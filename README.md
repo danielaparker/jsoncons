@@ -1,4 +1,4 @@
 jsoncons
 ========
 
-Json reader/writer
+Json constructor
