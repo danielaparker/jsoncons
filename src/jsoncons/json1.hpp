@@ -7,6 +7,7 @@
 #include <exception>
 #include <cstdlib>
 #include <cstring>
+#include "jsoncons/json_exception.hpp"
 
 namespace jsoncons {
 

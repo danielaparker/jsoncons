@@ -1,5 +1,5 @@
-#ifndef JSONCONS_JSONVARIANT_HPP
-#define JSONCONS_JSONVARIANT_HPP
+#ifndef JSONCONS_JSON_VARIANT_HPP
+#define JSONCONS_JSON_VARIANT_HPP
 
 #include <string>
 #include <vector>
@@ -11,24 +11,6 @@
 #include "jsoncons/json1.hpp"
 
 namespace jsoncons {
-
-class json_exception : public std::exception
-{
-public:
-    json_exception(std::string s)
-        : message_(s)
-    {
-    }
-    const char* what() const 
-    {
-        return message_.c_str();
-    }
-private:
-    std::string message_;
-};
-
-#define JSONCONS_THROW_EXCEPTION(x) throw json_exception((x))
-#define JSONCONS_ASSERT(x) if (!x) throw json_exception(#x)
 
 class json_object;
 class json_array;
