@@ -156,7 +156,7 @@ const basic_json<Char> basic_json<Char>::null_prototype(new json_null<Char>());
 template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<char_type>& is)
 {
-    json_parser parser;
+    json_parser<Char> parser;
     json_variant<Char>* object = parser.parse(is);
     return basic_json<Char>(object);
 }
@@ -166,7 +166,7 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse(const std::basic_string<char_type>& s)
 {
     std::basic_istringstream<char_type> is(s);
-    json_parser parser;
+    json_parser<Char> parser;
     json_variant<Char>* object = parser.parse(is);
     return basic_json<Char>(object);
 }
