@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include "jsoncons/json1.hpp"
 
 namespace jsoncons {
 

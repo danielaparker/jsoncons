@@ -11,7 +11,10 @@
 
 namespace jsoncons {
 
+template <class Char>
 class json_variant;
+
+template <class Char>
 class json_object;
 
 template <class Char>
@@ -26,7 +29,7 @@ public:
 
     struct object_proxy
     {
-    	object_proxy(json_object* var, const std::basic_string<char_type>& name);
+    	object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name);
 
         operator const basic_json() const;
 
@@ -46,7 +49,7 @@ public:
 
         object_proxy operator[](const std::basic_string<char_type>& name);
 
-        json_object* var_;
+        json_object<Char>* var_;
         const std::basic_string<char_type>& name_;
     };
 
@@ -58,7 +61,7 @@ public:
 
     basic_json(const basic_json& val);
 
-    basic_json(json_variant* var);
+    basic_json(json_variant<Char>* var);
 
     ~basic_json();
 
@@ -72,7 +75,7 @@ public:
 
     std::basic_string<char_type> to_string() const;
 
-    json_variant* var_;
+    json_variant<Char>* var_;
 };
 
 

@@ -35,7 +35,7 @@ static void append_codepoint_to_string(unsigned int cp, std::string& s)
     }
 }
 
-json_object* json_parser::parse(std::istream& is)
+json_object<char>* json_parser::parse(std::istream& is)
 {
     line_number_ = 0;
 
@@ -67,7 +67,7 @@ json_object* json_parser::parse(std::istream& is)
             break;
         case '{':
             {
-                json_object *value = parse_object(is);
+                json_object<char> *value = parse_object(is);
                 return value;
             }
         }
@@ -77,9 +77,9 @@ json_object* json_parser::parse(std::istream& is)
     return 0; // noop
 }
 
-json_object* json_parser::parse_object(std::istream& is)
+json_object<char>* json_parser::parse_object(std::istream& is)
 {
-    json_object *object = new json_object();
+    json_object<char> *object = new json_object<char>();
     bool comma = false;
 
     while (is)
@@ -114,7 +114,7 @@ json_object* json_parser::parse_object(std::istream& is)
                 JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_number_);
             }
             {
-                name_value_pair pair;
+                name_value_pair<char> pair;
                 parse_string(is);
                 //pair->name_ = std::move(buffer_);
                 pair.name_ = buffer_;
@@ -146,7 +146,7 @@ json_object* json_parser::parse_object(std::istream& is)
     return 0; // noop
 }
 
-json_variant* json_parser::parse_separator_value(std::istream& is)
+json_variant<char>* json_parser::parse_separator_value(std::istream& is)
 {
     while (is)
     {
@@ -184,7 +184,7 @@ json_variant* json_parser::parse_separator_value(std::istream& is)
     return 0; // noop
 }
 
-json_variant* json_parser::parse_value(std::istream& is)
+json_variant<char>* json_parser::parse_value(std::istream& is)
 {
     while (is)
     {
@@ -215,14 +215,13 @@ json_variant* json_parser::parse_value(std::istream& is)
         case '\"': // string value
             {
                 parse_string(is);
-                json_string *value = new json_string();
-                //value->var_ = std::move(buffer_);
+                json_string<char> *value = new json_string<char>();
                 value->value_ = buffer_;
                 return value;
             }
         case '{': // object value
             {
-                json_variant *value = parse_object(is);
+                json_variant<char> *value = parse_object(is);
                 return value;
             }
         case '[]': // array value
@@ -232,19 +231,19 @@ json_variant* json_parser::parse_value(std::istream& is)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            return new json_bool(true);
+            return new json_bool<char>(true);
         case 'f':
             if (!read_until_match_fails(is, "alse"))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            return new json_bool(false);
+            return new json_bool<char>(false);
         case 'n':
             if (!read_until_match_fails(is, "ull"))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            return new json_null();
+            return new json_null<char>();
         case '0':
         case '1':
         case '2':
@@ -276,9 +275,9 @@ bool json_parser::read_until_match_fails(std::istream& is, const char *s)
     return true;
 }
 
-json_variant* json_parser::parse_array(std::istream& is)
+json_variant<char>* json_parser::parse_array(std::istream& is)
 {
-    json_array *arrayValue = new json_array();
+    json_array<char> *arrayValue = new json_array<char>();
     bool comma = false;
     while (is)
     {
@@ -333,7 +332,7 @@ json_variant* json_parser::parse_array(std::istream& is)
     return 0;
 }
 
-json_variant* json_parser::parse_number(std::istream& is, char c)
+json_variant<char>* json_parser::parse_number(std::istream& is, char c)
 {
     buffer_.clear();
     buffer_.push_back(c);
@@ -378,7 +377,7 @@ json_variant* json_parser::parse_number(std::istream& is, char c)
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_number_);
                     }
-                    return new json_double(d);
+                    return new json_double<char>(d);
                 }
                 else if (has_neg)
                 {
@@ -387,7 +386,7 @@ json_variant* json_parser::parse_number(std::istream& is, char c)
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Invalid long value", line_number_);
                     }
-                    return new json_long (d);
+                    return new json_long<char> (d);
                 }
                 else
                 {
@@ -396,7 +395,7 @@ json_variant* json_parser::parse_number(std::istream& is, char c)
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Invalid unsigned long value", line_number_);
                     }
-                    return new json_ulong(d);
+                    return new json_ulong<char>(d);
                 }
             }
         }

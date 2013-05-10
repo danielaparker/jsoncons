@@ -8,19 +8,26 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
 #include "jsoncons/json1.hpp"
 
 namespace jsoncons {
 
+template <class Char>
 class json_object;
+
+template <class Char>
 class json_array;
 
-// json_variant
-
+template <class Char>
 class json_variant
 {
 public:
     enum value_type {object_t,string_t,double_t,long_t,ulong_t,pair_t,array_t,bool_t,null_t};
+
+    typedef Char char_type;
 
     json_variant(value_type type)
         : type_(type)
@@ -68,8 +75,8 @@ public:
 
     static std::string escape_string(const std::string& s);
 
-    json_object* object_cast();
-    json_array* array_cast();
+    json_object<Char>* object_cast();
+    json_array<Char>* array_cast();
     double double_value() const;
     long long_value() const;
     unsigned long ulong_value() const;
@@ -80,6 +87,7 @@ private:
 
 };
 
+template <class Char>
 class name_value_pair 
 {
 public:
@@ -87,36 +95,39 @@ public:
         : value_(0)
     {
     }
-    name_value_pair(std::string name, json_variant* value)
+    name_value_pair(std::string name, json_variant<Char>* value)
         : name_(name), value_(value)
     {
     }
     std::string name_;
-    json_variant* value_;
+    json_variant<Char>* value_;
 };
 
+template <class Char>
 class member_compare
 {
 public:
-    bool operator()(const name_value_pair& a, const name_value_pair& b) const
+    bool operator()(const name_value_pair<Char>& a, 
+                    const name_value_pair<Char>& b) const
     {
         return a.name_ < b.name_;
     }
 };
 
-class json_string : public json_variant
+template <class Char>
+class json_string : public json_variant<Char>
 {
 public:
     json_string()
-        : json_variant(json_variant::string_t)
+        : json_variant<Char>(json_variant<Char>::string_t)
     {
     }
     json_string(std::string s)
-        : json_variant(json_variant::string_t), value_(s)
+        : json_variant<Char>(json_variant<Char>::string_t), value_(s)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_string(value_);
     }
@@ -129,15 +140,16 @@ public:
     std::string value_;
 };
 
-class json_null : public json_variant
+template <class Char>
+class json_null : public json_variant<Char>
 {
 public:
     json_null()
-        : json_variant(json_variant::null_t)
+        : json_variant<Char>(json_variant<Char>::null_t)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_null();
     }
@@ -148,15 +160,16 @@ public:
     }
 };
 
-class json_double : public json_variant
+template <class Char>
+class json_double : public json_variant<Char>
 {
 public:
     json_double(double value)
-        : json_variant(json_variant::double_t), value_(value)
+        : json_variant<Char>(json_variant<Char>::double_t), value_(value)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_double(value_);
     }
@@ -169,15 +182,16 @@ public:
     double value_;
 };
 
-class json_long  : public json_variant
+template <class Char>
+class json_long  : public json_variant<Char>
 {
 public:
-    json_long (long value)
-        : json_variant(json_variant::long_t), value_(value)
+    json_long(long value)
+        : json_variant<Char>(json_variant<Char>::long_t), value_(value)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_long (value_);
     }
@@ -190,15 +204,16 @@ public:
     long value_;
 };
 
-class json_ulong : public json_variant
+template <class Char>
+class json_ulong : public json_variant<Char>
 {
 public:
     json_ulong(unsigned long value)
-        : json_variant(json_variant::ulong_t), value_(value)
+        : json_variant<Char>(json_variant<Char>::ulong_t), value_(value)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_ulong(value_);
     }
@@ -211,24 +226,25 @@ public:
     unsigned long value_;
 };
 
-class json_array : public json_variant
+template <class Char>
+class json_array : public json_variant<Char>
 {
 public:
-    typedef std::vector<json_variant*>::iterator iterator;
-    typedef std::vector<json_variant*>::const_iterator const_iterator;
+    typedef typename std::vector<json_variant<Char>*>::iterator iterator;
+    typedef typename std::vector<json_variant<Char>*>::const_iterator const_iterator;
 
     json_array()
-        : json_variant(json_variant::array_t)
+        : json_variant<Char>(json_variant<Char>::array_t)
     {
     }
-    json_array(std::vector<json_variant*> elements)
-        : json_variant(json_variant::array_t), elements_(elements)
+    json_array(std::vector<json_variant<Char>*> elements)
+        : json_variant<Char>(json_variant<Char>::array_t), elements_(elements)
     {
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
-        std::vector<json_variant*> elements(elements_.size());
+        std::vector<json_variant<Char>*> elements(elements_.size());
         for (size_t i = 0; i < elements_.size(); ++i)
         {
             elements[i] = elements_[i]->clone();
@@ -246,11 +262,11 @@ public:
 
     size_t size() const {return elements_.size();}
 
-    json_variant* at(size_t i) {return elements_[i];}
+    json_variant<Char>* at(size_t i) {return elements_[i];}
 
-    const json_variant* at(size_t i) const {return elements_[i];}
+    const json_variant<Char>* at(size_t i) const {return elements_[i];}
 
-    void push_back(json_variant* value);
+    void push_back(json_variant<Char>* value);
 
     virtual void to_stream(std::ostream& os) const
     {
@@ -266,18 +282,19 @@ public:
 		os << "]";
     }
 
-    std::vector<json_variant*> elements_;
+    std::vector<json_variant<Char>*> elements_;
 };
 
-class json_bool : public json_variant
+template <class Char>
+class json_bool : public json_variant<Char>
 {
 public:
 	json_bool(bool value)
-		: json_variant(json_variant::bool_t), value_(value)
+		: json_variant<Char>(json_variant<Char>::bool_t), value_(value)
 	{
 	}
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
         return new json_bool(value_);
     }
@@ -297,19 +314,20 @@ public:
     bool value_;
 };
 
-class json_object : public json_variant
+template <class Char>
+class json_object : public json_variant<Char>
 {
 public:
-    typedef std::vector<name_value_pair>::iterator iterator;
-    typedef std::vector<name_value_pair>::const_iterator const_iterator;
+    typedef typename std::vector<name_value_pair<Char>>::iterator iterator;
+    typedef typename std::vector<name_value_pair<Char>>::const_iterator const_iterator;
 
     json_object()
-        : json_variant(json_variant::object_t)
+        : json_variant<Char>(json_variant<Char>::object_t)
     {
     }
 
-    json_object(std::vector<name_value_pair> members)
-        : json_variant(json_variant::object_t), members_(members)
+    json_object(std::vector<name_value_pair<Char>> members)
+        : json_variant<Char>(json_variant<Char>::object_t), members_(members)
     {
     }
 
@@ -321,36 +339,36 @@ public:
         }
     }
 
-    virtual json_variant* clone() 
+    virtual json_variant<Char>* clone() 
     {
-        std::vector<name_value_pair> members(members_.size());
+        std::vector<name_value_pair<Char>> members(members_.size());
         for (size_t i = 0; i < members_.size(); ++i)
         {
             
-            members[i] = name_value_pair(members_[i].name_,members_[i].value_->clone());
+            members[i] = name_value_pair<Char>(members_[i].name_,members_[i].value_->clone());
         }
         return new json_object(members);
     }
 
     size_t size() const {return members_.size();}
 
-    json_variant* at(size_t i) {return members_[i].value_;}
+    json_variant<Char>* at(size_t i) {return members_[i].value_;}
 
-    const json_variant* at(size_t i) const {return members_[i].value_;}
+    const json_variant<Char>* at(size_t i) const {return members_[i].value_;}
 
-    void set_member(const std::string& name, json_variant* value);
+    void set_member(const std::string& name, json_variant<Char>* value);
 
     void remove(iterator at); 
 
-    json_variant* get(const std::string& name);
+    json_variant<Char>* get(const std::string& name);
 
     iterator find(const std::string& name);
 
     const_iterator find(const std::string& name) const;
 
-    void insert(const_iterator it, name_value_pair member);
+    void insert(const_iterator it, name_value_pair<Char> member);
 
-    void push_back(name_value_pair member)
+    void push_back(name_value_pair<Char> member)
     {
         members_.push_back(member);
     }
@@ -380,29 +398,164 @@ public:
 		os << "}";
     }
 
-    std::vector<name_value_pair> members_;
+    std::vector<name_value_pair<Char>> members_;
 };
 
-inline
-double json_variant::double_value() const {assert(type_ == double_t); return static_cast<const json_double*>(this)->value_;}
+template <class Char>
+double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
 
-inline
-long json_variant::long_value() const {assert(type_ == long_t); return static_cast<const json_long *>(this)->value_;}
+template <class Char>
+long json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_long<Char> *>(this)->value_;}
 
-inline
-unsigned long json_variant::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong*>(this)->value_;}
+template <class Char>
+unsigned long json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong<Char>*>(this)->value_;}
 
-inline
-std::string json_variant::string_value() const {assert(type_ == string_t); return static_cast<const json_string*>(this)->value_;}
+template <class Char>
+std::string json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
 
-inline
-bool json_variant::bool_value() const {assert(type_ == bool_t); return static_cast<const json_bool*>(this)->value_;}
+template <class Char>
+bool json_variant<Char>::bool_value() const {assert(type_ == bool_t); return static_cast<const json_bool<Char>*>(this)->value_;}
 
-inline
-json_object* json_variant::object_cast() {assert(type_ == object_t); return static_cast<json_object*>(this);}
+template <class Char>
+json_object<Char>* json_variant<Char>::object_cast() {assert(type_ == object_t); return static_cast<json_object<Char>*>(this);}
 
-inline
-json_array* json_variant::array_cast() {assert(type_ == array_t); return static_cast<json_array*>(this);}
+template <class Char>
+json_array<Char>* json_variant<Char>::array_cast() {assert(type_ == array_t); return static_cast<json_array<Char>*>(this);}
+
+template <class Char>
+std::string json_variant<Char>::to_string() const
+{
+    std::ostringstream os;
+    os.precision(16);
+    to_stream(os);
+    return os.str();
+}
+
+template <class Char>
+std::string json_variant<Char>::escape_string(const std::string& s)
+{
+    size_t pos = s.find_first_of("\\\"\b\f\n\r\t");
+    if (pos ==  string::npos)
+    {
+        return s;
+    }
+    else
+    {
+        const size_t len = s.length();
+        std::string buf(s,0,pos);
+        for (size_t i = pos; i < len; ++i)
+        {
+            char c = s[i];
+            switch (c)
+            {
+            case '\\':
+                buf.push_back('\\');
+                break;
+            case '"':
+                buf.append("\\\"");
+                break;
+            case '\b':
+                buf.append("\\b");
+                break;
+            case '\f':
+                buf.append("\\f");
+                break;
+            case '\n':
+                buf.append("\\n");
+                break;
+            case '\r':
+                buf.append("\\r");
+                break;
+            case '\t':
+                buf.append("\\t");
+                break;
+            default:
+                buf.push_back(c);
+                break;
+            }
+        }
+        return buf;
+    }
+}
+
+template <class Char>
+double json_variant<Char>::as_double() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return double_value();
+    case long_t:
+        return static_cast<double>(long_value());
+    case ulong_t:
+        return static_cast<double>(ulong_value());
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a double");
+    }
+}
+
+template <class Char>
+void json_array<Char>::push_back(json_variant<Char>* value)
+{
+    elements_.push_back(value);
+}
+
+template <class Char>
+void json_object<Char>::sort_members()
+{
+    std::sort(members_.begin(),members_.end(),member_compare<Char>());
+}
+
+template <class Char>
+void json_object<Char>::insert(const_iterator it, name_value_pair<Char> member)
+{
+    members_.insert(it,member);
+}
+
+template <class Char>
+void json_object<Char>::remove(iterator at)
+{
+    delete (*at).value_;
+    members_.erase(at);
+}
+
+template <class Char>
+void json_object<Char>::set_member(const std::string& name, json_variant<Char>* value)
+{
+    name_value_pair<Char> key(name,0);
+    iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
+    if (it != end() && (*it).name_ == name)
+    {
+        remove(it);
+    }
+    insert(it,name_value_pair<Char>(name,value));
+}
+
+template <class Char>
+json_variant<Char>* json_object<Char>::get(const std::string& name)
+{
+    iterator it = find(name);
+    JSONCONS_ASSERT((it != end()));
+    return (*it).value_;
+}
+
+template <class Char>
+typename json_object<Char>::iterator json_object<Char>::find(const std::string& name)
+{
+    name_value_pair<Char> key(name,0);
+    member_compare<Char> comp;
+    iterator it = std::lower_bound(begin(),end(),key,comp);
+    return (it != end() && !comp(key,*it)) ? it : end();
+}
+
+template <class Char>
+typename json_object<Char>::const_iterator json_object<Char>::find(const std::string& name) const
+{
+    name_value_pair<Char> key(name,0);
+    member_compare comp;
+    const_iterator it = std::lower_bound(begin(),end(),key,comp);
+    return (it != end() && !comp(key,*it)) ? it : end();
+}
 
 }
 

@@ -13,7 +13,7 @@
 namespace jsoncons {
 
 template <class Char>
-basic_json<Char>::object_proxy::object_proxy(json_object* var, const std::basic_string<char_type>& name)
+basic_json<Char>::object_proxy::object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name)
     : var_(var), name_(name)
 {
 }
@@ -21,7 +21,7 @@ basic_json<Char>::object_proxy::object_proxy(json_object* var, const std::basic_
 template <class Char>
 basic_json<Char>::object_proxy::operator const basic_json<Char>() const
 {
-    json_variant* v = var_->get(name_);
+    json_variant<Char>* v = var_->get(name_);
     JSONCONS_ASSERT(v != 0);
     return basic_json(var_->clone());
 }
@@ -29,7 +29,7 @@ basic_json<Char>::object_proxy::operator const basic_json<Char>() const
 template <class Char>
 basic_json<Char>::object_proxy::operator const double() const
 {
-    json_variant* v = var_->get(name_);
+    json_variant<Char>* v = var_->get(name_);
     JSONCONS_ASSERT(v != 0);
     return v->as_double();
 }
@@ -37,7 +37,7 @@ basic_json<Char>::object_proxy::operator const double() const
 template <class Char>
 typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator=(const char_type* val)
 {
-    var_->set_member(name_, new json_string(val));
+    var_->set_member(name_, new json_string<Char>(val));
     return *this;
 }
 
@@ -51,21 +51,21 @@ typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operato
 template <class Char>
 typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator=(double val)
 {
-    var_->set_member(name_, new json_double(val));
+    var_->set_member(name_, new json_double<Char>(val));
     return *this;
 }
 
 template <class Char>
 typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator=(int val)
 {
-    var_->set_member(name_, new json_long(val));
+    var_->set_member(name_, new json_long<Char>(val));
     return *this;
 }
 
 template <class Char>
 typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator=(bool val)
 {
-    var_->set_member(name_, new json_bool(val));
+    var_->set_member(name_, new json_bool<Char>(val));
     return *this;
 }
 
@@ -79,7 +79,7 @@ typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operato
 template <class Char>
 typename basic_json<Char>::object_proxy basic_json<Char>::object_proxy::operator[](const std::basic_string<char_type>& name)
 {
-    json_variant* v = var_->get(name_);
+    json_variant<Char>* v = var_->get(name_);
     JSONCONS_ASSERT(v != 0);
     return object_proxy(v->object_cast(),name);
 }
@@ -87,7 +87,7 @@ typename basic_json<Char>::object_proxy basic_json<Char>::object_proxy::operator
 
 template <class Char>
 basic_json<Char>::basic_json()
-    : var_(new json_object())
+    : var_(new json_object<Char>())
 {
 }
 
@@ -98,7 +98,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(json_variant* var)
+basic_json<Char>::basic_json(json_variant<Char>* var)
     : var_(var)
 {
 }
@@ -145,19 +145,19 @@ std::basic_string<Char> basic_json<Char>::to_string() const
 }
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::object_prototype(new json_object());
+const basic_json<Char> basic_json<Char>::object_prototype(new json_object<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::array_prototype(new json_array());
+const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null_prototype(new json_null());
+const basic_json<Char> basic_json<Char>::null_prototype(new json_null<Char>());
 
 template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<char_type>& is)
 {
     json_parser parser;
-    json_variant* object = parser.parse(is);
+    json_variant<Char>* object = parser.parse(is);
     return basic_json<Char>(object);
 }
 
@@ -167,7 +167,7 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<char_type>& s)
 {
     std::basic_istringstream<char_type> is(s);
     json_parser parser;
-    json_variant* object = parser.parse(is);
+    json_variant<Char>* object = parser.parse(is);
     return basic_json<Char>(object);
 }
 

@@ -28,18 +28,21 @@ private:
 
 #define JSONCONS_THROW_PARSER_EXCEPTION(x,n) throw json_parser_exception(x,n)
 
+template <class Char>
 class json_variant;
+
+template <class Char>
 class json_object;
 
 class json_parser
 {
 public:
-    json_object* parse(std::istream& is);
-    json_object* parse_object(std::istream& is);
-    json_variant* parse_separator_value(std::istream& is);
-    json_variant* parse_value(std::istream& is);
-    json_variant* parse_number(std::istream& is, char c);
-    json_variant* parse_array(std::istream& is);
+    json_object<char>* parse(std::istream& is);
+    json_object<char>* parse_object(std::istream& is);
+    json_variant<char>* parse_separator_value(std::istream& is);
+    json_variant<char>* parse_value(std::istream& is);
+    json_variant<char>* parse_number(std::istream& is, char c);
+    json_variant<char>* parse_array(std::istream& is);
     void parse_string(std::istream& is);
     void ignore_till_end_of_line(std::istream& is);
     bool read_until_match_fails(std::istream& is, const char *s);
