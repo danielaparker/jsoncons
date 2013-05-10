@@ -1,7 +1,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
+#include "jsoncons/json.hpp"
 #include "jsoncons/json_parser.hpp"
-#include "jsoncons/json_value.hpp"
 #include <sstream>
 
 using jsoncons::json;

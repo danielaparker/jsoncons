@@ -155,7 +155,6 @@ const basic_json<Char> basic_json<Char>::array_prototype(new json_array());
 template <class Char>
 const basic_json<Char> basic_json<Char>::null_prototype(new json_null());
 
-
 template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<char_type>& is)
 {

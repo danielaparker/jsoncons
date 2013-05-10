@@ -81,29 +81,6 @@ double json_variant::as_double() const
     }
 }
 
-/*json_value& json_value::operator[](std::string name)
-{
-    iterator it = find(name);
-    if (it == end())
-    {
-        set(name,json_value(new json_null()));
-    }
-    json_value value = get;
-    return value;
-}*/
-
-/*json_value& json_value::get(const std::string& name, json_value default_value)
-{
-    iterator it = find(name);
-    return it != end() ? *it : default_value;
-}*/
-
-/*const json_value& json_value::get(const std::string& name, json_value default_value) const
-{
-    const_iterator it = find(name);
-    return it != end() ? *it : default_value;
-}*/
-
 void json_array::push_back(json_variant* value)
 {
     elements_.push_back(value);

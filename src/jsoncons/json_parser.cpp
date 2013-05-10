@@ -11,8 +11,6 @@ namespace jsoncons {
 
 static void append_codepoint_to_string(unsigned int cp, std::string& s)
 {
-    // based on description from http://en.wikipedia.org/wiki/UTF-8
-
     if (cp <= 0x7f)
     {
         s.push_back(static_cast<char>(cp));

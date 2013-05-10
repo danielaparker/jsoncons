@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include "jsoncons/json1.hpp"
 
 namespace jsoncons {
 
@@ -29,34 +30,10 @@ private:
 #define JSONCONS_THROW_EXCEPTION(x) throw json_exception((x))
 #define JSONCONS_ASSERT(x) if (!x) throw json_exception(#x)
 
-class json_variant;
 class json_object;
 class json_array;
-class name_value_pair;
 
-class name_value_pair 
-{
-public:
-    name_value_pair()
-        : value_(0)
-    {
-    }
-    name_value_pair(std::string name, json_variant* value)
-        : name_(name), value_(value)
-    {
-    }
-    std::string name_;
-    json_variant* value_;
-};
-
-class member_compare
-{
-public:
-    bool operator()(const name_value_pair& a, const name_value_pair& b) const
-    {
-        return a.name_ < b.name_;
-    }
-};
+// json_variant
 
 class json_variant
 {
@@ -121,6 +98,29 @@ private:
 
 };
 
+class name_value_pair 
+{
+public:
+    name_value_pair()
+        : value_(0)
+    {
+    }
+    name_value_pair(std::string name, json_variant* value)
+        : name_(name), value_(value)
+    {
+    }
+    std::string name_;
+    json_variant* value_;
+};
+
+class member_compare
+{
+public:
+    bool operator()(const name_value_pair& a, const name_value_pair& b) const
+    {
+        return a.name_ < b.name_;
+    }
+};
 
 class json_string : public json_variant
 {
@@ -355,10 +355,6 @@ public:
     json_variant* at(size_t i) {return members_[i].value_;}
 
     const json_variant* at(size_t i) const {return members_[i].value_;}
-
-    //json_value& get(const std::string& name, json_value default_value);
-
-    //const json_value& get(const std::string& name, json_value default_value) const;
 
     void set_member(const std::string& name, json_variant* value);
 
