@@ -67,20 +67,20 @@ public:
 
     double as_double() const;
 
-    std::string to_string() const;
+    std::basic_string<Char> to_string() const;
 
     virtual void to_stream(std::ostream& os) const
     {
     }
 
-    static std::string escape_string(const std::string& s);
+    static std::basic_string<Char> escape_string(const std::basic_string<Char>& s);
 
     json_object<Char>* object_cast();
     json_array<Char>* array_cast();
     double double_value() const;
     long long_value() const;
     unsigned long ulong_value() const;
-    std::string string_value() const;
+    std::basic_string<Char> string_value() const;
     bool bool_value() const;
 private:
     value_type type_; 
@@ -95,11 +95,11 @@ public:
         : value_(0)
     {
     }
-    name_value_pair(std::string name, json_variant<Char>* value)
+    name_value_pair(std::basic_string<Char> name, json_variant<Char>* value)
         : name_(name), value_(value)
     {
     }
-    std::string name_;
+    std::basic_string<Char> name_;
     json_variant<Char>* value_;
 };
 
@@ -122,7 +122,7 @@ public:
         : json_variant<Char>(json_variant<Char>::string_t)
     {
     }
-    json_string(std::string s)
+    json_string(std::basic_string<Char> s)
         : json_variant<Char>(json_variant<Char>::string_t), value_(s)
     {
     }
@@ -137,7 +137,7 @@ public:
         os << "\"" << value_ << "\"";
     }
 
-    std::string value_;
+    std::basic_string<Char> value_;
 };
 
 template <class Char>
@@ -356,15 +356,15 @@ public:
 
     const json_variant<Char>* at(size_t i) const {return members_[i].value_;}
 
-    void set_member(const std::string& name, json_variant<Char>* value);
+    void set_member(const std::basic_string<Char>& name, json_variant<Char>* value);
 
     void remove(iterator at); 
 
-    json_variant<Char>* get(const std::string& name);
+    json_variant<Char>* get(const std::basic_string<Char>& name);
 
-    iterator find(const std::string& name);
+    iterator find(const std::basic_string<Char>& name);
 
-    const_iterator find(const std::string& name) const;
+    const_iterator find(const std::basic_string<Char>& name) const;
 
     void insert(const_iterator it, name_value_pair<Char> member);
 
@@ -411,7 +411,7 @@ template <class Char>
 unsigned long json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong<Char>*>(this)->value_;}
 
 template <class Char>
-std::string json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
+std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
 
 template <class Char>
 bool json_variant<Char>::bool_value() const {assert(type_ == bool_t); return static_cast<const json_bool<Char>*>(this)->value_;}
@@ -423,7 +423,7 @@ template <class Char>
 json_array<Char>* json_variant<Char>::array_cast() {assert(type_ == array_t); return static_cast<json_array<Char>*>(this);}
 
 template <class Char>
-std::string json_variant<Char>::to_string() const
+std::basic_string<Char> json_variant<Char>::to_string() const
 {
     std::ostringstream os;
     os.precision(16);
@@ -432,7 +432,7 @@ std::string json_variant<Char>::to_string() const
 }
 
 template <class Char>
-std::string json_variant<Char>::escape_string(const std::string& s)
+std::basic_string<Char> json_variant<Char>::escape_string(const std::basic_string<Char>& s)
 {
     size_t pos = s.find_first_of("\\\"\b\f\n\r\t");
     if (pos ==  string::npos)
@@ -442,7 +442,7 @@ std::string json_variant<Char>::escape_string(const std::string& s)
     else
     {
         const size_t len = s.length();
-        std::string buf(s,0,pos);
+        std::basic_string<Char> buf(s,0,pos);
         for (size_t i = pos; i < len; ++i)
         {
             char c = s[i];
@@ -520,7 +520,7 @@ void json_object<Char>::remove(iterator at)
 }
 
 template <class Char>
-void json_object<Char>::set_member(const std::string& name, json_variant<Char>* value)
+void json_object<Char>::set_member(const std::basic_string<Char>& name, json_variant<Char>* value)
 {
     name_value_pair<Char> key(name,0);
     iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
@@ -532,7 +532,7 @@ void json_object<Char>::set_member(const std::string& name, json_variant<Char>* 
 }
 
 template <class Char>
-json_variant<Char>* json_object<Char>::get(const std::string& name)
+json_variant<Char>* json_object<Char>::get(const std::basic_string<Char>& name)
 {
     iterator it = find(name);
     JSONCONS_ASSERT((it != end()));
@@ -540,7 +540,7 @@ json_variant<Char>* json_object<Char>::get(const std::string& name)
 }
 
 template <class Char>
-typename json_object<Char>::iterator json_object<Char>::find(const std::string& name)
+typename json_object<Char>::iterator json_object<Char>::find(const std::basic_string<Char>& name)
 {
     name_value_pair<Char> key(name,0);
     member_compare<Char> comp;
@@ -549,7 +549,7 @@ typename json_object<Char>::iterator json_object<Char>::find(const std::string& 
 }
 
 template <class Char>
-typename json_object<Char>::const_iterator json_object<Char>::find(const std::string& name) const
+typename json_object<Char>::const_iterator json_object<Char>::find(const std::basic_string<Char>& name) const
 {
     name_value_pair<Char> key(name,0);
     member_compare comp;

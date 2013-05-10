@@ -9,6 +9,32 @@
 
 namespace jsoncons {
 
+template <class Char>
+struct json_char_traits
+{
+};
+
+template <>
+struct json_char_traits<char>
+{
+    // Structural characters
+    static const char begin_array = '[';
+    static const char begin_object = '{';
+    static const char end_array = ']';
+    static const char end_object = '}';
+    static const char name_separator = ':';
+    static const char value_separator = ',';
+
+    // Whitespace
+    static const char nl = '\n';
+    static const char tab = '\t';
+    static const char vtab = '\v';
+    static const char ff = '\f';
+    static const char cr = '\r';
+    static const char space = ' ';
+    static const char fslash = '/';
+};
+
 void append_codepoint_to_string(unsigned int cp, std::string& s);
 
 class json_parser_exception : public std::exception
@@ -42,24 +68,24 @@ class json_parser
 public:
     typedef Char char_type;
 
-    json_object<Char>* parse(std::istream& is);
-    json_object<Char>* parse_object(std::istream& is);
-    json_variant<Char>* parse_separator_value(std::istream& is);
-    json_variant<Char>* parse_value(std::istream& is);
-    json_variant<Char>* parse_number(std::istream& is, char c);
-    json_variant<Char>* parse_array(std::istream& is);
-    void parse_string(std::istream& is);
-    void ignore_till_end_of_line(std::istream& is);
-    bool read_until_match_fails(std::istream& is, const char *s);
-    unsigned int decode_unicode_codepoint(std::istream& is);
-    unsigned int decode_unicode_escape_sequence(std::istream& is);
+    json_object<Char>* parse(std::basic_istream<Char>& is);
+    json_object<Char>* parse_object(std::basic_istream<Char>& is);
+    json_variant<Char>* parse_separator_value(std::basic_istream<Char>& is);
+    json_variant<Char>* parse_value(std::basic_istream<Char>& is);
+    json_variant<Char>* parse_number(std::basic_istream<Char>& is, char c);
+    json_variant<Char>* parse_array(std::basic_istream<Char>& is);
+    void parse_string(std::basic_istream<Char>& is);
+    void ignore_till_end_of_line(std::basic_istream<Char>& is);
+    bool read_until_match_fails(std::basic_istream<Char>& is, const char *s);
+    unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
+    unsigned int decode_unicode_escape_sequence(std::basic_istream<Char>& is);
 private:
     unsigned long line_number_;
-    std::string buffer_;
+    std::basic_string<Char> buffer_;
 };
 
 template <class Char>
-json_object<Char>* json_parser<Char>::parse(std::istream& is)
+json_object<Char>* json_parser<Char>::parse(std::basic_istream<Char>& is)
 {
     line_number_ = 0;
 
@@ -68,28 +94,28 @@ json_object<Char>* json_parser<Char>::parse(std::istream& is)
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '\n':
+        case json_char_traits<Char>::nl:
             ++line_number_;
             break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
+        case json_char_traits<Char>::tab:
+        case json_char_traits<Char>::vtab:
+        case json_char_traits<Char>::ff:
+        case json_char_traits<Char>::cr:
+        case json_char_traits<Char>::space:
             break;
-        case '/':
+        case json_char_traits<Char>::fslash:
             {
                 if (is)
                 {
                     char next = static_cast<Char>(is.peek());
-                    if (next == '/')
+                    if (next == json_char_traits<Char>::fslash)
                     {
                         ignore_till_end_of_line(is);
                     }
                 }
             }
             break;
-        case '{':
+        case json_char_traits<Char>::begin_object:
             {
                 json_object<Char> *value = parse_object(is);
                 return value;
@@ -102,7 +128,7 @@ json_object<Char>* json_parser<Char>::parse(std::istream& is)
 }
 
 template <class Char>
-json_object<Char>* json_parser<Char>::parse_object(std::istream& is)
+json_object<Char>* json_parser<Char>::parse_object(std::basic_istream<Char>& is)
 {
     json_object<Char> *object = new json_object<Char>();
     bool comma = false;
@@ -112,16 +138,16 @@ json_object<Char>* json_parser<Char>::parse_object(std::istream& is)
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '\n':
+        case json_char_traits<Char>::nl:
             ++line_number_;
             break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
+        case json_char_traits<Char>::tab:
+        case json_char_traits<Char>::vtab:
+        case json_char_traits<Char>::ff:
+        case json_char_traits<Char>::cr:
+        case json_char_traits<Char>::space:
             break;
-        case '/':
+        case json_char_traits<Char>::fslash:
             {
                 if (is)
                 {
@@ -147,7 +173,7 @@ json_object<Char>* json_parser<Char>::parse_object(std::istream& is)
                 object->push_back(pair);
             }
             break;
-        case ',':
+        case json_char_traits<Char>::value_separator:
             if (object->size() == 0)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_number_);
@@ -155,7 +181,7 @@ json_object<Char>* json_parser<Char>::parse_object(std::istream& is)
             comma = true;
             break;
 
-        case '}':
+        case json_char_traits<Char>::end_object:
             {
                 if (comma)
                 {
@@ -172,23 +198,23 @@ json_object<Char>* json_parser<Char>::parse_object(std::istream& is)
 }
 
 template <class Char>
-json_variant<Char>* json_parser<Char>::parse_separator_value(std::istream& is)
+json_variant<Char>* json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is)
 {
     while (is)
     {
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '\n':
+        case json_char_traits<Char>::nl:
             ++line_number_;
             break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
+        case json_char_traits<Char>::tab:
+        case json_char_traits<Char>::vtab:
+        case json_char_traits<Char>::ff:
+        case json_char_traits<Char>::cr:
+        case json_char_traits<Char>::space:
             break;
-        case '/':
+        case json_char_traits<Char>::fslash:
             {
                 if (is)
                 {
@@ -200,7 +226,7 @@ json_variant<Char>* json_parser<Char>::parse_separator_value(std::istream& is)
                 }
             }
             break;
-        case ':':
+        case json_char_traits<Char>::name_separator:
             return parse_value(is);
             break;
         }
@@ -211,23 +237,23 @@ json_variant<Char>* json_parser<Char>::parse_separator_value(std::istream& is)
 }
 
 template <class Char>
-json_variant<Char>* json_parser<Char>::parse_value(std::istream& is)
+json_variant<Char>* json_parser<Char>::parse_value(std::basic_istream<Char>& is)
 {
     while (is)
     {
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '\n':
+        case json_char_traits<Char>::nl:
             ++line_number_;
             break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
+        case json_char_traits<Char>::tab:
+        case json_char_traits<Char>::vtab:
+        case json_char_traits<Char>::ff:
+        case json_char_traits<Char>::cr:
+        case json_char_traits<Char>::space:
             break;
-        case '/':
+        case json_char_traits<Char>::fslash:
             {
                 if (is)
                 {
@@ -246,12 +272,12 @@ json_variant<Char>* json_parser<Char>::parse_value(std::istream& is)
                 value->value_ = buffer_;
                 return value;
             }
-        case '{': // object value
+        case json_char_traits<Char>::begin_object: // object value
             {
                 json_variant<Char> *value = parse_object(is);
                 return value;
             }
-        case '[]': // array value
+        case json_char_traits<Char>::begin_array: // array value
             return parse_array(is);
         case 't':
             if (!read_until_match_fails(is, "rue"))
@@ -290,7 +316,7 @@ json_variant<Char>* json_parser<Char>::parse_value(std::istream& is)
 }
 
 template <class Char>
-bool json_parser<Char>::read_until_match_fails(std::istream& is, const char *s)
+bool json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, const char *s)
 {
     for (const char* p = s; is && *p; ++p)
     {
@@ -304,7 +330,7 @@ bool json_parser<Char>::read_until_match_fails(std::istream& is, const char *s)
 }
 
 template <class Char>
-json_variant<Char>* json_parser<Char>::parse_array(std::istream& is)
+json_variant<Char>* json_parser<Char>::parse_array(std::basic_istream<Char>& is)
 {
     json_array<Char> *arrayValue = new json_array<Char>();
     bool comma = false;
@@ -313,16 +339,16 @@ json_variant<Char>* json_parser<Char>::parse_array(std::istream& is)
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '\n':
+        case json_char_traits<Char>::nl:
             ++line_number_;
             break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
+        case json_char_traits<Char>::tab:
+        case json_char_traits<Char>::vtab:
+        case json_char_traits<Char>::ff:
+        case json_char_traits<Char>::cr:
+        case json_char_traits<Char>::space:
             break;
-        case '/':
+        case json_char_traits<Char>::fslash:
             {
                 if (is)
                 {
@@ -334,7 +360,7 @@ json_variant<Char>* json_parser<Char>::parse_array(std::istream& is)
                 }
             }
             break;
-        case ',':
+        case json_char_traits<Char>::value_separator:
             if (arrayValue->size() == 0)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_number_);
@@ -362,7 +388,7 @@ json_variant<Char>* json_parser<Char>::parse_array(std::istream& is)
 }
 
 template <class Char>
-json_variant<Char>* json_parser<Char>::parse_number(std::istream& is, char c)
+json_variant<Char>* json_parser<Char>::parse_number(std::basic_istream<Char>& is, char c)
 {
     buffer_.clear();
     buffer_.push_back(c);
@@ -436,7 +462,7 @@ json_variant<Char>* json_parser<Char>::parse_number(std::istream& is, char c)
 }
 
 template <class Char>
-void json_parser<Char>::parse_string(std::istream& is)
+void json_parser<Char>::parse_string(std::basic_istream<Char>& is)
 {
     buffer_.clear();
 
@@ -445,14 +471,14 @@ void json_parser<Char>::parse_string(std::istream& is)
         char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case'\a':
-        case'\b':
-        case'\f':
-        case'\n':
-        case'\r':
-        case'\t':
-        case'\v':
-        case'\0':
+        case '\a':
+        case '\b':
+        case '\f':
+        case '\n':
+        case '\r':
+        case '\t':
+        case '\v':
+        case '\0':
             JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_number_);
             break;
         case '\\':
@@ -516,7 +542,7 @@ void json_parser<Char>::parse_string(std::istream& is)
 }
 
 template <class Char>
-void json_parser<Char>::ignore_till_end_of_line(std::istream& is)
+void json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& is)
 {
     while (is)
     {
@@ -530,7 +556,7 @@ void json_parser<Char>::ignore_till_end_of_line(std::istream& is)
 }
 
 template <class Char>
-unsigned int json_parser<Char>::decode_unicode_codepoint(std::istream& is)
+unsigned int json_parser<Char>::decode_unicode_codepoint(std::basic_istream<Char>& is)
 {
 
     unsigned int cp = decode_unicode_escape_sequence(is);
@@ -551,7 +577,7 @@ unsigned int json_parser<Char>::decode_unicode_codepoint(std::istream& is)
 }
 
 template <class Char>
-unsigned int json_parser<Char>::decode_unicode_escape_sequence(std::istream& is)
+unsigned int json_parser<Char>::decode_unicode_escape_sequence(std::basic_istream<Char>& is)
 {
     unsigned int cp = 0;
     size_t index = 0;
