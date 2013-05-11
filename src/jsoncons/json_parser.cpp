@@ -8,7 +8,7 @@
 #include "jsoncons/json_variant.hpp"
 
 namespace jsoncons {
-
+ 
 void append_codepoint_to_string(unsigned int cp, std::string& s)
 {
     if (cp <= 0x7f)
