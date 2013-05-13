@@ -98,6 +98,13 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
 }
 
 template <class Char>
+basic_json<Char>::basic_json(basic_json&& other)
+    : var_(other.var_)
+{
+    other.var_ = 0;
+}
+
+template <class Char>
 basic_json<Char>::basic_json(json_variant<Char>* var)
     : var_(var)
 {
@@ -142,6 +149,12 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     return var_->to_string();
+}
+
+template <class Char>
+void basic_json<Char>::to_stream(std::ostream& os) const
+{
+    var_->to_stream(os);
 }
 
 template <class Char>

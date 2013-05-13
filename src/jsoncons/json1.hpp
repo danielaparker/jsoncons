@@ -63,6 +63,8 @@ public:
 
     basic_json(json_variant<Char>* var);
 
+    basic_json(basic_json&& other);
+
     ~basic_json();
 
     basic_json& operator=(const basic_json& rhs);
@@ -74,6 +76,8 @@ public:
     object_proxy operator[](const std::basic_string<char_type>& name);
 
     std::basic_string<char_type> to_string() const;
+
+    void to_stream(std::ostream& os) const;
 
     json_variant<Char>* var_;
 };

@@ -92,15 +92,19 @@ class name_value_pair
 {
 public:
     name_value_pair()
-        : value_(0)
+//        : value_(0)
     {
     }
     name_value_pair(std::basic_string<Char> name, json_variant<Char>* value)
+        : name_(name), value_(basic_json<Char>(value))
+    {
+    }
+    name_value_pair(std::basic_string<Char> name, const basic_json<Char>& value)
         : name_(name), value_(value)
     {
     }
     std::basic_string<Char> name_;
-    json_variant<Char>* value_;
+    basic_json<Char> value_;
 };
 
 template <class Char>
@@ -333,10 +337,10 @@ public:
 
     ~json_object()
     {
-        for (size_t i = 0; i < members_.size(); ++i)
-        {
-            delete members_[i].value_;
-        }
+        //for (size_t i = 0; i < members_.size(); ++i)
+        //{
+            //delete members_[i].value_;
+        //}
     }
 
     virtual json_variant<Char>* clone() 
@@ -345,7 +349,7 @@ public:
         for (size_t i = 0; i < members_.size(); ++i)
         {
             
-            members[i] = name_value_pair<Char>(members_[i].name_,members_[i].value_->clone());
+            members[i] = name_value_pair<Char>(members_[i].name_,members_[i].value_);
         }
         return new json_object(members);
     }
@@ -393,7 +397,7 @@ public:
                 os << ",";
             }
             os << "\"" << members_[i].name_ << "\":";
-			members_[i].value_->to_stream(os);
+			members_[i].value_.to_stream(os);
         }
 		os << "}";
     }
@@ -515,7 +519,6 @@ void json_object<Char>::insert(const_iterator it, name_value_pair<Char> member)
 template <class Char>
 void json_object<Char>::remove(iterator at)
 {
-    delete (*at).value_;
     members_.erase(at);
 }
 
@@ -536,7 +539,7 @@ json_variant<Char>* json_object<Char>::get(const std::basic_string<Char>& name)
 {
     iterator it = find(name);
     JSONCONS_ASSERT((it != end()));
-    return (*it).value_;
+    return (*it).value_.var_;
 }
 
 template <class Char>
