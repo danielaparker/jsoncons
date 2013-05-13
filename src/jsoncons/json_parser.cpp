@@ -1,3 +1,6 @@
+// Copyright 2013 Daniel Parker
+// Distributed under Boost license
+
 #include <string>
 #include <utility>
 #include <vector>

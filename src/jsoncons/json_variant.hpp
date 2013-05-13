@@ -1,3 +1,6 @@
+// Copyright 2013 Daniel Parker
+// Distributed under Boost license
+
 #ifndef JSONCONS_JSON_VARIANT_HPP
 #define JSONCONS_JSON_VARIANT_HPP
 
