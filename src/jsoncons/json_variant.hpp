@@ -234,41 +234,37 @@ template <class Char>
 class json_array : public json_variant<Char>
 {
 public:
-    typedef typename std::vector<json_variant<Char>*>::iterator iterator;
-    typedef typename std::vector<json_variant<Char>*>::const_iterator const_iterator;
+    typedef typename std::vector<basic_json<Char>>::iterator iterator;
+    typedef typename std::vector<basic_json<Char>>::const_iterator const_iterator;
 
     json_array()
         : json_variant<Char>(json_variant<Char>::array_t)
     {
     }
-    json_array(std::vector<json_variant<Char>*> elements)
+    json_array(std::vector<basic_json<Char>> elements)
         : json_variant<Char>(json_variant<Char>::array_t), elements_(elements)
     {
     }
 
     virtual json_variant<Char>* clone() 
     {
-        std::vector<json_variant<Char>*> elements(elements_.size());
+        std::vector<basic_json<Char>> elements(elements_.size());
         for (size_t i = 0; i < elements_.size(); ++i)
         {
-            elements[i] = elements_[i]->clone();
+            elements[i] = elements_[i];
         }
         return new json_array(elements);
     }
 
     ~json_array()
     {
-        for (size_t i = 0; i < elements_.size(); ++i)
-        {
-            delete elements_[i];
-        }
     }
 
     size_t size() const {return elements_.size();}
 
-    json_variant<Char>* at(size_t i) {return elements_[i];}
+    json_variant<Char>* at(size_t i) {return elements_[i].var_;}
 
-    const json_variant<Char>* at(size_t i) const {return elements_[i];}
+    const json_variant<Char>* at(size_t i) const {return elements_[i].var_;}
 
     void push_back(json_variant<Char>* value);
 
@@ -281,12 +277,12 @@ public:
             {
                 os << ",";
             }
-            elements_[i]->to_stream(os);
+            elements_[i].to_stream(os);
         }
 		os << "]";
     }
 
-    std::vector<json_variant<Char>*> elements_;
+    std::vector<basic_json<Char>> elements_;
 };
 
 template <class Char>
