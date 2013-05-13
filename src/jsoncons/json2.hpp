@@ -104,6 +104,19 @@ basic_json<Char>::basic_json(basic_json&& other)
     other.var_ = 0;
 }
 
+// Move assignment operator.
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(basic_json<Char>&& other)
+{
+   if (this != &other)
+   {
+      delete[] var_;
+      var_ = other.var_;
+      other.var_ = 0;
+   }
+   return *this;
+}
+
 template <class Char>
 basic_json<Char>::basic_json(json_variant<Char>* var)
     : var_(var)

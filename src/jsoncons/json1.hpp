@@ -69,6 +69,8 @@ public:
 
     basic_json& operator=(const basic_json& rhs);
 
+    basic_json& operator=(basic_json<Char>&& other);
+
     size_t size() const;
 
     bool is_null() const;
