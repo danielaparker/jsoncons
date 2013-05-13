@@ -81,6 +81,8 @@ public:
 
     void to_stream(std::ostream& os) const;
 
+    double as_double() const;
+
     json_variant<Char>* var_;
 };
 

@@ -21,17 +21,13 @@ basic_json<Char>::object_proxy::object_proxy(json_object<Char>* var, const std::
 template <class Char>
 basic_json<Char>::object_proxy::operator const basic_json<Char>() const
 {
-    json_variant<Char>* v = var_->get(name_);
-    JSONCONS_ASSERT(v != 0);
-    return basic_json(var_->clone());
+    return var_->get(name_);
 }
 
 template <class Char>
 basic_json<Char>::object_proxy::operator const double() const
 {
-    json_variant<Char>* v = var_->get(name_);
-    JSONCONS_ASSERT(v != 0);
-    return v->as_double();
+    return var_->get(name_).as_double();
 }
 
 template <class Char>
@@ -79,9 +75,7 @@ typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operato
 template <class Char>
 typename basic_json<Char>::object_proxy basic_json<Char>::object_proxy::operator[](const std::basic_string<char_type>& name)
 {
-    json_variant<Char>* v = var_->get(name_);
-    JSONCONS_ASSERT(v != 0);
-    return object_proxy(v->object_cast(),name);
+    return object_proxy(static_cast<json_object<Char>*>(var_),name);
 }
 
 
@@ -195,6 +189,12 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<char_type>& s)
     json_parser<Char> parser;
     json_variant<Char>* object = parser.parse(is);
     return basic_json<Char>(object);
+}
+
+template <class Char>
+double basic_json<Char>::as_double() const
+{
+    return var_->as_double();
 }
 
 }

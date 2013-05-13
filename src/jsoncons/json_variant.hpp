@@ -360,7 +360,9 @@ public:
 
     void remove(iterator at); 
 
-    json_variant<Char>* get(const std::basic_string<Char>& name);
+    basic_json<Char>& get(const std::basic_string<Char>& name);
+
+    const basic_json<Char>& get(const std::basic_string<Char>& name) const;
 
     iterator find(const std::basic_string<Char>& name);
 
@@ -531,11 +533,19 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, json_var
 }
 
 template <class Char>
-json_variant<Char>* json_object<Char>::get(const std::basic_string<Char>& name)
+basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name)
 {
     iterator it = find(name);
     JSONCONS_ASSERT((it != end()));
-    return (*it).value_.var_;
+    return (*it).value_;
+}
+
+template <class Char>
+const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) const
+{
+    iterator it = find(name);
+    JSONCONS_ASSERT((it != end()));
+    return (*it).value_;
 }
 
 template <class Char>
