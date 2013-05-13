@@ -1,4 +1,4 @@
 jsoncons
 ========
 
-Json constructor
+Json construction
