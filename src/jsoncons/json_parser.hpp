@@ -190,7 +190,7 @@ json_object<Char>* json_parser<Char>::parse_object(std::basic_istream<Char>& is)
                 parse_string(is);
                 //pair->name_ = std::move(buffer_);
                 pair.name_ = buffer_;
-                pair.value_ = parse_separator_value(is);
+                pair.value_ = basic_json<Char>(parse_separator_value(is));
                 object->push_back(pair);
             }
             break;
@@ -400,7 +400,7 @@ json_variant<Char>* json_parser<Char>::parse_array(std::basic_istream<Char>& is)
                 JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_number_);
             }
             is.putback(c);
-            arrayValue->push_back(parse_value(is));
+            arrayValue->push_back(basic_json<Char>(parse_value(is)));
         }
 
     }

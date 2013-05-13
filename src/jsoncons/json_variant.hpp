@@ -269,7 +269,7 @@ public:
 
     const json_variant<Char>* at(size_t i) const {return elements_[i].var_;}
 
-    void push_back(json_variant<Char>* value);
+    void push_back(basic_json<Char> value);
 
     virtual void to_stream(std::ostream& os) const
     {
@@ -500,7 +500,7 @@ double json_variant<Char>::as_double() const
 }
 
 template <class Char>
-void json_array<Char>::push_back(json_variant<Char>* value)
+void json_array<Char>::push_back(basic_json<Char> value)
 {
     elements_.push_back(value);
 }

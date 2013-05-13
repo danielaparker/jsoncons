@@ -64,9 +64,9 @@ public:
 
     basic_json(const basic_json& val);
 
-    basic_json(json_variant<Char>* var);
+    explicit basic_json(json_variant<Char>* var);
 
-    basic_json(basic_json&& other);
+    explicit basic_json(basic_json&& other);
 
     ~basic_json();
 
