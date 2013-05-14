@@ -28,37 +28,40 @@ struct json_char_traits<char>
     static const char name_separator = ':';
     static const char value_separator = ',';
 
-    // Whitespace
-    static const char nl = '\n';
-    static const char tab = '\t';
-    static const char vtab = '\v';
-    static const char ff = '\f';
-    static const char cr = '\r';
-    static const char space = ' ';
-    static const char fslash = '/';
+    static const char forward_slash = '/';
 
     // Values
-    static const char t = 't';
     static const char* rue() {return "rue";};
-    static const char f = 'f';
     static const char* alse () {return "alse";};
-    static const char n = 'n';
     static const char* ull() {return "ull";};
+ 
+    static void append_codepoint_to_string(unsigned int cp, std::string& s)
+    {
+        if (cp <= 0x7f)
+        {
+            s.push_back(static_cast<char>(cp));
+        }
+        else if (cp <= 0x7FF)
+        {
+            s.push_back(static_cast<char>(0xC0 | (0x1f & (cp >> 6))));
+            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+        }
+        else if (cp <= 0xFFFF)
+        {
+            s.push_back(0xE0 | static_cast<char>((0xf & (cp >> 12))));
+            s.push_back(0x80 | static_cast<char>((0x3f & (cp >> 6))));
+            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+        }
+        else if (cp <= 0x10FFFF)
+        {
+            s.push_back(static_cast<char>(0xF0 | (0x7 & (cp >> 18))));
+            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 12))));
+            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 6))));
+            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+        }
+    }
 
-    // Digits
-    static const char zero = '0';
-    static const char one = '1';
-    static const char two = '2';
-    static const char three = '3';
-    static const char four = '4';
-    static const char five = '5';
-    static const char six = '6';
-    static const char seven = '7';
-    static const char eight = '8';
-    static const char nine = '9';
 };
-
-void append_codepoint_to_string(unsigned int cp, std::string& s);
 
 class json_parser_exception : public std::exception
 {
@@ -115,21 +118,21 @@ json_object<Char>* json_parser<Char>::parse(std::basic_istream<Char>& is)
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case json_char_traits<Char>::nl:
+        case '\n':
             ++line_number_;
             break;
-        case json_char_traits<Char>::tab:
-        case json_char_traits<Char>::vtab:
-        case json_char_traits<Char>::ff:
-        case json_char_traits<Char>::cr:
-        case json_char_traits<Char>::space:
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
             break;
-        case json_char_traits<Char>::fslash:
+        case '/':
             {
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::fslash)
+                    if (next == json_char_traits<Char>::forward_slash)
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -159,21 +162,21 @@ json_object<Char>* json_parser<Char>::parse_object(std::basic_istream<Char>& is)
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case json_char_traits<Char>::nl:
+        case '\n':
             ++line_number_;
             break;
-        case json_char_traits<Char>::tab:
-        case json_char_traits<Char>::vtab:
-        case json_char_traits<Char>::ff:
-        case json_char_traits<Char>::cr:
-        case json_char_traits<Char>::space:
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
             break;
-        case json_char_traits<Char>::fslash:
+        case '/':
             {
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == '/')
+                    if (next == json_char_traits<Char>::forward_slash)
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -226,21 +229,21 @@ json_variant<Char>* json_parser<Char>::parse_separator_value(std::basic_istream<
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case json_char_traits<Char>::nl:
+        case '\n':
             ++line_number_;
             break;
-        case json_char_traits<Char>::tab:
-        case json_char_traits<Char>::vtab:
-        case json_char_traits<Char>::ff:
-        case json_char_traits<Char>::cr:
-        case json_char_traits<Char>::space:
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
             break;
-        case json_char_traits<Char>::fslash:
+        case '/':
             {
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == '/')
+                    if (next == json_char_traits<Char>::forward_slash)
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -265,21 +268,21 @@ json_variant<Char>* json_parser<Char>::parse_value(std::basic_istream<Char>& is)
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case json_char_traits<Char>::nl:
+        case '\n':
             ++line_number_;
             break;
-        case json_char_traits<Char>::tab:
-        case json_char_traits<Char>::vtab:
-        case json_char_traits<Char>::ff:
-        case json_char_traits<Char>::cr:
-        case json_char_traits<Char>::space:
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
             break;
-        case json_char_traits<Char>::fslash:
+        case '/':
             {
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == '/')
+                    if (next == json_char_traits<Char>::forward_slash)
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -300,19 +303,19 @@ json_variant<Char>* json_parser<Char>::parse_value(std::basic_istream<Char>& is)
             }
         case json_char_traits<Char>::begin_array: // array value
             return parse_array(is);
-        case json_char_traits<Char>::t:
+        case 't':
             if (!read_until_match_fails(is, json_char_traits<Char>::rue()))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
             return new json_bool<Char>(true);
-        case json_char_traits<Char>::f:
+        case 'f':
             if (!read_until_match_fails(is, json_char_traits<Char>::alse()))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
             return new json_bool<Char>(false);
-        case json_char_traits<Char>::n:
+        case 'n':
             if (!read_until_match_fails(is, json_char_traits<Char>::ull()))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
@@ -360,21 +363,21 @@ json_variant<Char>* json_parser<Char>::parse_array(std::basic_istream<Char>& is)
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case json_char_traits<Char>::nl:
+        case '\n':
             ++line_number_;
             break;
-        case json_char_traits<Char>::tab:
-        case json_char_traits<Char>::vtab:
-        case json_char_traits<Char>::ff:
-        case json_char_traits<Char>::cr:
-        case json_char_traits<Char>::space:
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
             break;
-        case json_char_traits<Char>::fslash:
+        case '/':
             {
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == '/')
+                    if (next == json_char_traits<Char>::forward_slash)
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -544,7 +547,7 @@ void json_parser<Char>::parse_string(std::basic_istream<Char>& is)
                     {
                         is.ignore();
                         unsigned int cp = decode_unicode_codepoint(is);
-                        append_codepoint_to_string(cp, buffer_);
+                        json_char_traits<Char>::append_codepoint_to_string(cp, buffer_);
                     }
                     break;
                 default:

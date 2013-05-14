@@ -47,6 +47,12 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"]["string_2"] = "my string";
     root["myarray"] = json::array_prototype;
 
+    double double_2 = root["myobject"]["double_2"];
+    double int_2 = root["myobject"]["double_2"];
+
+    BOOST_CHECK_CLOSE(double_2, 7.0, 0.000001);
+    BOOST_CHECK_CLOSE(int_2, 7.0, 0);
+
 	std::cout << root.to_string() << std::endl;
 
     //json double_2_value = root["double_2"];

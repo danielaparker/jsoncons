@@ -28,7 +28,7 @@ template <class Char>
 class json_variant
 {
 public:
-    enum value_type {object_t,string_t,double_t,long_t,ulong_t,pair_t,array_t,bool_t,null_t};
+    enum value_type {object_t,string_t,double_t,long_t,ulong_t,array_t,bool_t,null_t};
 
     typedef Char char_type;
 
@@ -265,9 +265,9 @@ public:
 
     size_t size() const {return elements_.size();}
 
-    json_variant<Char>* at(size_t i) {return elements_[i].var_;}
+    basic_json<Char>& at(size_t i) {return elements_[i];}
 
-    const json_variant<Char>* at(size_t i) const {return elements_[i].var_;}
+    const basic_json<Char>& at(size_t i) const {return elements_[i];}
 
     void push_back(basic_json<Char> value);
 
@@ -355,9 +355,9 @@ public:
 
     size_t size() const {return members_.size();}
 
-    json_variant<Char>* at(size_t i) {return members_[i].value_;}
+    basic_json<Char>& at(size_t i) {return members_[i].value_;}
 
-    const json_variant<Char>* at(size_t i) const {return members_[i].value_;}
+    const basic_json<Char>& at(size_t i) const {return members_[i].value_;}
 
     void set_member(const std::basic_string<Char>& name, json_variant<Char>* value);
 
@@ -536,7 +536,7 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, json_var
 }
 
 template <class Char>
-basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name)
+basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) 
 {
     iterator it = find(name);
     JSONCONS_ASSERT((it != end()));

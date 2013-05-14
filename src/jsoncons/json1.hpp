@@ -21,6 +21,9 @@ template <class Char>
 class json_object;
 
 template <class Char>
+class json_array;
+
+template <class Char>
 class basic_json
 {
 public:
@@ -50,10 +53,48 @@ public:
 
         object_proxy& operator=(const basic_json& val);
 
+        object_proxy& operator[](size_t);
+
+        const object_proxy& operator[](size_t) const;
+
         object_proxy operator[](const std::basic_string<char_type>& name);
+
+        const object_proxy operator[](const std::basic_string<char_type>& name) const;
 
         json_object<Char>* var_;
         const std::basic_string<char_type>& name_;
+    };
+
+    struct array_proxy
+    {
+        array_proxy(json_array<Char>* var, size_t index);
+
+        operator const basic_json() const;
+
+        operator const double() const;
+
+        array_proxy& operator=(const char_type* val);
+
+        array_proxy& operator=(std::basic_string<char_type> val);
+
+        array_proxy& operator=(double val);
+
+        array_proxy& operator=(int val);
+
+        array_proxy& operator=(bool val);
+
+        array_proxy& operator=(const basic_json& val);
+
+        array_proxy& operator[](size_t);
+
+        const array_proxy& operator[](size_t) const;
+
+        array_proxy operator[](const std::basic_string<char_type>& name);
+
+        const array_proxy operator[](const std::basic_string<char_type>& name) const;
+
+        json_array<Char>* var_;
+        size_t index_;
     };
 
     static basic_json parse(std::basic_istream<char_type>& is);
@@ -78,7 +119,13 @@ public:
 
     bool is_null() const;
 
+    object_proxy operator[](size_t);
+
+    const object_proxy operator[](size_t) const;
+
     object_proxy operator[](const std::basic_string<char_type>& name);
+
+    const object_proxy operator[](const std::basic_string<char_type>& name) const;
 
     std::basic_string<char_type> to_string() const;
 

@@ -15,6 +15,81 @@
 
 namespace jsoncons {
 
+// array_proxy
+template <class Char>
+basic_json<Char>::array_proxy::array_proxy(json_array<Char>* var, size_t index)
+    : var_(var), index_(index)
+{
+}
+
+template <class Char>
+basic_json<Char>::array_proxy::operator const basic_json<Char>() const
+{
+    return var_->at_(index_);
+}
+
+template <class Char>
+basic_json<Char>::array_proxy::operator const double() const
+{
+    return var_->at_(index_).as_double();
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(const char_type* val)
+{
+    var_->set_member(name_, new json_string<Char>(val));
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(std::basic_string<char_type> val)
+{
+    var_->set_member(name_, new json_string(val));
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(double val)
+{
+    var_->set_member(name_, new json_double<Char>(val));
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(int val)
+{
+    var_->set_member(name_, new json_long<Char>(val));
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(bool val)
+{
+    var_->set_member(name_, new json_bool<Char>(val));
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy& basic_json<Char>::array_proxy::operator=(const basic_json& val)
+{
+    var_->set_member(name_, val.var_->clone());
+    return *this;
+}
+
+template <class Char>
+typename basic_json<Char>::array_proxy basic_json<Char>::array_proxy::operator[](const std::basic_string<char_type>& name)
+{
+    return array_proxy(static_cast<json_array<Char>*>(var_),name);
+}
+
+template <class Char>
+typename const basic_json<Char>::array_proxy basic_json<Char>::array_proxy::operator[](const std::basic_string<char_type>& name) const
+{
+    return object_proxy(static_cast<json_array<Char>*>(var_),name);
+}
+
+
+// object_proxy
 template <class Char>
 basic_json<Char>::object_proxy::object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name)
     : var_(var), name_(name)
@@ -78,8 +153,26 @@ typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operato
 template <class Char>
 typename basic_json<Char>::object_proxy basic_json<Char>::object_proxy::operator[](const std::basic_string<char_type>& name)
 {
+    return object_proxy(static_cast<json_object<Char>*>(var_->get(name_).var_->object_cast()),name);
+}
+
+template <class Char>
+typename const basic_json<Char>::object_proxy basic_json<Char>::object_proxy::operator[](const std::basic_string<char_type>& name) const
+{
+    return object_proxy(static_cast<json_object<Char>*>(var_->get(name_).var_->object_cast()),name);
+}
+
+/*template <class Char>
+typename basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator[](size_t i)
+{
     return object_proxy(static_cast<json_object<Char>*>(var_),name);
 }
+
+template <class Char>
+typename const basic_json<Char>::object_proxy& basic_json<Char>::object_proxy::operator[](size_t i) const
+{
+    return object_proxy(static_cast<json_object<Char>*>(var_),name);
+}*/
 
 
 template <class Char>
@@ -151,6 +244,12 @@ bool basic_json<Char>::is_null() const
 
 template <class Char>
 typename basic_json<Char>::object_proxy basic_json<Char>::operator[](const std::basic_string<char_type>& name)
+{
+    return object_proxy(var_->object_cast(),name);
+}
+
+template <class Char>
+const typename basic_json<Char>::object_proxy basic_json<Char>::operator[](const std::basic_string<char_type>& name) const
 {
     return object_proxy(var_->object_cast(),name);
 }
