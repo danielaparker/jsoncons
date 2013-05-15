@@ -37,6 +37,8 @@ public:
     {
     	object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name);
 
+        size_t size() const;
+
         operator const basic_json() const;
 
         operator const double() const;
@@ -68,6 +70,8 @@ public:
     struct array_proxy
     {
         array_proxy(json_array<Char>* var, size_t index);
+
+        size_t size() const;
 
         operator const basic_json() const;
 
@@ -104,6 +108,9 @@ public:
     basic_json();
 
     basic_json(const basic_json& val);
+
+    template <class Iterator>
+    basic_json(Iterator begin, Iterator end);
 
     explicit basic_json(json_variant<Char>* var);
 

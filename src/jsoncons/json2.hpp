@@ -23,6 +23,13 @@ basic_json<Char>::array_proxy::array_proxy(json_array<Char>* var, size_t index)
 }
 
 template <class Char>
+size_t basic_json<Char>::array_proxy::size() const
+{
+    std::cout << "basic_json<Char>::array_proxy::size()" << std::endl;
+    return var_->at(index_).size();
+}
+
+template <class Char>
 basic_json<Char>::array_proxy::operator const basic_json<Char>() const
 {
     return var_->at_(index_);
@@ -94,6 +101,13 @@ template <class Char>
 basic_json<Char>::object_proxy::object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name)
     : var_(var), name_(name)
 {
+}
+
+template <class Char>
+size_t basic_json<Char>::object_proxy::size() const
+{
+    std::cout << "basic_json<Char>::object_proxy::size()" << std::endl;
+    return var_->get(name_).size();
 }
 
 template <class Char>
@@ -182,6 +196,13 @@ basic_json<Char>::basic_json()
 }
 
 template <class Char>
+template <class Iterator>
+basic_json<Char>::basic_json(Iterator begin, Iterator end)
+    : var_(new json_array<Char>(begin,end))
+{
+}
+
+template <class Char>
 basic_json<Char>::basic_json(const basic_json<Char>& val)
     : var_(val.var_->clone())
 {
@@ -233,7 +254,7 @@ basic_json<Char>& basic_json<Char>::operator=(const basic_json<Char>& rhs)
 template <class Char>
 size_t basic_json<Char>::size() const
 {
-    return 0;
+    return var_->size();
 }
 
 template <class Char>
@@ -297,6 +318,13 @@ template <class Char>
 double basic_json<Char>::as_double() const
 {
     return var_->as_double();
+}
+
+template <class Char>
+std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
+{
+    os << o.to_string();
+    return os;
 }
 
 }

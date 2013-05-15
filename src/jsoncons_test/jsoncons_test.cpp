@@ -6,6 +6,8 @@
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_parser.hpp"
 #include <sstream>
+#include <vector>
+#include <utility>
 
 using jsoncons::json;
 using jsoncons::json_parser;
@@ -58,6 +60,39 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     //json double_2_value = root["double_2"];
 
     //BOOST_CHECK(double_2_value.is_null());
+}
+
+BOOST_AUTO_TEST_CASE(test_array)
+{
+    json root;
+
+    root["addresses"];
+
+    std::vector<json> addresses;
+    json address1;
+    address1["city"] = "San Francisco";
+    address1["state"] = "CA";
+    address1["zip"] = "94107";
+    address1["country"] = "USA";
+    addresses.push_back(address1);
+
+    json address2;
+    address2["city"] = "Sunnyvale";
+    address2["state"] = "CA";
+    address2["zip"] = "94085";
+    address2["country"] = "USA";
+    addresses.push_back(address2);
+    
+    root["addresses"] = json(addresses.begin(),addresses.end());
+
+    std::cout << root << std::endl;
+
+    BOOST_CHECK(root["addresses"].size() == 2);
+
+    //for (size_t i = 0; i < root["addresses"].size(); ++i)
+    //{
+    //    std::cout << root["addresses"][i] << std::endl;
+    //}
 }
 
 

@@ -37,6 +37,18 @@ public:
     {
     }
 
+    size_t size() const {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->size();
+        case array_t:
+            return array_cast()->size();
+        default:
+            return 0;
+        }
+    }
+
     bool is_null() const
     {
         return type_ == null_t;
@@ -80,6 +92,8 @@ public:
 
     json_object<Char>* object_cast();
     json_array<Char>* array_cast();
+    const json_object<Char>* object_cast() const;
+    const json_array<Char>* array_cast() const;
     double double_value() const;
     long long_value() const;
     unsigned long ulong_value() const;
@@ -244,19 +258,19 @@ public:
         : json_variant<Char>(json_variant<Char>::array_t)
     {
     }
-    json_array(std::vector<basic_json<Char>> elements)
-        : json_variant<Char>(json_variant<Char>::array_t), elements_(elements)
+    template <class Iterator>
+    json_array(Iterator begin, Iterator end)
+        : json_variant<Char>(json_variant<Char>::array_t)
     {
+        for (Iterator it = begin; it != end; ++it)
+        {
+            elements_.push_back(*it);
+        }
     }
 
     virtual json_variant<Char>* clone() 
     {
-        std::vector<basic_json<Char>> elements(elements_.size());
-        for (size_t i = 0; i < elements_.size(); ++i)
-        {
-            elements[i] = elements_[i];
-        }
-        return new json_array(elements);
+        return new json_array(elements_.begin(),elements_.end());
     }
 
     ~json_array()
@@ -426,6 +440,12 @@ json_object<Char>* json_variant<Char>::object_cast() {assert(type_ == object_t);
 
 template <class Char>
 json_array<Char>* json_variant<Char>::array_cast() {assert(type_ == array_t); return static_cast<json_array<Char>*>(this);}
+
+template <class Char>
+const json_object<Char>* json_variant<Char>::object_cast() const {assert(type_ == object_t); return static_cast<const json_object<Char>*>(this);}
+
+template <class Char>
+const json_array<Char>* json_variant<Char>::array_cast() const {assert(type_ == array_t); return static_cast<const json_array<Char>*>(this);}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::to_string() const
