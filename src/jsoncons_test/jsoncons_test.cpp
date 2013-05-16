@@ -89,10 +89,10 @@ BOOST_AUTO_TEST_CASE(test_array)
 
     BOOST_CHECK(root["addresses"].size() == 2);
 
-    //for (size_t i = 0; i < root["addresses"].size(); ++i)
-    //{
-    //    std::cout << root["addresses"][i] << std::endl;
-    //}
+    /*for (size_t i = 0; i < root["addresses"].size(); ++i)
+    {
+        std::cout << root["addresses"][i] << std::endl;
+    }*/
 }
 
 

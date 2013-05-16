@@ -33,9 +33,10 @@ public:
 
     typedef Char char_type;
 
-    struct object_proxy
+    template <class Key>
+    struct proxy
     {
-    	object_proxy(json_object<Char>* var, const std::basic_string<char_type>& name);
+    	proxy(json_variant<Char>* var, Key key);
 
         size_t size() const;
 
@@ -43,67 +44,34 @@ public:
 
         operator const double() const;
 
-        object_proxy& operator=(const char_type* val);
+        proxy<Key>& operator=(const Char* val);
 
-        object_proxy& operator=(std::basic_string<char_type> val);
+        proxy<Key>& operator=(std::basic_string<Char> val);
 
-        object_proxy& operator=(double val);
+        proxy<Key>& operator=(double val);
 
-        object_proxy& operator=(int val);
+        proxy<Key>& operator=(int val);
 
-        object_proxy& operator=(bool val);
+        proxy<Key>& operator=(bool val);
 
-        object_proxy& operator=(const basic_json& val);
+        proxy<Key>& operator=(const basic_json& val);
 
-        object_proxy& operator[](size_t);
+        proxy<size_t> operator[](size_t i);
 
-        const object_proxy& operator[](size_t) const;
+        const proxy<size_t> operator[](size_t i) const;
 
-        object_proxy operator[](const std::basic_string<char_type>& name);
+        proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name);
 
-        const object_proxy operator[](const std::basic_string<char_type>& name) const;
+        const proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name) const;
 
-        json_object<Char>* var_;
-        const std::basic_string<char_type>& name_;
+        json_variant<Char>* var_;
+
+        Key key_;
     };
 
-    struct array_proxy
-    {
-        array_proxy(json_array<Char>* var, size_t index);
+    static basic_json parse(std::basic_istream<Char>& is);
 
-        size_t size() const;
-
-        operator const basic_json() const;
-
-        operator const double() const;
-
-        array_proxy& operator=(const char_type* val);
-
-        array_proxy& operator=(std::basic_string<char_type> val);
-
-        array_proxy& operator=(double val);
-
-        array_proxy& operator=(int val);
-
-        array_proxy& operator=(bool val);
-
-        array_proxy& operator=(const basic_json& val);
-
-        array_proxy& operator[](size_t);
-
-        const array_proxy& operator[](size_t) const;
-
-        array_proxy operator[](const std::basic_string<char_type>& name);
-
-        const array_proxy operator[](const std::basic_string<char_type>& name) const;
-
-        json_array<Char>* var_;
-        size_t index_;
-    };
-
-    static basic_json parse(std::basic_istream<char_type>& is);
-
-    static basic_json parse(const std::basic_string<char_type>& s);
+    static basic_json parse(const std::basic_string<Char>& s);
 
     basic_json();
 
@@ -126,15 +94,15 @@ public:
 
     bool is_null() const;
 
-    object_proxy operator[](size_t);
+    proxy<size_t> operator[](size_t);
 
-    const object_proxy operator[](size_t) const;
+    const proxy<size_t> operator[](size_t) const;
 
-    object_proxy operator[](const std::basic_string<char_type>& name);
+    proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name);
 
-    const object_proxy operator[](const std::basic_string<char_type>& name) const;
+    const proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name) const;
 
-    std::basic_string<char_type> to_string() const;
+    std::basic_string<Char> to_string() const;
 
     void to_stream(std::ostream& os) const;
 

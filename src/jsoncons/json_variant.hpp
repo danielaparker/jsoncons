@@ -49,6 +49,61 @@ public:
         }
     }
 
+    basic_json<Char>& get(size_t i) {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->at(i);
+        case array_t:
+            return array_cast()->at(i);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an array or object");
+        }
+    }
+
+    const basic_json<Char>& get(size_t i) const {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->at(i);
+        case array_t:
+            return array_cast()->at(i);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an array or object");
+        }
+    }
+
+    basic_json<Char>& get(const std::string& name) {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->get(name);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
+    }
+
+    const basic_json<Char>& get(const std::string& name) const {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->get(name);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
+    }
+
+
+    void set_member(const std::string& name, json_variant* var) {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->set_member(name,var);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
+    }
+
     bool is_null() const
     {
         return type_ == null_t;
