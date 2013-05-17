@@ -39,13 +39,6 @@ basic_json<Char>::proxy<Key>::operator const basic_json<Char>() const
 
 template <class Char>
 template <class Key>
-basic_json<Char>::proxy<Key>::operator const double() const
-{
-    return var_->get(key_).as_double();
-}
-
-template <class Char>
-template <class Key>
 typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(const Char* val)
 {
     var_->set_member(key_, new json_string<Char>(val));
@@ -96,14 +89,14 @@ template <class Char>
 template <class Key>
 typename basic_json<Char>::proxy<size_t> basic_json<Char>::proxy<Key>::operator[](size_t i)
 {
-    return proxy<size_t>(var_,i);
+    return proxy<size_t>(var_->get(key_).var_,i);
 }
 
 template <class Char>
 template <class Key>
 const typename basic_json<Char>::proxy<size_t> basic_json<Char>::proxy<Key>::operator[](size_t i) const
 {
-    return proxy<size_t>(var_,i);
+    return proxy<size_t>(var_->get(key_).var_,i);
 }
 
 template <class Char>
@@ -118,6 +111,15 @@ template <class Key>
 typename const basic_json<Char>::proxy<std::basic_string<Char>> basic_json<Char>::proxy<Key>::operator[](std::basic_string<Char> name) const
 {
     return proxy<std::basic_string<Char>>(var_->get(key_).var_,name);
+}
+
+template <class Char>
+template <class Key>
+std::basic_string<Char> basic_json<Char>::proxy<Key>::to_string() const
+{
+	std::cout << key_ << std::endl;
+	var_->get(key_);
+    return var_->get(key_).var_->to_string();
 }
 
 
@@ -265,11 +267,25 @@ double basic_json<Char>::as_double() const
 }
 
 template <class Char>
+int basic_json<Char>::as_int() const
+{
+    return var_->as_int();
+}
+
+template <class Char>
 std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
 {
     os << o.to_string();
     return os;
 }
+
+/*template <class Char>
+template <class Key>
+std::ostream& operator<<(std::ostream& os, const typename basic_json<Char>::proxy<Key>& o)
+{
+    os << o.to_string();
+    return os;
+}*/
 
 }
 

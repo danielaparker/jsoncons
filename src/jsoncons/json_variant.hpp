@@ -29,6 +29,7 @@ class json_variant
 {
 public:
     enum value_type {object_t,string_t,double_t,long_t,ulong_t,array_t,bool_t,null_t};
+    friend class basic_json<Char>;
 
     typedef Char char_type;
 
@@ -136,6 +137,8 @@ public:
     virtual json_variant* clone() = 0;
 
     double as_double() const;
+
+    int as_int() const;
 
     std::basic_string<Char> to_string() const;
 
@@ -570,6 +573,24 @@ double json_variant<Char>::as_double() const
     case ulong_t:
         return static_cast<double>(ulong_value());
     default:
+        std::cout << "Must be here" << std::endl;
+        JSONCONS_THROW_EXCEPTION("Not a double");
+    }
+}
+
+template <class Char>
+int json_variant<Char>::as_int() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<int>(double_value());
+    case long_t:
+        return static_cast<int>(long_value());
+    case ulong_t:
+        return static_cast<int>(ulong_value());
+    default:
+        std::cout << "Must be here" << std::endl;
         JSONCONS_THROW_EXCEPTION("Not a double");
     }
 }

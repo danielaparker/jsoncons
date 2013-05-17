@@ -42,8 +42,6 @@ public:
 
         operator const basic_json() const;
 
-        operator const double() const;
-
         proxy<Key>& operator=(const Char* val);
 
         proxy<Key>& operator=(std::basic_string<Char> val);
@@ -63,6 +61,8 @@ public:
         proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name);
 
         const proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name) const;
+
+        std::basic_string<Char> to_string() const;
 
         json_variant<Char>* var_;
 
@@ -107,6 +107,8 @@ public:
     void to_stream(std::ostream& os) const;
 
     double as_double() const;
+
+    int as_int() const;
 
     json_variant<Char>* var_;
 };

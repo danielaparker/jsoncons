@@ -21,11 +21,9 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     root["double_1"] = 10.0;
 
-    json double_1_value = root["double_1"];
+    json double_1 = root["double_1"];
 
-    double double_1 = root["double_1"];
-
-    BOOST_CHECK_CLOSE(double_1, 10.0, 0.000001);
+    BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
     json copy = root;
 }
@@ -36,11 +34,9 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
 	root["double_1"] = 10.0;
 
-    json double_1_value = root["double_1"];
+    json double_1 = root["double_1"];
 
-    double double_1 = root["double_1"];
-
-    BOOST_CHECK_CLOSE(double_1, 10.0, 0.000001);
+    BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
     root["myobject"] = json::object_prototype;
     root["myobject"]["double_2"] = 7.0;
@@ -49,11 +45,11 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"]["string_2"] = "my string";
     root["myarray"] = json::array_prototype;
 
-    double double_2 = root["myobject"]["double_2"];
-    double int_2 = root["myobject"]["double_2"];
+    json double_2 = root["myobject"]["double_2"];
+    json int_2 = root["myobject"]["double_2"];
 
-    BOOST_CHECK_CLOSE(double_2, 7.0, 0.000001);
-    BOOST_CHECK_CLOSE(int_2, 7.0, 0);
+    BOOST_CHECK_CLOSE(double_2.as_double(), 7.0, 0.000001);
+    BOOST_CHECK_CLOSE(int_2.as_int(), 7.0, 0);
 
 	std::cout << root.to_string() << std::endl;
 
@@ -89,10 +85,11 @@ BOOST_AUTO_TEST_CASE(test_array)
 
     BOOST_CHECK(root["addresses"].size() == 2);
 
-    /*for (size_t i = 0; i < root["addresses"].size(); ++i)
+    std::cout << "size=" << root["addresses"].size() << std::endl;
+    for (size_t i = 0; i < root["addresses"].size(); ++i)
     {
-        std::cout << root["addresses"][i] << std::endl;
-    }*/
+        std::cout << root["addresses"][i].to_string() << std::endl;
+    }
 }
 
 
