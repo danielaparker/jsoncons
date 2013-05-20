@@ -14,6 +14,9 @@
 
 namespace jsoncons {
 
+typedef long long integer_type;
+typedef unsigned long long uinteger_type;
+
 template <class Char>
 class json_variant;
 
@@ -42,16 +45,6 @@ public:
 
         operator const basic_json() const;
 
-        proxy<Key>& operator=(const Char* val);
-
-        proxy<Key>& operator=(std::basic_string<Char> val);
-
-        proxy<Key>& operator=(double val);
-
-        proxy<Key>& operator=(int val);
-
-        proxy<Key>& operator=(bool val);
-
         proxy<Key>& operator=(const basic_json& val);
 
         proxy<size_t> operator[](size_t i);
@@ -76,6 +69,16 @@ public:
     basic_json();
 
     basic_json(const basic_json& val);
+
+    explicit basic_json(double val);
+
+    explicit basic_json(integer_type val);
+
+    explicit basic_json(uinteger_type val);
+
+    explicit basic_json(std::string val);
+
+    explicit basic_json(bool val);
 
     template <class Iterator>
     basic_json(Iterator begin, Iterator end);

@@ -153,8 +153,8 @@ public:
     const json_object<Char>* object_cast() const;
     const json_array<Char>* array_cast() const;
     double double_value() const;
-    long long_value() const;
-    unsigned long ulong_value() const;
+    integer_type long_value() const;
+    uinteger_type ulong_value() const;
     std::basic_string<Char> string_value() const;
     bool bool_value() const;
 private:
@@ -265,7 +265,7 @@ template <class Char>
 class json_long  : public json_variant<Char>
 {
 public:
-    json_long(long value)
+    json_long(integer_type value)
         : json_variant<Char>(json_variant<Char>::long_t), value_(value)
     {
     }
@@ -280,14 +280,14 @@ public:
         os << value_;
     }
 
-    long value_;
+    integer_type value_;
 };
 
 template <class Char>
 class json_ulong : public json_variant<Char>
 {
 public:
-    json_ulong(unsigned long value)
+    json_ulong(uinteger_type value)
         : json_variant<Char>(json_variant<Char>::ulong_t), value_(value)
     {
     }
@@ -302,7 +302,7 @@ public:
         os << value_;
     }
 
-    unsigned long value_;
+    uinteger_type value_;
 };
 
 template <class Char>
@@ -482,10 +482,10 @@ template <class Char>
 double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
 
 template <class Char>
-long json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_long<Char> *>(this)->value_;}
+integer_type json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_long<Char> *>(this)->value_;}
 
 template <class Char>
-unsigned long json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong<Char>*>(this)->value_;}
+uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong<Char>*>(this)->value_;}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}

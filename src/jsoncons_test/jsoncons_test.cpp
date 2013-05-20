@@ -10,6 +10,8 @@
 #include <utility>
 
 using jsoncons::json;
+using jsoncons::integer_type;
+using jsoncons::uinteger_type;
 using jsoncons::json_parser;
 using std::string;
 
@@ -19,7 +21,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json root = json::parse(is);
 
-    root["double_1"] = 10.0;
+    root["double_1"] = json(10.0);
 
     json double_1 = root["double_1"];
 
@@ -32,17 +34,17 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 {
     json root;
 
-	root["double_1"] = 10.0;
+	root["double_1"] = json(10.0);
 
     json double_1 = root["double_1"];
 
     BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
     root["myobject"] = json::object_prototype;
-    root["myobject"]["double_2"] = 7.0;
-    root["myobject"]["bool_2"] = true;
-    root["myobject"]["int_2"] = 0;
-    root["myobject"]["string_2"] = "my string";
+    root["myobject"]["double_2"] = json(7.0);
+    root["myobject"]["bool_2"] = json(true);
+    root["myobject"]["int_2"] = json(integer_type(0));
+    root["myobject"]["string_2"] = json("my string");
     root["myarray"] = json::array_prototype;
 
     json double_2 = root["myobject"]["double_2"];
@@ -51,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     BOOST_CHECK_CLOSE(double_2.as_double(), 7.0, 0.000001);
     BOOST_CHECK_CLOSE(int_2.as_int(), 7.0, 0);
 
-	std::cout << root.to_string() << std::endl;
+	std::cout << root << std::endl;
 
     //json double_2_value = root["double_2"];
 
@@ -66,17 +68,17 @@ BOOST_AUTO_TEST_CASE(test_array)
 
     std::vector<json> addresses;
     json address1;
-    address1["city"] = "San Francisco";
-    address1["state"] = "CA";
-    address1["zip"] = "94107";
-    address1["country"] = "USA";
+    address1["city"] = json("San Francisco");
+    address1["state"] = json("CA");
+    address1["zip"] = json("94107");
+    address1["country"] = json("USA");
     addresses.push_back(address1);
 
     json address2;
-    address2["city"] = "Sunnyvale";
-    address2["state"] = "CA";
-    address2["zip"] = "94085";
-    address2["country"] = "USA";
+    address2["city"] = json("Sunnyvale");
+    address2["state"] = json("CA");
+    address2["zip"] = json("94085");
+    address2["country"] = json("USA");
     addresses.push_back(address2);
     
     root["addresses"] = json(addresses.begin(),addresses.end());

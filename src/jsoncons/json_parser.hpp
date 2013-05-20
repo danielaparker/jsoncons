@@ -9,8 +9,59 @@
 #include <vector>
 #include <assert.h>
 #include <istream>
+#include <cstdlib>
 
 namespace jsoncons {
+
+typedef long long integer_type;
+typedef unsigned long long uinteger_type;
+
+template <class Char>
+class json_handler
+{
+public:
+    void begin_document()
+    {
+    }
+    void end_document()
+    {
+    }
+    void begin_object()
+    {
+    }
+    void end_object()
+    {
+    }
+    void begin_array()
+    {
+    }
+    void end_array()
+    {
+    }
+    void name(std::basic_string<Char> name)
+    {
+    }
+    void stringValue(std::basic_string<Char> value)
+    {
+    }
+    void doubleValue(double value)
+    {
+    }
+    void integerValue(integer_type value)
+    {
+    }
+    void uintegerValue(integer_type value)
+    {
+    }
+    void boolValue(bool value)
+    {
+    }
+    void nullValue()
+    {
+    }
+private:
+    std::vector<json_variant<Char>*> vars_;
+};
 
 template <class Char>
 struct json_char_traits
@@ -61,6 +112,19 @@ struct json_char_traits<char>
         }
     }
 
+    static uinteger_type string_to_uinteger(const std::string& s)
+    {
+        uinteger_type i = 0;
+        for (std::string::const_iterator it; it != s.end(); ++it)
+        {
+            if (*it >= '0' && *it <= '9')
+            {
+                i = i * 10 + *it;
+            }
+        }
+        return i;
+    }
+
 };
 
 class json_parser_exception : public std::exception
@@ -92,7 +156,7 @@ template <class Char>
 class json_parser
 {
 public:
-    json_object<Char>* parse(std::basic_istream<Char>& is);
+    json_variant<Char>* parse(std::basic_istream<Char>& is);
     json_object<Char>* parse_object(std::basic_istream<Char>& is);
     json_variant<Char>* parse_separator_value(std::basic_istream<Char>& is);
     json_variant<Char>* parse_value(std::basic_istream<Char>& is);
@@ -106,11 +170,13 @@ public:
 private:
     unsigned long line_number_;
     std::basic_string<Char> buffer_;
+    json_handler<Char> handler_;
 };
 
 template <class Char>
-json_object<Char>* json_parser<Char>::parse(std::basic_istream<Char>& is)
+json_variant<Char>* json_parser<Char>::parse(std::basic_istream<Char>& is)
 {
+    handler_.begin_document();
     line_number_ = 0;
 
     while (is)
@@ -141,9 +207,20 @@ json_object<Char>* json_parser<Char>::parse(std::basic_istream<Char>& is)
             break;
         case json_char_traits<Char>::begin_object:
             {
-                json_object<Char> *value = parse_object(is);
+                handler_.begin_object();
+                json_variant<Char> *value = parse_object(is);
+                handler_.end_document();
                 return value;
             }
+            break;
+        case json_char_traits<Char>::begin_array:
+            {
+                handler_.begin_array();
+                json_variant<Char> *value = parse_array(is);
+                handler_.end_document();
+                return value;
+            }
+            break;
         }
     }
 
@@ -193,6 +270,7 @@ json_object<Char>* json_parser<Char>::parse_object(std::basic_istream<Char>& is)
                 parse_string(is);
                 //pair->name_ = std::move(buffer_);
                 pair.name_ = buffer_;
+                handler_.name(buffer_);
                 pair.value_ = basic_json<Char>(parse_separator_value(is));
                 object->push_back(pair);
             }
@@ -212,6 +290,7 @@ json_object<Char>* json_parser<Char>::parse_object(std::basic_istream<Char>& is)
                     JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_number_);
                 }
                 object->sort_members();
+                handler_.end_object();
                 return object;
             }
         }
@@ -294,6 +373,7 @@ json_variant<Char>* json_parser<Char>::parse_value(std::basic_istream<Char>& is)
                 parse_string(is);
                 json_string<Char> *value = new json_string<Char>();
                 value->value_ = buffer_;
+                handler_.stringValue(buffer_);
                 return value;
             }
         case json_char_traits<Char>::begin_object: // object value
@@ -308,18 +388,21 @@ json_variant<Char>* json_parser<Char>::parse_value(std::basic_istream<Char>& is)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
+            handler_.boolValue(true);
             return new json_bool<Char>(true);
         case 'f':
             if (!read_until_match_fails(is, json_char_traits<Char>::alse()))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
+            handler_.boolValue(false);
             return new json_bool<Char>(false);
         case 'n':
             if (!read_until_match_fails(is, json_char_traits<Char>::ull()))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
+            handler_.nullValue();
             return new json_null<Char>();
         case '0':
         case '1':
@@ -396,6 +479,7 @@ json_variant<Char>* json_parser<Char>::parse_array(std::basic_istream<Char>& is)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_number_);
             }
+            handler_.end_array();
             return arrayValue;
         default:
             if (arrayValue->size() > 0 && !comma)
@@ -415,17 +499,18 @@ template <class Char>
 json_variant<Char>* json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c)
 {
     buffer_.clear();
-    buffer_.push_back(c);
     bool has_frac_or_exp = false;
     bool has_neg = (c == '-') ? true : false;
+    if (!has_neg)
+    {
+        buffer_.push_back(c);
+    }
 
     while (is)
     {
         Char c = static_cast<Char>(is.get());
         switch (c)
         {
-        case '-':
-            has_neg = true;
         case '0':
         case '1':
         case '2':
@@ -438,6 +523,7 @@ json_variant<Char>* json_parser<Char>::parse_number(std::basic_istream<Char>& is
         case '9':
             buffer_.push_back(c);
             break;
+        case '-':
         case '+':
         case '.':
         case 'e':
@@ -448,33 +534,29 @@ json_variant<Char>* json_parser<Char>::parse_number(std::basic_istream<Char>& is
         default:
             {
                 is.putback(c);
-                const Char *begin = buffer_.c_str();
-                Char *end;
                 if (has_frac_or_exp)
                 {
+                    const Char *begin = buffer_.c_str();
+                    Char *end;
                     double d = std::strtod(begin, &end);
                     if (end == begin)
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_number_);
                     }
+					if (has_neg)
+						d = -d;
+                    handler_.doubleValue(d);
                     return new json_double<Char>(d);
-                }
-                else if (has_neg)
-                {
-                    long d = std::strtol(begin, &end, 10);
-                    if (end == begin)
-                    {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid long value", line_number_);
-                    }
-                    return new json_long<Char> (d);
                 }
                 else
                 {
-                    unsigned long d = std::strtoul(begin, &end, 10);
-                    if (end == begin)
+                    uinteger_type d = json_char_traits<Char>::string_to_uinteger(buffer_);
+					if (has_neg)
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid unsigned long value", line_number_);
+                        handler_.integerValue(-static_cast<integer_type>(d));
+						return new json_long<Char>(-static_cast<integer_type>(d));
                     }
+                    handler_.uintegerValue(d);
                     return new json_ulong<Char>(d);
                 }
             }

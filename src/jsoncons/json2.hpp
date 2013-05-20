@@ -39,46 +39,6 @@ basic_json<Char>::proxy<Key>::operator const basic_json<Char>() const
 
 template <class Char>
 template <class Key>
-typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(const Char* val)
-{
-    var_->set_member(key_, new json_string<Char>(val));
-    return *this;
-}
-
-template <class Char>
-template <class Key>
-typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(std::basic_string<Char> val)
-{
-    var_->set_member(key_, new json_string(val));
-    return *this;
-}
-
-template <class Char>
-template <class Key>
-typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(double val)
-{
-    var_->set_member(key_, new json_double<Char>(val));
-    return *this;
-}
-
-template <class Char>
-template <class Key>
-typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(int val)
-{
-    var_->set_member(key_, new json_long<Char>(val));
-    return *this;
-}
-
-template <class Char>
-template <class Key>
-typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(bool val)
-{
-    var_->set_member(key_, new json_bool<Char>(val));
-    return *this;
-}
-
-template <class Char>
-template <class Key>
 typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(const basic_json& val)
 {
     var_->set_member(key_, val.var_->clone());
@@ -169,6 +129,36 @@ basic_json<Char>::basic_json(json_variant<Char>* var)
 }
 
 template <class Char>
+basic_json<Char>::basic_json(double val)
+    : var_(new json_double<Char>(val))
+{
+}
+
+template <class Char>
+basic_json<Char>::basic_json(integer_type val)
+    : var_(new json_long<Char>(val))
+{
+}
+
+template <class Char>
+basic_json<Char>::basic_json(uinteger_type val)
+    : var_(new json_ulong<Char>(val))
+{
+}
+
+template <class Char>
+basic_json<Char>::basic_json(bool val)
+    : var_(new json_bool<Char>(val))
+{
+}
+
+template <class Char>
+basic_json<Char>::basic_json(std::string s)
+    : var_(new json_string<Char>(s))
+{
+}
+
+template <class Char>
 basic_json<Char>::~basic_json()
 {
     delete var_;
@@ -246,8 +236,8 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
     json_parser<Char> parser;
-    json_variant<Char>* object = parser.parse(is);
-    return basic_json<Char>(object);
+    json_variant<Char>* var = parser.parse(is);
+    return basic_json<Char>(var);
 }
 
 
@@ -256,8 +246,8 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
     json_parser<Char> parser;
-    json_variant<Char>* object = parser.parse(is);
-    return basic_json<Char>(object);
+    json_variant<Char>* var = parser.parse(is);
+    return basic_json<Char>(var);
 }
 
 template <class Char>
@@ -279,13 +269,12 @@ std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
     return os;
 }
 
-/*template <class Char>
-template <class Key>
-std::ostream& operator<<(std::ostream& os, const typename basic_json<Char>::proxy<Key>& o)
+template <class Char,class Key>
+std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::proxy<Key>& o)
 {
     os << o.to_string();
     return os;
-}*/
+}
 
 }
 
