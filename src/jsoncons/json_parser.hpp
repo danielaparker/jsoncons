@@ -92,14 +92,14 @@ public:
     }
     void name(std::basic_string<Char> name)
     {
-        stack_.back().name_ = name;
+        stack_.back().name_ = std::move(name);
     }
     void stringValue(std::basic_string<Char> value)
     {
         json_string<Char>* var = new json_string<Char>(std::move(value));
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
             //std::cout << "stringValue " << vars_.back()->type() << " " << vars_.size() << std::endl;
         } 
         else if (stack_.back().var_->is_array())
@@ -116,7 +116,7 @@ public:
         json_double<Char>* var = new json_double<Char>(value);
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
         } 
         else if (stack_.back().var_->is_array())
         {
@@ -132,7 +132,7 @@ public:
         json_integer<Char>* var = new json_integer<Char>(value);
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
         } 
         else if (stack_.back().var_->is_array())
         {
@@ -148,7 +148,7 @@ public:
         json_uinteger<Char>* var = new json_uinteger<Char>(value);
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
         } 
         else if (stack_.back().var_->is_array())
         {
@@ -164,7 +164,7 @@ public:
         json_bool<Char>* var = new json_bool<Char>(value);
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
         } 
         else if (stack_.back().var_->is_array())
         {
@@ -180,7 +180,7 @@ public:
         json_null<Char>* var = new json_null<Char>();
         if (stack_.back().var_->is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(stack_.back().name_,var));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),var));
         } 
         else if (stack_.back().var_->is_array())
         {
