@@ -157,6 +157,7 @@ public:
     uinteger_type ulong_value() const;
     std::basic_string<Char> string_value() const;
     bool bool_value() const;
+    value_type type() const {return type_;}
 private:
     value_type type_; 
 
@@ -262,17 +263,17 @@ public:
 };
 
 template <class Char>
-class json_long  : public json_variant<Char>
+class json_integer  : public json_variant<Char>
 {
 public:
-    json_long(integer_type value)
+    json_integer(integer_type value)
         : json_variant<Char>(json_variant<Char>::long_t), value_(value)
     {
     }
 
     virtual json_variant<Char>* clone() 
     {
-        return new json_long (value_);
+        return new json_integer (value_);
     }
 
     virtual void to_stream(std::ostream& os) const
@@ -284,17 +285,17 @@ public:
 };
 
 template <class Char>
-class json_ulong : public json_variant<Char>
+class json_uinteger : public json_variant<Char>
 {
 public:
-    json_ulong(uinteger_type value)
+    json_uinteger(uinteger_type value)
         : json_variant<Char>(json_variant<Char>::ulong_t), value_(value)
     {
     }
 
     virtual json_variant<Char>* clone() 
     {
-        return new json_ulong(value_);
+        return new json_uinteger(value_);
     }
 
     virtual void to_stream(std::ostream& os) const
@@ -315,6 +316,7 @@ public:
     json_array()
         : json_variant<Char>(json_variant<Char>::array_t)
     {
+        std::cout << "*array type=" << type() << std::endl;
     }
     template <class Iterator>
     json_array(Iterator begin, Iterator end)
@@ -482,10 +484,10 @@ template <class Char>
 double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
 
 template <class Char>
-integer_type json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_long<Char> *>(this)->value_;}
+integer_type json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_integer<Char> *>(this)->value_;}
 
 template <class Char>
-uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_ulong<Char>*>(this)->value_;}
+uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}

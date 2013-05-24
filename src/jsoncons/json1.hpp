@@ -85,13 +85,11 @@ public:
 
     explicit basic_json(json_variant<Char>* var);
 
-    explicit basic_json(basic_json&& other);
+    explicit basic_json(basic_json<Char>&& other);
 
     ~basic_json();
 
-    basic_json& operator=(const basic_json& rhs);
-
-    basic_json& operator=(basic_json<Char>&& other);
+    basic_json& operator=(basic_json<Char> rhs);
 
     size_t size() const;
 
@@ -112,6 +110,8 @@ public:
     double as_double() const;
 
     int as_int() const;
+
+    void swap(basic_json<Char>& o) throw();
 
     json_variant<Char>* var_;
 };

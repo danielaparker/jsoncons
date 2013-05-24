@@ -10,6 +10,7 @@
 #include <exception>
 #include <cstdlib>
 #include <cstring>
+#include <utility>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_variant.hpp"
 
@@ -109,19 +110,6 @@ basic_json<Char>::basic_json(basic_json&& other)
     other.var_ = 0;
 }
 
-// Move assignment operator.
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(basic_json<Char>&& other)
-{
-   if (this != &other)
-   {
-      delete[] var_;
-      var_ = other.var_;
-      other.var_ = 0;
-   }
-   return *this;
-}
-
 template <class Char>
 basic_json<Char>::basic_json(json_variant<Char>* var)
     : var_(var)
@@ -136,13 +124,13 @@ basic_json<Char>::basic_json(double val)
 
 template <class Char>
 basic_json<Char>::basic_json(integer_type val)
-    : var_(new json_long<Char>(val))
+    : var_(new json_integer<Char>(val))
 {
 }
 
 template <class Char>
 basic_json<Char>::basic_json(uinteger_type val)
-    : var_(new json_ulong<Char>(val))
+    : var_(new json_uinteger<Char>(val))
 {
 }
 
@@ -165,14 +153,16 @@ basic_json<Char>::~basic_json()
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(const basic_json<Char>& rhs)
+basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 {
-    if (&rhs != this)
-    {
-        delete var_;
-        var_ = rhs.var_->clone();
-    }
+    rhs.swap(*this);
     return *this;
+}
+
+template <class Char>
+void basic_json<Char>::swap(basic_json<Char>& o) throw()
+{
+    std::swap(var_,o.var_);
 }
 
 template <class Char>
