@@ -222,11 +222,14 @@ const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>())
 template <class Char>
 const basic_json<Char> basic_json<Char>::null_prototype(new json_null<Char>());
 
-template <class Char>
+template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
     json_parser<Char> parser;
-    json_variant<Char>* var = parser.parse(is);
+    json_content_handler<Char> handler;
+    parser.parse(is,handler);
+    json_variant<Char>* var = 0;
+    std::swap(var,handler.root_.var_);
     return basic_json<Char>(var);
 }
 
@@ -236,7 +239,10 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
     json_parser<Char> parser;
-    json_variant<Char>* var = parser.parse(is);
+    json_content_handler<Char> handler;
+    json_variant<Char>* var = parser.parse(is,handler);
+    json_variant<Char>* var = 0;
+    std::swap(var,handler.root_.var_);
     return basic_json<Char>(var);
 }
 
