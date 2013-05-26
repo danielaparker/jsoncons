@@ -17,6 +17,7 @@ using std::string;
 
 BOOST_AUTO_TEST_CASE( test1 )
 {
+
     std::istringstream is("{\"unicode_string_1\":\"\\uD800\\uDC00\"}");
 
     json root = json::parse(is);

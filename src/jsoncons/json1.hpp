@@ -27,9 +27,19 @@ template <class Char>
 class json_array;
 
 template <class Char>
+union value_union
+{
+public:
+    double double_value_;
+    json_variant<Char>* var_;
+};
+
+template <class Char>
 class basic_json
 {
 public:
+    enum value_type {object_t,string_t,double_t,long_t,ulong_t,array_t,bool_t,null_t};
+
     static const basic_json<Char> object_prototype;
     static const basic_json<Char> array_prototype;
     static const basic_json<Char> null_prototype;
@@ -39,7 +49,7 @@ public:
     template <class Key>
     struct proxy
     {
-    	proxy(json_variant<Char>* var, Key key);
+    	proxy(basic_json<Char>& var, Key key);
 
         size_t size() const;
 
@@ -57,7 +67,7 @@ public:
 
         std::basic_string<Char> to_string() const;
 
-        json_variant<Char>* var_;
+        basic_json<Char>& var_;
 
         Key key_;
     };
@@ -113,7 +123,18 @@ public:
 
     void swap(basic_json<Char>& o) throw();
 
+    basic_json<Char>& get(size_t i);
+
+    const basic_json<Char>& get(size_t i) const;
+
+    basic_json<Char>& get(const std::string& name);
+
+    const basic_json<Char>& get(const std::string& name) const;
+
+    void set_member(const std::basic_string<Char>& name, basic_json<Char> value);
+
     json_variant<Char>* var_;
+    value_union<Char> value_;
 };
 
 

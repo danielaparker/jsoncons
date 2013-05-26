@@ -105,6 +105,16 @@ public:
         }
     }
 
+    void set_member(const std::string& name, basic_json<Char> var) {
+        switch (type_)
+        {
+        case object_t:
+            return object_cast()->set_member(name,var);
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
+    }
+
     bool is_null() const
     {
         return type_ == null_t;
@@ -175,7 +185,7 @@ public:
         : name_(name), value_(basic_json<Char>(value))
     {
     }
-    name_value_pair(std::basic_string<Char> name, const basic_json<Char>& value)
+    name_value_pair(std::basic_string<Char> name, basic_json<Char> value)
         : name_(name), value_(value)
     {
     }
@@ -435,6 +445,8 @@ public:
 
     void set_member(const std::basic_string<Char>& name, json_variant<Char>* value);
 
+    void set_member(const std::basic_string<Char>& name, basic_json<Char> value);
+
     void remove(iterator at); 
 
     basic_json<Char>& get(const std::basic_string<Char>& name);
@@ -623,6 +635,18 @@ void json_object<Char>::remove(iterator at)
 
 template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, json_variant<Char>* value)
+{
+    name_value_pair<Char> key(name,0);
+    iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
+    if (it != end() && (*it).name_ == name)
+    {
+        remove(it);
+    }
+    insert(it,name_value_pair<Char>(name,value));
+}
+
+template <class Char>
+void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
     name_value_pair<Char> key(name,0);
     iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
