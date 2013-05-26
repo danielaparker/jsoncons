@@ -129,14 +129,14 @@ basic_json<Char>::basic_json(double val)
 template <class Char>
 basic_json<Char>::basic_json(integer_type val)
 {
-    type_ = long_t;
+    type_ = longlong_t;
     value_.var_ = new json_integer<Char>(val);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(uinteger_type val)
 {
-    type_ = ulong_t;
+    type_ = ulonglong_t;
     value_.var_ = new json_uinteger<Char>(val);
 }
 

@@ -28,7 +28,7 @@ template <class Char>
 class json_variant
 {
 public:
-    enum value_type {object_t,string_t,double_t,long_t,ulong_t,array_t,bool_t,null_t};
+    enum value_type {object_t,string_t,double_t,longlong_t,ulonglong_t,array_t,bool_t,null_t};
     friend class basic_json<Char>;
 
     typedef Char char_type;
@@ -181,11 +181,15 @@ public:
 //        : value_(0)
     {
     }
-    name_value_pair(std::basic_string<Char> name, json_variant<Char>* value)
-        : name_(name), value_(basic_json<Char>(value))
+    name_value_pair(std::basic_string<Char> name)
+        : name_(name), value_(nullptr)
     {
     }
-    name_value_pair(std::basic_string<Char> name, basic_json<Char> value)
+    name_value_pair(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        : name_(name), value_(value)
+    {
+    }
+    name_value_pair(std::basic_string<Char>&& name, basic_json<Char>&& value)
         : name_(name), value_(value)
     {
     }
@@ -277,7 +281,7 @@ class json_integer  : public json_variant<Char>
 {
 public:
     json_integer(integer_type value)
-        : json_variant<Char>(json_variant<Char>::long_t), value_(value)
+        : json_variant<Char>(json_variant<Char>::longlong_t), value_(value)
     {
     }
 
@@ -299,7 +303,7 @@ class json_uinteger : public json_variant<Char>
 {
 public:
     json_uinteger(uinteger_type value)
-        : json_variant<Char>(json_variant<Char>::ulong_t), value_(value)
+        : json_variant<Char>(json_variant<Char>::ulonglong_t), value_(value)
     {
     }
 
@@ -496,10 +500,10 @@ template <class Char>
 double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
 
 template <class Char>
-integer_type json_variant<Char>::long_value() const {assert(type_ == long_t); return static_cast<const json_integer<Char> *>(this)->value_;}
+integer_type json_variant<Char>::long_value() const {assert(type_ == longlong_t); return static_cast<const json_integer<Char> *>(this)->value_;}
 
 template <class Char>
-uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
+uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulonglong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
@@ -582,9 +586,9 @@ double json_variant<Char>::as_double() const
     {
     case double_t:
         return double_value();
-    case long_t:
+    case longlong_t:
         return static_cast<double>(long_value());
-    case ulong_t:
+    case ulonglong_t:
         return static_cast<double>(ulong_value());
     default:
         std::cout << "Must be here" << std::endl;
@@ -599,9 +603,9 @@ int json_variant<Char>::as_int() const
     {
     case double_t:
         return static_cast<int>(double_value());
-    case long_t:
+    case longlong_t:
         return static_cast<int>(long_value());
-    case ulong_t:
+    case ulonglong_t:
         return static_cast<int>(ulong_value());
     default:
         std::cout << "Must be here" << std::endl;
@@ -648,7 +652,7 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, json_var
 template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
-    name_value_pair<Char> key(name,0);
+    name_value_pair<Char> key(name);
     iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
     if (it != end() && (*it).name_ == name)
     {
@@ -676,7 +680,7 @@ const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& na
 template <class Char>
 typename json_object<Char>::iterator json_object<Char>::find(const std::basic_string<Char>& name)
 {
-    name_value_pair<Char> key(name,0);
+    name_value_pair<Char> key(name);
     member_compare<Char> comp;
     iterator it = std::lower_bound(begin(),end(),key,comp);
     return (it != end() && !comp(key,*it)) ? it : end();

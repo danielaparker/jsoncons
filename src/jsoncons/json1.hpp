@@ -38,7 +38,7 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,string_t,double_t,long_t,ulong_t,array_t,bool_t,null_t};
+    enum value_type {object_t,string_t,double_t,longlong_t,ulonglong_t,array_t,bool_t,null_t};
 
     static const basic_json<Char> object_prototype;
     static const basic_json<Char> array_prototype;
