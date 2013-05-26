@@ -86,6 +86,7 @@ template <class Char>
 basic_json<Char>::basic_json()
     : var_(new json_object<Char>())
 {
+    type_ = object_t;
 }
 
 template <class Char>
@@ -93,18 +94,21 @@ template <class Iterator>
 basic_json<Char>::basic_json(Iterator begin, Iterator end)
     : var_(new json_array<Char>(begin,end))
 {
+    type_ = array_t;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const basic_json<Char>& val)
     : var_(val.var_->clone())
 {
+    type_ = val.type_;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(basic_json&& other)
     : var_(other.var_)
 {
+    type_ = other.type_;
     other.var_ = 0;
 }
 
@@ -118,30 +122,42 @@ template <class Char>
 basic_json<Char>::basic_json(double val)
     : var_(new json_double<Char>(val))
 {
+    type_ = double_t;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(integer_type val)
     : var_(new json_integer<Char>(val))
 {
+    type_ = long_t;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(uinteger_type val)
     : var_(new json_uinteger<Char>(val))
 {
+    type_ = ulong_t;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(bool val)
     : var_(new json_bool<Char>(val))
 {
+    type_ = bool_t;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(std::string s)
     : var_(new json_string<Char>(s))
 {
+    type_ = string_t;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(nullptr_t nullp)
+    : var_(new json_null<Char>())
+{
+    type_ = null_t;
 }
 
 template <class Char>
@@ -248,7 +264,7 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null_prototype(new json_null<Char>());
+const basic_json<Char> basic_json<Char>::null_prototype(basic_json<Char>(nullptr));
 
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)

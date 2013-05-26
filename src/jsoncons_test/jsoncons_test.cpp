@@ -105,3 +105,9 @@ BOOST_AUTO_TEST_CASE(example)
     std::cout << root << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_null)
+{
+    json nullval = json::null_prototype;
+    BOOST_CHECK(nullval.is_null());
+}
+

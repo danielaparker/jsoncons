@@ -80,6 +80,8 @@ public:
 
     basic_json(const basic_json& val);
 
+    explicit basic_json(nullptr_t nullp);
+
     explicit basic_json(double val);
 
     explicit basic_json(integer_type val);
@@ -133,6 +135,8 @@ public:
 
     void set_member(const std::basic_string<Char>& name, basic_json<Char> value);
 
+private:
+    value_type type_;
     json_variant<Char>* var_;
     value_union<Char> value_;
 };
