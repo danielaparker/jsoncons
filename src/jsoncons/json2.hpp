@@ -20,7 +20,7 @@ namespace jsoncons {
 template <class Char>
 template <class Key>
 basic_json<Char>::proxy<Key>::proxy(basic_json<Char>& var, Key key)
-    : var_(var), key_(key)
+    : val_(var), key_(key)
 {
 }
 
@@ -28,21 +28,21 @@ template <class Char>
 template <class Key>
 size_t basic_json<Char>::proxy<Key>::size() const
 {
-    return var_.get(key_).size();
+    return val_.get(key_).size();
 }
 
 template <class Char>
 template <class Key>
 basic_json<Char>::proxy<Key>::operator const basic_json<Char>() const
 {
-    return var_.get(key_);
+    return val_.get(key_);
 }
 
 template <class Char>
 template <class Key>
 typename basic_json<Char>::proxy<Key>& basic_json<Char>::proxy<Key>::operator=(const basic_json& val)
 {
-    var_.set_member(key_, val);
+    val_.set_member(key_, val);
     return *this;
 }
 
@@ -50,120 +50,121 @@ template <class Char>
 template <class Key>
 typename basic_json<Char>::proxy<size_t> basic_json<Char>::proxy<Key>::operator[](size_t i)
 {
-    return proxy<size_t>(var_.get(key_),i);
+    return proxy<size_t>(val_.get(key_),i);
 }
 
 template <class Char>
 template <class Key>
 const typename basic_json<Char>::proxy<size_t> basic_json<Char>::proxy<Key>::operator[](size_t i) const
 {
-    return proxy<size_t>(var_.get(key_),i);
+    return proxy<size_t>(val_.get(key_),i);
 }
 
 template <class Char>
 template <class Key>
 typename basic_json<Char>::proxy<std::basic_string<Char>> basic_json<Char>::proxy<Key>::operator[](std::basic_string<Char> name)
 {
-    return proxy<std::basic_string<Char>>(var_.get(key_),name);
+    return proxy<std::basic_string<Char>>(val_.get(key_),name);
 }
 
 template <class Char>
 template <class Key>
 typename const basic_json<Char>::proxy<std::basic_string<Char>> basic_json<Char>::proxy<Key>::operator[](std::basic_string<Char> name) const
 {
-    return proxy<std::basic_string<Char>>(var_.get(key_),name);
+    return proxy<std::basic_string<Char>>(val_.get(key_),name);
 }
 
 template <class Char>
 template <class Key>
 std::basic_string<Char> basic_json<Char>::proxy<Key>::to_string() const
 {
-    return var_.get(key_).to_string();
+    return val_.get(key_).to_string();
 }
 
 
 template <class Char>
 basic_json<Char>::basic_json()
-    : var_(new json_object<Char>())
 {
     type_ = object_t;
+    value_.var_ = new json_object<Char>();
 }
 
 template <class Char>
 template <class Iterator>
 basic_json<Char>::basic_json(Iterator begin, Iterator end)
-    : var_(new json_array<Char>(begin,end))
 {
     type_ = array_t;
+    value_.var_ = new json_array<Char>(begin,end);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const basic_json<Char>& val)
-    : var_(val.var_->clone())
 {
     type_ = val.type_;
+    value_.var_ = val.value_.var_->clone();
+
 }
 
 template <class Char>
 basic_json<Char>::basic_json(basic_json&& other)
-    : var_(other.var_)
 {
     type_ = other.type_;
-    other.var_ = 0;
+    value_.var_ = other.value_.var_;
+    other.value_.var_ = nullptr;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(json_variant<Char>* var)
-    : var_(var)
 {
+    value_.var_ = var;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(double val)
-    : var_(new json_double<Char>(val))
 {
     type_ = double_t;
+    value_.var_ = new json_double<Char>(val);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(integer_type val)
-    : var_(new json_integer<Char>(val))
 {
     type_ = long_t;
+    value_.var_ = new json_integer<Char>(val);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(uinteger_type val)
-    : var_(new json_uinteger<Char>(val))
 {
     type_ = ulong_t;
+    value_.var_ = new json_uinteger<Char>(val);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(bool val)
-    : var_(new json_bool<Char>(val))
 {
     type_ = bool_t;
+    value_.var_ = new json_bool<Char>(val);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(std::string s)
-    : var_(new json_string<Char>(s))
 {
     type_ = string_t;
+    value_.var_ = new json_string<Char>(s);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(nullptr_t nullp)
-    : var_(new json_null<Char>())
 {
     type_ = null_t;
+    value_.var_ = new json_null<Char>();
 }
 
 template <class Char>
 basic_json<Char>::~basic_json()
 {
-    delete var_;
+    delete value_.var_;
 }
 
 template <class Char>
@@ -176,49 +177,49 @@ basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 template <class Char>
 void basic_json<Char>::swap(basic_json<Char>& o) throw()
 {
-    std::swap(var_,o.var_);
+    std::swap(value_,o.value_);
 }
 
 template <class Char>
 basic_json<Char>& basic_json<Char>::get(size_t i) 
 {
-    return var_->get(i);
+    return value_.var_->get(i);
 }
 
 template <class Char>
 const basic_json<Char>& basic_json<Char>::get(size_t i) const
 {
-    return var_->get(i);
+    return value_.var_->get(i);
 }
 
 template <class Char>
 basic_json<Char>& basic_json<Char>::get(const std::string& name) 
 {
-    return var_->get(name);
+    return value_.var_->get(name);
 }
 
 template <class Char>
 const basic_json<Char>& basic_json<Char>::get(const std::string& name) const
 {
-    return var_->get(name);
+    return value_.var_->get(name);
 }
 
 template <class Char>
 void basic_json<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
-    return var_->set_member(name,value);
+    return value_.var_->set_member(name,value);
 }
 
 template <class Char>
 size_t basic_json<Char>::size() const
 {
-    return var_->size();
+    return value_.var_->size();
 }
 
 template <class Char>
 bool basic_json<Char>::is_null() const
 {
-    return var_->is_null();
+    return value_.var_->is_null();
 }
 
 template <class Char>
@@ -248,13 +249,13 @@ const typename basic_json<Char>::proxy<size_t> basic_json<Char>::operator[](size
 template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
-    return var_->to_string();
+    return value_.var_->to_string();
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::ostream& os) const
 {
-    var_->to_stream(os);
+    value_.var_->to_stream(os);
 }
 
 template <class Char>
@@ -273,7 +274,7 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     json_content_handler<Char> handler;
     parser.parse(is,handler);
     json_variant<Char>* var = 0;
-    std::swap(var,handler.root_.var_);
+    std::swap(var,handler.root_.value_.var_);
     return basic_json<Char>(var);
 }
 
@@ -286,20 +287,20 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
     json_content_handler<Char> handler;
     json_variant<Char>* var = parser.parse(is,handler);
     json_variant<Char>* var = 0;
-    std::swap(var,handler.root_.var_);
+    std::swap(var,handler.root_.value_.var_);
     return basic_json<Char>(var);
 }
 
 template <class Char>
 double basic_json<Char>::as_double() const
 {
-    return var_->as_double();
+    return value_.var_->as_double();
 }
 
 template <class Char>
 int basic_json<Char>::as_int() const
 {
-    return var_->as_int();
+    return value_.var_->as_int();
 }
 
 template <class Char>

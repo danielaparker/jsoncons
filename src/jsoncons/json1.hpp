@@ -67,7 +67,7 @@ public:
 
         std::basic_string<Char> to_string() const;
 
-        basic_json<Char>& var_;
+        basic_json<Char>& val_;
 
         Key key_;
     };
@@ -137,7 +137,6 @@ public:
 
 private:
     value_type type_;
-    json_variant<Char>* var_;
     value_union<Char> value_;
 };
 
