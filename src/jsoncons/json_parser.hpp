@@ -19,12 +19,18 @@ typedef unsigned long long ulonglong_type;
 template <class Char>
 struct stack_item
 {
-    stack_item(json_variant<Char>* var)
-        : var_(var)
+    stack_item(json_variant<Char>* var, bool is_object)
+        : var_(var), is_object_(is_object)
     {
     }
+    bool is_object() const
+    {
+        return is_object_;
+    }
+
     std::basic_string<Char> name_;
     json_variant<Char>* var_;
+    bool is_object_;
 };
 
 template <class Char>
@@ -40,16 +46,16 @@ public:
     void begin_object()
     {
         json_object<Char>* var = new json_object<Char>();
-        stack_.push_back(stack_item<Char>(var));
+        stack_.push_back(stack_item<Char>(var,true));
     }
     void end_object()
     {
-        json_variant<Char>* var = stack_.back().var_;
-        var->object_cast()->sort_members();
-        stack_.pop_back();
+		json_object<Char>* var = stack_.back().var_->object_cast();
+	    var->sort_members();
+		stack_.pop_back();
         if (stack_.size() > 0)
         {
-            if (stack_.back().var_->is_object())
+            if (stack_.back().is_object())
             {
                 stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
             }
@@ -61,20 +67,21 @@ public:
         else
         {
             root_ = basic_json<Char>(var);
+            std::cout << "initial root type " << root_.type() << std::endl;
         }
     }
     void begin_array()
     {
         json_array<Char>* var = new json_array<Char>();
-        stack_.push_back(stack_item<Char>(var));
+        stack_.push_back(stack_item<Char>(var,false));
     }
     void end_array()
     {
-        json_variant<Char>* var = stack_.back().var_;
+        json_array<Char>* var = stack_.back().var_->array_cast();
         stack_.pop_back();
         if (stack_.size() > 0)
         {
-            if (stack_.back().var_->is_object())
+            if (stack_.back().is_object())
             {
                 stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
             }
@@ -95,97 +102,74 @@ public:
     void string_value(std::basic_string<Char>&& value)
     {
         json_string<Char>* var = new json_string<Char>(value);
-        if (stack_.back().var_->is_object())
+        if (stack_.back().is_object())
         {
             stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
         } 
-        else if (stack_.back().var_->is_array())
+        else 
         {
             stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
             //std::cout << "string_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
         }
-        else 
-        {
-        }
     }
     void double_value(double value)
     {
-        json_double<Char>* var = new json_double<Char>(value);
-        if (stack_.back().var_->is_object())
+        basic_json<Char> val(value);
+        if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
-        else if (stack_.back().var_->is_array())
+        else
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
-        }
-        else 
-        {
-            //std::cout << "double_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
+            stack_.back().var_->array_cast()->push_back(val);
         }
     }
     void integer_value(longlong_type value)
     {
-        json_integer<Char>* var = new json_integer<Char>(value);
-        if (stack_.back().var_->is_object())
+        basic_json<Char> val(value);
+        if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
-        else if (stack_.back().var_->is_array())
+        else
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
-        }
-        else 
-        {
-            //std::cout << "integer_value " << vars_.back()->type()  << " " << vars_.size()<< std::endl;
+            stack_.back().var_->array_cast()->push_back(val);
         }
     }
     void uinteger_value(longlong_type value)
     {
-        json_uinteger<Char>* var = new json_uinteger<Char>(value);
-        if (stack_.back().var_->is_object())
+        basic_json<Char> val(value);
+        if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
-        else if (stack_.back().var_->is_array())
+        else
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
-        }
-        else 
-        {
-            //std::cout << "uinteger_value " << vars_.back()->type()  << " " << vars_.size()<< std::endl;
+            stack_.back().var_->array_cast()->push_back(val);
         }
     }
     void bool_value(bool value)
     {
-        json_bool<Char>* var = new json_bool<Char>(value);
-        if (stack_.back().var_->is_object())
+        basic_json<Char> val(value);
+        if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
-        else if (stack_.back().var_->is_array())
+        else
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
-        }
-        else 
-        {
-            //std::cout << "bool_value " << vars_.back()->type()  << " " << vars_.size()<< std::endl;
+            stack_.back().var_->array_cast()->push_back(val);
         }
     }
     void null_value()
     {
-        json_null<Char>* var = new json_null<Char>();
-        if (stack_.back().var_->is_object())
+        basic_json<Char> val(nullptr);
+        if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
-        else if (stack_.back().var_->is_array())
+        else
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
-        }
-        else 
-        {
-            //std::cout << "null_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
+            stack_.back().var_->array_cast()->push_back(val);
         }
     }
 	basic_json<Char> root_;

@@ -27,6 +27,9 @@ template <class Char>
 class json_array;
 
 template <class Char>
+class json_string;
+
+template <class Char>
 union value_union
 {
 public:
@@ -98,7 +101,11 @@ public:
     template <class Iterator>
     basic_json(Iterator begin, Iterator end);
 
-    explicit basic_json(json_variant<Char>* var);
+    explicit basic_json(json_string<Char>* var);
+
+    explicit basic_json(json_object<Char>* var);
+
+    explicit basic_json(json_array<Char>* var);
 
     explicit basic_json(basic_json<Char>&& other);
 
@@ -107,8 +114,6 @@ public:
     basic_json& operator=(basic_json<Char> rhs);
 
     size_t size() const;
-
-    bool is_null() const;
 
     proxy<size_t> operator[](size_t);
 
@@ -136,7 +141,44 @@ public:
 
     const basic_json<Char>& get(const std::string& name) const;
 
-    void set_member(const std::basic_string<Char>& name, basic_json<Char> value);
+    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
+
+    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+
+    bool is_null() const
+    {
+        return type_ == null_t;
+    }
+
+    bool is_bool() const
+    {
+        return type_ == bool_t;
+    }
+
+    bool is_object() const
+    {
+        return type_ == object_t;
+    }
+
+    bool is_array() const
+    {
+        return type_ == array_t;
+    }
+
+    bool is_string() const
+    {
+        return type_ == string_t;
+    }
+
+    bool is_double() const
+    {
+        return type_ == double_t;
+    }
+
+    value_type type() const
+    {
+        return type_;
+    }
 
 private:
     value_type type_;

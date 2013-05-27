@@ -28,127 +28,13 @@ template <class Char>
 class json_variant
 {
 public:
-    enum value_type {object_t,string_t,double_t,longlong_t,ulonglong_t,array_t,bool_t,null_t};
     friend class basic_json<Char>;
-
-    typedef Char char_type;
-
-    json_variant(value_type type)
-        : type_(type)
-    {
-    }
-
-    size_t size() const {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->size();
-        case array_t:
-            return array_cast()->size();
-        default:
-            return 0;
-        }
-    }
-
-    basic_json<Char>& get(size_t i) {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->at(i);
-        case array_t:
-            return array_cast()->at(i);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an array or object");
-        }
-    }
-
-    const basic_json<Char>& get(size_t i) const {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->at(i);
-        case array_t:
-            return array_cast()->at(i);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an array or object");
-        }
-    }
-
-    basic_json<Char>& get(const std::string& name) {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->get(name);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
-        }
-    }
-
-    const basic_json<Char>& get(const std::string& name) const {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->get(name);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
-        }
-    }
-
-
-    void set_member(const std::string& name, json_variant* var) {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->set_member(name,var);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
-        }
-    }
-
-    void set_member(const std::string& name, basic_json<Char> var) {
-        switch (type_)
-        {
-        case object_t:
-            return object_cast()->set_member(name,var);
-        default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
-        }
-    }
-
-    bool is_null() const
-    {
-        return type_ == null_t;
-    }
-
-    bool is_object() const
-    {
-        return type_ == object_t;
-    }
-
-    bool is_array() const
-    {
-        return type_ == array_t;
-    }
-
-    bool is_string() const
-    {
-        return type_ == string_t;
-    }
-
-    bool is_double() const
-    {
-        return type_ == double_t;
-    }
 
     virtual ~json_variant()
     {
     }
 
     virtual json_variant* clone() = 0;
-
-    double as_double() const;
-
-    int as_int() const;
 
     std::basic_string<Char> to_string() const;
 
@@ -162,15 +48,7 @@ public:
     json_array<Char>* array_cast();
     const json_object<Char>* object_cast() const;
     const json_array<Char>* array_cast() const;
-    double double_value() const;
-    longlong_type long_value() const;
-    ulonglong_type ulong_value() const;
     std::basic_string<Char> string_value() const;
-    bool bool_value() const;
-    value_type type() const {return type_;}
-private:
-    value_type type_; 
-
 };
 
 template <class Char>
@@ -235,11 +113,10 @@ class json_string : public json_variant<Char>
 {
 public:
     json_string()
-        : json_variant<Char>(json_variant<Char>::string_t)
     {
     }
     json_string(std::basic_string<Char> s)
-        : json_variant<Char>(json_variant<Char>::string_t), value_(s)
+        : value_(s)
     {
     }
 
@@ -257,92 +134,6 @@ public:
 };
 
 template <class Char>
-class json_null : public json_variant<Char>
-{
-public:
-    json_null()
-        : json_variant<Char>(json_variant<Char>::null_t)
-    {
-    }
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_null();
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        os << "null";
-    }
-};
-
-template <class Char>
-class json_double : public json_variant<Char>
-{
-public:
-    json_double(double value)
-        : json_variant<Char>(json_variant<Char>::double_t), value_(value)
-    {
-    }
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_double(value_);
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        os << value_;
-    }
-
-    double value_;
-};
-
-template <class Char>
-class json_integer  : public json_variant<Char>
-{
-public:
-    json_integer(longlong_type value)
-        : json_variant<Char>(json_variant<Char>::longlong_t), value_(value)
-    {
-    }
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_integer (value_);
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        os << value_;
-    }
-
-    longlong_type value_;
-};
-
-template <class Char>
-class json_uinteger : public json_variant<Char>
-{
-public:
-    json_uinteger(ulonglong_type value)
-        : json_variant<Char>(json_variant<Char>::ulonglong_t), value_(value)
-    {
-    }
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_uinteger(value_);
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        os << value_;
-    }
-
-    ulonglong_type value_;
-};
-
-template <class Char>
 class json_array : public json_variant<Char>
 {
 public:
@@ -350,13 +141,10 @@ public:
     typedef typename std::vector<basic_json<Char>>::const_iterator const_iterator;
 
     json_array()
-        : json_variant<Char>(json_variant<Char>::array_t)
     {
-        std::cout << "*array type=" << type() << std::endl;
     }
     template <class Iterator>
     json_array(Iterator begin, Iterator end)
-        : json_variant<Char>(json_variant<Char>::array_t)
     {
         for (Iterator it = begin; it != end; ++it)
         {
@@ -399,35 +187,6 @@ public:
 };
 
 template <class Char>
-class json_bool : public json_variant<Char>
-{
-public:
-	json_bool(bool value)
-		: json_variant<Char>(json_variant<Char>::bool_t), value_(value)
-	{
-	}
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_bool(value_);
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        if (value_)
-        {
-            os << "true";
-        }
-        else
-        {
-            os << "false";
-        }
-    }
-
-    bool value_;
-};
-
-template <class Char>
 class json_object : public json_variant<Char>
 {
 public:
@@ -435,12 +194,11 @@ public:
     typedef typename std::vector<name_value_pair<Char>>::const_iterator const_iterator;
 
     json_object()
-        : json_variant<Char>(json_variant<Char>::object_t)
     {
     }
 
     json_object(std::vector<name_value_pair<Char>> members)
-        : json_variant<Char>(json_variant<Char>::object_t), members_(members)
+        : members_(members)
     {
     }
 
@@ -519,36 +277,24 @@ public:
 };
 
 template <class Char>
-double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
+std::basic_string<Char> json_variant<Char>::string_value() const {return static_cast<const json_string<Char>*>(this)->value_;}
 
 template <class Char>
-longlong_type json_variant<Char>::long_value() const {assert(type_ == longlong_t); return static_cast<const json_integer<Char> *>(this)->value_;}
+json_object<Char>* json_variant<Char>::object_cast() {return static_cast<json_object<Char>*>(this);}
 
 template <class Char>
-ulonglong_type json_variant<Char>::ulong_value() const {assert(type_ == ulonglong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
+json_array<Char>* json_variant<Char>::array_cast() {return static_cast<json_array<Char>*>(this);}
 
 template <class Char>
-std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
+const json_object<Char>* json_variant<Char>::object_cast() const {return static_cast<const json_object<Char>*>(this);}
 
 template <class Char>
-bool json_variant<Char>::bool_value() const {assert(type_ == bool_t); return static_cast<const json_bool<Char>*>(this)->value_;}
-
-template <class Char>
-json_object<Char>* json_variant<Char>::object_cast() {assert(type_ == object_t); return static_cast<json_object<Char>*>(this);}
-
-template <class Char>
-json_array<Char>* json_variant<Char>::array_cast() {assert(type_ == array_t); return static_cast<json_array<Char>*>(this);}
-
-template <class Char>
-const json_object<Char>* json_variant<Char>::object_cast() const {assert(type_ == object_t); return static_cast<const json_object<Char>*>(this);}
-
-template <class Char>
-const json_array<Char>* json_variant<Char>::array_cast() const {assert(type_ == array_t); return static_cast<const json_array<Char>*>(this);}
+const json_array<Char>* json_variant<Char>::array_cast() const {return static_cast<const json_array<Char>*>(this);}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::to_string() const
 {
-    std::ostringstream os;
+    std::basic_ostringstream<Char> os;
     os.precision(16);
     to_stream(os);
     return os.str();
@@ -598,40 +344,6 @@ std::basic_string<Char> json_variant<Char>::escape_string(const std::basic_strin
             }
         }
         return buf;
-    }
-}
-
-template <class Char>
-double json_variant<Char>::as_double() const
-{
-    switch (type_)
-    {
-    case double_t:
-        return double_value();
-    case longlong_t:
-        return static_cast<double>(long_value());
-    case ulonglong_t:
-        return static_cast<double>(ulong_value());
-    default:
-        std::cout << "Must be here" << std::endl;
-        JSONCONS_THROW_EXCEPTION("Not a double");
-    }
-}
-
-template <class Char>
-int json_variant<Char>::as_int() const
-{
-    switch (type_)
-    {
-    case double_t:
-        return static_cast<int>(double_value());
-    case longlong_t:
-        return static_cast<int>(long_value());
-    case ulonglong_t:
-        return static_cast<int>(ulong_value());
-    default:
-        std::cout << "Must be here" << std::endl;
-        JSONCONS_THROW_EXCEPTION("Not a double");
     }
 }
 

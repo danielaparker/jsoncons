@@ -78,7 +78,7 @@ template <class Char>
 template <class Key>
 std::basic_string<Char> basic_json<Char>::proxy<Key>::to_string() const
 {
-    return val_.get(key_).to_string();
+    return val_.to_string();
 }
 
 
@@ -101,21 +101,48 @@ template <class Char>
 basic_json<Char>::basic_json(const basic_json<Char>& val)
 {
     type_ = val.type_;
-    value_.var_ = val.value_.var_->clone();
-
+    switch (type_)
+    {
+    case double_t:
+    case longlong_t:
+    case ulonglong_t:
+    case bool_t:
+    case null_t:
+        value_ = val.value_;
+        break;
+    default:
+        value_.var_ = val.value_.var_->clone();
+        break;
+    }
 }
 
 template <class Char>
 basic_json<Char>::basic_json(basic_json&& other)
 {
     type_ = other.type_;
-    value_.var_ = other.value_.var_;
+    value_ = other.value_;
+    other.type_ = null_t;
     other.value_.var_ = nullptr;
 }
 
 template <class Char>
-basic_json<Char>::basic_json(json_variant<Char>* var)
+basic_json<Char>::basic_json(json_string<Char>* var)
 {
+    type_ = string_t;
+    value_.var_ = var;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(json_object<Char>* var)
+{
+    type_ = object_t;
+    value_.var_ = var;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(json_array<Char>* var)
+{
+    type_ = array_t;
     value_.var_ = var;
 }
 
@@ -123,28 +150,28 @@ template <class Char>
 basic_json<Char>::basic_json(double val)
 {
     type_ = double_t;
-    value_.var_ = new json_double<Char>(val);
+    value_.double_value_ = val;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(longlong_type val)
 {
     type_ = longlong_t;
-    value_.var_ = new json_integer<Char>(val);
+    value_.longlong_value_ = val;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(ulonglong_type val)
 {
     type_ = ulonglong_t;
-    value_.var_ = new json_uinteger<Char>(val);
+    value_.ulonglong_value_ = val;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(bool val)
 {
     type_ = bool_t;
-    value_.var_ = new json_bool<Char>(val);
+    value_.bool_value_ = val;
 }
 
 template <class Char>
@@ -158,13 +185,24 @@ template <class Char>
 basic_json<Char>::basic_json(nullptr_t nullp)
 {
     type_ = null_t;
-    value_.var_ = new json_null<Char>();
+    value_.var_ = nullptr;
 }
 
 template <class Char>
 basic_json<Char>::~basic_json()
 {
-    delete value_.var_;
+    switch (type_)
+    {
+    case double_t:
+    case longlong_t:
+    case ulonglong_t:
+    case bool_t:
+    case null_t:
+        break;
+    default:
+        delete value_.var_;
+        break;
+    }
 }
 
 template <class Char>
@@ -177,49 +215,114 @@ basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 template <class Char>
 void basic_json<Char>::swap(basic_json<Char>& o) throw()
 {
+    std::swap(type_,o.type_);
     std::swap(value_,o.value_);
 }
 
 template <class Char>
 basic_json<Char>& basic_json<Char>::get(size_t i) 
 {
-    return value_.var_->get(i);
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->at(i);
+    case array_t:
+        return value_.var_->array_cast()->at(i);
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array or object");
+    }
 }
 
 template <class Char>
 const basic_json<Char>& basic_json<Char>::get(size_t i) const
 {
-    return value_.var_->get(i);
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->at(i);
+    case array_t:
+        return value_.var_->array_cast()->at(i);
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array or object");
+    }
 }
 
 template <class Char>
 basic_json<Char>& basic_json<Char>::get(const std::string& name) 
 {
-    return value_.var_->get(name);
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->get(name);
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to get " << name << " from a non object " << type_; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
 }
 
 template <class Char>
 const basic_json<Char>& basic_json<Char>::get(const std::string& name) const
 {
-    return value_.var_->get(name);
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->get(name);
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to get " << name << " from a non object " << type_; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
 }
 
 template <class Char>
-void basic_json<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
+void basic_json<Char>::set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
 {
-    return value_.var_->set_member(name,value);
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->set_member(name,value);
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to set " << name << " on a non object " << type_; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
+}
+
+template <class Char>
+void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
+{
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->set_member(name,value);
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to set " << name << " on a non object " << type_; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
 }
 
 template <class Char>
 size_t basic_json<Char>::size() const
 {
-    return value_.var_->size();
-}
-
-template <class Char>
-bool basic_json<Char>::is_null() const
-{
-    return value_.var_->is_null();
+    switch (type_)
+    {
+    case object_t:
+        return value_.var_->object_cast()->size();
+    case array_t:
+        return value_.var_->array_cast()->size();
+    default:
+        return 0;
+    }
 }
 
 template <class Char>
@@ -249,13 +352,36 @@ const typename basic_json<Char>::proxy<size_t> basic_json<Char>::operator[](size
 template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
-    return value_.var_->to_string();
+    std::basic_ostringstream<Char> os;
+    os.precision(16);
+    to_stream(os);
+    return os.str();
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::ostream& os) const
 {
-    value_.var_->to_stream(os);
+    switch (type_)
+    {
+    case double_t:
+        os << value_.double_value_;
+        break;
+    case longlong_t:
+        os << value_.longlong_value_;
+        break;
+    case ulonglong_t:
+        os << value_.ulonglong_value_;
+        break;
+    case bool_t:
+        os << (value_.bool_value_ ? "true" : "false");
+        break;
+    case null_t:
+        os << "null";
+        break;
+    default:
+        value_.var_->to_stream(os);
+        break;
+    }
 }
 
 template <class Char>
@@ -273,9 +399,9 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
-    json_variant<Char>* var = 0;
-    std::swap(var,handler.root_.value_.var_);
-    return basic_json<Char>(var);
+    basic_json<Char> val(nullptr);
+    val.swap(handler.root_);
+    return val;
 }
 
 
@@ -285,22 +411,42 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
     std::basic_istringstream<Char> is(s);
     json_parser<Char> parser;
     json_content_handler<Char> handler;
-    json_variant<Char>* var = parser.parse(is,handler);
-    json_variant<Char>* var = 0;
-    std::swap(var,handler.root_.value_.var_);
-    return basic_json<Char>(var);
+    parser.parse(is,handler);
+    basic_json<Char> val(nullptr);
+    val.swap(handler.root_);
+    return val;
 }
 
 template <class Char>
 double basic_json<Char>::as_double() const
 {
-    return value_.var_->as_double();
+    switch (type_)
+    {
+    case double_t:
+        return value_.double_value_;
+    case longlong_t:
+        return static_cast<double>(value_.longlong_value_);
+    case ulonglong_t:
+        return static_cast<double>(value_.ulonglong_value_);
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a double");
+    }
 }
 
 template <class Char>
 int basic_json<Char>::as_int() const
 {
-    return value_.var_->as_int();
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<int>(value_.double_value_);
+    case longlong_t:
+        return static_cast<int>(value_.longlong_value_);
+    case ulonglong_t:
+        return static_cast<int>(value_.ulonglong_value_);
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a int");
+    }
 }
 
 template <class Char>
