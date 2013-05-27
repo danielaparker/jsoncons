@@ -10,8 +10,8 @@
 #include <utility>
 
 using jsoncons::json;
-using jsoncons::integer_type;
-using jsoncons::uinteger_type;
+using jsoncons::longlong_type;
+using jsoncons::ulonglong_type;
 using jsoncons::json_parser;
 using std::string;
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"] = json::object_prototype;
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
-    root["myobject"]["int_2"] = json(integer_type(0));
+    root["myobject"]["int_2"] = json(longlong_type(0));
     root["myobject"]["string_2"] = json("my string");
     root["myarray"] = json::array_prototype;
 

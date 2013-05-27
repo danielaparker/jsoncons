@@ -13,8 +13,8 @@
 
 namespace jsoncons {
 
-typedef long long integer_type;
-typedef unsigned long long uinteger_type;
+typedef long long longlong_type;
+typedef unsigned long long ulonglong_type;
 
 template <class Char>
 struct stack_item
@@ -124,7 +124,7 @@ public:
             //std::cout << "double_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
         }
     }
-    void integer_value(integer_type value)
+    void integer_value(longlong_type value)
     {
         json_integer<Char>* var = new json_integer<Char>(value);
         if (stack_.back().var_->is_object())
@@ -140,7 +140,7 @@ public:
             //std::cout << "integer_value " << vars_.back()->type()  << " " << vars_.size()<< std::endl;
         }
     }
-    void uinteger_value(integer_type value)
+    void uinteger_value(longlong_type value)
     {
         json_uinteger<Char>* var = new json_uinteger<Char>(value);
         if (stack_.back().var_->is_object())
@@ -242,9 +242,9 @@ struct json_char_traits<char>
         }
     }
 
-    static uinteger_type string_to_uinteger(const std::string& s)
+    static ulonglong_type string_to_uinteger(const std::string& s)
     {
-        uinteger_type i = 0;
+        ulonglong_type i = 0;
         for (std::string::const_iterator it; it != s.end(); ++it)
         {
             if (*it >= '0' && *it <= '9')
@@ -688,10 +688,10 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
                 }
                 else
                 {
-                    uinteger_type d = json_char_traits<Char>::string_to_uinteger(buffer_);
+                    ulonglong_type d = json_char_traits<Char>::string_to_uinteger(buffer_);
 					if (has_neg)
                     {
-                        handler.integer_value(-static_cast<integer_type>(d));
+                        handler.integer_value(-static_cast<longlong_type>(d));
 						return;
                     }
                     handler.uinteger_value(d);

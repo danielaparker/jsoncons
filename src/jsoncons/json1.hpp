@@ -14,8 +14,8 @@
 
 namespace jsoncons {
 
-typedef long long integer_type;
-typedef unsigned long long uinteger_type;
+typedef long long longlong_type;
+typedef unsigned long long ulonglong_type;
 
 template <class Char>
 class json_variant;
@@ -31,6 +31,9 @@ union value_union
 {
 public:
     double double_value_;
+    long long longlong_value_;
+    unsigned long long ulonglong_value_;
+    bool bool_value_;
     json_variant<Char>* var_;
 };
 
@@ -84,9 +87,9 @@ public:
 
     explicit basic_json(double val);
 
-    explicit basic_json(integer_type val);
+    explicit basic_json(longlong_type val);
 
-    explicit basic_json(uinteger_type val);
+    explicit basic_json(ulonglong_type val);
 
     explicit basic_json(std::string val);
 

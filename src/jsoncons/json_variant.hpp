@@ -163,8 +163,8 @@ public:
     const json_object<Char>* object_cast() const;
     const json_array<Char>* array_cast() const;
     double double_value() const;
-    integer_type long_value() const;
-    uinteger_type ulong_value() const;
+    longlong_type long_value() const;
+    ulonglong_type ulong_value() const;
     std::basic_string<Char> string_value() const;
     bool bool_value() const;
     value_type type() const {return type_;}
@@ -195,6 +195,28 @@ public:
     }
     std::basic_string<Char> name_;
     basic_json<Char> value_;
+};
+
+template <class Char>
+class member_key
+{
+public:
+    member_key(const std::basic_string<Char>& name)
+        : name_(name)
+    {
+    }
+    const std::basic_string<Char>& name_;
+};
+
+template <class Char>
+class key_compare
+{
+public:
+    bool operator()(const name_value_pair<Char>& a, 
+                    const member_key<Char>& b) const
+    {
+        return a.name_ < b.name_;
+    }
 };
 
 template <class Char>
@@ -280,7 +302,7 @@ template <class Char>
 class json_integer  : public json_variant<Char>
 {
 public:
-    json_integer(integer_type value)
+    json_integer(longlong_type value)
         : json_variant<Char>(json_variant<Char>::longlong_t), value_(value)
     {
     }
@@ -295,14 +317,14 @@ public:
         os << value_;
     }
 
-    integer_type value_;
+    longlong_type value_;
 };
 
 template <class Char>
 class json_uinteger : public json_variant<Char>
 {
 public:
-    json_uinteger(uinteger_type value)
+    json_uinteger(ulonglong_type value)
         : json_variant<Char>(json_variant<Char>::ulonglong_t), value_(value)
     {
     }
@@ -317,7 +339,7 @@ public:
         os << value_;
     }
 
-    uinteger_type value_;
+    ulonglong_type value_;
 };
 
 template <class Char>
@@ -500,10 +522,10 @@ template <class Char>
 double json_variant<Char>::double_value() const {assert(type_ == double_t); return static_cast<const json_double<Char>*>(this)->value_;}
 
 template <class Char>
-integer_type json_variant<Char>::long_value() const {assert(type_ == longlong_t); return static_cast<const json_integer<Char> *>(this)->value_;}
+longlong_type json_variant<Char>::long_value() const {assert(type_ == longlong_t); return static_cast<const json_integer<Char> *>(this)->value_;}
 
 template <class Char>
-uinteger_type json_variant<Char>::ulong_value() const {assert(type_ == ulonglong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
+ulonglong_type json_variant<Char>::ulong_value() const {assert(type_ == ulonglong_t); return static_cast<const json_uinteger<Char>*>(this)->value_;}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::string_value() const {assert(type_ == string_t); return static_cast<const json_string<Char>*>(this)->value_;}
@@ -640,8 +662,8 @@ void json_object<Char>::remove(iterator at)
 template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, json_variant<Char>* value)
 {
-    name_value_pair<Char> key(name,0);
-    iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
+    member_key<Char> key(name);
+    iterator it = std::lower_bound(begin(),end(),key,key_compare<Char>());
     if (it != end() && (*it).name_ == name)
     {
         remove(it);
@@ -652,8 +674,8 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, json_var
 template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
-    name_value_pair<Char> key(name);
-    iterator it = std::lower_bound(begin(),end(),key,member_compare<Char>());
+    member_key<Char> key(name);
+    iterator it = std::lower_bound(begin(),end(),key,key_compare<Char>());
     if (it != end() && (*it).name_ == name)
     {
         remove(it);
@@ -680,19 +702,19 @@ const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& na
 template <class Char>
 typename json_object<Char>::iterator json_object<Char>::find(const std::basic_string<Char>& name)
 {
-    name_value_pair<Char> key(name);
-    member_compare<Char> comp;
+    member_key<Char> key(name);
+    key_compare<Char> comp;
     iterator it = std::lower_bound(begin(),end(),key,comp);
-    return (it != end() && !comp(key,*it)) ? it : end();
+    return (it != end() && !comp(*it,key)) ? it : end();
 }
 
 template <class Char>
 typename json_object<Char>::const_iterator json_object<Char>::find(const std::basic_string<Char>& name) const
 {
-    name_value_pair<Char> key(name,0);
-    member_compare comp;
+    member_key<Char> key(name);
+    key_compare comp;
     const_iterator it = std::lower_bound(begin(),end(),key,comp);
-    return (it != end() && !comp(key,*it)) ? it : end();
+    return (it != end() && !comp(*it,key)) ? it : end();
 }
 
 }
