@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <utility>
+#include <algorithm>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_variant.hpp"
 
@@ -110,6 +111,11 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     case null_t:
         value_ = val.value_;
         break;
+    case string_t:
+        value_.string_value_.length_ = val.value_.string_value_.length_;
+        value_.string_value_.data_ = new Char[value_.string_value_.length_];
+        std::memcpy(value_.string_value_.data_,val.value_.string_value_.data_,value_.string_value_.length_*sizeof(Char));
+        break;
     default:
         value_.var_ = val.value_.var_->clone();
         break;
@@ -123,13 +129,6 @@ basic_json<Char>::basic_json(basic_json&& other)
     value_ = other.value_;
     other.type_ = null_t;
     other.value_.var_ = nullptr;
-}
-
-template <class Char>
-basic_json<Char>::basic_json(json_string<Char>* var)
-{
-    type_ = string_t;
-    value_.var_ = var;
 }
 
 template <class Char>
@@ -175,10 +174,12 @@ basic_json<Char>::basic_json(bool val)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(std::string s)
+basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
-    value_.var_ = new json_string<Char>(s);
+    value_.string_value_.length_ = s.length();
+    value_.string_value_.data_ = new Char[s.length()];
+    std::memcpy(value_.string_value_.data_,&s[0],s.length()*sizeof(Char));
 }
 
 template <class Char>
@@ -198,6 +199,9 @@ basic_json<Char>::~basic_json()
     case ulonglong_t:
     case bool_t:
     case null_t:
+        break;
+    case string_t:
+        delete value_.string_value_.data_;
         break;
     default:
         delete value_.var_;
@@ -363,6 +367,9 @@ void basic_json<Char>::to_stream(std::ostream& os) const
 {
     switch (type_)
     {
+    case string_t:
+        os << "\"" << value_.string_value_ << "\"";
+        break;
     case double_t:
         os << value_.double_value_;
         break;
@@ -540,7 +547,7 @@ std::string basic_json<Char>::as_string() const
     switch (type_)
     {
     case string_t:
-        return value_.;
+        return std::string(value_.string_value_.data_,value_.string_value_.length_);
     case defaut:
         return to_string();
     }

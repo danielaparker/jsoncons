@@ -27,18 +27,21 @@ template <class Char>
 class json_array;
 
 template <class Char>
-class json_string;
+struct simple_string
+{
+    size_t length_;
+    Char* data_;
+};
 
 template <class Char>
-union value_union
+std::ostream& operator<<(std::ostream& os, const simple_string<Char>& o)
 {
-public:
-    double double_value_;
-    long long longlong_value_;
-    unsigned long long ulonglong_value_;
-    bool bool_value_;
-    json_variant<Char>* var_;
-};
+    for (size_t i = 0; i < o.length_; ++i)
+    {
+        os << o.data_[i];
+    }
+    return os;
+}
 
 template <class Char>
 class basic_json
@@ -94,14 +97,12 @@ public:
 
     explicit basic_json(ulonglong_type val);
 
-    explicit basic_json(std::string val);
+    explicit basic_json(const std::basic_string<Char>& val);
 
     explicit basic_json(bool val);
 
     template <class Iterator>
     basic_json(Iterator begin, Iterator end);
-
-    explicit basic_json(json_string<Char>* var);
 
     explicit basic_json(json_object<Char>* var);
 
@@ -194,7 +195,16 @@ public:
 
 private:
     value_type type_;
-    value_union<Char> value_;
+    union
+    {
+        double double_value_;
+        long long longlong_value_;
+        unsigned long long ulonglong_value_;
+        bool bool_value_;
+        simple_string<Char> string_value_;
+        json_variant<Char>* var_;
+    } value_;
+    //value_union<Char> value_;
 };
 
 

@@ -46,7 +46,6 @@ public:
     json_array<Char>* array_cast();
     const json_object<Char>* object_cast() const;
     const json_array<Char>* array_cast() const;
-    std::basic_string<Char> string_value() const;
 };
 
 template <class Char>
@@ -104,31 +103,6 @@ public:
     {
         return a.name_ < b.name_;
     }
-};
-
-template <class Char>
-class json_string : public json_variant<Char>
-{
-public:
-    json_string()
-    {
-    }
-    json_string(std::basic_string<Char> s)
-        : value_(s)
-    {
-    }
-
-    virtual json_variant<Char>* clone() 
-    {
-        return new json_string(value_);
-    }
-
-    virtual void to_stream(std::ostream& os) const
-    {
-        os << "\"" << value_ << "\"";
-    }
-
-    std::basic_string<Char> value_;
 };
 
 template <class Char>
@@ -273,9 +247,6 @@ public:
 
     std::vector<name_value_pair<Char>> members_;
 };
-
-template <class Char>
-std::basic_string<Char> json_variant<Char>::string_value() const {return static_cast<const json_string<Char>*>(this)->value_;}
 
 template <class Char>
 json_object<Char>* json_variant<Char>::object_cast() {return static_cast<json_object<Char>*>(this);}

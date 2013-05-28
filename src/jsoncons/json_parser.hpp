@@ -99,16 +99,16 @@ public:
     {
         stack_.back().name_ = name;
     }
-    void string_value(std::basic_string<Char>&& value)
+    void string_value(const std::basic_string<Char>& value)
     {
-        json_string<Char>* var = new json_string<Char>(value);
+        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+            stack_.back().var_->object_cast()->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
         } 
         else 
         {
-            stack_.back().var_->array_cast()->push_back(basic_json<Char>(var));
+            stack_.back().var_->array_cast()->push_back(val);
             //std::cout << "string_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
         }
     }
@@ -230,7 +230,6 @@ struct json_char_traits<char>
         }
         return i;
     }
-
 };
 
 class json_parser_exception : public std::exception
@@ -488,7 +487,7 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
         case '\"': // string value
             {
                 parse_string(is,handler);
-                handler.string_value(std::move(buffer_));
+                handler.string_value(buffer_);
                 //handler.string_value(buffer_);
                 return;
             }
