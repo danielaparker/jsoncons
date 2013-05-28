@@ -185,14 +185,6 @@ struct json_char_traits
 template <>
 struct json_char_traits<char>
 {
-    // Structural characters
-    static const char begin_array = '[';
-    static const char begin_object = '{';
-    static const char end_array = ']';
-    static const char end_object = '}';
-    static const char name_separator = ':';
-    static const char value_separator = ',';
-
     static const char forward_slash = '/';
 
     // Values
@@ -270,6 +262,13 @@ template <class Char>
 class json_parser
 {
 public:
+    // Structural characters
+    static const char begin_array = '[';
+    static const char begin_object = '{';
+    static const char end_array = ']';
+    static const char end_object = '}';
+    static const char name_separator = ':';
+    static const char value_separator = ',';
     //!  Parse an input stream of JSON text into a json object
     /*!
       \param is The input stream to read from
@@ -331,12 +330,12 @@ void json_parser<Char>::parse(std::basic_istream<Char>& is, ContentHandler& hand
                 }
             }
             break;
-        case json_char_traits<Char>::begin_object:
+        case begin_object:
             handler.begin_object();
             parse_object(is,handler);
             handler.end_document();
             return;
-        case json_char_traits<Char>::begin_array:
+        case begin_array:
             handler.begin_array();
             parse_array(is,handler);
             handler.end_document();
@@ -394,7 +393,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
                 ++count;
             }
             break;
-        case json_char_traits<Char>::value_separator:
+        case value_separator:
             if (count == 0)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_number_);
@@ -402,7 +401,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
             comma = true;
             break;
 
-        case json_char_traits<Char>::end_object:
+        case end_object:
             {
                 if (comma)
                 {
@@ -447,7 +446,7 @@ void json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is, Cont
                 }
             }
             break;
-        case json_char_traits<Char>::name_separator:
+        case name_separator:
             parse_value(is,handler);
             return;
         }
@@ -493,13 +492,13 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
                 //handler.string_value(buffer_);
                 return;
             }
-        case json_char_traits<Char>::begin_object: // object value
+        case begin_object: // object value
             {
                 handler.begin_object();
                 parse_object(is,handler);
                 return;
             }
-        case json_char_traits<Char>::begin_array: // array value
+        case begin_array: // array value
             handler.begin_array();
             parse_array(is,handler);
             return;
@@ -587,7 +586,7 @@ void json_parser<Char>::parse_array(std::basic_istream<Char>& is, ContentHandler
                 }
             }
             break;
-        case json_char_traits<Char>::value_separator:
+        case value_separator:
             if (count == 0)
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_number_);

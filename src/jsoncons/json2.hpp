@@ -257,7 +257,7 @@ basic_json<Char>& basic_json<Char>::get(const std::string& name)
     default:
         {
             std::ostringstream os;
-            os << "Attempting to get " << name << " from a non object " << type_; 
+            os << "Attempting to get " << name << " from a value that is not an object"; 
             JSONCONS_THROW_EXCEPTION(os.str());
         }
     }
@@ -273,7 +273,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::string& name) const
     default:
         {
             std::ostringstream os;
-            os << "Attempting to get " << name << " from a non object " << type_; 
+            os << "Attempting to get " << name << " from a value that is not an object"; 
             JSONCONS_THROW_EXCEPTION(os.str());
         }
     }
@@ -289,7 +289,7 @@ void basic_json<Char>::set_member(const std::basic_string<Char>& name, const bas
     default:
         {
             std::ostringstream os;
-            os << "Attempting to set " << name << " on a non object " << type_; 
+            os << "Attempting to set " << name << " on a value that is not an object"; 
             JSONCONS_THROW_EXCEPTION(os.str());
         }
     }
@@ -305,7 +305,7 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
     default:
         {
             std::ostringstream os;
-            os << "Attempting to set " << name << " on a non object " << type_; 
+            os << "Attempting to set " << name << " on a value that is not an object"; 
             JSONCONS_THROW_EXCEPTION(os.str());
         }
     }
@@ -434,6 +434,35 @@ double basic_json<Char>::as_double() const
 }
 
 template <class Char>
+bool basic_json<Char>::is_empty() const
+{
+    switch (type_)
+    {
+    case null_t:
+        return true;
+    case array_t:
+        return value_.array_cast()->size() == 0;
+    case object_t:
+        return value_.object_cast()->size() == 0;
+        return true;
+    default:
+        return false;
+    }
+}
+
+template <class Char>
+bool basic_json<Char>::as_bool() const
+{
+    switch (type_)
+    {
+    case bool_t:
+        return value_.bool_value_;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a int");
+    }
+}
+
+template <class Char>
 int basic_json<Char>::as_int() const
 {
     switch (type_)
@@ -444,8 +473,76 @@ int basic_json<Char>::as_int() const
         return static_cast<int>(value_.longlong_value_);
     case ulonglong_t:
         return static_cast<int>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a int");
+    }
+}
+
+template <class Char>
+unsigned int basic_json<Char>::as_uint() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<unsigned int>(value_.double_value_);
+    case longlong_t:
+        return static_cast<unsigned int>(value_.longlong_value_);
+    case ulonglong_t:
+        return static_cast<unsigned int>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a unsigned int");
+    }
+}
+
+template <class Char>
+long long basic_json<Char>::as_longlong() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<long long>(value_.double_value_);
+    case longlong_t:
+        return static_cast<long long>(value_.longlong_value_);
+    case ulonglong_t:
+        return static_cast<long long>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a long long");
+    }
+}
+
+template <class Char>
+unsigned long long basic_json<Char>::as_ulonglong() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<unsigned long long>(value_.double_value_);
+    case longlong_t:
+        return static_cast<unsigned long long>(value_.longlong_value_);
+    case ulonglong_t:
+        return static_cast<unsigned long long>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
+    }
+}
+
+template <class Char>
+std::string basic_json<Char>::as_string() const
+{
+    switch (type_)
+    {
+    case string_t:
+        return value_.;
+    case defaut:
+        return to_string();
     }
 }
 

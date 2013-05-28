@@ -127,27 +127,19 @@ public:
 
     void to_stream(std::ostream& os) const;
 
-    double as_double() const;
-
-    int as_int() const;
-
-    void swap(basic_json<Char>& o) throw();
-
-    basic_json<Char>& get(size_t i);
-
-    const basic_json<Char>& get(size_t i) const;
-
-    basic_json<Char>& get(const std::string& name);
-
-    const basic_json<Char>& get(const std::string& name) const;
-
-    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
-
-    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
-
     bool is_null() const
     {
         return type_ == null_t;
+    }
+
+    bool is_string() const
+    {
+        return type_ == string_t;
+    }
+
+    bool is_numeric() const
+    {
+        return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }
 
     bool is_bool() const
@@ -165,15 +157,35 @@ public:
         return type_ == array_t;
     }
 
-    bool is_string() const
-    {
-        return type_ == string_t;
-    }
+    bool is_empty() const;
 
-    bool is_double() const
-    {
-        return type_ == double_t;
-    }
+    bool as_bool() const;
+
+    double as_double() const;
+
+    int as_int() const;
+
+    unsigned int as_uint() const;
+
+    long long as_longlong() const;
+
+    unsigned long long as_ulonglong() const;
+
+    std::string as_string() const;
+
+    void swap(basic_json<Char>& o) throw();
+
+    basic_json<Char>& get(size_t i);
+
+    const basic_json<Char>& get(size_t i) const;
+
+    basic_json<Char>& get(const std::string& name);
+
+    const basic_json<Char>& get(const std::string& name) const;
+
+    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
+
+    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     value_type type() const
     {

@@ -36,8 +36,6 @@ public:
 
     virtual json_variant* clone() = 0;
 
-    std::basic_string<Char> to_string() const;
-
     virtual void to_stream(std::ostream& os) const
     {
     }
@@ -290,15 +288,6 @@ const json_object<Char>* json_variant<Char>::object_cast() const {return static_
 
 template <class Char>
 const json_array<Char>* json_variant<Char>::array_cast() const {return static_cast<const json_array<Char>*>(this);}
-
-template <class Char>
-std::basic_string<Char> json_variant<Char>::to_string() const
-{
-    std::basic_ostringstream<Char> os;
-    os.precision(16);
-    to_stream(os);
-    return os.str();
-}
 
 template <class Char>
 std::basic_string<Char> json_variant<Char>::escape_string(const std::basic_string<Char>& s)
