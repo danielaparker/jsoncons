@@ -34,6 +34,55 @@ size_t basic_json<Char>::proxy<Key>::size() const
 
 template <class Char>
 template <class Key>
+std::string basic_json<Char>::proxy<Key>::as_string() const
+{
+    return val_.get(key_).as_string();
+}
+
+template <class Char>
+template <class Key>
+bool basic_json<Char>::proxy<Key>::as_bool() const
+{
+    return val_.get(key_).as_bool();
+}
+
+template <class Char>
+template <class Key>
+double basic_json<Char>::proxy<Key>::as_double() const
+{
+    return val_.get(key_).as_double();
+}
+
+template <class Char>
+template <class Key>
+int basic_json<Char>::proxy<Key>::as_int() const
+{
+    return val_.get(key_).as_int();
+}
+
+template <class Char>
+template <class Key>
+unsigned int basic_json<Char>::proxy<Key>::as_uint() const
+{
+    return val_.get(key_).as_uint();
+}
+
+template <class Char>
+template <class Key>
+long long basic_json<Char>::proxy<Key>::as_longlong() const
+{
+    return val_.get(key_).as_longlong();
+}
+
+template <class Char>
+template <class Key>
+unsigned long long basic_json<Char>::proxy<Key>::as_ulonglong() const
+{
+    return val_.get(key_).as_ulonglong();
+}
+
+template <class Char>
+template <class Key>
 basic_json<Char>::proxy<Key>::operator const basic_json<Char>() const
 {
     return val_.get(key_);
@@ -548,7 +597,7 @@ std::string basic_json<Char>::as_string() const
     {
     case string_t:
         return std::string(value_.string_value_.data_,value_.string_value_.length_);
-    case defaut:
+    default:
         return to_string();
     }
 }
@@ -565,6 +614,53 @@ std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::prox
 {
     os << o.to_string();
     return os;
+}
+
+template <class Char>
+std::basic_string<Char> escape_string(const std::basic_string<Char>& s)
+{
+    size_t pos = s.find_first_of("\\\"\b\f\n\r\t");
+    if (pos ==  string::npos)
+    {
+        return s;
+    }
+    else
+    {
+        const size_t len = s.length();
+        std::basic_string<Char> buf(s,0,pos);
+        for (size_t i = pos; i < len; ++i)
+        {
+            char c = s[i];
+            switch (c)
+            {
+            case '\\':
+                buf.push_back('\\');
+                break;
+            case '"':
+                buf.append("\\\"");
+                break;
+            case '\b':
+                buf.append("\\b");
+                break;
+            case '\f':
+                buf.append("\\f");
+                break;
+            case '\n':
+                buf.append("\\n");
+                break;
+            case '\r':
+                buf.append("\\r");
+                break;
+            case '\t':
+                buf.append("\\t");
+                break;
+            default:
+                buf.push_back(c);
+                break;
+            }
+        }
+        return buf;
+    }
 }
 
 }

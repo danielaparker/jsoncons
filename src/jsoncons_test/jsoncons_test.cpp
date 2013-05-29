@@ -112,3 +112,34 @@ BOOST_AUTO_TEST_CASE(test_null)
     BOOST_CHECK(nullval.is_null());
 }
 
+BOOST_AUTO_TEST_CASE(test_to_string)
+{
+    std::ostringstream os;
+    os << "{"
+       << "\"string\":\"value\""
+        << ",\"null\":null"
+        << ",\"bool1\":false"
+        << ",\"bool2\":true"
+        << ",\"integer\":12345678"
+        << ",\"neg-integer\":-87654321"
+        << ",\"double\":123456.01"
+        << ",\"neg-double\":-654321.01"
+        << ",\"exp\":2.00600e+03"
+        << ",\"minus-exp\":1.00600e-010"
+        << ",\"escaped-string\":\"\\\\\\n\""
+       << "}";
+
+
+    json root = json::parse(os.str());
+    std::cout << root << std::endl;
+
+    BOOST_CHECK(root["null"].is_null());
+    BOOST_CHECK(!root["bool1"].as_bool());
+    BOOST_CHECK(root["bool2"].as_bool());
+    BOOST_CHECK(root["integer"].as_int() == 12345678);
+    BOOST_CHECK(root["integer"].as_uint() == 12345678);
+    BOOST_CHECK(root["neg-integer"].as_int() == -87654321);
+    BOOST_CHECK_CLOSE(root["double"].as_double(), 123456.01, 0.0000001);
+    BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
+}
+

@@ -34,12 +34,12 @@ struct simple_string
 };
 
 template <class Char>
+std::basic_string<Char> escape_string(const std::basic_string<Char>& s);
+
+template <class Char>
 std::ostream& operator<<(std::ostream& os, const simple_string<Char>& o)
 {
-    for (size_t i = 0; i < o.length_; ++i)
-    {
-        os << o.data_[i];
-    }
+    os << escape_string<Char>(std::basic_string<Char>(o.data_,o.length_));
     return os;
 }
 
@@ -61,6 +61,30 @@ public:
     	proxy(basic_json<Char>& var, Key key);
 
         size_t size() const;
+
+        bool is_null() const
+        {
+            return val_.get(key_).is_null();
+        }
+
+        bool is_empty() const
+        {
+            return val_.get(key_).is_empty();
+        }
+
+        std::string as_string() const;
+
+        bool as_bool() const;
+
+        double as_double() const;
+
+        int as_int() const;
+
+        unsigned int as_uint() const;
+
+        long long as_longlong() const;
+
+        unsigned long long as_ulonglong() const;
 
         operator const basic_json() const;
 
@@ -204,7 +228,6 @@ private:
         simple_string<Char> string_value_;
         json_variant<Char>* var_;
     } value_;
-    //value_union<Char> value_;
 };
 
 

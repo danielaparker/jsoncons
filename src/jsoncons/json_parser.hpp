@@ -95,7 +95,7 @@ public:
             root_ = basic_json<Char>(var);
         }
     }
-    void name(std::basic_string<Char>&& name)
+    void name(std::basic_string<Char> name)
     {
         stack_.back().name_ = name;
     }
@@ -221,11 +221,11 @@ struct json_char_traits<char>
     static ulonglong_type string_to_uinteger(const std::string& s)
     {
         ulonglong_type i = 0;
-        for (std::string::const_iterator it; it != s.end(); ++it)
+        for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
         {
             if (*it >= '0' && *it <= '9')
             {
-                i = i * 10 + *it;
+                i = i * 10 + (*it - '0');
             }
         }
         return i;
@@ -385,8 +385,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
             }
             {
                 parse_string(is,handler);
-                handler.name(std::move(buffer_));
-                //handler.name(buffer_);
+                handler.name(buffer_);
                 parse_separator_value(is,handler);
                 comma = false;
                 ++count;

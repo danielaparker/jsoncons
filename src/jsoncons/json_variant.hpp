@@ -40,8 +40,6 @@ public:
     {
     }
 
-    static std::basic_string<Char> escape_string(const std::basic_string<Char>& s);
-
     json_object<Char>* object_cast();
     json_array<Char>* array_cast();
     const json_object<Char>* object_cast() const;
@@ -259,53 +257,6 @@ const json_object<Char>* json_variant<Char>::object_cast() const {return static_
 
 template <class Char>
 const json_array<Char>* json_variant<Char>::array_cast() const {return static_cast<const json_array<Char>*>(this);}
-
-template <class Char>
-std::basic_string<Char> json_variant<Char>::escape_string(const std::basic_string<Char>& s)
-{
-    size_t pos = s.find_first_of("\\\"\b\f\n\r\t");
-    if (pos ==  string::npos)
-    {
-        return s;
-    }
-    else
-    {
-        const size_t len = s.length();
-        std::basic_string<Char> buf(s,0,pos);
-        for (size_t i = pos; i < len; ++i)
-        {
-            char c = s[i];
-            switch (c)
-            {
-            case '\\':
-                buf.push_back('\\');
-                break;
-            case '"':
-                buf.append("\\\"");
-                break;
-            case '\b':
-                buf.append("\\b");
-                break;
-            case '\f':
-                buf.append("\\f");
-                break;
-            case '\n':
-                buf.append("\\n");
-                break;
-            case '\r':
-                buf.append("\\r");
-                break;
-            case '\t':
-                buf.append("\\t");
-                break;
-            default:
-                buf.push_back(c);
-                break;
-            }
-        }
-        return buf;
-    }
-}
 
 template <class Char>
 void json_array<Char>::push_back(basic_json<Char> value)
