@@ -37,7 +37,7 @@ template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s);
 
 template <class Char>
-std::ostream& operator<<(std::ostream& os, const simple_string<Char>& o)
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const simple_string<Char>& o)
 {
     os << escape_string<Char>(std::basic_string<Char>(o.data_,o.length_));
     return os;
@@ -150,7 +150,7 @@ public:
 
     std::basic_string<Char> to_string() const;
 
-    void to_stream(std::ostream& os) const;
+    void to_stream(std::basic_ostream<Char>& os) const;
 
     bool is_null() const
     {

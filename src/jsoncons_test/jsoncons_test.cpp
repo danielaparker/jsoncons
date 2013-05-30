@@ -143,3 +143,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
 }
 
+BOOST_AUTO_TEST_CASE(test_wjson)
+{
+    jsoncons::basic_json<wchar_t> root;
+}

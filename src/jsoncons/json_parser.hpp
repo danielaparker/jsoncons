@@ -183,6 +183,11 @@ struct json_char_traits
 };
 
 template <>
+struct json_char_traits<char16_t>
+{
+};
+
+template <>
 struct json_char_traits<char>
 {
     static const char forward_slash = '/';

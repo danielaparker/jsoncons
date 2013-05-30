@@ -412,7 +412,7 @@ std::basic_string<Char> basic_json<Char>::to_string() const
 }
 
 template <class Char>
-void basic_json<Char>::to_stream(std::ostream& os) const
+void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
     switch (type_)
     {
@@ -619,48 +619,45 @@ std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::prox
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s)
 {
-    size_t pos = s.find_first_of("\\\"\b\f\n\r\t");
-    if (pos ==  string::npos)
-    {
-        return s;
-    }
-    else
-    {
-        const size_t len = s.length();
-        std::basic_string<Char> buf(s,0,pos);
-        for (size_t i = pos; i < len; ++i)
-        {
-            char c = s[i];
-            switch (c)
-            {
-            case '\\':
-                buf.push_back('\\');
-                break;
-            case '"':
-                buf.append("\\\"");
-                break;
-            case '\b':
-                buf.append("\\b");
-                break;
-            case '\f':
-                buf.append("\\f");
-                break;
-            case '\n':
-                buf.append("\\n");
-                break;
-            case '\r':
-                buf.append("\\r");
-                break;
-            case '\t':
-                buf.append("\\t");
-                break;
-            default:
-                buf.push_back(c);
-                break;
-            }
-        }
-        return buf;
-    }
+   	std::basic_string<Char> buf;
+       for (size_t i = 0; i < s.length(); ++i)
+       {
+           Char c = s[i];
+           switch (c)
+           {
+           case '\\':
+               buf.push_back('\\');
+               break;
+           case '"':
+               buf.push_back('\\');
+               buf.push_back('\"');
+               break;
+           case '\b':
+               buf.push_back('\\');
+               buf.push_back('b');
+               break;
+           case '\f':
+               buf.push_back('\\');
+               buf.push_back('f');
+               break;
+           case '\n':
+               buf.push_back('\\');
+               buf.push_back('n');
+               break;
+           case '\r':
+               buf.push_back('\\');
+               buf.push_back('r');
+               break;
+           case '\t':
+               buf.push_back('\\');
+               buf.push_back('t');
+               break;
+           default:
+               buf.push_back(c);
+               break;
+           }
+       }
+       return buf;
 }
 
 }

@@ -36,7 +36,7 @@ public:
 
     virtual json_variant* clone() = 0;
 
-    virtual void to_stream(std::ostream& os) const
+    virtual void to_stream(std::basic_ostream<Char>& os) const
     {
     }
 
@@ -139,7 +139,7 @@ public:
 
     void push_back(basic_json<Char> value);
 
-    virtual void to_stream(std::ostream& os) const
+    virtual void to_stream(std::basic_ostream<Char>& os) const
     {
 		os << "[";
         for (size_t i = 0; i < elements_.size(); ++i)
@@ -228,7 +228,7 @@ public:
 
     const_iterator end() const {return members_.end();}
 
-    virtual void to_stream(std::ostream& os) const
+    virtual void to_stream(std::basic_ostream<Char>& os) const
     {
 		os << "{";
         for (size_t i = 0; i < members_.size(); ++i)
