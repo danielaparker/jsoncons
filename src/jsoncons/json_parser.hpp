@@ -190,8 +190,6 @@ struct json_char_traits<char16_t>
 template <>
 struct json_char_traits<char>
 {
-    static const char forward_slash = '/';
-
     // Values
     static const char* rue() {return "rue";};
     static const char* alse () {return "alse";};
@@ -327,7 +325,7 @@ void json_parser<Char>::parse(std::basic_istream<Char>& is, ContentHandler& hand
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::forward_slash)
+                    if (next == '/')
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -376,7 +374,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::forward_slash)
+                    if (next == '/')
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -442,7 +440,7 @@ void json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is, Cont
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::forward_slash)
+                    if (next == '/')
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -481,7 +479,7 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::forward_slash)
+                    if (next == '/')
                     {
                         ignore_till_end_of_line(is);
                     }
@@ -582,7 +580,7 @@ void json_parser<Char>::parse_array(std::basic_istream<Char>& is, ContentHandler
                 if (is)
                 {
                     Char next = static_cast<Char>(is.peek());
-                    if (next == json_char_traits<Char>::forward_slash)
+                    if (next == '/')
                     {
                         ignore_till_end_of_line(is);
                     }

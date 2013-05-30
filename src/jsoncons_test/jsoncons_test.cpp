@@ -10,6 +10,7 @@
 #include <utility>
 
 using jsoncons::json;
+using jsoncons::wjson;
 using jsoncons::longlong_type;
 using jsoncons::ulonglong_type;
 using jsoncons::json_parser;
@@ -145,5 +146,5 @@ BOOST_AUTO_TEST_CASE(test_to_string)
 
 BOOST_AUTO_TEST_CASE(test_wjson)
 {
-    jsoncons::basic_json<wchar_t> root;
+    //wjson root = wjson::parse(L"{}");
 }
