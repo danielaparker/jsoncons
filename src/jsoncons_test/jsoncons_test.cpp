@@ -146,5 +146,5 @@ BOOST_AUTO_TEST_CASE(test_to_string)
 
 BOOST_AUTO_TEST_CASE(test_wjson)
 {
-    //wjson root = wjson::parse(L"{}");
+    wjson root = wjson::parse(L"{}");
 }

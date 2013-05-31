@@ -183,18 +183,13 @@ struct json_char_traits
 };
 
 template <>
-struct json_char_traits<char16_t>
+struct json_char_traits<wchar_t>
 {
 };
 
 template <>
 struct json_char_traits<char>
 {
-    // Values
-    static const char* rue() {return "rue";};
-    static const char* alse () {return "alse";};
-    static const char* ull() {return "ull";};
- 
     static void append_codepoint_to_string(unsigned int cp, std::string& s)
     {
         if (cp <= 0x7f)
@@ -221,18 +216,6 @@ struct json_char_traits<char>
         }
     }
 
-    static ulonglong_type string_to_uinteger(const std::string& s)
-    {
-        ulonglong_type i = 0;
-        for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
-        {
-            if (*it >= '0' && *it <= '9')
-            {
-                i = i * 10 + (*it - '0');
-            }
-        }
-        return i;
-    }
 };
 
 class json_parser_exception : public std::exception
@@ -291,13 +274,27 @@ private:
     template <class ContentHandler>
     void parse_string(std::basic_istream<Char>& is, ContentHandler& handler);
     void ignore_till_end_of_line(std::basic_istream<Char>& is);
-    bool read_until_match_fails(std::basic_istream<Char>& is, const Char *s);
+    bool read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len);
     unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
     unsigned int decode_unicode_escape_sequence(std::basic_istream<Char>& is);
 
     unsigned long line_number_;
     std::basic_string<Char> buffer_;
 };
+
+template <class Char>
+ulonglong_type string_to_uinteger(const std::basic_string<Char>& s)
+{
+    ulonglong_type i = 0;
+    for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+    {
+        if (*it >= '0' && *it <= '9')
+        {
+            i = i * 10 + (*it - '0');
+        }
+    }
+    return i;
+}
 
 template <class Char>
 template <class ContentHandler>
@@ -504,21 +501,21 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
             parse_array(is,handler);
             return;
         case 't':
-            if (!read_until_match_fails(is, json_char_traits<Char>::rue()))
+            if (!read_until_match_fails(is, "rue", 3))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
             handler.bool_value(true);
             return;
         case 'f':
-            if (!read_until_match_fails(is, json_char_traits<Char>::alse()))
+            if (!read_until_match_fails(is, "alse",4))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
             handler.bool_value(false);
             return;
         case 'n':
-            if (!read_until_match_fails(is, json_char_traits<Char>::ull()))
+            if (!read_until_match_fails(is, "ull",3))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
@@ -542,12 +539,12 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
 }
 
 template <class Char>
-bool json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, const Char *s)
+bool json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len)
 {
-    for (const Char* p = s; is && *p; ++p)
+    for (size_t i = 0; is && i < len; ++i)
     {
         Char c = static_cast<Char>(is.get());
-        if (*p != c)
+        if (c != s[i])
         {
             return false;
         }
@@ -672,7 +669,7 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
                 }
                 else
                 {
-                    ulonglong_type d = json_char_traits<Char>::string_to_uinteger(buffer_);
+                    ulonglong_type d = string_to_uinteger(buffer_);
 					if (has_neg)
                     {
                         handler.integer_value(-static_cast<longlong_type>(d));
