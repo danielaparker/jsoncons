@@ -616,48 +616,74 @@ std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::prox
     return os;
 }
 
+inline 
+char to_hex_character(unsigned char c)
+{
+    assert( c <= 0xF );
+
+    return ( c < 10 ) ? ('0' + c) : ('A' - 10 + c);
+}
+
+template <class Char>
+bool is_control_character(Char c)
+{
+    return c > 0 && c <= 0x1F;
+}
+
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s)
 {
    	std::basic_string<Char> buf;
-       for (size_t i = 0; i < s.length(); ++i)
-       {
-           Char c = s[i];
-           switch (c)
-           {
-           case '\\':
-               buf.push_back('\\');
-               break;
-           case '"':
-               buf.push_back('\\');
-               buf.push_back('\"');
-               break;
-           case '\b':
-               buf.push_back('\\');
-               buf.push_back('b');
-               break;
-           case '\f':
-               buf.push_back('\\');
-               buf.push_back('f');
-               break;
-           case '\n':
-               buf.push_back('\\');
-               buf.push_back('n');
-               break;
-           case '\r':
-               buf.push_back('\\');
-               buf.push_back('r');
-               break;
-           case '\t':
-               buf.push_back('\\');
-               buf.push_back('t');
-               break;
-           default:
-               buf.push_back(c);
-               break;
-           }
-       }
-       return buf;
+    for (size_t i = 0; i < s.length(); ++i)
+    {
+        Char c = s[i];
+        switch (c)
+        {
+        case '\\':
+            buf.push_back('\\');
+            break;
+        case '"':
+            buf.push_back('\\');
+            buf.push_back('\"');
+            break;
+        case '\b':
+            buf.push_back('\\');
+            buf.push_back('b');
+            break;
+        case '\f':
+            buf.push_back('\\');
+            buf.push_back('f');
+            break;
+        case '\n':
+            buf.push_back('\\');
+            buf.push_back('n');
+            break;
+        case '\r':
+            buf.push_back('\\');
+            buf.push_back('r');
+            break;
+        case '\t':
+            buf.push_back('\\');
+            buf.push_back('t');
+            break;
+        default:
+            if (is_control_character(c))
+            {
+                buf.push_back('\\');
+                buf.push_back('u');
+                buf.push_back(to_hex_character(c>>12 & 0x000F ));
+                buf.push_back(to_hex_character(c>>8  & 0x000F )); 
+                buf.push_back(to_hex_character(c>>4  & 0x000F )); 
+                buf.push_back(to_hex_character(c     & 0x000F )); 
+            }
+            else
+            {
+                buf.push_back(c);
+            }
+            break;
+        }
+    }
+    return buf;
 }
 
 }

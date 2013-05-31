@@ -237,7 +237,7 @@ public:
             {
                 os << ",";
             }
-            os << "\"" << members_[i].name_ << "\":";
+            os << "\"" << escape_string(members_[i].name_) << "\":";
 			members_[i].value_.to_stream(os);
         }
 		os << "}";
