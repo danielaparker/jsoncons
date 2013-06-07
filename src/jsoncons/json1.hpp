@@ -18,9 +18,6 @@ typedef long long longlong_type;
 typedef unsigned long long ulonglong_type;
 
 template <class Char>
-class json_variant;
-
-template <class Char>
 class json_object;
 
 template <class Char>

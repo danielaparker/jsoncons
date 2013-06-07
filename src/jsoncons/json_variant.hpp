@@ -19,24 +19,6 @@
 namespace jsoncons {
 
 template <class Char>
-class json_object;
-
-template <class Char>
-class json_array;
-
-template <class Char>
-class json_variant
-{
-public:
-    friend class basic_json<Char>;
-
-    json_object<Char>* object_cast();
-    json_array<Char>* array_cast();
-    const json_object<Char>* object_cast() const;
-    const json_array<Char>* array_cast() const;
-};
-
-template <class Char>
 class name_value_pair 
 {
 public:
@@ -94,7 +76,7 @@ public:
 };
 
 template <class Char>
-class json_array : public json_variant<Char>
+class json_array 
 {
 public:
     typedef typename std::vector<basic_json<Char>>::iterator iterator;
@@ -133,7 +115,7 @@ public:
 };
 
 template <class Char>
-class json_object : public json_variant<Char>
+class json_object
 {
 public:
     typedef typename std::vector<name_value_pair<Char>>::iterator iterator;
@@ -178,8 +160,6 @@ public:
 
     const basic_json<Char>& at(size_t i) const {return members_[i].value_;}
 
-    void set_member(const std::basic_string<Char>& name, json_variant<Char>* value);
-
     void set_member(const std::basic_string<Char>& name, basic_json<Char> value);
 
     void remove(iterator at); 
@@ -213,18 +193,6 @@ public:
 };
 
 template <class Char>
-json_object<Char>* json_variant<Char>::object_cast() {return static_cast<json_object<Char>*>(this);}
-
-template <class Char>
-json_array<Char>* json_variant<Char>::array_cast() {return static_cast<json_array<Char>*>(this);}
-
-template <class Char>
-const json_object<Char>* json_variant<Char>::object_cast() const {return static_cast<const json_object<Char>*>(this);}
-
-template <class Char>
-const json_array<Char>* json_variant<Char>::array_cast() const {return static_cast<const json_array<Char>*>(this);}
-
-template <class Char>
 void json_array<Char>::push_back(basic_json<Char> value)
 {
     elements_.push_back(value);
@@ -246,18 +214,6 @@ template <class Char>
 void json_object<Char>::remove(iterator at)
 {
     members_.erase(at);
-}
-
-template <class Char>
-void json_object<Char>::set_member(const std::basic_string<Char>& name, json_variant<Char>* value)
-{
-    member_key<Char> key(name);
-    iterator it = std::lower_bound(begin(),end(),key,key_compare<Char>());
-    if (it != end() && (*it).name_ == name)
-    {
-        remove(it);
-    }
-    insert(it,name_value_pair<Char>(name,value));
 }
 
 template <class Char>
