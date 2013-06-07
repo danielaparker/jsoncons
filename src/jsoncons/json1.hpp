@@ -217,6 +217,9 @@ public:
         return type_;
     }
 
+    template <class Serializer>
+    void serialize(Serializer& serializer) const;
+
 private:
     value_type type_;
     union
@@ -226,7 +229,8 @@ private:
         unsigned long long ulonglong_value_;
         bool bool_value_;
         simple_string<Char> string_value_;
-        json_variant<Char>* var_;
+        json_object<Char>* object_;
+        json_array<Char>* array_;
     } value_;
 };
 

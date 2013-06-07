@@ -30,16 +30,6 @@ class json_variant
 public:
     friend class basic_json<Char>;
 
-    virtual ~json_variant()
-    {
-    }
-
-    virtual json_variant* clone() = 0;
-
-    virtual void to_stream(std::basic_ostream<Char>& os) const
-    {
-    }
-
     json_object<Char>* object_cast();
     json_array<Char>* array_cast();
     const json_object<Char>* object_cast() const;
@@ -122,7 +112,7 @@ public:
         }
     }
 
-    virtual json_variant<Char>* clone() 
+    json_array<Char>* clone() 
     {
         return new json_array(elements_.begin(),elements_.end());
     }
@@ -138,20 +128,6 @@ public:
     const basic_json<Char>& at(size_t i) const {return elements_[i];}
 
     void push_back(basic_json<Char> value);
-
-    virtual void to_stream(std::basic_ostream<Char>& os) const
-    {
-		os << "[";
-        for (size_t i = 0; i < elements_.size(); ++i)
-        {
-            if (i > 0)
-            {
-                os << ",";
-            }
-            elements_[i].to_stream(os);
-        }
-		os << "]";
-    }
 
     std::vector<basic_json<Char>> elements_;
 };
@@ -180,7 +156,7 @@ public:
         //}
     }
 
-    virtual json_variant<Char>* clone() 
+    json_object<Char>* clone() 
     {
         std::vector<name_value_pair<Char>> members(members_.size());
         for (size_t i = 0; i < members_.size(); ++i)
@@ -192,6 +168,11 @@ public:
     }
 
     size_t size() const {return members_.size();}
+
+    const name_value_pair<Char>& get(size_t i) const 
+    {
+        return members_[i];
+    }
 
     basic_json<Char>& at(size_t i) {return members_[i].value_;}
 
@@ -227,21 +208,6 @@ public:
     const_iterator begin() const {return members_.begin();}
 
     const_iterator end() const {return members_.end();}
-
-    virtual void to_stream(std::basic_ostream<Char>& os) const
-    {
-		os << "{";
-        for (size_t i = 0; i < members_.size(); ++i)
-        {
-            if (i > 0)
-            {
-                os << ",";
-            }
-            os << "\"" << escape_string(members_[i].name_) << "\":";
-			members_[i].value_.to_stream(os);
-        }
-		os << "}";
-    }
 
     std::vector<name_value_pair<Char>> members_;
 };

@@ -136,7 +136,7 @@ template <class Char>
 basic_json<Char>::basic_json()
 {
     type_ = object_t;
-    value_.var_ = new json_object<Char>();
+    value_.object_ = new json_object<Char>();
 }
 
 template <class Char>
@@ -144,7 +144,7 @@ template <class Iterator>
 basic_json<Char>::basic_json(Iterator begin, Iterator end)
 {
     type_ = array_t;
-    value_.var_ = new json_array<Char>(begin,end);
+    value_.array_ = new json_array<Char>(begin,end);
 }
 
 template <class Char>
@@ -165,9 +165,15 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         value_.string_value_.data_ = new Char[value_.string_value_.length_];
         std::memcpy(value_.string_value_.data_,val.value_.string_value_.data_,value_.string_value_.length_*sizeof(Char));
         break;
-    default:
-        value_.var_ = val.value_.var_->clone();
+    case array_t:
+        value_.array_ = val.value_.array_->clone();
         break;
+    case object_t:
+        value_.object_ = val.value_.object_->clone();
+        break;
+    default:
+        // throw
+		break;
     }
 }
 
@@ -177,21 +183,20 @@ basic_json<Char>::basic_json(basic_json&& other)
     type_ = other.type_;
     value_ = other.value_;
     other.type_ = null_t;
-    other.value_.var_ = nullptr;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(json_object<Char>* var)
 {
     type_ = object_t;
-    value_.var_ = var;
+    value_.object_ = var;
 }
 
 template <class Char>
 basic_json<Char>::basic_json(json_array<Char>* var)
 {
     type_ = array_t;
-    value_.var_ = var;
+    value_.array_ = var;
 }
 
 template <class Char>
@@ -235,7 +240,7 @@ template <class Char>
 basic_json<Char>::basic_json(nullptr_t nullp)
 {
     type_ = null_t;
-    value_.var_ = nullptr;
+    value_.object_ = nullptr;
 }
 
 template <class Char>
@@ -252,8 +257,11 @@ basic_json<Char>::~basic_json()
     case string_t:
         delete value_.string_value_.data_;
         break;
-    default:
-        delete value_.var_;
+    case array_t:
+        delete value_.array_;
+        break;
+    case object_t:
+        delete value_.object_;
         break;
     }
 }
@@ -278,9 +286,9 @@ basic_json<Char>& basic_json<Char>::get(size_t i)
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->at(i);
+        return value_.object_->at(i);
     case array_t:
-        return value_.var_->array_cast()->at(i);
+        return value_.array_->at(i);
     default:
         JSONCONS_THROW_EXCEPTION("Not an array or object");
     }
@@ -292,9 +300,9 @@ const basic_json<Char>& basic_json<Char>::get(size_t i) const
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->at(i);
+        return value_.object_->at(i);
     case array_t:
-        return value_.var_->array_cast()->at(i);
+        return value_.array_->at(i);
     default:
         JSONCONS_THROW_EXCEPTION("Not an array or object");
     }
@@ -306,7 +314,7 @@ basic_json<Char>& basic_json<Char>::get(const std::string& name)
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->get(name);
+        return value_.object_->get(name);
     default:
         {
             std::ostringstream os;
@@ -322,7 +330,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::string& name) const
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->get(name);
+        return value_.object_->get(name);
     default:
         {
             std::ostringstream os;
@@ -338,7 +346,7 @@ void basic_json<Char>::set_member(const std::basic_string<Char>& name, const bas
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->set_member(name,value);
+        return value_.object_->set_member(name,value);
     default:
         {
             std::ostringstream os;
@@ -354,7 +362,7 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->set_member(name,value);
+        return value_.object_->set_member(name,value);
     default:
         {
             std::ostringstream os;
@@ -370,9 +378,9 @@ size_t basic_json<Char>::size() const
     switch (type_)
     {
     case object_t:
-        return value_.var_->object_cast()->size();
+        return value_.object_->size();
     case array_t:
-        return value_.var_->array_cast()->size();
+        return value_.array_->size();
     default:
         return 0;
     }
@@ -412,32 +420,62 @@ std::basic_string<Char> basic_json<Char>::to_string() const
 }
 
 template <class Char>
-void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
+template <class Serializer>
+void basic_json<Char>::serialize(Serializer& serializer) const
 {
     switch (type_)
     {
     case string_t:
-        os << "\"" << value_.string_value_ << "\"";
+        serializer.string_value(value_.string_value_.data_,value_.string_value_.length_);
         break;
     case double_t:
-        os << value_.double_value_;
+        serializer.double_value(value_.double_value_);
         break;
     case longlong_t:
-        os << value_.longlong_value_;
+        serializer.longlong_value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        os << value_.ulonglong_value_;
+        serializer.ulonglong_value(value_.ulonglong_value_);
         break;
     case bool_t:
-        os << (value_.bool_value_ ? "true" : "false");
+        serializer.bool_value(value_.bool_value_);
         break;
     case null_t:
-        os << "null";
+        serializer.null_value();
+        break;
+    case object_t:
+		{
+        serializer.begin_object();
+        json_object<Char>* o = value_.object_;
+        for (size_t i = 0; i < o->size(); ++i)
+        {
+            serializer.name(o->get(i).name_);
+            o->get(i).value_.serialize(serializer);
+        }
+        serializer.end_object();
+		}
+        break;
+    case array_t:
+		{
+        serializer.begin_array();
+        json_array<Char>* o = value_.array_;
+        for (size_t i = 0; i < o->size(); ++i)
+        {
+            o->at(i).serialize(serializer);
+        }
+        serializer.end_array();
+		}
         break;
     default:
-        value_.var_->to_stream(os);
+        // throw
         break;
     }
+}
+
+template <class Char>
+void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
+{
+    serialize(basic_json_serializer<Char>(os));
 }
 
 template <class Char>
@@ -612,7 +650,7 @@ std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
 template <class Char,class Key>
 std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::proxy<Key>& o)
 {
-    os << o.to_string();
+    os << o.to_stream(os);
     return os;
 }
 

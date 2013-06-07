@@ -5,10 +5,13 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_parser.hpp"
+#include "jsoncons/json_serializer.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
 
+using jsoncons::json_serializer;
+using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::longlong_type;
@@ -148,3 +151,17 @@ BOOST_AUTO_TEST_CASE(test_wjson)
 {
     //wjson root = wjson::parse(L"{}");
 }
+
+BOOST_AUTO_TEST_CASE(test_serialize)
+{
+    std::string input = "{\"city\":\"Toronto\", \"number\":100.5}";
+
+    json o = json::parse(input);
+
+    std::ostringstream os;
+
+    json_serializer serializer(os,output_format(true));
+    o.serialize(serializer);
+    std::cout << os.str() << std::endl;
+}
+
