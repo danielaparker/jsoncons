@@ -43,24 +43,13 @@ public:
 };
 
 template <class Char>
-class member_key
-{
-public:
-    member_key(const std::basic_string<Char>& name)
-        : name_(name)
-    {
-    }
-    const std::basic_string<Char>& name_;
-};
-
-template <class Char>
 class key_compare
 {
 public:
     bool operator()(const name_value_pair<Char>& a, 
-                    const member_key<Char>& b) const
+                    const std::basic_string<Char>& b) const
     {
-        return a.name_ < b.name_;
+        return a.name_ < b;
     }
 };
 
@@ -219,8 +208,7 @@ void json_object<Char>::remove(iterator at)
 template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
-    member_key<Char> key(name);
-    iterator it = std::lower_bound(begin(),end(),key,key_compare<Char>());
+    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
     if (it != end() && (*it).name_ == name)
     {
         remove(it);
@@ -247,19 +235,17 @@ const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& na
 template <class Char>
 typename json_object<Char>::iterator json_object<Char>::find(const std::basic_string<Char>& name)
 {
-    member_key<Char> key(name);
     key_compare<Char> comp;
-    iterator it = std::lower_bound(begin(),end(),key,comp);
-    return (it != end() && !comp(*it,key)) ? it : end();
+    iterator it = std::lower_bound(begin(),end(), name, comp);
+    return (it != end() && !comp(*it,name)) ? it : end();
 }
 
 template <class Char>
 typename json_object<Char>::const_iterator json_object<Char>::find(const std::basic_string<Char>& name) const
 {
-    member_key<Char> key(name);
     key_compare comp;
-    const_iterator it = std::lower_bound(begin(),end(),key,comp);
-    return (it != end() && !comp(*it,key)) ? it : end();
+    const_iterator it = std::lower_bound(begin(),end(),name, comp);
+    return (it != end() && !comp(*it,name)) ? it : end();
 }
 
 }
