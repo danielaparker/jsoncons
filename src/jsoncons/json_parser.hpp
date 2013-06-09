@@ -105,11 +105,11 @@ public:
             root_ = basic_json<Char>(var);
         }
     }
-    void name(std::basic_string<Char> name)
+    void key(std::basic_string<Char> name)
     {
         stack_.back().name_ = name;
     }
-    void string_value(const std::basic_string<Char>& value)
+    void value(const std::basic_string<Char>& value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -119,10 +119,10 @@ public:
         else 
         {
             stack_.back().structure_.array_->push_back(val);
-            //std::cout << "string_value " << vars_.back()->type() << " " << vars_.size() << std::endl;
+            //std::cout << "value " << vars_.back()->type() << " " << vars_.size() << std::endl;
         }
     }
-    void double_value(double value)
+    void value(double value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -158,7 +158,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void bool_value(bool value)
+    void value(bool value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -170,7 +170,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void null_value()
+    void value(nullptr_t)
     {
         basic_json<Char> val(nullptr);
         if (stack_.back().is_object())
@@ -392,7 +392,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
             }
             {
                 parse_string(is,handler);
-                handler.name(buffer_);
+                handler.key(buffer_);
                 parse_separator_value(is,handler);
                 comma = false;
                 ++count;
@@ -493,8 +493,8 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
         case '\"': // string value
             {
                 parse_string(is,handler);
-                handler.string_value(buffer_);
-                //handler.string_value(buffer_);
+                handler.value(buffer_);
+                //handler.value(buffer_);
                 return;
             }
         case begin_object: // object value
@@ -512,21 +512,21 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            handler.bool_value(true);
+            handler.value(true);
             return;
         case 'f':
             if (!read_until_match_fails(is, "alse",4))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            handler.bool_value(false);
+            handler.value(false);
             return;
         case 'n':
             if (!read_until_match_fails(is, "ull",3))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            handler.null_value();
+            handler.value(nullptr);
             return;
         case '0':
         case '1':
@@ -671,7 +671,7 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
                     }
 					if (has_neg)
 						d = -d;
-                    handler.double_value(d);
+                    handler.value(d);
                     return;
                 }
                 else

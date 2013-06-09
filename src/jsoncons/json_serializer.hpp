@@ -66,7 +66,7 @@ public:
     {
     }
 
-    void name(const std::string& name)
+    void key(const std::string& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -76,7 +76,7 @@ public:
         os_ << '\"' << escape_string<Char>(name) << '\"' << ':';
     }
 
-    void string_value(const char* value, size_t length)
+    void value(const char* value, size_t length)
     {
         if (stack_.back().is_array_)
         {
@@ -90,7 +90,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void double_value(double value)
+    void value(double value)
     {
         if (stack_.back().is_array_)
         {
@@ -104,7 +104,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void longlong_value(longlong_type value)
+    void value(longlong_type value)
     {
         if (stack_.back().is_array_)
         {
@@ -118,7 +118,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void ulonglong_value(ulonglong_type value)
+    void value(ulonglong_type value)
     {
         if (stack_.back().is_array_)
         {
@@ -132,7 +132,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void bool_value(bool value)
+    void value(bool value)
     {
         if (stack_.back().is_array_)
         {
@@ -146,7 +146,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void null_value()
+    void value(nullptr_t)
     {
         if (stack_.back().is_array_)
         {

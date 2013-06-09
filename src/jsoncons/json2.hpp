@@ -426,22 +426,22 @@ void basic_json<Char>::serialize(Serializer& serializer) const
     switch (type_)
     {
     case string_t:
-        serializer.string_value(value_.string_value_.data_,value_.string_value_.length_);
+        serializer.value(value_.string_value_.data_,value_.string_value_.length_);
         break;
     case double_t:
-        serializer.double_value(value_.double_value_);
+        serializer.value(value_.double_value_);
         break;
     case longlong_t:
-        serializer.longlong_value(value_.longlong_value_);
+        serializer.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        serializer.ulonglong_value(value_.ulonglong_value_);
+        serializer.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        serializer.bool_value(value_.bool_value_);
+        serializer.value(value_.bool_value_);
         break;
     case null_t:
-        serializer.null_value();
+        serializer.value(nullptr);
         break;
     case object_t:
 		{
@@ -449,7 +449,7 @@ void basic_json<Char>::serialize(Serializer& serializer) const
         json_object<Char>* o = value_.object_;
         for (size_t i = 0; i < o->size(); ++i)
         {
-            serializer.name(o->get(i).name_);
+            serializer.key(o->get(i).name_);
             o->get(i).value_.serialize(serializer);
         }
         serializer.end_object();

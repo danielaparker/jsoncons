@@ -110,7 +110,7 @@ public:
 
     basic_json(const basic_json& val);
 
-    explicit basic_json(nullptr_t nullp);
+    explicit basic_json(nullptr_t);
 
     explicit basic_json(double val);
 
