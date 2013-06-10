@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
 BOOST_AUTO_TEST_CASE(test_assignment)
 {
-    json root;
+    json root(json::object_prototype);
 
 	root["double_1"] = json(10.0);
 
@@ -65,19 +65,19 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
 BOOST_AUTO_TEST_CASE(test_array)
 {
-    json root;
+    json root(json::object_prototype);
 
     root["addresses"];
 
     std::vector<json> addresses;
-    json address1;
+    json address1(json::object_prototype);
     address1["city"] = json("San Francisco");
     address1["state"] = json("CA");
     address1["zip"] = json("94107");
     address1["country"] = json("USA");
     addresses.push_back(address1);
 
-    json address2;
+    json address2(json::object_prototype);
     address2["city"] = json("Sunnyvale");
     address2["state"] = json("CA");
     address2["zip"] = json("94085");
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_null)
     json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
 
-    json obj;
+    json obj(json::object_prototype);
     obj["field"] = json::null;
     std::cout << obj << std::endl;
 }

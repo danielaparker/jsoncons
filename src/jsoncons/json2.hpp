@@ -119,8 +119,9 @@ std::basic_string<Char> basic_json<Char>::proxy::to_string() const
 template <class Char>
 basic_json<Char>::basic_json()
 {
-    type_ = object_t;
-    value_.object_ = new json_object<Char>();
+    //type_ = object_t;
+    //value_.object_ = new json_object<Char>();
+    type_ = null_t;
 }
 
 template <class Char>
