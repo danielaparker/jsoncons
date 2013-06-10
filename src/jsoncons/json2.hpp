@@ -250,13 +250,6 @@ basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(nullptr_t nullp)
-{
-    type_ = null_t;
-    value_.object_ = nullptr;
-}
-
-template <class Char>
 basic_json<Char>::~basic_json()
 {
     switch (type_)
@@ -534,7 +527,7 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null(basic_json<Char>(nullptr));
+const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
@@ -542,7 +535,7 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
-    basic_json<Char> val(nullptr);
+    basic_json<Char> val;
     val.swap(handler.root_);
     return val;
 }
@@ -555,7 +548,7 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
-    basic_json<Char> val(nullptr);
+    basic_json<Char> val;
     val.swap(handler.root_);
     return val;
 }

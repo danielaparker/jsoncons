@@ -108,8 +108,6 @@ public:
 
     basic_json(basic_json&& val);
 
-    basic_json(nullptr_t);
-
     basic_json(double val);
 
     basic_json(int val);

@@ -169,7 +169,7 @@ public:
     }
     void value(nullptr_t)
     {
-        basic_json<Char> val(nullptr);
+        basic_json<Char> val;
         if (stack_.back().is_object())
         {
             stack_.back().structure_.object_->push_back(name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
