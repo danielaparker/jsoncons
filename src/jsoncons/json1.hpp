@@ -49,10 +49,9 @@ public:
 
     typedef Char char_type;
 
-    template <class Key>
     struct proxy
     {
-    	proxy(basic_json<Char>& var, Key key);
+    	proxy(basic_json<Char>& var, std::basic_string<Char> key);
 
         size_t size() const;
 
@@ -66,7 +65,7 @@ public:
             return val_.get(key_).is_empty();
         }
 
-        std::string as_string() const;
+        std::basic_string<Char> as_string() const;
 
         bool as_bool() const;
 
@@ -82,21 +81,21 @@ public:
 
         operator const basic_json() const;
 
-        proxy<Key>& operator=(const basic_json& val);
+        proxy& operator=(const basic_json& val);
 
-        proxy<size_t> operator[](size_t i);
+        basic_json<Char>& operator[](size_t i);
 
-        const proxy<size_t> operator[](size_t i) const;
+        const basic_json<Char>& operator[](size_t i) const;
 
-        proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name);
+        proxy operator[](std::basic_string<Char> name);
 
-        const proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name) const;
+        const proxy operator[](std::basic_string<Char> name) const;
 
         std::basic_string<Char> to_string() const;
 
         basic_json<Char>& val_;
 
-        Key key_;
+        std::basic_string<Char> key_;
     };
 
     static basic_json parse(std::basic_istream<Char>& is);
@@ -107,7 +106,7 @@ public:
 
     basic_json(const basic_json& val);
 
-    basic_json(basic_json<Char>&& val);
+    basic_json(basic_json&& val);
 
     basic_json(nullptr_t);
 
@@ -142,13 +141,13 @@ public:
 
     size_t size() const;
 
-    proxy<size_t> operator[](size_t);
+    basic_json<Char>& operator[](size_t i);
 
-    const proxy<size_t> operator[](size_t) const;
+    const basic_json<Char>& operator[](size_t i) const;
 
-    proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name);
+    proxy operator[](std::basic_string<Char> k);
 
-    const proxy<std::basic_string<Char>> operator[](std::basic_string<Char> name) const;
+    const proxy operator[](std::basic_string<Char> k) const;
 
     std::basic_string<Char> to_string() const;
 
@@ -198,7 +197,7 @@ public:
 
     unsigned long long as_ulonglong() const;
 
-    std::string as_string() const;
+    std::basic_string<Char> as_string() const;
 
     void swap(basic_json<Char>& o) throw();
 
@@ -206,13 +205,13 @@ public:
 
     const basic_json<Char>& get(size_t i) const;
 
-    basic_json<Char>& get(const std::string& name);
+    basic_json<Char>& get(const std::basic_string<Char>& k);
 
-    const basic_json<Char>& get(const std::string& name) const;
+    const basic_json<Char>& get(const std::basic_string<Char>& k) const;
 
-    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
+    void set_member(const std::basic_string<Char>& k, const basic_json<Char>& value);
 
-    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+    void set_member(std::basic_string<Char>&& k, basic_json<Char>&& value);
 
     void push_back(const basic_json<Char>& value);
 

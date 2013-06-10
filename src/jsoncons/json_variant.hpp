@@ -118,10 +118,6 @@ public:
 
     ~json_object()
     {
-        //for (size_t i = 0; i < members_.size(); ++i)
-        //{
-            //delete members_[i].value_;
-        //}
     }
 
     json_object<Char>* clone() 
