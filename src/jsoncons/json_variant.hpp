@@ -74,13 +74,10 @@ public:
     json_array()
     {
     }
-    template <class Iterator>
-    json_array(Iterator begin, Iterator end)
+    template <class InputIterator>
+    json_array(InputIterator begin, InputIterator end)
+        : elements_(begin,end)
     {
-        for (Iterator it = begin; it != end; ++it)
-        {
-            elements_.push_back(*it);
-        }
     }
 
     json_array<Char>* clone() 

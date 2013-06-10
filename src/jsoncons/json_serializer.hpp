@@ -104,7 +104,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void value(longlong_type value)
+    void value(long long value)
     {
         if (stack_.back().is_array_)
         {
@@ -118,7 +118,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void value(ulonglong_type value)
+    void value(unsigned long long value)
     {
         if (stack_.back().is_array_)
         {

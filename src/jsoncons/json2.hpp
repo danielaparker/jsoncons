@@ -140,11 +140,11 @@ basic_json<Char>::basic_json()
 }
 
 template <class Char>
-template <class Iterator>
-basic_json<Char>::basic_json(Iterator begin, Iterator end)
+template <class InputIterator>
+basic_json<Char>::basic_json(InputIterator first, InputIterator last)
 {
     type_ = array_t;
-    value_.array_ = new json_array<Char>(begin,end);
+    value_.array_ = new json_array<Char>(first,last);
 }
 
 template <class Char>
@@ -207,14 +207,42 @@ basic_json<Char>::basic_json(double val)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(longlong_type val)
+basic_json<Char>::basic_json(long long val)
 {
     type_ = longlong_t;
     value_.longlong_value_ = val;
 }
 
 template <class Char>
-basic_json<Char>::basic_json(ulonglong_type val)
+basic_json<Char>::basic_json(int val)
+{
+    type_ = longlong_t;
+    value_.longlong_value_ = val;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(unsigned int val)
+{
+    type_ = longlong_t;
+    value_.longlong_value_ = val;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(long val)
+{
+    type_ = longlong_t;
+    value_.longlong_value_ = val;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(unsigned long val)
+{
+    type_ = longlong_t;
+    value_.longlong_value_ = val;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(unsigned long long val)
 {
     type_ = ulonglong_t;
     value_.ulonglong_value_ = val;
@@ -346,7 +374,8 @@ void basic_json<Char>::set_member(const std::basic_string<Char>& name, const bas
     switch (type_)
     {
     case object_t:
-        return value_.object_->set_member(name,value);
+        value_.object_->set_member(name,value);
+        break;
     default:
         {
             std::ostringstream os;
@@ -362,11 +391,46 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
     switch (type_)
     {
     case object_t:
-        return value_.object_->set_member(name,value);
+        value_.object_->set_member(name,value);
+        break;
     default:
         {
             std::ostringstream os;
             os << "Attempting to set " << name << " on a value that is not an object"; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
+}
+
+template <class Char>
+void basic_json<Char>::push_back(const basic_json<Char>& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->push_back(value);
+        break;
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to insert into a value that is not an array"; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
+}
+
+template <class Char>
+void basic_json<Char>::push_back(basic_json<Char>&& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->push_back(value);
+        break;
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to insert into a value that is not an array"; 
             JSONCONS_THROW_EXCEPTION(os.str());
         }
     }
@@ -485,7 +549,7 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null_prototype(basic_json<Char>(nullptr));
+const basic_json<Char> basic_json<Char>::null(basic_json<Char>(nullptr));
 
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)

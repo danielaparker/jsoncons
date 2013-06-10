@@ -14,8 +14,6 @@ using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
-using jsoncons::longlong_type;
-using jsoncons::ulonglong_type;
 using jsoncons::json_parser;
 using std::string;
 
@@ -48,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"] = json::object_prototype;
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
-    root["myobject"]["int_2"] = json(longlong_type(0));
+    root["myobject"]["int_2"] = json(long long(0));
     root["myobject"]["string_2"] = json("my string");
     root["myarray"] = json::array_prototype;
 
@@ -111,8 +109,12 @@ BOOST_AUTO_TEST_CASE(example)
 
 BOOST_AUTO_TEST_CASE(test_null)
 {
-    json nullval = json::null_prototype;
+    json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
+
+    json obj;
+    obj["field"] = json::null;
+    std::cout << obj << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_to_string)
@@ -163,4 +165,19 @@ BOOST_AUTO_TEST_CASE(test_serialize)
     o.serialize(serializer);
     std::cout << os.str() << std::endl;
 }
+
+BOOST_AUTO_TEST_CASE(test_array2)
+{
+    std::vector<int> v;
+    v.push_back(100);
+    v.push_back(200);
+    v.push_back(300);
+
+    json a(v.begin(),v.end());
+    a.push_back(400);
+
+    std::cout << a << std::endl;
+
+}
+
 

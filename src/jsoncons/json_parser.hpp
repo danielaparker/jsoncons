@@ -13,9 +13,6 @@
 
 namespace jsoncons {
 
-typedef long long longlong_type;
-typedef unsigned long long ulonglong_type;
-
 template <class Char>
 struct stack_item
 {
@@ -134,7 +131,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void integer_value(longlong_type value)
+    void integer_value(long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -146,7 +143,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void uinteger_value(longlong_type value)
+    void uinteger_value(long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -290,9 +287,9 @@ private:
 };
 
 template <class Char>
-ulonglong_type string_to_uinteger(const std::basic_string<Char>& s)
+unsigned long long string_to_uinteger(const std::basic_string<Char>& s)
 {
-    ulonglong_type i = 0;
+    unsigned long long i = 0;
     for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
     {
         if (*it >= '0' && *it <= '9')
@@ -676,10 +673,10 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
                 }
                 else
                 {
-                    ulonglong_type d = string_to_uinteger(buffer_);
+                    unsigned long long d = string_to_uinteger(buffer_);
 					if (has_neg)
                     {
-                        handler.integer_value(-static_cast<longlong_type>(d));
+                        handler.integer_value(-static_cast<long long>(d));
 						return;
                     }
                     handler.uinteger_value(d);

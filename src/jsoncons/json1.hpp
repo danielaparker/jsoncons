@@ -14,9 +14,6 @@
 
 namespace jsoncons {
 
-typedef long long longlong_type;
-typedef unsigned long long ulonglong_type;
-
 template <class Char>
 class json_object;
 
@@ -44,11 +41,11 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,string_t,double_t,longlong_t,ulonglong_t,array_t,bool_t,null_t};
+    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t};
 
     static const basic_json<Char> object_prototype;
     static const basic_json<Char> array_prototype;
-    static const basic_json<Char> null_prototype;
+    static const basic_json<Char> null;
 
     typedef Char char_type;
 
@@ -106,30 +103,38 @@ public:
 
     static basic_json parse(const std::basic_string<Char>& s);
 
-    basic_json();
+    explicit basic_json();
 
     basic_json(const basic_json& val);
 
-    explicit basic_json(nullptr_t);
+    basic_json(basic_json<Char>&& val);
 
-    explicit basic_json(double val);
+    basic_json(nullptr_t);
 
-    explicit basic_json(longlong_type val);
+    basic_json(double val);
 
-    explicit basic_json(ulonglong_type val);
+    basic_json(int val);
 
-    explicit basic_json(const std::basic_string<Char>& val);
+    basic_json(unsigned int val);
 
-    explicit basic_json(bool val);
+    basic_json(long val);
 
-    template <class Iterator>
-    basic_json(Iterator begin, Iterator end);
+    basic_json(unsigned long val);
+
+    basic_json(long long val);
+
+    basic_json(unsigned long long val);
+
+    basic_json(const std::basic_string<Char>& val);
+
+    basic_json(bool val);
+
+    template <class InputIterator>
+    basic_json(InputIterator first, InputIterator last);
 
     explicit basic_json(json_object<Char>* var);
 
     explicit basic_json(json_array<Char>* var);
-
-    explicit basic_json(basic_json<Char>&& other);
 
     ~basic_json();
 
@@ -208,6 +213,10 @@ public:
     void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
     void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+
+    void push_back(const basic_json<Char>& value);
+
+    void push_back(basic_json<Char>&& value);
 
     value_type type() const
     {
