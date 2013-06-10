@@ -201,9 +201,9 @@ public:
 
     void swap(basic_json<Char>& o) throw();
 
-    basic_json<Char>& get(size_t i);
+    basic_json<Char>& at(size_t i);
 
-    const basic_json<Char>& get(size_t i) const;
+    const basic_json<Char>& at(size_t i) const;
 
     basic_json<Char>& get(const std::basic_string<Char>& k);
 

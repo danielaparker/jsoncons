@@ -293,7 +293,7 @@ void basic_json<Char>::swap(basic_json<Char>& o) throw()
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::get(size_t i) 
+basic_json<Char>& basic_json<Char>::at(size_t i) 
 {
     switch (type_)
     {
@@ -307,7 +307,7 @@ basic_json<Char>& basic_json<Char>::get(size_t i)
 }
 
 template <class Char>
-const basic_json<Char>& basic_json<Char>::get(size_t i) const
+const basic_json<Char>& basic_json<Char>::at(size_t i) const
 {
     switch (type_)
     {
