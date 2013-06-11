@@ -175,7 +175,7 @@ public:
         return type_ == string_t;
     }
 
-    bool is_numeric() const
+    bool is_number() const
     {
         return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }

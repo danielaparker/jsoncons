@@ -587,13 +587,10 @@ bool basic_json<Char>::is_empty() const
 {
     switch (type_)
     {
-    case null_t:
-        return true;
     case array_t:
         return value_.array_->size() == 0;
     case object_t:
         return value_.object_->size() == 0;
-        return true;
     default:
         return false;
     }
