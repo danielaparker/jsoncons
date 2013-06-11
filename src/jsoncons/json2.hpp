@@ -19,7 +19,7 @@ namespace jsoncons {
 
 // proxy
 template <class Char>
-basic_json<Char>::proxy::proxy(basic_json<Char>& var, std::basic_string<Char> key)
+basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Char>& key)
     : val_(var), key_(key)
 {
 }
@@ -73,7 +73,13 @@ unsigned long long basic_json<Char>::proxy::as_ulonglong() const
 }
 
 template <class Char>
-basic_json<Char>::proxy::operator const basic_json<Char>() const
+basic_json<Char>::proxy::operator basic_json<Char>&()
+{
+    return val_.get(key_);
+}
+
+template <class Char>
+basic_json<Char>::proxy::operator const basic_json<Char>&() const
 {
     return val_.get(key_);
 }
@@ -98,13 +104,13 @@ const basic_json<Char>& basic_json<Char>::proxy::operator[](size_t i) const
 }
 
 template <class Char>
-typename basic_json<Char>::proxy basic_json<Char>::proxy::operator[](std::basic_string<Char> name)
+typename basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name)
 {
     return proxy(val_.get(key_),name);
 }
 
 template <class Char>
-typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](std::basic_string<Char> name) const
+typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name) const
 {
     return proxy(val_.get(key_),name);
 }
@@ -436,13 +442,13 @@ size_t basic_json<Char>::size() const
 }
 
 template <class Char>
-typename basic_json<Char>::proxy basic_json<Char>::operator[](std::basic_string<Char> name)
+typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_string<Char>& name)
 {
     return proxy(*this,name);
 }
 
 template <class Char>
-const typename basic_json<Char>::proxy basic_json<Char>::operator[](std::basic_string<Char> name) const
+const typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_string<Char>& name) const
 {
     return proxy(*this,name);
 }

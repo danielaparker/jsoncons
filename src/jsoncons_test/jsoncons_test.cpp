@@ -180,4 +180,60 @@ BOOST_AUTO_TEST_CASE(test_array2)
 
 }
 
+class A
+{
+public:
+    class Proxy
+	{
+	public:
+		friend class A;
+
+        operator A&() 
+        {
+            return val_.get(k_);
+        }
+
+        operator const A&() const 
+        {
+            return val_.get(k_);
+        }
+	private:
+		Proxy& operator = (const Proxy& other) {/* do nothing */}
+		Proxy(const Proxy& proxy)
+			: val_(proxy.val_), k_(proxy.k_)
+		{
+		}
+		Proxy(A& val, const std::string& k)
+			: val_(val), k_(k)
+		{
+		}
+
+		A& val_;
+		const std::string& k_;
+	};
+
+	A& get(const std::string& k)
+	{
+		// In real code, looks up an A instance using k
+		return *this;
+	}
+
+	const A& get(const std::string& k) const
+	{
+		// In real code, looks up an A instance using k
+		return *this;
+	}
+
+    Proxy operator[](const std::string& k)
+    {
+        return Proxy(*this,k);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(test_temp)
+{
+    A a;
+    A b = a["key"];
+}
+
 
