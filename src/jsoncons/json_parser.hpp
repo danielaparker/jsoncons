@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <istream>
 #include <cstdlib>
+#include "jsoncons/json_char_traits.hpp"
 
 namespace jsoncons {
 
@@ -182,47 +183,6 @@ public:
 	basic_json<Char> root_;
 private:
     std::vector<stack_item<Char>> stack_;
-};
-
-template <class Char>
-struct json_char_traits
-{
-};
-
-template <>
-struct json_char_traits<wchar_t>
-{
-};
-
-template <>
-struct json_char_traits<char>
-{
-    static void append_codepoint_to_string(unsigned int cp, std::string& s)
-    {
-        if (cp <= 0x7f)
-        {
-            s.push_back(static_cast<char>(cp));
-        }
-        else if (cp <= 0x7FF)
-        {
-            s.push_back(static_cast<char>(0xC0 | (0x1f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0xFFFF)
-        {
-            s.push_back(0xE0 | static_cast<char>((0xf & (cp >> 12))));
-            s.push_back(0x80 | static_cast<char>((0x3f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<char>(0xF0 | (0x7 & (cp >> 18))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 12))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
-        }
-    }
-
 };
 
 class json_parser_exception : public std::exception

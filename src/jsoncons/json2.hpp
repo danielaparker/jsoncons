@@ -14,6 +14,8 @@
 #include <algorithm>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_variant.hpp"
+#include "jsoncons/json_parser.hpp"
+#include "jsoncons/json_serializer.hpp"
 
 namespace jsoncons {
 

@@ -12,6 +12,7 @@
 #include <ostream>
 #include <cstdlib>
 #include "jsoncons/json2.hpp"
+#include "jsoncons/json_char_traits.hpp"
 
 namespace jsoncons {
 
@@ -58,15 +59,36 @@ struct stack_item
 };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-        : os_(os), indent_(0)
+        : os_(os), indent_(0),
+          pos_inf_encoding_(json_char_traits<Char>::pos_inf_encoding()),
+          neg_inf_encoding_(json_char_traits<Char>::neg_inf_encoding()),
+          nan_encoding_(json_char_traits<Char>::nan_encoding())
     {
     }
     basic_json_serializer(std::basic_ostream<Char>& os, output_format format)
-        : os_(os), format_(format), indent_(0)
+        : os_(os), format_(format), indent_(0),
+          pos_inf_encoding_(json_char_traits<Char>::pos_inf_encoding()),
+          neg_inf_encoding_(json_char_traits<Char>::neg_inf_encoding()),
+          nan_encoding_(json_char_traits<Char>::nan_encoding())
     {
     }
 
-    void key(const std::string& name)
+    void nan_encoding(const std::basic_string<Char>& encoding)
+    {
+        nan_encoding_ = encoding;
+    }
+
+    void pos_inf_encoding(const std::basic_string<Char>& encoding)
+    {
+        pos_inf_encoding_ = encoding;
+    }
+
+    void neg_inf_encoding(const std::basic_string<Char>& encoding)
+    {
+        neg_inf_encoding_ = encoding;
+    }
+
+    void key(const std::basic_string<Char>& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -234,6 +256,10 @@ private:
     output_format format_;
     std::vector<stack_item> stack_;
     int indent_;
+
+    std::basic_string<Char> nan_encoding_;
+    std::basic_string<Char> pos_inf_encoding_;
+    std::basic_string<Char> neg_inf_encoding_;
 };
 
 typedef basic_json_serializer<char> json_serializer;
