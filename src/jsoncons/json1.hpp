@@ -50,7 +50,11 @@ public:
     static const basic_json<Char> array_prototype;
     static const basic_json<Char> null;
 
-    typedef Char char_type;
+    typedef typename json_object<Char>::iterator object_iterator;
+    typedef typename json_object<Char>::const_iterator const_object_iterator;
+
+    typedef typename json_array<Char>::iterator array_iterator;
+    typedef typename json_array<Char>::const_iterator const_array_iterator;
 
     class proxy
     {
@@ -123,8 +127,6 @@ public:
 
     basic_json(basic_json&& val);
 
-    basic_json(nullptr_t);
-
     basic_json(double val);
 
     basic_json(int val);
@@ -139,6 +141,8 @@ public:
 
     basic_json(unsigned long long val);
 
+    basic_json(const Char* val);
+
     basic_json(const std::basic_string<Char>& val);
 
     basic_json(bool val);
@@ -151,6 +155,22 @@ public:
     explicit basic_json(json_array<Char>* var);
 
     ~basic_json();
+
+    object_iterator begin_members();
+
+    const_object_iterator begin_members() const;
+
+    object_iterator end_members();
+
+    const_object_iterator end_members() const;
+
+    array_iterator begin_elements();
+
+    const_array_iterator begin_elements() const;
+
+    array_iterator end_elements();
+
+    const_array_iterator end_elements() const;
 
     basic_json& operator=(basic_json<Char> rhs);
 

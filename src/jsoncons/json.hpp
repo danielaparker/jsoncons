@@ -23,6 +23,7 @@ namespace jsoncons {
 */
 
 typedef basic_json<char> json;
+typedef basic_name_value_pair<char> name_value_pair;
 typedef basic_json<wchar_t> wjson;
 
 }

@@ -218,4 +218,23 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
     obj.to_stream(std::cout,format) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_object_iterator)
+{
+    json obj(json::object_prototype);
+    obj["city"] = std::string("Toronto");
+    obj["province"] = json("Ontario");
+    obj["country"] = json("Canada");
+
+	std::cout << obj["city"].to_string() << std::endl;
+	std::cout << obj["province"].to_string() << std::endl;
+	std::cout << obj["country"].to_string() << std::endl;
+
+    json::object_iterator it = obj.begin_members();
+    while (it != obj.end_members())
+    {
+        std::cout << it->name() << "=" << it->value() << std::endl;
+		++it;
+    }
+}
+
 

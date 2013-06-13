@@ -13,7 +13,7 @@
 #include <utility>
 #include <algorithm>
 #include "jsoncons/json1.hpp"
-#include "jsoncons/json_variant.hpp"
+#include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
 #include "jsoncons/json_serializer.hpp"
 
@@ -120,7 +120,7 @@ typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const
 template <class Char>
 std::basic_string<Char> basic_json<Char>::proxy::to_string() const
 {
-    return val_.to_string();
+    return val_.get(key_).to_string();
 }
 
 
@@ -155,8 +155,15 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         break;
     case string_t:
         value_.string_value_.length_ = val.value_.string_value_.length_;
-        value_.string_value_.data_ = new Char[value_.string_value_.length_];
-        std::memcpy(value_.string_value_.data_,val.value_.string_value_.data_,value_.string_value_.length_*sizeof(Char));
+        if (value_.string_value_.length_ > 0)
+        {
+            value_.string_value_.data_ = new Char[value_.string_value_.length_];
+            std::memcpy(value_.string_value_.data_,val.value_.string_value_.data_,value_.string_value_.length_*sizeof(Char));
+        }
+        else
+        {
+            value_.string_value_.data_ = nullptr;
+        }
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -253,15 +260,32 @@ basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
     value_.string_value_.length_ = s.length();
-    value_.string_value_.data_ = new Char[s.length()];
-    std::memcpy(value_.string_value_.data_,&s[0],s.length()*sizeof(Char));
+    if (s.length() > 0)
+    {
+        value_.string_value_.data_ = new Char[s.length()];
+        std::memcpy(value_.string_value_.data_,&s[0],s.length()*sizeof(Char));
+    }
+    else
+    {
+        value_.string_value_.data_ = nullptr;
+    }
 }
 
 template <class Char>
-basic_json<Char>::basic_json(nullptr_t nullp)
+basic_json<Char>::basic_json(const Char* s)
 {
-    type_ = null_t;
-    value_.object_ = nullptr;
+    type_ = string_t;
+    size_t len = std::strlen(s);
+    value_.string_value_.length_ = len;
+    if (len > 0)
+    {
+        value_.string_value_.data_ = new Char[len];
+        std::memcpy(value_.string_value_.data_,s,len*sizeof(Char));
+    }
+    else
+    {
+        value_.string_value_.data_ = nullptr;
+    }
 }
 
 template <class Char>
@@ -506,8 +530,9 @@ void basic_json<Char>::serialize(Serializer& serializer) const
         json_object<Char>* o = value_.object_;
         for (size_t i = 0; i < o->size(); ++i)
         {
-            serializer.key(o->get(i).name_);
+            serializer.begin_member(o->get(i).name_);
             o->get(i).value_.serialize(serializer);
+            serializer.end_member();
         }
         serializer.end_object();
 		}
@@ -518,7 +543,9 @@ void basic_json<Char>::serialize(Serializer& serializer) const
         json_array<Char>* o = value_.array_;
         for (size_t i = 0; i < o->size(); ++i)
         {
+            serializer.begin_element();
             o->at(i).serialize(serializer);
+            serializer.end_element();
         }
         serializer.end_array();
 		}
@@ -550,7 +577,7 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null(basic_json<Char>(nullptr));
+const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
@@ -558,7 +585,7 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
-    basic_json<Char> val(nullptr);
+    basic_json<Char> val;
     val.swap(handler.root_);
     return val;
 }
@@ -571,9 +598,105 @@ basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
-    basic_json<Char> val(nullptr);
+    basic_json<Char> val;
     val.swap(handler.root_);
     return val;
+}
+
+template <class Char>
+typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
+{
+    switch (type_)
+    {
+    case object_t:
+        return value_.object_->begin();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members() const
+{
+    switch (type_)
+    {
+    case object_t:
+        return value_.object_->begin();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
+{
+    switch (type_)
+    {
+    case object_t:
+        return value_.object_->end();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members() const
+{
+    switch (type_)
+    {
+    case object_t:
+        return value_.object_->end();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
+{
+    switch (type_)
+    {
+    case array_t:
+        return value_.array_->begin();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements() const
+{
+    switch (type_)
+    {
+    case array_t:
+        return value_.array_->begin();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
+{
+    switch (type_)
+    {
+    case array_t:
+        return value_.array_->end();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array");
+    }
+}
+
+template <class Char>
+typename basic_json<Char>::const_array_iterator basic_json<Char>::end_elements() const
+{
+    switch (type_)
+    {
+    case array_t:
+        return value_.array_->end();
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array");
+    }
 }
 
 template <class Char>

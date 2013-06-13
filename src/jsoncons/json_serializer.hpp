@@ -174,7 +174,7 @@ public:
     {
     }
 
-    void key(const std::basic_string<Char>& name)
+    void begin_member(const std::basic_string<Char>& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -184,30 +184,32 @@ public:
         os_ << '\"' << escape_string<Char>(name) << '\"' << ':';
     }
 
+    void end_member()
+    {
+        ++stack_.back().count_;
+    }
+
+    void begin_element()
+    {
+        if (stack_.back().count_ > 0)
+        {
+            os_ << ',';
+        }
+        write_indent();
+    }
+
+    void end_element()
+    {
+        ++stack_.back().count_;
+    }
+
     void value(const char* value, size_t length)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         os_  << '\"' << escape_string<Char>(std::basic_string<Char>(value,length)) << '\"';
-        ++stack_.back().count_;
     }
 
     void value(double value)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         if (is_nan(value) && format_.replace_nan())
         {
             os_  << format_.nan_replacement();
@@ -224,76 +226,30 @@ public:
         {
             os_  << value;
         }
-        ++stack_.back().count_;
     }
 
     void value(long long value)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         os_  << value;
-        ++stack_.back().count_;
     }
 
     void value(unsigned long long value)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         os_  << value;
-        ++stack_.back().count_;
     }
 
     void value(bool value)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         os_ << value ? "true" : "false";
-        ++stack_.back().count_;
     }
 
     void value(nullptr_t)
     {
-        if (stack_.back().is_array_)
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            write_indent();
-        }
         os_ << "null";
-        ++stack_.back().count_;
     }
 
     void begin_object()
     {
-        if (stack_.size() > 0)
-        {
-            if (stack_.back().is_array_ && stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            ++stack_.back().count_;
-            write_indent();
-        }
         stack_.push_back(stack_item(false));
         os_ << "{";
         indent();
@@ -309,15 +265,6 @@ public:
 
     void begin_array()
     {
-        if (stack_.size() > 0)
-        {
-            if (stack_.back().is_array_ && stack_.back().count_ > 0)
-            {
-                os_ << ',';
-            }
-            ++stack_.back().count_;
-            write_indent();
-        }
         stack_.push_back(stack_item(true));
         os_ << "[";
         indent();
