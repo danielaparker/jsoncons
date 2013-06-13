@@ -48,9 +48,9 @@ public:
         : indenting_(false), 
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::default_pos_inf_replacement()),
-          neg_inf_replacement_(json_char_traits<Char>::default_neg_inf_replacement()),
-          nan_replacement_(json_char_traits<Char>::default_nan_replacement())
+          pos_inf_replacement_(json_char_traits<Char>::null_value()),
+          neg_inf_replacement_(json_char_traits<Char>::null_value()),
+          nan_replacement_(json_char_traits<Char>::null_value())
     {
     }
 
@@ -58,15 +58,21 @@ public:
         : indenting_(indenting), 
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::default_pos_inf_replacement()),
-          neg_inf_replacement_(json_char_traits<Char>::default_neg_inf_replacement()),
-          nan_replacement_(json_char_traits<Char>::default_nan_replacement())
+          pos_inf_replacement_(json_char_traits<Char>::null_value()),
+          neg_inf_replacement_(json_char_traits<Char>::null_value()),
+          nan_replacement_(json_char_traits<Char>::null_value())
     {
     }
 
     void replace_nan(bool replace)
     {
         replace_nan_ = replace;
+    }
+
+    void replace_inf(bool replace)
+    {
+        replace_pos_inf_ = replace;
+        replace_neg_inf_ = replace;
     }
 
     void replace_pos_inf(bool replace)
