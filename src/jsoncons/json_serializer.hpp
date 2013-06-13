@@ -13,22 +13,106 @@
 #include <cstdlib>
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
+#include <math.h> // isnan
+#include <limits> // std::numeric_limits
 
 namespace jsoncons {
 
-class output_format
+#ifdef _MSC_VER
+inline bool is_nan(double x) { return _isnan( x ) != 0; }
+inline bool is_inf(double x)
+{
+    return !_finite(x) && !_isnan(x);
+}
+inline bool is_pos_inf(double x)
+{
+    return is_inf(x) && x > 0;
+}
+inline bool is_neg_inf(double x)
+{
+    return is_inf(x) && x < 0;
+}
+#else
+inline bool is_nan(double x) { return std::isnan( x ); }
+inline bool is_pos_inf(double x) {return std::isinf() && x > 0;}
+inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
+#endif
+
+template <class Char>
+class basic_output_format
 {
 public:
     static const size_t default_indent = 4;
 
-    output_format()
-        : indenting_(false), indent_(default_indent)
+    basic_output_format()
+        : indenting_(false), 
+          indent_(default_indent),
+          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
+          pos_inf_replacement_(json_char_traits<Char>::default_pos_inf_replacement()),
+          neg_inf_replacement_(json_char_traits<Char>::default_neg_inf_replacement()),
+          nan_replacement_(json_char_traits<Char>::default_nan_replacement())
     {
     }
 
-    output_format(bool indenting)
-        : indenting_(indenting), indent_(default_indent)
+    basic_output_format(bool indenting)
+        : indenting_(indenting), 
+          indent_(default_indent),
+          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
+          pos_inf_replacement_(json_char_traits<Char>::default_pos_inf_replacement()),
+          neg_inf_replacement_(json_char_traits<Char>::default_neg_inf_replacement()),
+          nan_replacement_(json_char_traits<Char>::default_nan_replacement())
     {
+    }
+
+    void replace_nan(bool replace)
+    {
+        replace_nan_ = replace;
+    }
+
+    void replace_pos_inf(bool replace)
+    {
+        replace_pos_inf_ = replace;
+    }
+
+    void replace_neg_inf(bool replace)
+    {
+        replace_neg_inf_ = replace;
+    }
+
+    bool replace_nan() const {return replace_nan_;}
+
+    bool replace_pos_inf() const {return replace_pos_inf_;}
+
+    bool replace_neg_inf() const {return replace_neg_inf_;}
+
+    void nan_replacement(const std::basic_string<Char>& replacement)
+    {
+        nan_replacement_ = replacement;
+    }
+
+    void pos_inf_replacement(const std::basic_string<Char>& replacement)
+    {
+        pos_inf_replacement_ = replacement;
+    }
+
+    void neg_inf_replacement(const std::basic_string<Char>& replacement)
+    {
+        neg_inf_replacement_ = replacement;
+    }
+
+    std::basic_string<Char> nan_replacement() const 
+    {
+        return nan_replacement_;
+    }
+
+    std::basic_string<Char> pos_inf_replacement() const 
+    {
+        return pos_inf_replacement_;
+    }
+
+    std::basic_string<Char> neg_inf_replacement() const 
+    {
+        return neg_inf_replacement_;
     }
 
     bool indenting() const
@@ -43,6 +127,13 @@ public:
 private:
     bool indenting_;
     size_t indent_;
+
+    bool replace_nan_;
+    bool replace_pos_inf_;
+    bool replace_neg_inf_;
+    std::basic_string<Char> nan_replacement_;
+    std::basic_string<Char> pos_inf_replacement_;
+    std::basic_string<Char> neg_inf_replacement_;
 };
 
 template <class Char>
@@ -59,33 +150,12 @@ struct stack_item
 };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-        : os_(os), indent_(0),
-          pos_inf_encoding_(json_char_traits<Char>::pos_inf_encoding()),
-          neg_inf_encoding_(json_char_traits<Char>::neg_inf_encoding()),
-          nan_encoding_(json_char_traits<Char>::nan_encoding())
+        : os_(os), indent_(0)
     {
     }
-    basic_json_serializer(std::basic_ostream<Char>& os, output_format format)
-        : os_(os), format_(format), indent_(0),
-          pos_inf_encoding_(json_char_traits<Char>::pos_inf_encoding()),
-          neg_inf_encoding_(json_char_traits<Char>::neg_inf_encoding()),
-          nan_encoding_(json_char_traits<Char>::nan_encoding())
+    basic_json_serializer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
+        : os_(os), format_(format), indent_(0)
     {
-    }
-
-    void nan_encoding(const std::basic_string<Char>& encoding)
-    {
-        nan_encoding_ = encoding;
-    }
-
-    void pos_inf_encoding(const std::basic_string<Char>& encoding)
-    {
-        pos_inf_encoding_ = encoding;
-    }
-
-    void neg_inf_encoding(const std::basic_string<Char>& encoding)
-    {
-        neg_inf_encoding_ = encoding;
     }
 
     void key(const std::basic_string<Char>& name)
@@ -122,7 +192,22 @@ public:
             }
             write_indent();
         }
-        os_  << value;
+        if (is_nan(value) && format_.replace_nan())
+        {
+            os_  << format_.nan_replacement();
+        }
+        else if (is_pos_inf(value) && format_.replace_pos_inf())
+        {
+            os_  << format_.pos_inf_replacement();
+        }
+        else if (is_neg_inf(value) && format_.replace_neg_inf())
+        {
+            os_  << format_.neg_inf_replacement();
+        }
+        else
+        {
+            os_  << value;
+        }
         ++stack_.back().count_;
     }
 
@@ -253,16 +338,14 @@ public:
     }
 private:
     std::basic_ostream<Char>& os_;
-    output_format format_;
+    basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
-
-    std::basic_string<Char> nan_encoding_;
-    std::basic_string<Char> pos_inf_encoding_;
-    std::basic_string<Char> neg_inf_encoding_;
 };
 
 typedef basic_json_serializer<char> json_serializer;
+
+typedef basic_output_format<char> output_format;
 
 }
 #endif

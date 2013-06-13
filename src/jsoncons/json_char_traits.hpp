@@ -26,9 +26,9 @@ struct json_char_traits<wchar_t>
 template <>
 struct json_char_traits<char>
 {
-	static const std::string pos_inf_encoding() {return "\"+Inf\"";};
-	static const std::string neg_inf_encoding() {return "\"-Inf\"";};
-	static const std::string nan_encoding() {return "\"NaN\"";};
+    static const std::string default_nan_replacement() {return "\"NaN\"";};
+	static const std::string default_pos_inf_replacement() {return "\"Infinity\"";};
+	static const std::string default_neg_inf_replacement() {return "\"-Infinity\"";};
 
     static void append_codepoint_to_string(unsigned int cp, std::string& s)
     {
