@@ -189,4 +189,19 @@ BOOST_AUTO_TEST_CASE(test_nan_replacement)
     std::cout << obj << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
+{
+    json obj(json::object_prototype);
+    obj["field1"] = std::sqrt(-1.0);
+    obj["field2"] = 1.79e308*1000;
+    obj["field3"] = -1.79e308*1000;
+
+    output_format format;
+    format.nan_replacement("null");
+    format.pos_inf_replacement("1e9999");
+    format.neg_inf_replacement("-1e9999");
+
+    obj.to_stream(std::cout,format);
+}
+
 

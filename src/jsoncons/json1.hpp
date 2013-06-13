@@ -21,6 +21,9 @@ template <class Char>
 class json_array;
 
 template <class Char>
+class basic_output_format;
+
+template <class Char>
 struct simple_string
 {
     size_t length_;
@@ -151,7 +154,7 @@ public:
 
     basic_json& operator=(basic_json<Char> rhs);
 
-    size_t size() const;
+    size_t size() const; 
 
     basic_json<Char>& operator[](size_t i);
 
@@ -164,6 +167,8 @@ public:
     std::basic_string<Char> to_string() const;
 
     void to_stream(std::basic_ostream<Char>& os) const;
+
+    void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const;
 
     bool is_null() const
     {
