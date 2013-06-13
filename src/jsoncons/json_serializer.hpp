@@ -64,6 +64,16 @@ public:
     {
     }
 
+    void indenting(bool value)
+    {
+        indenting_ = value;
+    }
+
+    void indent(size_t value)
+    {
+        indent_ = value;
+    }
+
     void replace_nan(bool replace)
     {
         replace_nan_ = replace;
