@@ -33,6 +33,27 @@ public:
         : name_(name), value_(value)
     {
     }
+    basic_name_value_pair(const basic_name_value_pair& val)
+        : name_(val.name_), value_(val.value_)
+    {
+    }
+    basic_name_value_pair(basic_name_value_pair&& val)
+    {
+        swap(val);
+    }
+
+    basic_name_value_pair<Char>& operator=(basic_name_value_pair<Char> rhs)
+    {
+        swap(rhs);
+        return *this;
+    }
+
+    void swap(basic_name_value_pair<Char>& o) throw()
+    {
+        std::swap(name_,o.name_);
+        value_.swap(o.value_);
+    }
+
     const std::basic_string<Char>& name() const
     {
         return name_;

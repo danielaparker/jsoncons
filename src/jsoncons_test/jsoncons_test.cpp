@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
        << "}";
 
 
-    json root = json::parse(os.str());
+    json root = json::parse_string(os.str());
     std::cout << root << std::endl;
 
     BOOST_CHECK(root["null"].is_null());
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 {
     std::string input = "{\"city\":\"Toronto\", \"number\":100.5}";
 
-    json o = json::parse(input);
+    json o = json::parse_string(input);
 
     std::ostringstream os;
 
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE(test_u0000)
 
     std::cout << "Input:    " << inputStr << std::endl;
 
-    json arr = json::parse(inputStr);
+    json arr = json::parse_string(inputStr);
 
     json::array_iterator it = arr.begin_elements();
     while (it != arr.end_elements())
@@ -264,4 +264,8 @@ BOOST_AUTO_TEST_CASE(test_u0000)
 
 }
 
-
+BOOST_AUTO_TEST_CASE(parse_file)
+{
+    json obj = json::parse_file("../../../examples/persons.json");
+    std::cout << obj << std::endl;
+}

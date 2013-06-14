@@ -102,7 +102,7 @@ public:
             root_ = basic_json<Char>(var);
         }
     }
-    void key(std::basic_string<Char> name)
+    void name(std::basic_string<Char> name)
     {
         stack_.back().name_ = name;
     }
@@ -347,7 +347,7 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
             }
             {
                 parse_string(is,handler);
-                handler.key(buffer_);
+                handler.name(buffer_);
                 parse_separator_value(is,handler);
                 comma = false;
                 ++count;

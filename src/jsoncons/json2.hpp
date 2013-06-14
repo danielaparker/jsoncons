@@ -12,6 +12,7 @@
 #include <cstring>
 #include <utility>
 #include <algorithm>
+#include <fstream>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
@@ -21,106 +22,106 @@ namespace jsoncons {
 
 // proxy
 template <class Char>
-basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Char>& key)
-    : val_(var), key_(key)
+basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Char>& name)
+    : val_(var), name_(name)
 {
 }
 
 template <class Char>
 size_t basic_json<Char>::proxy::size() const
 {
-    return val_.get(key_).size();
+    return val_.get(name_).size();
 }
 
 template <class Char>
 std::basic_string<Char> basic_json<Char>::proxy::as_string() const
 {
-    return val_.get(key_).as_string();
+    return val_.get(name_).as_string();
 }
 
 template <class Char>
 bool basic_json<Char>::proxy::as_bool() const
 {
-    return val_.get(key_).as_bool();
+    return val_.get(name_).as_bool();
 }
 
 template <class Char>
 double basic_json<Char>::proxy::as_double() const
 {
-    return val_.get(key_).as_double();
+    return val_.get(name_).as_double();
 }
 
 template <class Char>
 int basic_json<Char>::proxy::as_int() const
 {
-    return val_.get(key_).as_int();
+    return val_.get(name_).as_int();
 }
 
 template <class Char>
 unsigned int basic_json<Char>::proxy::as_uint() const
 {
-    return val_.get(key_).as_uint();
+    return val_.get(name_).as_uint();
 }
 
 template <class Char>
 long long basic_json<Char>::proxy::as_longlong() const
 {
-    return val_.get(key_).as_longlong();
+    return val_.get(name_).as_longlong();
 }
 
 template <class Char>
 unsigned long long basic_json<Char>::proxy::as_ulonglong() const
 {
-    return val_.get(key_).as_ulonglong();
+    return val_.get(name_).as_ulonglong();
 }
 
 template <class Char>
 basic_json<Char>::proxy::operator basic_json<Char>&()
 {
-    return val_.get(key_);
+    return val_.get(name_);
 }
 
 template <class Char>
 basic_json<Char>::proxy::operator const basic_json<Char>&() const
 {
-    return val_.get(key_);
+    return val_.get(name_);
 }
 
 template <class Char>
 typename basic_json<Char>::proxy& basic_json<Char>::proxy::operator=(const basic_json& val)
 {
-    val_.set_member(key_, val);
+    val_.set_member(name_, val);
     return *this;
 }
 
 template <class Char>
 basic_json<Char>& basic_json<Char>::proxy::operator[](size_t i)
 {
-    return val_.get(key_)[i];
+    return val_.get(name_)[i];
 }
 
 template <class Char>
 const basic_json<Char>& basic_json<Char>::proxy::operator[](size_t i) const
 {
-    return val_.get(key_)[i];
+    return val_.get(name_)[i];
 }
 
 template <class Char>
 typename basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name)
 {
-    return proxy(val_.get(key_),name);
+    return proxy(val_.get(name_),name);
 }
 
 template <class Char>
 typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name) const
 {
-    return proxy(val_.get(key_),name);
+    return proxy(val_.get(name_),name);
 }
 
 template <class Char>
 std::basic_string<Char> basic_json<Char>::proxy::to_string() const
 {
-    return val_.get(key_).to_string();
+    return val_.get(name_).to_string();
 }
 
 
@@ -590,14 +591,49 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     return val;
 }
 
-
 template <class Char>
-basic_json<Char> basic_json<Char>::parse(const std::basic_string<Char>& s)
+basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
     json_parser<Char> parser;
     json_content_handler<Char> handler;
     parser.parse(is,handler);
+    basic_json<Char> val;
+    val.swap(handler.root_);
+    return val;
+}
+
+template <class Char>
+basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
+{
+    std::basic_ifstream<Char> is(filename, std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
+    if (!is.is_open())
+    {
+        std::ostringstream ss;
+        ss << "Cannot open file " << filename;
+        JSONCONS_THROW_EXCEPTION(ss.str());
+    }
+    is.seekg(0,std::ios_base::end);
+    std::ios::pos_type pos = is.tellg();
+    is.seekg(0,std::ios_base::beg);
+
+    size_t length = static_cast<size_t>(pos);
+
+    if (length == 0)
+    {
+        std::ostringstream ss;
+        ss << "File " << filename << " is empty";
+        JSONCONS_THROW_EXCEPTION(ss.str());
+    }
+
+    std::string buffer;
+    buffer.resize(length);
+    is.read(&buffer[0],length);
+    std::istringstream sstr(buffer);
+
+    json_parser<Char> parser;
+    json_content_handler<Char> handler;
+    parser.parse(sstr,handler);
     basic_json<Char> val;
     val.swap(handler.root_);
     return val;

@@ -26,7 +26,11 @@ struct json_char_traits<wchar_t>
 template <>
 struct json_char_traits<char>
 {
-    static const std::string null_value() {return "null";};
+    static const std::string null_literal() {return "null";};
+
+    static const std::string true_literal() {return "true";};
+
+    static const std::string false_literal() {return "false";};
 
     static void append_codepoint_to_string(unsigned int cp, std::string& s)
     {

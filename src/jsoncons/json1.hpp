@@ -65,12 +65,12 @@ public:
 
         bool is_null() const
         {
-            return val_.get(key_).is_null();
+            return val_.get(name_).is_null();
         }
 
         bool is_empty() const
         {
-            return val_.get(key_).is_empty();
+            return val_.get(name_).is_empty();
         }
 
         std::basic_string<Char> as_string() const;
@@ -104,22 +104,24 @@ public:
         std::basic_string<Char> to_string() const;
     private:
         proxy(const proxy& proxy)
-            : val_(proxy.val_), key_(proxy.key_)
+            : val_(proxy.val_), name_(proxy.name_)
         {
         }
         proxy& operator = (const proxy& other) {/* do nothing */}
 
         proxy(basic_json<Char>& var, 
-              const std::basic_string<Char>& key);
+              const std::basic_string<Char>& name);
 
         basic_json<Char>& val_;
 
-        const std::basic_string<Char>& key_;
+        const std::basic_string<Char>& name_;
     };
 
     static basic_json parse(std::basic_istream<Char>& is);
 
-    static basic_json parse(const std::basic_string<Char>& s);
+    static basic_json parse_string(const std::basic_string<Char>& s);
+
+    static basic_json parse_file(const std::string& s);
 
     explicit basic_json();
 
@@ -180,9 +182,9 @@ public:
 
     const basic_json<Char>& operator[](size_t i) const;
 
-    proxy operator[](const std::basic_string<Char>& k);
+    proxy operator[](const std::basic_string<Char>& name);
 
-    const proxy operator[](const std::basic_string<Char>& k) const;
+    const proxy operator[](const std::basic_string<Char>& name) const;
 
     std::basic_string<Char> to_string() const;
 
@@ -242,13 +244,13 @@ public:
 
     const basic_json<Char>& at(size_t i) const;
 
-    basic_json<Char>& get(const std::basic_string<Char>& k);
+    basic_json<Char>& get(const std::basic_string<Char>& name);
 
-    const basic_json<Char>& get(const std::basic_string<Char>& k) const;
+    const basic_json<Char>& get(const std::basic_string<Char>& name) const;
 
-    void set_member(const std::basic_string<Char>& k, const basic_json<Char>& value);
+    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
-    void set_member(std::basic_string<Char>&& k, basic_json<Char>&& value);
+    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     void push_back(const basic_json<Char>& value);
 

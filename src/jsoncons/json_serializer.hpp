@@ -48,9 +48,9 @@ public:
         : indenting_(false), 
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::null_value()),
-          neg_inf_replacement_(json_char_traits<Char>::null_value()),
-          nan_replacement_(json_char_traits<Char>::null_value())
+          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
+          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+          nan_replacement_(json_char_traits<Char>::null_literal())
     {
     }
 
@@ -58,9 +58,9 @@ public:
         : indenting_(indenting), 
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::null_value()),
-          neg_inf_replacement_(json_char_traits<Char>::null_value()),
-          nan_replacement_(json_char_traits<Char>::null_value())
+          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
+          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+          nan_replacement_(json_char_traits<Char>::null_literal())
     {
     }
 
@@ -240,12 +240,12 @@ public:
 
     void value(bool value)
     {
-        os_ << value ? "true" : "false";
+        os_ << value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal();
     }
 
     void value(nullptr_t)
     {
-        os_ << "null";
+        os_ << json_char_traits<Char>::null_literal();
     }
 
     void begin_object()
