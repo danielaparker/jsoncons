@@ -524,7 +524,7 @@ void basic_json<Char>::serialize(Serializer& serializer) const
         serializer.value(value_.bool_value_);
         break;
     case null_t:
-        serializer.value(nullptr);
+        serializer.null();
         break;
     case object_t:
 		{
@@ -607,7 +607,7 @@ basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s
 template <class Char>
 basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
 {
-    std::basic_ifstream<Char> is(filename, std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
+    std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
     if (!is.is_open())
     {
         std::ostringstream ss;

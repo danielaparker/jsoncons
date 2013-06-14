@@ -166,7 +166,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void value(nullptr_t)
+    void null()
     {
         basic_json<Char> val;
         if (stack_.back().is_object())
@@ -481,7 +481,7 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
             }
-            handler.value(nullptr);
+            handler.null();
             return;
         case '0':
         case '1':

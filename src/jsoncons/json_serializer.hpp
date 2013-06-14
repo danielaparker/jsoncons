@@ -243,7 +243,7 @@ public:
         os_ << value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal();
     }
 
-    void value(nullptr_t)
+    void null()
     {
         os_ << json_char_traits<Char>::null_literal();
     }
