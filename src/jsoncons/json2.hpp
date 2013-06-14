@@ -850,7 +850,7 @@ char to_hex_character(unsigned char c)
 template <class Char>
 bool is_control_character(Char c)
 {
-    return c > 0 && c <= 0x1F;
+    return c >= 0 && c <= 0x1F;
 }
 
 template <class Char>

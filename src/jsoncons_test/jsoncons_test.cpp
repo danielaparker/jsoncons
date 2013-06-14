@@ -221,20 +221,47 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 BOOST_AUTO_TEST_CASE(test_object_iterator)
 {
     json obj(json::object_prototype);
-    obj["city"] = std::string("Toronto");
-    obj["province"] = json("Ontario");
-    obj["country"] = json("Canada");
-
-	std::cout << obj["city"].to_string() << std::endl;
-	std::cout << obj["province"].to_string() << std::endl;
-	std::cout << obj["country"].to_string() << std::endl;
+    obj["city"] = "Toronto";
+    obj["province"] = "Ontario";
+    obj["country"] = "Canada";
 
     json::object_iterator it = obj.begin_members();
     while (it != obj.end_members())
     {
-        std::cout << it->name() << "=" << it->value() << std::endl;
+        std::cout << it->name() << "=" << it->value().as_string() << std::endl;
 		++it;
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_u0000)
+{
+    string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
+
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse(inputStr);
+
+    json::array_iterator it = arr.begin_elements();
+    while (it != arr.end_elements())
+    {
+        std::string str = it->as_string();
+        std::cout << "Hex dump: [";
+        for (size_t i = 0; i < str.size(); ++i)
+        {
+            unsigned int val = static_cast<unsigned int>(str[i]);
+            if (i != 0)
+            {
+                std::cout << " ";
+            }
+            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+        }
+        std::cout << "]" << std::endl;
+         ++it;
+    }
+    std::ostringstream os;
+    os << arr;
+    std::cout << "Output:   " << os.str() << std::endl;
+
 }
 
 

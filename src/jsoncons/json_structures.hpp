@@ -101,6 +101,14 @@ public:
 
     void push_back(basic_json<Char> value);
 
+    iterator begin() {return elements_.begin();}
+
+    iterator end() {return elements_.end();}
+
+    const_iterator begin() const {return elements_.begin();}
+
+    const_iterator end() const {return elements_.end();}
+
     std::vector<basic_json<Char>> elements_;
 };
 
