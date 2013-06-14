@@ -13,6 +13,7 @@
 #include <utility>
 #include <algorithm>
 #include <fstream>
+#include <limits>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
@@ -746,6 +747,8 @@ double basic_json<Char>::as_double() const
         return static_cast<double>(value_.longlong_value_);
     case ulonglong_t:
         return static_cast<double>(value_.ulonglong_value_);
+    case null_t:
+        return std::numeric_limits<double>::quiet_NaN();;
     default:
         JSONCONS_THROW_EXCEPTION("Not a double");
     }
@@ -863,13 +866,6 @@ std::basic_string<Char> basic_json<Char>::as_string() const
 
 template <class Char>
 std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
-{
-    os << o.to_string();
-    return os;
-}
-
-template <class Char>
-std::ostream& operator<<(std::ostream& os, typename const basic_json<Char>::proxy& o)
 {
     os << o.to_stream(os);
     return os;

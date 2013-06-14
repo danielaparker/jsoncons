@@ -56,7 +56,7 @@ public:
     typedef typename json_array<Char>::iterator array_iterator;
     typedef typename json_array<Char>::const_iterator const_array_iterator;
 
-    class proxy
+    class proxy 
     {
     public:
         friend class basic_json<Char>;
