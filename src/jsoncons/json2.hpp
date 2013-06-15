@@ -120,6 +120,18 @@ typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const
 }
 
 template <class Char>
+void basic_json<Char>::proxy::push_back(const basic_json<Char>& value)
+{
+    val_.get(name_).push_back(value);
+}
+
+template <class Char>
+void basic_json<Char>::proxy::push_back(basic_json<Char>&& value)
+{
+    val_.get(name_).push_back(value);
+}
+
+template <class Char>
 std::basic_string<Char> basic_json<Char>::proxy::to_string() const
 {
     return val_.get(name_).to_string();

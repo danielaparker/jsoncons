@@ -304,9 +304,25 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 
 }
 
-BOOST_AUTO_TEST_CASE(test_extra)
+BOOST_AUTO_TEST_CASE(constructing_structures)
 {
-	json obj = json::parse_string("{}");
-    std::cout << obj << std::endl;
+	json root = json(json::object_prototype);
+
+    root["persons"] = json(json::array_prototype);
+
+    json person(json::object_prototype);
+    person["first_name"] = "John";
+    person["last_name"] = "Smith";
+    person["birth_date"] = "1972-01-30";
+    json address(json::object_prototype);
+    address["city"] = "Toronto";
+    address["country"] = "Canada";
+    person["address"] = std::move(address);
+
+    root["persons"].push_back(std::move(person));
+
+    output_format format(true);
+    root.to_stream(std::cout,format);
+    std::cout << std::endl;
 }
 

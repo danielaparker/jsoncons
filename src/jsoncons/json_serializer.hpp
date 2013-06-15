@@ -281,6 +281,8 @@ public:
 
     void begin_object()
     {
+        //std::cout << "begin_object" << std::endl;
+        //write_indent();
         stack_.push_back(stack_item(false));
         os_ << "{";
         indent();
@@ -288,14 +290,15 @@ public:
 
     void end_object()
     {
-        stack_.pop_back();
         deindent();
         write_indent();
+        stack_.pop_back();
         os_ << '}';
     }
 
     void begin_array()
     {
+        //write_indent();
         stack_.push_back(stack_item(true));
         os_ << "[";
         indent();
@@ -303,9 +306,9 @@ public:
 
     void end_array()
     {
-        stack_.pop_back();
         deindent();
         write_indent();
+        stack_.pop_back();
         os_ << "]";
     }
 
@@ -321,7 +324,7 @@ public:
 
     void write_indent()
     {
-        if (format_.indenting())
+        if (format_.indenting() && stack_.size() > 0)
         {
             os_ << '\n';
             for (int i = 0; i < indent_; ++i)

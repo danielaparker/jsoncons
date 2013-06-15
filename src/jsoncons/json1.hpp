@@ -94,6 +94,10 @@ public:
 
         const proxy operator[](const std::basic_string<Char>& name) const;
 
+        void push_back(const basic_json<Char>& value);
+
+        void push_back(basic_json<Char>&& value);
+
         std::basic_string<Char> to_string() const;
     private:
         proxy(const proxy& proxy)
