@@ -31,14 +31,7 @@ struct simple_string
 };
 
 template <class Char>
-std::basic_string<Char> escape_string(const std::basic_string<Char>& s);
-
-template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const simple_string<Char>& o)
-{
-    os << escape_string<Char>(std::basic_string<Char>(o.data_,o.length_));
-    return os;
-}
+std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
 template <class Char>
 class basic_json

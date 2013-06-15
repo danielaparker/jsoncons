@@ -269,3 +269,60 @@ BOOST_AUTO_TEST_CASE(parse_file)
     json obj = json::parse_file("../../../examples/persons.json");
     std::cout << obj << std::endl;
 }
+
+BOOST_AUTO_TEST_CASE(test_uHHHH)
+{
+    string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
+
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse_string(inputStr);
+
+    json::array_iterator it = arr.begin_elements();
+    while (it != arr.end_elements())
+    {
+        std::string str = it->as_string();
+        std::cout << "Hex dump: [";
+        for (size_t i = 0; i < str.size(); ++i)
+        {
+            unsigned int val = static_cast<unsigned int>(str[i]);
+            if (i != 0)
+            {
+                std::cout << " ";
+            }
+            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+        }
+        std::cout << "]" << std::endl;
+         ++it;
+    }
+    std::ostringstream os;
+    output_format format;
+    format.escape_all_non_ascii(true);
+    arr.to_stream(os,format);
+    std::cout << "Output:   " << os.str() << std::endl;
+
+	json arr2 = json::parse_string(os.str());
+    for (json::array_iterator it = arr2.begin_elements(); it != arr2.end_elements(); ++it)
+    {
+        std::string str = it->as_string();
+        std::cout << "Hex dump: [";
+        for (size_t i = 0; i < str.size(); ++i)
+        {
+            int val = static_cast<int>(str[i]);
+            if (i != 0)
+            {
+                std::cout << " ";
+            }
+            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+        }
+        std::cout << "]" << std::endl;
+    }
+
+}
+
+BOOST_AUTO_TEST_CASE(test_extra)
+{
+	json obj = json::parse_string("{}");
+    std::cout << obj << std::endl;
+}
+

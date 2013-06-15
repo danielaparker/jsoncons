@@ -129,8 +129,6 @@ std::basic_string<Char> basic_json<Char>::proxy::to_string() const
 template <class Char>
 basic_json<Char>::basic_json()
 {
-    //type_ = object_t;
-    //value_.object_ = new json_object<Char>();
     type_ = null_t;
 }
 
@@ -867,8 +865,7 @@ std::basic_string<Char> basic_json<Char>::as_string() const
 template <class Char>
 std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
 {
-    os << o.to_stream(os);
-    return os;
+    return o.to_stream(os);
 }
 
 inline 
@@ -879,14 +876,20 @@ char to_hex_character(unsigned char c)
     return ( c < 10 ) ? ('0' + c) : ('A' - 10 + c);
 }
 
-template <class Char>
-bool is_control_character(Char c)
+inline
+bool is_control_character(unsigned int c)
 {
     return c >= 0 && c <= 0x1F;
 }
 
+inline
+bool is_non_ascii_character(unsigned int c)
+{
+    return c >= 0x80;
+}
+
 template <class Char>
-std::basic_string<Char> escape_string(const std::basic_string<Char>& s)
+std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format)
 {
    	std::basic_string<Char> buf;
     for (size_t i = 0; i < s.length(); ++i)
@@ -922,14 +925,20 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s)
             buf.push_back('t');
             break;
         default:
+            //const unsigned int uchar(c >= 0 ? c : 256 + c );
             if (is_control_character(c))
             {
                 buf.push_back('\\');
                 buf.push_back('u');
-                buf.push_back(to_hex_character(c>>12 & 0x000F ));
-                buf.push_back(to_hex_character(c>>8  & 0x000F )); 
-                buf.push_back(to_hex_character(c>>4  & 0x000F )); 
+                buf.push_back(to_hex_character(c >>12 & 0x000F ));
+                buf.push_back(to_hex_character(c >>8  & 0x000F )); 
+                buf.push_back(to_hex_character(c >>4  & 0x000F )); 
                 buf.push_back(to_hex_character(c     & 0x000F )); 
+            }
+            else if (format.escape_solidus() && c == '/')
+            {
+                buf.push_back('\\');
+                buf.push_back('/');
             }
             else
             {

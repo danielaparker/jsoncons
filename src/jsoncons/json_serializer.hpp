@@ -50,7 +50,9 @@ public:
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
-          nan_replacement_(json_char_traits<Char>::null_literal())
+          nan_replacement_(json_char_traits<Char>::null_literal()),
+          escape_all_non_ascii_(false),
+          escape_solidus_(false)
     {
     }
 
@@ -60,8 +62,15 @@ public:
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
-          nan_replacement_(json_char_traits<Char>::null_literal())
+          nan_replacement_(json_char_traits<Char>::null_literal()),
+          escape_all_non_ascii_(false),
+          escape_solidus_(false)
     {
+    }
+
+    bool indenting() const
+    {
+        return indenting_;
     }
 
     void indenting(bool value)
@@ -69,9 +78,34 @@ public:
         indenting_ = value;
     }
 
+    size_t indent() const
+    {
+        return indent_;
+    }
+
     void indent(size_t value)
     {
         indent_ = value;
+    }
+
+    bool escape_all_non_ascii() const
+    {
+        return escape_all_non_ascii_;
+    }
+
+    void escape_all_non_ascii(bool value)
+    {
+        escape_all_non_ascii_ = value;
+    }
+
+    bool escape_solidus() const
+    {
+        return escape_solidus_;
+    }
+
+    void escape_solidus(bool value)
+    {
+        escape_solidus_ = value;
     }
 
     void replace_nan(bool replace)
@@ -130,16 +164,6 @@ public:
     {
         return neg_inf_replacement_;
     }
-
-    bool indenting() const
-    {
-        return indenting_;
-    }
-
-    size_t indent() const
-    {
-        return indent_;
-    }
 private:
     bool indenting_;
     size_t indent_;
@@ -150,6 +174,8 @@ private:
     std::basic_string<Char> nan_replacement_;
     std::basic_string<Char> pos_inf_replacement_;
     std::basic_string<Char> neg_inf_replacement_;
+    bool escape_all_non_ascii_;
+    bool escape_solidus_;
 };
 
 template <class Char>
@@ -181,7 +207,7 @@ public:
             os_ << ',';
         }
         write_indent();
-        os_ << '\"' << escape_string<Char>(name) << '\"' << ':';
+        os_ << '\"' << escape_string<Char>(name,format_) << '\"' << ':';
     }
 
     void end_member()
@@ -205,7 +231,7 @@ public:
 
     void value(const char* value, size_t length)
     {
-        os_  << '\"' << escape_string<Char>(std::basic_string<Char>(value,length)) << '\"';
+        os_  << '\"' << escape_string<Char>(std::basic_string<Char>(value,length),format_) << '\"';
     }
 
     void value(double value)
