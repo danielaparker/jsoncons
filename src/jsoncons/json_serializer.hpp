@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include <math.h> // isnan
+//#include <math.h> // isnan
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {
@@ -232,7 +232,7 @@ public:
         ++stack_.back().count_;
     }
 
-    void value(const char* value, size_t length)
+    void value(const Char* value, size_t length)
     {
         os_ << '\"';
         escape_string<Char>(value,length,format_,os_);
