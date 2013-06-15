@@ -528,10 +528,10 @@ void basic_json<Char>::serialize(Serializer& serializer) const
 		{
         serializer.begin_object();
         json_object<Char>* o = value_.object_;
-        for (size_t i = 0; i < o->size(); ++i)
+        for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_member(o->get(i).name_);
-            o->get(i).value_.serialize(serializer);
+            serializer.begin_member(&(it->name()[0]),it->name().length());
+            it->value().serialize(serializer);
             serializer.end_member();
         }
         serializer.end_object();
@@ -541,10 +541,10 @@ void basic_json<Char>::serialize(Serializer& serializer) const
 		{
         serializer.begin_array();
         json_array<Char>* o = value_.array_;
-        for (size_t i = 0; i < o->size(); ++i)
+        for (auto it = o->begin(); it != o->end(); ++it)
         {
             serializer.begin_element();
-            o->at(i).serialize(serializer);
+            it->serialize(serializer);
             serializer.end_element();
         }
         serializer.end_array();
@@ -889,68 +889,67 @@ bool is_non_ascii_character(unsigned int c)
 }
 
 template <class Char>
-std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format)
+void escape_string(const Char* s, 
+                   size_t length,
+                   const basic_output_format<Char>& format,
+                   std::basic_ostream<Char>& os)
 {
-   	std::basic_string<Char> buf;
-    for (size_t i = 0; i < s.length(); ++i)
+    for (size_t i = 0; i < length; ++i)
     {
         Char c = s[i];
         switch (c)
         {
         case '\\':
-            buf.push_back('\\');
+            os << '\\';
             break;
         case '"':
-            buf.push_back('\\');
-            buf.push_back('\"');
+            os << '\\' << '\"';
             break;
         case '\b':
-            buf.push_back('\\');
-            buf.push_back('b');
+            os << '\\' << 'b';
             break;
         case '\f':
-            buf.push_back('\\');
-            buf.push_back('f');
+            os << '\\';
+            os << 'f';
             break;
         case '\n':
-            buf.push_back('\\');
-            buf.push_back('n');
+            os << '\\';
+            os << 'n';
             break;
         case '\r':
-            buf.push_back('\\');
-            buf.push_back('r');
+            os << '\\';
+            os << 'r';
             break;
         case '\t':
-            buf.push_back('\\');
-            buf.push_back('t');
+            os << '\\';
+            os << 't';
             break;
         default:
             unsigned int u(c >= 0 ? c : 256 + c );
             if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
             {
                 // convert utf8 to codepoint
-                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(s,i);
+                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(s,length,i);
 
-                buf.push_back('\\');
-                buf.push_back('u');
-                buf.push_back(to_hex_character(cp >>12 & 0x000F ));
-                buf.push_back(to_hex_character(cp >>8  & 0x000F )); 
-                buf.push_back(to_hex_character(cp >>4  & 0x000F )); 
-                buf.push_back(to_hex_character(cp     & 0x000F )); 
+                os << '\\';
+                os << 'u';
+                os << to_hex_character(cp >>12 & 0x000F );
+                os << to_hex_character(cp >>8  & 0x000F ); 
+                os << to_hex_character(cp >>4  & 0x000F ); 
+                os << to_hex_character(cp     & 0x000F ); 
             }
             else if (format.escape_solidus() && c == '/')
             {
-                buf.push_back('\\');
-                buf.push_back('/');
+                os << '\\';
+                os << '/';
             }
             else
             {
-                buf.push_back(c);
+                os << c;
             }
             break;
         }
     }
-    return buf;
 }
 
 }

@@ -236,28 +236,22 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 BOOST_AUTO_TEST_CASE(test_u0000)
 {
     string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
-
     std::cout << "Input:    " << inputStr << std::endl;
-
     json arr = json::parse_string(inputStr);
 
-    json::array_iterator it = arr.begin_elements();
-    while (it != arr.end_elements())
+    std::string str = arr[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < str.size(); ++i)
     {
-        std::string str = it->as_string();
-        std::cout << "Hex dump: [";
-        for (size_t i = 0; i < str.size(); ++i)
+        unsigned int val = static_cast<unsigned int>(str[i]);
+        if (i != 0)
         {
-            unsigned int val = static_cast<unsigned int>(str[i]);
-            if (i != 0)
-            {
-                std::cout << " ";
-            }
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+            std::cout << " ";
         }
-        std::cout << "]" << std::endl;
-         ++it;
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
     }
+    std::cout << "]" << std::endl;
+
     std::ostringstream os;
     os << arr;
     std::cout << "Output:   " << os.str() << std::endl;
@@ -273,9 +267,7 @@ BOOST_AUTO_TEST_CASE(parse_file)
 BOOST_AUTO_TEST_CASE(test_uHHHH)
 {
     string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
-
     std::cout << "Input:    " << inputStr << std::endl;
-
     json arr = json::parse_string(inputStr);
 
     std::string s = arr[0].as_string();

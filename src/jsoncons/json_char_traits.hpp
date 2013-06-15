@@ -73,6 +73,47 @@ struct json_char_traits<char>
         return cp;
     }
 
+    static unsigned int char_sequence_to_codepoint(const char* s, size_t length, size_t& i)
+    {
+        char c = s[i];
+        unsigned int u(c >= 0 ? c : 256 + c );
+        unsigned int cp = u;
+        if (u < 0x80)
+        {
+        }
+        else if ((u >> 5) == 0x6)
+        {
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp = ((cp << 6) & 0x7ff) + (u & 0x3f);
+        }
+        else if ((u >> 4) == 0xe)
+        {
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp = ((cp << 12) & 0xffff) + ((static_cast<unsigned int>(0xff & u) << 6) & 0xfff);
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp += (u) & 0x3f;
+        }
+        else if ((u >> 3) == 0x1e)
+        {
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp = ((cp << 18) & 0x1fffff) + ((static_cast<unsigned int>(0xff & u) << 12) & 0x3ffff);                
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp += (static_cast<unsigned int>(0xff & u) << 6) & 0xfff;
+            c = s[++i];
+            u = (c >= 0 ? c : 256 + c );
+            cp += (u) & 0x3f; 
+        }
+        else
+        {
+        }
+        return cp;
+    }
+
     static void append_codepoint_to_string(unsigned int cp, std::string& s)
     {
         if (cp <= 0x7f)

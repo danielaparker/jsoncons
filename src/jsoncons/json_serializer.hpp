@@ -200,14 +200,17 @@ public:
     {
     }
 
-    void begin_member(const std::basic_string<Char>& name)
+    void begin_member(const Char* name, size_t length)
     {
         if (stack_.back().count_ > 0)
         {
             os_ << ',';
         }
         write_indent();
-        os_ << '\"' << escape_string<Char>(name,format_) << '\"' << ':';
+        os_ << '\"'; 
+        escape_string<Char>(name,length,format_,os_); 
+        os_ << '\"' 
+            << ':';
     }
 
     void end_member()
@@ -231,7 +234,9 @@ public:
 
     void value(const char* value, size_t length)
     {
-        os_  << '\"' << escape_string<Char>(std::basic_string<Char>(value,length),format_) << '\"';
+        os_ << '\"';
+        escape_string<Char>(value,length,format_,os_);
+        os_ << '\"';
     }
 
     void value(double value)
