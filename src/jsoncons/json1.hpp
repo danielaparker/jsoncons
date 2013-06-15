@@ -181,9 +181,9 @@ public:
 
     std::basic_string<Char> to_string() const;
 
-    std::basic_ostream<Char>& to_stream(std::basic_ostream<Char>& os) const;
+    void to_stream(std::basic_ostream<Char>& os) const;
 
-    std::basic_ostream<Char>& to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const;
+    void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const;
 
     bool is_null() const
     {

@@ -10,7 +10,7 @@
 #include <vector>
 #include <utility>
 
-using jsoncons::json_serializer;
+using jsoncons::json_stream_writer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer serializer(os,output_format(true));
+    json_stream_writer serializer(os,output_format(true));
     o.serialize(serializer);
     std::cout << os.str() << std::endl;
 }
@@ -201,7 +201,8 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
     format.pos_inf_replacement("1e9999");
     format.neg_inf_replacement("-1e9999");
 
-    obj.to_stream(std::cout,format) << std::endl;
+    obj.to_stream(std::cout,format);
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
@@ -215,7 +216,8 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
     format.replace_nan(false);
     format.replace_inf(false);
 
-    obj.to_stream(std::cout,format) << std::endl;
+    obj.to_stream(std::cout,format);
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_object_iterator)

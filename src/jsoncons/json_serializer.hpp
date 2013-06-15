@@ -179,7 +179,7 @@ private:
 };
 
 template <class Char>
-class basic_json_serializer
+class basic_json_stream_writer
 {
 struct stack_item
 {
@@ -191,11 +191,11 @@ struct stack_item
     size_t count_;
 };
 public:
-    basic_json_serializer(std::basic_ostream<Char>& os)
+    basic_json_stream_writer(std::basic_ostream<Char>& os)
         : os_(os), indent_(0)
     {
     }
-    basic_json_serializer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
+    basic_json_stream_writer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
         : os_(os), format_(format), indent_(0)
     {
     }
@@ -337,7 +337,7 @@ private:
     int indent_;
 };
 
-typedef basic_json_serializer<char> json_serializer;
+typedef basic_json_stream_writer<char> json_stream_writer;
 
 typedef basic_output_format<char> output_format;
 

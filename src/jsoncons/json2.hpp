@@ -557,17 +557,15 @@ void basic_json<Char>::serialize(Serializer& serializer) const
 }
 
 template <class Char>
-std::basic_ostream<Char>& basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
+void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
-    serialize(basic_json_serializer<Char>(os)); 
-    return os;
+    serialize(basic_json_stream_writer<Char>(os)); 
 }
 
 template <class Char>
-std::basic_ostream<Char>& basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
 {
-    serialize(basic_json_serializer<Char>(os,format));
-    return os;
+    serialize(basic_json_stream_writer<Char>(os,format));
 }
 
 template <class Char>
@@ -865,7 +863,8 @@ std::basic_string<Char> basic_json<Char>::as_string() const
 template <class Char>
 std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
 {
-    return o.to_stream(os);
+    o.to_stream(os);
+    return os;
 }
 
 inline 
