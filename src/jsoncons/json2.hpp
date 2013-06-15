@@ -925,15 +925,18 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
             buf.push_back('t');
             break;
         default:
-            //const unsigned int uchar(c >= 0 ? c : 256 + c );
-            if (is_control_character(c))
+            unsigned int u(c >= 0 ? c : 256 + c );
+            if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
             {
+                // convert utf8 to codepoint
+                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(s,i);
+
                 buf.push_back('\\');
                 buf.push_back('u');
-                buf.push_back(to_hex_character(c >>12 & 0x000F ));
-                buf.push_back(to_hex_character(c >>8  & 0x000F )); 
-                buf.push_back(to_hex_character(c >>4  & 0x000F )); 
-                buf.push_back(to_hex_character(c     & 0x000F )); 
+                buf.push_back(to_hex_character(cp >>12 & 0x000F ));
+                buf.push_back(to_hex_character(cp >>8  & 0x000F )); 
+                buf.push_back(to_hex_character(cp >>4  & 0x000F )); 
+                buf.push_back(to_hex_character(cp     & 0x000F )); 
             }
             else if (format.escape_solidus() && c == '/')
             {

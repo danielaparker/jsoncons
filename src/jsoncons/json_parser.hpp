@@ -771,23 +771,24 @@ unsigned int json_parser<Char>::decode_unicode_escape_sequence(std::basic_istrea
     while (is && index < 4)
     {
         Char c = static_cast<Char>(is.get());
+        const unsigned int u(c >= 0 ? c : 256 + c );
         cp *= 16;
-        if (c >= '0'  &&  c <= '9')
+        if (u >= '0'  &&  u <= '9')
         {
-            cp += c - '0';
+            cp += u - '0';
         }
-        else if (c >= 'a'  &&  c <= 'f')
+        else if (u >= 'a'  &&  u <= 'f')
         {
-            cp += c - 'a' + 10;
+            cp += u - 'a' + 10;
         }
-        else if (c >= 'A'  &&  c <= 'F')
+        else if (u >= 'A'  &&  u <= 'F')
         {
-            cp += c - 'A' + 10;
+            cp += u - 'A' + 10;
         }
         else
         {
             std::ostringstream os;
-            os << "Expected hexadecimal digit, found " << c << ".";
+            os << "Expected hexadecimal digit, found " << u << ".";
             JSONCONS_THROW_PARSER_EXCEPTION(os.str(), line_number_);
         }
         ++index;

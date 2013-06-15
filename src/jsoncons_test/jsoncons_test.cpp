@@ -278,45 +278,35 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 
     json arr = json::parse_string(inputStr);
 
-    json::array_iterator it = arr.begin_elements();
-    while (it != arr.end_elements())
+    std::string s = arr[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s.size(); ++i)
     {
-        std::string str = it->as_string();
-        std::cout << "Hex dump: [";
-        for (size_t i = 0; i < str.size(); ++i)
-        {
-            unsigned int val = static_cast<unsigned int>(str[i]);
-            if (i != 0)
-            {
-                std::cout << " ";
-            }
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
-        }
-        std::cout << "]" << std::endl;
-         ++it;
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
     }
+    std::cout << "]" << std::endl;
+    
     std::ostringstream os;
     output_format format;
     format.escape_all_non_ascii(true);
     arr.to_stream(os,format);
+    std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 
-	json arr2 = json::parse_string(os.str());
-    for (json::array_iterator it = arr2.begin_elements(); it != arr2.end_elements(); ++it)
+	json arr2 = json::parse_string(outputStr);
+    std::string s2 = arr2[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s2.size(); ++i)
     {
-        std::string str = it->as_string();
-        std::cout << "Hex dump: [";
-        for (size_t i = 0; i < str.size(); ++i)
-        {
-            int val = static_cast<int>(str[i]);
-            if (i != 0)
-            {
-                std::cout << " ";
-            }
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
-        }
-        std::cout << "]" << std::endl;
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
     }
+    std::cout << "]" << std::endl;
 
 }
 
