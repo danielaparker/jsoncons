@@ -130,7 +130,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void integer_value(long long value)
+    void value(long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -142,7 +142,7 @@ public:
             stack_.back().structure_.array_->push_back(val);
         }
     }
-    void uinteger_value(long long value)
+    void value(unsigned long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -634,10 +634,10 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
                     unsigned long long d = string_to_uinteger(buffer_);
 					if (has_neg)
                     {
-                        handler.integer_value(-static_cast<long long>(d));
+                        handler.value(-static_cast<long long>(d));
 						return;
                     }
-                    handler.uinteger_value(d);
+                    handler.value(d);
                     return;
                 }
             }

@@ -269,7 +269,7 @@ typename json_object<Char>::iterator json_object<Char>::find(const std::basic_st
 template <class Char>
 typename json_object<Char>::const_iterator json_object<Char>::find(const std::basic_string<Char>& name) const
 {
-    key_compare comp;
+    key_compare<Char> comp;
     const_iterator it = std::lower_bound(begin(),end(),name, comp);
     return (it != end() && it->name_ == name) ? it : end();
 }
