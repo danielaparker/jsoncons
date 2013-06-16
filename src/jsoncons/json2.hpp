@@ -568,8 +568,8 @@ const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
-    json_parser<Char> parser;
-    json_content_handler<Char> handler;
+    basic_json_parser<Char> parser;
+    basic_json_stream_listener<Char> handler;
     parser.parse(is,handler);
     basic_json<Char> val;
     val.swap(handler.root_);
@@ -580,8 +580,8 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    json_parser<Char> parser;
-    json_content_handler<Char> handler;
+    basic_json_parser<Char> parser;
+    basic_json_stream_listener<Char> handler;
     parser.parse(is,handler);
     basic_json<Char> val;
     val.swap(handler.root_);
@@ -616,8 +616,8 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     is.read(&buffer[0],length);
     std::istringstream sstr(buffer);
 
-    json_parser<Char> parser;
-    json_content_handler<Char> handler;
+    basic_json_parser<Char> parser;
+    basic_json_stream_listener<Char> handler;
     parser.parse(sstr,handler);
     basic_json<Char> val;
     val.swap(handler.root_);

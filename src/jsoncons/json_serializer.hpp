@@ -181,15 +181,15 @@ private:
 template <class Char>
 class basic_json_stream_writer
 {
-struct stack_item
-{
-    stack_item(bool is_array)
-        : is_array_(is_array), count_(0)
+    struct stack_item
     {
-    }
-    bool is_array_;
-    size_t count_;
-};
+        stack_item()
+            : count_(0)
+        {
+        }
+
+        size_t count_;
+    };
 public:
     basic_json_stream_writer(std::basic_ostream<Char>& os)
         : os_(os), indent_(0)
@@ -283,7 +283,7 @@ public:
     {
         //std::cout << "begin_object" << std::endl;
         //write_indent();
-        stack_.push_back(stack_item(false));
+        stack_.push_back(stack_item());
         os_ << "{";
         indent();
     }
@@ -299,7 +299,7 @@ public:
     void begin_array()
     {
         //write_indent();
-        stack_.push_back(stack_item(true));
+        stack_.push_back(stack_item());
         os_ << "[";
         indent();
     }

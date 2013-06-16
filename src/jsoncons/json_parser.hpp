@@ -11,177 +11,9 @@
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/json_stream_listener.hpp"
 
 namespace jsoncons {
-
-template <class Char>
-struct stack_item
-{
-    enum structure_type {object_t, array_t};
-    stack_item(json_object<Char>* var)
-        : type_(object_t)
-    {
-        structure_.object_ = var;
-    }
-    stack_item(json_array<Char>* var)
-        : type_(array_t)
-    {
-        structure_.array_ = var;
-    }
-    bool is_object() const
-    {
-        return type_ == object_t;
-    }
-
-    std::basic_string<Char> name_;
-    structure_type type_;
-    union {
-        json_object<Char>* object_;
-        json_array<Char>* array_;
-    } structure_;
-};
-
-template <class Char>
-class json_content_handler
-{
-public:
-    void begin_document()
-    {
-    }
-    void end_document()
-    {
-    }
-    void begin_object()
-    {
-        json_object<Char>* var = new json_object<Char>();
-        stack_.push_back(stack_item<Char>(var));
-    }
-    void end_object()
-    {
-		json_object<Char>* var = stack_.back().structure_.object_;
-	    var->sort_members();
-		stack_.pop_back();
-        if (stack_.size() > 0)
-        {
-            if (stack_.back().is_object())
-            {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
-            }
-            else
-            {
-                stack_.back().structure_.array_->push_back(basic_json<Char>(var));
-            }
-        }
-        else
-        {
-            root_ = basic_json<Char>(var);
-        }
-    }
-    void begin_array()
-    {
-        json_array<Char>* var = new json_array<Char>();
-        stack_.push_back(stack_item<Char>(var));
-    }
-    void end_array()
-    {
-        json_array<Char>* var = stack_.back().structure_.array_;
-        stack_.pop_back();
-        if (stack_.size() > 0)
-        {
-            if (stack_.back().is_object())
-            {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
-            }
-            else
-            {
-                stack_.back().structure_.array_->push_back(basic_json<Char>(var));
-            }
-        }
-        else
-        {
-            root_ = basic_json<Char>(var);
-        }
-    }
-    void name(std::basic_string<Char> name)
-    {
-        stack_.back().name_ = name;
-    }
-    void value(const std::basic_string<Char>& value)
-    {
-        basic_json<Char> val(value);
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else 
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-    void value(double value)
-    {
-        basic_json<Char> val(value);
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-    void value(long long value)
-    {
-        basic_json<Char> val(value);
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-    void value(unsigned long long value)
-    {
-        basic_json<Char> val(value);
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-    void value(bool value)
-    {
-        basic_json<Char> val(value);
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-    void null()
-    {
-        basic_json<Char> val;
-        if (stack_.back().is_object())
-        {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
-        } 
-        else
-        {
-            stack_.back().structure_.array_->push_back(val);
-        }
-    }
-	basic_json<Char> root_;
-private:
-    std::vector<stack_item<Char>> stack_;
-};
 
 class json_parser_exception : public std::exception
 {
@@ -206,7 +38,7 @@ template <class Char>
 class json_object;
 
 template <class Char>
-class json_parser
+class basic_json_parser
 {
 public:
     // Structural characters
@@ -220,21 +52,21 @@ public:
     /*!
       \param is The input stream to read from
     */
-    template <class ContentHandler>
-    void parse(std::basic_istream<Char>& is, ContentHandler& handler);
+    template <class StreamListener>
+    void parse(std::basic_istream<Char>& is, StreamListener& handler);
 private:
-    template <class ContentHandler>
-    void parse_object(std::basic_istream<Char>& is, ContentHandler& handler);
-    template <class ContentHandler>
-    void parse_separator_value(std::basic_istream<Char>& is, ContentHandler& handler);
-    template <class ContentHandler>
-    void parse_value(std::basic_istream<Char>& is, ContentHandler& handler);
-    template <class ContentHandler>
-    void parse_number(std::basic_istream<Char>& is, Char c, ContentHandler& handler);
-    template <class ContentHandler>
-    void parse_array(std::basic_istream<Char>& is, ContentHandler& handler);
-    template <class ContentHandler>
-    void parse_string(std::basic_istream<Char>& is, ContentHandler& handler);
+    template <class StreamListener>
+    void parse_object(std::basic_istream<Char>& is, StreamListener& handler);
+    template <class StreamListener>
+    void parse_separator_value(std::basic_istream<Char>& is, StreamListener& handler);
+    template <class StreamListener>
+    void parse_value(std::basic_istream<Char>& is, StreamListener& handler);
+    template <class StreamListener>
+    void parse_number(std::basic_istream<Char>& is, Char c, StreamListener& handler);
+    template <class StreamListener>
+    void parse_array(std::basic_istream<Char>& is, StreamListener& handler);
+    template <class StreamListener>
+    void parse_string(std::basic_istream<Char>& is, StreamListener& handler);
     void ignore_till_end_of_line(std::basic_istream<Char>& is);
     bool read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len);
     unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
@@ -259,10 +91,10 @@ unsigned long long string_to_uinteger(const std::basic_string<Char>& s)
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse(std::basic_istream<Char>& is, StreamListener& handler)
 {
-    handler.begin_document();
+    handler.begin_json();
     line_number_ = 0;
 
     while (is)
@@ -294,12 +126,12 @@ void json_parser<Char>::parse(std::basic_istream<Char>& is, ContentHandler& hand
         case begin_object:
             handler.begin_object();
             parse_object(is,handler);
-            handler.end_document();
+            handler.end_json();
             return;
         case begin_array:
             handler.begin_array();
             parse_array(is,handler);
-            handler.end_document();
+            handler.end_json();
             return;
         }
     }
@@ -308,8 +140,8 @@ void json_parser<Char>::parse(std::basic_istream<Char>& is, ContentHandler& hand
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamListener& handler)
 {
     size_t count = 0;
     bool comma = false;
@@ -377,8 +209,8 @@ void json_parser<Char>::parse_object(std::basic_istream<Char>& is, ContentHandle
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is, StreamListener& handler)
 {
     while (is)
     {
@@ -416,8 +248,8 @@ void json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is, Cont
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamListener& handler)
 {
     while (is)
     {
@@ -501,7 +333,7 @@ void json_parser<Char>::parse_value(std::basic_istream<Char>& is, ContentHandler
 }
 
 template <class Char>
-bool json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len)
+bool basic_json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len)
 {
     for (size_t i = 0; is && i < len; ++i)
     {
@@ -515,8 +347,8 @@ bool json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, cha
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_array(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_array(std::basic_istream<Char>& is, StreamListener& handler)
 {
     size_t count = 0;
     bool comma = false;
@@ -576,8 +408,8 @@ void json_parser<Char>::parse_array(std::basic_istream<Char>& is, ContentHandler
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, StreamListener& handler)
 {
     buffer_.clear();
     bool has_frac_or_exp = false;
@@ -648,8 +480,8 @@ void json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c, Conte
 }
 
 template <class Char>
-template <class ContentHandler>
-void json_parser<Char>::parse_string(std::basic_istream<Char>& is, ContentHandler& handler)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamListener& handler)
 {
     buffer_.clear();
 
@@ -729,7 +561,7 @@ void json_parser<Char>::parse_string(std::basic_istream<Char>& is, ContentHandle
 }
 
 template <class Char>
-void json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& is)
+void basic_json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& is)
 {
     while (is)
     {
@@ -743,7 +575,7 @@ void json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& is)
 }
 
 template <class Char>
-unsigned int json_parser<Char>::decode_unicode_codepoint(std::basic_istream<Char>& is)
+unsigned int basic_json_parser<Char>::decode_unicode_codepoint(std::basic_istream<Char>& is)
 {
 
     unsigned int cp = decode_unicode_escape_sequence(is);
@@ -764,7 +596,7 @@ unsigned int json_parser<Char>::decode_unicode_codepoint(std::basic_istream<Char
 }
 
 template <class Char>
-unsigned int json_parser<Char>::decode_unicode_escape_sequence(std::basic_istream<Char>& is)
+unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence(std::basic_istream<Char>& is)
 {
     unsigned int cp = 0;
     size_t index = 0;
@@ -799,6 +631,9 @@ unsigned int json_parser<Char>::decode_unicode_escape_sequence(std::basic_istrea
     }
     return cp;
 }
+
+typedef basic_json_stream_listener<char> json_stream_listener;
+typedef basic_json_parser<char> json_parser;
 
 }
 

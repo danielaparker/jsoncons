@@ -14,7 +14,7 @@ using jsoncons::json_stream_writer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
-using jsoncons::json_parser;
+using jsoncons::basic_json_parser;
 using std::string;
 
 BOOST_AUTO_TEST_CASE( test1 )
