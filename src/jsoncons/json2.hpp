@@ -29,12 +29,6 @@ basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Ch
 }
 
 template <class Char>
-size_t basic_json<Char>::proxy::size() const
-{
-    return val_.get(name_).size();
-}
-
-template <class Char>
 std::basic_string<Char> basic_json<Char>::proxy::as_string() const
 {
     return val_.get(name_).as_string();
@@ -117,24 +111,6 @@ template <class Char>
 typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name) const
 {
     return proxy(val_.get(name_),name);
-}
-
-template <class Char>
-void basic_json<Char>::proxy::push_back(const basic_json<Char>& value)
-{
-    val_.get(name_).push_back(value);
-}
-
-template <class Char>
-void basic_json<Char>::proxy::push_back(basic_json<Char>&& value)
-{
-    val_.get(name_).push_back(value);
-}
-
-template <class Char>
-std::basic_string<Char> basic_json<Char>::proxy::to_string() const
-{
-    return val_.get(name_).to_string();
 }
 
 
@@ -771,6 +747,22 @@ bool basic_json<Char>::is_empty() const
         return value_.array_->size() == 0;
     case object_t:
         return value_.object_->size() == 0;
+    default:
+        return false;
+    }
+}
+
+template <class Char>
+bool basic_json<Char>::has_member(const std::basic_string<Char>& name) const
+{
+    switch (type_)
+    {
+    case object_t:
+        {
+            const_object_iterator it = value_.object_->find(name);
+            return it != end_members();
+        }
+        break;
     default:
         return false;
     }

@@ -227,11 +227,22 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    json::object_iterator it = obj.begin_members();
-    while (it != obj.end_members())
+    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
         std::cout << it->name() << "=" << it->value().as_string() << std::endl;
-		++it;
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_array_iterator)
+{
+    json arr(json::array_prototype);
+    arr.push_back("Toronto");
+    arr.push_back("Vancouver");
+    arr.push_back("Montreal");
+
+    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    {
+        std::cout << it->as_string() << std::endl;
     }
 }
 
@@ -326,3 +337,15 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
     std::cout << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_defaults)
+{
+    json obj(json::object_prototype);
+
+    obj["field1"] = 1;
+
+    double x1 = obj.has_member("field1") ? obj["field1"].as_double() : 10.0;
+    double x2 = obj.has_member("field2") ? obj["field2"].as_double() : 20.0;
+
+    std::cout << "x1=" << x1 << std::endl;
+    std::cout << "x2=" << x2 << std::endl;
+}

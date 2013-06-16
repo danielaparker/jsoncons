@@ -54,11 +54,19 @@ public:
     public:
         friend class basic_json<Char>;
 
-        size_t size() const;
+        size_t size() const
+        {
+            return val_.get(name_).size();
+        }
 
         bool is_null() const
         {
             return val_.get(name_).is_null();
+        }
+
+        bool has_member(const std::basic_string<Char>& name) const
+        {
+            return val_.get(name_).has_member(name);
         }
 
         bool is_empty() const
@@ -94,11 +102,31 @@ public:
 
         const proxy operator[](const std::basic_string<Char>& name) const;
 
-        void push_back(const basic_json<Char>& value);
+        void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        {
+            return val_.get(name_).set_member(name,value);
+        }
 
-        void push_back(basic_json<Char>&& value);
+        void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
-        std::basic_string<Char> to_string() const;
+        {
+            return val_.get(name_).set_member(name,value);
+        }
+
+        void push_back(const basic_json<Char>& value)
+        {
+            val_.get(name_).push_back(value);
+        }
+
+        void push_back(basic_json<Char>&& value)
+        {
+            val_.get(name_).push_back(value);
+        }
+
+        std::basic_string<Char> to_string() const
+        {
+            return val_.get(name_).to_string();
+        }
     private:
         proxy(const proxy& proxy)
             : val_(proxy.val_), name_(proxy.name_)
@@ -193,6 +221,8 @@ public:
     {
         return type_ == null_t;
     }
+
+    bool has_member(const std::basic_string<Char>& name) const;
 
     bool is_string() const
     {
