@@ -483,7 +483,6 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    os.precision(16);
     to_stream(os);
     return os.str();
 }

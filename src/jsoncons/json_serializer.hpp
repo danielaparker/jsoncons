@@ -44,9 +44,12 @@ class basic_output_format
 public:
     static const size_t default_indent = 4;
 
+//  Constructors
+
     basic_output_format()
         : indenting_(false), 
           indent_(default_indent),
+          precision_(16),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -58,6 +61,7 @@ public:
 
     basic_output_format(bool indenting)
         : indenting_(indenting), 
+          precision_(16),
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -68,14 +72,11 @@ public:
     {
     }
 
+//  Accessors
+
     bool indenting() const
     {
         return indenting_;
-    }
-
-    void indenting(bool value)
-    {
-        indenting_ = value;
     }
 
     size_t indent() const
@@ -83,9 +84,9 @@ public:
         return indent_;
     }
 
-    void indent(size_t value)
+    std::streamsize precision() const 
     {
-        indent_ = value;
+        return precision_; 
     }
 
     bool escape_all_non_ascii() const
@@ -93,14 +94,52 @@ public:
         return escape_all_non_ascii_;
     }
 
-    void escape_all_non_ascii(bool value)
-    {
-        escape_all_non_ascii_ = value;
-    }
-
     bool escape_solidus() const
     {
         return escape_solidus_;
+    }
+
+    bool replace_nan() const {return replace_nan_;}
+
+    bool replace_pos_inf() const {return replace_pos_inf_;}
+
+    bool replace_neg_inf() const {return replace_neg_inf_;}
+
+    std::basic_string<Char> nan_replacement() const 
+    {
+        return nan_replacement_;
+    }
+
+    std::basic_string<Char> pos_inf_replacement() const 
+    {
+        return pos_inf_replacement_;
+    }
+
+    std::basic_string<Char> neg_inf_replacement() const 
+    {
+        return neg_inf_replacement_;
+    }
+
+//  Mutators
+
+    void indenting(bool value)
+    {
+        indenting_ = value;
+    }
+
+    void indent(size_t value)
+    {
+        indent_ = value;
+    }
+
+    void precision(std::streamsize prec)
+    {
+        precision_ = prec; 
+    }
+
+    void escape_all_non_ascii(bool value)
+    {
+        escape_all_non_ascii_ = value;
     }
 
     void escape_solidus(bool value)
@@ -129,12 +168,6 @@ public:
         replace_neg_inf_ = replace;
     }
 
-    bool replace_nan() const {return replace_nan_;}
-
-    bool replace_pos_inf() const {return replace_pos_inf_;}
-
-    bool replace_neg_inf() const {return replace_neg_inf_;}
-
     void nan_replacement(const std::basic_string<Char>& replacement)
     {
         nan_replacement_ = replacement;
@@ -149,24 +182,10 @@ public:
     {
         neg_inf_replacement_ = replacement;
     }
-
-    std::basic_string<Char> nan_replacement() const 
-    {
-        return nan_replacement_;
-    }
-
-    std::basic_string<Char> pos_inf_replacement() const 
-    {
-        return pos_inf_replacement_;
-    }
-
-    std::basic_string<Char> neg_inf_replacement() const 
-    {
-        return neg_inf_replacement_;
-    }
 private:
     bool indenting_;
     size_t indent_;
+    std::streamsize precision_;
 
     bool replace_nan_;
     bool replace_pos_inf_;
@@ -194,10 +213,24 @@ public:
     basic_json_stream_writer(std::basic_ostream<Char>& os)
         : os_(os), indent_(0)
     {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+
+        os.precision(16);
     }
     basic_json_stream_writer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
         : os_(os), format_(format), indent_(0)
     {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+
+        os.precision(format_.precision());
+    }
+
+    ~basic_json_stream_writer()
+    {
+        os_.precision(original_precision_);
+        os_.flags(original_format_flags_);
     }
 
     void begin_member(const Char* name, size_t length)
@@ -338,6 +371,8 @@ private:
     basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
+    std::streamsize original_precision_;
+    std::ios_base::fmtflags original_format_flags_;
 };
 
 typedef basic_json_stream_writer<char> json_stream_writer;
