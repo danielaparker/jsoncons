@@ -571,7 +571,7 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     basic_json_stream_listener<Char> handler;
     parser.parse(is,handler);
     basic_json<Char> val;
-    val.swap(handler.root_);
+    handler.swap_root(val);
     return val;
 }
 
@@ -583,7 +583,7 @@ basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s
     basic_json_stream_listener<Char> handler;
     parser.parse(is,handler);
     basic_json<Char> val;
-    val.swap(handler.root_);
+    handler.swap_root(val);
     return val;
 }
 
@@ -619,7 +619,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     basic_json_stream_listener<Char> handler;
     parser.parse(sstr,handler);
     basic_json<Char> val;
-    val.swap(handler.root_);
+    handler.swap_root(val);
     return val;
 }
 

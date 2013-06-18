@@ -17,18 +17,23 @@ namespace jsoncons {
 template <class Char>
 class basic_json_stream_listener
 {
+    enum structure_type {object_t, array_t};
     struct stack_item
     {
-        enum structure_type {object_t, array_t};
-        stack_item(json_object<Char>* var)
-            : type_(object_t)
+        stack_item(structure_type type)
+            : type_(type)
         {
-            structure_.object_ = var;
-        }
-        stack_item(json_array<Char>* var)
-            : type_(array_t)
-        {
-            structure_.array_ = var;
+            switch (type)
+            {
+            case object_t:
+                structure_.object_ = new json_object<Char>();
+                //structure_.object_->reserve(4);
+                break;
+            case array_t:
+                structure_.array_ =  new json_array<Char>();
+                //structure_.array_->reserve(4);
+                break;
+            }
         }
         bool is_object() const
         {
@@ -58,8 +63,7 @@ public:
 
     void begin_object()
     {
-        json_object<Char>* var = new json_object<Char>();
-        stack_.push_back(stack_item(var));
+        stack_.push_back(stack_item(object_t));
     }
 
     void end_object()
@@ -87,8 +91,7 @@ public:
 
     void begin_array()
     {
-        json_array<Char>* var = new json_array<Char>();
-        stack_.push_back(stack_item(var));
+        stack_.push_back(stack_item(array_t));
     }
 
     void end_array()
@@ -100,7 +103,8 @@ public:
         {
             if (stack_.back().is_object())
             {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+                basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+                stack_.back().structure_.object_->push_back(std::move(pair));
             }
             else
             {
@@ -123,7 +127,8 @@ public:
         basic_json<Char> val(std::move(value));
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(std::move(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val))));
+            basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+            stack_.back().structure_.object_->push_back(std::move(pair));
         } 
         else 
         {
@@ -136,7 +141,8 @@ public:
         basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+            stack_.back().structure_.object_->push_back(std::move(pair));
         } 
         else
         {
@@ -196,8 +202,12 @@ public:
         }
     }
 
-	basic_json<Char> root_;
+    void swap_root(basic_json<Char>& val)
+    {
+        val.swap(root_);
+    }
 private:
+	basic_json<Char> root_;
     std::vector<stack_item> stack_;
 };
 
