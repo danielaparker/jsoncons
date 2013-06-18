@@ -179,7 +179,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
             }
             {
                 parse_string(is,handler);
-                handler.name(buffer_);
+                handler.name(std::move(buffer_));
                 parse_separator_value(is,handler);
                 comma = false;
                 ++count;
@@ -280,7 +280,7 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
         case '\"': // string value
             {
                 parse_string(is,handler);
-                handler.value(buffer_);
+                handler.value(std::move(buffer_));
                 //handler.value(buffer_);
                 return;
             }

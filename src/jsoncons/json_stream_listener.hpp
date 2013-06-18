@@ -113,12 +113,12 @@ public:
         }
     }
 
-    void name(const std::basic_string<Char>& name)
+    void name(std::basic_string<Char> name)
     {
         stack_.back().name_ = std::move(name);
     }
 
-    void value(const std::basic_string<Char>& value)
+    void value(std::basic_string<Char> value)
     {
         basic_json<Char> val(std::move(value));
         if (stack_.back().is_object())
