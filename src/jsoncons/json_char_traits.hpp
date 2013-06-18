@@ -21,11 +21,26 @@ struct json_char_traits
 template <>
 struct json_char_traits<wchar_t>
 {
+    static size_t cstring_len(const wchar_t* s)
+    {
+        return std::wcslen(s);
+    }
+
+    static const std::wstring null_literal() {return L"null";};
+
+    static const std::wstring true_literal() {return L"true";};
+
+    static const std::wstring false_literal() {return L"false";};
 };
 
 template <>
 struct json_char_traits<char>
 {
+    static size_t cstring_len(const char* s)
+    {
+        return strlen(s);
+    }
+
     static const std::string null_literal() {return "null";};
 
     static const std::string true_literal() {return "true";};

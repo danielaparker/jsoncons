@@ -263,7 +263,7 @@ template <class Char>
 basic_json<Char>::basic_json(const Char* s)
 {
     type_ = string_t;
-    size_t len = std::strlen(s);
+    size_t len = json_char_traits<Char>::cstring_len(s);
     value_.string_value_.length_ = len;
     if (len > 0)
     {

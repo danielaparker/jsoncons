@@ -5,10 +5,12 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_parser.hpp"
+//#include "jsoncons/json_parser2.hpp"
 #include "jsoncons/json_serializer.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
+#include <ctime>
 
 using jsoncons::json_stream_writer;
 using jsoncons::output_format;
@@ -146,11 +148,6 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     BOOST_CHECK(root["neg-integer"].as_int() == -87654321);
     BOOST_CHECK_CLOSE(root["double"].as_double(), 123456.01, 0.0000001);
     BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
-}
-
-BOOST_AUTO_TEST_CASE(test_wjson)
-{
-    //wjson root = wjson::parse(L"{}");
 }
 
 BOOST_AUTO_TEST_CASE(test_serialize)
@@ -349,3 +346,106 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
 }
+
+BOOST_AUTO_TEST_CASE(test_wjson)
+{
+    wjson root(wjson::object_prototype);
+    //root[L"field1"] = L"test";
+    //wjson root = wjson::parse(L"{}");
+}
+
+BOOST_AUTO_TEST_CASE(test_big_file)
+{
+    std::ofstream os("test.json",std::ofstream::binary);
+
+    std::string person("person");
+    std::string first_name("first_name");
+    std::string last_name("last_name");
+    std::string birthdate("birthdate");
+    std::string sex("sex");
+    std::string salary("salary");
+    std::string interests("interests");
+    std::string favorites("favorites");
+    std::string color("color");
+    std::string sport("sport");
+    std::string food("food");
+
+    std::string john_first_name("john");
+    std::string john_last_name("doe");
+    std::string john_birthdate("1998-05-13");
+    std::string john_sex("m");
+    std::string reading("Reading");
+    std::string mountain_biking("Mountain biking");
+    std::string hacking("Hacking");
+    std::string john_color("blue");
+    std::string john_sport("soccer");
+    std::string john_food("spaghetti");
+
+    output_format format(false);
+    json_stream_writer writer(os, format);
+    writer.begin_array();
+    for (size_t i = 0; i < 1000000; ++i)
+    {
+        writer.begin_element();
+        writer.begin_object();
+        writer.begin_member(&person[0],person.length());
+        writer.begin_object();
+        writer.begin_member(&first_name[0],first_name.length());
+        writer.value(&john_first_name[0],john_first_name.length());
+        writer.end_member();
+        writer.begin_member(&last_name[0],last_name.length());
+        writer.value(&john_last_name[0],john_last_name.length());
+        writer.end_member();
+        writer.begin_member(&birthdate[0],birthdate.length());
+        writer.value(&john_birthdate[0],john_birthdate.length());
+        writer.end_member();
+        writer.begin_member(&sex[0],sex.length());
+        writer.value(&john_sex[0],john_sex.length());
+        writer.end_member();
+        writer.begin_member(&salary[0],salary.length());
+        writer.value((long long)70000);
+        writer.end_member();
+        writer.begin_member(&interests[0],interests.length());
+        writer.begin_array();
+        writer.begin_element();
+        writer.value(&reading[0],reading.length());
+        writer.end_element();
+        writer.begin_element();
+        writer.value(&mountain_biking[0],mountain_biking.length());
+        writer.end_element();
+        writer.begin_element();
+        writer.value(&hacking[0],hacking.length());
+        writer.end_element();
+        writer.end_array();
+        writer.end_member();
+        writer.begin_member(&favorites[0],favorites.length());
+        writer.begin_object();
+        writer.begin_member(&color[0],color.length());
+        writer.value(&john_color[0],john_color.length());
+        writer.end_member();
+        writer.begin_member(&sport[0],sport.length());
+        writer.value(&john_sport[0],john_sport.length());
+        writer.end_member();
+        writer.begin_member(&food[0],food.length());
+        writer.value(&john_food[0],john_food.length());
+        writer.end_member();
+        writer.end_object();
+        writer.end_member();
+
+        writer.end_object();
+        writer.end_member();
+        writer.end_object();
+        writer.end_element();
+    }
+    writer.end_array();
+    os.flush();
+
+    std::clock_t t = std::clock();
+
+    std::ifstream is("test.json",std::ofstream::binary);
+    json root = json::parse(is);
+    t = clock() - t;
+    std::cout << "It took " << (((float)t)/CLOCKS_PER_SEC) << " seconds.\n";
+ 
+}
+
