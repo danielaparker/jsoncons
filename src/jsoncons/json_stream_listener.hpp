@@ -65,22 +65,23 @@ public:
     void end_object()
     {
 		json_object<Char>* var = stack_.back().structure_.object_;
-	    var->sort_members();
+        var->sort_members();
+        basic_json<Char> val(var);	    
 		stack_.pop_back();
         if (stack_.size() > 0)
         {
             if (stack_.back().is_object())
             {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
             }
             else
             {
-                stack_.back().structure_.array_->push_back(basic_json<Char>(var));
+                stack_.back().structure_.array_->push_back(std::move(val));
             }
         }
         else
         {
-            root_ = basic_json<Char>(var);
+            root_ = std::move(val);
         }
     }
 
@@ -94,38 +95,39 @@ public:
     {
         json_array<Char>* var = stack_.back().structure_.array_;
         stack_.pop_back();
+        basic_json<Char> val(var);	    
         if (stack_.size() > 0)
         {
             if (stack_.back().is_object())
             {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(basic_json<Char>(var))));
+                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
             }
             else
             {
-                stack_.back().structure_.array_->push_back(basic_json<Char>(var));
+                stack_.back().structure_.array_->push_back(std::move(val));
             }
         }
         else
         {
-            root_ = basic_json<Char>(var);
+            root_ = std::move(val);
         }
     }
 
-    void name(std::basic_string<Char> name)
+    void name(const std::basic_string<Char>& name)
     {
-        stack_.back().name_ = name;
+        stack_.back().name_ = std::move(name);
     }
 
     void value(const std::basic_string<Char>& value)
     {
-        basic_json<Char> val(value);
+        basic_json<Char> val(std::move(value));
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().structure_.object_->push_back(std::move(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val))));
         } 
         else 
         {
-            stack_.back().structure_.array_->push_back(val);
+            stack_.back().structure_.array_->push_back(std::move(val));
         }
     }
 
