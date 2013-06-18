@@ -1,8 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSONCHARTRAITS_HPP
-#define JSONCONS_JSONCHARTRAITS_HPP
+#ifndef JSONCONS_JSON_CHAR_TRAITS_HPP
+#define JSONCONS_JSON_CHAR_TRAITS_HPP
 
 #include <string>
 #include <sstream>

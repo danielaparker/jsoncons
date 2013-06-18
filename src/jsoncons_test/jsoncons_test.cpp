@@ -354,6 +354,19 @@ BOOST_AUTO_TEST_CASE(test_wjson)
     //wjson root = wjson::parse(L"{}");
 }
 
+BOOST_AUTO_TEST_CASE(test_exception)
+{
+    try
+    {
+        std::string input("{\"field1\":\n\"value}");
+		json obj = json::parse_string(input);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_big_file)
 {
     std::ofstream os("test.json",std::ofstream::binary);

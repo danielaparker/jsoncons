@@ -1,8 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSONPARSER_HPP
-#define JSONCONS_JSONPARSER_HPP
+#ifndef JSONCONS_JSON_PARSER_HPP
+#define JSONCONS_JSON_PARSER_HPP
 
 #include <string>
 #include <sstream>
@@ -18,10 +18,12 @@ namespace jsoncons {
 class json_parser_exception : public std::exception
 {
 public:
-    json_parser_exception(std::string s, unsigned long line_number)
+    json_parser_exception(std::string s, 
+                          unsigned long line, 
+                          unsigned long column)
     {
         std::ostringstream os;
-        os << s << " on line " << line_number;
+        os << s << " on line " << line << " at column " << column;
         message_ = os.str();
     }
     const char* what() const
@@ -32,7 +34,7 @@ private:
     std::string message_;
 };
 
-#define JSONCONS_THROW_PARSER_EXCEPTION(x,n) throw json_parser_exception(x,n)
+#define JSONCONS_THROW_PARSER_EXCEPTION(x,n,m) throw json_parser_exception(x,n,m)
 
 template <class Char>
 class json_object;
@@ -72,7 +74,8 @@ private:
     unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
     unsigned int decode_unicode_escape_sequence(std::basic_istream<Char>& is);
 
-    unsigned long line_number_;
+    unsigned long column_;
+    unsigned long line_;
     std::basic_string<Char> buffer_;
 };
 
@@ -95,15 +98,18 @@ template <class StreamListener>
 void basic_json_parser<Char>::parse(std::basic_istream<Char>& is, StreamListener& handler)
 {
     handler.begin_json();
-    line_number_ = 0;
+    line_ = 1;
+    column_ = 0;
 
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\n':
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             break;
         case '\t':
         case '\v':
@@ -136,7 +142,7 @@ void basic_json_parser<Char>::parse(std::basic_istream<Char>& is, StreamListener
         }
     }
 
-    JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_number_);
+    JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_,column_);
 }
 
 template <class Char>
@@ -149,10 +155,12 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\n':
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             break;
         case '\t':
         case '\v':
@@ -175,7 +183,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
         case '\"':
             if (count > 0 && !comma)
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_,column_);
             }
             {
                 parse_string(is,handler);
@@ -188,7 +196,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
         case value_separator:
             if (count == 0)
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_,column_);
             }
             comma = true;
             break;
@@ -197,7 +205,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
             {
                 if (comma)
                 {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_number_);
+                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_,column_);
                 }
                 handler.end_object();
                 return;
@@ -205,7 +213,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
         }
     }
 
-    JSONCONS_THROW_PARSER_EXCEPTION("Expected }", line_number_);
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected }", line_,column_);
 }
 
 template <class Char>
@@ -215,10 +223,12 @@ void basic_json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\n':
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             break;
         case '\t':
         case '\v':
@@ -244,7 +254,7 @@ void basic_json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is
         }
     }
 
-    JSONCONS_THROW_PARSER_EXCEPTION("Expected :", line_number_);
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected :", line_,column_);
 }
 
 template <class Char>
@@ -254,10 +264,12 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\n':
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             break;
         case '\t':
         case '\v':
@@ -297,21 +309,21 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
         case 't':
             if (!read_until_match_fails(is, "rue", 3))
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
             handler.value(true);
             return;
         case 'f':
             if (!read_until_match_fails(is, "alse",4))
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
             handler.value(false);
             return;
         case 'n':
             if (!read_until_match_fails(is, "ull",3))
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
             handler.null();
             return;
@@ -338,6 +350,7 @@ bool basic_json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& i
     for (size_t i = 0; is && i < len; ++i)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         if (c != s[i])
         {
             return false;
@@ -355,10 +368,12 @@ void basic_json_parser<Char>::parse_array(std::basic_istream<Char>& is, StreamLi
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\n':
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             break;
         case '\t':
         case '\v':
@@ -381,23 +396,24 @@ void basic_json_parser<Char>::parse_array(std::basic_istream<Char>& is, StreamLi
         case value_separator:
             if (count == 0)
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_,column_);
             }
             comma = true;
             break;
         case ']':
             if (comma)
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_,column_);
             }
             handler.end_array();
             return;
         default:
             if (count > 0 && !comma)
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_number_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_,column_);
             }
             is.putback(c);
+            --column_;
             parse_value(is,handler);
             ++count;
             comma = false;
@@ -422,6 +438,7 @@ void basic_json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c,
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '0':
@@ -447,6 +464,7 @@ void basic_json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c,
         default:
             {
                 is.putback(c);
+                --column_;
                 if (has_frac_or_exp)
                 {
                     const Char *begin = buffer_.c_str();
@@ -454,7 +472,7 @@ void basic_json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c,
                     double d = std::strtod(begin, &end);
                     if (end == begin)
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_number_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_,column_);
                     }
 					if (has_neg)
 						d = -d;
@@ -476,7 +494,7 @@ void basic_json_parser<Char>::parse_number(std::basic_istream<Char>& is, Char c,
         }
     }
 
-    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected eof", line_number_);
+    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected eof", line_,column_);
 }
 
 template <class Char>
@@ -488,6 +506,7 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         switch (c)
         {
         case '\a':
@@ -498,7 +517,7 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
         case '\t':
         case '\v':
         case '\0':
-            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_number_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_,column_);
             break;
         case '\\':
             if (is)
@@ -546,7 +565,7 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
                     }
                     break;
                 default:
-                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid character following \\", line_number_);
+                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid character following \\", line_,column_);
                 }
             }
             break;
@@ -557,7 +576,7 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
             break;
         }
     }
-    JSONCONS_THROW_PARSER_EXCEPTION("Expected \"", line_number_);
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected \"", line_,column_);
 }
 
 template <class Char>
@@ -566,9 +585,11 @@ void basic_json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& 
     while (is)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         if (c == '\n')
         {
-            ++line_number_;
+            ++line_;
+            column_ = 0;
             return;
         }
     }
@@ -584,12 +605,13 @@ unsigned int basic_json_parser<Char>::decode_unicode_codepoint(std::basic_istrea
         // surrogate pairs
         if (static_cast<Char>(is.get()) == '\\' && static_cast<Char>(is.get()) == 'u')
         {
+            column_ += 2;
             unsigned int surrogate_pair = decode_unicode_escape_sequence(is);
             cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
         }
         else
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("expecting another \\u token to begin the second half of a cp surrogate pair.", line_number_);
+            JSONCONS_THROW_PARSER_EXCEPTION("expecting another \\u token to begin the second half of a cp surrogate pair.", line_,column_);
         }
     }
     return cp;
@@ -603,6 +625,7 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence(std::basic_
     while (is && index < 4)
     {
         Char c = static_cast<Char>(is.get());
+        ++column_;
         const unsigned int u(c >= 0 ? c : 256 + c );
         cp *= 16;
         if (u >= '0'  &&  u <= '9')
@@ -621,13 +644,13 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence(std::basic_
         {
             std::ostringstream os;
             os << "Expected hexadecimal digit, found " << u << ".";
-            JSONCONS_THROW_PARSER_EXCEPTION(os.str(), line_number_);
+            JSONCONS_THROW_PARSER_EXCEPTION(os.str(), line_,column_);
         }
         ++index;
     }
     if (index != 4)
     {
-        JSONCONS_THROW_PARSER_EXCEPTION("Bad cp escape sequence in string: four digits expected.", line_number_);
+        JSONCONS_THROW_PARSER_EXCEPTION("Bad cp escape sequence in string: four digits expected.", line_,column_);
     }
     return cp;
 }

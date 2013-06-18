@@ -1,8 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSONSERIALIZER_HPP
-#define JSONCONS_JSONSERIALIZER_HPP
+#ifndef JSONCONS_JSON_SERIALIZER_HPP
+#define JSONCONS_JSON_SERIALIZER_HPP
 
 #include <string>
 #include <sstream>
@@ -50,6 +50,8 @@ public:
         : indenting_(false), 
           indent_(default_indent),
           precision_(16),
+          set_format_flags_(0),
+          unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -62,6 +64,8 @@ public:
     basic_output_format(bool indenting)
         : indenting_(indenting), 
           precision_(16),
+          set_format_flags_(0),
+          unset_format_flags_(0),
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -87,6 +91,16 @@ public:
     std::streamsize precision() const 
     {
         return precision_; 
+    }
+
+    std::ios_base::fmtflags set_format_flags() const
+    {
+        return set_format_flags_;
+    }
+
+    std::ios_base::fmtflags unset_format_flags() const
+    {
+        return unset_format_flags_;
     }
 
     bool escape_all_non_ascii() const
@@ -120,7 +134,7 @@ public:
         return neg_inf_replacement_;
     }
 
-//  Mutators
+//  Modifiers
 
     void indenting(bool value)
     {
@@ -182,10 +196,22 @@ public:
     {
         neg_inf_replacement_ = replacement;
     }
+
+    void set_format_flags(std::ios_base::fmtflags flags)
+    {
+        set_format_flags_ = flags;
+    }
+
+    void unset_format_flags(std::ios_base::fmtflags flags)
+    {
+        unset_format_flags_ = flags;
+    }
 private:
     bool indenting_;
     size_t indent_;
     std::streamsize precision_;
+    std::ios_base::fmtflags set_format_flags_;
+    std::ios_base::fmtflags unset_format_flags_;
 
     bool replace_nan_;
     bool replace_pos_inf_;
@@ -224,6 +250,8 @@ public:
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
 
+        os.setf(format_.set_format_flags());
+        os.unsetf(format_.unset_format_flags());
         os.precision(format_.precision());
     }
 
