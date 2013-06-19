@@ -11,7 +11,6 @@
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_stream_listener.hpp"
 
 namespace jsoncons {
 
@@ -69,8 +68,7 @@ private:
     void parse_array(std::basic_istream<Char>& is, StreamListener& handler);
     template <class StreamListener>
     void parse_string(std::basic_istream<Char>& is, StreamListener& handler);
-    template <class StreamListener>
-    void parse_single_line_comment(std::basic_istream<Char>& is, StreamListener& handler);
+    void ignore_single_line_comment(std::basic_istream<Char>& is);
     bool read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3);
     bool read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
@@ -128,7 +126,7 @@ void basic_json_parser<Char>::parse(std::basic_istream<Char>& is, StreamListener
                     {
                         is.ignore();
                         ++column_;
-                        parse_single_line_comment(is,handler);
+                        ignore_single_line_comment(is);
                     }
                 }
             }
@@ -179,7 +177,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        parse_single_line_comment(is,handler);
+                        ignore_single_line_comment(is);
                     }
                 }
             }
@@ -247,7 +245,7 @@ void basic_json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        parse_single_line_comment(is,handler);
+                        ignore_single_line_comment(is);
                     }
                 }
             }
@@ -288,7 +286,7 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        parse_single_line_comment(is,handler);
+                        ignore_single_line_comment(is);
                     }
                 }
             }
@@ -434,7 +432,7 @@ void basic_json_parser<Char>::parse_array(std::basic_istream<Char>& is, StreamLi
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        parse_single_line_comment(is,handler);
+                        ignore_single_line_comment(is);
                     }
                 }
             }
@@ -635,8 +633,7 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
 }
 
 template <class Char>
-template <class StreamListener>
-void basic_json_parser<Char>::parse_single_line_comment(std::basic_istream<Char>& is, StreamListener& handler)
+void basic_json_parser<Char>::ignore_single_line_comment(std::basic_istream<Char>& is)
 {
     buffer_.clear();
 
@@ -646,14 +643,9 @@ void basic_json_parser<Char>::parse_single_line_comment(std::basic_istream<Char>
         ++column_;
         if (c == '\n')
         {
-            handler.comment(std::move(buffer_));
             ++line_;
             column_ = 0;
             return;
-        }
-        else
-        {
-            buffer_.push_back(c);
         }
     }
 }
@@ -718,7 +710,6 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence(std::basic_
     return cp;
 }
 
-typedef basic_json_stream_listener<char> json_stream_listener;
 typedef basic_json_parser<char> json_parser;
 
 }

@@ -17,6 +17,7 @@
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
+#include "jsoncons/json_stream_listener.hpp"
 #include "jsoncons/json_serializer.hpp"
 
 namespace jsoncons {

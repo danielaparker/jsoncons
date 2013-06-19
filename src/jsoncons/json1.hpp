@@ -30,21 +30,6 @@ struct simple_string
     Char* data_;
 };
 
-struct comment_symbol
-{
-    char first;
-    char second;
-};
-
-template <class Char>
-struct single_line_comment
-{
-    char comment_symbol_1;
-    char comment_symbol_2;
-    size_t length_;
-    Char* data_;
-};
-
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
@@ -52,7 +37,7 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,single_line_comment_t};
+    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t};
 
     static const basic_json<Char> an_object;
     static const basic_json<Char> an_array;
@@ -378,12 +363,10 @@ private:
         unsigned long long ulonglong_value_;
         bool bool_value_;
         simple_string<Char> string_value_;
-        single_line_comment<Char> comment_;
         json_object<Char>* object_;
         json_array<Char>* array_;
     } value_;
 };
-
 
 }
 

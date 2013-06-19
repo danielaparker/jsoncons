@@ -11,6 +11,7 @@
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/json1.hpp"
 
 namespace jsoncons {
 
@@ -200,10 +201,6 @@ public:
         {
             stack_.back().structure_.array_->push_back(val);
         }
-    }
-
-    void comment(std::basic_string<Char> value)
-    {
     }
 
     void swap_root(basic_json<Char>& val)
