@@ -510,10 +510,10 @@ void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_outpu
 }
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::object_prototype(new json_object<Char>());
+const basic_json<Char> basic_json<Char>::an_object(new json_object<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::array_prototype(new json_array<Char>());
+const basic_json<Char> basic_json<Char>::an_array(new json_array<Char>());
 
 template <class Char>
 const basic_json<Char> basic_json<Char>::null = basic_json<Char>();

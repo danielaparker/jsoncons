@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
 BOOST_AUTO_TEST_CASE(test_assignment)
 {
-    json root(json::object_prototype);
+    json root(json::an_object);
 
 	root["double_1"] = json(10.0);
 
@@ -45,12 +45,12 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
     BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
-    root["myobject"] = json::object_prototype;
+    root["myobject"] = json::an_object;
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
     root["myobject"]["int_2"] = json(long long(0));
     root["myobject"]["string_2"] = json("my string");
-    root["myarray"] = json::array_prototype;
+    root["myarray"] = json::an_array;
 
     json double_2 = root["myobject"]["double_2"];
     json int_2 = root["myobject"]["double_2"];
@@ -67,19 +67,19 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
 BOOST_AUTO_TEST_CASE(test_array)
 {
-    json root(json::object_prototype);
+    json root(json::an_object);
 
     root["addresses"];
 
     std::vector<json> addresses;
-    json address1(json::object_prototype);
+    json address1(json::an_object);
     address1["city"] = json("San Francisco");
     address1["state"] = json("CA");
     address1["zip"] = json("94107");
     address1["country"] = json("USA");
     addresses.push_back(address1);
 
-    json address2(json::object_prototype);
+    json address2(json::an_object);
     address2["city"] = json("Sunnyvale");
     address2["state"] = json("CA");
     address2["zip"] = json("94085");
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_null)
     json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
 
-    json obj(json::object_prototype);
+    json obj(json::an_object);
     obj["field"] = json::null;
     std::cout << obj << std::endl;
 }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_array2)
 
 BOOST_AUTO_TEST_CASE(test_nan_replacement)
 {
-    json obj(json::object_prototype);
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(test_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
 {
-    json obj(json::object_prototype);
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 {
-    json obj(json::object_prototype);
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_object_iterator)
 {
-    json obj(json::object_prototype);
+    json obj(json::an_object);
     obj["city"] = "Toronto";
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_array_iterator)
 {
-    json arr(json::array_prototype);
+    json arr(json::an_array);
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.push_back("Montreal");
@@ -314,15 +314,15 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 
 BOOST_AUTO_TEST_CASE(constructing_structures)
 {
-	json root = json(json::object_prototype);
+	json root = json(json::an_object);
 
-    root["persons"] = json(json::array_prototype);
+    root["persons"] = json(json::an_array);
 
-    json person(json::object_prototype);
+    json person(json::an_object);
     person["first_name"] = "John";
     person["last_name"] = "Smith";
     person["birth_date"] = "1972-01-30";
-    json address(json::object_prototype);
+    json address(json::an_object);
     address["city"] = "Toronto";
     address["country"] = "Canada";
     person["address"] = std::move(address);
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
 
 BOOST_AUTO_TEST_CASE(test_defaults)
 {
-    json obj(json::object_prototype);
+    json obj(json::an_object);
 
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(test_defaults)
 
 BOOST_AUTO_TEST_CASE(test_wjson)
 {
-    wjson root(wjson::object_prototype);
+    wjson root(wjson::an_object);
     //root[L"field1"] = L"test";
     //wjson root = wjson::parse(L"{}");
 }

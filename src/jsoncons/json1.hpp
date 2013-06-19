@@ -54,8 +54,8 @@ class basic_json
 public:
     enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,single_line_comment_t};
 
-    static const basic_json<Char> object_prototype;
-    static const basic_json<Char> array_prototype;
+    static const basic_json<Char> an_object;
+    static const basic_json<Char> an_array;
     static const basic_json<Char> null;
 
     typedef typename json_object<Char>::iterator object_iterator;
