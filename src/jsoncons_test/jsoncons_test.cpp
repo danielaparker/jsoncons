@@ -339,12 +339,19 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     json obj(json::object_prototype);
 
     obj["field1"] = 1;
+    obj["field3"] = "Toronto";
 
     double x1 = obj.has_member("field1") ? obj["field1"].as_double() : 10.0;
     double x2 = obj.has_member("field2") ? obj["field2"].as_double() : 20.0;
 
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
+
+    std::string x3 = obj.get("field3","Montreal").as_string();
+    std::string x4 = obj.get("field4","San Francisco").as_string();
+
+    std::cout << "x3=" << x3 << std::endl;
+    std::cout << "x4=" << x4 << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_wjson)
@@ -397,7 +404,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     output_format format(false);
     json_stream_writer writer(os, format);
     writer.begin_array();
-    for (size_t i = 0; i < 1000000; ++i)
+    for (size_t i = 0; i < 100000; ++i)
     {
         writer.begin_element();
         writer.begin_object();

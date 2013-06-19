@@ -69,8 +69,10 @@ private:
     void parse_array(std::basic_istream<Char>& is, StreamListener& handler);
     template <class StreamListener>
     void parse_string(std::basic_istream<Char>& is, StreamListener& handler);
-    void ignore_till_end_of_line(std::basic_istream<Char>& is);
-    bool read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len);
+    template <class StreamListener>
+    void parse_single_line_comment(std::basic_istream<Char>& is, StreamListener& handler);
+    bool read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3);
+    bool read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint(std::basic_istream<Char>& is);
     unsigned int decode_unicode_escape_sequence(std::basic_istream<Char>& is);
 
@@ -124,7 +126,9 @@ void basic_json_parser<Char>::parse(std::basic_istream<Char>& is, StreamListener
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        ignore_till_end_of_line(is);
+                        is.ignore();
+                        ++column_;
+                        parse_single_line_comment(is,handler);
                     }
                 }
             }
@@ -175,7 +179,7 @@ void basic_json_parser<Char>::parse_object(std::basic_istream<Char>& is, StreamL
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        ignore_till_end_of_line(is);
+                        parse_single_line_comment(is,handler);
                     }
                 }
             }
@@ -243,7 +247,7 @@ void basic_json_parser<Char>::parse_separator_value(std::basic_istream<Char>& is
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        ignore_till_end_of_line(is);
+                        parse_single_line_comment(is,handler);
                     }
                 }
             }
@@ -284,7 +288,7 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        ignore_till_end_of_line(is);
+                        parse_single_line_comment(is,handler);
                     }
                 }
             }
@@ -307,21 +311,21 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
             parse_array(is,handler);
             return;
         case 't':
-            if (!read_until_match_fails(is, "rue", 3))
+            if (!read_until_match_fails(is, 'r', 'u', 'e'))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
             handler.value(true);
             return;
         case 'f':
-            if (!read_until_match_fails(is, "alse",4))
+            if (!read_until_match_fails(is, 'a', 'l', 's', 'e'))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
             handler.value(false);
             return;
         case 'n':
-            if (!read_until_match_fails(is, "ull",3))
+            if (!read_until_match_fails(is, 'u', 'l', 'l'))
             {
                 JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
             }
@@ -345,18 +349,60 @@ void basic_json_parser<Char>::parse_value(std::basic_istream<Char>& is, StreamLi
 }
 
 template <class Char>
-bool basic_json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char* s, size_t len)
+bool basic_json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3)
 {
-    for (size_t i = 0; is && i < len; ++i)
+    if (is)
     {
         Char c = static_cast<Char>(is.get());
         ++column_;
-        if (c != s[i])
+        if (c == char1 && is)
         {
-            return false;
+            Char c = static_cast<Char>(is.get());
+            ++column_;
+            if (c == char2 && is)
+            {
+                Char c = static_cast<Char>(is.get());
+                ++column_;
+                if (c = char3)
+                {
+                    return true;
+                }
+            }
         }
     }
-    return true;
+
+    return false;
+}
+
+template <class Char>
+bool basic_json_parser<Char>::read_until_match_fails(std::basic_istream<Char>& is, char char1, char char2, char char3, char char4)
+{
+    if (is)
+    {
+        Char c = static_cast<Char>(is.get());
+        ++column_;
+        if (c == char1 && is)
+        {
+            Char c = static_cast<Char>(is.get());
+            ++column_;
+            if (c == char2 && is)
+            {
+                Char c = static_cast<Char>(is.get());
+                ++column_;
+                if (c = char3 && is)
+                {
+                    Char c = static_cast<Char>(is.get());
+                    ++column_;
+                    if (c = char4)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 template <class Char>
@@ -388,7 +434,7 @@ void basic_json_parser<Char>::parse_array(std::basic_istream<Char>& is, StreamLi
                     Char next = static_cast<Char>(is.peek());
                     if (next == '/')
                     {
-                        ignore_till_end_of_line(is);
+                        parse_single_line_comment(is,handler);
                     }
                 }
             }
@@ -527,39 +573,48 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
                 {
                 case '\"':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\"');
                     break;
                 case '\\':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\\');
                     break;
                 case '/':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('/');
                     break;
                 case 'n':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\n');
                     break;
                 case 'b':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\n');
                     break;
                 case 'f':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\n');
                     break;
                 case 'r':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\n');
                     break;
                 case 't':
                     is.ignore();
+                    ++column_;
                     buffer_.push_back('\n');
                     break;
                 case 'u':
                     {
                         is.ignore();
+                        ++column_;
                         unsigned int cp = decode_unicode_codepoint(is);
                         json_char_traits<Char>::append_codepoint_to_string(cp, buffer_);
                     }
@@ -580,17 +635,25 @@ void basic_json_parser<Char>::parse_string(std::basic_istream<Char>& is, StreamL
 }
 
 template <class Char>
-void basic_json_parser<Char>::ignore_till_end_of_line(std::basic_istream<Char>& is)
+template <class StreamListener>
+void basic_json_parser<Char>::parse_single_line_comment(std::basic_istream<Char>& is, StreamListener& handler)
 {
+    buffer_.clear();
+
     while (is)
     {
         Char c = static_cast<Char>(is.get());
         ++column_;
         if (c == '\n')
         {
+            handler.comment(std::move(buffer_));
             ++line_;
             column_ = 0;
             return;
+        }
+        else
+        {
+            buffer_.push_back(c);
         }
     }
 }

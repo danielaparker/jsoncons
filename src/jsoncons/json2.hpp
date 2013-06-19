@@ -29,88 +29,10 @@ basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Ch
 }
 
 template <class Char>
-std::basic_string<Char> basic_json<Char>::proxy::as_string() const
-{
-    return val_.get(name_).as_string();
-}
-
-template <class Char>
-bool basic_json<Char>::proxy::as_bool() const
-{
-    return val_.get(name_).as_bool();
-}
-
-template <class Char>
-double basic_json<Char>::proxy::as_double() const
-{
-    return val_.get(name_).as_double();
-}
-
-template <class Char>
-int basic_json<Char>::proxy::as_int() const
-{
-    return val_.get(name_).as_int();
-}
-
-template <class Char>
-unsigned int basic_json<Char>::proxy::as_uint() const
-{
-    return val_.get(name_).as_uint();
-}
-
-template <class Char>
-long long basic_json<Char>::proxy::as_longlong() const
-{
-    return val_.get(name_).as_longlong();
-}
-
-template <class Char>
-unsigned long long basic_json<Char>::proxy::as_ulonglong() const
-{
-    return val_.get(name_).as_ulonglong();
-}
-
-template <class Char>
-basic_json<Char>::proxy::operator basic_json<Char>&()
-{
-    return val_.get(name_);
-}
-
-template <class Char>
-basic_json<Char>::proxy::operator const basic_json<Char>&() const
-{
-    return val_.get(name_);
-}
-
-template <class Char>
 typename basic_json<Char>::proxy& basic_json<Char>::proxy::operator=(const basic_json& val)
 {
     val_.set_member(name_, val);
     return *this;
-}
-
-template <class Char>
-basic_json<Char>& basic_json<Char>::proxy::operator[](size_t i)
-{
-    return val_.get(name_)[i];
-}
-
-template <class Char>
-const basic_json<Char>& basic_json<Char>::proxy::operator[](size_t i) const
-{
-    return val_.get(name_)[i];
-}
-
-template <class Char>
-typename basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name)
-{
-    return proxy(val_.get(name_),name);
-}
-
-template <class Char>
-typename const basic_json<Char>::proxy basic_json<Char>::proxy::operator[](const std::basic_string<Char>& name) const
-{
-    return proxy(val_.get(name_),name);
 }
 
 
@@ -364,6 +286,38 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     {
     case object_t:
         return value_.object_->get(name);
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to get " << name << " from a value that is not an object"; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, basic_json<Char>& default_val) 
+{
+    switch (type_)
+    {
+    case object_t:
+        return has_member(name) ? value_.object_->get(name) : default_val;
+    default:
+        {
+            std::ostringstream os;
+            os << "Attempting to get " << name << " from a value that is not an object"; 
+            JSONCONS_THROW_EXCEPTION(os.str());
+        }
+    }
+}
+
+template <class Char>
+const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+{
+    switch (type_)
+    {
+    case object_t:
+        return has_member(name) ? value_.object_->get(name) : default_val;
     default:
         {
             std::ostringstream os;

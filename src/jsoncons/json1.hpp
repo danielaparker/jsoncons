@@ -30,6 +30,21 @@ struct simple_string
     Char* data_;
 };
 
+struct comment_symbol
+{
+    char first;
+    char second;
+};
+
+template <class Char>
+struct single_line_comment
+{
+    char comment_symbol_1;
+    char comment_symbol_2;
+    size_t length_;
+    Char* data_;
+};
+
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
@@ -37,7 +52,7 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t};
+    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,single_line_comment_t};
 
     static const basic_json<Char> object_prototype;
     static const basic_json<Char> array_prototype;
@@ -74,33 +89,92 @@ public:
             return val_.get(name_).is_empty();
         }
 
-        std::basic_string<Char> as_string() const;
+        std::basic_string<Char> as_string() const
+        {
+            return val_.get(name_).as_string();
+        }
 
-        bool as_bool() const;
+        bool as_bool() const
+        {
+            return val_.get(name_).as_bool();
+        }
 
-        double as_double() const;
+        double as_double() const
+        {
+            return val_.get(name_).as_double();
+        }
 
-        int as_int() const;
+        int as_int() const
+        {
+            return val_.get(name_).as_int();
+        }
 
-        unsigned int as_uint() const;
+        unsigned int as_uint() const
+        {
+            return val_.get(name_).as_uint();
+        }
 
-        long long as_longlong() const;
+        long long as_longlong() const
+        {
+            return val_.get(name_).as_longlong();
+        }
 
-        unsigned long long as_ulonglong() const;
+        unsigned long long as_ulonglong() const
+        {
+            return val_.get(name_).as_ulonglong();
+        }
 
-        operator basic_json&();
+        operator basic_json&()
+        {
+            return val_.get(name_);
+        }
 
-        operator const basic_json&() const;
+        operator const basic_json&() const
+        {
+            return val_.get(name_);
+        }
 
         proxy& operator=(const basic_json& val);
 
-        basic_json<Char>& operator[](size_t i);
+        basic_json<Char>& operator[](size_t i)
+        {
+            return val_.get(name_)[i];
+        }
 
-        const basic_json<Char>& operator[](size_t i) const;
+        const basic_json<Char>& operator[](size_t i) const
+        {
+            return val_.get(name_)[i];
+        }
 
-        proxy operator[](const std::basic_string<Char>& name);
+        proxy operator[](const std::basic_string<Char>& name)
+        {
+            return proxy(val_.get(name_),name);
+        }
 
-        const proxy operator[](const std::basic_string<Char>& name) const;
+        const proxy operator[](const std::basic_string<Char>& name) const
+        {
+            return proxy(val_.get(name_),name);
+        }
+
+        basic_json<Char>& get(const std::basic_string<Char>& name)
+        {
+            return val_.get(name_).get(name);
+        }
+
+        const basic_json<Char>& get(const std::basic_string<Char>& name) const
+        {
+            return val_.get(name_).get(name);
+        }
+
+        basic_json<Char>& get(const std::basic_string<Char>& name, basic_json<Char>& default_val)
+        {
+            return val_.get(name_).get(name,default_val);
+        }
+
+        const basic_json<Char>& get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+        {
+            return val_.get(name_).get(name,default_val);
+        }
 
         void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
@@ -275,6 +349,10 @@ public:
 
     const basic_json<Char>& get(const std::basic_string<Char>& name) const;
 
+    basic_json<Char>& get(const std::basic_string<Char>& name, basic_json<Char>& default_val);
+
+    const basic_json<Char>& get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
+
     void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
     void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
@@ -300,6 +378,7 @@ private:
         unsigned long long ulonglong_value_;
         bool bool_value_;
         simple_string<Char> string_value_;
+        single_line_comment<Char> comment_;
         json_object<Char>* object_;
         json_array<Char>* array_;
     } value_;

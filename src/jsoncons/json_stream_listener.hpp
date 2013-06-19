@@ -202,6 +202,10 @@ public:
         }
     }
 
+    void comment(std::basic_string<Char> value)
+    {
+    }
+
     void swap_root(basic_json<Char>& val)
     {
         val.swap(root_);
