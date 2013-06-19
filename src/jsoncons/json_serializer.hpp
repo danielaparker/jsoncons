@@ -38,16 +38,19 @@ public:
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
+        init();
     }
     basic_json_stream_writer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
         : os_(os), format_(format), indent_(0)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
+        init();
     }
 
     ~basic_json_stream_writer()
     {
+        restore();
     }
 
     void begin_member(const Char* name, size_t length)
@@ -131,10 +134,6 @@ public:
 
     void begin_object()
     {
-        if (stack_.size() == 0)
-        {
-            init();
-        }
         //std::cout << "begin_object" << std::endl;
         //write_indent();
         stack_.push_back(stack_item());
@@ -148,18 +147,10 @@ public:
         write_indent();
         stack_.pop_back();
         os_.put('}');
-        if (stack_.size() == 0)
-        {
-            finish();
-        }
     }
 
     void begin_array()
     {
-        if (stack_.size() == 0)
-        {
-            init();
-        }
         //write_indent();
         stack_.push_back(stack_item());
         os_.put('[');
@@ -172,10 +163,12 @@ public:
         write_indent();
         stack_.pop_back();
         os_.put(']');
-        if (stack_.size() == 0)
-        {
-            finish();
-        }
+    }
+
+    void restore()
+    {
+        os_.precision(original_precision_);
+        os_.flags(original_format_flags_);
     }
 private:
 
@@ -184,13 +177,6 @@ private:
         os_.setf(format_.set_format_flags());
         os_.unsetf(format_.unset_format_flags());
         os_.precision(format_.precision());
-    }
-
-    void finish()
-    {
-        os_.precision(original_precision_);
-        os_.flags(original_format_flags_);
-        os_.flush();
     }
 
     void indent()
