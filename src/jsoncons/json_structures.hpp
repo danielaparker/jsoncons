@@ -99,6 +99,11 @@ public:
     json_array()
     {
     }
+
+    json_array(size_t n)
+        : elements_(n)
+    {
+    }
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)
@@ -115,6 +120,10 @@ public:
     }
 
     size_t size() const {return elements_.size();}
+
+    void clear() {elements_.clear();}
+
+    void reserve(size_t n) {elements_.reserve(n);}
 
     basic_json<Char>& at(size_t i) {return elements_[i];}
 
@@ -144,6 +153,11 @@ public:
     {
     }
 
+    json_object(size_t n)
+        : members_(n)
+    {
+    }
+
     json_object(std::vector<basic_name_value_pair<Char>> members)
         : members_(members)
     {
@@ -165,6 +179,10 @@ public:
     }
 
     size_t size() const {return members_.size();}
+
+    void clear() {members_.clear();}
+
+    void reserve(size_t n) {members_.reserve(n);}
 
     const basic_name_value_pair<Char>& get(size_t i) const 
     {
@@ -245,15 +263,15 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_js
 template <class Char>
 basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) 
 {
-    iterator it = find(name);
-    JSONCONS_ASSERT((it != end()));
+    auto it = find(name);
+    JSONCONS_ASSERT(it != end());
     return (*it).value_;
 }
 
 template <class Char>
 const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) const
 {
-    iterator it = find(name);
+    const_iterator it = find(name);
     JSONCONS_ASSERT((it != end()));
     return (*it).value_;
 }
@@ -273,6 +291,8 @@ typename json_object<Char>::const_iterator json_object<Char>::find(const std::ba
     const_iterator it = std::lower_bound(begin(),end(),name, comp);
     return (it != end() && it->name_ == name) ? it : end();
 }
+
+
 
 }
 

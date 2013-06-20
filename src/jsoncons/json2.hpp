@@ -273,9 +273,7 @@ basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name)
         return value_.object_->get(name);
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to get " << name << " from a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -522,9 +520,9 @@ const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
-    basic_json_parser<Char> parser;
+    basic_json_parser<Char> parser(is);
     basic_json_stream_listener<Char> handler;
-    parser.parse(is,handler);
+    parser.parse(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -534,9 +532,9 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    basic_json_parser<Char> parser;
+    basic_json_parser<Char> parser(is);
     basic_json_stream_listener<Char> handler;
-    parser.parse(is,handler);
+    parser.parse(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -570,9 +568,9 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     is.read(&buffer[0],length);
     std::istringstream sstr(buffer);
 
-    basic_json_parser<Char> parser;
+    basic_json_parser<Char> parser(sstr);
     basic_json_stream_listener<Char> handler;
-    parser.parse(sstr,handler);
+    parser.parse(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;

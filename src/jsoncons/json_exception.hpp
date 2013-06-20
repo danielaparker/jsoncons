@@ -6,11 +6,13 @@
 
 #include <string>
 #include <vector>
-#include <assert.h> 
 #include <exception>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <cstdio>
+#include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/jsoncons_config.hpp"
 
 namespace jsoncons {
 
@@ -29,8 +31,28 @@ private:
     std::string message_;
 };
 
+template <class Char>
+class json_exception_1 : public std::exception
+{
+public:
+    json_exception_1(const std::string& format, const std::basic_string<Char>& arg1)
+        : format_(format), arg1_(arg1)
+    {
+    }
+    const char* what() const 
+    {
+        c99_snprintf(const_cast<char*>(message_),255, format_.c_str(),arg1_.c_str());
+        return message_;
+    }
+private:
+    std::string format_;
+    std::basic_string<Char> arg1_;
+    char message_[255];
+};
+
 #define JSONCONS_THROW_EXCEPTION(x) throw json_exception((x))
-#define JSONCONS_ASSERT(x) if (!x) throw json_exception(#x)
+#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw json_exception_1<Char>((fmt),(arg1))
+#define JSONCONS_ASSERT(x) if (!(x)) {std::cerr << #x; abort();}
 
 }
 

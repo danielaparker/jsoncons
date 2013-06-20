@@ -11,10 +11,8 @@
 #include <istream>
 #include <ostream>
 #include <cstdlib>
-#include "jsoncons/output_format.hpp"
-#include "jsoncons/json2.hpp"
-#include "jsoncons/json_char_traits.hpp"
-//#include <math.h> // isnan
+#include <cmath>
+#include <cstdarg>
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {
@@ -33,11 +31,42 @@ inline bool is_neg_inf(double x)
 {
     return is_inf(x) && x < 0;
 }
+
+inline 
+int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
+{
+    int count = -1;
+
+    if (size != 0)
+        count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+    if (count == -1)
+        count = _vscprintf(format, ap);
+
+    return count;
+}
+
+inline 
+int c99_snprintf(char* str, size_t size, const char* format, ...)
+{
+    int count;
+    va_list ap;
+
+    va_start(ap, format);
+    count = c99_vsnprintf(str, size, format, ap);
+    va_end(ap);
+
+    return count;
+}
 #else
 inline bool is_nan(double x) { return std::isnan( x ); }
 inline bool is_pos_inf(double x) {return std::isinf() && x > 0;}
 inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
+
+#define c99_snprintf std::snprintf
+
 #endif
+
+#define JSONCONS_BUFFER_READ 1
 
 }
 #endif

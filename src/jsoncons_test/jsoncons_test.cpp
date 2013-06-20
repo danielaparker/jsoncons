@@ -4,8 +4,6 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
-#include "jsoncons/json_parser.hpp"
-//#include "jsoncons/json_parser2.hpp"
 #include "jsoncons/json_serializer.hpp"
 #include <sstream>
 #include <vector>
@@ -135,6 +133,8 @@ BOOST_AUTO_TEST_CASE(test_to_string)
         << ",\"minus-exp\":1.00600e-010"
         << ",\"escaped-string\":\"\\\\\\n\""
        << "}";
+    std::cout << "test_to_string" << std::endl;
+    std::cout << os.str() << std::endl;
 
 
     json root = json::parse_string(os.str());
@@ -366,7 +366,8 @@ BOOST_AUTO_TEST_CASE(test_exception)
     try
     {
         std::string input("{\"field1\":\n\"value}");
-		json obj = json::parse_string(input);
+        std::cout << input << std::endl;
+	json obj = json::parse_string(input);
     }
     catch (const std::exception& e)
     {
@@ -403,6 +404,9 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 
     output_format format(false);
     json_stream_writer writer(os, format);
+
+    std::clock_t t = std::clock();
+
     writer.begin_array();
     for (size_t i = 0; i < 100000; ++i)
     {
@@ -459,13 +463,15 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     }
     writer.end_array();
     os.flush();
-
-    std::clock_t t = std::clock();
+    std::clock_t s = std::clock() - t;
+    std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds to write.\n";
 
     std::ifstream is("test.json",std::ofstream::binary);
+    t = std::clock();
+
     json root = json::parse(is);
-    t = clock() - t;
-    std::cout << "It took " << (((float)t)/CLOCKS_PER_SEC) << " seconds.\n";
+    s = std::clock() - t;
+    std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds.\n";
  
 }
 
