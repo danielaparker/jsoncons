@@ -18,8 +18,8 @@ namespace jsoncons {
 class json_parser_exception : public std::exception
 {
 public:
-    json_parser_exception(std::string s,
-                          unsigned long line,
+    json_parser_exception(std::string s, 
+                          unsigned long line, 
                           unsigned long column)
     {
         std::ostringstream os;
@@ -36,35 +36,22 @@ private:
 
 #define JSONCONS_THROW_PARSER_EXCEPTION(x,n,m) throw json_parser_exception(x,n,m)
 
-template<class Char>
+template <class Char>
 class json_object;
 
-template<class Char>
+template <class Char>
 class basic_json_parser
 {
-    enum structure_type {object_t, array_t};
+    enum state_type {};
     struct stack_item
     {
-        stack_item(structure_type type)
-           : type_(type), count_(0), comma_(false)
+        stack_item()
+            : count_(0)
         {
-            read_name_ = is_object() ? false : true;
-        }
-
-        bool is_object() const
-        {
-            return type_ == object_t;
-        }
-
-        bool is_array() const
-        {
-            return type_ == array_t;
         }
 
         size_t count_;
-        structure_type type_;
-        bool comma_;
-        bool read_name_;
+        state_type state_;
 
     };
 public:
@@ -82,8 +69,8 @@ public:
       \param is The input stream to read from
     */
     basic_json_parser(std::basic_istream<Char>& is)
-       : is_(is), data_block_(0),
-         buffer_position_(0), buffer_length_(0)
+        : is_(is), data_block_(0), 
+          buffer_position_(0), buffer_length_(0)
     {
 #ifdef JSONCONS_BUFFER_READ
         data_block_ = new Char[max_buffer_length];
@@ -97,13 +84,21 @@ public:
 #endif
     }
 
-    template<class StreamListener>
+    template <class StreamListener>
     void parse(StreamListener& handler);
 private:
-    void skip_separator();
-    template<class StreamListener>
+    template <class StreamListener>
+    void parse_object(StreamListener& handler);
+    template <class StreamListener>
+    void parse_separator_value(StreamListener& handler);
+    template <class StreamListener>
+    void parse_value(StreamListener& handler);
+    template <class StreamListener>
     void parse_number(Char c, StreamListener& handler);
-    void parse_string();
+    template <class StreamListener>
+    void parse_array(StreamListener& handler);
+    template <class StreamListener>
+    void parse_string(StreamListener& handler);
     void ignore_single_line_comment();
     bool read_until_match_fails(char char1, char char2, char char3);
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
@@ -125,10 +120,10 @@ private:
         buffer_position_ = 0;
         if (!is_.eof())
         {
-            is_.read(data_block_, max_buffer_length);
+            is_.read(data_block_,max_buffer_length);
             buffer_length_ = static_cast<int>(is_.gcount());
         }
-        else
+        else 
         {
             buffer_length_ = 0;
         }
@@ -210,8 +205,7 @@ private:
         {
             --buffer_position_;
             --column_;
-            if (ch == '\n')
-            {
+            if (ch == '\n') {
                 --line_;
                 column_ = 0;
             }
@@ -219,8 +213,7 @@ private:
 #else
         is_.putback(ch);
         --column_;
-        if (ch == '\n')
-        {
+        if (ch == '\n') {
             --line_;
             column_ = 0;
         }
@@ -232,12 +225,12 @@ private:
     std::basic_string<Char> buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
-    Char *data_block_;
+    Char* data_block_;
     int buffer_position_;
     int buffer_length_;
 };
 
-template<class Char>
+template <class Char>
 unsigned long long string_to_uinteger(const std::basic_string<Char>& s)
 {
     unsigned long long i = 0;
@@ -251,8 +244,8 @@ unsigned long long string_to_uinteger(const std::basic_string<Char>& s)
     return i;
 }
 
-template<class Char>
-template<class StreamListener>
+template <class Char>
+template <class StreamListener>
 void basic_json_parser<Char>::parse(StreamListener& handler)
 {
     handler.begin_json();
@@ -274,173 +267,121 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
         case '\f':
         case '\r':
         case ' ':
-            continue;
+            break;
         case '/':
             {
-                Char next = peek();
-                if (eof())
+                if (!eof())
                 {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
-                }
-                if (next == '/')
-                {
-                    skip_ch();
-                    if (eof())
+                    Char next = peek();
+                    if (next == '/')
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        skip_ch();
+                        if (eof())
+                        {
+                            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
+                        }
+                        ignore_single_line_comment();
                     }
-                    ignore_single_line_comment();
                 }
             }
-            continue;
+            break;
         case begin_object:
-            stack_.push_back(stack_item(object_t));
             handler.begin_object();
-            break;
+            parse_object(handler);
+            handler.end_json();
+            return;
         case begin_array:
-            stack_.push_back(stack_item(array_t));
             handler.begin_array();
-            break;
-        }
-        if (stack_.size() > 0)
-        {
-            switch (c)
-            {
-            case value_separator:
-                if (stack_.back().count_ == 0)
-                {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_, column_);
-                }
-                stack_.back().comma_ = true;
-                break;
-            case '\"':
-                if (stack_.back().count_ > 0 && !stack_.back().comma_)
-                {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_, column_);
-                }
-                {
-                    parse_string();
-                    if (stack_.back().is_object() && !stack_.back().read_name_)
-                    {
-                        handler.name(std::move(buffer_));
-                        skip_separator();
-                        stack_.back().read_name_ = true;
-                    }
-                    else
-                    {
-                        handler.value(std::move(buffer_));
-                        stack_.back().comma_ = false;
-                        stack_.back().read_name_ = false;
-                        ++stack_.back().count_;
-                    }
-                }
-                break;
-            case end_object:
-                {
-                    if (!stack_.back().is_object())
-                    {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected }", line_, column_);
-                    }
-                    if (stack_.back().comma_)
-                    {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_, column_);
-                    }
-                    handler.end_object();
-                    stack_.pop_back();
-                }
-                if (stack_.size() > 0)
-                {
-                    stack_.back().read_name_ = false;
-                    stack_.back().comma_ = false;
-                    ++stack_.back().count_;
-                }
-                break;
-            case end_array:
-                {
-                    if (!stack_.back().is_array())
-                    {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected ]", line_, column_);
-                    }
-                    if (stack_.back().comma_)
-                    {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_, column_);
-                    }
-                    handler.end_array();
-                    stack_.pop_back();
-                }
-                if (stack_.size() > 0)
-                {
-                    stack_.back().read_name_ = false;
-                    stack_.back().comma_ = false;
-                    ++stack_.back().count_;
-                }
-                break;
-            case 't':
-                if (!read_until_match_fails('r', 'u', 'e'))
-                {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_, column_);
-                }
-                handler.value(true);
-                stack_.back().comma_ = false;
-                stack_.back().read_name_ = false;
-                ++stack_.back().count_;
-                break;
-            case 'f':
-                if (!read_until_match_fails('a', 'l', 's', 'e'))
-                {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_, column_);
-                }
-                handler.value(false);
-                stack_.back().comma_ = false;
-                stack_.back().read_name_ = false;
-                ++stack_.back().count_;
-                break;
-            case 'n':
-                if (!read_until_match_fails('u', 'l', 'l'))
-                {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_, column_);
-                }
-                handler.null();
-                stack_.back().comma_ = false;
-                stack_.back().read_name_ = false;
-                ++stack_.back().count_;
-                break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '-':
-                parse_number(c, handler);
-                stack_.back().read_name_ = false;
-                stack_.back().comma_ = false;
-                ++stack_.back().count_;
-                break;
-            }
+            parse_array(handler);
+            handler.end_json();
+            return;
         }
     }
 
-    if (stack_.size() > 0)
-    {
-        JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_, column_);
-    }
-    handler.end_json();
+    JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_,column_);
 }
 
-template<class Char>
-void basic_json_parser<Char>::skip_separator()
+template <class Char>
+template <class StreamListener>
+void basic_json_parser<Char>::parse_object(StreamListener& handler)
+{
+    size_t count = 0;
+    bool comma = false;
+
+    while (!eof())
+    {
+        Char c = read_ch();
+        if (eof())
+        {
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
+        }
+        switch (c)
+        {
+        case '\n':
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
+            break;
+        case '/':
+            {
+                if (!eof())
+                {
+                    Char next = peek();
+                    if (next == '/')
+                    {
+                        ignore_single_line_comment();
+                    }
+                }
+            }
+            break;
+        case '\"':
+            if (count > 0 && !comma)
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_,column_);
+            }
+            {
+                parse_string(handler);
+                handler.name(std::move(buffer_));
+                parse_separator_value(handler);
+                comma = false;
+                ++count;
+            }
+            break;
+        case value_separator:
+            if (count == 0)
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_,column_);
+            }
+            comma = true;
+            break;
+
+        case end_object:
+            {
+                if (comma)
+                {
+                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected comma", line_,column_);
+                }
+                handler.end_object();
+                return;
+            }
+        }
+    }
+
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected }", line_,column_);
+}
+
+template <class Char>
+template <class StreamListener>
+void basic_json_parser<Char>::parse_separator_value(StreamListener& handler)
 {
     while (!eof())
     {
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         switch (c)
         {
@@ -464,15 +405,102 @@ void basic_json_parser<Char>::skip_separator()
             }
             break;
         case name_separator:
-            //parse_value(handler);
+            parse_value(handler);
             return;
         }
     }
 
-    JSONCONS_THROW_PARSER_EXCEPTION("Expected :", line_, column_);
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected :", line_,column_);
 }
 
-template<class Char>
+template <class Char>
+template <class StreamListener>
+void basic_json_parser<Char>::parse_value(StreamListener& handler)
+{
+    while (!eof())
+    {
+        Char c = read_ch();
+        if (eof())
+        {
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
+        }
+        switch (c)
+        {
+        case '\n':
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
+            break;
+        case '/':
+            {
+                if (!eof())
+                {
+                    Char next = peek();
+                    if (next == '/')
+                    {
+                        ignore_single_line_comment();
+                    }
+                }
+            }
+            break;
+        case '\"': // string value
+            {
+                parse_string(handler);
+                handler.value(std::move(buffer_));
+                //handler.value(buffer_);
+                return;
+            }
+        case begin_object: // object value
+            {
+                handler.begin_object();
+                parse_object(handler);
+                return;
+            }
+        case begin_array: // array value
+            handler.begin_array();
+            parse_array(handler);
+            return;
+        case 't':
+            if (!read_until_match_fails('r', 'u', 'e'))
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
+            }
+            handler.value(true);
+            return;
+        case 'f':
+            if (!read_until_match_fails('a', 'l', 's', 'e'))
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
+            }
+            handler.value(false);
+            return;
+        case 'n':
+            if (!read_until_match_fails('u', 'l', 'l'))
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Invalid value", line_,column_);
+            }
+            handler.null();
+            return;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '-':
+            parse_number(c, handler);
+            return;
+        }
+    }
+}
+
+template <class Char>
 bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, char char3)
 {
     if (!eof())
@@ -480,21 +508,21 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         if (c == char1)
         {
             Char c = read_ch();
             if (eof())
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
             }
             if (c == char2)
             {
                 Char c = read_ch();
                 if (eof())
                 {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                 }
                 if (c = char3)
                 {
@@ -507,7 +535,7 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
+template <class Char>
 bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
 {
     if (!eof())
@@ -515,28 +543,28 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         if (c == char1)
         {
             Char c = read_ch();
             if (eof())
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
             }
             if (c == char2)
             {
                 Char c = read_ch();
                 if (eof())
                 {
-                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                 }
                 if (c = char3)
                 {
                     Char c = read_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     if (c = char4)
                     {
@@ -550,8 +578,71 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
-template<class StreamListener>
+template <class Char>
+template <class StreamListener>
+void basic_json_parser<Char>::parse_array(StreamListener& handler)
+{
+    size_t count = 0;
+    bool comma = false;
+    while (!eof())
+    {
+        Char c = read_ch();
+        if (eof())
+        {
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
+        }
+        switch (c)
+        {
+        case '\n':
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
+            break;
+        case '/':
+            {
+                if (!eof())
+                {
+                    Char next = peek();
+                    if (next == '/')
+                    {
+                        ignore_single_line_comment();
+                    }
+                }
+            }
+            break;
+        case value_separator:
+            if (count == 0)
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_,column_);
+            }
+            comma = true;
+            break;
+        case ']':
+            if (comma)
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Unxpected comma", line_,column_);
+            }
+            handler.end_array();
+            return;
+        default:
+            if (count > 0 && !comma)
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Expected comma", line_,column_);
+            }
+            unread_ch(c);
+            parse_value(handler);
+            ++count;
+            comma = false;
+            break;
+        }
+
+    }
+}
+
+template <class Char>
+template <class StreamListener>
 void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
 {
     buffer_.clear();
@@ -562,13 +653,12 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
         buffer_.push_back(c);
     }
 
-    bool done = false;
-    while (!done)
+    while (!eof())
     {
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         switch (c)
         {
@@ -602,43 +692,43 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                     double d = std::strtod(begin, &end);
                     if (end == begin)
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_,column_);
                     }
-                    if (has_neg)
-                        d = -d;
+					if (has_neg)
+						d = -d;
                     handler.value(d);
+                    return;
                 }
                 else
                 {
                     unsigned long long d = string_to_uinteger(buffer_);
-                    if (has_neg)
+					if (has_neg)
                     {
                         handler.value(-static_cast<long long>(d));
+						return;
                     }
-                    else
-                    {
-                        handler.value(d);
-                    }
+                    handler.value(d);
+                    return;
                 }
-                done = true;
             }
-            break;
         }
     }
+
+    JSONCONS_THROW_PARSER_EXCEPTION("Unexpected eof", line_,column_);
 }
 
-template<class Char>
-void basic_json_parser<Char>::parse_string()
+template <class Char>
+template <class StreamListener>
+void basic_json_parser<Char>::parse_string(StreamListener& handler)
 {
     buffer_.clear();
 
-    bool done = false;
-    while (!done)
+    while (!eof())
     {
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("EOF, expected \"", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         switch (c)
         {
@@ -650,7 +740,7 @@ void basic_json_parser<Char>::parse_string()
         case '\t':
         case '\v':
         case '\0':
-            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_,column_);
             break;
         case '\\':
             if (!eof())
@@ -662,7 +752,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\"');
                     break;
@@ -670,7 +760,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\\');
                     break;
@@ -678,7 +768,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('/');
                     break;
@@ -686,7 +776,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\n');
                     break;
@@ -694,7 +784,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\n');
                     break;
@@ -702,7 +792,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\n');
                     break;
@@ -710,7 +800,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\n');
                     break;
@@ -718,7 +808,7 @@ void basic_json_parser<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                     }
                     buffer_.push_back('\n');
                     break;
@@ -727,49 +817,47 @@ void basic_json_parser<Char>::parse_string()
                         skip_ch();
                         if (eof())
                         {
-                            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
                         }
                         unsigned int cp = decode_unicode_codepoint();
                         json_char_traits<Char>::append_codepoint_to_string(cp, buffer_);
                     }
                     break;
                 default:
-                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid character following \\", line_, column_);
+                    JSONCONS_THROW_PARSER_EXCEPTION("Invalid character following \\", line_,column_);
                 }
             }
             break;
         case '\"':
-            done = true;
-            break;
+            return;
         default:
             buffer_.push_back(c);
             break;
         }
     }
+    JSONCONS_THROW_PARSER_EXCEPTION("Expected \"", line_,column_);
 }
 
-template<class Char>
+template <class Char>
 void basic_json_parser<Char>::ignore_single_line_comment()
 {
     buffer_.clear();
 
-    bool done = false;
-    while (!done)
+    while (!eof())
     {
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
         if (c == '\n')
         {
-            done = true;
-            break;
+            return;
         }
     }
 }
 
-template<class Char>
+template <class Char>
 unsigned int basic_json_parser<Char>::decode_unicode_codepoint()
 {
 
@@ -781,20 +869,20 @@ unsigned int basic_json_parser<Char>::decode_unicode_codepoint()
         {
             if (eof())
             {
-                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
             }
             unsigned int surrogate_pair = decode_unicode_escape_sequence();
             cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
         }
         else
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("expecting another \\u token to begin the second half of a cp surrogate pair.", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("expecting another \\u token to begin the second half of a cp surrogate pair.", line_,column_);
         }
     }
     return cp;
 }
 
-template<class Char>
+template <class Char>
 unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence()
 {
     unsigned int cp = 0;
@@ -804,9 +892,9 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence()
         Char c = read_ch();
         if (eof())
         {
-            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF",line_,column_);
         }
-        const unsigned int u(c >= 0 ? c : 256 + c);
+        const unsigned int u(c >= 0 ? c : 256 + c );
         cp *= 16;
         if (u >= '0'  &&  u <= '9')
         {
@@ -824,13 +912,13 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence()
         {
             std::ostringstream os;
             os << "Expected hexadecimal digit, found " << u << ".";
-            JSONCONS_THROW_PARSER_EXCEPTION(os.str(), line_, column_);
+            JSONCONS_THROW_PARSER_EXCEPTION(os.str(), line_,column_);
         }
         ++index;
     }
     if (index != 4)
     {
-        JSONCONS_THROW_PARSER_EXCEPTION("Bad cp escape sequence in string: four digits expected.", line_, column_);
+        JSONCONS_THROW_PARSER_EXCEPTION("Bad cp escape sequence in string: four digits expected.", line_,column_);
     }
     return cp;
 }
