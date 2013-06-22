@@ -436,7 +436,15 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    to_stream(os);
+    serialize(basic_json_stream_writer<Char>(os)); 
+    return os.str();
+}
+
+template <class Char>
+std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Char>& format) const
+{
+    std::basic_ostringstream<Char> os;
+    serialize(basic_json_stream_writer<Char>(os,format)); 
     return os.str();
 }
 

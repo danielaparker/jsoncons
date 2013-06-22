@@ -186,6 +186,11 @@ public:
         {
             return val_.get(name_).to_string();
         }
+
+        std::basic_string<Char> to_string(const basic_output_format<Char>& format) const
+        {
+            return val_.get(name_).to_string(format);
+        }
     private:
         proxy(const proxy& proxy)
             : val_(proxy.val_), name_(proxy.name_)
@@ -271,6 +276,8 @@ public:
     const proxy operator[](const std::basic_string<Char>& name) const;
 
     std::basic_string<Char> to_string() const;
+
+    std::basic_string<Char> to_string(const basic_output_format<Char>& format) const;
 
     void to_stream(std::basic_ostream<Char>& os) const;
 
