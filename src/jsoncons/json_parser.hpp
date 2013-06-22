@@ -100,10 +100,6 @@ public:
     template<class StreamListener>
     void parse(StreamListener& handler);
 private:
-    bool is_control_character(unsigned int c)
-    {
-        return c >= 0 && c <= 0x1F;
-    }
 
     void skip_separator();
     template<class StreamListener>
@@ -111,8 +107,10 @@ private:
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
+    void fast_ignore_single_line_comment();
+    void fast_ignore_multi_line_comment();
     bool read_until_match_fails(char char1, char char2, char char3);
-    void skip_more_white_space();
+    void fast_skip_white_space();
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
@@ -281,7 +279,7 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
         case '\f':
         case '\r':
         case ' ':
-            skip_more_white_space();
+            fast_skip_white_space();
             continue;
         case '/':
             {
@@ -467,7 +465,7 @@ void basic_json_parser<Char>::skip_separator()
         case '\f':
         case '\r':
         case ' ':
-            skip_more_white_space();
+            fast_skip_white_space();
             continue;
         case '/':
             {
@@ -767,8 +765,6 @@ void basic_json_parser<Char>::parse_string()
 template<class Char>
 void basic_json_parser<Char>::ignore_single_line_comment()
 {
-    buffer_.clear();
-
     bool done = false;
     while (!done)
     {
@@ -786,10 +782,41 @@ void basic_json_parser<Char>::ignore_single_line_comment()
 }
 
 template<class Char>
+void basic_json_parser<Char>::fast_ignore_single_line_comment()
+{
+    while (buffer_position_ < buffer_length_)
+    {
+        if (data_block_[buffer_position_] == '\n')
+        {
+            break;
+        }
+        ++buffer_position_;
+        ++column_;
+    }
+}
+
+template<class Char>
+void basic_json_parser<Char>::fast_ignore_multi_line_comment()
+{
+    while (buffer_position_ < buffer_length_)
+    {
+        if (data_block_[buffer_position_] == '*')
+        {
+            break;
+        }
+        if (data_block_[buffer_position_] == '\n')
+        {
+            ++line_;
+            column_ = 0;
+        }
+        ++buffer_position_;
+        ++column_;
+    }
+}
+
+template<class Char>
 void basic_json_parser<Char>::ignore_multi_line_comment()
 {
-    buffer_.clear();
-
     bool done = false;
     while (!done)
     {
@@ -815,7 +842,7 @@ void basic_json_parser<Char>::ignore_multi_line_comment()
 }
 
 template<class Char>
-void basic_json_parser<Char>::skip_more_white_space()
+void basic_json_parser<Char>::fast_skip_white_space()
 {
     bool done = false;
     while (!done && buffer_position_ < buffer_length_)

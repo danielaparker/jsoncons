@@ -832,12 +832,6 @@ char to_hex_character(unsigned char c)
 }
 
 inline
-bool is_control_character(unsigned int c)
-{
-    return c >= 0 && c <= 0x1F;
-}
-
-inline
 bool is_non_ascii_character(unsigned int c)
 {
     return c >= 0x80;

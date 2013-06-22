@@ -157,5 +157,11 @@ struct json_char_traits<char>
 
 };
 
+inline
+bool is_control_character(unsigned int c)
+{
+    return c >= 0 && c <= 0x1F;
+}
+
 }
 #endif

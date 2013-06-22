@@ -68,5 +68,6 @@ inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
 
 #define JSONCONS_BUFFERED_READ 1
 
+
 }
 #endif
