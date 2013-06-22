@@ -100,11 +100,17 @@ public:
     template<class StreamListener>
     void parse(StreamListener& handler);
 private:
+    bool is_control_character(unsigned int c)
+    {
+        return c >= 0 && c <= 0x1F;
+    }
+
     void skip_separator();
     template<class StreamListener>
     void parse_number(Char c, StreamListener& handler);
     void parse_string();
     void ignore_single_line_comment();
+    void ignore_multi_line_comment();
     bool read_until_match_fails(char char1, char char2, char char3);
     void skip_more_white_space();
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
@@ -293,6 +299,15 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                     }
                     ignore_single_line_comment();
                 }
+                if (next == '*')
+                {
+                    skip_ch();
+                    if (eof())
+                    {
+                        JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+                    }
+                    ignore_multi_line_comment();
+                }
             }
             continue;
         case begin_object:
@@ -462,6 +477,10 @@ void basic_json_parser<Char>::skip_separator()
                     if (next == '/')
                     {
                         ignore_single_line_comment();
+                    }
+                    if (next == '/')
+                    {
+                        ignore_multi_line_comment();
                     }
                 }
             }
@@ -643,18 +662,12 @@ void basic_json_parser<Char>::parse_string()
         {
             JSONCONS_THROW_PARSER_EXCEPTION("EOF, expected \"", line_, column_);
         }
+        if (is_control_character(c))
+        {
+            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_, column_);
+        }
         switch (c)
         {
-        case '\a':
-        case '\b':
-        case '\f':
-        case '\n':
-        case '\r':
-        case '\t':
-        case '\v':
-        case '\0':
-            JSONCONS_THROW_PARSER_EXCEPTION("Illegal control character in string", line_, column_);
-            break;
         case '\\':
             if (!eof())
             {
@@ -767,6 +780,35 @@ void basic_json_parser<Char>::ignore_single_line_comment()
         if (c == '\n')
         {
             done = true;
+            break;
+        }
+    }
+}
+
+template<class Char>
+void basic_json_parser<Char>::ignore_multi_line_comment()
+{
+    buffer_.clear();
+
+    bool done = false;
+    while (!done)
+    {
+        Char c = read_ch();
+        if (eof())
+        {
+            JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+        }
+        if (c == '*')
+        {
+            Char next = peek();
+            if (eof())
+            {
+                JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
+            }
+            if (next == '/')
+            {
+                done = true;
+            }
             break;
         }
     }
