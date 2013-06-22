@@ -358,8 +358,8 @@ public:
         return type_;
     }
 
-    template <class Serializer>
-    void serialize(Serializer& serializer) const;
+    template <class StreamWriter>
+    void serialize(StreamWriter& stream_writer) const;
 
 private:
     value_type type_;

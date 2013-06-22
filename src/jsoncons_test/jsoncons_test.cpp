@@ -4,7 +4,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer.hpp"
+#include "jsoncons/json_stream_writer.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -158,8 +158,8 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_stream_writer serializer(os,output_format(true));
-    o.serialize(serializer);
+    json_stream_writer stream_writer(os,output_format(true));
+    o.serialize(stream_writer);
     std::cout << os.str() << std::endl;
 }
 

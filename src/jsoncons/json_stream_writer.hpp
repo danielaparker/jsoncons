@@ -15,7 +15,6 @@
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
-//#include <math.h> // isnan
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {

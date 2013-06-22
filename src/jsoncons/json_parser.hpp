@@ -260,7 +260,6 @@ template<class Char>
 template<class StreamListener>
 void basic_json_parser<Char>::parse(StreamListener& handler)
 {
-    handler.begin_json();
     line_ = 1;
     column_ = 0;
 
@@ -309,10 +308,18 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
             }
             continue;
         case begin_object:
+            if (stack_.size() == 0)
+            {
+                handler.begin_json();
+            }
             stack_.push_back(stack_item(object_t));
             handler.begin_object();
             break;
         case begin_array:
+            if (stack_.size() == 0)
+            {
+                handler.begin_json();
+            }
             stack_.push_back(stack_item(array_t));
             handler.begin_array();
             break;
@@ -369,6 +376,10 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                     stack_.back().comma_ = false;
                     ++stack_.back().count_;
                 }
+                else
+                {
+                    handler.end_json();
+                }
                 break;
             case end_array:
                 {
@@ -388,6 +399,10 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                     stack_.back().read_name_ = false;
                     stack_.back().comma_ = false;
                     ++stack_.back().count_;
+                }
+                else
+                {
+                    handler.end_json();
                 }
                 break;
             case 't':
@@ -444,7 +459,6 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
     {
         JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_, column_);
     }
-    handler.end_json();
 }
 
 template<class Char>

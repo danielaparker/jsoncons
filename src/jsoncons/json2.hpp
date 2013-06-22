@@ -18,7 +18,7 @@
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
 #include "jsoncons/json_stream_listener.hpp"
-#include "jsoncons/json_serializer.hpp"
+#include "jsoncons/json_stream_writer.hpp"
 
 namespace jsoncons {
 
@@ -449,53 +449,53 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 }
 
 template <class Char>
-template <class Serializer>
-void basic_json<Char>::serialize(Serializer& serializer) const
+template <class StreamWriter>
+void basic_json<Char>::serialize(StreamWriter& stream_writer) const
 {
     switch (type_)
     {
     case string_t:
-        serializer.value(value_.string_value_.data_,value_.string_value_.length_);
+        stream_writer.value(value_.string_value_.data_,value_.string_value_.length_);
         break;
     case double_t:
-        serializer.value(value_.double_value_);
+        stream_writer.value(value_.double_value_);
         break;
     case longlong_t:
-        serializer.value(value_.longlong_value_);
+        stream_writer.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        serializer.value(value_.ulonglong_value_);
+        stream_writer.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        serializer.value(value_.bool_value_);
+        stream_writer.value(value_.bool_value_);
         break;
     case null_t:
-        serializer.null();
+        stream_writer.null();
         break;
     case object_t:
 		{
-        serializer.begin_object();
+        stream_writer.begin_object();
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_member(&(it->name()[0]),it->name().length());
-            it->value().serialize(serializer);
-            serializer.end_member();
+            stream_writer.begin_member(&(it->name()[0]),it->name().length());
+            it->value().serialize(stream_writer);
+            stream_writer.end_member();
         }
-        serializer.end_object();
+        stream_writer.end_object();
 		}
         break;
     case array_t:
 		{
-        serializer.begin_array();
+        stream_writer.begin_array();
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_element();
-            it->serialize(serializer);
-            serializer.end_element();
+            stream_writer.begin_element();
+            it->serialize(stream_writer);
+            stream_writer.end_element();
         }
-        serializer.end_array();
+        stream_writer.end_array();
 		}
         break;
     default:
