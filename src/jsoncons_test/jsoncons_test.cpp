@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::string john_sport("soccer");
     std::string john_food("spaghetti");
 
-    output_format format(false);
+    output_format format(true);
     json_stream_writer writer(os, format);
 
     std::clock_t t = std::clock();

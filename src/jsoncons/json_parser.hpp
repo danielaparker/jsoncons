@@ -106,6 +106,7 @@ private:
     void parse_string();
     void ignore_single_line_comment();
     bool read_until_match_fails(char char1, char char2, char char3);
+    void skip_more_white_space();
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
@@ -274,6 +275,7 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
         case '\f':
         case '\r':
         case ' ':
+            skip_more_white_space();
             continue;
         case '/':
             {
@@ -450,7 +452,8 @@ void basic_json_parser<Char>::skip_separator()
         case '\f':
         case '\r':
         case ' ':
-            break;
+            skip_more_white_space();
+            continue;
         case '/':
             {
                 if (!eof())
@@ -763,6 +766,32 @@ void basic_json_parser<Char>::ignore_single_line_comment()
         }
         if (c == '\n')
         {
+            done = true;
+            break;
+        }
+    }
+}
+
+template<class Char>
+void basic_json_parser<Char>::skip_more_white_space()
+{
+    bool done = false;
+    while (!done && buffer_position_ < buffer_length_)
+    {
+        switch (data_block_[buffer_position_])
+        {
+        case '\n':
+            ++line_;
+            column_ = 0;
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
+            ++buffer_position_;
+            ++column_;
+            break;
+        default:
             done = true;
             break;
         }
