@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::clock_t t = std::clock();
 
     writer.begin_array();
-    for (size_t i = 0; i < 100000; ++i)
+    for (size_t i = 0; i < 1000; ++i)
     {
         writer.begin_element();
         writer.begin_object();

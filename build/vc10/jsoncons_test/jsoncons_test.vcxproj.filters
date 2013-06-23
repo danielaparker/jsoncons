@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\jsoncons_test\jsoncons_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\jsoncons_test\json_construction_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

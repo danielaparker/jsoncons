@@ -123,7 +123,7 @@ public:
 
     void value(bool value)
     {
-        os_ << value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal();
+        os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
     }
 
     void null()
