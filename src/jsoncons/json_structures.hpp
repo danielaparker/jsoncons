@@ -264,7 +264,10 @@ template <class Char>
 basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) 
 {
     auto it = find(name);
-    JSONCONS_ASSERT(it != end());
+    if (it == end())
+    {
+        JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+    }
     return (*it).value_;
 }
 
@@ -272,7 +275,10 @@ template <class Char>
 const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) const
 {
     const_iterator it = find(name);
-    JSONCONS_ASSERT((it != end()));
+    if (it == end())
+    {
+        JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+    }
     return (*it).value_;
 }
 

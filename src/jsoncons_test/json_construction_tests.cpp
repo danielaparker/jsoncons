@@ -36,23 +36,24 @@ BOOST_AUTO_TEST_CASE(test_construction_from_file)
 
 BOOST_AUTO_TEST_CASE(test_construction_in_code)
 {
-    #undef true
-
     // A null value
     json null_val;
 
     // A boolean value
     json flag(true);
 
-    // A numberic value
+    // A numeric value
     json number(10.5);
 
-    // An empty object value
+    // An object value with four members
     json obj(json::an_object);
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
+    obj["events_attended"] = 10;
+    obj["accept_waiver_of_liability"] = true;
 
-    // An empty array value
+    // An array value with four elements
     json arr(json::an_array);
-
     arr.push_back(null_val);
     arr.push_back(flag);
     arr.push_back(number);
@@ -63,4 +64,51 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     std::cout << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_from_container)
+{
+    std::vector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+
+    json val1(vec.begin(), vec.end());
+    std::cout << val1 << std::endl;
+
+    std::list<double> list;
+    list.push_back(10.5);
+    list.push_back(20.5);
+    list.push_back(30.5);
+
+    json val2(list.begin(), list.end());
+    std::cout << val2 << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_accessing)
+{
+    json val = json::parse_file("../../../examples/members.json");
+
+    json member = val["members"][0];
+    std::cout << member.to_string() << std::endl;
+
+    json& ref = val["members"][0].get("first_name");
+    std::cout << ref.to_string() << std::endl;
+
+    const json& cref = val["members"][1].get("first_name");
+    std::cout << cref.to_string() << std::endl;
+
+}
+
+BOOST_AUTO_TEST_CASE(test_exceptions)
+{
+    json val = json::parse_file("../../../examples/members.json");
+
+    try
+    {
+        json members = val.get("members1");
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+}
 
