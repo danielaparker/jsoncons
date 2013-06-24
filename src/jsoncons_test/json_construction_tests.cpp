@@ -85,30 +85,40 @@ BOOST_AUTO_TEST_CASE(test_from_container)
 
 BOOST_AUTO_TEST_CASE(test_accessing)
 {
-    json val = json::parse_file("../../../examples/members.json");
+    json obj(json::an_object);
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
+    obj["events_attended"] = 10;
+    obj["accept_waiver_of_liability"] = true;
 
-    json member = val["members"][0];
-    std::cout << member.to_string() << std::endl;
+    std::string first_name = obj["first_name"].as_string();
+    std::string last_name = obj.get("last_name").as_string();
+    int events_attended = obj["events_attended"].as_int();
+    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as_bool();
 
-    json& ref = val["members"][0].get("first_name");
-    std::cout << ref.to_string() << std::endl;
-
-    const json& cref = val["members"][1].get("first_name");
-    std::cout << cref.to_string() << std::endl;
+    std::cout << first_name << " " << last_name << ", " << events_attended << ", " << accept_waiver_of_liability << std::endl;
 
 }
 
-BOOST_AUTO_TEST_CASE(test_exceptions)
+BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 {
-    json val = json::parse_file("../../../examples/members.json");
+    json obj(json::an_object);
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
 
     try
     {
-        json members = val.get("members1");
+        std::string experience = obj["outdoor_experience"].as_string();
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
+
+    std::string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as_string() : "";
+
+    bool first_aid_certification = obj.get("first_aid_certification",false).as_bool();
+
+    std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
 }
 

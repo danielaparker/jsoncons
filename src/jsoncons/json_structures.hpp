@@ -26,15 +26,15 @@ public:
     {
     }
     basic_name_value_pair(const std::basic_string<Char>& name, const basic_json<Char>& value)
-        : name_(name), value_(value)
+        : first(name), second(value)
     {
     }
     basic_name_value_pair(std::basic_string<Char>&& name, basic_json<Char>&& value)
-        : name_(name), value_(value)
+        : first(name), second(value)
     {
     }
     basic_name_value_pair(const basic_name_value_pair& val)
-        : name_(val.name_), value_(val.value_)
+        : first(val.first), second(val.second)
     {
     }
     basic_name_value_pair(basic_name_value_pair&& val)
@@ -50,21 +50,12 @@ public:
 
     void swap(basic_name_value_pair<Char>& o) throw()
     {
-        std::swap(name_,o.name_);
-        value_.swap(o.value_);
+        std::swap(first,o.first);
+        second.swap(o.second);
     }
 
-    const std::basic_string<Char>& name() const
-    {
-        return name_;
-    }
-    const basic_json<Char>& value() const
-    {
-        return value_;
-    }
-
-    std::basic_string<Char> name_;
-    basic_json<Char> value_;
+    std::basic_string<Char> first;
+    basic_json<Char> second;
 };
 
 template <class Char>
@@ -74,7 +65,7 @@ public:
     bool operator()(const basic_name_value_pair<Char>& a, 
                     const std::basic_string<Char>& b) const
     {
-        return a.name_ < b;
+        return a.first < b;
     }
 };
 
@@ -85,7 +76,7 @@ public:
     bool operator()(const basic_name_value_pair<Char>& a, 
                     const basic_name_value_pair<Char>& b) const
     {
-        return a.name_ < b.name_;
+        return a.first < b.first;
     }
 };
 
@@ -173,7 +164,7 @@ public:
         for (size_t i = 0; i < members_.size(); ++i)
         {
             
-            members[i] = basic_name_value_pair<Char>(members_[i].name_,members_[i].value_);
+            members[i] = basic_name_value_pair<Char>(members_[i].first,members_[i].second);
         }
         return new json_object(members);
     }
@@ -253,7 +244,7 @@ template <class Char>
 void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_json<Char> value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
-    if (it != end() && (*it).name_ == name)
+    if (it != end() && (*it).first == name)
     {
         remove(it);
     }
@@ -268,7 +259,7 @@ basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name)
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
     }
-    return (*it).value_;
+    return (*it).second;
 }
 
 template <class Char>
@@ -287,7 +278,7 @@ typename json_object<Char>::iterator json_object<Char>::find(const std::basic_st
 {
     key_compare<Char> comp;
     iterator it = std::lower_bound(begin(),end(), name, comp);
-    return (it != end() && it->name_ == name) ? it : end();
+    return (it != end() && it->first == name) ? it : end();
 }
 
 template <class Char>

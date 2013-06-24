@@ -478,8 +478,8 @@ void basic_json<Char>::serialize(StreamWriter& stream_writer) const
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            stream_writer.begin_member(&(it->name()[0]),it->name().length());
-            it->value().serialize(stream_writer);
+            stream_writer.begin_member(&(it->first[0]),it->first.length());
+            it->second.serialize(stream_writer);
             stream_writer.end_member();
         }
         stream_writer.end_object();
