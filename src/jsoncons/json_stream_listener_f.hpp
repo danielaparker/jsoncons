@@ -37,7 +37,7 @@ class basic_json_stream_listener_f
         std::basic_string<Char> name_;
         structure_type type_;
 
-        std::vector<basic_name_value_pair<Char>> members_;
+        std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
         std::vector<basic_json<Char>> elements_;
     };
 
@@ -83,7 +83,7 @@ public:
         {
             if (stack_[level_-1].is_object())
             {
-                stack_[level_-1].members_.push_back(std::move(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val))));
+                stack_[level_-1].members_.push_back(std::move(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val))));
             }
             else
             {
@@ -121,7 +121,7 @@ public:
         {
             if (stack_[level_-1].is_object())
             {
-                stack_[level_-1].members_.push_back(std::move(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val))));
+                stack_[level_-1].members_.push_back(std::move(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val))));
             }
             else
             {
@@ -144,7 +144,7 @@ public:
         basic_json<Char> val(std::move(value));
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(std::move(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val))));
+            stack_[level_-1].members_.push_back(std::move(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val))));
         } 
         else 
         {
@@ -157,7 +157,7 @@ public:
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val)));
+            stack_[level_-1].members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val)));
         } 
         else
         {
@@ -170,7 +170,7 @@ public:
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val)));
+            stack_[level_-1].members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val)));
         } 
         else
         {
@@ -183,7 +183,7 @@ public:
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val)));
+            stack_[level_-1].members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val)));
         } 
         else
         {
@@ -196,7 +196,7 @@ public:
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(std::move(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val))));
+            stack_[level_-1].members_.push_back(std::move(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val))));
         } 
         else
         {
@@ -209,7 +209,7 @@ public:
         basic_json<Char> val;
         if (stack_[level_-1].is_object())
         {
-            stack_[level_-1].members_.push_back(basic_name_value_pair<Char>(std::move(stack_[level_-1].name_),std::move(val)));
+            stack_[level_-1].members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val)));
         } 
         else
         {

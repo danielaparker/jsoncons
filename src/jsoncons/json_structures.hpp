@@ -14,55 +14,16 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <utility>
 #include "jsoncons/json1.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_name_value_pair 
-{
-public:
-    basic_name_value_pair()
-    {
-    }
-    basic_name_value_pair(const std::basic_string<Char>& name, const basic_json<Char>& value)
-        : first(name), second(value)
-    {
-    }
-    basic_name_value_pair(std::basic_string<Char>&& name, basic_json<Char>&& value)
-        : first(name), second(value)
-    {
-    }
-    basic_name_value_pair(const basic_name_value_pair& val)
-        : first(val.first), second(val.second)
-    {
-    }
-    basic_name_value_pair(basic_name_value_pair&& val)
-    {
-        swap(val);
-    }
-
-    basic_name_value_pair<Char>& operator=(basic_name_value_pair<Char> rhs)
-    {
-        swap(rhs);
-        return *this;
-    }
-
-    void swap(basic_name_value_pair<Char>& o) throw()
-    {
-        std::swap(first,o.first);
-        second.swap(o.second);
-    }
-
-    std::basic_string<Char> first;
-    basic_json<Char> second;
-};
-
-template <class Char>
 class key_compare
 {
 public:
-    bool operator()(const basic_name_value_pair<Char>& a, 
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char>>& a, 
                     const std::basic_string<Char>& b) const
     {
         return a.first < b;
@@ -73,8 +34,8 @@ template <class Char>
 class member_compare
 {
 public:
-    bool operator()(const basic_name_value_pair<Char>& a, 
-                    const basic_name_value_pair<Char>& b) const
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char>>& a, 
+                    const std::pair<std::basic_string<Char>,basic_json<Char>>& b) const
     {
         return a.first < b.first;
     }
@@ -137,8 +98,8 @@ template <class Char>
 class json_object
 {
 public:
-    typedef typename std::vector<basic_name_value_pair<Char>>::iterator iterator;
-    typedef typename std::vector<basic_name_value_pair<Char>>::const_iterator const_iterator;
+    typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>>::iterator iterator;
+    typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>>::const_iterator const_iterator;
 
     json_object()
     {
@@ -149,7 +110,7 @@ public:
     {
     }
 
-    json_object(std::vector<basic_name_value_pair<Char>> members)
+    json_object(std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members)
         : members_(members)
     {
     }
@@ -160,11 +121,11 @@ public:
 
     json_object<Char>* clone() 
     {
-        std::vector<basic_name_value_pair<Char>> members(members_.size());
+        std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members(members_.size());
         for (size_t i = 0; i < members_.size(); ++i)
         {
             
-            members[i] = basic_name_value_pair<Char>(members_[i].first,members_[i].second);
+            members[i] = std::pair<std::basic_string<Char>,basic_json<Char>>(members_[i].first,members_[i].second);
         }
         return new json_object(members);
     }
@@ -175,7 +136,7 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
-    const basic_name_value_pair<Char>& get(size_t i) const 
+    const std::pair<std::basic_string<Char>,basic_json<Char>>& get(size_t i) const 
     {
         return members_[i];
     }
@@ -196,9 +157,9 @@ public:
 
     const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(const_iterator it, basic_name_value_pair<Char> member);
+    void insert(const_iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member);
 
-    void push_back(basic_name_value_pair<Char> member)
+    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>> member)
     {
         members_.push_back(member);
     }
@@ -213,7 +174,7 @@ public:
 
     const_iterator end() const {return members_.end();}
 
-    std::vector<basic_name_value_pair<Char>> members_;
+    std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
 };
 
 template <class Char>
@@ -229,7 +190,7 @@ void json_object<Char>::sort_members()
 }
 
 template <class Char>
-void json_object<Char>::insert(const_iterator it, basic_name_value_pair<Char> member)
+void json_object<Char>::insert(const_iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member)
 {
     members_.insert(it,member);
 }
@@ -248,7 +209,7 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, basic_js
     {
         remove(it);
     }
-    insert(it,basic_name_value_pair<Char>(name,value));
+    insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
 }
 
 template <class Char>

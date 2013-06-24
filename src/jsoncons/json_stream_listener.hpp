@@ -77,7 +77,7 @@ public:
         {
             if (stack_.back().is_object())
             {
-                stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+                stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
             }
             else
             {
@@ -104,7 +104,7 @@ public:
         {
             if (stack_.back().is_object())
             {
-                basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+                std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
                 stack_.back().structure_.object_->push_back(std::move(pair));
             }
             else
@@ -128,7 +128,7 @@ public:
         basic_json<Char> val(std::move(value));
         if (stack_.back().is_object())
         {
-            basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+            std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
             stack_.back().structure_.object_->push_back(std::move(pair));
         } 
         else 
@@ -142,7 +142,7 @@ public:
         basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            basic_name_value_pair<Char> pair(std::move(stack_.back().name_),std::move(val));
+            std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
             stack_.back().structure_.object_->push_back(std::move(pair));
         } 
         else
@@ -156,7 +156,7 @@ public:
         basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
         } 
         else
         {
@@ -169,7 +169,7 @@ public:
         basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
         } 
         else
         {
@@ -182,7 +182,7 @@ public:
         basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
         } 
         else
         {
@@ -195,7 +195,7 @@ public:
         basic_json<Char> val;
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(basic_name_value_pair<Char>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
         } 
         else
         {
