@@ -74,6 +74,46 @@ public:
             return val_.get(name_).is_empty();
         }
 
+        bool is_string() const
+        {
+            return val_.get(name_).is_string();
+        }
+
+        bool is_number() const
+        {
+            return val_.get(name_).is_number();
+        }
+
+        bool is_longlong() const
+        {
+            return val_.get(name_).is_longlong();
+        }
+
+        bool is_ulonglong() const
+        {
+            return val_.get(name_).is_ulonglong();
+        }
+
+        bool is_double() const
+        {
+            return val_.get(name_).is_double();
+        }
+
+        bool is_bool() const
+        {
+            return val_.get(name_).is_bool();
+        }
+
+        bool is_object() const
+        {
+            return val_.get(name_).is_object();
+        }
+
+        bool is_array() const
+        {
+            return val_.get(name_).is_array();
+        }
+
         std::basic_string<Char> as_string() const
         {
             return val_.get(name_).as_string();
@@ -298,6 +338,21 @@ public:
     bool is_number() const
     {
         return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
+    }
+
+    bool is_longlong() const
+    {
+        return type_ == longlong_t;
+    }
+
+    bool is_ulonglong() const
+    {
+        return type_ == ulonglong_t;
+    }
+
+    bool is_double() const
+    {
+        return type_ == double_t;
     }
 
     bool is_bool() const

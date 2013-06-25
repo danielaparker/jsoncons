@@ -234,7 +234,8 @@ private:
 
     unsigned long column_;
     unsigned long line_;
-    std::basic_string<Char> buffer_;
+    std::basic_string<Char> string_buffer_;
+    std::string number_buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
     Char *data_block_;
@@ -242,58 +243,60 @@ private:
     int buffer_length_;
 };
 
-template<class Char>
-long long string_to_longlong(const std::basic_string<Char>& s)
+inline
+long long string_to_longlong(const char* s, size_t length)
 {
-    long long max_value = std::numeric_limits<long long>::max();
+    const long long max_value = std::numeric_limits<long long>::max();
 
-	long long i = 0;
-    for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+	long long n = 0;
+    for (size_t i = 0; i < length; ++i)
     {
-        if (*it >= '0' && *it <= '9')
+        char c = s[i];
+        if (c >= '0' && c <= '9')
         {
-			if (i > max_value/10)
+			if (n > max_value/10)
 			{
 		        JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
 			}
-            i = i * 10;
-			long long c = (*it - '0'); 
-			if (i > max_value - c)
+            n = n * 10;
+			long long k = (c - '0'); 
+			if (n > max_value - k)
 			{
 				JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
 			}
 
-			i += c;
+			n += k;
         }
     }
-    return i;
+    return n;
 }
 
-template<class Char>
-unsigned long long string_to_ulonglong(const std::basic_string<Char>& s)
+inline
+unsigned long long string_to_ulonglong(const char* s, size_t length)
 {
-    unsigned long long max_value = std::numeric_limits<unsigned long long>::max();
+    const unsigned long long max_value = std::numeric_limits<unsigned long long>::max();
 
-	unsigned long long i = 0;
-    for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+	unsigned long long n = 0;
+    for (size_t i = 0; i < length; ++i)
     {
-        if (*it >= '0' && *it <= '9')
+        char c = s[i];
+        if (c >= '0' && c <= '9')
         {
-			if (i > max_value/10)
+			if (n > max_value/10)
 			{
 		        JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
 			}
-            i = i * 10;
-			long long c = (*it - '0'); 
-			if (i > max_value - c)
+            n = n * 10;
+			long long k = (c - '0'); 
+			if (n > max_value - k)
 			{
 				JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
 			}
 
-			i += c;
+			n += k;
         }
     }
-    return i;
+    return n;
 }
 
 template<class Char>
@@ -384,13 +387,13 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                     parse_string();
                     if (stack_.back().is_object() && !stack_.back().read_name_)
                     {
-                        handler.name(std::move(buffer_));
+                        handler.name(std::move(string_buffer_));
                         skip_separator();
                         stack_.back().read_name_ = true;
                     }
                     else
                     {
-                        handler.value(std::move(buffer_));
+                        handler.value(std::move(string_buffer_));
                         stack_.back().comma_ = false;
                         stack_.back().read_name_ = false;
                         ++stack_.back().count_;
@@ -628,12 +631,12 @@ template<class Char>
 template<class StreamListener>
 void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
 {
-    buffer_.clear();
+    number_buffer_.clear();
     bool has_frac_or_exp = false;
     bool has_neg = (c == '-') ? true : false;
     if (!has_neg)
     {
-        buffer_.push_back(c);
+        number_buffer_.push_back(c);
     }
 
     bool done = false;
@@ -656,7 +659,7 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
         case '7':
         case '8':
         case '9':
-            buffer_.push_back(c);
+            number_buffer_.push_back(c);
             break;
         case '-':
         case '+':
@@ -664,14 +667,14 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
         case 'e':
         case 'E':
             has_frac_or_exp = true;
-            buffer_.push_back(c);
+            number_buffer_.push_back(c);
             break;
         default:
             {
                 unread_ch(c);
                 if (has_frac_or_exp)
                 {
-                    const Char *begin = buffer_.c_str();
+                    const Char *begin = number_buffer_.c_str();
                     Char *end;
                     double d = std::strtod(begin, &end);
                     if (end == begin)
@@ -686,12 +689,12 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                 {
                     try
                     {
-                        long long d = string_to_longlong(buffer_);
+                        long long d = string_to_longlong(&number_buffer_[0],number_buffer_.length());
                         handler.value(-d);
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = buffer_.c_str();
+                        const Char *begin = number_buffer_.c_str();
                         Char *end;
                         double d = std::strtod(begin, &end);
                         if (end == begin)
@@ -707,12 +710,12 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(buffer_);
+                        unsigned long long d = string_to_ulonglong(&number_buffer_[0],number_buffer_.length());
                         handler.value(d);
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = buffer_.c_str();
+                        const Char *begin = number_buffer_.c_str();
                         Char *end;
                         double d = std::strtod(begin, &end);
                         if (end == begin)
@@ -734,7 +737,7 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
 template<class Char>
 void basic_json_parser<Char>::parse_string()
 {
-    buffer_.clear();
+    string_buffer_.clear();
 
     bool done = false;
     while (!done)
@@ -762,7 +765,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\"');
+                    string_buffer_.push_back('\"');
                     break;
                 case '\\':
                     skip_ch();
@@ -770,7 +773,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\\');
+                    string_buffer_.push_back('\\');
                     break;
                 case '/':
                     skip_ch();
@@ -778,7 +781,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('/');
+                    string_buffer_.push_back('/');
                     break;
                 case 'n':
                     skip_ch();
@@ -786,7 +789,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\n');
+                    string_buffer_.push_back('\n');
                     break;
                 case 'b':
                     skip_ch();
@@ -794,7 +797,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\n');
+                    string_buffer_.push_back('\n');
                     break;
                 case 'f':
                     skip_ch();
@@ -802,7 +805,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\n');
+                    string_buffer_.push_back('\n');
                     break;
                 case 'r':
                     skip_ch();
@@ -810,7 +813,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\n');
+                    string_buffer_.push_back('\n');
                     break;
                 case 't':
                     skip_ch();
@@ -818,7 +821,7 @@ void basic_json_parser<Char>::parse_string()
                     {
                         JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                     }
-                    buffer_.push_back('\n');
+                    string_buffer_.push_back('\n');
                     break;
                 case 'u':
                     {
@@ -828,7 +831,7 @@ void basic_json_parser<Char>::parse_string()
                             JSONCONS_THROW_PARSER_EXCEPTION("Unexpected EOF", line_, column_);
                         }
                         unsigned int cp = decode_unicode_codepoint();
-                        json_char_traits<Char>::append_codepoint_to_string(cp, buffer_);
+                        json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
                     }
                     break;
                 default:
@@ -840,7 +843,7 @@ void basic_json_parser<Char>::parse_string()
             done = true;
             break;
         default:
-            buffer_.push_back(c);
+            string_buffer_.push_back(c);
             break;
         }
     }
