@@ -287,9 +287,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
         return value_.object_->get(name);
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to get " << name << " from a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -303,9 +301,7 @@ basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, bas
         return has_member(name) ? value_.object_->get(name) : default_val;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to get " << name << " from a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object",name);
         }
     }
 }
@@ -336,9 +332,7 @@ void basic_json<Char>::set_member(const std::basic_string<Char>& name, const bas
         break;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to set " << name << " on a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
         }
     }
 }
@@ -571,12 +565,8 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
         JSONCONS_THROW_EXCEPTION(ss.str());
     }
 
-    std::string buffer;
-    buffer.resize(length);
-    is.read(&buffer[0],length);
-    std::istringstream sstr(buffer);
-
-    basic_json_parser<Char> parser(sstr);
+    basic_json_parser<Char> parser(is);
+    parser.buffer_capacity(length);
     basic_json_stream_listener<Char> handler;
     parser.parse(handler);
     basic_json<Char> val;

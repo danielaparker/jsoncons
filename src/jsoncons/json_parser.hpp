@@ -76,29 +76,40 @@ public:
     static const char name_separator = ':';
     static const char value_separator = ',';
 
-    static const size_t max_buffer_length = 16384;
+    static const size_t default_max_buffer_length = 16384;
     //!  Parse an input stream of JSON text into a json object
     /*!
       \param is The input stream to read from
     */
     basic_json_parser(std::basic_istream<Char>& is)
-       : is_(is), data_block_(0),
+       : is_(is), input_buffer_(0),
          buffer_position_(0), buffer_length_(0)
     {
 #ifdef JSONCONS_BUFFER_READ
-        data_block_ = new Char[max_buffer_length];
+        input_buffer_ = new Char[buffer_capacity_];
 #endif
     }
 
     ~basic_json_parser()
     {
 #ifdef JSONCONS_BUFFER_READ
-        delete[] data_block_;
+        delete[] input_buffer_;
 #endif
     }
 
     template<class StreamListener>
     void parse(StreamListener& handler);
+
+    size_t buffer_capacity() const
+    {
+        return buffer_capacity_;
+    }
+
+    void buffer_capacity(size_t buffer_capacity)
+    {
+        buffer_capacity_ = buffer_capacity;
+    }
+
 private:
 
     void skip_separator();
@@ -130,7 +141,7 @@ private:
         buffer_position_ = 0;
         if (!is_.eof())
         {
-            is_.read(data_block_, max_buffer_length);
+            is_.read(input_buffer_, buffer_capacity_);
             buffer_length_ = static_cast<int>(is_.gcount());
         }
         else
@@ -152,7 +163,7 @@ private:
         //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
         {
-            c = data_block_[buffer_position_++];
+            c = input_buffer_[buffer_position_++];
             if (c == '\n')
             {
                 ++line_;
@@ -188,7 +199,7 @@ private:
         Char c = 0;
         if (buffer_position_ < buffer_length_)
         {
-            c = data_block_[buffer_position_];
+            c = input_buffer_[buffer_position_];
         }
 
         return c;
@@ -238,44 +249,15 @@ private:
     std::string number_buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
-    Char *data_block_;
+    Char *input_buffer_;
+    size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
 };
 
 inline
-long long string_to_longlong(const char* s, size_t length)
+unsigned long long string_to_ulonglong(const char* s, size_t length, const unsigned long long max_value)
 {
-    const long long max_value = std::numeric_limits<long long>::max();
-
-	long long n = 0;
-    for (size_t i = 0; i < length; ++i)
-    {
-        char c = s[i];
-        if (c >= '0' && c <= '9')
-        {
-			if (n > max_value/10)
-			{
-		        JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
-			}
-            n = n * 10;
-			long long k = (c - '0'); 
-			if (n > max_value - k)
-			{
-				JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
-			}
-
-			n += k;
-        }
-    }
-    return n;
-}
-
-inline
-unsigned long long string_to_ulonglong(const char* s, size_t length)
-{
-    const unsigned long long max_value = std::numeric_limits<unsigned long long>::max();
-
 	unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
@@ -689,7 +671,7 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                 {
                     try
                     {
-                        long long d = string_to_longlong(&number_buffer_[0],number_buffer_.length());
+                        long long d = static_cast<long long>(string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<long long>::max()));
                         handler.value(-d);
                     }
                     catch (const std::exception&)
@@ -710,7 +692,7 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&number_buffer_[0],number_buffer_.length());
+                        unsigned long long d = string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<unsigned long long>::max());
                         handler.value(d);
                     }
                     catch (const std::exception&)
@@ -873,7 +855,7 @@ void basic_json_parser<Char>::fast_ignore_single_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
-        if (data_block_[buffer_position_] == '\n')
+        if (input_buffer_[buffer_position_] == '\n')
         {
             break;
         }
@@ -887,11 +869,11 @@ void basic_json_parser<Char>::fast_ignore_multi_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
-        if (data_block_[buffer_position_] == '*')
+        if (input_buffer_[buffer_position_] == '*')
         {
             break;
         }
-        if (data_block_[buffer_position_] == '\n')
+        if (input_buffer_[buffer_position_] == '\n')
         {
             ++line_;
             column_ = 0;
@@ -934,7 +916,7 @@ void basic_json_parser<Char>::fast_skip_white_space()
     bool done = false;
     while (!done && buffer_position_ < buffer_length_)
     {
-        switch (data_block_[buffer_position_])
+        switch (input_buffer_[buffer_position_])
         {
         case '\n':
             ++line_;
