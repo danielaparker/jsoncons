@@ -243,14 +243,54 @@ private:
 };
 
 template<class Char>
-unsigned long long string_to_uinteger(const std::basic_string<Char>& s)
+long long string_to_longlong(const std::basic_string<Char>& s)
 {
-    unsigned long long i = 0;
+    long long max_value = std::numeric_limits<long long>::max();
+
+	long long i = 0;
     for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
     {
         if (*it >= '0' && *it <= '9')
         {
-            i = i * 10 + (*it - '0');
+			if (i > max_value/10)
+			{
+		        JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
+			}
+            i = i * 10;
+			long long c = (*it - '0'); 
+			if (i > max_value - c)
+			{
+				JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
+			}
+
+			i += c;
+        }
+    }
+    return i;
+}
+
+template<class Char>
+unsigned long long string_to_ulonglong(const std::basic_string<Char>& s)
+{
+    unsigned long long max_value = std::numeric_limits<unsigned long long>::max();
+
+	unsigned long long i = 0;
+    for (std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+    {
+        if (*it >= '0' && *it <= '9')
+        {
+			if (i > max_value/10)
+			{
+		        JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
+			}
+            i = i * 10;
+			long long c = (*it - '0'); 
+			if (i > max_value - c)
+			{
+				JSONCONS_THROW_PARSER_EXCEPTION("Integer overflow", 0, 0);
+			}
+
+			i += c;
         }
     }
     return i;
@@ -642,15 +682,45 @@ void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
                         d = -d;
                     handler.value(d);
                 }
-                else
+                else if (has_neg)
                 {
-                    unsigned long long d = string_to_uinteger(buffer_);
-                    if (has_neg)
+                    try
                     {
-                        handler.value(-static_cast<long long>(d));
+                        long long d = string_to_longlong(buffer_);
+                        handler.value(-d);
                     }
-                    else
+                    catch (const std::exception&)
                     {
+                        const Char *begin = buffer_.c_str();
+                        Char *end;
+                        double d = std::strtod(begin, &end);
+                        if (end == begin)
+                        {
+                            JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_, column_);
+                        }
+                        if (has_neg)
+                            d = -d;
+                        handler.value(d);
+                    }
+                }
+                else 
+                {
+                    try
+                    {
+                        unsigned long long d = string_to_ulonglong(buffer_);
+                        handler.value(d);
+                    }
+                    catch (const std::exception&)
+                    {
+                        const Char *begin = buffer_.c_str();
+                        Char *end;
+                        double d = std::strtod(begin, &end);
+                        if (end == begin)
+                        {
+                            JSONCONS_THROW_PARSER_EXCEPTION("Invalid double value", line_, column_);
+                        }
+                        if (has_neg)
+                            d = -d;
                         handler.value(d);
                     }
                 }
