@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     std::cout << "size=" << root["addresses"].size() << std::endl;
     for (size_t i = 0; i < root["addresses"].size(); ++i)
     {
-        std::cout << root["addresses"][i].to_string() << std::endl;
+        std::cout << root["addresses"][i] << std::endl;
     }
 }
 

@@ -315,9 +315,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
         return has_member(name) ? value_.object_->get(name) : default_val;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to get " << name << " from a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -347,9 +345,7 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
         break;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to set " << name << " on a value that is not an object"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
         }
     }
 }
@@ -364,9 +360,7 @@ void basic_json<Char>::push_back(const basic_json<Char>& value)
         break;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to insert into a value that is not an array"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
         }
     }
 }
@@ -381,9 +375,7 @@ void basic_json<Char>::push_back(basic_json<Char>&& value)
         break;
     default:
         {
-            std::ostringstream os;
-            os << "Attempting to insert into a value that is not an array"; 
-            JSONCONS_THROW_EXCEPTION(os.str());
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
         }
     }
 }
@@ -548,9 +540,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
     if (!is.is_open())
     {
-        std::ostringstream ss;
-        ss << "Cannot open file " << filename;
-        JSONCONS_THROW_EXCEPTION(ss.str());
+        throw json_exception_1<char>("Cannot open file %s", filename);
     }
     is.seekg(0,std::ios_base::end);
     std::ios::pos_type pos = is.tellg();
@@ -560,9 +550,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
 
     if (length == 0)
     {
-        std::ostringstream ss;
-        ss << "File " << filename << " is empty";
-        JSONCONS_THROW_EXCEPTION(ss.str());
+        throw json_exception_1<char>("File %s is empty", filename);
     }
 
     basic_json_parser<Char> parser(is);

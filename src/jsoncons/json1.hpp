@@ -231,6 +231,22 @@ public:
         {
             return val_.get(name_).to_string(format);
         }
+
+        void to_stream(std::basic_ostream<Char>& os) const
+        {
+            val_.get(name_).to_stream(os);
+        }
+
+        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+        {
+            val_.get(name_).to_stream(os,format);
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const proxy& o)
+        {
+            o.to_stream(os);
+            return os;
+        }
     private:
         proxy(const proxy& proxy)
             : val_(proxy.val_), name_(proxy.name_)

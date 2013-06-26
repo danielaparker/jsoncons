@@ -7,13 +7,17 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.12
+------------
+
+Implemented operator>> for json::proxy
+
+Added to_stream methods to json::proxy
+
 Release 0.11
 ------------
 
 Added members to json_parser to access and modify the buffer capacity
-
-    size_t buffer_capacity() const
-    void buffer_capacity(size_t buffer_capacity)
 
 Added checks when parsing integer values to determine overflow for 
 long long and unsigned long long, and if overflow, parse them as
