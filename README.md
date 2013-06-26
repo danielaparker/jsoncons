@@ -10,7 +10,7 @@ It has been tested with MS Visual C++ 10, SP1
 Release 0.12
 ------------
 
-Implemented operator>> for json::proxy
+Implemented operator<< for json::proxy
 
 Added to_stream methods to json::proxy
 
