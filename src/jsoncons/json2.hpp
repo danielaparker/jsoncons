@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
+#include <new>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_parser.hpp"
@@ -65,16 +66,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         value_ = val.value_;
         break;
     case string_t:
-        value_.string_value_.length_ = val.value_.string_value_.length_;
-        if (value_.string_value_.length_ > 0)
-        {
-            value_.string_value_.data_ = new Char[value_.string_value_.length_];
-            std::memcpy(value_.string_value_.data_,val.value_.string_value_.data_,value_.string_value_.length_*sizeof(Char));
-        }
-        else
-        {
-            value_.string_value_.data_ = nullptr;
-        }
+        value_.string_value_ = new json_string<Char>(*(val.value_.string_value_));
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -170,33 +162,14 @@ template <class Char>
 basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
-    value_.string_value_.length_ = s.length();
-    if (s.length() > 0)
-    {
-        value_.string_value_.data_ = new Char[s.length()];
-        std::memcpy(value_.string_value_.data_,&s[0],s.length()*sizeof(Char));
-    }
-    else
-    {
-        value_.string_value_.data_ = nullptr;
-    }
+    value_.string_value_ = new json_string<Char>(s);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const Char* s)
 {
     type_ = string_t;
-    size_t len = json_char_traits<Char>::cstring_len(s);
-    value_.string_value_.length_ = len;
-    if (len > 0)
-    {
-        value_.string_value_.data_ = new Char[len];
-        std::memcpy(value_.string_value_.data_,s,len*sizeof(Char));
-    }
-    else
-    {
-        value_.string_value_.data_ = nullptr;
-    }
+    value_.string_value_ = new json_string<Char>(s);
 }
 
 template <class Char>
@@ -211,7 +184,7 @@ basic_json<Char>::~basic_json()
     case null_t:
         break;
     case string_t:
-        delete value_.string_value_.data_;
+        delete value_.string_value_;
         break;
     case array_t:
         delete value_.array_;
@@ -441,7 +414,7 @@ void basic_json<Char>::serialize(StreamWriter& stream_writer) const
     switch (type_)
     {
     case string_t:
-        stream_writer.value(value_.string_value_.data_,value_.string_value_.length_);
+        stream_writer.value(value_.string_value_->str_);
         break;
     case double_t:
         stream_writer.value(value_.double_value_);
@@ -464,7 +437,7 @@ void basic_json<Char>::serialize(StreamWriter& stream_writer) const
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            stream_writer.begin_member(&(it->first[0]),it->first.length());
+            stream_writer.begin_member(it->first);
             it->second.serialize(stream_writer);
             stream_writer.end_member();
         }
@@ -796,7 +769,7 @@ std::basic_string<Char> basic_json<Char>::as_string() const
     switch (type_)
     {
     case string_t:
-        return std::basic_string<Char>(value_.string_value_.data_,value_.string_value_.length_);
+        return value_.string_value_->str_;
     default:
         return to_string();
     }
@@ -824,14 +797,13 @@ bool is_non_ascii_character(unsigned int c)
 }
 
 template <class Char>
-void escape_string(const Char* s, 
-                   size_t length,
+void escape_string(const std::basic_string<Char>& s, 
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
-    for (size_t i = 0; i < length; ++i)
+    for (auto it = s.begin(); it != s.end(); ++it)
     {
-        Char c = s[i];
+        Char c = *it;
         switch (c)
         {
         case '\\':
@@ -864,7 +836,7 @@ void escape_string(const Char* s,
             if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
             {
                 // convert utf8 to codepoint
-                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(s,length,i);
+                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(it,s.end());
 
                 os << '\\';
                 os << 'u';

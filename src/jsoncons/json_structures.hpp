@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iomanip>
 #include <utility>
+#include <new>
 #include "jsoncons/json1.hpp"
 
 namespace jsoncons {
@@ -92,6 +93,67 @@ public:
     const_iterator end() const {return elements_.end();}
 
     std::vector<basic_json<Char>> elements_;
+};
+
+template <class Char>
+class json_string 
+{
+public:
+    typedef typename std::basic_string<Char>::iterator iterator;
+    typedef typename std::basic_string<Char>::const_iterator const_iterator;
+
+    json_string()
+    {
+    }
+
+    json_string(const std::basic_string<Char>& s)
+        : str_(s)
+    {
+    }
+
+    json_string(const Char* s)
+        : str_(s)
+    {
+    }
+
+    template <class InputIterator>
+    json_string(InputIterator begin, InputIterator end)
+        : str_(begin,end)
+    {
+    }
+
+    json_string<Char>* clone() 
+    {
+        return new json_string(str_.begin(),str_.end());
+    }
+
+    ~json_string()
+    {
+    }
+
+    size_t size() const {return str_.size();}
+
+    size_t length() const {return str_.length();}
+
+    void clear() {str_.clear();}
+
+    void reserve(size_t n) {str_.reserve(n);}
+
+    basic_json<Char>& at(size_t i) {return str_[i];}
+
+    const basic_json<Char>& at(size_t i) const {return str_[i];}
+
+    void push_back(basic_json<Char> value);
+
+    iterator begin() {return str_.begin();}
+
+    iterator end() {return str_.end();}
+
+    const_iterator begin() const {return str_.begin();}
+
+    const_iterator end() const {return str_.end();}
+
+    std::basic_string<Char> str_;
 };
 
 template <class Char>

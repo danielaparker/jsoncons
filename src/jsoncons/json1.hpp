@@ -21,14 +21,10 @@ template <class Char>
 class json_array;
 
 template <class Char>
-class basic_output_format;
+class json_string;
 
 template <class Char>
-struct simple_string
-{
-    size_t length_;
-    Char* data_;
-};
+class basic_output_format;
 
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
@@ -440,9 +436,9 @@ private:
         long long longlong_value_;
         unsigned long long ulonglong_value_;
         bool bool_value_;
-        simple_string<Char> string_value_;
         json_object<Char>* object_;
         json_array<Char>* array_;
+        json_string<Char>* string_value_;
     } value_;
 };
 

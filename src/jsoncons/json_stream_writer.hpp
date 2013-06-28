@@ -52,7 +52,7 @@ public:
         restore();
     }
 
-    void begin_member(const Char* name, size_t length)
+    void begin_member(const std::basic_string<Char>& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -60,7 +60,7 @@ public:
         }
         write_indent();
         os_.put('\"'); 
-        escape_string<Char>(name,length,format_,os_); 
+        escape_string<Char>(name,format_,os_); 
         os_.put('\"'); 
         os_.put(':');
     }
@@ -84,10 +84,10 @@ public:
         ++stack_.back().count_;
     }
 
-    void value(const Char* value, size_t length)
+    void value(const std::basic_string<Char>& value)
     {
         os_.put('\"');
-        escape_string<Char>(value,length,format_,os_);
+        escape_string<Char>(value,format_,os_);
         os_.put('\"');
     }
 

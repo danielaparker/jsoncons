@@ -369,13 +369,13 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                     parse_string();
                     if (stack_.back().is_object() && !stack_.back().read_name_)
                     {
-                        handler.name(std::move(string_buffer_));
+                        handler.name(string_buffer_);
                         skip_separator();
                         stack_.back().read_name_ = true;
                     }
                     else
                     {
-                        handler.value(std::move(string_buffer_));
+                        handler.value(string_buffer_);
                         stack_.back().comma_ = false;
                         stack_.back().read_name_ = false;
                         ++stack_.back().count_;

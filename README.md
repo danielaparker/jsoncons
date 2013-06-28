@@ -7,6 +7,16 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.13
+------------
+
+Replaced `simple_string` union member with json_string that 
+wraps `std::basic_string<Char>`
+
+name() and value() event handler methods on 
+basic_json_stream_writer take `const std::basic_string<Char>&`
+rather than `const Char*` and `length`.
+
 Release 0.12
 ------------
 

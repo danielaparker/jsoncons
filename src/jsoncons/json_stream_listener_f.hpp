@@ -134,14 +134,14 @@ public:
         }
     }
 
-    void name(std::basic_string<Char> name)
+    void name(const std::basic_string<Char>& name)
     {
-        stack_[level_-1].name_ = std::move(name);
+        stack_[level_-1].name_ = name;
     }
 
-    void value(std::basic_string<Char> value)
+    void value(const std::basic_string<Char>& value)
     {
-        basic_json<Char> val(std::move(value));
+        basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
         {
             stack_[level_-1].members_.push_back(std::move(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_[level_-1].name_),std::move(val))));
