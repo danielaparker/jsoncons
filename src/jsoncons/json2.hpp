@@ -66,7 +66,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         value_ = val.value_;
         break;
     case string_t:
-        value_.string_value_ = new json_string<Char>(*(val.value_.string_value_));
+        value_.string_value_ = new std::basic_string<Char>(*(val.value_.string_value_));
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -162,14 +162,14 @@ template <class Char>
 basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
-    value_.string_value_ = new json_string<Char>(s);
+    value_.string_value_ = new std::basic_string<Char>(s);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const Char* s)
 {
     type_ = string_t;
-    value_.string_value_ = new json_string<Char>(s);
+    value_.string_value_ = new std::basic_string<Char>(s);
 }
 
 template <class Char>
@@ -414,7 +414,7 @@ void basic_json<Char>::serialize(StreamWriter& stream_writer) const
     switch (type_)
     {
     case string_t:
-        stream_writer.value(value_.string_value_->str_);
+        stream_writer.value(*(value_.string_value_));
         break;
     case double_t:
         stream_writer.value(value_.double_value_);
@@ -769,7 +769,7 @@ std::basic_string<Char> basic_json<Char>::as_string() const
     switch (type_)
     {
     case string_t:
-        return value_.string_value_->str_;
+        return *(value_.string_value_);
     default:
         return to_string();
     }

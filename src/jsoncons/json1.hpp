@@ -438,7 +438,7 @@ private:
         bool bool_value_;
         json_object<Char>* object_;
         json_array<Char>* array_;
-        json_string<Char>* string_value_;
+        std::basic_string<Char>* string_value_;
     } value_;
 };
 
