@@ -7,6 +7,14 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.14
+------------
+
+Renamed `json_stream_writer` to `json_serializer`, and 
+`json_stream_listener` to `json_content_handler`
+
+Changed indenting so object and array members start on new line.
+
 Release 0.13
 ------------
 
