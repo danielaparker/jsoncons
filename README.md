@@ -10,6 +10,8 @@ It has been tested with MS Visual C++ 10, SP1
 Release 0.14
 ------------
 
+Added `pretty_print` class
+
 Renamed `json_stream_writer` to `json_serializer`, and 
 `json_stream_listener` to `json_content_handler`
 

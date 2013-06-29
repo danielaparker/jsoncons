@@ -407,53 +407,53 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 }
 
 template <class Char>
-template <class StreamWriter>
-void basic_json<Char>::serialize(StreamWriter& stream_writer) const
+template <class Serializer>
+void basic_json<Char>::serialize(Serializer& serializer) const
 {
     switch (type_)
     {
     case string_t:
-        stream_writer.value(*(value_.string_value_));
+        serializer.value(*(value_.string_value_));
         break;
     case double_t:
-        stream_writer.value(value_.double_value_);
+        serializer.value(value_.double_value_);
         break;
     case longlong_t:
-        stream_writer.value(value_.longlong_value_);
+        serializer.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        stream_writer.value(value_.ulonglong_value_);
+        serializer.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        stream_writer.value(value_.bool_value_);
+        serializer.value(value_.bool_value_);
         break;
     case null_t:
-        stream_writer.null();
+        serializer.null();
         break;
     case object_t:
 		{
-        stream_writer.begin_object();
+        serializer.begin_object();
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            stream_writer.begin_member(it->first);
-            it->second.serialize(stream_writer);
-            stream_writer.end_member();
+            serializer.begin_member(it->first);
+            it->second.serialize(serializer);
+            serializer.end_member();
         }
-        stream_writer.end_object();
+        serializer.end_object();
 		}
         break;
     case array_t:
 		{
-        stream_writer.begin_array();
+        serializer.begin_array();
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            stream_writer.begin_element();
-            it->serialize(stream_writer);
-            stream_writer.end_element();
+            serializer.begin_element();
+            it->serialize(serializer);
+            serializer.end_element();
         }
-        stream_writer.end_array();
+        serializer.end_array();
 		}
         break;
     default:
