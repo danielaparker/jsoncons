@@ -12,6 +12,7 @@
 using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
+using jsoncons::pretty_print;
 using jsoncons::wjson;
 using jsoncons::basic_json_parser;
 using std::string;
@@ -29,9 +30,10 @@ BOOST_AUTO_TEST_CASE(test_construction_from_file)
 {
     json val = json::parse_file("../../../examples/members.json");
 
-    output_format format(true);
-    val.to_stream(std::cout,format);
-	std::cout << std::endl;
+    //output_format format(true);
+    //val.to_stream(std::cout,format);
+
+	std::cout << pretty_print(val) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_construction_in_code)

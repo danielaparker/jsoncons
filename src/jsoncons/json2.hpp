@@ -781,6 +781,39 @@ std::ostream& operator<<(std::ostream& os, const basic_json<Char>& o)
     return os;
 }
 
+template <class Char>
+class basic_pretty_print
+{
+public:
+    basic_pretty_print(basic_json<Char>& o)
+        : o_(o)
+    {
+        format_.indenting(true);
+    }
+    basic_pretty_print(basic_json<Char>& o,
+                       const basic_output_format<Char>& format)
+        : o_(o), format_(format_)
+    {
+    }
+
+    void to_stream(std::ostream& os) const
+    {
+        o_.to_stream(os,format_);
+    }
+
+    basic_json<Char>& o_;
+    basic_output_format<Char> format_;
+};
+
+template <class Char>
+std::ostream& operator<<(std::ostream& os, const basic_pretty_print<Char>& o)
+{
+    o.to_stream(os);
+    return os;
+}
+
+typedef basic_pretty_print<char> pretty_print;
+
 inline 
 char to_hex_character(unsigned char c)
 {
