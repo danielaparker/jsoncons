@@ -102,6 +102,11 @@ public:
         os_.put('\"');
     }
 
+    void userdata(const base_userdata& value)
+    {
+        value.to_stream(os_);
+    }
+
     void value(double value)
     {
         if (is_nan(value) && format_.replace_nan())
@@ -185,20 +190,7 @@ public:
         stack_.pop_back();
         os_.put(']');
     }
-
-    void restore()
-    {
-        os_.precision(original_precision_);
-        os_.flags(original_format_flags_);
-    }
-private:
-
-    void init()
-    {
-        os_.setf(format_.set_format_flags());
-        os_.unsetf(format_.unset_format_flags());
-        os_.precision(format_.precision());
-    }
+protected:
 
     void indent()
     {
@@ -225,6 +217,20 @@ private:
     int indent_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
+private:
+
+    void init()
+    {
+        os_.setf(format_.set_format_flags());
+        os_.unsetf(format_.unset_format_flags());
+        os_.precision(format_.precision());
+    }
+
+    void restore()
+    {
+        os_.precision(original_precision_);
+        os_.flags(original_format_flags_);
+    }
 };
 
 typedef basic_json_serializer<char> json_serializer;

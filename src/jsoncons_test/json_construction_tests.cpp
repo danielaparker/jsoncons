@@ -2,6 +2,8 @@
 // Distributed under Boost license
 
 #include <boost/test/unit_test.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
 #include <sstream>
@@ -16,6 +18,7 @@ using jsoncons::pretty_print;
 using jsoncons::wjson;
 using jsoncons::basic_json_parser;
 using std::string;
+using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
@@ -198,5 +201,101 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     std::cout << "size string=" << sizeof(string) << std::endl;
     std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
     std::cout << "size map=" << sizeof(std::vector<std::pair<std::string,json>>) << std::endl;
+}
+
+class my_json_serializer : public json_serializer
+{
+public:
+	my_json_serializer (std::ostream& os)
+		: json_serializer(os)
+	{
+	}
+
+    using json_serializer::userdata;
+
+    void userdata(const jsoncons::userdata<matrix<double>>& o)
+    {
+        const matrix<double>& A = o.value_;
+
+        os_ << "[";
+        for (size_t i = 0; i < A.size1(); ++i)
+        {
+            if (i > 0)
+            {
+                os_ << ',';
+            }
+            os_ << "[";
+            for (size_t j = 0; j < A.size2(); ++j)
+            {
+                if (j > 0)
+                {
+                    os_ << ',';
+                }
+                os_ << A(i,j);
+            }
+            os_ << "]";
+        }
+        os_ << "]";
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, const jsoncons::userdata<matrix<double>>& o)
+{
+    const matrix<double>& A = o.value_;
+
+    os << "[";
+    for (size_t i = 0; i < A.size1(); ++i)
+    {
+        if (i > 0)
+        {
+            os << ',';
+        }
+        os << "[";
+        for (size_t j = 0; j < A.size2(); ++j)
+        {
+            if (j > 0)
+            {
+                os << ',';
+            }
+            os << A(i,j);
+        }
+        os << "]";
+    }
+    os << "]";
+    return os;
+}
+
+
+BOOST_AUTO_TEST_CASE(test_userdata)
+{
+    std::cout << "Check 1" << std::endl;
+    json obj(json::an_object);
+    matrix<double> A(2,2);
+    A(0,0) = 1;
+    A(0,1) = 2;
+    A(1,0) = 3;
+    A(1,1) = 4;
+
+    std::cout << A << std::endl;
+
+    obj.set_userdata("mydata",A);
+
+    obj.serialize(json_serializer(std::cout));
+    std::cout << std::endl;
+
+    matrix<double> B = obj["mydata"].as_userdata<matrix<double>>();
+
+    for (size_t i = 0; i < B.size1(); ++i)
+    {
+        for (size_t j = 0; j < B.size2(); ++j)
+        {
+            if (j > 0)
+            {
+                std::cout << ',';
+            }
+            std::cout << B(i,j);
+        }
+        std::cout << '\n';
+    }
 }
 

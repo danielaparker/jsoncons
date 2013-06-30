@@ -14,6 +14,45 @@
 
 namespace jsoncons {
 
+class base_userdata
+{
+public:
+    virtual ~base_userdata()
+    {
+    }
+    template <class Serializer>
+    void serialize(Serializer& serializer) const;
+
+    virtual void to_stream(std::ostream& os) const = 0;
+
+    virtual base_userdata* clone() const = 0;
+};
+
+template <class T>
+class userdata : public base_userdata
+{
+public:
+    userdata(const T& value)
+        : value_(value)
+    {
+    }
+    userdata(T&& value)
+        : value_(value)
+    {
+    }
+    virtual base_userdata* clone() const
+    {
+        return new userdata<T>(value_) ;
+    }
+
+    virtual void to_stream(std::ostream& os) const
+    {
+        os << "null";
+    }
+
+    T value_;
+};
+
 template <class Char>
 class json_object;
 
@@ -33,7 +72,7 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t};
+    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,userdata_t};
 
     static const basic_json<Char> an_object;
     static const basic_json<Char> an_array;
@@ -145,6 +184,12 @@ public:
             return val_.get(name_).as_ulonglong();
         }
 
+        template <class T>
+        const T& as_userdata() const
+        {
+            return val_.get(name_).as_userdata<T>();
+        }
+
         operator basic_json&()
         {
             return val_.get(name_);
@@ -208,6 +253,18 @@ public:
             return val_.get(name_).set_member(name,value);
         }
 
+        template <class T>
+        void set_userdata(const std::basic_string<Char>& name, const T& value)
+        {
+            return val_.get(name_).set_userdata(name,value);
+        }
+
+        template <class T>
+        void set_userdata(const std::basic_string<Char>& name, T&& value)
+        {
+            return val_.get(name_).set_userdata(name,value);
+        }
+
         void push_back(const basic_json<Char>& value)
         {
             val_.get(name_).push_back(value);
@@ -248,7 +305,7 @@ public:
             : val_(proxy.val_), name_(proxy.name_)
         {
         }
-        proxy& operator = (const proxy& other) {/* do nothing */}
+        proxy& operator = (const proxy& other); // noop
 
         proxy(basic_json<Char>& var, 
               const std::basic_string<Char>& name);
@@ -296,6 +353,8 @@ public:
     explicit basic_json(json_object<Char>* var);
 
     explicit basic_json(json_array<Char>* var);
+
+    explicit basic_json(base_userdata* var);
 
     ~basic_json();
 
@@ -396,6 +455,9 @@ public:
 
     unsigned long long as_ulonglong() const;
 
+    template <class T>
+    const T& as_userdata() const;
+
     std::basic_string<Char> as_string() const;
 
     void swap(basic_json<Char>& o) throw();
@@ -415,6 +477,12 @@ public:
     void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
     void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+
+    template <class T>
+    void set_userdata(const std::basic_string<Char>& name, const T& value);
+
+    template <class T>
+    void set_userdata(std::basic_string<Char>&& name, T&& value);
 
     void push_back(const basic_json<Char>& value);
 
@@ -439,6 +507,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
+        base_userdata* userdata_;
     } value_;
 };
 

@@ -23,6 +23,12 @@
 
 namespace jsoncons {
 
+template <class Serializer>
+void base_userdata::serialize(Serializer& serializer) const
+{
+    serializer.userdata(*this);
+}
+
 // proxy
 template <class Char>
 basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Char>& name)
@@ -73,6 +79,9 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     case object_t:
         value_.object_ = val.value_.object_->clone();
         break;
+    case userdata_t:
+        value_.userdata_ = val.value_.userdata_->clone();
+        break;
     default:
         // throw
 		break;
@@ -99,6 +108,13 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 {
     type_ = array_t;
     value_.array_ = var;
+}
+
+template <class Char>
+basic_json<Char>::basic_json(base_userdata* var)
+{
+    type_ = userdata_t;
+    value_.userdata_ = var;
 }
 
 template <class Char>
@@ -190,6 +206,9 @@ basic_json<Char>::~basic_json()
         break;
     case object_t:
         delete value_.object_;
+		break;
+    case userdata_t:
+        delete value_.userdata_;
         break;
     }
 }
@@ -314,6 +333,38 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
     {
     case object_t:
         value_.object_->set_member(name,value);
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T& value)
+{
+    switch (type_)
+    {
+    case object_t:
+        value_.object_->set_member(name,basic_json<Char>(new userdata<T>(value)));
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
+{
+    switch (type_)
+    {
+    case object_t:
+        value_.object_->set_member(name,basic_json<Char>(new userdata<T>(value)));
         break;
     default:
         {
@@ -455,6 +506,9 @@ void basic_json<Char>::serialize(Serializer& serializer) const
         }
         serializer.end_array();
 		}
+        break;
+    case userdata_t:
+        value_.userdata_->serialize(serializer);
         break;
     default:
         // throw
@@ -763,6 +817,19 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 }
 
 template <class Char>
+template <class T>
+const T& basic_json<Char>::as_userdata() const
+{
+    switch (type_)
+    {
+    case userdata_t:
+        return static_cast<const userdata<T>*>(value_.userdata_)->value_;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not userdata");
+    }
+}
+
+template <class Char>
 std::basic_string<Char> basic_json<Char>::as_string() const
 {
     switch (type_)
@@ -803,6 +870,9 @@ public:
 
     basic_json<Char>& o_;
     basic_output_format<Char> format_;
+private:
+    basic_pretty_print();
+    basic_pretty_print(const basic_pretty_print& o);
 };
 
 template <class Char>

@@ -97,8 +97,8 @@ public:
 #endif
     }
 
-    template<class StreamListener>
-    void parse(StreamListener& handler);
+    template<class ContentHandler>
+    void parse(ContentHandler& handler);
 
     size_t buffer_capacity() const
     {
@@ -113,8 +113,8 @@ public:
 private:
 
     void skip_separator();
-    template<class StreamListener>
-    void parse_number(Char c, StreamListener& handler);
+    template<class ContentHandler>
+    void parse_number(Char c, ContentHandler& handler);
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
@@ -282,8 +282,8 @@ unsigned long long string_to_ulonglong(const char* s, size_t length, const unsig
 }
 
 template<class Char>
-template<class StreamListener>
-void basic_json_parser<Char>::parse(StreamListener& handler)
+template<class ContentHandler>
+void basic_json_parser<Char>::parse(ContentHandler& handler)
 {
     line_ = 1;
     column_ = 0;
@@ -404,6 +404,7 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                 else
                 {
                     handler.end_json();
+                    return;
                 }
                 break;
             case end_array:
@@ -428,6 +429,7 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
                 else
                 {
                     handler.end_json();
+                    return;
                 }
                 break;
             case 't':
@@ -480,10 +482,7 @@ void basic_json_parser<Char>::parse(StreamListener& handler)
         }
     }
 
-    if (stack_.size() > 0)
-    {
-        JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_, column_);
-    }
+    JSONCONS_THROW_PARSER_EXCEPTION("End of file", line_, column_);
 }
 
 template<class Char>
@@ -610,8 +609,8 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
 }
 
 template<class Char>
-template<class StreamListener>
-void basic_json_parser<Char>::parse_number(Char c, StreamListener& handler)
+template<class ContentHandler>
+void basic_json_parser<Char>::parse_number(Char c, ContentHandler& handler)
 {
     number_buffer_.clear();
     bool has_frac_or_exp = false;
