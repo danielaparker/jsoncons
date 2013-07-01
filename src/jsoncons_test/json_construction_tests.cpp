@@ -206,9 +206,9 @@ namespace jsoncons
 {
     template <typename Char>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, 
-                                         const data_envelope<Char,matrix<double>>& env)
+                                         const data_wrapper<Char,matrix<double>>& w)
     {
-        const matrix<double>& A = env.data;
+        const matrix<double>& A = w.data;
 
         os << '[';
         for (size_t i = 0; i < A.size1(); ++i)

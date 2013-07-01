@@ -341,7 +341,7 @@ void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_envelope<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -357,7 +357,7 @@ void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_envelope<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -812,7 +812,7 @@ const T& basic_json<Char>::userdata() const
     switch (type_)
     {
     case userdata_t:
-        return static_cast<const data_envelope<Char,T>*>(value_.userdata_)->data;
+        return static_cast<const data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

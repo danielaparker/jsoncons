@@ -37,16 +37,16 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_us
 }
 
 template <class Char, class T>
-class data_envelope : public base_userdata<Char>
+class data_wrapper : public base_userdata<Char>
 {
 public:
-    data_envelope(const T& value)
+    data_wrapper(const T& value)
         : data(value)
     {
     }
     virtual base_userdata<Char>* clone() const
     {
-        return new data_envelope<Char,T>(data) ;
+        return new data_wrapper<Char,T>(data) ;
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os) const
