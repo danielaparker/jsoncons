@@ -187,9 +187,15 @@ public:
         }
 
         template <class T>
-        const T& userdata() const
+        const T& get_userdata() const
         {
-            return val_.get(name_).userdata<T>();
+            return val_.get(name_).get_userdata<T>();
+        }
+
+        template <class T>
+        T& get_userdata() 
+        {
+            return val_.get(name_).get_userdata<T>();
         }
 
         operator basic_json&()
@@ -458,7 +464,10 @@ public:
     unsigned long long as_ulonglong() const;
 
     template <class T>
-    const T& userdata() const;
+    const T& get_userdata() const;
+
+    template <class T>
+    T& get_userdata();
 
     std::basic_string<Char> as_string() const;
 

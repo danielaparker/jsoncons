@@ -250,8 +250,8 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     obj.serialize(json_serializer(std::cout));
     std::cout << std::endl;
 
-    matrix<double> B = obj["mydata"].userdata<matrix<double>>();
-
+    matrix<double>& B = obj["mydata"].get_userdata<matrix<double>>();
+	
     for (size_t i = 0; i < B.size1(); ++i)
     {
         for (size_t j = 0; j < B.size2(); ++j)
@@ -264,5 +264,15 @@ BOOST_AUTO_TEST_CASE(test_userdata)
         }
         std::cout << '\n';
     }
+    
+    for (size_t i = 0; i < B.size1(); ++i)
+    {
+        for (size_t j = 0; j < B.size2(); ++j)
+        {
+            B(i,j) += 1;
+        }
+    }
+
+    std::cout << obj << std::endl;
 }
 

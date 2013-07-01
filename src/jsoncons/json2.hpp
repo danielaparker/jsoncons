@@ -807,12 +807,25 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 
 template <class Char>
 template <class T>
-const T& basic_json<Char>::userdata() const
+const T& basic_json<Char>::get_userdata() const
 {
     switch (type_)
     {
     case userdata_t:
         return static_cast<const data_wrapper<Char,T>*>(value_.userdata_)->data;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not userdata");
+    }
+}
+
+template <class Char>
+template <class T>
+T& basic_json<Char>::get_userdata() 
+{
+    switch (type_)
+    {
+    case userdata_t:
+        return static_cast<data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
