@@ -12,10 +12,18 @@ Release 0.14
 
 Added `pretty_print` class
 
-Renamed `json_stream_writer` to `json_serializer`, and 
-`json_stream_listener` to `json_content_handler`
+Renamed `json_stream_writer` to `json_serializer`, 
+implements pure virtual class `json_out_stream`
+ 
+Renamed `json_stream_listener` to `json_deserializer`
+implements pure virtual class `json_in_stream`
+
+Renamed `json_parser` to `json_reader`, `parse` to `read`.
 
 Changed indenting so object and array members start on new line.
+
+Added support for storing user data in `json` object, and
+serializing to JSON.
 
 Release 0.13
 ------------
