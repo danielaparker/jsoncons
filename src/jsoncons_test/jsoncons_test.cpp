@@ -4,13 +4,13 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer_impl.hpp"
+#include "jsoncons/json_serializer.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_serializer_impl;
+using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer_impl serializer(os,output_format(true));
+    json_serializer serializer(os,output_format(true));
     o.serialize(serializer);
     std::cout << os.str() << std::endl;
 }
@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::string john_food("spaghetti");
 
     output_format format(true);
-    json_serializer_impl writer(os, format);
+    json_serializer writer(os, format);
 
     std::clock_t t = std::clock();
 

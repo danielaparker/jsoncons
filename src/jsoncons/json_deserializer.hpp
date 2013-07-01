@@ -1,8 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSON_HANDLER_IMPL_HPP
-#define JSONCONS_JSON_HANDLER_IMPL_HPP
+#ifndef JSONCONS_JSON_DESERIALIZER_HPP
+#define JSONCONS_JSON_DESERIALIZER_HPP
 
 #include <string>
 #include <sstream>
@@ -11,12 +11,12 @@
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
-#include "jsoncons/json_handler.hpp"
+#include "jsoncons/json_in_stream.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_handler_impl : public basic_json_handler<Char>
+class basic_json_deserializer : public basic_json_in_stream<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -190,7 +190,7 @@ public:
         }
     }
 
-    virtual void null()
+    virtual void null_value()
     {
         basic_json<Char> val;
         if (stack_.back().is_object())
@@ -212,7 +212,7 @@ private:
     std::vector<stack_item> stack_;
 };
 
-typedef basic_json_handler_impl<char> json_handler_impl;
+typedef basic_json_deserializer<char> json_deserializer;
 
 }
 

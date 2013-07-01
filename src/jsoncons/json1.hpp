@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "jsoncons/json_exception.hpp"
-#include "jsoncons/json_serializer.hpp"
+#include "jsoncons/json_out_stream.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 using boost::numeric::ublas::matrix;
 
@@ -501,7 +501,7 @@ public:
         return type_;
     }
 
-    void serialize(basic_json_serializer<Char>& serializer) const;
+    void serialize(basic_json_out_stream<Char>& serializer) const;
 
 private:
     value_type type_;

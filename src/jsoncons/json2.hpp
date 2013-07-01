@@ -17,8 +17,8 @@
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_reader.hpp"
-#include "jsoncons/json_handler_impl.hpp"
-#include "jsoncons/json_serializer_impl.hpp"
+#include "jsoncons/json_deserializer.hpp"
+#include "jsoncons/json_serializer.hpp"
 
 namespace jsoncons {
 
@@ -438,7 +438,7 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    serialize(basic_json_serializer_impl<Char>(os)); 
+    serialize(basic_json_serializer<Char>(os)); 
     return os.str();
 }
 
@@ -446,12 +446,12 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Char>& format) const
 {
     std::basic_ostringstream<Char> os;
-    serialize(basic_json_serializer_impl<Char>(os,format)); 
+    serialize(basic_json_serializer<Char>(os,format)); 
     return os.str();
 }
 
 template <class Char>
-void basic_json<Char>::serialize(basic_json_serializer<Char>& serializer) const
+void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
 {
     switch (type_)
     {
@@ -471,7 +471,7 @@ void basic_json<Char>::serialize(basic_json_serializer<Char>& serializer) const
         serializer.value(value_.bool_value_);
         break;
     case null_t:
-        serializer.null();
+        serializer.null_value();
         break;
     case object_t:
 		{
@@ -500,7 +500,7 @@ void basic_json<Char>::serialize(basic_json_serializer<Char>& serializer) const
 		}
         break;
     case userdata_t:
-        serializer.userdata(*(value_.userdata_));
+        serializer.value(*(value_.userdata_));
         break;
     default:
         // throw
@@ -511,13 +511,13 @@ void basic_json<Char>::serialize(basic_json_serializer<Char>& serializer) const
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
-    serialize(basic_json_serializer_impl<Char>(os)); 
+    serialize(basic_json_serializer<Char>(os)); 
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
 {
-    serialize(basic_json_serializer_impl<Char>(os,format));
+    serialize(basic_json_serializer<Char>(os,format));
 }
 
 template <class Char>
@@ -532,7 +532,7 @@ const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
-    basic_json_handler_impl<Char> handler;
+    basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
     basic_json<Char> val;
@@ -544,7 +544,7 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    basic_json_handler_impl<Char> handler;
+    basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
     basic_json<Char> val;
@@ -571,7 +571,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
         throw json_exception_1<char>("File %s is empty", filename);
     }
 
-    basic_json_handler_impl<Char> handler;
+    basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.buffer_capacity(length);
     parser.read();

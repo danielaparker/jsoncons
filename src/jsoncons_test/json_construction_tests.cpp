@@ -5,13 +5,13 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer_impl.hpp"
+#include "jsoncons/json_serializer.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_serializer_impl;
+using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::pretty_print;
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(test_userdata)
 
     obj.set_userdata("mydata",A);
 
-    obj.serialize(json_serializer_impl(std::cout));
+    obj.serialize(json_serializer(std::cout));
     std::cout << std::endl;
 
     matrix<double> B = obj["mydata"].userdata<matrix<double>>();
