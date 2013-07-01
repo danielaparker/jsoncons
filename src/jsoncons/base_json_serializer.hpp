@@ -9,7 +9,7 @@
 namespace jsoncons {
 
 template <class Char>
-class base_userdata;
+class base_data_box;
 
 template <class Char>
 class base_json_serializer
@@ -26,7 +26,7 @@ public:
 
     virtual void value(const std::basic_string<Char>& value) = 0;
 
-    virtual void userdata(const base_userdata<Char>& value) = 0;
+    virtual void userdata(const base_data_box<Char>& value) = 0;
 
     virtual void value(double value) = 0;
 

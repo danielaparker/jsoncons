@@ -105,7 +105,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(base_userdata<Char>* var)
+basic_json<Char>::basic_json(base_data_box<Char>* var)
 {
     type_ = userdata_t;
     value_.userdata_ = var;
@@ -342,7 +342,7 @@ void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new userdata<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_box<Char,T>(value)));
         break;
     default:
         {
@@ -358,7 +358,7 @@ void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new userdata<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_box<Char,T>(value)));
         break;
     default:
         {
@@ -533,9 +533,9 @@ const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
-    basic_json_reader<Char> parser(is);
     basic_json_content_handler<Char> handler;
-    parser.read(handler);
+    basic_json_reader<Char> parser(is,handler);
+    parser.read();
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -545,9 +545,9 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    basic_json_reader<Char> parser(is);
     basic_json_content_handler<Char> handler;
-    parser.read(handler);
+    basic_json_reader<Char> parser(is,handler);
+    parser.read();
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -572,10 +572,10 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
         throw json_exception_1<char>("File %s is empty", filename);
     }
 
-    basic_json_reader<Char> parser(is);
-    parser.buffer_capacity(length);
     basic_json_content_handler<Char> handler;
-    parser.read(handler);
+    basic_json_reader<Char> parser(is,handler);
+    parser.buffer_capacity(length);
+    parser.read();
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -811,12 +811,12 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 
 template <class Char>
 template <class T>
-const T& basic_json<Char>::as_userdata() const
+const T& basic_json<Char>::userdata() const
 {
     switch (type_)
     {
     case userdata_t:
-        return static_cast<const userdata<Char,T>*>(value_.userdata_)->value_;
+        return static_cast<const data_box<Char,T>*>(value_.userdata_)->value_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/base_json_content_handler.hpp"
 
 namespace jsoncons {
 
@@ -81,8 +82,9 @@ public:
     /*!
       \param is The input stream to read from
     */
-    basic_json_reader(std::basic_istream<Char>& is)
-       : is_(is), input_buffer_(0),
+    basic_json_reader(std::basic_istream<Char>& is,
+                      base_json_content_handler<Char>& handler)
+       : is_(is), handler_(handler), input_buffer_(0), 
          buffer_position_(0), buffer_length_(0)
     {
 #ifdef JSONCONS_BUFFER_READ
@@ -97,8 +99,7 @@ public:
 #endif
     }
 
-    template<class ContentHandler>
-    void read(ContentHandler& handler);
+    void read();
 
     size_t buffer_capacity() const
     {
@@ -113,8 +114,7 @@ public:
 private:
 
     void skip_separator();
-    template<class ContentHandler>
-    void parse_number(Char c, ContentHandler& handler);
+    void parse_number(Char c);
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
@@ -253,6 +253,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
+    base_json_content_handler<Char>& handler_;
 };
 
 inline
@@ -282,8 +283,7 @@ unsigned long long string_to_ulonglong(const char* s, size_t length, const unsig
 }
 
 template<class Char>
-template<class ContentHandler>
-void basic_json_reader<Char>::read(ContentHandler& handler)
+void basic_json_reader<Char>::read()
 {
     line_ = 1;
     column_ = 0;
@@ -335,18 +335,18 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
         case begin_object:
             if (stack_.size() == 0)
             {
-                handler.begin_json();
+                handler_.begin_json();
             }
             stack_.push_back(stack_item(object_t));
-            handler.begin_object();
+            handler_.begin_object();
             break;
         case begin_array:
             if (stack_.size() == 0)
             {
-                handler.begin_json();
+                handler_.begin_json();
             }
             stack_.push_back(stack_item(array_t));
-            handler.begin_array();
+            handler_.begin_array();
             break;
         }
         if (stack_.size() > 0)
@@ -369,13 +369,13 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                     parse_string();
                     if (stack_.back().is_object() && !stack_.back().read_name_)
                     {
-                        handler.name(string_buffer_);
+                        handler_.name(string_buffer_);
                         skip_separator();
                         stack_.back().read_name_ = true;
                     }
                     else
                     {
-                        handler.value(string_buffer_);
+                        handler_.value(string_buffer_);
                         stack_.back().comma_ = false;
                         stack_.back().read_name_ = false;
                         ++stack_.back().count_;
@@ -392,7 +392,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                     {
                         JSONCONS_THROW_PARSE_EXCEPTION("Unexpected comma", line_, column_);
                     }
-                    handler.end_object();
+                    handler_.end_object();
                     stack_.pop_back();
                 }
                 if (stack_.size() > 0)
@@ -403,7 +403,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                 }
                 else
                 {
-                    handler.end_json();
+                    handler_.end_json();
                     return;
                 }
                 break;
@@ -417,7 +417,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                     {
                         JSONCONS_THROW_PARSE_EXCEPTION("Unexpected comma", line_, column_);
                     }
-                    handler.end_array();
+                    handler_.end_array();
                     stack_.pop_back();
                 }
                 if (stack_.size() > 0)
@@ -428,7 +428,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                 }
                 else
                 {
-                    handler.end_json();
+                    handler_.end_json();
                     return;
                 }
                 break;
@@ -437,7 +437,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                 {
                     JSONCONS_THROW_PARSE_EXCEPTION("Invalid value", line_, column_);
                 }
-                handler.value(true);
+                handler_.value(true);
                 stack_.back().comma_ = false;
                 stack_.back().read_name_ = false;
                 ++stack_.back().count_;
@@ -447,7 +447,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                 {
                     JSONCONS_THROW_PARSE_EXCEPTION("Invalid value", line_, column_);
                 }
-                handler.value(false);
+                handler_.value(false);
                 stack_.back().comma_ = false;
                 stack_.back().read_name_ = false;
                 ++stack_.back().count_;
@@ -457,7 +457,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
                 {
                     JSONCONS_THROW_PARSE_EXCEPTION("Invalid value", line_, column_);
                 }
-                handler.null();
+                handler_.null();
                 stack_.back().comma_ = false;
                 stack_.back().read_name_ = false;
                 ++stack_.back().count_;
@@ -473,7 +473,7 @@ void basic_json_reader<Char>::read(ContentHandler& handler)
             case '8':
             case '9':
             case '-':
-                parse_number(c, handler);
+                parse_number(c);
                 stack_.back().read_name_ = false;
                 stack_.back().comma_ = false;
                 ++stack_.back().count_;
@@ -522,7 +522,7 @@ void basic_json_reader<Char>::skip_separator()
             }
             break;
         case name_separator:
-            //parse_value(handler);
+            //parse_value(handler_);
             return;
         }
     }
@@ -609,8 +609,7 @@ bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, cha
 }
 
 template<class Char>
-template<class ContentHandler>
-void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
+void basic_json_reader<Char>::parse_number(Char c)
 {
     number_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -664,14 +663,14 @@ void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
                     }
                     if (has_neg)
                         d = -d;
-                    handler.value(d);
+                    handler_.value(d);
                 }
                 else if (has_neg)
                 {
                     try
                     {
                         long long d = static_cast<long long>(string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<long long>::max()));
-                        handler.value(-d);
+                        handler_.value(-d);
                     }
                     catch (const std::exception&)
                     {
@@ -684,7 +683,7 @@ void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
                         }
                         if (has_neg)
                             d = -d;
-                        handler.value(d);
+                        handler_.value(d);
                     }
                 }
                 else 
@@ -692,7 +691,7 @@ void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
                     try
                     {
                         unsigned long long d = string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<unsigned long long>::max());
-                        handler.value(d);
+                        handler_.value(d);
                     }
                     catch (const std::exception&)
                     {
@@ -705,7 +704,7 @@ void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
                         }
                         if (has_neg)
                             d = -d;
-                        handler.value(d);
+                        handler_.value(d);
                     }
                 }
                 done = true;

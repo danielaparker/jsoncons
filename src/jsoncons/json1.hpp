@@ -18,40 +18,40 @@ using boost::numeric::ublas::matrix;
 namespace jsoncons {
 
 template <class Char>
-class base_userdata
+class base_data_box
 {
 public:
-    virtual ~base_userdata()
+    virtual ~base_data_box()
     {
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os) const = 0;
 
-    virtual base_userdata<Char>* clone() const = 0;
+    virtual base_data_box<Char>* clone() const = 0;
 };
 
 template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_userdata<Char>& o)
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_data_box<Char>& o)
 {
     os << json_char_traits<Char>::null_literal();
     return os;
 }
 
 template <class Char, class T>
-class userdata : public base_userdata<Char>
+class data_box : public base_data_box<Char>
 {
 public:
-    userdata(const T& value)
+    data_box(const T& value)
         : value_(value)
     {
     }
-    userdata(T&& value)
+    data_box(T&& value)
         : value_(value)
     {
     }
-    virtual base_userdata<Char>* clone() const
+    virtual base_data_box<Char>* clone() const
     {
-        return new userdata<Char,T>(value_) ;
+        return new data_box<Char,T>(value_) ;
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os) const
@@ -194,9 +194,9 @@ public:
         }
 
         template <class T>
-        const T& as_userdata() const
+        const T& userdata() const
         {
-            return val_.get(name_).as_userdata<T>();
+            return val_.get(name_).userdata<T>();
         }
 
         operator basic_json&()
@@ -363,7 +363,7 @@ public:
 
     explicit basic_json(json_array<Char>* var);
 
-    explicit basic_json(base_userdata<Char>* var);
+    explicit basic_json(base_data_box<Char>* var);
 
     ~basic_json();
 
@@ -465,7 +465,7 @@ public:
     unsigned long long as_ulonglong() const;
 
     template <class T>
-    const T& as_userdata() const;
+    const T& userdata() const;
 
     std::basic_string<Char> as_string() const;
 
@@ -515,7 +515,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
-        base_userdata<Char>* userdata_;
+        base_data_box<Char>* userdata_;
     } value_;
 };
 

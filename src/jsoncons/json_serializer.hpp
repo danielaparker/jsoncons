@@ -103,7 +103,7 @@ public:
         os_.put('\"');
     }
 
-    virtual void userdata(const base_userdata<Char>& value)
+    virtual void userdata(const base_data_box<Char>& value)
     {
         value.to_stream(os_);
     }

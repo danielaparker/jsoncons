@@ -206,7 +206,7 @@ namespace jsoncons
 {
     template <typename Char>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, 
-                                         const userdata<Char,matrix<double>>& o)
+                                         const data_box<Char,matrix<double>>& o)
     {
         const matrix<double>& A = o.value_;
 
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     obj.serialize(json_serializer(std::cout));
     std::cout << std::endl;
 
-    matrix<double> B = obj["mydata"].as_userdata<matrix<double>>();
+    matrix<double> B = obj["mydata"].userdata<matrix<double>>();
 
     for (size_t i = 0; i < B.size1(); ++i)
     {

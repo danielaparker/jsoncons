@@ -16,7 +16,7 @@
 namespace jsoncons {
 
 template <class Char>
-class basic_json_content_handler
+class basic_json_content_handler : public base_json_content_handler<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -54,20 +54,20 @@ class basic_json_content_handler
     };
 
 public:
-    void begin_json()
+    virtual void begin_json()
     {
     }
 
-    void end_json()
+    virtual void end_json()
     {
     }
 
-    void begin_object()
+    virtual void begin_object()
     {
         stack_.push_back(stack_item(object_t));
     }
 
-    void end_object()
+    virtual void end_object()
     {
 		json_object<Char>* var = stack_.back().structure_.object_;
         var->sort_members();
@@ -90,12 +90,12 @@ public:
         }
     }
 
-    void begin_array()
+    virtual void begin_array()
     {
         stack_.push_back(stack_item(array_t));
     }
 
-    void end_array()
+    virtual void end_array()
     {
         json_array<Char>* var = stack_.back().structure_.array_;
         stack_.pop_back();
@@ -118,12 +118,12 @@ public:
         }
     }
 
-    void name(const std::basic_string<Char>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
         stack_.back().name_ = name;
     }
 
-    void value(const std::basic_string<Char>& value)
+    virtual void value(const std::basic_string<Char>& value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -137,7 +137,7 @@ public:
         }
     }
 
-    void value(double value)
+    virtual void value(double value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -151,7 +151,7 @@ public:
         }
     }
 
-    void value(long long value)
+    virtual void value(long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -164,7 +164,7 @@ public:
         }
     }
 
-    void value(unsigned long long value)
+    virtual void value(unsigned long long value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    void value(bool value)
+    virtual void value(bool value)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -190,7 +190,7 @@ public:
         }
     }
 
-    void null()
+    virtual void null()
     {
         basic_json<Char> val;
         if (stack_.back().is_object())
