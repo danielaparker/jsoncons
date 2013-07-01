@@ -11,8 +11,6 @@
 #include <cstring>
 #include "jsoncons/json_exception.hpp"
 #include "jsoncons/json_out_stream.hpp"
-#include <boost/numeric/ublas/matrix.hpp>
-using boost::numeric::ublas::matrix;
 
 namespace jsoncons {
 

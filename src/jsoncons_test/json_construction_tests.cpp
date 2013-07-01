@@ -18,6 +18,7 @@ using jsoncons::pretty_print;
 using jsoncons::wjson;
 using jsoncons::basic_json_reader;
 using std::string;
+using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
@@ -235,7 +236,6 @@ namespace jsoncons
 
 BOOST_AUTO_TEST_CASE(test_userdata)
 {
-    std::cout << "Check 1" << std::endl;
     json obj(json::an_object);
     matrix<double> A(2,2);
     A(0,0) = 1;
