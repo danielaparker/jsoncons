@@ -17,17 +17,11 @@
 #include <new>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_structures.hpp"
-#include "jsoncons/json_parser.hpp"
+#include "jsoncons/json_reader.hpp"
 #include "jsoncons/json_content_handler.hpp"
 #include "jsoncons/json_serializer.hpp"
 
 namespace jsoncons {
-
-template <class Serializer>
-void base_userdata::serialize(Serializer& serializer) const
-{
-    serializer.userdata(*this);
-}
 
 // proxy
 template <class Char>
@@ -111,7 +105,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(base_userdata* var)
+basic_json<Char>::basic_json(base_userdata<Char>* var)
 {
     type_ = userdata_t;
     value_.userdata_ = var;
@@ -348,7 +342,7 @@ void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new userdata<T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new userdata<Char,T>(value)));
         break;
     default:
         {
@@ -364,7 +358,7 @@ void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new userdata<T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new userdata<Char,T>(value)));
         break;
     default:
         {
@@ -458,8 +452,7 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 }
 
 template <class Char>
-template <class Serializer>
-void basic_json<Char>::serialize(Serializer& serializer) const
+void basic_json<Char>::serialize(base_json_serializer<Char>& serializer) const
 {
     switch (type_)
     {
@@ -508,7 +501,7 @@ void basic_json<Char>::serialize(Serializer& serializer) const
 		}
         break;
     case userdata_t:
-        value_.userdata_->serialize(serializer);
+        serializer.userdata(*(value_.userdata_));
         break;
     default:
         // throw
@@ -540,9 +533,9 @@ const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
-    basic_json_parser<Char> parser(is);
+    basic_json_reader<Char> parser(is);
     basic_json_content_handler<Char> handler;
-    parser.parse(handler);
+    parser.read(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -552,9 +545,9 @@ template <class Char>
 basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    basic_json_parser<Char> parser(is);
+    basic_json_reader<Char> parser(is);
     basic_json_content_handler<Char> handler;
-    parser.parse(handler);
+    parser.read(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -579,10 +572,10 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
         throw json_exception_1<char>("File %s is empty", filename);
     }
 
-    basic_json_parser<Char> parser(is);
+    basic_json_reader<Char> parser(is);
     parser.buffer_capacity(length);
     basic_json_content_handler<Char> handler;
-    parser.parse(handler);
+    parser.read(handler);
     basic_json<Char> val;
     handler.swap_root(val);
     return val;
@@ -823,7 +816,7 @@ const T& basic_json<Char>::as_userdata() const
     switch (type_)
     {
     case userdata_t:
-        return static_cast<const userdata<T>*>(value_.userdata_)->value_;
+        return static_cast<const userdata<Char,T>*>(value_.userdata_)->value_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -903,7 +896,9 @@ void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
-    for (auto it = s.begin(); it != s.end(); ++it)
+    auto begin = s.begin();
+    auto end = s.end();
+    for (auto it = begin; it != end; ++it)
     {
         Char c = *it;
         switch (c)
@@ -938,7 +933,7 @@ void escape_string(const std::basic_string<Char>& s,
             if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
             {
                 // convert utf8 to codepoint
-                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(it,s.end());
+                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(it,end);
 
                 os << '\\';
                 os << 'u';

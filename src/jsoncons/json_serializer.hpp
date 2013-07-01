@@ -15,12 +15,13 @@
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/base_json_serializer.hpp"
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_serializer
+class basic_json_serializer : public base_json_serializer<Char>
 {
     struct stack_item
     {
@@ -57,7 +58,7 @@ public:
         restore();
     }
 
-    void begin_member(const std::basic_string<Char>& name)
+    virtual void begin_member(const std::basic_string<Char>& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -73,12 +74,12 @@ public:
         os_.put(':');
     }
 
-    void end_member()
+    virtual void end_member()
     {
         ++stack_.back().count_;
     }
 
-    void begin_element()
+    virtual void begin_element()
     {
         if (stack_.back().count_ > 0)
         {
@@ -90,24 +91,24 @@ public:
         }
     }
 
-    void end_element()
+    virtual void end_element()
     {
         ++stack_.back().count_;
     }
 
-    void value(const std::basic_string<Char>& value)
+    virtual void value(const std::basic_string<Char>& value)
     {
         os_.put('\"');
         escape_string<Char>(value,format_,os_);
         os_.put('\"');
     }
 
-    void userdata(const base_userdata& value)
+    virtual void userdata(const base_userdata<Char>& value)
     {
         value.to_stream(os_);
     }
 
-    void value(double value)
+    virtual void value(double value)
     {
         if (is_nan(value) && format_.replace_nan())
         {
@@ -127,27 +128,27 @@ public:
         }
     }
 
-    void value(long long value)
+    virtual void value(long long value)
     {
         os_  << value;
     }
 
-    void value(unsigned long long value)
+    virtual void value(unsigned long long value)
     {
         os_  << value;
     }
 
-    void value(bool value)
+    virtual void value(bool value)
     {
         os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
     }
 
-    void null()
+    virtual void null()
     {
         os_ << json_char_traits<Char>::null_literal();
     }
 
-    void begin_object()
+    virtual void begin_object()
     {
         if (format_.indenting() && stack_.size() > 0 && stack_.back().is_member())
         {
@@ -158,7 +159,7 @@ public:
         indent();
     }
 
-    void end_object()
+    virtual void end_object()
     {
         unindent();
         if (format_.indenting() && stack_.size() > 0)
@@ -169,7 +170,7 @@ public:
         os_.put('}');
     }
 
-    void begin_array()
+    virtual void begin_array()
     {
         if (format_.indenting() && stack_.size() > 0 && stack_.back().is_member())
         {
@@ -180,7 +181,7 @@ public:
         indent();
     }
 
-    void end_array()
+    virtual void end_array()
     {
         unindent();
         if (format_.indenting() && stack_.size() > 0)

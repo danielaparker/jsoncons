@@ -11,25 +11,34 @@
 #include <cstdlib>
 #include <cstring>
 #include "jsoncons/json_exception.hpp"
+#include "jsoncons/base_json_serializer.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
+using boost::numeric::ublas::matrix;
 
 namespace jsoncons {
 
+template <class Char>
 class base_userdata
 {
 public:
     virtual ~base_userdata()
     {
     }
-    template <class Serializer>
-    void serialize(Serializer& serializer) const;
 
-    virtual void to_stream(std::ostream& os) const = 0;
+    virtual void to_stream(std::basic_ostream<Char>& os) const = 0;
 
-    virtual base_userdata* clone() const = 0;
+    virtual base_userdata<Char>* clone() const = 0;
 };
 
-template <class T>
-class userdata : public base_userdata
+template <class Char>
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_userdata<Char>& o)
+{
+    os << json_char_traits<Char>::null_literal();
+    return os;
+}
+
+template <class Char, class T>
+class userdata : public base_userdata<Char>
 {
 public:
     userdata(const T& value)
@@ -40,14 +49,14 @@ public:
         : value_(value)
     {
     }
-    virtual base_userdata* clone() const
+    virtual base_userdata<Char>* clone() const
     {
-        return new userdata<T>(value_) ;
+        return new userdata<Char,T>(value_) ;
     }
 
-    virtual void to_stream(std::ostream& os) const
+    virtual void to_stream(std::basic_ostream<Char>& os) const
     {
-        os << "null";
+        os << *this;
     }
 
     T value_;
@@ -354,7 +363,7 @@ public:
 
     explicit basic_json(json_array<Char>* var);
 
-    explicit basic_json(base_userdata* var);
+    explicit basic_json(base_userdata<Char>* var);
 
     ~basic_json();
 
@@ -493,8 +502,7 @@ public:
         return type_;
     }
 
-    template <class Serializer>
-    void serialize(Serializer& serializer) const;
+    void serialize(base_json_serializer<Char>& serializer) const;
 
 private:
     value_type type_;
@@ -507,7 +515,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
-        base_userdata* userdata_;
+        base_userdata<Char>* userdata_;
     } value_;
 };
 

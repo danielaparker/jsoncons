@@ -15,12 +15,12 @@
 
 namespace jsoncons {
 
-class json_parser_exception : public std::exception
+class json_parse_exception : public std::exception
 {
 public:
-    json_parser_exception(std::string s,
-                          unsigned long line,
-                          unsigned long column)
+    json_parse_exception(std::string s,
+                         unsigned long line,
+                         unsigned long column)
     {
         std::ostringstream os;
         os << s << " on line " << line << " at column " << column;
@@ -34,13 +34,13 @@ private:
     std::string message_;
 };
 
-#define JSONCONS_THROW_PARSER_EXCEPTION(x,n,m) throw json_parser_exception(x,n,m)
+#define JSONCONS_THROW_PARSER_EXCEPTION(x,n,m) throw json_parse_exception(x,n,m)
 
 template<class Char>
 class json_object;
 
 template<class Char>
-class basic_json_parser
+class basic_json_reader
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -81,7 +81,7 @@ public:
     /*!
       \param is The input stream to read from
     */
-    basic_json_parser(std::basic_istream<Char>& is)
+    basic_json_reader(std::basic_istream<Char>& is)
        : is_(is), input_buffer_(0),
          buffer_position_(0), buffer_length_(0)
     {
@@ -90,7 +90,7 @@ public:
 #endif
     }
 
-    ~basic_json_parser()
+    ~basic_json_reader()
     {
 #ifdef JSONCONS_BUFFER_READ
         delete[] input_buffer_;
@@ -98,7 +98,7 @@ public:
     }
 
     template<class ContentHandler>
-    void parse(ContentHandler& handler);
+    void read(ContentHandler& handler);
 
     size_t buffer_capacity() const
     {
@@ -283,7 +283,7 @@ unsigned long long string_to_ulonglong(const char* s, size_t length, const unsig
 
 template<class Char>
 template<class ContentHandler>
-void basic_json_parser<Char>::parse(ContentHandler& handler)
+void basic_json_reader<Char>::read(ContentHandler& handler)
 {
     line_ = 1;
     column_ = 0;
@@ -486,7 +486,7 @@ void basic_json_parser<Char>::parse(ContentHandler& handler)
 }
 
 template<class Char>
-void basic_json_parser<Char>::skip_separator()
+void basic_json_reader<Char>::skip_separator()
 {
     while (!eof())
     {
@@ -531,7 +531,7 @@ void basic_json_parser<Char>::skip_separator()
 }
 
 template<class Char>
-bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, char char3)
+bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, char char3)
 {
     if (!eof())
     {
@@ -566,7 +566,7 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
 }
 
 template<class Char>
-bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
+bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
 {
     if (!eof())
     {
@@ -610,7 +610,7 @@ bool basic_json_parser<Char>::read_until_match_fails(char char1, char char2, cha
 
 template<class Char>
 template<class ContentHandler>
-void basic_json_parser<Char>::parse_number(Char c, ContentHandler& handler)
+void basic_json_reader<Char>::parse_number(Char c, ContentHandler& handler)
 {
     number_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -716,7 +716,7 @@ void basic_json_parser<Char>::parse_number(Char c, ContentHandler& handler)
 }
 
 template<class Char>
-void basic_json_parser<Char>::parse_string()
+void basic_json_reader<Char>::parse_string()
 {
     string_buffer_.clear();
 
@@ -831,7 +831,7 @@ void basic_json_parser<Char>::parse_string()
 }
 
 template<class Char>
-void basic_json_parser<Char>::ignore_single_line_comment()
+void basic_json_reader<Char>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
@@ -850,7 +850,7 @@ void basic_json_parser<Char>::ignore_single_line_comment()
 }
 
 template<class Char>
-void basic_json_parser<Char>::fast_ignore_single_line_comment()
+void basic_json_reader<Char>::fast_ignore_single_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
@@ -864,7 +864,7 @@ void basic_json_parser<Char>::fast_ignore_single_line_comment()
 }
 
 template<class Char>
-void basic_json_parser<Char>::fast_ignore_multi_line_comment()
+void basic_json_reader<Char>::fast_ignore_multi_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
@@ -883,7 +883,7 @@ void basic_json_parser<Char>::fast_ignore_multi_line_comment()
 }
 
 template<class Char>
-void basic_json_parser<Char>::ignore_multi_line_comment()
+void basic_json_reader<Char>::ignore_multi_line_comment()
 {
     bool done = false;
     while (!done)
@@ -910,7 +910,7 @@ void basic_json_parser<Char>::ignore_multi_line_comment()
 }
 
 template<class Char>
-void basic_json_parser<Char>::fast_skip_white_space()
+void basic_json_reader<Char>::fast_skip_white_space()
 {
     bool done = false;
     while (!done && buffer_position_ < buffer_length_)
@@ -936,7 +936,7 @@ void basic_json_parser<Char>::fast_skip_white_space()
 }
 
 template<class Char>
-unsigned int basic_json_parser<Char>::decode_unicode_codepoint()
+unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
 {
 
     unsigned int cp = decode_unicode_escape_sequence();
@@ -961,7 +961,7 @@ unsigned int basic_json_parser<Char>::decode_unicode_codepoint()
 }
 
 template<class Char>
-unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence()
+unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     unsigned int cp = 0;
     size_t index = 0;
@@ -1001,7 +1001,7 @@ unsigned int basic_json_parser<Char>::decode_unicode_escape_sequence()
     return cp;
 }
 
-typedef basic_json_parser<char> json_parser;
+typedef basic_json_reader<char> json_reader;
 
 }
 

@@ -16,9 +16,8 @@ using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::pretty_print;
 using jsoncons::wjson;
-using jsoncons::basic_json_parser;
+using jsoncons::basic_json_reader;
 using std::string;
-using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
@@ -203,68 +202,36 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     std::cout << "size map=" << sizeof(std::vector<std::pair<std::string,json>>) << std::endl;
 }
 
-class my_json_serializer : public json_serializer
+namespace jsoncons
 {
-public:
-	my_json_serializer (std::ostream& os)
-		: json_serializer(os)
-	{
-	}
-
-    using json_serializer::userdata;
-
-    void userdata(const jsoncons::userdata<matrix<double>>& o)
+    template <typename Char>
+    std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, 
+                                         const userdata<Char,matrix<double>>& o)
     {
         const matrix<double>& A = o.value_;
 
-        os_ << "[";
+        os << '[';
         for (size_t i = 0; i < A.size1(); ++i)
         {
             if (i > 0)
             {
-                os_ << ',';
+                os << ',';
             }
-            os_ << "[";
+            os << '[';
             for (size_t j = 0; j < A.size2(); ++j)
             {
                 if (j > 0)
                 {
-                    os_ << ',';
+                    os << ',';
                 }
-                os_ << A(i,j);
+                os << A(i,j);
             }
-            os_ << "]";
+            os << ']';
         }
-        os_ << "]";
+        os << ']';
+        return os;
     }
-};
-
-std::ostream& operator<<(std::ostream& os, const jsoncons::userdata<matrix<double>>& o)
-{
-    const matrix<double>& A = o.value_;
-
-    os << "[";
-    for (size_t i = 0; i < A.size1(); ++i)
-    {
-        if (i > 0)
-        {
-            os << ',';
-        }
-        os << "[";
-        for (size_t j = 0; j < A.size2(); ++j)
-        {
-            if (j > 0)
-            {
-                os << ',';
-            }
-            os << A(i,j);
-        }
-        os << "]";
-    }
-    os << "]";
-    return os;
 }
-
 
 BOOST_AUTO_TEST_CASE(test_userdata)
 {

@@ -14,7 +14,7 @@ using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
-using jsoncons::basic_json_parser;
+using jsoncons::basic_json_reader;
 using std::string;
 
 BOOST_AUTO_TEST_CASE( test1 )
@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::clock_t t = std::clock();
 
     writer.begin_array();
-    for (size_t i = 0; i < 1000000; ++i)
+    for (size_t i = 0; i < 100; ++i)
     {
         writer.begin_element();
         writer.begin_object();
