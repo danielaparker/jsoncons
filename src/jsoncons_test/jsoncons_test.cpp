@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+    for (auto it = obj.begin_pairs(); it != obj.end_pairs(); ++it)
     {
         std::cout << it->first << "=" << it->second.as_string() << std::endl;
     }
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
     arr.push_back("Vancouver");
     arr.push_back("Montreal");
 
-    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    for (auto it = arr.begin_values(); it != arr.end_values(); ++it)
     {
         std::cout << it->as_string() << std::endl;
     }
@@ -412,24 +412,24 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     {
         writer.begin_element();
         writer.begin_object();
-        writer.begin_member(person);
+        writer.begin_pair(person);
         writer.begin_object();
-        writer.begin_member(first_name);
+        writer.begin_pair(first_name);
         writer.value(john_first_name);
-        writer.end_member();
-        writer.begin_member(last_name);
+        writer.end_pair();
+        writer.begin_pair(last_name);
         writer.value(john_last_name);
-        writer.end_member();
-        writer.begin_member(birthdate);
+        writer.end_pair();
+        writer.begin_pair(birthdate);
         writer.value(john_birthdate);
-        writer.end_member();
-        writer.begin_member(sex);
+        writer.end_pair();
+        writer.begin_pair(sex);
         writer.value(john_sex);
-        writer.end_member();
-        writer.begin_member(salary);
+        writer.end_pair();
+        writer.begin_pair(salary);
         writer.value((long long)70000);
-        writer.end_member();
-        writer.begin_member(interests);
+        writer.end_pair();
+        writer.begin_pair(interests);
         writer.begin_array();
         writer.begin_element();
         writer.value(reading);
@@ -441,23 +441,23 @@ BOOST_AUTO_TEST_CASE(test_big_file)
         writer.value(hacking);
         writer.end_element();
         writer.end_array();
-        writer.end_member();
-        writer.begin_member(favorites);
+        writer.end_pair();
+        writer.begin_pair(favorites);
         writer.begin_object();
-        writer.begin_member(color);
+        writer.begin_pair(color);
         writer.value(john_color);
-        writer.end_member();
-        writer.begin_member(sport);
+        writer.end_pair();
+        writer.begin_pair(sport);
         writer.value(john_sport);
-        writer.end_member();
-        writer.begin_member(food);
+        writer.end_pair();
+        writer.begin_pair(food);
         writer.value(john_food);
-        writer.end_member();
+        writer.end_pair();
         writer.end_object();
-        writer.end_member();
+        writer.end_pair();
 
         writer.end_object();
-        writer.end_member();
+        writer.end_pair();
         writer.end_object();
         writer.end_element();
     }

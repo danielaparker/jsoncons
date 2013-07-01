@@ -57,7 +57,7 @@ public:
         restore();
     }
 
-    virtual void begin_member(const std::basic_string<Char>& name)
+    virtual void begin_pair(const std::basic_string<Char>& name)
     {
         if (stack_.back().count_ > 0)
         {
@@ -73,7 +73,7 @@ public:
         os_.put(':');
     }
 
-    virtual void end_member()
+    virtual void end_pair()
     {
         ++stack_.back().count_;
     }

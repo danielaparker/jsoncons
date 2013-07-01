@@ -366,21 +366,21 @@ public:
 
     ~basic_json();
 
-    object_iterator begin_members();
+    object_iterator begin_pairs();
 
-    const_object_iterator begin_members() const;
+    const_object_iterator begin_pairs() const;
 
-    object_iterator end_members();
+    object_iterator end_pairs();
 
-    const_object_iterator end_members() const;
+    const_object_iterator end_pairs() const;
 
-    array_iterator begin_elements();
+    array_iterator begin_values();
 
-    const_array_iterator begin_elements() const;
+    const_array_iterator begin_values() const;
 
-    array_iterator end_elements();
+    array_iterator end_values();
 
-    const_array_iterator end_elements() const;
+    const_array_iterator end_values() const;
 
     basic_json& operator=(basic_json<Char> rhs);
 

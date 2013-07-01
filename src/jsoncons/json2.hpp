@@ -479,9 +479,9 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_member(it->first);
+            serializer.begin_pair(it->first);
             it->second.serialize(serializer);
-            serializer.end_member();
+            serializer.end_pair();
         }
         serializer.end_object();
 		}
@@ -581,7 +581,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
 }
 
 template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
+typename basic_json<Char>::object_iterator basic_json<Char>::begin_pairs()
 {
     switch (type_)
     {
@@ -593,7 +593,7 @@ typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
 }
 
 template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members() const
+typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_pairs() const
 {
     switch (type_)
     {
@@ -605,7 +605,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members
 }
 
 template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
+typename basic_json<Char>::object_iterator basic_json<Char>::end_pairs()
 {
     switch (type_)
     {
@@ -617,7 +617,7 @@ typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
 }
 
 template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members() const
+typename basic_json<Char>::const_object_iterator basic_json<Char>::end_pairs() const
 {
     switch (type_)
     {
@@ -629,7 +629,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members()
 }
 
 template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
+typename basic_json<Char>::array_iterator basic_json<Char>::begin_values()
 {
     switch (type_)
     {
@@ -641,7 +641,7 @@ typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
 }
 
 template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements() const
+typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_values() const
 {
     switch (type_)
     {
@@ -653,7 +653,7 @@ typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements
 }
 
 template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
+typename basic_json<Char>::array_iterator basic_json<Char>::end_values()
 {
     switch (type_)
     {
@@ -665,7 +665,7 @@ typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
 }
 
 template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::end_elements() const
+typename basic_json<Char>::const_array_iterator basic_json<Char>::end_values() const
 {
     switch (type_)
     {
@@ -716,7 +716,7 @@ bool basic_json<Char>::has_member(const std::basic_string<Char>& name) const
     case object_t:
         {
             const_object_iterator it = value_.object_->find(name);
-            return it != end_members();
+            return it != end_pairs();
         }
         break;
     default:

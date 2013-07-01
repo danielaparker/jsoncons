@@ -16,9 +16,9 @@ class basic_json_out_stream
 {
 public:
 
-    virtual void begin_member(const std::basic_string<Char>& name) = 0;
+    virtual void begin_pair(const std::basic_string<Char>& name) = 0;
 
-    virtual void end_member() = 0;
+    virtual void end_pair() = 0;
 
     virtual void begin_element() = 0;
 
