@@ -24,16 +24,16 @@ class basic_json_serializer : public basic_json_out_stream<Char>
 {
     struct stack_item
     {
-        stack_item(bool is_pair)
-            : is_pair_(is_pair), count_(0)
+        stack_item(bool is_object)
+            : is_object_(is_object), count_(0)
         {
         }
-        bool is_pair() const
+        bool is_object() const
         {
-            return is_pair_;
+            return is_object_;
         }
 
-        bool is_pair_;
+        bool is_object_;
         size_t count_;
     };
 public:
@@ -57,6 +57,58 @@ public:
         restore();
     }
 
+    virtual void begin_object()
+    {
+        begin_value();
+
+        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        {
+            write_indent();
+        }
+        stack_.push_back(stack_item(true));
+        os_.put('{');
+        indent();
+    }
+
+    virtual void end_object()
+    {
+        unindent();
+        if (format_.indenting() && !stack_.empty())
+        {
+            write_indent();
+        }
+        stack_.pop_back();
+        os_.put('}');
+
+        end_element();
+    }
+
+    virtual void begin_array()
+    {
+        begin_value();
+
+        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        {
+            write_indent();
+        }
+        stack_.push_back(stack_item(false));
+        os_.put('[');
+        indent();
+    }
+
+    virtual void end_array()
+    {
+        unindent();
+        if (format_.indenting() && !stack_.empty())
+        {
+            write_indent();
+        }
+        stack_.pop_back();
+        os_.put(']');
+
+        end_element();
+    }
+
     virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
@@ -66,37 +118,6 @@ public:
         os_.put(':');
     }
 
-    void begin_element()
-    {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count_ > 0)
-            {
-                os_.put(',');
-            }
-            if (format_.indenting())
-            {
-                write_indent();
-            }
-        }
-    }
-
-    void end_element()
-    {
-        if (!stack_.empty())
-        {
-            ++stack_.back().count_;
-        }
-    }
-
-    void begin_value()
-    {
-        if (!stack_.empty() && !stack_.back().is_pair())
-        {
-            begin_element();
-        }
-    }
-
     virtual void value(const std::basic_string<Char>& value)
     {
         begin_value();
@@ -104,15 +125,6 @@ public:
         os_.put('\"');
         escape_string<Char>(value,format_,os_);
         os_.put('\"');
-
-        end_element();
-    }
-
-    virtual void value(const base_data_box<Char>& value)
-    {
-        begin_value();
-
-        value.to_stream(os_);
 
         end_element();
     }
@@ -177,58 +189,46 @@ public:
         end_element();
     }
 
-    virtual void begin_object()
+    virtual void value(const base_userdata<Char>& value)
     {
         begin_value();
 
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_pair())
-        {
-            write_indent();
-        }
-        stack_.push_back(stack_item(true));
-        os_.put('{');
-        indent();
-    }
-
-    virtual void end_object()
-    {
-        unindent();
-        if (format_.indenting() && !stack_.empty())
-        {
-            write_indent();
-        }
-        stack_.pop_back();
-        os_.put('}');
-
-        end_element();
-    }
-
-    virtual void begin_array()
-    {
-        begin_value();
-
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_pair())
-        {
-            write_indent();
-        }
-        stack_.push_back(stack_item(false));
-        os_.put('[');
-        indent();
-    }
-
-    virtual void end_array()
-    {
-        unindent();
-        if (format_.indenting() && !stack_.empty())
-        {
-            write_indent();
-        }
-        stack_.pop_back();
-        os_.put(']');
+        value.to_stream(os_);
 
         end_element();
     }
 protected:
+
+    void begin_element()
+    {
+        if (!stack_.empty())
+        {
+            if (stack_.back().count_ > 0)
+            {
+                os_.put(',');
+            }
+            if (format_.indenting())
+            {
+                write_indent();
+            }
+        }
+    }
+
+    void end_element()
+    {
+        if (!stack_.empty())
+        {
+            ++stack_.back().count_;
+        }
+    }
+
+    void begin_value()
+    {
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_element();
+        }
+    }
 
     void indent()
     {

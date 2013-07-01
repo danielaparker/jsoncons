@@ -104,7 +104,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(base_data_box<Char>* var)
+basic_json<Char>::basic_json(base_userdata<Char>* var)
 {
     type_ = userdata_t;
     value_.userdata_ = var;
@@ -341,7 +341,7 @@ void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_box<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_envelope<Char,T>(value)));
         break;
     default:
         {
@@ -357,7 +357,7 @@ void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_box<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new data_envelope<Char,T>(value)));
         break;
     default:
         {
@@ -578,7 +578,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
 }
 
 template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::begin_pairs()
+typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
 {
     switch (type_)
     {
@@ -590,7 +590,7 @@ typename basic_json<Char>::object_iterator basic_json<Char>::begin_pairs()
 }
 
 template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_pairs() const
+typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members() const
 {
     switch (type_)
     {
@@ -602,7 +602,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_pairs()
 }
 
 template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::end_pairs()
+typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
 {
     switch (type_)
     {
@@ -614,7 +614,7 @@ typename basic_json<Char>::object_iterator basic_json<Char>::end_pairs()
 }
 
 template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::end_pairs() const
+typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members() const
 {
     switch (type_)
     {
@@ -626,7 +626,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_pairs() c
 }
 
 template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::begin_values()
+typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
 {
     switch (type_)
     {
@@ -638,7 +638,7 @@ typename basic_json<Char>::array_iterator basic_json<Char>::begin_values()
 }
 
 template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_values() const
+typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements() const
 {
     switch (type_)
     {
@@ -650,7 +650,7 @@ typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_values()
 }
 
 template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::end_values()
+typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
 {
     switch (type_)
     {
@@ -662,7 +662,7 @@ typename basic_json<Char>::array_iterator basic_json<Char>::end_values()
 }
 
 template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::end_values() const
+typename basic_json<Char>::const_array_iterator basic_json<Char>::end_elements() const
 {
     switch (type_)
     {
@@ -713,7 +713,7 @@ bool basic_json<Char>::has_member(const std::basic_string<Char>& name) const
     case object_t:
         {
             const_object_iterator it = value_.object_->find(name);
-            return it != end_pairs();
+            return it != end_members();
         }
         break;
     default:
@@ -812,7 +812,7 @@ const T& basic_json<Char>::userdata() const
     switch (type_)
     {
     case userdata_t:
-        return static_cast<const data_box<Char,T>*>(value_.userdata_)->value_;
+        return static_cast<const data_envelope<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

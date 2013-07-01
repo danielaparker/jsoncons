@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    for (auto it = obj.begin_pairs(); it != obj.end_pairs(); ++it)
+    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
         std::cout << "name=" << it->first << ", value=" << it->second.as_string() << std::endl;
     }
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(test_another_array_iterator)
     arr.push_back("Ottawa");
     arr.push_back("Vancouver");
 
-    for (auto it = arr.begin_values(); it != arr.end_values(); ++it)
+    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
         std::cout << it->as_string() << std::endl;
     }
@@ -206,9 +206,9 @@ namespace jsoncons
 {
     template <typename Char>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, 
-                                         const data_box<Char,matrix<double>>& o)
+                                         const data_envelope<Char,matrix<double>>& env)
     {
-        const matrix<double>& A = o.value_;
+        const matrix<double>& A = env.data;
 
         os << '[';
         for (size_t i = 0; i < A.size1(); ++i)

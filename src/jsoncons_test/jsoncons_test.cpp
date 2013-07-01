@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    for (auto it = obj.begin_pairs(); it != obj.end_pairs(); ++it)
+    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
         std::cout << it->first << "=" << it->second.as_string() << std::endl;
     }
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
     arr.push_back("Vancouver");
     arr.push_back("Montreal");
 
-    for (auto it = arr.begin_values(); it != arr.end_values(); ++it)
+    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
         std::cout << it->as_string() << std::endl;
     }

@@ -17,40 +17,36 @@ using boost::numeric::ublas::matrix;
 namespace jsoncons {
 
 template <class Char>
-class base_data_box
+class base_userdata
 {
 public:
-    virtual ~base_data_box()
+    virtual ~base_userdata()
     {
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os) const = 0;
 
-    virtual base_data_box<Char>* clone() const = 0;
+    virtual base_userdata<Char>* clone() const = 0;
 };
 
 template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_data_box<Char>& o)
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_userdata<Char>& o)
 {
     os << json_char_traits<Char>::null_literal();
     return os;
 }
 
 template <class Char, class T>
-class data_box : public base_data_box<Char>
+class data_envelope : public base_userdata<Char>
 {
 public:
-    data_box(const T& value)
-        : value_(value)
+    data_envelope(const T& value)
+        : data(value)
     {
     }
-    data_box(T&& value)
-        : value_(value)
+    virtual base_userdata<Char>* clone() const
     {
-    }
-    virtual base_data_box<Char>* clone() const
-    {
-        return new data_box<Char,T>(value_) ;
+        return new data_envelope<Char,T>(data) ;
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os) const
@@ -58,7 +54,7 @@ public:
         os << *this;
     }
 
-    T value_;
+    T data;
 };
 
 template <class Char>
@@ -362,25 +358,25 @@ public:
 
     explicit basic_json(json_array<Char>* var);
 
-    explicit basic_json(base_data_box<Char>* var);
+    explicit basic_json(base_userdata<Char>* var);
 
     ~basic_json();
 
-    object_iterator begin_pairs();
+    object_iterator begin_members();
 
-    const_object_iterator begin_pairs() const;
+    const_object_iterator begin_members() const;
 
-    object_iterator end_pairs();
+    object_iterator end_members();
 
-    const_object_iterator end_pairs() const;
+    const_object_iterator end_members() const;
 
-    array_iterator begin_values();
+    array_iterator begin_elements();
 
-    const_array_iterator begin_values() const;
+    const_array_iterator begin_elements() const;
 
-    array_iterator end_values();
+    array_iterator end_elements();
 
-    const_array_iterator end_values() const;
+    const_array_iterator end_elements() const;
 
     basic_json& operator=(basic_json<Char> rhs);
 
@@ -514,7 +510,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
-        base_data_box<Char>* userdata_;
+        base_userdata<Char>* userdata_;
     } value_;
 };
 

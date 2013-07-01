@@ -9,7 +9,7 @@
 namespace jsoncons {
 
 template <class Char>
-class base_data_box;
+class base_userdata;
 
 template <class Char>
 class basic_json_out_stream
@@ -20,7 +20,7 @@ public:
 
     virtual void value(const std::basic_string<Char>& value) = 0;
 
-    virtual void value(const base_data_box<Char>& value) = 0;
+    virtual void value(const base_userdata<Char>& value) = 0;
 
     virtual void value(double value) = 0;
 
