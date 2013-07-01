@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
+#include "jsoncons/base_json_content_handler.hpp"
 
 namespace jsoncons {
 

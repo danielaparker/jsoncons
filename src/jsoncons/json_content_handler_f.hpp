@@ -12,11 +12,12 @@
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json_exception.hpp"
+#include "jsoncons/base_json_content_handler.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_content_handler_f
+class basic_json_content_handler_f : public base_json_content_handler<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -47,17 +48,17 @@ public:
     {
     }
 
-    void begin_json()
+    virtual void begin_json()
     {
         level_ = 0;
     }
 
-    void end_json()
+    virtual void end_json()
     {
         JSONCONS_ASSERT(level_ == 0);
     }
 
-    void begin_object()
+    virtual void begin_object()
     {
         if (++level_ >= stack_.size())
         {
@@ -69,7 +70,7 @@ public:
         }
     }
 
-    void end_object()
+    virtual void end_object()
     {
 		json_object<Char>* var = new json_object<Char>(stack_[level_-1].members_.size());
         for (size_t i = 0; i < var->size(); ++i)
@@ -96,7 +97,7 @@ public:
         }
     }
 
-    void begin_array()
+    virtual void begin_array()
     {
         if (++level_ >= stack_.size())
         {
@@ -108,7 +109,7 @@ public:
         }
     }
 
-    void end_array()
+    virtual void end_array()
     {
         json_array<Char>* var = new json_array<Char>(stack_[level_-1].elements_.size());
         for (size_t i = 0; i < var->size(); ++i)
@@ -134,12 +135,12 @@ public:
         }
     }
 
-    void name(const std::basic_string<Char>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
         stack_[level_-1].name_ = name;
     }
 
-    void value(const std::basic_string<Char>& value)
+    virtual void value(const std::basic_string<Char>& value)
     {
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
@@ -152,7 +153,7 @@ public:
         }
     }
 
-    void value(double value)
+    virtual void value(double value)
     {
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
@@ -165,7 +166,7 @@ public:
         }
     }
 
-    void value(long long value)
+    virtual void value(long long value)
     {
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
@@ -178,7 +179,7 @@ public:
         }
     }
 
-    void value(unsigned long long value)
+    virtual void value(unsigned long long value)
     {
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
@@ -191,7 +192,7 @@ public:
         }
     }
 
-    void value(bool value)
+    virtual void value(bool value)
     {
         basic_json<Char> val(value);
         if (stack_[level_-1].is_object())
@@ -204,7 +205,7 @@ public:
         }
     }
 
-    void null()
+    virtual void null()
     {
         basic_json<Char> val;
         if (stack_[level_-1].is_object())
@@ -217,7 +218,7 @@ public:
         }
     }
 
-    void swap_root(basic_json<Char>& root)
+    virtual void swap_root(basic_json<Char>& root)
     {
         root.swap(root_);
     }
