@@ -57,58 +57,70 @@ public:
         restore();
     }
 
-    virtual void begin_pair(const std::basic_string<Char>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
-        if (stack_.back().count_ > 0)
-        {
-            os_.put(',');
-        }
-        if (format_.indenting())
-        {
-            write_indent();
-        }
+        begin_element();
         os_.put('\"'); 
         escape_string<Char>(name,format_,os_); 
         os_.put('\"'); 
         os_.put(':');
     }
 
-    virtual void end_pair()
+    void begin_element()
     {
-        ++stack_.back().count_;
-    }
-
-    virtual void begin_element()
-    {
-        if (stack_.back().count_ > 0)
+        if (!stack_.empty())
         {
-            os_.put(',');
-        }
-        if (format_.indenting())
-        {
-            write_indent();
+            if (stack_.back().count_ > 0)
+            {
+                os_.put(',');
+            }
+            if (format_.indenting())
+            {
+                write_indent();
+            }
         }
     }
 
-    virtual void end_element()
+    void end_element()
     {
-        ++stack_.back().count_;
+        if (!stack_.empty())
+        {
+            ++stack_.back().count_;
+        }
+    }
+
+    void begin_value()
+    {
+        if (!stack_.empty() && !stack_.back().is_pair())
+        {
+            begin_element();
+        }
     }
 
     virtual void value(const std::basic_string<Char>& value)
     {
+        begin_value();
+
         os_.put('\"');
         escape_string<Char>(value,format_,os_);
         os_.put('\"');
+
+        end_element();
     }
 
     virtual void value(const base_data_box<Char>& value)
     {
+        begin_value();
+
         value.to_stream(os_);
+
+        end_element();
     }
 
     virtual void value(double value)
     {
+        begin_value();
+
         if (is_nan(value) && format_.replace_nan())
         {
             os_  << format_.nan_replacement();
@@ -125,30 +137,50 @@ public:
         {
             os_  << value;
         }
+
+        end_element();
     }
 
     virtual void value(long long value)
     {
+        begin_value();
+
         os_  << value;
+
+        end_element();
     }
 
     virtual void value(unsigned long long value)
     {
+        begin_value();
+
         os_  << value;
+
+        end_element();
     }
 
     virtual void value(bool value)
     {
+        begin_value();
+
         os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
+
+        end_element();
     }
 
     virtual void null_value()
     {
+        begin_value();
+
         os_ << json_char_traits<Char>::null_literal();
+
+        end_element();
     }
 
     virtual void begin_object()
     {
+        begin_value();
+
         if (format_.indenting() && !stack_.empty() && stack_.back().is_pair())
         {
             write_indent();
@@ -167,10 +199,14 @@ public:
         }
         stack_.pop_back();
         os_.put('}');
+
+        end_element();
     }
 
     virtual void begin_array()
     {
+        begin_value();
+
         if (format_.indenting() && !stack_.empty() && stack_.back().is_pair())
         {
             write_indent();
@@ -189,6 +225,8 @@ public:
         }
         stack_.pop_back();
         os_.put(']');
+
+        end_element();
     }
 protected:
 
@@ -230,11 +268,6 @@ private:
     {
         os_.precision(original_precision_);
         os_.flags(original_format_flags_);
-    }
-
-    virtual void end_value()
-    {
-        ++stack_.back().count_;
     }
 };
 

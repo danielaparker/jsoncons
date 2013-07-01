@@ -479,9 +479,8 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_pair(it->first);
+            serializer.name(it->first);
             it->second.serialize(serializer);
-            serializer.end_pair();
         }
         serializer.end_object();
 		}
@@ -492,9 +491,7 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.begin_element();
             it->serialize(serializer);
-            serializer.end_element();
         }
         serializer.end_array();
 		}
