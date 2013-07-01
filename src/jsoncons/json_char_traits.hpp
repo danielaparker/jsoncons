@@ -7,7 +7,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <assert.h>
 #include <istream>
 #include <cstdlib>
 

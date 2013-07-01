@@ -6,7 +6,6 @@
 
 #include <string>
 #include <vector>
-#include <assert.h> 
 #include <exception>
 #include <cstdlib>
 #include <cstring>

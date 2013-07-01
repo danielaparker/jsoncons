@@ -1,23 +1,22 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSON_CONTENT_HANDLER_F_HPP
-#define JSONCONS_JSON_CONTENT_HANDLER_F_HPP
+#ifndef JSONCONS_FAST_JSON_HANDLER_HPP
+#define JSONCONS_FAST_JSON_HANDLER_HPP
 
 #include <string>
 #include <sstream>
 #include <vector>
-#include <assert.h>
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json_exception.hpp"
-#include "jsoncons/base_json_content_handler.hpp"
+#include "jsoncons/json_handler.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_content_handler_f : public base_json_content_handler<Char>
+class basic_fast_json_handler : public basic_json_handler<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -43,7 +42,7 @@ class basic_json_content_handler_f : public base_json_content_handler<Char>
     };
 
 public:
-    basic_json_content_handler_f()
+    basic_fast_json_handler()
         : level_(0)
     {
     }
@@ -229,7 +228,7 @@ private:
     size_t level_;
 };
 
-typedef basic_json_content_handler_f<char> json_content_handler_f;
+typedef basic_fast_json_handler<char> fast_json_handler;
 
 }
 

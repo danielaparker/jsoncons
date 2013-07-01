@@ -1,18 +1,17 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSON_PARSER_HPP
-#define JSONCONS_JSON_PARSER_HPP
+#ifndef JSONCONS_JSON_READER_HPP
+#define JSONCONS_JSON_READER_HPP
 
 #include <string>
 #include <sstream>
 #include <vector>
-#include <assert.h>
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/base_json_content_handler.hpp"
+#include "jsoncons/json_handler.hpp"
 
 namespace jsoncons {
 
@@ -83,7 +82,7 @@ public:
       \param is The input stream to read from
     */
     basic_json_reader(std::basic_istream<Char>& is,
-                      base_json_content_handler<Char>& handler)
+                      basic_json_handler<Char>& handler)
        : is_(is), handler_(handler), input_buffer_(0), 
          buffer_position_(0), buffer_length_(0)
     {
@@ -253,7 +252,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    base_json_content_handler<Char>& handler_;
+    basic_json_handler<Char>& handler_;
 };
 
 inline

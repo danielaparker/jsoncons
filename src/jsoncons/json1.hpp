@@ -6,12 +6,11 @@
 
 #include <string>
 #include <vector>
-#include <assert.h> 
 #include <exception>
 #include <cstdlib>
 #include <cstring>
 #include "jsoncons/json_exception.hpp"
-#include "jsoncons/base_json_serializer.hpp"
+#include "jsoncons/json_serializer.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 using boost::numeric::ublas::matrix;
 
@@ -502,7 +501,7 @@ public:
         return type_;
     }
 
-    void serialize(base_json_serializer<Char>& serializer) const;
+    void serialize(basic_json_serializer<Char>& serializer) const;
 
 private:
     value_type type_;

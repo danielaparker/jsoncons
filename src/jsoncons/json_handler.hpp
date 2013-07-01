@@ -1,15 +1,15 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_BASE_JSON_CONTENT_HANDLER_HPP
-#define JSONCONS_BASE_JSON_CONTENT_HANDLER_HPP
+#ifndef JSONCONS_BASIC_JSON_HANDLER_HPP
+#define JSONCONS_BASIC_JSON_HANDLER_HPP
 
 #include <string>
 
 namespace jsoncons {
 
 template <class Char>
-class base_json_content_handler
+class basic_json_handler
 {
 public:
     virtual void begin_json() = 0;
@@ -38,6 +38,8 @@ public:
 
     virtual void null() = 0;
 };
+
+typedef basic_json_serializer<char> json_serializer;
 
 }
 

@@ -1,23 +1,22 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifndef JSONCONS_JSON_CONTENT_HANDLER_HPP
-#define JSONCONS_JSON_CONTENT_HANDLER_HPP
+#ifndef JSONCONS_JSON_HANDLER_IMPL_HPP
+#define JSONCONS_JSON_HANDLER_IMPL_HPP
 
 #include <string>
 #include <sstream>
 #include <vector>
-#include <assert.h>
 #include <istream>
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
-#include "jsoncons/base_json_content_handler.hpp"
+#include "jsoncons/json_handler.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_content_handler : public base_json_content_handler<Char>
+class basic_json_handler_impl : public basic_json_handler<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item
@@ -213,7 +212,7 @@ private:
     std::vector<stack_item> stack_;
 };
 
-typedef basic_json_content_handler<char> json_content_handler;
+typedef basic_json_handler_impl<char> json_handler_impl;
 
 }
 
