@@ -16,17 +16,17 @@
 namespace jsoncons {
 
 template <class Char>
-class base_userdata
+class custom_data
 {
 public:
-    virtual ~base_userdata()
+    virtual ~custom_data()
     {
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os, 
                            const basic_output_format<Char>& format) const = 0;
 
-    virtual base_userdata<Char>* clone() const = 0;
+    virtual custom_data<Char>* clone() const = 0;
 };
 
 template <class Char,class T>
@@ -38,16 +38,16 @@ void to_stream(std::basic_ostream<Char>& os,
 }
 
 template <class Char, class T>
-class data_wrapper : public base_userdata<Char>
+class custom_data_wrapper : public custom_data<Char>
 {
 public:
-    data_wrapper(const T& value)
+    custom_data_wrapper(const T& value)
         : data(value)
     {
     }
-    virtual base_userdata<Char>* clone() const
+    virtual custom_data<Char>* clone() const
     {
-        return new data_wrapper<Char,T>(data);
+        return new custom_data_wrapper<Char,T>(data);
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os, 
@@ -191,16 +191,18 @@ public:
         }
 
         template <class T>
-        const T& get_userdata() const
+        const T& get_custom() const
         {
-            return val_.get(name_).get_userdata<T>();
+            return val_.get(name_).get_custom<T>();
         }
+        // Returns a const reference to the custom data associated with name
 
         template <class T>
-        T& get_userdata() 
+        T& get_custom() 
         {
-            return val_.get(name_).get_userdata<T>();
+            return val_.get(name_).get_custom<T>();
         }
+        // Returns a reference to the custom data associated with name
 
         operator basic_json&()
         {
@@ -266,15 +268,15 @@ public:
         }
 
         template <class T>
-        void set_userdata(const std::basic_string<Char>& name, const T& value)
+        void set_custom(const std::basic_string<Char>& name, const T& value)
         {
-            return val_.get(name_).set_userdata(name,value);
+            return val_.get(name_).set_custom(name,value);
         }
 
         template <class T>
-        void set_userdata(const std::basic_string<Char>& name, T&& value)
+        void set_custom(const std::basic_string<Char>& name, T&& value)
         {
-            return val_.get(name_).set_userdata(name,value);
+            return val_.get(name_).set_custom(name,value);
         }
 
         void push_back(const basic_json<Char>& value)
@@ -366,7 +368,7 @@ public:
 
     explicit basic_json(json_array<Char>* var);
 
-    explicit basic_json(base_userdata<Char>* var);
+    explicit basic_json(custom_data<Char>* var);
 
     ~basic_json();
 
@@ -468,10 +470,12 @@ public:
     unsigned long long as_ulonglong() const;
 
     template <class T>
-    const T& get_userdata() const;
+    const T& get_custom() const;
+    // Returns a const reference to the custom data associated with name
 
     template <class T>
-    T& get_userdata();
+    T& get_custom();
+    // Returns a reference to the custom data associated with name
 
     std::basic_string<Char> as_string() const;
 
@@ -494,10 +498,10 @@ public:
     void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     template <class T>
-    void set_userdata(const std::basic_string<Char>& name, const T& value);
+    void set_custom(const std::basic_string<Char>& name, const T& value);
 
     template <class T>
-    void set_userdata(std::basic_string<Char>&& name, T&& value);
+    void set_custom(std::basic_string<Char>&& name, T&& value);
 
     void push_back(const basic_json<Char>& value);
 
@@ -521,7 +525,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
-        base_userdata<Char>* userdata_;
+        custom_data<Char>* userdata_;
     } value_;
 };
 

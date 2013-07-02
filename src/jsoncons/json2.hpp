@@ -104,7 +104,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(base_userdata<Char>* var)
+basic_json<Char>::basic_json(custom_data<Char>* var)
 {
     type_ = userdata_t;
     value_.userdata_ = var;
@@ -336,12 +336,12 @@ void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Cha
 
 template <class Char>
 template <class T>
-void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T& value)
+void basic_json<Char>::set_custom(const std::basic_string<Char>& name, const T& value)
 {
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_wrapper<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -352,12 +352,12 @@ void basic_json<Char>::set_userdata(const std::basic_string<Char>& name, const T
 
 template <class Char>
 template <class T>
-void basic_json<Char>::set_userdata(std::basic_string<Char>&& name, T&& value)
+void basic_json<Char>::set_custom(std::basic_string<Char>&& name, T&& value)
 {
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new data_wrapper<Char,T>(value)));
+        value_.object_->set_member(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -807,12 +807,12 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 
 template <class Char>
 template <class T>
-const T& basic_json<Char>::get_userdata() const
+const T& basic_json<Char>::get_custom() const
 {
     switch (type_)
     {
     case userdata_t:
-        return static_cast<const data_wrapper<Char,T>*>(value_.userdata_)->data;
+        return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -820,12 +820,12 @@ const T& basic_json<Char>::get_userdata() const
 
 template <class Char>
 template <class T>
-T& basic_json<Char>::get_userdata() 
+T& basic_json<Char>::get_custom() 
 {
     switch (type_)
     {
     case userdata_t:
-        return static_cast<data_wrapper<Char,T>*>(value_.userdata_)->data;
+        return static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

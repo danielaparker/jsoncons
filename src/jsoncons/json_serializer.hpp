@@ -189,7 +189,7 @@ public:
         end_element();
     }
 
-    virtual void value(const base_userdata<Char>& value)
+    virtual void value(const custom_data<Char>& value)
     {
         begin_value();
 
