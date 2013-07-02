@@ -44,7 +44,7 @@ public:
         original_format_flags_ = os.flags();
         init();
     }
-    basic_json_serializer(std::basic_ostream<Char>& os, basic_output_format<Char> format)
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
         : os_(os), format_(format), indent_(0)
     {
         original_precision_ = os.precision();
@@ -189,7 +189,7 @@ public:
         end_element();
     }
 
-    virtual void value(const custom_data<Char>& value)
+    virtual void value(const basic_custom_data<Char>& value)
     {
         begin_value();
 

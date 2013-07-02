@@ -104,7 +104,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(custom_data<Char>* var)
+basic_json<Char>::basic_json(basic_custom_data<Char>* var)
 {
     type_ = userdata_t;
     value_.userdata_ = var;

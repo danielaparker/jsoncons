@@ -16,18 +16,20 @@
 namespace jsoncons {
 
 template <class Char>
-class custom_data
+class basic_custom_data
 {
 public:
-    virtual ~custom_data()
+    virtual ~basic_custom_data()
     {
     }
 
     virtual void to_stream(std::basic_ostream<Char>& os, 
                            const basic_output_format<Char>& format) const = 0;
 
-    virtual custom_data<Char>* clone() const = 0;
+    virtual basic_custom_data<Char>* clone() const = 0;
 };
+
+typedef basic_custom_data<char> custom_data;
 
 template <class Char,class T>
 void to_stream(std::basic_ostream<Char>& os, 
@@ -38,14 +40,14 @@ void to_stream(std::basic_ostream<Char>& os,
 }
 
 template <class Char, class T>
-class custom_data_wrapper : public custom_data<Char>
+class custom_data_wrapper : public basic_custom_data<Char>
 {
 public:
     custom_data_wrapper(const T& value)
         : data(value)
     {
     }
-    virtual custom_data<Char>* clone() const
+    virtual basic_custom_data<Char>* clone() const
     {
         return new custom_data_wrapper<Char,T>(data);
     }
@@ -368,7 +370,7 @@ public:
 
     explicit basic_json(json_array<Char>* var);
 
-    explicit basic_json(custom_data<Char>* var);
+    explicit basic_json(basic_custom_data<Char>* var);
 
     ~basic_json();
 
@@ -525,7 +527,7 @@ private:
         json_object<Char>* object_;
         json_array<Char>* array_;
         std::basic_string<Char>* string_value_;
-        custom_data<Char>* userdata_;
+        basic_custom_data<Char>* userdata_;
     } value_;
 };
 
