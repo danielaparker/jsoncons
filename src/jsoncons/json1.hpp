@@ -11,6 +11,7 @@
 #include <cstring>
 #include "jsoncons/json_exception.hpp"
 #include "jsoncons/json_out_stream.hpp"
+#include "jsoncons/output_format.hpp"
 
 namespace jsoncons {
 
@@ -22,16 +23,18 @@ public:
     {
     }
 
-    virtual void to_stream(std::basic_ostream<Char>& os) const = 0;
+    virtual void to_stream(std::basic_ostream<Char>& os, 
+                           const basic_output_format<Char>& format) const = 0;
 
     virtual base_userdata<Char>* clone() const = 0;
 };
 
-template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const base_userdata<Char>& o)
+template <class Char,class T>
+void to_stream(std::basic_ostream<Char>& os, 
+               const T& val, 
+               const basic_output_format<Char>& format)
 {
     os << json_char_traits<Char>::null_literal();
-    return os;
 }
 
 template <class Char, class T>
@@ -44,12 +47,13 @@ public:
     }
     virtual base_userdata<Char>* clone() const
     {
-        return new data_wrapper<Char,T>(data) ;
+        return new data_wrapper<Char,T>(data);
     }
 
-    virtual void to_stream(std::basic_ostream<Char>& os) const
+    virtual void to_stream(std::basic_ostream<Char>& os, 
+                           const basic_output_format<Char>& format) const
     {
-        os << *this;
+        jsoncons::to_stream(os,data,format);
     }
 
     T data;

@@ -193,7 +193,7 @@ public:
     {
         begin_value();
 
-        value.to_stream(os_);
+        value.to_stream(os_,format_);
 
         end_element();
     }

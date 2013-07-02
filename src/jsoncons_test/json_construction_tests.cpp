@@ -205,12 +205,10 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
 
 namespace jsoncons
 {
-    template <typename Char>
-    std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, 
-                                         const data_wrapper<Char,matrix<double>>& w)
+    void to_stream(std::ostream& os, 
+                   const matrix<double>& A,
+                   const output_format& format)
     {
-        const matrix<double>& A = w.data;
-
         os << '[';
         for (size_t i = 0; i < A.size1(); ++i)
         {
@@ -230,7 +228,6 @@ namespace jsoncons
             os << ']';
         }
         os << ']';
-        return os;
     }
 }
 
@@ -274,5 +271,28 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     }
 
     std::cout << obj << std::endl;
+}
+
+namespace ns
+{
+    template <typename Char, typename T>
+    void to_stream(std::basic_ostream<Char>& os, const T& val)
+    {
+        os << "null";
+    }
+}
+namespace ns
+{
+    template <typename Char>
+    void to_stream(std::basic_ostream<Char>& os, const matrix<double>& val)
+    {
+        os << "a";
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_userdata2)
+{
+        matrix<double> A(2,2);
+        ns::to_stream(std::cout,A);
 }
 
