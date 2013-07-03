@@ -72,7 +72,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     case object_t:
         value_.object_ = val.value_.object_->clone();
         break;
-    case userdata_t:
+    case custom_t:
         value_.userdata_ = val.value_.userdata_->clone();
         break;
     default:
@@ -106,7 +106,7 @@ basic_json<Char>::basic_json(json_array<Char>* var)
 template <class Char>
 basic_json<Char>::basic_json(basic_custom_data<Char>* var)
 {
-    type_ = userdata_t;
+    type_ = custom_t;
     value_.userdata_ = var;
 }
 
@@ -200,7 +200,7 @@ basic_json<Char>::~basic_json()
     case object_t:
         delete value_.object_;
 		break;
-    case userdata_t:
+    case custom_t:
         delete value_.userdata_;
         break;
     }
@@ -496,7 +496,7 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
         serializer.end_array();
 		}
         break;
-    case userdata_t:
+    case custom_t:
         serializer.value(*(value_.userdata_));
         break;
     default:
@@ -811,7 +811,7 @@ const T& basic_json<Char>::get_custom() const
 {
     switch (type_)
     {
-    case userdata_t:
+    case custom_t:
         return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
@@ -824,7 +824,7 @@ T& basic_json<Char>::get_custom()
 {
     switch (type_)
     {
-    case userdata_t:
+    case custom_t:
         return static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");

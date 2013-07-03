@@ -100,6 +100,15 @@ public:
 
     void read();
 
+    bool eof() const
+    {
+#ifdef JSONCONS_BUFFER_READ
+        return buffer_position_ > buffer_length_ && is_.eof();
+#else
+        return is_.eof();
+#endif
+    }
+
     size_t buffer_capacity() const
     {
         return buffer_capacity_;
@@ -124,15 +133,6 @@ private:
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
-
-    bool eof() const
-    {
-#ifdef JSONCONS_BUFFER_READ
-        return buffer_position_ > buffer_length_ && is_.eof();
-#else
-        return is_.eof();
-#endif
-    }
 
     void read_data_block()
     {
@@ -481,7 +481,10 @@ void basic_json_reader<Char>::read()
         }
     }
 
-    JSONCONS_THROW_PARSE_EXCEPTION("End of file", line_, column_);
+    if (stack_.size() > 0)
+    {
+        JSONCONS_THROW_PARSE_EXCEPTION("End of file", line_, column_);
+    }
 }
 
 template<class Char>

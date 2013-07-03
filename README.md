@@ -7,6 +7,12 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.15
+------------
+
+Made eof() method on json_reader public, to support reading
+multiple JSON objects from a stream.
+
 Release 0.14
 ------------
 

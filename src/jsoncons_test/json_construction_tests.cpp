@@ -16,7 +16,7 @@ using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::pretty_print;
 using jsoncons::wjson;
-using jsoncons::basic_json_reader;
+using jsoncons::json_reader;
 using std::string;
 using boost::numeric::ublas::matrix;
 
@@ -273,26 +273,28 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     std::cout << obj << std::endl;
 }
 
-namespace ns
+BOOST_AUTO_TEST_CASE(test_multiple)
 {
-    template <typename Char, typename T>
-    void to_stream(std::basic_ostream<Char>& os, const T& val)
-    {
-        os << "null";
-    }
-}
-namespace ns
-{
-    template <typename Char>
-    void to_stream(std::basic_ostream<Char>& os, const matrix<double>& val)
-    {
-        os << "a";
-    }
-}
+    std::string in = "{\"a\": 1, \"b\": 2, \"c\": 3}{\"a\": 4, \"b\": 5, \"c\": 6}";
+    std::istringstream is(in);
 
-BOOST_AUTO_TEST_CASE(test_userdata2)
-{
-        matrix<double> A(2,2);
-        ns::to_stream(std::cout,A);
+    jsoncons::json_deserializer handler;
+    json_reader reader(is,handler);
+
+    bool done = false;
+    while (!done)
+    {
+        reader.read();
+        if (reader.eof())
+        {
+            done = true;
+        }
+        else
+        {
+            json val;
+            handler.swap_root(val);
+            std::cout << val << std::endl;
+        }
+    }
 }
 
