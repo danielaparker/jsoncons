@@ -17,7 +17,7 @@ Change to json_out_stream and json_serializer:
 removed.
 
 Free function `serialize` replaces free function `to_stream` for
-outputting custom data.
+serializing custom data.
 
 pretty print tidied up for nested arrays
 

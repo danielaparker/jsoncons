@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     obj.set_custom("mydata",A);
 
     //obj.serialize(json_serializer(std::cout));
-    std::cout << pretty_print(obj) << std::endl;
+    std::cout << obj << std::endl;
 
     matrix<double>& B = obj["mydata"].get_custom<matrix<double>>();
 	
