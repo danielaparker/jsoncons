@@ -59,7 +59,7 @@ public:
 
     virtual void begin_object()
     {
-        begin_value();
+        begin_structure();
 
         if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
         {
@@ -80,12 +80,12 @@ public:
         stack_.pop_back();
         os_.put('}');
 
-        end_element();
+        end_structure();
     }
 
     virtual void begin_array()
     {
-        begin_value();
+        begin_structure();
 
         if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
         {
@@ -99,14 +99,14 @@ public:
     virtual void end_array()
     {
         unindent();
-        if (format_.indenting() && !stack_.empty())
+        stack_.pop_back();
+        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
         {
             write_indent();
         }
-        stack_.pop_back();
         os_.put(']');
 
-        end_element();
+        end_structure();
     }
 
     virtual void name(const std::basic_string<Char>& name)
@@ -126,7 +126,7 @@ public:
         escape_string<Char>(value,format_,os_);
         os_.put('\"');
 
-        end_element();
+        end_value();
     }
 
     virtual void value(double value)
@@ -150,7 +150,7 @@ public:
             os_  << value;
         }
 
-        end_element();
+        end_value();
     }
 
     virtual void value(long long value)
@@ -159,7 +159,7 @@ public:
 
         os_  << value;
 
-        end_element();
+        end_value();
     }
 
     virtual void value(unsigned long long value)
@@ -168,7 +168,7 @@ public:
 
         os_  << value;
 
-        end_element();
+        end_value();
     }
 
     virtual void value(bool value)
@@ -177,7 +177,7 @@ public:
 
         os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
 
-        end_element();
+        end_value();
     }
 
     virtual void null_value()
@@ -186,7 +186,7 @@ public:
 
         os_ << json_char_traits<Char>::null_literal();
 
-        end_element();
+        end_value();
     }
 protected:
 
@@ -205,7 +205,19 @@ protected:
         }
     }
 
-    void end_element()
+    void begin_value()
+    {
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            //begin_element();
+            if (stack_.back().count_ > 0)
+            {
+                os_.put(',');
+            }
+        }
+    }
+
+    void end_value()
     {
         if (!stack_.empty())
         {
@@ -213,11 +225,19 @@ protected:
         }
     }
 
-    void begin_value()
+    void begin_structure()
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
             begin_element();
+        }
+    }
+
+    void end_structure()
+    {
+        if (!stack_.empty())
+        {
+            ++stack_.back().count_;
         }
     }
 
