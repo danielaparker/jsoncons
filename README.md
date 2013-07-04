@@ -19,7 +19,7 @@ removed.
 Free function `serialize` replaces free function `to_stream` for
 outputting custom data.
 
-pretty print fixed up for nested arrays
+pretty print tidied up for nested arrays
 
 Release 0.15
 ------------
