@@ -134,7 +134,7 @@ basic_json<Char>::basic_json(int val)
 template <class Char>
 basic_json<Char>::basic_json(unsigned int val)
 {
-    type_ = longlong_t;
+    type_ = ulonglong_t;
     value_.longlong_value_ = val;
 }
 
@@ -148,7 +148,7 @@ basic_json<Char>::basic_json(long val)
 template <class Char>
 basic_json<Char>::basic_json(unsigned long val)
 {
-    type_ = longlong_t;
+    type_ = ulonglong_t;
     value_.longlong_value_ = val;
 }
 

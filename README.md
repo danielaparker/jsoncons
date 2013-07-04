@@ -7,6 +7,11 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.17
+------------
+
+Added is_custom() method to json and proxy
+
 Release 0.16
 ------------
 

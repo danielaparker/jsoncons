@@ -126,16 +126,19 @@ public:
 
         bool is_longlong() const
         {
+            std::cout << "proxy is_longlong " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_longlong();
         }
 
         bool is_ulonglong() const
         {
+            std::cout << "proxy is_ulonglong " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_ulonglong();
         }
 
         bool is_double() const
         {
+            std::cout << "proxy is_double " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_double();
         }
 
@@ -152,6 +155,11 @@ public:
         bool is_array() const
         {
             return val_.get(name_).is_array();
+        }
+
+        bool is_custom() const
+        {
+            return val_.get(name_).is_custom();
         }
 
         std::basic_string<Char> as_string() const
@@ -431,11 +439,13 @@ public:
 
     bool is_ulonglong() const
     {
+        std::cout << "json is_ulonglong " << type() << std::endl;
         return type_ == ulonglong_t;
     }
 
     bool is_double() const
     {
+        std::cout << "json is_double " << type() << std::endl;
         return type_ == double_t;
     }
 
@@ -452,6 +462,11 @@ public:
     bool is_array() const
     {
         return type_ == array_t;
+    }
+
+    bool is_custom() const
+    {
+        return type_ == custom_t;
     }
 
     bool is_empty() const;
