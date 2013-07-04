@@ -7,6 +7,18 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.16
+------------
+
+Change to json_out_stream and json_serializer:
+
+    void value(const custom_data& value)
+
+removed.
+
+Free function `serialize` replaces free function `to_stream` for
+outputting custom data.
+
 Release 0.15
 ------------
 

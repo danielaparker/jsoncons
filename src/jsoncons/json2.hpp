@@ -497,7 +497,7 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
 		}
         break;
     case custom_t:
-        serializer.value(*(value_.userdata_));
+        value_.userdata_->serialize(serializer);
         break;
     default:
         // throw
@@ -812,7 +812,7 @@ const T& basic_json<Char>::get_custom() const
     switch (type_)
     {
     case custom_t:
-        return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
+        return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -825,7 +825,7 @@ T& basic_json<Char>::get_custom()
     switch (type_)
     {
     case custom_t:
-        return static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_)->data;
+        return static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_)->data_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

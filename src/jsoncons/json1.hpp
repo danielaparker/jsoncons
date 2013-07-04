@@ -23,8 +23,7 @@ public:
     {
     }
 
-    virtual void to_stream(std::basic_ostream<Char>& os, 
-                           const basic_output_format<Char>& format) const = 0;
+    virtual void serialize(basic_json_out_stream<Char>& os) const = 0;
 
     virtual basic_custom_data<Char>* clone() const = 0;
 };
@@ -32,11 +31,10 @@ public:
 typedef basic_custom_data<char> custom_data;
 
 template <class Char,class T>
-void to_stream(std::basic_ostream<Char>& os, 
-               const T& val, 
-               const basic_output_format<Char>& format)
+void serialize(basic_json_out_stream<Char>& os, 
+               const T& val)
 {
-    os << json_char_traits<Char>::null_literal();
+    os.null_value();
 }
 
 template <class Char, class T>
@@ -44,21 +42,20 @@ class custom_data_wrapper : public basic_custom_data<Char>
 {
 public:
     custom_data_wrapper(const T& value)
-        : data(value)
+        : data_(value)
     {
     }
     virtual basic_custom_data<Char>* clone() const
     {
-        return new custom_data_wrapper<Char,T>(data);
+        return new custom_data_wrapper<Char,T>(data_);
     }
 
-    virtual void to_stream(std::basic_ostream<Char>& os, 
-                           const basic_output_format<Char>& format) const
+    virtual void serialize(basic_json_out_stream<Char>& os) const
     {
-        jsoncons::to_stream(os,data,format);
+        jsoncons::serialize(os,data_);
     }
 
-    T data;
+    T data_;
 };
 
 template <class Char>

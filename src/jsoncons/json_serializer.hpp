@@ -188,15 +188,6 @@ public:
 
         end_element();
     }
-
-    virtual void value(const basic_custom_data<Char>& value)
-    {
-        begin_value();
-
-        value.to_stream(os_,format_);
-
-        end_element();
-    }
 protected:
 
     void begin_element()

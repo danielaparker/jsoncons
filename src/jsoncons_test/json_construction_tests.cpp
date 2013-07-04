@@ -33,9 +33,6 @@ BOOST_AUTO_TEST_CASE(test_construction_from_file)
 {
     json val = json::parse_file("../../../examples/members.json");
 
-    //output_format format(true);
-    //val.to_stream(std::cout,format);
-
 	std::cout << pretty_print(val) << std::endl;
 }
 
@@ -205,29 +202,20 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
 
 namespace jsoncons
 {
-    void to_stream(std::ostream& os, 
-                   const matrix<double>& A,
-                   const output_format& format)
+    void serialize(json_out_stream& os, 
+                   const matrix<double>& A)
     {
-        os << '[';
+        os.begin_array();
         for (size_t i = 0; i < A.size1(); ++i)
         {
-            if (i > 0)
-            {
-                os << ',';
-            }
-            os << '[';
+            os.begin_array();
             for (size_t j = 0; j < A.size2(); ++j)
             {
-                if (j > 0)
-                {
-                    os << ',';
-                }
-                os << A(i,j);
+                os.value(A(i,j));
             }
-            os << ']';
+            os.end_array();
         }
-        os << ']';
+        os.end_array();
     }
 }
 
@@ -244,8 +232,8 @@ BOOST_AUTO_TEST_CASE(test_userdata)
 
     obj.set_custom("mydata",A);
 
-    obj.serialize(json_serializer(std::cout));
-    std::cout << std::endl;
+    //obj.serialize(json_serializer(std::cout));
+    std::cout << obj << std::endl;
 
     matrix<double>& B = obj["mydata"].get_custom<matrix<double>>();
 	
