@@ -14,9 +14,11 @@ Added is_custom() method to json and proxy
 
 Added clear() method to json and proxy
 
-push_back() method renamed to add_element() in json and proxy
+set_member() method renamed to insert_member()
 
-get_custom() method renamed to custom_cast() in json and proxy
+set_custom() method renamed to insert_custom()
+
+push_back() method renamed to add_element() in json and proxy
 
 Added add_custom method() in json and proxy
 
