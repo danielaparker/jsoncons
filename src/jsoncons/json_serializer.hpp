@@ -25,7 +25,7 @@ class basic_json_serializer : public basic_json_out_stream<Char>
     struct stack_item
     {
         stack_item(bool is_object)
-            : is_object_(is_object), count_(0)
+            : is_object_(is_object), count_(0), content_indented_(false)
         {
         }
         bool is_object() const
@@ -35,6 +35,7 @@ class basic_json_serializer : public basic_json_out_stream<Char>
 
         bool is_object_;
         size_t count_;
+        bool content_indented_;
     };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
@@ -99,11 +100,11 @@ public:
     virtual void end_array()
     {
         unindent();
-        stack_.pop_back();
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        if (format_.indenting() && !stack_.empty() && stack_.back().content_indented_)
         {
             write_indent();
         }
+        stack_.pop_back();
         os_.put(']');
 
         end_structure();
@@ -253,6 +254,10 @@ protected:
 
     void write_indent()
     {
+        if (!stack_.empty())
+        {
+            stack_.back().content_indented_ = true;
+        }
         os_.put('\n');
         for (int i = 0; i < indent_; ++i)
         {
