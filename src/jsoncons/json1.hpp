@@ -198,16 +198,16 @@ public:
         }
 
         template <class T>
-        const T& get_custom() const
+        const T& custom_cast() const
         {
-            return val_.get(name_).get_custom<T>();
+            return val_.get(name_).custom_cast<T>();
         }
         // Returns a const reference to the custom data associated with name
 
         template <class T>
-        T& get_custom() 
+        T& custom_cast() 
         {
-            return val_.get(name_).get_custom<T>();
+            return val_.get(name_).custom_cast<T>();
         }
         // Returns a reference to the custom data associated with name
 
@@ -263,15 +263,21 @@ public:
             return val_.get(name_).get(name,default_val);
         }
 
-        void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        void clear()
         {
-            return val_.get(name_).set_member(name,value);
+            val_.get(name_).clear();
+        }
+        // Remove all elements from an array or object
+
+        void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        {
+            return val_.get(name_).set(name,value);
         }
 
-        void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
+        void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
-            return val_.get(name_).set_member(name,value);
+            return val_.get(name_).set(name,value);
         }
 
         template <class T>
@@ -286,14 +292,26 @@ public:
             return val_.get(name_).set_custom(name,value);
         }
 
-        void push_back(const basic_json<Char>& value)
+        void add(const basic_json<Char>& value)
         {
-            val_.get(name_).push_back(value);
+            val_.get(name_).add(value);
         }
 
-        void push_back(basic_json<Char>&& value)
+        void add(basic_json<Char>&& value)
         {
-            val_.get(name_).push_back(value);
+            val_.get(name_).add(value);
+        }
+
+        template <class T>
+        void add_custom(const T& value)
+        {
+            val_.get(name_).add_custom(value);
+        }
+
+        template <class T>
+        void add_custom(T&& value)
+        {
+            val_.get(name_).add_custom(value);
         }
 
         std::basic_string<Char> to_string() const
@@ -484,11 +502,11 @@ public:
     unsigned long long as_ulonglong() const;
 
     template <class T>
-    const T& get_custom() const;
+    const T& custom_cast() const;
     // Returns a const reference to the custom data associated with name
 
     template <class T>
-    T& get_custom();
+    T& custom_cast();
     // Returns a reference to the custom data associated with name
 
     std::basic_string<Char> as_string() const;
@@ -507,9 +525,14 @@ public:
 
     const basic_json<Char>& get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
 
-    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
+    // Modifiers
 
-    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+    void clear();
+    // Remove all elements from an array or object
+
+    void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
+
+    void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     template <class T>
     void set_custom(const std::basic_string<Char>& name, const T& value);
@@ -517,9 +540,15 @@ public:
     template <class T>
     void set_custom(std::basic_string<Char>&& name, T&& value);
 
-    void push_back(const basic_json<Char>& value);
+    void add(const basic_json<Char>& value);
 
-    void push_back(basic_json<Char>&& value);
+    void add(basic_json<Char>&& value);
+
+    template <class T>
+    void add_custom(const T& value);
+
+    template <class T>
+    void add_custom(T&& value);
 
     value_type type() const
     {

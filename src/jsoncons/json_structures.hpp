@@ -145,9 +145,9 @@ public:
 
     const basic_json<Char>& at(size_t i) const {return members_[i].value_;}
 
-    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
+    void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
-    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
+    void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     void remove(iterator at); 
 
@@ -204,7 +204,7 @@ void json_object<Char>::remove(iterator at)
 }
 
 template <class Char>
-void json_object<Char>::set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
+void json_object<Char>::set(const std::basic_string<Char>& name, const basic_json<Char>& value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
     if (it != end() && (*it).first == name)
@@ -215,7 +215,7 @@ void json_object<Char>::set_member(const std::basic_string<Char>& name, const ba
 }
 
 template <class Char>
-void json_object<Char>::set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
+void json_object<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
     if (it != end() && (*it).first == name)

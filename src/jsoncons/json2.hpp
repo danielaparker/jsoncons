@@ -32,7 +32,7 @@ basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Ch
 template <class Char>
 typename basic_json<Char>::proxy& basic_json<Char>::proxy::operator=(const basic_json& val)
 {
-    val_.set_member(name_, val);
+    val_.set(name_, val);
     return *this;
 }
 
@@ -305,12 +305,12 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
 }
 
 template <class Char>
-void basic_json<Char>::set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
+void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json<Char>& value)
 {
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,value);
+        value_.object_->set(name,value);
         break;
     default:
         {
@@ -320,12 +320,12 @@ void basic_json<Char>::set_member(const std::basic_string<Char>& name, const bas
 }
 
 template <class Char>
-void basic_json<Char>::set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
+void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 {
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,value);
+        value_.object_->set(name,value);
         break;
     default:
         {
@@ -341,7 +341,7 @@ void basic_json<Char>::set_custom(const std::basic_string<Char>& name, const T& 
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -357,7 +357,7 @@ void basic_json<Char>::set_custom(std::basic_string<Char>&& name, T&& value)
     switch (type_)
     {
     case object_t:
-        value_.object_->set_member(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -367,7 +367,23 @@ void basic_json<Char>::set_custom(std::basic_string<Char>&& name, T&& value)
 }
 
 template <class Char>
-void basic_json<Char>::push_back(const basic_json<Char>& value)
+void basic_json<Char>::clear()
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->clear();
+        break;
+    case object_t:
+        value_.object_->clear();
+        break;
+    default:
+        break;
+    }
+}
+
+template <class Char>
+void basic_json<Char>::add(const basic_json<Char>& value)
 {
     switch (type_)
     {
@@ -382,12 +398,44 @@ void basic_json<Char>::push_back(const basic_json<Char>& value)
 }
 
 template <class Char>
-void basic_json<Char>::push_back(basic_json<Char>&& value)
+void basic_json<Char>::add(basic_json<Char>&& value)
 {
     switch (type_)
     {
     case array_t:
         value_.array_->push_back(value);
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::add_custom(const T& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::add_custom(T&& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -807,7 +855,7 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 
 template <class Char>
 template <class T>
-const T& basic_json<Char>::get_custom() const
+const T& basic_json<Char>::custom_cast() const
 {
     switch (type_)
     {
@@ -820,7 +868,7 @@ const T& basic_json<Char>::get_custom() const
 
 template <class Char>
 template <class T>
-T& basic_json<Char>::get_custom() 
+T& basic_json<Char>::custom_cast() 
 {
     switch (type_)
     {

@@ -12,6 +12,16 @@ Release 0.17
 
 Added is_custom() method to json and proxy
 
+Added clear() method to json and proxy
+
+set_member() method renamed to set() in json and proxy
+
+push_back() method renamed to add() in json and proxy
+
+get_custom() method renamed to custom() in json and proxy
+
+Added add_custom method() in json and proxy
+
 Release 0.16
 ------------
 

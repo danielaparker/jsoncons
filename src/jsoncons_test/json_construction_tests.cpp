@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
 
     // An array value with four elements
     json arr(json::an_array);
-    arr.push_back(null_val);
-    arr.push_back(flag);
-    arr.push_back(number);
-    arr.push_back(obj);
+    arr.add(null_val);
+    arr.add(flag);
+    arr.add(number);
+    arr.add(obj);
 
     output_format format(true);
     arr.to_stream(std::cout,format);
@@ -141,10 +141,10 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
     json arr(json::an_array);
-    arr.push_back("Montreal");
-    arr.push_back("Toronto");
-    arr.push_back("Ottawa");
-    arr.push_back("Vancouver");
+    arr.add("Montreal");
+    arr.add("Toronto");
+    arr.add("Ottawa");
+    arr.add("Vancouver");
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     //obj.serialize(json_serializer(std::cout));
     std::cout << obj << std::endl;
 
-    matrix<double>& B = obj["mydata"].get_custom<matrix<double>>();
+    matrix<double>& B = obj["mydata"].custom_cast<matrix<double>>();
 	
     for (size_t i = 0; i < B.size1(); ++i)
     {
@@ -259,6 +259,27 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     }
 
     std::cout << pretty_print(obj) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_userdata_in_array)
+{
+    json arr(json::an_array);
+    matrix<double> A(2,2);
+    A(0,0) = 1;
+    A(0,1) = 2;
+    A(1,0) = 3;
+    A(1,1) = 4;
+    matrix<double> B(2,2);
+    B(0,0) = 5;
+    B(0,1) = 6;
+    B(1,0) = 7;
+    B(1,1) = 8;
+
+    arr.add_custom(A);
+    arr.add_custom(B);
+
+    //arr.serialize(json_serializer(std::cout));
+    std::cout << pretty_print(arr) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple)
