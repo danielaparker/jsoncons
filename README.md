@@ -16,11 +16,11 @@ Added clear() method to json and proxy
 
 set_member() method renamed to insert_member()
 
-set_custom() method renamed to insert_custom()
+set_custom() method renamed to insert_custom_member()
 
 push_back() method renamed to add_element() in json and proxy
 
-Added add_custom method() in json and proxy
+Added add_custom_element method() in json and proxy
 
 Release 0.16
 ------------
