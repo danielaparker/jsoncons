@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(test_array2)
     v.push_back(300);
 
     json a(v.begin(),v.end());
-    a.add(400);
+    a.add_element(400);
 
     std::cout << a << std::endl;
 
@@ -233,9 +233,9 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 BOOST_AUTO_TEST_CASE(test_array_iterator)
 {
     json arr(json::an_array);
-    arr.add("Toronto");
-    arr.add("Vancouver");
-    arr.add("Montreal");
+    arr.add_element("Toronto");
+    arr.add_element("Vancouver");
+    arr.add_element("Montreal");
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
     address["country"] = "Canada";
     person["address"] = std::move(address);
 
-    root["persons"].add(std::move(person));
+    root["persons"].add_element(std::move(person));
 
     output_format format(true);
     root.to_stream(std::cout,format);

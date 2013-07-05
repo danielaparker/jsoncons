@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
 
     // An array value with four elements
     json arr(json::an_array);
-    arr.add(null_val);
-    arr.add(flag);
-    arr.add(number);
-    arr.add(obj);
+    arr.add_element(null_val);
+    arr.add_element(flag);
+    arr.add_element(number);
+    arr.add_element(obj);
 
     output_format format(true);
     arr.to_stream(std::cout,format);
@@ -141,10 +141,10 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
     json arr(json::an_array);
-    arr.add("Montreal");
-    arr.add("Toronto");
-    arr.add("Ottawa");
-    arr.add("Vancouver");
+    arr.add_element("Montreal");
+    arr.add_element("Toronto");
+    arr.add_element("Ottawa");
+    arr.add_element("Vancouver");
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {

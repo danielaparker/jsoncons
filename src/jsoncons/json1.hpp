@@ -269,15 +269,15 @@ public:
         }
         // Remove all elements from an array or object
 
-        void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
-            return val_.get(name_).set(name,value);
+            return val_.get(name_).set_member(name,value);
         }
 
-        void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
+        void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
-            return val_.get(name_).set(name,value);
+            return val_.get(name_).set_member(name,value);
         }
 
         template <class T>
@@ -292,14 +292,14 @@ public:
             return val_.get(name_).set_custom(name,value);
         }
 
-        void add(const basic_json<Char>& value)
+        void add_element(const basic_json<Char>& value)
         {
-            val_.get(name_).add(value);
+            val_.get(name_).add_element(value);
         }
 
-        void add(basic_json<Char>&& value)
+        void add_element(basic_json<Char>&& value)
         {
-            val_.get(name_).add(value);
+            val_.get(name_).add_element(value);
         }
 
         template <class T>
@@ -530,9 +530,9 @@ public:
     void clear();
     // Remove all elements from an array or object
 
-    void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
+    void set_member(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
-    void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
+    void set_member(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     template <class T>
     void set_custom(const std::basic_string<Char>& name, const T& value);
@@ -540,9 +540,9 @@ public:
     template <class T>
     void set_custom(std::basic_string<Char>&& name, T&& value);
 
-    void add(const basic_json<Char>& value);
+    void add_element(const basic_json<Char>& value);
 
-    void add(basic_json<Char>&& value);
+    void add_element(basic_json<Char>&& value);
 
     template <class T>
     void add_custom(const T& value);
