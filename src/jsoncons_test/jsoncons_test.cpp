@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
     std::ostringstream os;
 
     json_serializer serializer(os,output_format(true));
-    o.serialize(serializer);
+    o.to_stream(serializer);
     std::cout << os.str() << std::endl;
 }
 

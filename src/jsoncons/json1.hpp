@@ -14,30 +14,14 @@
 #include "jsoncons/json_out_stream.hpp"
 #include "jsoncons/output_format.hpp"
 
-#include <boost/numeric/ublas/matrix.hpp>
-using boost::numeric::ublas::matrix;
-
 namespace jsoncons {
-
-template <class Char,class T>
-struct custom_serialization;
 
 template <class Char,class T>
 void serialize(basic_json_out_stream<Char>& os, 
                const T& val)
 {
-    custom_serialization<Char,T>::serialize(os,val);
+    os.null_value();
 }
-
-template <class Char,class T>
-struct custom_serialization
-{
-    static void serialize(basic_json_out_stream<Char>& os, 
-                          const T& val)
-	{
-        os.null_value();
-	}
-};
 
 template <class Char>
 class basic_custom_data
@@ -47,7 +31,7 @@ public:
     {
     }
 
-    virtual void serialize(basic_json_out_stream<Char>& os) const = 0;
+    virtual void to_stream(basic_json_out_stream<Char>& os) const = 0;
 
     virtual basic_custom_data<Char>* clone() const = 0;
 };
@@ -65,7 +49,7 @@ public:
         return new custom_data_wrapper<Char,T>(data_);
     }
 
-    virtual void serialize(basic_json_out_stream<Char>& os) const
+    virtual void to_stream(basic_json_out_stream<Char>& os) const
     {
         jsoncons::serialize(os,data_);
     }
@@ -570,7 +554,7 @@ public:
         return type_;
     }
 
-    void serialize(basic_json_out_stream<Char>& serializer) const;
+    void to_stream(basic_json_out_stream<Char>& out_stream) const;
 
 private:
     value_type type_;

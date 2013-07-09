@@ -7,6 +7,15 @@ The library is header-only: it consists solely of header files containing templa
 
 It has been tested with MS Visual C++ 10, SP1
 
+Release 0.18
+------------
+
+Renamed serialize() class method to to_stream() in json  
+
+Custom data serialization supported through template function specialization of serialize
+(reverses change in 0.17)
+
+
 Release 0.17
 ------------
 

@@ -485,7 +485,7 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    serialize(basic_json_serializer<Char>(os)); 
+    to_stream(basic_json_serializer<Char>(os)); 
     return os.str();
 }
 
@@ -493,58 +493,58 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Char>& format) const
 {
     std::basic_ostringstream<Char> os;
-    serialize(basic_json_serializer<Char>(os,format)); 
+    to_stream(basic_json_serializer<Char>(os,format)); 
     return os.str();
 }
 
 template <class Char>
-void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
+void basic_json<Char>::to_stream(basic_json_out_stream<Char>& out_stream) const
 {
     switch (type_)
     {
     case string_t:
-        serializer.value(*(value_.string_value_));
+        out_stream.value(*(value_.string_value_));
         break;
     case double_t:
-        serializer.value(value_.double_value_);
+        out_stream.value(value_.double_value_);
         break;
     case longlong_t:
-        serializer.value(value_.longlong_value_);
+        out_stream.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        serializer.value(value_.ulonglong_value_);
+        out_stream.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        serializer.value(value_.bool_value_);
+        out_stream.value(value_.bool_value_);
         break;
     case null_t:
-        serializer.null_value();
+        out_stream.null_value();
         break;
     case object_t:
 		{
-        serializer.begin_object();
+        out_stream.begin_object();
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            serializer.name(it->first);
-            it->second.serialize(serializer);
+            out_stream.name(it->first);
+            it->second.to_stream(out_stream);
         }
-        serializer.end_object();
+        out_stream.end_object();
 		}
         break;
     case array_t:
 		{
-        serializer.begin_array();
+        out_stream.begin_array();
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            it->serialize(serializer);
+            it->to_stream(out_stream);
         }
-        serializer.end_array();
+        out_stream.end_array();
 		}
         break;
     case custom_t:
-        value_.userdata_->serialize(serializer);
+        value_.userdata_->to_stream(out_stream);
         break;
     default:
         // throw
@@ -555,13 +555,13 @@ void basic_json<Char>::serialize(basic_json_out_stream<Char>& serializer) const
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
-    serialize(basic_json_serializer<Char>(os)); 
+    to_stream(basic_json_serializer<Char>(os)); 
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
 {
-    serialize(basic_json_serializer<Char>(os,format));
+    to_stream(basic_json_serializer<Char>(os,format));
 }
 
 template <class Char>
