@@ -5,6 +5,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
+#include "my_custom_data.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -66,7 +67,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["array"].is_array());
 
     matrix<double> A;
-    obj.insert_custom_member("custom",A);
+    obj.set_custom_value("custom",A);
     BOOST_CHECK(obj["custom"].is_custom());
 
     // tests for json is_type methods
@@ -75,6 +76,5 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 
     json str = obj["string"];
     BOOST_CHECK(str.is_string());
-
 }
 

@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include "my_custom_data.hpp"
 
 using jsoncons::json_serializer;
 using jsoncons::output_format;
@@ -56,10 +57,10 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
 
     // An array value with four elements
     json arr(json::an_array);
-    arr.add_element(null_val);
-    arr.add_element(flag);
-    arr.add_element(number);
-    arr.add_element(obj);
+    arr.add(null_val);
+    arr.add(flag);
+    arr.add(number);
+    arr.add(obj);
 
     output_format format(true);
     arr.to_stream(std::cout,format);
@@ -141,10 +142,10 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
     json arr(json::an_array);
-    arr.add_element("Montreal");
-    arr.add_element("Toronto");
-    arr.add_element("Ottawa");
-    arr.add_element("Vancouver");
+    arr.add("Montreal");
+    arr.add("Toronto");
+    arr.add("Ottawa");
+    arr.add("Vancouver");
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
@@ -200,25 +201,6 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     std::cout << "size map=" << sizeof(std::vector<std::pair<std::string,json>>) << std::endl;
 }
 
-namespace jsoncons
-{
-    void serialize(json_out_stream& os, 
-                   const matrix<double>& A)
-    {
-        os.begin_array();
-        for (size_t i = 0; i < A.size1(); ++i)
-        {
-            os.begin_array();
-            for (size_t j = 0; j < A.size2(); ++j)
-            {
-                os.value(A(i,j));
-            }
-            os.end_array();
-        }
-        os.end_array();
-    }
-}
-
 BOOST_AUTO_TEST_CASE(test_userdata)
 {
     json obj(json::an_object);
@@ -230,26 +212,15 @@ BOOST_AUTO_TEST_CASE(test_userdata)
 
     std::cout << A << std::endl;
 
-    obj.insert_custom_member("mydata",A);
+    obj.set_custom_value("mydata",A);
 
     //obj.serialize(json_serializer(std::cout));
     std::cout << obj << std::endl;
 
-    matrix<double>& B = obj["mydata"].get_custom<matrix<double>>();
+    matrix<double>& B = obj["mydata"].custom_value<matrix<double>>();
 	
-    for (size_t i = 0; i < B.size1(); ++i)
-    {
-        for (size_t j = 0; j < B.size2(); ++j)
-        {
-            if (j > 0)
-            {
-                std::cout << ',';
-            }
-            std::cout << B(i,j);
-        }
-        std::cout << '\n';
-    }
-    
+    std::cout << B << std::endl;
+       
     for (size_t i = 0; i < B.size1(); ++i)
     {
         for (size_t j = 0; j < B.size2(); ++j)
@@ -275,16 +246,17 @@ BOOST_AUTO_TEST_CASE(test_userdata_in_array)
     B(1,0) = 7;
     B(1,1) = 8;
 
-    arr.add_custom_element(A);
-    arr.add_custom_element(B);
+    arr.add_custom_value(A);
+    arr.add_custom_value(B);
 
-    //arr.serialize(json_serializer(std::cout));
     std::cout << pretty_print(arr) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple)
 {
-    std::string in = "{\"a\": 1, \"b\": 2, \"c\": 3}{\"a\": 4, \"b\": 5, \"c\": 6}";
+    std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
+    std::cout << in << std::endl;
+
     std::istringstream is(in);
 
     jsoncons::json_deserializer handler;
