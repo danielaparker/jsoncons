@@ -335,7 +335,7 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
 
 template <class Char>
 template <class T>
-void basic_json<Char>::set_custom_value(const std::basic_string<Char>& name, const T& value)
+void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, const T& value)
 {
     switch (type_)
     {
@@ -351,7 +351,7 @@ void basic_json<Char>::set_custom_value(const std::basic_string<Char>& name, con
 
 template <class Char>
 template <class T>
-void basic_json<Char>::set_custom_value(std::basic_string<Char>&& name, T&& value)
+void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value)
 {
     switch (type_)
     {
@@ -413,7 +413,7 @@ void basic_json<Char>::add(basic_json<Char>&& value)
 
 template <class Char>
 template <class T>
-void basic_json<Char>::add_custom_value(const T& value)
+void basic_json<Char>::add_custom_data(const T& value)
 {
     switch (type_)
     {
@@ -429,7 +429,7 @@ void basic_json<Char>::add_custom_value(const T& value)
 
 template <class Char>
 template <class T>
-void basic_json<Char>::add_custom_value(T&& value)
+void basic_json<Char>::add_custom_data(T&& value)
 {
     switch (type_)
     {
@@ -854,7 +854,7 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 
 template <class Char>
 template <class T>
-const T& basic_json<Char>::custom_value() const
+const T& basic_json<Char>::custom_data() const
 {
     switch (type_)
     {
@@ -867,7 +867,7 @@ const T& basic_json<Char>::custom_value() const
 
 template <class Char>
 template <class T>
-T& basic_json<Char>::custom_value() 
+T& basic_json<Char>::custom_data() 
 {
     switch (type_)
     {

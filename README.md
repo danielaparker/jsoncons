@@ -12,17 +12,17 @@ Release 0.17
 
 Added is_custom() method to json and proxy
 
-get_custom() method renamed to custom_value() in json and proxy
+get_custom() method renamed to custom_data() in json and proxy
 
 Added clear() method to json and proxy
 
 set_member() method renamed to set()
 
-set_custom() method renamed to set_custom_value()
+set_custom() method renamed to set_custom_data()
 
 push_back() method renamed to add() in json and proxy
 
-Added add_custom_value method() in json and proxy
+Added add_custom_data method() in json and proxy
 
 Custom data serialization supported through template class specialization of custom_serialization
 (replaces template function specialization of serialize)

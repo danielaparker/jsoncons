@@ -213,16 +213,16 @@ public:
         }
 
         template <class T>
-        const T& custom_value() const
+        const T& custom_data() const
         {
-            return val_.get(name_).custom_value<T>();
+            return val_.get(name_).custom_data<T>();
         }
         // Returns a const reference to the custom data associated with name
 
         template <class T>
-        T& custom_value() 
+        T& custom_data() 
         {
-            return val_.get(name_).custom_value<T>();
+            return val_.get(name_).custom_data<T>();
         }
         // Returns a reference to the custom data associated with name
 
@@ -296,15 +296,15 @@ public:
         }
 
         template <class T>
-        void set_custom_value(const std::basic_string<Char>& name, const T& value)
+        void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
-            return val_.get(name_).set_custom_value(name,value);
+            return val_.get(name_).set_custom_data(name,value);
         }
 
         template <class T>
-        void set_custom_value(const std::basic_string<Char>& name, T&& value)
+        void set_custom_data(const std::basic_string<Char>& name, T&& value)
         {
-            return val_.get(name_).set_custom_value(name,value);
+            return val_.get(name_).set_custom_data(name,value);
         }
 
         void add(const basic_json<Char>& value)
@@ -318,15 +318,15 @@ public:
         }
 
         template <class T>
-        void add_custom_value(const T& value)
+        void add_custom_data(const T& value)
         {
-            val_.get(name_).add_custom_value(value);
+            val_.get(name_).add_custom_data(value);
         }
 
         template <class T>
-        void add_custom_value(T&& value)
+        void add_custom_data(T&& value)
         {
-            val_.get(name_).add_custom_value(value);
+            val_.get(name_).add_custom_data(value);
         }
 
         std::basic_string<Char> to_string() const
@@ -517,11 +517,11 @@ public:
     unsigned long long as_ulonglong() const;
 
     template <class T>
-    const T& custom_value() const;
+    const T& custom_data() const;
     // Returns a const reference to the custom data associated with name
 
     template <class T>
-    T& custom_value();
+    T& custom_data();
     // Returns a reference to the custom data associated with name
 
     std::basic_string<Char> as_string() const;
@@ -550,20 +550,20 @@ public:
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
 
     template <class T>
-    void set_custom_value(const std::basic_string<Char>& name, const T& value);
+    void set_custom_data(const std::basic_string<Char>& name, const T& value);
 
     template <class T>
-    void set_custom_value(std::basic_string<Char>&& name, T&& value);
+    void set_custom_data(std::basic_string<Char>&& name, T&& value);
 
     void add(const basic_json<Char>& value);
 
     void add(basic_json<Char>&& value);
 
     template <class T>
-    void add_custom_value(const T& value);
+    void add_custom_data(const T& value);
 
     template <class T>
-    void add_custom_value(T&& value);
+    void add_custom_data(T&& value);
 
     value_type type() const
     {

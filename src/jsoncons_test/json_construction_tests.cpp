@@ -212,12 +212,12 @@ BOOST_AUTO_TEST_CASE(test_userdata)
 
     std::cout << A << std::endl;
 
-    obj.set_custom_value("mydata",A);
+    obj.set_custom_data("mydata",A);
 
     //obj.serialize(json_serializer(std::cout));
     std::cout << obj << std::endl;
 
-    matrix<double>& B = obj["mydata"].custom_value<matrix<double>>();
+    matrix<double>& B = obj["mydata"].custom_data<matrix<double>>();
 	
     std::cout << B << std::endl;
        
@@ -246,8 +246,8 @@ BOOST_AUTO_TEST_CASE(test_userdata_in_array)
     B(1,0) = 7;
     B(1,1) = 8;
 
-    arr.add_custom_value(A);
-    arr.add_custom_value(B);
+    arr.add_custom_data(A);
+    arr.add_custom_data(B);
 
     std::cout << pretty_print(arr) << std::endl;
 }
