@@ -1,0 +1,19 @@
+### Header
+
+    #include "jsoncons/json_reader.hpp"
+
+### Constructor
+
+    json_reader(std::istream& is,
+                json_in_stream& handler)
+
+### Member functions
+
+    void read()
+
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_in_stream]] handler, such as a [[json_deserializer]].
+
+    size_t buffer_capacity() const
+
+    void buffer_capacity(size_t buffer_capacity)
+

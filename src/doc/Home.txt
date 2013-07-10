@@ -1,0 +1,147 @@
+The jsoncons library implements C++ classes for the construction of [JavaScript Object Notation](http://www.json.org) (JSON). 
+
+The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
+
+To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory.
+
+All jsoncons classes and functions are in namespace `jsoncons`.
+
+### Features
+
+* Implements parsing and serializing JSON text in UTF-8
+* Supports event based JSON parsing and serializing with user defined in stream and out stream handlers
+* Uses the standard C++ input/output streams library
+* Accepts and ignores single line comments that start with `//`, and multi line comments that start with `/*` and end with `*/`
+* Supports optional escaping of the solidus (`/`) character
+* Supports `Nan`, `Inf` and `-Inf` replacement
+* Supports reading multiple json objects from a stream
+* Supports optional escaping of non-ascii UTF-8 octets
+* Supports storing custom data types in a json object, with specialized serialization
+
+### Tutorial
+
+[[Basics]]
+
+[[Custom data]]
+
+### Classes
+
+[[json]]
+
+[[json_serializer]]
+
+[[output_format]]
+
+[[json_reader]]
+
+[[json_deserializer]]
+
+## Examples
+
+### First example
+
+    #include <string>
+    #include "jsoncons/json.hpp"
+
+    using jsoncons::json;
+
+    std::string input = "{\"city\":\"Toronto\", \"number\":100.5}";
+    json o = json::parse_string(input);
+
+    std::string city = o["city"].as_string();  
+    double num = o["number"].as_double();  
+
+### User specified `Nan`, `Inf` and `-Inf` replacement
+
+    json obj(json::an_object);
+    obj["field1"] = std::sqrt(-1.0);
+    obj["field2"] = 1.79e308*1000;
+    obj["field3"] = -1.79e308*1000;
+
+    output_format format;
+    format.nan_replacement("null");        // default is "null"
+    format.pos_inf_replacement("1e9999");  // default is "null"
+    format.neg_inf_replacement("-1e9999"); // default is "null"
+
+    obj.to_stream(std::cout,format);
+    std::cout << std::endl;
+
+The output is
+
+    {"field1":null,"field2":1e9999,"field3":-1e9999}
+
+### Reading multiple JSON objects from a stream
+
+    std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
+    std::cout << in << std::endl;
+
+    std::istringstream is(in);
+
+    jsoncons::json_deserializer handler;
+    json_reader reader(is,handler);
+
+    bool done = false;
+    while (!done)
+    {
+        reader.read();
+        if (reader.eof())
+        {
+            done = true;
+        }
+        else
+        {
+            json val;
+            handler.swap_root(val);
+            std::cout << val << std::endl;
+        }
+    }
+
+The output is
+
+    {"a":1,"b":2,"c":3}{"a":4,"b":5,"c":6}
+
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+
+### Optional escaping of non-ASCII UTF8 octets 
+
+    string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse_string(inputStr);
+    std::string s = arr[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s.size(); ++i)
+    {
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+    }
+    std::cout << "]" << std::endl;
+    
+    std::ostringstream os;
+    output_format format;
+    format.escape_all_non_ascii(true);
+    arr.to_stream(os,format);
+    std::string outputStr = os.str();
+    std::cout << "Output:   " << os.str() << std::endl;
+
+    json arr2 = json::parse_string(outputStr);
+    std::string s2 = arr2[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s2.size(); ++i)
+    {
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+    }
+    std::cout << "]" << std::endl;
+
+The output is
+
+    Input:    ["\u007F\u07FF\u0800"]
+    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
+    Output:   ["?\u07FF\u0800"]
+    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]

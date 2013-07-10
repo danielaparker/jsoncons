@@ -1,0 +1,86 @@
+The output_format class is an instantiation of the basic_output_format class template that uses char as the character type.
+
+### Header
+
+    #include "jsoncons/output_format.hpp"
+
+### Member constants
+
+    default_indent
+The default indent is 4
+
+### Constructors
+
+    output_format()
+
+    output_format(bool indenting)
+
+### Accessors
+
+    bool indenting() const
+Returns `true` if indenting is turned on, the default is `false`.
+
+    size_t indent() const
+Returns the level of indentation, the default is 4
+
+    std::streamsize precision() const 
+Returns the floating-point decimal precision, the default is 16
+
+    std::ios_base::fmtflags set_format_flags() const
+
+    std::ios_base::fmtflags unset_format_flags() const
+
+    bool escape_all_non_ascii() const
+The default is false
+
+    bool escape_solidus() const
+The default is false
+
+    bool replace_nan() const
+The defult is `true`
+
+    bool replace_pos_inf() const
+The defult is `true`
+
+    bool replace_neg_inf() const
+The defult is `true`
+
+    std::string nan_replacement() const 
+The default is "null"
+
+    std::string pos_inf_replacement() const 
+The default is "null"
+
+    std::string neg_inf_replacement() const 
+The default is "null"
+
+### Modifiers
+
+    void indenting(bool value)
+
+    void indent(size_t value)
+
+    void precision(std::streamsize prec)
+Sets the floating point decimal precision
+
+    void set_format_flags(std::ios_base::fmtflags flags)
+
+    void unset_format_flags(std::ios_base::fmtflags flags)
+
+    void escape_all_non_ascii(bool value)
+
+    void escape_solidus(bool value)
+
+    void replace_nan(bool replace)
+
+    void replace_inf(bool replace)
+
+    void replace_pos_inf(bool replace)
+
+    void replace_neg_inf(bool replace)
+
+    void nan_replacement(const std::string& replacement)
+
+    void pos_inf_replacement(const std::string& replacement)
+
+    void neg_inf_replacement(const std::string& replacement)

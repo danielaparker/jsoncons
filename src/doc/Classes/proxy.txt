@@ -1,0 +1,115 @@
+The `proxy` class wraps a reference to a json object and a reference to a member name, returned by `operator[](const std::string& name)`.
+
+### Capacity
+
+    size_t size() const
+
+    bool is_empty() const
+
+### Accessors
+
+    bool is_null() const
+
+    bool has_member(const std::string& name) const
+
+    bool is_string() const
+
+    bool is_number() const
+
+    bool is_longlong() const
+
+    bool is_ulonglong() const
+
+    bool is_double() const
+
+    bool is_bool() const
+
+    bool is_object() const
+
+    bool is_array() const
+
+    bool is_custom() const
+
+    std::string as_string() const
+
+    bool as_bool() const
+
+    double as_double() const
+
+    int as_int() const
+
+    unsigned int as_uint() const
+
+    long long as_longlong() const
+
+    unsigned long long as_ulonglong() const
+
+    json& operator[](size_t i)
+
+    const json& operator[](size_t i) const
+
+    proxy operator[](const std::string& name)
+    const proxy operator[](const std::string& name) const
+If `name` matches the name of a member in the json object, returns a [[proxy]] object to its mapped value.
+
+    json& get(const std::string& name)
+    const json& get(const std::string& name) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+
+    json& get(const std::string& name, json& default_val)
+    const json& get(const std::string& name, const json& default_val) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise returns `default_val`.
+
+    template <class T>
+    const T& custom_data() const
+If the value is custom, returns a reference to the custom value, otherwise throws  
+
+    template <class T>
+    T& custom_data() 
+If the value is custom, returns a reference to the custom value, otherwise throws  
+
+### Assignment
+
+    proxy& operator=(const json& val)
+
+    operator json&()
+
+    operator const json&() const
+
+### Modifiers
+
+    void clear()
+    Remove all elements from an array or object value, otherwise do nothing
+
+    void set(const std::string& k, const json& val)
+    void set(std::string&& k, json&& val)
+Inserts a new member into a json object.
+
+    template <class T>
+    void set_custom_data(const std::string& name, const T& value)
+Inserts custom data of type `T` into a json object.
+
+    void add(const json& value)
+
+    void add(json&& value)
+
+    template <class T>
+    void add_custom_data(const T& value)
+Adds a custom value of type `T` into a json array
+
+### Serialization
+
+    std::string to_string() const
+Inserts json value into string.
+
+    std::string to_string(const output_format& format) const
+Inserts json value into string using specified [[output_format]].
+
+    std::ostream& to_stream(std::ostream& os) const
+Inserts json value into stream with default output format.
+
+    std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
+Inserts json value into stream using specified [[output_format]].
+
+    friend std::ostream& operator<<(std::ostream& os, const proxy& o)
+

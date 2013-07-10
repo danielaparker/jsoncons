@@ -1,0 +1,41 @@
+The `json_out_stream` class is an instantiation of the `basic_json_out_stream` class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON output stream.
+
+### Header
+
+    #include "jsoncons/json_out_stream.hpp"
+
+### Event handler methods
+
+    virtual void begin_object()
+Receive notification of the start of a JSON object
+
+    virtual void end_object()
+Receive notification of the end of a JSON object
+
+    virtual void begin_array()
+Receive notification of the start of a JSON array
+
+    virtual void end_array()
+Receive notification of the end of a JSON object
+
+    virtual void name(const std::string& name)
+Receive notification of the `name` of a name value pair
+
+    virtual void value(const std::string& value)
+Receive notification of a `string` value
+
+    virtual void value(double value)
+Receive notification of a floating point number
+
+    virtual void value(long long value)
+Receive notification of a signed integer
+
+    virtual void value(unsigned long long value)
+Receive notification of a non-negative integer
+
+    virtual void value(bool value)
+Receive notification of a boolean value
+
+    virtual void null_value()
+Receive notification of `null`
+

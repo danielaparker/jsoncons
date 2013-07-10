@@ -1,0 +1,499 @@
+The `json` class is an instantiation of the `basic_json` class template that uses char as the character type.
+
+### Header
+
+    #include "jsoncons/json.hpp"
+
+### Member types
+
+    object_iterator
+A random access iterator to `std::pair<std::string,json>`
+
+    const_object_iterator
+A random access iterator to `const std::pair<std::string,json>`
+
+    array_iterator
+A random access iterator to `json`
+
+    const_array_iterator
+A random access iterator to `const json`
+
+    proxy
+A [[proxy]] object wraps a pair of references to a json object and a member name, returned by `operator[](const std::string& name)`.
+
+### Member constants
+
+    an_object
+Empty constant json object value
+
+    an_array
+Empty constant json array value
+
+    null
+Constant json null value
+
+### Static member functions
+
+    static json parse(std::istream& is)
+Parses an input stream of JSON text and returns a json object or array value
+
+    static json parse_string(const std::string& s)
+Parses a string of JSON text and returns a json object or array value
+
+    static json parse_file(const std::string& filename)
+Opens a file of JSON text as a binary stream and reads it into memory before parsing, for very large files, use `parse` instead. Returns a json object or array value.
+
+### Constructors
+
+    explicit json()
+Constructs a `null` value
+
+    json(const json& val);
+Constructs a copy of val
+
+    json(json&& val);
+Acquires the contents of val, leaving val a `null` value
+
+    json(double val);
+Constructs a `double` value
+
+    json(int val);
+Constructs a `integer` value
+
+    json(unsigned int val);
+Constructs a `unsigned integer` value
+
+    json(long val);
+Constructs a `integer` value
+
+    json(unsigned long val);
+Constructs a `unsigned integer` value
+
+    json(long long val);
+Constructs a `integer` value
+
+    json(unsigned long long val);
+Constructs a `unsigned integer` value
+
+    json(const std::string& val);
+Constructs a `string` value
+
+    json(bool val);
+Constructs a `true` or `false` value
+
+    template <class InputIterator>
+    json(InputIterator first, InputIterator last);
+
+Constructs a json array with the elements in the range [first,last).
+
+### Destructor
+
+    ~json()
+Destroys all values and deletes all memory allocated for strings, arrays, and objects.
+
+### Assignment operator
+
+    json& operator=(json rhs);
+Supports copy and move assignment
+
+### Iterators
+
+    object_iterator begin_members()
+    const_object_iterator begin_members() const
+Returns an iterator to the first member of the json object,
+provided this value is a json object, otherwise throws a `std::exception`
+
+    object_iterator end_members()
+    const_object_iterator end_members() const
+Returns an iterator to one-past the last member of the json object
+provided this value is a json object, otherwise throws a `std::exception`
+
+    array_iterator begin_elements()
+    const_array_iterator begin_elements() const
+Returns an iterator to the first element of the json array
+provided this value is a json array, otherwise throws a `std::exception`
+
+    array_iterator end_elements()
+    const_array_iterator end_elements() const
+Returns an iterator to one-past the last element of the json array
+provided this value is a json array, otherwise throws a `std::exception`
+
+### Capacity
+
+    size_t size() const
+Returns the number of elements in a json array, or the number of members in a json object, or `zero`
+
+    bool is_empty() const
+Returns `true` if a json object or array has no elements, otherwise `false`.
+
+### Accessors
+
+    bool is_null() const
+
+    bool has_member(const std::string& name) const
+
+    bool is_string() const
+
+    bool is_number() const
+
+    bool is_longlong() const
+
+    bool is_ulonglong() const
+
+    bool is_double() const
+
+    bool is_bool() const
+
+    bool is_object() const
+
+    bool is_array() const
+
+    bool is_custom() const
+
+    json& operator[](size_t i)
+    const json& operator[](size_t i) const
+Returns a reference to the value at position i in a json object or array.
+
+    proxy operator[](const std::string& name)
+    const proxy operator[](const std::string& name) const
+If `name` matches the name of a member in the json object, returns a [[proxy]] object to its mapped value.
+
+    json& at(size_t i)
+    const json& at(size_t i) const
+Returns a reference to the element at position `i` in a json array.
+
+    json& get(const std::string& name)
+    const json& get(const std::string& name) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+
+    json& get(const std::string& name, json& default_val)
+    const json& get(const std::string& name, const json& default_val) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise returns `default_val`.
+
+    bool as_bool() const
+
+    double as_double() const
+If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
+
+    int as_int() const
+
+    unsigned int as_uint() const
+
+    long long as_longlong() const
+If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.
+
+    unsigned long long as_ulonglong() const
+
+    std::string as_string() const
+If value is string, returns value, otherwise returns result of `to_string`.
+
+    template <class T>
+    const T& custom_data() const
+If the value is custom, returns a reference to the custom value, otherwise throws  
+
+    template <class T>
+    T& custom_data() 
+If the value is custom, returns a reference to the custom value, otherwise throws  
+
+### Modifiers
+
+    void clear()
+Remove all elements from an array or object value, otherwise do nothing
+
+    void set(const std::string& k, const json& val)
+    void set(std::string&& k, json&& val)
+Inserts a new member into a json object.
+
+    template <class T>
+    void set_custom_data(const std::string& name, const T& value)
+
+    void add(const json& val)
+    void add(json&& val)
+Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
+
+    template <class T>
+    void add_custom_data(const T& value)
+
+### Serialization
+
+    std::string to_string() const
+Inserts json value into string.
+
+    std::string to_string(const output_format& format) const
+Inserts json value into string using specified [[output_format]].
+
+    std::ostream& to_stream(std::ostream& os) const
+Inserts json value into stream with default output format.
+
+    std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
+Inserts json value into stream using specified [[output_format]].
+
+    void to_stream(json_out_stream& out_stream) const;
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_out_stream]], such as a [[json_serializer]].
+
+### Non-member functions
+
+    ostream& operator<< (ostream& os, const json& val)
+Inserts json value into stream.
+
+### Examples
+
+### Example 1. Accessors and defaults
+
+    json obj(json::an_object);
+
+    obj["field1"] = 1;
+    obj["field3"] = "Toronto";
+
+    double x1 = obj.has_member("field1") ? obj["field1"].as_double() : 10.0;
+    double x2 = obj.has_member("field2") ? obj["field2"].as_double() : 20.0;
+
+    std::string x3 = obj.get("field3","Montreal").as_string();
+    std::string x4 = obj.get("field4","San Francisco").as_string();
+
+    std::cout << "x1=" << x1 << std::endl;
+    std::cout << "x2=" << x2 << std::endl;
+    std::cout << "x3=" << x3 << std::endl;
+    std::cout << "x4=" << x4 << std::endl;
+
+The output is
+
+    x1=1
+    x2=20
+    x3=Toronto
+    x4=San Francisco
+
+### Example 2. Nulls
+
+    json obj(json::an_object);
+    obj["field1"] = json::null;
+    obj["field2"] = json();
+    std::cout << obj << std::endl;
+
+The output is 
+
+    {"field1":null,"field2":null}
+
+### Example 3. Array
+
+    json arr(json::an_array);
+    arr.add(10);
+    arr.add(20);
+    arr.add(30);
+
+    std::cout << arr << std::endl;
+
+The output is 
+
+    [10,20,30]
+
+### Example 4. Array from std::vector
+
+    std::vector<int> v;
+    v.push_back(10);
+    v.push_back(20);
+    v.push_back(30);
+
+    json arr(v.begin(),v.end());
+
+    std::cout << arr << std::endl;
+
+The output is 
+
+    [10,20,30]
+
+### Example 5. Object iterator
+
+    json obj(json::an_object);
+    obj["city"] = "Toronto";
+    obj["province"] = "Ontario";
+    obj["country"] = "Canada";
+
+    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+    {
+        std::cout << it->first << "=" << it->second.as_string() << std::endl;
+    }
+
+The output is
+
+    city=Toronto
+    country=Canada
+    province=Ontario
+
+### Example 6. Array iterator
+
+    json arr(json::an_array);
+    arr.add("Toronto");
+    arr.add("Vancouver");
+    arr.add("Montreal");
+
+    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    {
+        std::cout << it->as_string() << std::endl;
+    }
+
+The output is
+
+    Toronto
+    Vancouver 
+    Montreal
+
+### Example 7. Constructing json structures
+
+	json root = json(json::an_object);
+
+    root["persons"] = json(json::an_array);
+
+    json person(json::an_object);
+    person["first_name"] = "John";
+    person["last_name"] = "Smith";
+    person["birth_date"] = "1972-01-30";
+    
+    json address(json::an_object);
+    address["city"] = "Toronto";
+    address["country"] = "Canada";
+    
+    person["address"] = std::move(address);
+
+    root["persons"].add(std::move(person));
+
+    output_format format(true);
+    root.to_stream(std::cout,format);
+    std::cout << std::endl;
+
+The output is
+
+    {
+        "persons":[
+            {
+                "address":{
+                    "city":"Toronto",
+                    "country":"Canada"
+                },
+                "birth_date":"1972-01-30",
+                "first_name":"John",
+                "last_name":"Smith"
+            }
+        ]
+    }
+
+### Example 8. Default NaN, inf and -inf replacement
+
+    json obj(json::an_object);
+    obj["field1"] = std::sqrt(-1.0);
+    obj["field2"] = 1.79e308*1000;
+    obj["field3"] = -1.79e308*1000;
+    std::cout << obj << std::endl;
+
+The output is
+
+    {"field1":null,"field2":null,"field3":null}
+
+### Example 9. Custom NaN, inf and -inf replacement
+
+    json obj(json::an_object);
+    obj["field1"] = std::sqrt(-1.0);
+    obj["field2"] = 1.79e308*1000;
+    obj["field3"] = -1.79e308*1000;
+
+    output_format format;
+    format.nan_replacement("null");
+    format.pos_inf_replacement("1e9999");
+    format.neg_inf_replacement("-1e9999");
+
+    obj.to_stream(std::cout,format);
+    std::cout << std::endl;
+
+The output is
+
+    {"field1":null,"field2":1e9999,"field3":-1e9999}
+
+### Example 10. Suppressing NaN, inf and -inf replacement
+
+    json obj(json::an_object);
+    obj["field1"] = std::sqrt(-1.0);
+    obj["field2"] = 1.79e308*1000;
+    obj["field3"] = -1.79e308*1000;
+
+    output_format format;
+    format.replace_nan(false);
+    format.replace_inf(false);
+
+    obj.to_stream(std::cout,format);
+    std::cout << std::endl;
+
+The (illegal) json output produced by Visual Studio 2010 is
+
+    {"field1":-1.#IND,"field2":1.#INF,"field3":-1.#INF}
+
+### Example 11. Unicode escaping
+
+    string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse_string(inputStr);
+    std::string str = arr[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < str.size(); ++i)
+    {
+        unsigned int val = static_cast<unsigned int>(str[i]);
+        if (i != 0)
+        {
+            std::cout << " ";
+        }
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+    }
+    std::cout << "]" << std::endl;
+
+    std::ostringstream os;
+    os << arr;
+    std::cout << "Output:   " << os.str() << std::endl;
+
+The output is
+
+    Input:    ["\u0040\u0040\u0000\u0011"]
+    Hex dump: [0x40 0x40 0x00 0x11]
+    Output:   ["@@\u0000\u0011"]
+
+### Example 12. Output escaping of non-ASCII UTF8 octets (optional)
+
+    string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse_string(inputStr);
+    std::string s = arr[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s.size(); ++i)
+    {
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+    }
+    std::cout << "]" << std::endl;
+    
+    std::ostringstream os;
+    output_format format;
+    format.escape_all_non_ascii(true);
+    arr.to_stream(os,format);
+    std::string outputStr = os.str();
+    std::cout << "Output:   " << os.str() << std::endl;
+
+    json arr2 = json::parse_string(outputStr);
+    std::string s2 = arr2[0].as_string();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s2.size(); ++i)
+    {
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+    }
+    std::cout << "]" << std::endl;
+
+The output is
+
+    Input:    ["\u007F\u07FF\u0800"]
+    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
+    Output:   ["?\u07FF\u0800"]
+    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]

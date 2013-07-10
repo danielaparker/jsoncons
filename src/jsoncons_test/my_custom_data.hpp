@@ -5,13 +5,12 @@
 #define MY_CUSTOM_DATA_HPP
 
 #include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
 
 namespace jsoncons {
 
-template<> inline
-void serialize(json_out_stream& os, const boost::numeric::ublas::matrix<double>& A)
+template<> 
+inline void serialize(json_out_stream& os, const boost::numeric::ublas::matrix<double>& A)
 {
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

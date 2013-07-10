@@ -1,0 +1,12 @@
+### Header
+
+    #include "jsoncons/json_exception.hpp"
+
+### Base class
+
+    std::exception
+
+### Constructors
+
+
+
