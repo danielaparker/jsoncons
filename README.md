@@ -7,8 +7,6 @@ The library is header-only: it consists solely of header files containing templa
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory.
 
-All jsoncons classes and functions are in namespace `jsoncons`.
-
 It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
