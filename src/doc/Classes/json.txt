@@ -101,22 +101,22 @@ Supports copy and move assignment
     object_iterator begin_members()
     const_object_iterator begin_members() const
 Returns an iterator to the first member of the json object,
-provided this value is a json object, otherwise throws a `std::exception`
+provided this value is a json object, otherwise throws a `json_exception`
 
     object_iterator end_members()
     const_object_iterator end_members() const
 Returns an iterator to one-past the last member of the json object
-provided this value is a json object, otherwise throws a `std::exception`
+provided this value is a json object, otherwise throws a `json_exception`
 
     array_iterator begin_elements()
     const_array_iterator begin_elements() const
 Returns an iterator to the first element of the json array
-provided this value is a json array, otherwise throws a `std::exception`
+provided this value is a json array, otherwise throws a `json_exception`
 
     array_iterator end_elements()
     const_array_iterator end_elements() const
 Returns an iterator to one-past the last element of the json array
-provided this value is a json array, otherwise throws a `std::exception`
+provided this value is a json array, otherwise throws a `json_exception`
 
 ### Capacity
 

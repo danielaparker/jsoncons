@@ -14,6 +14,8 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.19
 ------------
 
+Made json_exception a base class for all json exceptions
+
 Added root() method to json_deserializer to get a reference to the json value
 
 Removed swap_root() method from json_deserializer

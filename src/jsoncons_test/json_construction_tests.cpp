@@ -18,6 +18,7 @@ using jsoncons::json;
 using jsoncons::pretty_print;
 using jsoncons::wjson;
 using jsoncons::json_reader;
+using jsoncons::json_exception;
 using std::string;
 using boost::numeric::ublas::matrix;
 
@@ -113,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
     {
         std::string experience = obj["outdoor_experience"].as_string();
     }
-    catch (const std::exception& e)
+    catch (const json_exception& e)
     {
         std::cout << e.what() << std::endl;
     }

@@ -19,7 +19,15 @@ namespace jsoncons {
 class json_exception : public std::exception
 {
 public:
-    json_exception(std::string s)
+    json_exception()
+    {
+    }
+};
+
+class json_exception_0 : public json_exception
+{
+public:
+    json_exception_0(std::string s)
         : message_(s)
     {
     }
@@ -32,7 +40,7 @@ private:
 };
 
 template <class Char>
-class json_exception_1 : public std::exception
+class json_exception_1 : public json_exception
 {
 public:
     json_exception_1(const std::string& format, const std::basic_string<Char>& arg1)
@@ -50,7 +58,7 @@ private:
     char message_[255];
 };
 
-#define JSONCONS_THROW_EXCEPTION(x) throw json_exception((x))
+#define JSONCONS_THROW_EXCEPTION(x) throw json_exception_0((x))
 #define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw json_exception_1<Char>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) {std::cerr << #x; abort();}
 
