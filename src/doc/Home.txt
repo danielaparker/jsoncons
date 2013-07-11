@@ -6,8 +6,6 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 All jsoncons classes and functions are in namespace `jsoncons`.
 
-Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
-
 ### Features
 
 * Implements parsing and serializing JSON text in UTF-8
