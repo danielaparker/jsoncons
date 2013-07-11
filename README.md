@@ -11,6 +11,13 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.19
+------------
+
+Added root() method to json_deserializer to get a reference to the json value
+
+Removed swap_root() method from json_deserializer
+
 Release 0.18
 ------------
 
