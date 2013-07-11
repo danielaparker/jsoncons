@@ -203,10 +203,11 @@ public:
         }
     }
 
-    void swap_root(basic_json<Char>& val)
+    basic_json<Char>& root()
     {
-        val.swap(root_);
+        return root_;
     }
+
 private:
 	basic_json<Char> root_;
     std::vector<stack_item> stack_;

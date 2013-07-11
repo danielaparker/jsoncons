@@ -6,6 +6,8 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 All jsoncons classes and functions are in namespace `jsoncons`.
 
+Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
+
 ### Features
 
 * Implements parsing and serializing JSON text in UTF-8
@@ -91,7 +93,7 @@ The output is
         else
         {
             json val;
-            handler.swap_root(val);
+            handler.root().swap(val);
             std::cout << val << std::endl;
         }
     }

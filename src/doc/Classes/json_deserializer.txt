@@ -51,4 +51,4 @@ Receive notification of a null value
 
 ### Accessors
 
-    void swap_root(json& val)
+    json& root()

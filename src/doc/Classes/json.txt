@@ -238,7 +238,7 @@ Inserts json value into stream.
 
 ### Examples
 
-### Example 1. Accessors and defaults
+### Accessors and defaults
 
     json obj(json::an_object);
 
@@ -263,7 +263,7 @@ The output is
     x3=Toronto
     x4=San Francisco
 
-### Example 2. Nulls
+### Nulls
 
     json obj(json::an_object);
     obj["field1"] = json::null;
@@ -274,7 +274,7 @@ The output is
 
     {"field1":null,"field2":null}
 
-### Example 3. Array
+### Array
 
     json arr(json::an_array);
     arr.add(10);
@@ -287,7 +287,7 @@ The output is
 
     [10,20,30]
 
-### Example 4. Array from std::vector
+### Array from std::vector
 
     std::vector<int> v;
     v.push_back(10);
@@ -302,7 +302,7 @@ The output is
 
     [10,20,30]
 
-### Example 5. Object iterator
+### Object iterator
 
     json obj(json::an_object);
     obj["city"] = "Toronto";
@@ -320,7 +320,7 @@ The output is
     country=Canada
     province=Ontario
 
-### Example 6. Array iterator
+### Array iterator
 
     json arr(json::an_array);
     arr.add("Toronto");
@@ -338,7 +338,7 @@ The output is
     Vancouver 
     Montreal
 
-### Example 7. Constructing json structures
+### Constructing json structures
 
 	json root = json(json::an_object);
 
@@ -377,7 +377,7 @@ The output is
         ]
     }
 
-### Example 8. Default NaN, inf and -inf replacement
+### Default NaN, inf and -inf replacement
 
     json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
@@ -389,7 +389,7 @@ The output is
 
     {"field1":null,"field2":null,"field3":null}
 
-### Example 9. Custom NaN, inf and -inf replacement
+### Custom NaN, inf and -inf replacement
 
     json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
@@ -408,7 +408,7 @@ The output is
 
     {"field1":null,"field2":1e9999,"field3":-1e9999}
 
-### Example 10. Suppressing NaN, inf and -inf replacement
+### Suppressing NaN, inf and -inf replacement
 
     json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
@@ -426,7 +426,7 @@ The (illegal) json output produced by Visual Studio 2010 is
 
     {"field1":-1.#IND,"field2":1.#INF,"field3":-1.#INF}
 
-### Example 11. Unicode escaping
+### Unicode escaping
 
     string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     std::cout << "Input:    " << inputStr << std::endl;
@@ -455,7 +455,7 @@ The output is
     Hex dump: [0x40 0x40 0x00 0x11]
     Output:   ["@@\u0000\u0011"]
 
-### Example 12. Output escaping of non-ASCII UTF8 octets (optional)
+### Output escaping of non-ASCII UTF8 octets (optional)
 
     string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
     std::cout << "Input:    " << inputStr << std::endl;

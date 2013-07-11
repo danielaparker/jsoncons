@@ -28,8 +28,8 @@ Note that `B` is a reference to the matrix data in the `json` object, and change
 will be reflected in the `json` object (but not in `A`.)
 
 ### Serializing the custom data
-
-By default, if you write the json object to a stream
+ 
+By default, if you write the json object containing your boost matrix to a stream
 
     std::cout << obj << std::endl;
 

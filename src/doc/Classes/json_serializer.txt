@@ -55,3 +55,47 @@ Receive notification of a boolean value
     virtual void null_value()
 Receive notification of `null`
 
+### Examples
+
+### Feeding json events directly to a `json_serializer`
+
+    #include <iostream>
+    #include <boost/numeric/ublas/matrix.hpp>
+    #include "jsoncons/json_serializer.hpp"
+
+    using boost::numeric::ublas::matrix;
+    using jsoncons::json_serializer;
+    using jsoncons::output_format;
+
+    int main()
+    {
+        matrix<double> A(2,2);
+        A(0,0) = 1;
+        A(0,1) = 2;
+        A(1,0) = 3;
+        A(1,1) = 4;
+
+        output_format format(true); // pretty printing
+        json_serializer os(std::cout,format);
+        os.begin_array();
+        for (size_t i = 0; i < A.size1(); ++i)
+        {
+            os.begin_array();
+            for (size_t j = 0; j < A.size2(); ++j)
+            {
+                os.value(A(i, j));
+            }
+            os.end_array();
+        }
+        os.end_array();
+
+        return 0;
+    }
+
+The output is
+
+    [
+        [1,2],
+        [3,4]
+    ]
+

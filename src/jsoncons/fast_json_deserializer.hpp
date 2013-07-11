@@ -217,9 +217,9 @@ public:
         }
     }
 
-    virtual void swap_root(basic_json<Char>& root)
+    basic_json<Char>& root()
     {
-        root.swap(root_);
+        return root_;
     }
 
 private:

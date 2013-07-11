@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE(test_multiple)
         else
         {
             json val;
-            handler.swap_root(val);
+            handler.root().swap(val);
             std::cout << val << std::endl;
         }
     }
