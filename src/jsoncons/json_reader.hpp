@@ -16,30 +16,6 @@
 
 namespace jsoncons {
 
-class json_parse_exception : public json_exception
-{
-public:
-    json_parse_exception(std::string s,
-                         unsigned long line,
-                         unsigned long column)
-    {
-        std::ostringstream os;
-        os << s << " on line " << line << " at column " << column;
-        message_ = os.str();
-    }
-    const char* what() const
-    {
-        return message_.c_str();
-    }
-private:
-    std::string message_;
-};
-
-#define JSONCONS_THROW_PARSE_EXCEPTION(x,n,m) throw json_parse_exception(x,n,m)
-
-template<class Char>
-class json_object;
-
 template<class Char>
 class basic_json_reader
 {

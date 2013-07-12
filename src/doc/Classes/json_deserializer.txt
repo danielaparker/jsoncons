@@ -52,3 +52,4 @@ Receive notification of a null value
 ### Accessors
 
     json& root()
+Returns a reference to the root of the json value read from the stream

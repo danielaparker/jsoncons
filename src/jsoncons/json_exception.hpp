@@ -62,6 +62,27 @@ private:
 #define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw json_exception_1<Char>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) {std::cerr << #x; abort();}
 
+class json_parse_exception : public json_exception
+{
+public:
+    json_parse_exception(std::string s,
+                         unsigned long line,
+                         unsigned long column)
+    {
+        std::ostringstream os;
+        os << s << " on line " << line << " at column " << column;
+        message_ = os.str();
+    }
+    const char* what() const
+    {
+        return message_.c_str();
+    }
+private:
+    std::string message_;
+};
+
+#define JSONCONS_THROW_PARSE_EXCEPTION(x,n,m) throw json_parse_exception(x,n,m)
+
 }
 
 #endif
