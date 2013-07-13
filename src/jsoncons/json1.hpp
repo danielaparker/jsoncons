@@ -339,10 +339,7 @@ public:
             return os;
         }
     private:
-        proxy(const proxy& proxy)
-            : val_(proxy.val_), name_(proxy.name_)
-        {
-        }
+        proxy(); // nopop
         proxy& operator = (const proxy& other); // noop
 
         proxy(basic_json<Char>& var, 
