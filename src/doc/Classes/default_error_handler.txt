@@ -1,0 +1,19 @@
+### Header
+
+    #include "jsoncons/error_handler.hpp"
+
+### Base class
+
+[[error_handler]]    
+
+### Member functions
+
+    virtual void warning(const json_parse_exception& e) throw (json_parse_exception)
+Does nothing
+
+    virtual void content_error(const json_parse_exception& e) throw (json_parse_exception)
+Throws a json_parse_exception
+    
+    virtual void fatal_error(const json_parse_exception& e) throw (json_parse_exception)
+Throws a json_parse_exception
+

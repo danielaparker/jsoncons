@@ -2,10 +2,20 @@
 
     #include "jsoncons/json_reader.hpp"
 
-### Constructor
+### Constructors
+
+    json_reader(std::istream& is,
+                json_in_stream& handler,
+                error_handler& err_handler)
+Constructs a `json_reader` that is associated with an input stream
+`is` of JSON text, a [[json_in_stream]] handler that receives
+notification of JSON events, and the specified [[error_handler]].
 
     json_reader(std::istream& is,
                 json_in_stream& handler)
+Constructs a `json_reader` that is associated with an input stream
+`is` of JSON text, a [[json_in_stream]] handler that receives
+notification of JSON events, and a [[default_error_handler]]
 
 ### Member functions
 

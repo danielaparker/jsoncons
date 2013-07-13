@@ -17,6 +17,7 @@
 namespace jsoncons {
 
 #ifdef _MSC_VER
+#pragma warning( disable : 4290 )
 inline bool is_nan(double x) { return _isnan( x ) != 0; }
 inline bool is_inf(double x)
 {

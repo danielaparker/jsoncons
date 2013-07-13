@@ -68,6 +68,7 @@ public:
     json_parse_exception(std::string s,
                          unsigned long line,
                          unsigned long column)
+        : line_number_(line), column_number_(column)
     {
         std::ostringstream os;
         os << s << " on line " << line << " at column " << column;
@@ -77,8 +78,20 @@ public:
     {
         return message_.c_str();
     }
+
+    unsigned long line_number() const
+    {
+        return line_number_;
+    }
+
+    unsigned long column_number() const
+    {
+        return column_number_;
+    }
 private:
     std::string message_;
+    unsigned long line_number_;
+    unsigned long column_number_;
 };
 
 #define JSONCONS_THROW_PARSE_EXCEPTION(x,n,m) throw json_parse_exception(x,n,m)
