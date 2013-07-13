@@ -113,6 +113,8 @@ public:
     }
 
 private:
+    basic_json_reader(const basic_json_reader&); // noop
+    basic_json_reader& operator = (const basic_json_reader&); // noop
 
     void skip_separator();
     void parse_number(Char c);
