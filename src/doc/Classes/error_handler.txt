@@ -9,8 +9,13 @@
 ### Member functions
 
     virtual void warning(const json_parse_exception& e) throw (json_parse_exception) = 0
+Receive notification of a warning. Information about the error is
+passed in a [[json_parse_exception]].
 
     virtual void content_error(const json_parse_exception& e) throw (json_parse_exception) = 0
+Receive notification of a recoverable error. Information about the error is
+passed in a [[json_parse_exception]].
     
     virtual void fatal_error(const json_parse_exception& e) throw (json_parse_exception) = 0
-
+Receive notification of a non-recoverable error. Information about the error is
+passed in a [[json_parse_exception]].

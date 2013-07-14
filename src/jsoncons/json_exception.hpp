@@ -65,18 +65,31 @@ private:
 class json_parse_exception : public json_exception
 {
 public:
-    json_parse_exception(std::string s,
+    json_parse_exception(std::string message,
                          unsigned long line,
                          unsigned long column)
-        : line_number_(line), column_number_(column)
+        : message_(message), 
+          line_number_(line), 
+          column_number_(column)
     {
-        std::ostringstream os;
-        os << s << " on line " << line << " at column " << column;
-        message_ = os.str();
+    }
+    json_parse_exception(const json_parse_exception& other)
+        : message_(other.message_), 
+          line_number_(other.line_number_), 
+          column_number_(other.column_number_)
+    {
     }
     const char* what() const
     {
+        std::ostringstream os;
+        os << message_ << " on line " << line_number_ << " at column " << column_number_;
+        const_cast<std::string&>(message_) = os.str();
         return message_.c_str();
+    }
+
+    const std::string& message() const
+    {
+        return message_;
     }
 
     unsigned long line_number() const
@@ -90,6 +103,7 @@ public:
     }
 private:
     std::string message_;
+    std::string buffer_;
     unsigned long line_number_;
     unsigned long column_number_;
 };
