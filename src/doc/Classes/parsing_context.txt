@@ -1,0 +1,17 @@
+Provides contextual information for the element being parsed. 
+This information may be used for error reporting.
+
+### Header
+
+    #include "jsoncons/error_handler.hpp"
+
+### Member functions
+
+    virtual unsigned long line_number() const = 0
+Returns the line number. Line numbers start at 1.
+
+    virtual unsigned long column_number() const = 0
+Returns the column number. Column numbers start at 1.
+
+
+

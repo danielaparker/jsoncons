@@ -364,9 +364,11 @@ The output is
 The output is
 
     {
-        "persons":[
+        "persons":
+        [
             {
-                "address":{
+                "address":
+                {
                     "city":"Toronto",
                     "country":"Canada"
                 },

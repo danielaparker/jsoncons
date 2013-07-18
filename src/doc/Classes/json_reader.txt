@@ -19,6 +19,9 @@ notification of JSON events, and a [[default_error_handler]]
 
 ### Member functions
 
+    bool eof() const
+Returns `true` when there is no more data to be read from the stream, `false` otherwise
+
     void read()
 
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_in_stream]] handler, such as a [[json_deserializer]].

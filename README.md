@@ -11,6 +11,16 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.20
+------------
+
+Added parsing_context class for providing information about the
+element being parsed.
+
+error_handler methods take message and parsing_context parameters
+
+json_in_stream handlers take parsing_context parameter
+
 Release 0.19
 ------------
 

@@ -62,12 +62,12 @@ public:
     {
     }
 
-    virtual void begin_object()
+    virtual void begin_object(const basic_parsing_context<Char>& context)
     {
         stack_.push_back(stack_item(object_t));
     }
 
-    virtual void end_object()
+    virtual void end_object(const basic_parsing_context<Char>& context)
     {
 		json_object<Char>* var = stack_.back().structure_.object_;
         var->sort_members();
@@ -90,12 +90,12 @@ public:
         }
     }
 
-    virtual void begin_array()
+    virtual void begin_array(const basic_parsing_context<Char>& context)
     {
         stack_.push_back(stack_item(array_t));
     }
 
-    virtual void end_array()
+    virtual void end_array(const basic_parsing_context<Char>& context)
     {
         json_array<Char>* var = stack_.back().structure_.array_;
         stack_.pop_back();
@@ -118,12 +118,12 @@ public:
         }
     }
 
-    virtual void name(const std::basic_string<Char>& name)
+    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
         stack_.back().name_ = name;
     }
 
-    virtual void value(const std::basic_string<Char>& value)
+    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -137,7 +137,7 @@ public:
         }
     }
 
-    virtual void value(double value)
+    virtual void value(double value, const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -151,7 +151,7 @@ public:
         }
     }
 
-    virtual void value(long long value)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -164,7 +164,7 @@ public:
         }
     }
 
-    virtual void value(unsigned long long value)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    virtual void value(bool value)
+    virtual void value(bool value, const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val(value);
         if (stack_.back().is_object())
@@ -190,7 +190,7 @@ public:
         }
     }
 
-    virtual void null_value()
+    virtual void null_value(const basic_parsing_context<Char>& context)
     {
         basic_json<Char> val;
         if (stack_.back().is_object())
