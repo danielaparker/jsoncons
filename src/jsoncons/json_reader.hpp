@@ -18,7 +18,7 @@
 namespace jsoncons {
 
 template<class Char>
-class basic_json_reader : public basic_parsing_context<Char>
+class basic_json_reader : private basic_parsing_context<Char>
 {
     static default_error_handler default_err_handler;
 
@@ -120,6 +120,11 @@ public:
     virtual unsigned long column_number() const
     {
         return column_;
+    }
+
+    virtual const std::basic_string<Char>& buffer() const
+    {
+        return string_buffer_;
     }
 
 private:
@@ -250,7 +255,6 @@ private:
     unsigned long column_;
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
-    std::string number_buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
     Char *input_buffer_;
@@ -622,12 +626,12 @@ bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, cha
 template<class Char>
 void basic_json_reader<Char>::parse_number(Char c) 
 {
-    number_buffer_.clear();
+    string_buffer_.clear();
     bool has_frac_or_exp = false;
     bool has_neg = (c == '-') ? true : false;
     if (!has_neg)
     {
-        number_buffer_.push_back(c);
+        string_buffer_.push_back(c);
     }
 
     bool done = false;
@@ -650,7 +654,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         case '7':
         case '8':
         case '9':
-            number_buffer_.push_back(c);
+            string_buffer_.push_back(c);
             break;
         case '-':
         case '+':
@@ -658,16 +662,16 @@ void basic_json_reader<Char>::parse_number(Char c)
         case 'e':
         case 'E':
             has_frac_or_exp = true;
-            number_buffer_.push_back(c);
+            string_buffer_.push_back(c);
             break;
         default:
             {
                 unread_ch(c);
                 if (has_frac_or_exp)
                 {
-                    const Char *begin = number_buffer_.c_str();
+                    const Char *begin = string_buffer_.c_str();
                     Char *end;
-                    double d = std::strtod(begin, &end);
+                    double d = json_char_traits<Char>::string_to_double(begin, &end);
                     if (end == begin)
                     {
                         err_handler_.fatal_error("Invalid double value", *this);
@@ -680,14 +684,14 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        long long d = static_cast<long long>(string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<long long>::max()));
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max()));
                         handler_.value(-d,*this);
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = number_buffer_.c_str();
+                        const Char *begin = string_buffer_.c_str();
                         Char *end;
-                        double d = std::strtod(begin, &end);
+                        double d = json_char_traits<Char>::string_to_double(begin, &end);
                         if (end == begin)
                         {
                             err_handler_.content_error("Invalid double value", *this);
@@ -705,14 +709,14 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&number_buffer_[0],number_buffer_.length(),std::numeric_limits<unsigned long long>::max());
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max());
                         handler_.value(d,*this);
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = number_buffer_.c_str();
+                        const Char *begin = string_buffer_.c_str();
                         Char *end;
-                        double d = std::strtod(begin, &end);
+                        double d = json_char_traits<Char>::string_to_double(begin, &end);
                         if (end == begin)
                         {
                             err_handler_.content_error("Invalid double value", *this);

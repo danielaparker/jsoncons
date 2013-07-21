@@ -14,6 +14,11 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.20
 ------------
 
+Added buffer accessor method to parsing_context
+
+Release 0.20
+------------
+
 Added parsing_context class for providing information about the
 element being parsed.
 

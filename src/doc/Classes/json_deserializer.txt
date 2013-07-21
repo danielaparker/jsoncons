@@ -4,7 +4,7 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
     #include "jsoncons/json_deserializer.hpp"
 
-### Implemented interfaces
+### Base classes
 
 [[json_in_stream]]
 
