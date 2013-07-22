@@ -11,7 +11,7 @@
 #include <cstring>
 #include <ostream>
 #include "jsoncons/json_exception.hpp"
-#include "jsoncons/json_out_stream.hpp"
+#include "jsoncons/json_writer.hpp"
 #include "jsoncons/output_format.hpp"
 
 namespace jsoncons {

@@ -36,7 +36,7 @@ public:
     virtual void end_array() = 0;
 };
 
-typedef basic_json_out_stream<char> json_out_stream;
+typedef basic_json_out_stream<char> json_writer;
 
 }
 #endif

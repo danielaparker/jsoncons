@@ -11,8 +11,12 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
-Release 0.20
+Release 0.21
 ------------
+
+json_in_stream renamed to json_listener
+
+json_out_stream renamed to json_writer
 
 Added buffer accessor method to parsing_context
 

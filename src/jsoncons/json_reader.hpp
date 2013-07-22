@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_in_stream.hpp"
+#include "jsoncons/json_listener.hpp"
 #include "jsoncons/error_handler.hpp"
 
 namespace jsoncons {

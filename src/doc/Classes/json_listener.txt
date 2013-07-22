@@ -1,4 +1,4 @@
-The `json_in_stream` class is an instantiation of the `basic_json_in_stream` class template that uses char as the character type. It defines an interface for a JSON input stream.
+The `json_listener` class is an instantiation of the `basic_json_in_stream` class template that uses char as the character type. It defines an interface for a JSON input stream.
 
 ### Header
 

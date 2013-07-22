@@ -1,4 +1,4 @@
-The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [[json_out_stream]] supporting pretty serialization.
+The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [[json_writer]] supporting pretty serialization.
 
 ### Header
 
@@ -6,7 +6,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Implemented interfaces
 
-[[json_out_stream]]
+[[json_writer]]
 
 ### Constructors
 

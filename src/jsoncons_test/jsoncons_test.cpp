@@ -11,11 +11,13 @@
 #include <ctime>
 #include "my_custom_data.hpp"
 
+using jsoncons::parsing_context;
 using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
-using jsoncons::basic_json_reader;
+using jsoncons::json_reader;
+using jsoncons::json_listener;
 using std::string;
 
 BOOST_AUTO_TEST_CASE( test1 )
@@ -457,3 +459,116 @@ BOOST_AUTO_TEST_CASE(test_big_file)
  
 }
 
+class my_json_filter : public json_listener
+{
+public:
+    my_json_filter(std::ostream& os)
+        : serializer_(os, output_format(true))
+    {
+    }
+
+    virtual void begin_json() 
+    {
+    }
+
+    virtual void end_json() 
+    {
+    }
+
+    virtual void begin_object(const parsing_context& context)
+    {
+        serializer_.begin_object();
+    }
+
+    virtual void end_object(const parsing_context& context) 
+    {
+        serializer_.end_object();
+    }
+
+    virtual void begin_array(const parsing_context& context) 
+    {
+        serializer_.begin_array();
+    }
+
+    virtual void end_array(const parsing_context& context) 
+    {
+        serializer_.end_array();
+    }
+
+    virtual void name(const std::string& name, const parsing_context& context) 
+    {
+        name_ = name;
+        if (name != "name")
+        {
+            serializer_.name(name);
+        }
+    }
+
+    virtual void value(const std::string& value, const parsing_context& context) 
+    {
+        if (name_ == "name")
+        {
+            size_t end_first = value.find_first_of(" \t");
+            size_t start_last = value.find_first_not_of(" \t",end_first);
+            serializer_.name("first-name");
+            std::string first = value.substr(0,end_first);
+            serializer_.value(first);
+            if (start_last != std::string::npos)
+            {
+                serializer_.name("last-name");
+                std::string last = value.substr(start_last);
+                serializer_.value(last);
+            }
+            else 
+            {
+                std::cerr << "Incomplete name \"" << value 
+                          << "\" at line " << context.line_number() 
+                          << " and column " << context.column_number() << std::endl;
+            }
+        }
+        else
+        {
+            serializer_.value(value);
+        }
+    }
+
+    virtual void value(double value, const parsing_context& context) 
+    {
+        serializer_.value(value);
+    }
+
+    virtual void value(long long value, const parsing_context& context) 
+    {
+        serializer_.value(value);
+    }
+
+    virtual void value(unsigned long long value, const parsing_context& context) 
+    {
+        serializer_.value(value);
+    }
+
+    virtual void value(bool value, const parsing_context& context) 
+    {
+        serializer_.value(value);
+    }
+
+    virtual void null_value(const parsing_context& context)
+    {
+        serializer_.null_value();
+    }
+private:
+    json_serializer serializer_;
+    std::string name_;
+};
+
+BOOST_AUTO_TEST_CASE(test_filter)
+{
+    std::string in_file = "../../../examples/address-book.json";
+    std::string out_file = "../../../examples/address-book-new.json";
+    std::ifstream is(in_file,std::ofstream::binary);
+    std::ofstream os(out_file);
+
+    my_json_filter filter(os);
+    json_reader reader(is,filter);
+	reader.read();
+}

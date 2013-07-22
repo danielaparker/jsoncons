@@ -10,7 +10,7 @@
 namespace jsoncons {
 
 template<> 
-inline void serialize(json_out_stream& os, const boost::numeric::ublas::matrix<double>& A)
+inline void serialize(json_writer& os, const boost::numeric::ublas::matrix<double>& A)
 {
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

@@ -14,7 +14,7 @@
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_out_stream.hpp"
+#include "jsoncons/json_writer.hpp"
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {

@@ -49,7 +49,7 @@ the `jsoncons` namespace, in a header file, like this:
     namespace jsoncons {
 
     template<> 
-    inline void serialize(json_out_stream& os, 
+    inline void serialize(json_writer& os, 
                           const boost::numeric::ublas::matrix<double>& A)
     {
         os.begin_array();

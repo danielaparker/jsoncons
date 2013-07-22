@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
-#include "jsoncons/json_in_stream.hpp"
+#include "jsoncons/json_listener.hpp"
 
 namespace jsoncons {
 

@@ -1,4 +1,4 @@
-The `json_out_stream` class is an instantiation of the `basic_json_out_stream` class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON output stream.
+The `json_writer` class is an instantiation of the `basic_json_out_stream` class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON output stream.
 
 ### Header
 

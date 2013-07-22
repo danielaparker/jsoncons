@@ -42,7 +42,7 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 };
 
-typedef basic_json_in_stream<char> json_in_stream;
+typedef basic_json_in_stream<char> json_listener;
 
 }
 
