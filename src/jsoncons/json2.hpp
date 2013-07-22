@@ -498,53 +498,53 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 }
 
 template <class Char>
-void basic_json<Char>::to_stream(basic_json_out_stream<Char>& out_stream) const
+void basic_json<Char>::to_stream(basic_json_writer<Char>& writer) const
 {
     switch (type_)
     {
     case string_t:
-        out_stream.value(*(value_.string_value_));
+        writer.value(*(value_.string_value_));
         break;
     case double_t:
-        out_stream.value(value_.double_value_);
+        writer.value(value_.double_value_);
         break;
     case longlong_t:
-        out_stream.value(value_.longlong_value_);
+        writer.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        out_stream.value(value_.ulonglong_value_);
+        writer.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        out_stream.value(value_.bool_value_);
+        writer.value(value_.bool_value_);
         break;
     case null_t:
-        out_stream.null_value();
+        writer.null_value();
         break;
     case object_t:
 		{
-        out_stream.begin_object();
+        writer.begin_object();
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            out_stream.name(it->first);
-            it->second.to_stream(out_stream);
+            writer.name(it->first);
+            it->second.to_stream(writer);
         }
-        out_stream.end_object();
+        writer.end_object();
 		}
         break;
     case array_t:
 		{
-        out_stream.begin_array();
+        writer.begin_array();
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            it->to_stream(out_stream);
+            it->to_stream(writer);
         }
-        out_stream.end_array();
+        writer.end_array();
 		}
         break;
     case custom_t:
-        value_.userdata_->to_stream(out_stream);
+        value_.userdata_->to_stream(writer);
         break;
     default:
         // throw

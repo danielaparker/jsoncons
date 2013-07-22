@@ -9,7 +9,7 @@
 namespace jsoncons {
 
 template <class Char>
-class basic_json_out_stream
+class basic_json_writer
 {
 public:
 
@@ -36,7 +36,7 @@ public:
     virtual void end_array() = 0;
 };
 
-typedef basic_json_out_stream<char> json_writer;
+typedef basic_json_writer<char> json_writer;
 
 }
 #endif

@@ -12,7 +12,7 @@ template <class Char>
 class basic_parsing_context;
 
 template <class Char>
-class basic_json_in_stream
+class basic_json_listener
 {
 public:
     virtual void begin_json() = 0;
@@ -42,7 +42,7 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 };
 
-typedef basic_json_in_stream<char> json_listener;
+typedef basic_json_listener<char> json_listener;
 
 }
 

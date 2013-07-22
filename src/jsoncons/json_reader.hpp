@@ -62,7 +62,7 @@ public:
       \param is The input stream to read from
     */
     basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_in_stream<Char>& handler,
+                      basic_json_listener<Char>& handler,
                       basic_error_handler<Char>& err_handler)
        : is_(is), handler_(handler), err_handler_(err_handler)
          input_buffer_(0), 
@@ -73,7 +73,7 @@ public:
 #endif
     }
     basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_in_stream<Char>& handler)
+                      basic_json_listener<Char>& handler)
         
        : is_(is), handler_(handler), err_handler_(default_err_handler), 
          input_buffer_(0), 
@@ -261,7 +261,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    basic_json_in_stream<Char>& handler_;
+    basic_json_listener<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
 };
 

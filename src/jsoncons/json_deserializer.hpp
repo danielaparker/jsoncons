@@ -16,7 +16,7 @@
 namespace jsoncons {
 
 template <class Char>
-class basic_json_deserializer : public basic_json_in_stream<Char>
+class basic_json_deserializer : public basic_json_listener<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item

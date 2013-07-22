@@ -20,7 +20,7 @@
 namespace jsoncons {
 
 template <class Char>
-class basic_json_serializer : public basic_json_out_stream<Char>
+class basic_json_serializer : public basic_json_writer<Char>
 {
     struct stack_item
     {

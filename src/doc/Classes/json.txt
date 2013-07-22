@@ -228,7 +228,7 @@ Inserts json value into stream with default output format.
     std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
 Inserts json value into stream using specified [[output_format]].
 
-    void to_stream(json_writer& out_stream) const;
+    void to_stream(json_writer& writer) const;
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_writer]], such as a [[json_serializer]].
 
 ### Non-member functions

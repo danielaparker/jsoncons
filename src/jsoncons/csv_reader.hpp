@@ -55,7 +55,7 @@ public:
 
     static const size_t default_max_buffer_length = 16384;
     basic_csv_reader(std::basic_istream<Char>& is,
-                      basic_json_in_stream<Char>& handler)
+                      basic_json_listener<Char>& handler)
        : is_(is), handler_(handler), input_buffer_(0), 
          buffer_position_(0), buffer_length_(0)
     {
@@ -225,7 +225,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    basic_json_in_stream<Char>& handler_;
+    basic_json_listener<Char>& handler_;
 };
 
 inline
