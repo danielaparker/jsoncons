@@ -11,7 +11,7 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
-Release 0.21
+Release 0.30
 ------------
 
 json_in_stream renamed to json_listener
