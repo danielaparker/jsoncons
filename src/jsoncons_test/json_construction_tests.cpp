@@ -263,15 +263,10 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     jsoncons::json_deserializer handler;
     json_reader reader(is,handler);
 
-    bool done = false;
-    while (!done)
+    while (!reader.eof())
     {
         reader.read();
-        if (reader.eof())
-        {
-            done = true;
-        }
-        else
+        if (!reader.eof())
         {
             json val;
             handler.root().swap(val);

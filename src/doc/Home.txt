@@ -9,7 +9,7 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 ### Features
 
 * Implements parsing and serializing JSON text in UTF-8
-* Supports event based JSON parsing and serializing with user defined in stream and out stream handlers
+* Supports event based JSON parsing and serializing with user defined listeners and writers
 * Uses the standard C++ input/output streams library
 * Accepts and ignores single line comments that start with `//`, and multi line comments that start with `/*` and end with `*/`
 * Supports optional escaping of the solidus (`/`) character
@@ -23,6 +23,8 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 [[Basics]]
 
 [[Custom data]]
+
+[[Filtering JSON content]]
 
 ### Classes
 
@@ -80,15 +82,10 @@ The output is
     jsoncons::json_deserializer handler;
     json_reader reader(is,handler);
 
-    bool done = false;
-    while (!done)
+    while (!reader.eof())
     {
         reader.read();
-        if (reader.eof())
-        {
-            done = true;
-        }
-        else
+        if (!reader.eof())
         {
             json val;
             handler.root().swap(val);
@@ -99,7 +96,6 @@ The output is
 The output is
 
     {"a":1,"b":2,"c":3}{"a":4,"b":5,"c":6}
-
     {"a":1,"b":2,"c":3}
     {"a":4,"b":5,"c":6}
 

@@ -322,14 +322,14 @@ void basic_json_reader<Char>::read()
                 Char next = peek();
                 if (eof())
                 {
-                    err_handler_.fatal_error("Unexpected EOF", *this);
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
                 if (next == '/')
                 {
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     ignore_single_line_comment();
                 }
@@ -338,7 +338,7 @@ void basic_json_reader<Char>::read()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     ignore_multi_line_comment();
                 }
@@ -368,14 +368,14 @@ void basic_json_reader<Char>::read()
             case value_separator:
                 if (stack_.back().count_ == 0)
                 {
-                    err_handler_.fatal_error("Unexpected comma", *this);
+                    err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
                 }
                 stack_.back().comma_ = true;
                 break;
             case '\"':
                 if (stack_.back().count_ > 0 && !stack_.back().comma_)
                 {
-                    err_handler_.fatal_error("Expected comma", *this);
+                    err_handler_.fatal_error("JPE102", "Expected comma", *this);
                 }
                 {
                     parse_string();
@@ -398,11 +398,11 @@ void basic_json_reader<Char>::read()
                 {
                     if (!stack_.back().is_object())
                     {
-                        err_handler_.fatal_error("Unexpected }", *this);
+                        err_handler_.fatal_error("JPE103", "Unexpected }", *this);
                     }
                     if (stack_.back().comma_)
                     {
-                        err_handler_.fatal_error("Unexpected comma", *this);
+                        err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
                     }
                     handler_.end_object(*this);
                     stack_.pop_back();
@@ -423,11 +423,11 @@ void basic_json_reader<Char>::read()
                 {
                     if (!stack_.back().is_array())
                     {
-                        err_handler_.fatal_error("Unexpected ]", *this);
+                        err_handler_.fatal_error("JPE104", "Unexpected ]", *this);
                     }
                     if (stack_.back().comma_)
                     {
-                        err_handler_.fatal_error("Unexpected comma", *this);
+                        err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
                     }
                     handler_.end_array(*this);
                     stack_.pop_back();
@@ -447,7 +447,7 @@ void basic_json_reader<Char>::read()
             case 't':
                 if (!read_until_match_fails('r', 'u', 'e'))
                 {
-                    err_handler_.fatal_error("Invalid value", *this);
+                    err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                 }
                 handler_.value(true,*this);
                 stack_.back().comma_ = false;
@@ -457,7 +457,7 @@ void basic_json_reader<Char>::read()
             case 'f':
                 if (!read_until_match_fails('a', 'l', 's', 'e'))
                 {
-                    err_handler_.fatal_error("Invalid value", *this);
+                    err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                 }
                 handler_.value(false,*this);
                 stack_.back().comma_ = false;
@@ -467,7 +467,7 @@ void basic_json_reader<Char>::read()
             case 'n':
                 if (!read_until_match_fails('u', 'l', 'l'))
                 {
-                    err_handler_.fatal_error("Invalid value", *this);
+                    err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                 }
                 handler_.null_value(*this);
                 stack_.back().comma_ = false;
@@ -496,7 +496,7 @@ void basic_json_reader<Char>::read()
 
     if (stack_.size() > 0)
     {
-        err_handler_.fatal_error("End of file", *this);
+        err_handler_.fatal_error("JPE101", "End of file", *this);
     }
 }
 
@@ -508,7 +508,7 @@ void basic_json_reader<Char>::skip_separator()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         switch (c)
         {
@@ -542,7 +542,7 @@ void basic_json_reader<Char>::skip_separator()
         }
     }
 
-    err_handler_.fatal_error("Expected :", *this);
+    err_handler_.fatal_error("JPE106", "Expected :", *this);
 }
 
 template<class Char>
@@ -553,21 +553,21 @@ bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, cha
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == char1)
         {
             Char c = read_ch();
             if (eof())
             {
-                err_handler_.fatal_error("Unexpected EOF", *this);
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             if (c == char2)
             {
                 Char c = read_ch();
                 if (eof())
                 {
-                    err_handler_.fatal_error("Unexpected EOF", *this);
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
                 if (c = char3)
                 {
@@ -588,28 +588,28 @@ bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, cha
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == char1)
         {
             Char c = read_ch();
             if (eof())
             {
-                err_handler_.fatal_error("Unexpected EOF", *this);
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             if (c == char2)
             {
                 Char c = read_ch();
                 if (eof())
                 {
-                    err_handler_.fatal_error("Unexpected EOF", *this);
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
                 if (c = char3)
                 {
                     Char c = read_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     if (c = char4)
                     {
@@ -640,7 +640,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         switch (c)
         {
@@ -674,7 +674,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                     double d = json_char_traits<Char>::string_to_double(begin, &end);
                     if (end == begin)
                     {
-                        err_handler_.fatal_error("Invalid double value", *this);
+                        err_handler_.fatal_error("JPE203", "Invalid double value", *this);
                     }
                     if (has_neg)
                         d = -d;
@@ -694,7 +694,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         double d = json_char_traits<Char>::string_to_double(begin, &end);
                         if (end == begin)
                         {
-                            err_handler_.content_error("Invalid double value", *this);
+                            err_handler_.content_error("JPE203", "Invalid double value", *this);
                             handler_.null_value(*this);
                         }
                         else
@@ -719,7 +719,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         double d = json_char_traits<Char>::string_to_double(begin, &end);
                         if (end == begin)
                         {
-                            err_handler_.content_error("Invalid double value", *this);
+                            err_handler_.content_error("JPE203", "Invalid double value", *this);
                         }
                         else
                         {
@@ -747,12 +747,11 @@ void basic_json_reader<Char>::parse_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("EOF, expected \"", *this);
+            err_handler_.fatal_error("JPE101", "EOF, expected \"", *this);
         }
         if (is_control_character(c))
         {
-            err_handler_.content_error("Illegal control character in string", *this);
-            continue;
+            err_handler_.content_error("JPE201", "Illegal control character in string", *this);
         }
         switch (c)
         {
@@ -766,7 +765,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\"');
                     break;
@@ -774,7 +773,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\\');
                     break;
@@ -782,7 +781,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('/');
                     break;
@@ -790,7 +789,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\n');
                     break;
@@ -798,7 +797,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\n');
                     break;
@@ -806,7 +805,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\n');
                     break;
@@ -814,7 +813,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\n');
                     break;
@@ -822,7 +821,7 @@ void basic_json_reader<Char>::parse_string()
                     skip_ch();
                     if (eof())
                     {
-                        err_handler_.fatal_error("Unexpected EOF", *this);
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
                     string_buffer_.push_back('\n');
                     break;
@@ -831,14 +830,14 @@ void basic_json_reader<Char>::parse_string()
                         skip_ch();
                         if (eof())
                         {
-                            err_handler_.fatal_error("Unexpected EOF", *this);
+                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                         }
                         unsigned int cp = decode_unicode_codepoint();
                         json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
                     }
                     break;
                 default:
-                    err_handler_.fatal_error("Invalid character following \\", *this);
+                    err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
                 }
             }
             break;
@@ -861,7 +860,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == '\n')
         {
@@ -913,14 +912,14 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == '*')
         {
             Char next = peek();
             if (eof())
             {
-                err_handler_.fatal_error("Unexpected EOF", *this);
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             if (next == '/')
             {
@@ -969,14 +968,14 @@ unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
         {
             if (eof())
             {
-                err_handler_.fatal_error("Unexpected EOF", *this);
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             unsigned int surrogate_pair = decode_unicode_escape_sequence();
             cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
         }
         else
         {
-            err_handler_.fatal_error("expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
+            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
         }
     }
     return cp;
@@ -992,7 +991,7 @@ unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("Unexpected EOF", *this);
+            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         const unsigned int u(c >= 0 ? c : 256 + c);
         cp *= 16;
@@ -1012,13 +1011,13 @@ unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
         {
             std::ostringstream os;
             os << "Expected hexadecimal digit, found " << u << ".";
-            err_handler_.fatal_error(os.str(), *this);
+            err_handler_.fatal_error("JPE202", os.str(), *this);
         }
         ++index;
     }
     if (index != 4)
     {
-        err_handler_.fatal_error("Bad cp escape sequence in string: four digits expected.", *this);
+        err_handler_.fatal_error("JPE202", "Bad codepoint escape sequence in string: four digits expected.", *this);
     }
     return cp;
 }

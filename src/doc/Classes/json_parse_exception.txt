@@ -1,6 +1,6 @@
 ### Header
 
-    #include "jsoncons/json_exception.hpp"
+    #include "jsoncons/error_handler.hpp"
 
 ### Base class
 
