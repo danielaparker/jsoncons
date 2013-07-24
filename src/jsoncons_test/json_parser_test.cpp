@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     std::istringstream is("{\"field1\":}");
 
     json_deserializer handler;
-    my_error_handler err_handler("","JPE204");
+    my_error_handler err_handler("","JPE107");
 
     json_reader reader(is,handler,err_handler);
 

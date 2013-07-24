@@ -406,7 +406,7 @@ void basic_json_reader<Char>::read()
                         }
                         if (stack_.back().received_name_)
                         {
-                            err_handler_.fatal_error("JPE204", "Value not found", *this);
+                            err_handler_.fatal_error("JPE107", "Value not found", *this);
                         }
                         handler_.end_object(*this);
                         stack_.pop_back();

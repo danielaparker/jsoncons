@@ -5,9 +5,9 @@ JPE103 Unexpected end of object
 JPE104 Unexpected end of array
 JPE105 Unrecognized value
 JPE106 Expected name-value separator
+JPE107 Value not found
 JPE201 Illegal character
 JPE202 Invalid codepoint
 JPE203 Invalid number
-JPE204 Value not found
 
 
