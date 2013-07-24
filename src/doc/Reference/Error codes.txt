@@ -8,5 +8,6 @@ JPE106 Expected name-value separator
 JPE201 Illegal character
 JPE202 Invalid codepoint
 JPE203 Invalid number
+JPE204 Value not found
 
 

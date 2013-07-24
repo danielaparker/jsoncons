@@ -87,7 +87,7 @@ public:
                          const std::string& message, 
                          const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 
-    virtual void content_error(const std::string& error_code, 
+    virtual void error(const std::string& error_code, 
                                const std::string& message, 
                                const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
     
@@ -106,7 +106,7 @@ public:
     {
         // Do nothing
     }
-    virtual void content_error(const std::string& error_code, 
+    virtual void error(const std::string& error_code, 
                                const std::string& message, 
                                const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {

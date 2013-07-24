@@ -13,7 +13,7 @@
                          const parsing_context& context) throw (json_parse_exception)
 Does nothing
 
-    virtual void content_error(const std::string& error_code,
+    virtual void error(const std::string& error_code,
                                const std::string& message,
                                const parsing_context& context) throw (json_parse_exception)
 Throws a [[json_parse_exception]] with the message and the line 
