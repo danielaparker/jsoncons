@@ -11,6 +11,13 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.31
+------------
+
+error_handler method content_error renamed to error
+
+Added error_code to warning, error and fatal_error methods of error_handler
+
 Release 0.30
 ------------
 
