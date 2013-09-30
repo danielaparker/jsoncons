@@ -45,7 +45,7 @@ class basic_json_deserializer : public basic_json_listener<Char>
             return type_ == array_t;
         }
 
-        std::basic_string<Char> name_;
+        std::pair<std::basic_string<Char>,basic_json<Char>> pair_;
         structure_type type_;
         union {
             json_object<Char>* object_;
@@ -71,21 +71,23 @@ public:
     {
 		json_object<Char>* var = stack_.back().structure_.object_;
         var->sort_members();
-        basic_json<Char> val(var);	    
 		stack_.pop_back();
         if (stack_.size() > 0)
         {
             if (stack_.back().is_object())
             {
-                stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
+                stack_.back().pair_.second = basic_json<Char>(var);	    
+                stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
             }
             else
             {
+                basic_json<Char> val(var);	    
                 stack_.back().structure_.array_->push_back(std::move(val));
             }
         }
         else
         {
+            basic_json<Char> val(var);	    
             root_ = std::move(val);
         }
     }
@@ -99,106 +101,111 @@ public:
     {
         json_array<Char>* var = stack_.back().structure_.array_;
         stack_.pop_back();
-        basic_json<Char> val(var);	    
         if (stack_.size() > 0)
         {
             if (stack_.back().is_object())
             {
-                std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
-                stack_.back().structure_.object_->push_back(std::move(pair));
+                stack_.back().pair_.second = basic_json<Char>(var);	    
+                stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
             }
             else
             {
+                basic_json<Char> val(var);	    
                 stack_.back().structure_.array_->push_back(std::move(val));
             }
         }
         else
         {
+            basic_json<Char> val(var);	    
             root_ = std::move(val);
         }
     }
 
     virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
-        stack_.back().name_ = name;
+        stack_.back().pair_.first = name;
     }
 
     virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
-            stack_.back().structure_.object_->push_back(std::move(pair));
+            stack_.back().pair_.second = basic_json<Char>(value);	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else 
         {
+            basic_json<Char> val(value);
             stack_.back().structure_.array_->push_back(std::move(val));
         }
     }
 
     virtual void value(double value, const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            std::pair<std::basic_string<Char>,basic_json<Char>> pair(std::move(stack_.back().name_),std::move(val));
-            stack_.back().structure_.object_->push_back(std::move(pair));
+            stack_.back().pair_.second = basic_json<Char>(value);	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
+            basic_json<Char> val(value);
             stack_.back().structure_.array_->push_back(val);
         }
     }
 
     virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().pair_.second = basic_json<Char>(value);	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
+            basic_json<Char> val(value);
             stack_.back().structure_.array_->push_back(val);
         }
     }
 
     virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().pair_.second = basic_json<Char>(value);	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
+            basic_json<Char> val(value);
             stack_.back().structure_.array_->push_back(val);
         }
     }
 
     virtual void value(bool value, const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(value);
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().pair_.second = basic_json<Char>(value);	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
+            basic_json<Char> val(value);
             stack_.back().structure_.array_->push_back(val);
         }
     }
 
     virtual void null_value(const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val;
         if (stack_.back().is_object())
         {
-            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().name_),std::move(val)));
+            stack_.back().pair_.second = basic_json<Char>();	    
+            stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
+            basic_json<Char> val;
             stack_.back().structure_.array_->push_back(val);
         }
     }

@@ -24,7 +24,7 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 
 [[Custom data]]
 
-[[Filtering JSON content]]
+[Transforming JSON with filters]("Filtering JSON content")
 
 ### Classes
 

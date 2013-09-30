@@ -56,6 +56,12 @@ public:
         : elements_(n)
     {
     }
+
+    json_array(size_t n, const basic_json<Char>& val)
+        : elements_(n,val)
+    {
+    }
+
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)

@@ -356,6 +356,14 @@ public:
 
     static basic_json parse_file(const std::string& s);
 
+    static basic_json make_array(size_t n);
+
+    static basic_json make_array(size_t n, const basic_json<Char>& val);
+
+    static basic_json make_2_dim_array(size_t m, size_t n);
+
+    static basic_json make_2_dim_array(size_t m, size_t n, const basic_json<Char>& val);
+
     explicit basic_json();
 
     basic_json(const basic_json& val);

@@ -574,6 +574,40 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
 
 template <class Char> 
+basic_json<Char> basic_json<Char>::make_array(size_t n)
+{
+    return basic_json<Char>(new json_array<Char>(n));
+}
+
+template <class Char> 
+basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& val)
+{
+    return basic_json<Char>(new json_array<Char>(n,val));
+}
+
+template <class Char> 
+basic_json<Char> basic_json<Char>::make_2_dim_array(size_t m, size_t n)
+{
+    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        a[i] = basic_json<Char>(new json_array<Char>(n));
+    }
+    return a;
+}
+
+template <class Char> 
+basic_json<Char> basic_json<Char>::make_2_dim_array(size_t m, size_t n, const basic_json<Char>& val)
+{
+    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        a[i] = basic_json<Char>(new json_array<Char>(n,val));
+    }
+    return a;
+}
+
+template <class Char> 
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
     basic_json_deserializer<Char> handler;
