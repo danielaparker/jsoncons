@@ -98,6 +98,22 @@ public:
     const_iterator end() const {return elements_.end();}
 
     std::vector<basic_json<Char>> elements_;
+
+    bool operator==(const json_array<Char>& rhs) const
+    {
+        if (size() != rhs.size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < size(); ++i)
+        {
+            if (elements_[i] != rhs.elements_[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 template <class Char>
@@ -181,6 +197,23 @@ public:
     const_iterator begin() const {return members_.begin();}
 
     const_iterator end() const {return members_.end();}
+
+    bool operator==(const json_object<Char>& rhs) const
+    {
+        if (size() != rhs.size())
+        {
+            return false;
+        }
+        for (auto it = members_.begin(); it != members_.end(); ++it)
+        {
+            bool exists = std::binary_search(rhs.members_.begin(),rhs.members_.end(),*it,member_compare<Char>());
+            if (!exists)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
 };

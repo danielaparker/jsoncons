@@ -222,6 +222,16 @@ public:
 
         proxy& operator=(const basic_json& val);
 
+        bool operator==(const basic_json& val) const
+        {
+            return val_ == val;
+        }
+
+        bool operator!=(const basic_json& val) const
+        {
+            return val_ != val;
+        }
+
         basic_json<Char>& operator[](size_t i)
         {
             return val_.get(name_)[i];
@@ -418,6 +428,10 @@ public:
     const_array_iterator end_elements() const;
 
     basic_json& operator=(basic_json<Char> rhs);
+
+    bool operator!=(const basic_json<Char>& rhs) const;
+
+    bool operator==(const basic_json<Char>& rhs) const;
 
     size_t size() const; 
 

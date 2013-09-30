@@ -25,6 +25,7 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
     json a = json::make_array(10,0);
     std::cout << pretty_print(a) << std::endl;
     BOOST_CHECK(a.size() == 10);
+    BOOST_CHECK(a[0] == 0);
 	a[0] = 1;
     std::cout << pretty_print(a) << std::endl;
 }

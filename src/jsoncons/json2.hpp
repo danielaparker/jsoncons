@@ -213,6 +213,51 @@ basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 }
 
 template <class Char>
+bool basic_json<Char>::operator!=(const basic_json<Char>& rhs) const
+{
+    return !(*this == rhs);
+}
+
+template <class Char>
+bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
+{
+    if (rhs.type_ != type_)
+    {
+        return false;
+    }
+    switch (type_)
+    {
+    case double_t:
+        return value_.double_value_ == rhs.value_.double_value_;
+    case longlong_t:
+        return value_.longlong_value_ == rhs.value_.longlong_value_;
+    case ulonglong_t:
+        return value_.ulonglong_value_ == rhs.value_.ulonglong_value_;
+    case bool_t:
+        return value_.bool_value_ == rhs.value_.bool_value_;
+    case null_t:
+        return true;
+    case string_t:
+        return *(value_.string_value_) == *(rhs.value_.string_value_);
+    case array_t:
+        return *(value_.array_) == *(rhs.value_.array_);
+        //value_.array_ = val.value_.array_->clone();
+        break;
+    case object_t:
+        return *(value_.object_) == *(rhs.value_.object_);
+        //value_.object_ = val.value_.object_->clone();
+        break;
+    case custom_t:
+        //value_.userdata_ = val.value_.userdata_->clone();
+        break;
+    default:
+        // throw
+        break;
+    }
+    return false;
+}
+
+template <class Char>
 void basic_json<Char>::swap(basic_json<Char>& o) throw()
 {
     std::swap(type_,o.type_);
