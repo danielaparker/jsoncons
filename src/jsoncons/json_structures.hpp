@@ -81,6 +81,13 @@ public:
 
     void clear() {elements_.clear();}
 
+    void remove_range(size_t from_index, size_t to_index) 
+    {
+        JSONCONS_ASSERT(from <= to);
+        JSONCONS_ASSERT(to <= elements_.size());
+        elements_.erase(elements_.begin()+from,elements_.begin()+to);
+    }
+
     void reserve(size_t n) {elements_.reserve(n);}
 
     basic_json<Char>& at(size_t i) {return elements_[i];}
@@ -155,6 +162,13 @@ public:
     size_t size() const {return members_.size();}
 
     void clear() {members_.clear();}
+
+    void remove_range(size_t from_index, size_t to_index) 
+    {
+        JSONCONS_ASSERT(from <= to);
+        JSONCONS_ASSERT(to <= members_.size());
+        members_.erase(members_.begin()+from,members_.begin()+to);
+    }
 
     void reserve(size_t n) {members_.reserve(n);}
 

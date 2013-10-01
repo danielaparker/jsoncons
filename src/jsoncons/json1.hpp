@@ -125,20 +125,23 @@ public:
 
         bool is_longlong() const
         {
-            std::cout << "proxy is_longlong " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_longlong();
         }
 
         bool is_ulonglong() const
         {
-            std::cout << "proxy is_ulonglong " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_ulonglong();
         }
 
         bool is_double() const
         {
-            std::cout << "proxy is_double " << val_.get(name_).type() << std::endl;
             return val_.get(name_).is_double();
+        }
+
+        bool is_numeric() const
+        {
+            value_type t = type();
+            return t == double_t || t == longlong_t || t == ulonglong_t;
         }
 
         bool is_bool() const
@@ -278,6 +281,12 @@ public:
         }
         // Remove all elements from an array or object
 
+        void remove_range(size_t from_index, size_t to_index)
+        {
+            val_.get(name_).remove_range(size_t from_index, size_t to_index);
+        }
+        // Remove a range of elements from an array 
+
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
             return val_.get(name_).set(name,value);
@@ -370,9 +379,9 @@ public:
 
     static basic_json make_array(size_t n, const basic_json<Char>& val);
 
-    static basic_json make_2_dim_array(size_t m, size_t n);
+    static basic_json make_2d_array(size_t m, size_t n);
 
-    static basic_json make_2_dim_array(size_t m, size_t n, const basic_json<Char>& val);
+    static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);
 
     explicit basic_json();
 
@@ -475,14 +484,17 @@ public:
 
     bool is_ulonglong() const
     {
-        std::cout << "json is_ulonglong " << type() << std::endl;
         return type_ == ulonglong_t;
     }
 
     bool is_double() const
     {
-        std::cout << "json is_double " << type() << std::endl;
         return type_ == double_t;
+    }
+
+    bool is_numeric() const
+    {
+        return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }
 
     bool is_bool() const
@@ -547,6 +559,9 @@ public:
 
     void clear();
     // Remove all elements from an array or object
+
+    void remove_range(size_t from_index, size_t to_index);
+    // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 

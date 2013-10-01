@@ -43,6 +43,18 @@ Parses a string of JSON text and returns a json object or array value
     static json parse_file(const std::string& filename)
 Opens a file of JSON text as a binary stream and reads it into memory before parsing, for very large files, use `parse` instead. Returns a json object or array value.
 
+    static json make_array(size_t n);
+Makes an n dimensional array. Each element is a json null value.
+
+    static json make_array(size_t n, const json& val);
+Makes an n dimensional array. Each element is a copy of `val`.
+
+    static json make_2d_array(size_t m, size_t n);
+Makes an m dimensional array of n dimensional arrays. Each element is a json null value.
+
+    static json make_2d_array(size_t m, size_t n, const json& val);
+Makes an m dimensional array of n dimensional arrays. Each element is a copy of `val`.
+
 ### Constructors
 
     explicit json()
@@ -200,6 +212,9 @@ If the value is custom, returns a reference to the custom value, otherwise throw
     void clear()
 Remove all elements from an array or object value, otherwise do nothing
 
+    void remove_range(size_t from_index, size_t to_index)
+Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+
     void set(const std::string& k, const json& val)
     void set(std::string&& k, json&& val)
 Inserts a new member into a json object.
@@ -213,6 +228,14 @@ Adds a new element at the end of a json array. The content of `val` is copied (o
 
     template <class T>
     void add_custom_data(const T& value)
+
+### Relational operators
+
+    bool operator==(const json& rhs) const
+Returns `true` if two json objects compare equal, `false` otherwise.
+
+    bool operator!=(const json& rhs) const
+Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 

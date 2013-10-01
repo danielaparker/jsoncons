@@ -81,6 +81,9 @@ If the value is custom, returns a reference to the custom value, otherwise throw
     void clear()
     Remove all elements from an array or object value, otherwise do nothing
 
+    void remove_range(size_t from_index, size_t to_index)
+Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+
     void set(const std::string& k, const json& val)
     void set(std::string&& k, json&& val)
 Inserts a new member into a json object.
@@ -96,6 +99,14 @@ Inserts custom data of type `T` into a json object.
     template <class T>
     void add_custom_data(const T& value)
 Adds a custom value of type `T` into a json array
+
+### Relational operators
+
+    bool operator==(const json& rhs) const
+Returns `true` if two json objects compare equal, `false` otherwise.
+
+    bool operator!=(const json& rhs) const
+Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 

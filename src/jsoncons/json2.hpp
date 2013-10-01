@@ -221,18 +221,52 @@ bool basic_json<Char>::operator!=(const basic_json<Char>& rhs) const
 template <class Char>
 bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
 {
+    if (is_numeric() && rhs.is_numeric())
+    {
+        switch (type_)
+        {
+        case longlong_t:
+            switch (rhs.type())
+            {
+            case longlong_t:
+                return value_.longlong_value_ == rhs.value_.longlong_value_;
+            case ulonglong_t:
+                return value_.longlong_value_ == rhs.value_.ulonglong_value_;
+            case double_t:
+                return value_.longlong_value_ == rhs.value_.double_value_;
+            }
+            break;
+        case ulonglong_t:
+            switch (rhs.type())
+            {
+            case longlong_t:
+                return value_.ulonglong_value_ == rhs.value_.longlong_value_;
+            case ulonglong_t:
+                return value_.ulonglong_value_ == rhs.value_.ulonglong_value_;
+            case double_t:
+                return value_.ulonglong_value_ == rhs.value_.double_value_;
+            }
+            break;
+        case double_t:
+            switch (rhs.type())
+            {
+            case longlong_t:
+                return value_.double_value_ == rhs.value_.longlong_value_;
+            case ulonglong_t:
+                return value_.double_value_ == rhs.value_.ulonglong_value_;
+            case double_t:
+                return value_.double_value_ == rhs.value_.double_value_;
+            }
+            break;
+        }
+    }
+
     if (rhs.type_ != type_)
     {
         return false;
     }
     switch (type_)
     {
-    case double_t:
-        return value_.double_value_ == rhs.value_.double_value_;
-    case longlong_t:
-        return value_.longlong_value_ == rhs.value_.longlong_value_;
-    case ulonglong_t:
-        return value_.ulonglong_value_ == rhs.value_.ulonglong_value_;
     case bool_t:
         return value_.bool_value_ == rhs.value_.bool_value_;
     case null_t:
@@ -420,6 +454,22 @@ void basic_json<Char>::clear()
         break;
     case object_t:
         value_.object_->clear();
+        break;
+    default:
+        break;
+    }
+}
+
+template <class Char>
+void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->remove_range(from, to);
+        break;
+    case object_t:
+        value_.object_->remove_range(from, to);
         break;
     default:
         break;
@@ -631,7 +681,7 @@ basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& 
 }
 
 template <class Char> 
-basic_json<Char> basic_json<Char>::make_2_dim_array(size_t m, size_t n)
+basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
     for (size_t i = 0; i < a.size(); ++i)
@@ -642,7 +692,7 @@ basic_json<Char> basic_json<Char>::make_2_dim_array(size_t m, size_t n)
 }
 
 template <class Char> 
-basic_json<Char> basic_json<Char>::make_2_dim_array(size_t m, size_t n, const basic_json<Char>& val)
+basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic_json<Char>& val)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
     for (size_t i = 0; i < a.size(); ++i)

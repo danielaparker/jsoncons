@@ -122,6 +122,7 @@ public:
 
 typedef basic_error_handler<char> error_handler;
 typedef basic_default_error_handler<char> default_error_handler;
+typedef basic_parsing_context<char> parsing_context;
 
 }
 #endif
