@@ -1,0 +1,37 @@
+    #include "jsoncons/json.hpp"
+
+    using jsoncons::json;
+    using jsoncons::pretty_print;
+
+## Constructing a one dimensional array
+
+    json a = json::make_array(10,0);
+	a[1] = 1;
+	a[2] = 2;
+    std::cout << pretty_print(a) << std::endl;
+
+The output is
+
+    [0,1,2,0,0,0,0,0,0,0]
+
+## Constructing a two dimensional array
+
+    json a = json::make_2d_array(10,8,0);
+	a[0][2] = 2;
+    a[0][3] = 3;
+    std::cout << pretty_print(a) << std::endl;
+
+The output is
+
+    [
+        [0,0,2,3,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0]
+    ]

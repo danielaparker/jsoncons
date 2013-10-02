@@ -213,7 +213,7 @@ If the value is custom, returns a reference to the custom value, otherwise throw
 Remove all elements from an array or object value, otherwise do nothing
 
     void remove_range(size_t from_index, size_t to_index)
-Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+Removes all elements from an array value whose index is between `from_index`, inclusive, and `to_index`, exclusive.
 
     void set(const std::string& k, const json& val)
     void set(std::string&& k, json&& val)

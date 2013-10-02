@@ -11,6 +11,13 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.32
+------------
+
+Added remove_range method, operator== and  operator!= to proxy and json objects
+
+Added static methods make_array and make_2d_array to json
+
 Release 0.31
 ------------
 
