@@ -1,5 +1,9 @@
 // Copyright 2013 Daniel Parker
-// Distributed under Boost license
+// Distributed under the Boost license, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// See https://sourceforge.net/projects/jsoncons/files/ for latest version
+// See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
 #ifndef JSONCONS_JSON2_HPP
 #define JSONCONS_JSON2_HPP
@@ -686,7 +690,7 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>(new json_array<Char>(n));
+        a[i] = basic_json<Char>::make_array(n);
     }
     return a;
 }
@@ -697,7 +701,29 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>(new json_array<Char>(n,val));
+        a[i] = basic_json<Char>::make_array(n,val);
+    }
+    return a;
+}
+
+template <class Char> 
+basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
+{
+    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        a[i] = basic_json<Char>::make_2d_array(n,k);
+    }
+    return a;
+}
+
+template <class Char> 
+basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val)
+{
+    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        a[i] = basic_json<Char>::make_2d_array(n,k,val);
     }
     return a;
 }
@@ -878,6 +904,20 @@ bool basic_json<Char>::is_empty() const
         return value_.object_->size() == 0;
     default:
         return false;
+    }
+}
+
+template <class Char>
+void basic_json<Char>::reserve(size_t n) 
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->reserve(n);
+        break;
+    case object_t:
+        value_.object_->reserve(n);
+        break;
     }
 }
 

@@ -11,6 +11,11 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.33
+------------
+
+Added reserve method to json
+
 Release 0.32
 ------------
 

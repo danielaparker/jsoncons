@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\jsoncons_test\csv_reader_tests.cpp" />
     <ClCompile Include="..\..\..\src\jsoncons_test\jsoncons_test.cpp" />
     <ClCompile Include="..\..\..\src\jsoncons_test\json_accessor_tests.cpp" />
     <ClCompile Include="..\..\..\src\jsoncons_test\json_array_tests.cpp" />

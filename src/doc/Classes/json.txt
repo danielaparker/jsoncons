@@ -19,7 +19,7 @@ A random access iterator to `json`
 A random access iterator to `const json`
 
     proxy
-A [[proxy]] object wraps a pair of references to a json object and a member name, returned by `operator[](const std::string& name)`.
+A [proxy](proxy) object wraps a pair of references to a json object and a member name, returned by `operator[](const std::string& name)`.
 
 ### Member constants
 
@@ -43,17 +43,27 @@ Parses a string of JSON text and returns a json object or array value
     static json parse_file(const std::string& filename)
 Opens a file of JSON text as a binary stream and reads it into memory before parsing, for very large files, use `parse` instead. Returns a json object or array value.
 
-    static json make_array(size_t n);
-Makes an n dimensional array. Each element is a json null value.
+    static json make_array(size_t n)
+Makes an array of n elements. Each element is a json null value.
 
-    static json make_array(size_t n, const json& val);
-Makes an n dimensional array. Each element is a copy of `val`.
+    static json make_array(size_t n, const json& val)
+Makes an array of n elements. Each element is a copy of `val`.
 
-    static json make_2d_array(size_t m, size_t n);
-Makes an m dimensional array of n dimensional arrays. Each element is a json null value.
+    static json make_2d_array(size_t m, size_t n)
+Makes an m dimensional array of n dimensional arrays of elements. 
+Each element is a json null value.
 
-    static json make_2d_array(size_t m, size_t n, const json& val);
-Makes an m dimensional array of n dimensional arrays. Each element is a copy of `val`.
+    static json make_2d_array(size_t m, size_t n, const json& val)
+Makes an m dimensional array of n dimensional arrays of elements. 
+Each element is a copy of the json value `val`.
+
+    static json make_3d_array(size_t m, size_t n, size_t k)
+Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
+Each element is a json null value.
+
+    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
+Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
+Each element is a copy of the json value `val`.
 
 ### Constructors
 
@@ -138,6 +148,9 @@ Returns the number of elements in a json array, or the number of members in a js
     bool is_empty() const
 Returns `true` if a json object or array has no elements, otherwise `false`.
 
+    void reserve(size_t n)
+Increases the capacity of a json object or array to allow at least `n` members or elements.
+
 ### Accessors
 
     bool is_null() const
@@ -168,7 +181,7 @@ Returns a reference to the value at position i in a json object or array.
 
     proxy operator[](const std::string& name)
     const proxy operator[](const std::string& name) const
-If `name` matches the name of a member in the json object, returns a [[proxy]] object to its mapped value.
+If `name` matches the name of a member in the json object, returns a [proxy](proxy) object to its mapped value.
 
     json& at(size_t i)
     const json& at(size_t i) const
@@ -243,16 +256,16 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 Inserts json value into string.
 
     std::string to_string(const output_format& format) const
-Inserts json value into string using specified [[output_format]].
+Inserts json value into string using specified [output_format](output_format).
 
     std::ostream& to_stream(std::ostream& os) const
 Inserts json value into stream with default output format.
 
     std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
-Inserts json value into stream using specified [[output_format]].
+Inserts json value into stream using specified [output_format](output_format).
 
     void to_stream(json_writer& writer) const;
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_writer]], such as a [[json_serializer]].
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_writer](json_writer), such as a [json_serializer](json_serializer).
 
 ### Non-member functions
 

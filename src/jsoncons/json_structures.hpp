@@ -1,5 +1,9 @@
 // Copyright 2013 Daniel Parker
-// Distributed under Boost license
+// Distributed under the Boost license, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// See https://sourceforge.net/projects/jsoncons/files/ for latest version
+// See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
 #ifndef JSONCONS_JSON_STRUCTURES_HPP
 #define JSONCONS_JSON_STRUCTURES_HPP
@@ -81,14 +85,14 @@ public:
 
     void clear() {elements_.clear();}
 
+    void reserve(size_t n) {elements_.reserve(n);}
+
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from <= to);
         JSONCONS_ASSERT(to <= elements_.size());
         elements_.erase(elements_.begin()+from,elements_.begin()+to);
     }
-
-    void reserve(size_t n) {elements_.reserve(n);}
 
     basic_json<Char>& at(size_t i) {return elements_[i];}
 
@@ -163,14 +167,14 @@ public:
 
     void clear() {members_.clear();}
 
+    void reserve(size_t n) {members_.reserve(n);}
+
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from <= to);
         JSONCONS_ASSERT(to <= members_.size());
         members_.erase(members_.begin()+from,members_.begin()+to);
     }
-
-    void reserve(size_t n) {members_.reserve(n);}
 
     const std::pair<std::basic_string<Char>,basic_json<Char>>& get(size_t i) const 
     {

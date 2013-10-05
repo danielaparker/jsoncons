@@ -50,7 +50,7 @@ The `proxy` class wraps a reference to a json object and a reference to a member
 
     proxy operator[](const std::string& name)
     const proxy operator[](const std::string& name) const
-If `name` matches the name of a member in the json object, returns a [[proxy]] object to its mapped value.
+If `name` matches the name of a member in the json object, returns a [proxy](proxy) object to its mapped value.
 
     json& get(const std::string& name)
     const json& get(const std::string& name) const
@@ -114,13 +114,13 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 Inserts json value into string.
 
     std::string to_string(const output_format& format) const
-Inserts json value into string using specified [[output_format]].
+Inserts json value into string using specified [output_format](output_format).
 
     std::ostream& to_stream(std::ostream& os) const
 Inserts json value into stream with default output format.
 
     std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
-Inserts json value into stream using specified [[output_format]].
+Inserts json value into stream using specified [output_format](output_format).
 
     friend std::ostream& operator<<(std::ostream& os, const proxy& o)
 

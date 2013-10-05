@@ -1,5 +1,9 @@
 // Copyright 2013 Daniel Parker
-// Distributed under Boost license
+// Distributed under the Boost license, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// See https://sourceforge.net/projects/jsoncons/files/ for latest version
+// See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
 #ifndef JSONCONS_JSON1_HPP
 #define JSONCONS_JSON1_HPP
@@ -16,9 +20,8 @@
 
 namespace jsoncons {
 
-template <class Char,class T>
-void serialize(basic_json_writer<Char>& os, 
-               const T& val)
+template <class Char,class T> inline
+void serialize(basic_json_writer<Char>& os, const T& val)
 {
     os.null_value();
 }
@@ -111,6 +114,11 @@ public:
         bool is_empty() const
         {
             return val_.get(name_).is_empty();
+        }
+
+        void reserve(size_t n)
+        {
+            return val_.get(name_).reserve(n);
         }
 
         bool is_string() const
@@ -383,6 +391,10 @@ public:
 
     static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);
 
+    static basic_json make_3d_array(size_t m, size_t n, size_t k);
+
+    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val);
+
     explicit basic_json();
 
     basic_json(const basic_json& val);
@@ -518,6 +530,8 @@ public:
     }
 
     bool is_empty() const;
+
+    void reserve(size_t n);
 
     bool as_bool() const;
 
