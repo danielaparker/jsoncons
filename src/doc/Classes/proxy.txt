@@ -3,8 +3,10 @@ The `proxy` class wraps a reference to a json object and a reference to a member
 ### Capacity
 
     size_t size() const
+Returns the number of elements in a json array, or the number of members in a json object, or `zero`
 
     bool is_empty() const
+Returns `true` if a json string, object or array has no elements, otherwise `false`.
 
 ### Accessors
 

@@ -15,6 +15,9 @@ Release 0.33
 ------------
 
 Added reserve method to json
+Added static make_3d_array method to json
+
+Added csv_reader class
 
 Release 0.32
 ------------

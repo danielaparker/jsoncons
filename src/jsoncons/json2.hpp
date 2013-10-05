@@ -898,6 +898,8 @@ bool basic_json<Char>::is_empty() const
 {
     switch (type_)
     {
+    case string_t:
+        return value_.string_value_->size() == 0;
     case array_t:
         return value_.array_->size() == 0;
     case object_t:
