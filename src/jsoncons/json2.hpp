@@ -359,21 +359,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, basic_json<Char>& default_val) 
-{
-    switch (type_)
-    {
-    case object_t:
-        return has_member(name) ? value_.object_->get(name) : default_val;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object",name);
-        }
-    }
-}
-
-template <class Char>
-const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
 {
     switch (type_)
     {
