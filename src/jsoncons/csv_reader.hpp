@@ -59,6 +59,7 @@ public:
         const basic_json<Char>& vs = params.get("field_separator",",");
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
 
+        assume_header_ = params.get("assume_header",false).as_bool();
     }
     basic_csv_reader(const basic_json<Char>& params,
                      std::basic_istream<Char>& is,
@@ -75,6 +76,8 @@ public:
 
         const basic_json<Char>& vs = params.get("field_separator",",");
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
+
+        assume_header_ = params.get("assume_header",false).as_bool();
     }
 
     ~basic_csv_reader()
@@ -117,6 +120,9 @@ public:
 private:
     basic_csv_reader(const basic_csv_reader&); // noop
     basic_csv_reader& operator = (const basic_csv_reader&); // noop
+
+    void read_array_of_arrays();
+    void read_array_of_objects();
 
     void skip_separator();
     void parse_string();
@@ -216,6 +222,7 @@ private:
     basic_json_listener<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
     char value_separator_;
+    bool assume_header_;
 };
 
 template<class Char>
@@ -231,6 +238,22 @@ void basic_csv_reader<Char>::read()
     stack_.push_back(stack_item());
     handler_.begin_array(*this);
     stack_.back().array_begun_ = true;
+    if (assume_header_)
+    {
+        read_array_of_objects();
+    }
+    else
+    {
+        read_array_of_arrays();
+    }
+    handler_.end_array(*this);
+    stack_.pop_back();
+    handler_.end_json();
+}
+
+template<class Char>
+void basic_csv_reader<Char>::read_array_of_arrays()
+{
     stack_.push_back(stack_item());
     while (!eof())
     {
@@ -325,12 +348,123 @@ void basic_csv_reader<Char>::read()
         }
         stack_.pop_back();
     }
-    if (stack_.back().array_begun_)
+}
+
+template<class Char>
+void basic_csv_reader<Char>::read_array_of_objects()
+{
+    std::vector<std::string> header;
+    size_t row_index = 0;
+    size_t column_index = 0;
+
+    stack_.push_back(stack_item());
+    while (!eof())
     {
-        handler_.end_array(*this);
+        Char c = read_ch();
+        if (eof())
+        {
+            continue;
+        }
+        switch (c)
+        {
+        case '\n':
+            ++row_index;
+            column_index = 0;
+            if (stack_.back().array_begun_)
+            {
+                handler_.end_object(*this);
+            }
+            stack_.pop_back();
+            stack_.push_back(stack_item());
+            break;
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case ' ':
+            fast_skip_white_space();
+            continue;
+        case '/':
+            {
+                Char next = peek();
+                if (eof())
+                {
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                }
+                if (next == '/')
+                {
+                    skip_ch();
+                    if (eof())
+                    {
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                    }
+                    ignore_single_line_comment();
+                }
+                if (next == '*')
+                {
+                    skip_ch();
+                    if (eof())
+                    {
+                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                    }
+                    ignore_multi_line_comment();
+                }
+            }
+            continue;
+        default:
+            if (stack_.size() > 0)
+            {
+                switch (c)
+                {
+                case '\"':
+                    {
+                        parse_quoted_string();
+                        if (!stack_.back().array_begun_)
+                        {
+                            handler_.begin_object(*this);
+                            stack_.back().array_begun_ = true;
+                        }
+                        handler_.value(string_buffer_,*this);
+                    }
+                    break;
+                default:
+                    {
+                        unread_ch(c);
+                        parse_string();
+                        if (row_index == 0)
+                        {
+                            header.push_back(string_buffer_);
+                        }
+                        else
+                        {
+                            if (!stack_.back().array_begun_)
+                            {
+                                handler_.begin_object(*this);
+                                stack_.back().array_begun_ = true;
+                            }
+                            if (column_index < header.size())
+                            {
+                                handler_.name(header[column_index],*this);
+                                handler_.value(string_buffer_,*this);
+                            }
+							++column_index;
+                        }
+                    }
+                    break;
+                }
+                break;
+            }
+        }
     }
-    stack_.pop_back();
-    handler_.end_json();
+
+    if (stack_.size() > 1)
+    {
+        if (stack_.back().array_begun_)
+        {
+            handler_.end_object(*this);
+        }
+        stack_.pop_back();
+    }
 }
 
 template<class Char>

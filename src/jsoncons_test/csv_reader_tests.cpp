@@ -45,6 +45,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     json_deserializer handler;
     json params(json::an_object);
     params["field_separator"] = "\t";
+    params["assume_header"] = true;
 
     csv_reader reader(params,is,handler);
     reader.read();
