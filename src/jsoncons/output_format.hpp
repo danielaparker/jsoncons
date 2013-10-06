@@ -28,7 +28,7 @@ public:
     basic_output_format()
         : indenting_(false), 
           indent_(default_indent),
-          precision_(16),
+          precision_(17),
           set_format_flags_(0),
           unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
@@ -42,7 +42,7 @@ public:
 
     basic_output_format(bool indenting)
         : indenting_(indenting), 
-          precision_(16),
+          precision_(17),
           set_format_flags_(0),
           unset_format_flags_(0),
           indent_(default_indent),

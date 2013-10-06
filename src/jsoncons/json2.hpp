@@ -1066,8 +1066,9 @@ public:
 
     basic_pretty_print(basic_json<Char>& o,
                        const basic_output_format<Char>& format)
-        : o_(o), format_(format_)
+        : o_(o), format_(format)
     {
+	;
     }
 
     void to_stream(std::ostream& os) const

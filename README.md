@@ -15,9 +15,14 @@ Release 0.33
 ------------
 
 Added reserve method to json
+
 Added static make_3d_array method to json
 
-Added csv_reader class
+json_reader now configured for buffered reading
+
+Added csv_reader class for reading CSV files and producing JSON events
+
+Fixed bug with explicitly passing output_format in pretty_print.
 
 Release 0.32
 ------------

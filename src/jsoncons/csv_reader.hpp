@@ -40,12 +40,41 @@ class basic_csv_reader : private basic_parsing_context<Char>
 public:
     // Structural characters
     static const size_t default_max_buffer_length = 16384;
-    //!  Parse an input stream of JSON text into a json object
+    //!  Parse an input stream of CSV text into a json object
     /*!
       \param is The input stream to read from
     */
-    basic_csv_reader(const basic_json<Char>& params,
-                     std::basic_istream<Char>& is,
+
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     basic_json_listener<Char>& handler)
+
+       : is_(is), 
+         handler_(handler), 
+         err_handler_(default_err_handler), 
+         input_buffer_(0), 
+         buffer_position_(0), 
+         buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length)
+    {
+        init(json::an_object);
+    }
+
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     basic_json_listener<Char>& handler,
+                     const basic_json<Char>& params)
+
+       : is_(is), 
+         handler_(handler), 
+         err_handler_(default_err_handler), 
+         input_buffer_(0), 
+         buffer_position_(0), 
+         buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length)
+    {
+        init(params);
+    }
+
+    basic_csv_reader(std::basic_istream<Char>& is,
                      basic_json_listener<Char>& handler,
                      basic_error_handler<Char>& err_handler)
        : is_(is), 
@@ -56,37 +85,38 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
-        input_buffer_ = new Char[buffer_capacity_];
-
-        const basic_json<Char>& vs = params.get("field_separator",",");
-        value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
-
-        assume_header_ = params.get("assume_header",false).as_bool();
-
-        const basic_json<Char>& qc = params.get("quote_char","\"");
-        quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
+        init(json::an_object);
     }
-    basic_csv_reader(const basic_json<Char>& params,
-                     std::basic_istream<Char>& is,
-                     basic_json_listener<Char>& handler)
-        
+
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     basic_json_listener<Char>& handler,
+                     basic_error_handler<Char>& err_handler,
+                     const basic_json<Char>& params)
        : is_(is), 
          handler_(handler), 
-         err_handler_(default_err_handler), 
+         err_handler_(err_handler),
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        init(params);
+    }
+
+    void init(const basic_json<Char>& params)
+    {
         input_buffer_ = new Char[buffer_capacity_];
 
-        basic_json<Char> vs = params.get("field_separator",",");
+        const basic_json<Char>& vs = params.get("field_delimiter",",");
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
 
-        assume_header_ = params.get("assume_header",false).as_bool();
+        assume_header_ = params.get("has_header",false).as_bool();
 
-        basic_json<Char> qc = params.get("quote_char","\"");
+        const basic_json<Char>& qc = params.get("quote_char","\"");
         quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
+
+        basic_json<Char> qec = params.get("quote_escape_char","\"");
+        quote_escape_char_ = qec.is_empty() ? '\"' : qec.as_string()[0];
     }
 
     ~basic_csv_reader()
@@ -141,8 +171,6 @@ private:
     void fast_ignore_single_line_comment();
     void fast_ignore_multi_line_comment();
     void fast_skip_white_space();
-    unsigned int decode_unicode_codepoint();
-    unsigned int decode_unicode_escape_sequence();
 
     void read_data_block()
     {
@@ -233,6 +261,7 @@ private:
     char value_separator_;
     bool assume_header_;
     char quote_char_;
+    char quote_escape_char_;
 };
 
 template<class Char>
@@ -282,12 +311,7 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             stack_.pop_back();
             stack_.push_back(stack_item());
             break;
-        case '\t':
-        case '\v':
-        case '\f':
         case '\r':
-        case ' ':
-            fast_skip_white_space();
             continue;
         case '/':
             {
@@ -317,6 +341,10 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             }
             continue;
         default:
+            if (c == value_separator_)
+            {
+                c = read_ch();
+            }
             if (stack_.size() > 0)
             {
                 if (c == quote_char_)
@@ -381,12 +409,7 @@ void basic_csv_reader<Char>::read_array_of_objects()
             stack_.pop_back();
             stack_.push_back(stack_item());
             break;
-        case '\t':
-        case '\v':
-        case '\f':
         case '\r':
-        case ' ':
-            fast_skip_white_space();
             continue;
         case '/':
             {
@@ -418,6 +441,10 @@ void basic_csv_reader<Char>::read_array_of_objects()
         default:
             if (stack_.size() > 0)
             {
+                if (c == value_separator_)
+                {
+                    c = read_ch();
+                }
                 if (c == quote_char_)
                 {
                     parse_quoted_string();
@@ -426,7 +453,11 @@ void basic_csv_reader<Char>::read_array_of_objects()
                         handler_.begin_object(*this);
                         stack_.back().array_begun_ = true;
                     }
-                    handler_.value(string_buffer_,*this);
+                    if (column_index < header.size())
+                    {
+                        handler_.name(header[column_index],*this);
+                        handler_.value(string_buffer_,*this);
+                    }
                 }
                 else
                 {
@@ -513,6 +544,7 @@ template<class Char>
 void basic_csv_reader<Char>::parse_string()
 {
     string_buffer_.clear();
+    //std::cout << "start string" << std::endl;
 
     bool done = false;
     while (!done)
@@ -525,14 +557,10 @@ void basic_csv_reader<Char>::parse_string()
         else if (c == '\r')
         {
         }
-        else if (c == '\n')
+        else if (c == value_separator_ || c == '\n')
         {
             done = true;
             unread_ch(c);
-        }
-        else if (c == value_separator_)
-        {
-            done = true;
         }
         else 
         {
@@ -547,6 +575,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
     string_buffer_.clear();
 
     bool done_string = false;
+    //std::cout << "start quoted string" << std::endl;
     while (!done_string)
     {
         Char c = read_ch();
@@ -554,23 +583,22 @@ void basic_csv_reader<Char>::parse_quoted_string()
         {
             err_handler_.fatal_error("JPE101", "EOF, expected quote character", *this);
         }
+        else if (c == quote_escape_char_ && peek() == quote_char_)
+        {
+            string_buffer_.push_back(quote_char_);
+            skip_ch();
+        } 
         else if (c == quote_char_)
         {
-            if (peek() == quote_char_)
-            {
-                string_buffer_.push_back(quote_char_);
-                skip_ch();
-            }
-            else
-            {
-                done_string = true;
-            }
-        } 
+            done_string = true;
+        }
         else
         {
+            //std::cout << c;
             string_buffer_.push_back(c);
         }
     }
+    //std::cout << std::endl << "end string" << std::endl;
     bool done = false;
     while (!done)
     {
@@ -579,7 +607,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
         {
             done = true;
         }
-        else if (c == '\n')
+        else if (c == value_separator_ || c == '\n')
         {
             done = true;
             unread_ch(c);
@@ -690,72 +718,6 @@ void basic_csv_reader<Char>::fast_skip_white_space()
             break;
         }
     }
-}
-
-template<class Char>
-unsigned int basic_csv_reader<Char>::decode_unicode_codepoint()
-{
-
-    unsigned int cp = decode_unicode_escape_sequence();
-    if (cp >= 0xD800 && cp <= 0xDBFF)
-    {
-        // surrogate pairs
-        if (read_ch() == '\\' && read_ch() == 'u')
-        {
-            if (eof())
-            {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            unsigned int surrogate_pair = decode_unicode_escape_sequence();
-            cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
-        }
-        else
-        {
-            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
-        }
-    }
-    return cp;
-}
-
-template<class Char>
-unsigned int basic_csv_reader<Char>::decode_unicode_escape_sequence()
-{
-    unsigned int cp = 0;
-    size_t index = 0;
-    while (!eof() && index < 4)
-    {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        const unsigned int u(c >= 0 ? c : 256 + c);
-        cp *= 16;
-        if (u >= '0'  &&  u <= '9')
-        {
-            cp += u - '0';
-        }
-        else if (u >= 'a'  &&  u <= 'f')
-        {
-            cp += u - 'a' + 10;
-        }
-        else if (u >= 'A'  &&  u <= 'F')
-        {
-            cp += u - 'A' + 10;
-        }
-        else
-        {
-            std::ostringstream os;
-            os << "Expected hexadecimal digit, found " << u << ".";
-            err_handler_.fatal_error("JPE202", os.str(), *this);
-        }
-        ++index;
-    }
-    if (index != 4)
-    {
-        err_handler_.fatal_error("JPE202", "Bad codepoint escape sequence in string: four digits expected.", *this);
-    }
-    return cp;
 }
 
 typedef basic_csv_reader<char> csv_reader;

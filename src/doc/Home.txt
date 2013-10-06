@@ -17,6 +17,7 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 * Supports reading multiple json objects from a stream
 * Supports optional escaping of non-ascii UTF-8 octets
 * Supports storing custom data types in a json object, with specialized serialization
+* Supports reading JSON values from CSV files
 
 ### Tutorial
 
@@ -39,6 +40,10 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 [[json_reader]]
 
 [[json_deserializer]]
+
+### Extensions
+
+[[csv_reader]]
 
 ## Examples
 
