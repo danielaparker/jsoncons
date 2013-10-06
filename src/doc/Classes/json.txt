@@ -146,7 +146,7 @@ provided this value is a json array, otherwise throws a `json_exception`
 Returns the number of elements in a json array, or the number of members in a json object, or `zero`
 
     bool is_empty() const
-Returns `true` if a json object or array has no elements, otherwise `false`.
+Returns `true` if a json string, object or array has no elements, otherwise `false`.
 
     void reserve(size_t n)
 Increases the capacity of a json object or array to allow at least `n` members or elements.

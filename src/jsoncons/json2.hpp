@@ -1072,11 +1072,12 @@ template <class Char>
 class basic_pretty_print
 {
 public:
+
     basic_pretty_print(basic_json<Char>& o)
-        : o_(o)
+        : o_(o), format_(true)
     {
-        format_.indenting(true);
     }
+
     basic_pretty_print(basic_json<Char>& o,
                        const basic_output_format<Char>& format)
         : o_(o), format_(format_)
@@ -1088,7 +1089,7 @@ public:
         o_.to_stream(os,format_);
     }
 
-    basic_json<Char>& o_;
+    const basic_json<Char>& o_;
     basic_output_format<Char> format_;
 private:
     basic_pretty_print();
@@ -1096,7 +1097,7 @@ private:
 };
 
 template <class Char>
-std::ostream& operator<<(std::ostream& os, const basic_pretty_print<Char>& o)
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_pretty_print<Char>& o)
 {
     o.to_stream(os);
     return os;

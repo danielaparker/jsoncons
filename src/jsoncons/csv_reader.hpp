@@ -19,6 +19,7 @@
 #include "jsoncons/json_listener.hpp"
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_reader.hpp"
+#include "jsoncons/json.hpp"
 
 namespace jsoncons {
 
@@ -52,7 +53,8 @@ public:
          err_handler_(err_handler),
          input_buffer_(0), 
          buffer_position_(0), 
-         buffer_length_(0)
+         buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length)
     {
         input_buffer_ = new Char[buffer_capacity_];
 
@@ -73,16 +75,17 @@ public:
          err_handler_(default_err_handler), 
          input_buffer_(0), 
          buffer_position_(0), 
-         buffer_length_(0)
+         buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length)
     {
         input_buffer_ = new Char[buffer_capacity_];
 
-        const basic_json<Char>& vs = params.get("field_separator",",");
+        basic_json<Char> vs = params.get("field_separator",",");
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
 
         assume_header_ = params.get("assume_header",false).as_bool();
 
-        const basic_json<Char>& qc = params.get("quote_char","\"");
+        basic_json<Char> qc = params.get("quote_char","\"");
         quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
     }
 

@@ -3,9 +3,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer.hpp"
 #include "jsoncons/csv_reader.hpp"
+#include "jsoncons/json_reader.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -15,6 +14,7 @@ using jsoncons::json_deserializer;
 using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::csv_reader;
+using jsoncons::json_reader;
 using jsoncons::pretty_print;
 using std::string;
 
@@ -31,8 +31,9 @@ BOOST_AUTO_TEST_CASE(test_comma_delimited_file)
 
     csv_reader reader(params,is,handler);
     reader.read();
+    json countries = handler.root();
 
-    std::cout << pretty_print(handler.root()) << std::endl;
+    std::cout << pretty_print(countries) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
@@ -49,7 +50,8 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 
     csv_reader reader(params,is,handler);
     reader.read();
+    json employees = handler.root();
 
-    std::cout << pretty_print(handler.root()) << std::endl;
+    std::cout << pretty_print(employees) << std::endl;
 }
 

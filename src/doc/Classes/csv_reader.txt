@@ -1,0 +1,89 @@
+### Header
+
+    #include "jsoncons/csv_reader.hpp"
+
+### Constructors
+
+    csv_reader(const json& params,
+               std::istream& is,
+               json_listener& handler,
+               error_handler& err_handler)
+Constructs a `csv_reader` that is associated with an input stream
+`is` of JSON text, a [[json_listener]] handler that receives
+notification of JSON events, and the specified [[error_handler]].
+
+    csv_reader(const json& params,
+               std::istream& is,
+               json_listener& handler)
+Constructs a `csv_reader` that is associated with an input stream
+`is` of JSON text, a [[json_listener]] handler that receives
+notification of JSON events, and a [[default_error_handler]]
+
+### Member functions
+
+    bool eof() const
+Returns `true` when there is no more data to be read from the stream, `false` otherwise
+
+    void read()
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_listener]] handler, such as a [[json_deserializer]].
+
+    size_t buffer_capacity() const
+
+    void buffer_capacity(size_t buffer_capacity)
+
+### Examples
+
+### Reading a comma delimted file into an array of json values
+
+The input file is
+
+    country_code,name
+    ABW,ARUBA
+    ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+    VUT,VANUATU
+    WLF,WALLIS & FUTUNA ISLANDS
+
+    std::string in_file = "countries.csv";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+    json params(json::an_object);
+    params["field_separator"] = ",";
+
+    csv_reader reader(params,is,handler);
+    reader.read();
+    json countries = std::move(handler.root());
+
+    std::cout << countries << std::endl;
+
+The output is
+
+
+### Reading a tab delimted file into an array of json objects
+
+The input file is
+
+    employee-no	employee-name	dept	salary
+    00000001	Smith, Matthew	sales	150,000.00
+    00000002	Brown, Sarah	sales	89,000.00
+    00000003	Oberc, Scott	finance	110,000.00
+    00000004	Scott, Colette	sales	75,000.00
+
+    std::string in_file = "../../../examples/employees.txt";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+    json params(json::an_object);
+    params["field_separator"] = "\t";
+    params["assume_header"] = true;
+
+    csv_reader reader(params,is,handler);
+    reader.read();
+    json employees = std::move(handler.root());
+
+    std::cout << employees << std::endl;
+
+The output is
+
+
+
