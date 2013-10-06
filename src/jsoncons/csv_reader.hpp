@@ -60,6 +60,9 @@ public:
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
 
         assume_header_ = params.get("assume_header",false).as_bool();
+
+        const basic_json<Char>& qc = params.get("quote_char","\"");
+        quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
     }
     basic_csv_reader(const basic_json<Char>& params,
                      std::basic_istream<Char>& is,
@@ -78,6 +81,9 @@ public:
         value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
 
         assume_header_ = params.get("assume_header",false).as_bool();
+
+        const basic_json<Char>& qc = params.get("quote_char","\"");
+        quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
     }
 
     ~basic_csv_reader()
@@ -223,6 +229,7 @@ private:
     basic_error_handler<Char>& err_handler_;
     char value_separator_;
     bool assume_header_;
+    char quote_char_;
 };
 
 template<class Char>
@@ -309,33 +316,27 @@ void basic_csv_reader<Char>::read_array_of_arrays()
         default:
             if (stack_.size() > 0)
             {
-                switch (c)
+                if (c == quote_char_)
                 {
-                case '\"':
+                    parse_quoted_string();
+                    if (!stack_.back().array_begun_)
                     {
-                        parse_quoted_string();
-                        if (!stack_.back().array_begun_)
-                        {
-                            handler_.begin_array(*this);
-                            stack_.back().array_begun_ = true;
-                        }
-                        handler_.value(string_buffer_,*this);
+                        handler_.begin_array(*this);
+                        stack_.back().array_begun_ = true;
                     }
-                    break;
-                default:
-                    {
-                        unread_ch(c);
-                        parse_string();
-                        if (!stack_.back().array_begun_)
-                        {
-                            handler_.begin_array(*this);
-                            stack_.back().array_begun_ = true;
-                        }
-                        handler_.value(string_buffer_,*this);
-                    }
-                    break;
+                    handler_.value(string_buffer_,*this);
                 }
-                break;
+                else
+                {
+                    unread_ch(c);
+                    parse_string();
+                    if (!stack_.back().array_begun_)
+                    {
+                        handler_.begin_array(*this);
+                        stack_.back().array_begun_ = true;
+                    }
+                    handler_.value(string_buffer_,*this);
+                }
             }
         }
     }
@@ -414,45 +415,39 @@ void basic_csv_reader<Char>::read_array_of_objects()
         default:
             if (stack_.size() > 0)
             {
-                switch (c)
+                if (c == quote_char_)
                 {
-                case '\"':
+                    parse_quoted_string();
+                    if (!stack_.back().array_begun_)
                     {
-                        parse_quoted_string();
+                        handler_.begin_object(*this);
+                        stack_.back().array_begun_ = true;
+                    }
+                    handler_.value(string_buffer_,*this);
+                }
+                else
+                {
+                    unread_ch(c);
+                    parse_string();
+                    if (row_index == 0)
+                    {
+                        header.push_back(string_buffer_);
+                    }
+                    else
+                    {
                         if (!stack_.back().array_begun_)
                         {
                             handler_.begin_object(*this);
                             stack_.back().array_begun_ = true;
                         }
-                        handler_.value(string_buffer_,*this);
-                    }
-                    break;
-                default:
-                    {
-                        unread_ch(c);
-                        parse_string();
-                        if (row_index == 0)
+                        if (column_index < header.size())
                         {
-                            header.push_back(string_buffer_);
+                            handler_.name(header[column_index],*this);
+                            handler_.value(string_buffer_,*this);
                         }
-                        else
-                        {
-                            if (!stack_.back().array_begun_)
-                            {
-                                handler_.begin_object(*this);
-                                stack_.back().array_begun_ = true;
-                            }
-                            if (column_index < header.size())
-                            {
-                                handler_.name(header[column_index],*this);
-                                handler_.value(string_buffer_,*this);
-                            }
-							++column_index;
-                        }
+						++column_index;
                     }
-                    break;
                 }
-                break;
             }
         }
     }
@@ -554,13 +549,13 @@ void basic_csv_reader<Char>::parse_quoted_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("JPE101", "EOF, expected \"", *this);
+            err_handler_.fatal_error("JPE101", "EOF, expected quote character", *this);
         }
-        else if (c == '\"')
+        else if (c == quote_char_)
         {
-            if (peek() == '\"')
+            if (peek() == quote_char_)
             {
-                string_buffer_.push_back(c);
+                string_buffer_.push_back(quote_char_);
                 skip_ch();
             }
             else
