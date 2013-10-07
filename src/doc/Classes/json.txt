@@ -191,7 +191,8 @@ Returns a reference to the element at position `i` in a json array.
     const json& get(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
-    json get(const std::string& name, const json& default_val) const
+    json& get(const std::string& name, json& default_val)
+    const json& get(const std::string& name, const json& default_val) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise returns `default_val`.
 
     bool as_bool() const
