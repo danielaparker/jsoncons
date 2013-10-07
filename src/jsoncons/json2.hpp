@@ -7,7 +7,7 @@
 
 #ifndef JSONCONS_JSON2_HPP
 #define JSONCONS_JSON2_HPP
-
+ 
 #include <string>
 #include <vector>
 #include <exception>

@@ -90,7 +90,7 @@ public:
          buffer_position_(0), 
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
-    {
+    { 
 #ifdef JSONCONS_BUFFER_READ
         input_buffer_ = new Char[buffer_capacity_];
 #endif

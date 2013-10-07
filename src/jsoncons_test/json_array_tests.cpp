@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     BOOST_CHECK(a.size() == 3);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
-	a[0][2] = "25-d-MS";
+	a[0][2] = "25-d-MS"; 
     a[0][3] = "25-d-RR";
     a[1][0] = "1Y";
     a[1][1] = 0.20;

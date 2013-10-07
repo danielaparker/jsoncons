@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_comma_delimited_file)
     json countries = std::move(handler.root());
 
     std::cout << pretty_print(countries) << std::endl;
-}
+} 
 
 BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 {

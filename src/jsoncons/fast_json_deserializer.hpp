@@ -220,7 +220,7 @@ public:
             stack_[level_-1].elements_.push_back(val);
         }
     }
-
+ 
     basic_json<Char>& root()
     {
         return root_;

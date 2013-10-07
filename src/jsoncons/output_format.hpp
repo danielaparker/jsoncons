@@ -184,7 +184,7 @@ public:
     void neg_inf_replacement(const std::basic_string<Char>& replacement)
     {
         neg_inf_replacement_ = replacement;
-    }
+    } 
 private:
     bool indenting_;
     size_t indent_;
