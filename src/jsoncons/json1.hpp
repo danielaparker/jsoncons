@@ -360,7 +360,7 @@ public:
             val_.get(name_).to_stream(os,format);
         }
 
-        friend std::ostream& operator<<(std::ostream& os, const proxy& o)
+        friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const proxy& o)
         {
             o.to_stream(os);
             return os;
