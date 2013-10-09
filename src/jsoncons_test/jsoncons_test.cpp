@@ -357,13 +357,6 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     std::cout << "x4=" << x4 << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_wjson)
-{
-    wjson root(wjson::an_object);
-    //root[L"field1"] = L"test";
-    //wjson root = wjson::parse(L"{}");
-}
-
 BOOST_AUTO_TEST_CASE(test_exception)
 {
     try
@@ -572,3 +565,14 @@ BOOST_AUTO_TEST_CASE(test_filter)
     json_reader reader(is,filter);
 	reader.read();
 }
+
+BOOST_AUTO_TEST_CASE( test_wjson2 )
+{
+    wjson root(wjson::an_object);
+    root[L"field1"] = L"test";
+    root[L"field2"] = 3.9;
+    root[L"field3"] = true;
+    //std::wcout << root << L"\n";
+    //wjson root = wjson::parse(L"{}");
+}
+
