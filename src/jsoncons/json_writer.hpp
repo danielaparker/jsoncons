@@ -40,6 +40,58 @@ public:
     virtual void end_array() = 0;
 };
 
+template <class Char>
+class basic_null_json_writer : public basic_json_writer<Char>
+{
+public:
+
+    virtual void name(const std::basic_string<Char>& name) 
+    {
+    }
+
+    virtual void value(const std::basic_string<Char>& value) 
+    {
+    }
+
+    virtual void value(double value) 
+    {
+    }
+
+    virtual void value(long long value) 
+    {
+    }
+
+    virtual void value(unsigned long long value) 
+    {
+    }
+
+    virtual void value(bool value) 
+    {
+    }
+
+    virtual void null_value() 
+    {
+    }
+
+    virtual void begin_object() 
+    {
+    }
+
+    virtual void end_object() 
+    {
+    }
+
+    virtual void begin_array() 
+    {
+    }
+
+    virtual void end_array() 
+    {
+    }
+};
+
+typedef basic_null_json_writer<char> null_json_writer;
+
 typedef basic_json_writer<char> json_writer;
 
 }

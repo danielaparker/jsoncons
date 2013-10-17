@@ -359,21 +359,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, basic_json<Char>& default_val) 
-{
-    switch (type_)
-    {
-    case object_t:
-        return has_member(name) ? value_.object_->get(name) : default_val;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object",name);
-        }
-    }
-}
-
-template <class Char>
-const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
 {
     switch (type_)
     {
@@ -565,7 +551,7 @@ typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_s
 template <class Char>
 const typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_string<Char>& name) const
 {
-    return proxy(*this,name);
+    return proxy(const_cast<basic_json<Char>&>(*this),name);
 }
 
 template <class Char>
@@ -1058,6 +1044,19 @@ std::basic_string<Char> basic_json<Char>::as_string() const
         return *(value_.string_value_);
     default:
         return to_string();
+    }
+}
+
+template <class Char>
+Char basic_json<Char>::as_char() const
+{
+    switch (type_)
+    {
+    case string_t:
+        return value_.string_value_->length() > 0 ? (*value_.string_value_)[0] : '\0';
+    default:
+        std::basic_string<Char> s = to_string();
+        return s.length() > 0 ? s[0] : '\0';
     }
 }
 

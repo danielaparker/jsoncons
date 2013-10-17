@@ -107,16 +107,13 @@ public:
     {
         input_buffer_ = new Char[buffer_capacity_];
 
-        const basic_json<Char>& vs = params.get("field_delimiter",",");
-        value_separator_ = vs.is_empty() ? ',' : vs.as_string()[0];
+        value_separator_ = params.get("field_delimiter",",").as_char();
 
         assume_header_ = params.get("has_header",false).as_bool();
 
-        const basic_json<Char>& qc = params.get("quote_char","\"");
-        quote_char_ = qc.is_empty() ? '\"' : qc.as_string()[0];
+        quote_char_ = params.get("quote_char","\"").as_char();
 
-        basic_json<Char> qec = params.get("quote_escape_char","\"");
-        quote_escape_char_ = qec.is_empty() ? '\"' : qec.as_string()[0];
+        quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
     }
 
     ~basic_csv_reader()

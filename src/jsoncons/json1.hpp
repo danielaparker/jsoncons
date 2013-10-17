@@ -177,6 +177,11 @@ public:
             return val_.get(name_).as_string();
         }
 
+        Char as_char() const
+        {
+            return val_.get(name_).as_char();
+        }
+
         bool as_bool() const
         {
             return val_.get(name_).as_bool();
@@ -273,12 +278,7 @@ public:
             return val_.get(name_).get(name);
         }
 
-        basic_json<Char>& get(const std::basic_string<Char>& name, basic_json<Char>& default_val)
-        {
-            return val_.get(name_).get(name,default_val);
-        }
-
-        const basic_json<Char>& get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+        basic_json<Char> get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
         {
             return val_.get(name_).get(name,default_val);
         }
@@ -555,6 +555,8 @@ public:
 
     std::basic_string<Char> as_string() const;
 
+    Char as_char() const;
+
     void swap(basic_json<Char>& o) throw();
 
     basic_json<Char>& at(size_t i);
@@ -565,9 +567,7 @@ public:
 
     const basic_json<Char>& get(const std::basic_string<Char>& name) const;
 
-    basic_json<Char>& get(const std::basic_string<Char>& name, basic_json<Char>& default_val);
-
-    const basic_json<Char>& get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
+    basic_json<Char> get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
 
     // Modifiers
 

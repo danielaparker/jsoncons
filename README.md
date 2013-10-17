@@ -11,6 +11,14 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.34
+------------
+
+- json get method that takes default argument now returns a value rather than a reference
+- issue in csv_reader related to get method issue fixed
+- isue with const json operator[] fixed
+- added as_char method to json
+
 Release 0.33
 ------------
 
