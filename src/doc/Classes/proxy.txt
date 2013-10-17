@@ -34,6 +34,8 @@ Returns `true` if a json string, object or array has no elements, otherwise `fal
 
     std::string as_string() const
 
+    char as_char() const
+
     bool as_bool() const
 
     double as_double() const
@@ -58,9 +60,8 @@ If `name` matches the name of a member in the json object, returns a [proxy](pro
     const json& get(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
-    json& get(const std::string& name, json& default_val)
-    const json& get(const std::string& name, const json& default_val) const
-If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise returns `default_val`.
+    json get(const std::string& name, const json& default_val) const
+If `name` matches the name of a member in the json object, returns the json object, otherwise returns `default_val`.
 
     template <class T>
     const T& custom_data() const

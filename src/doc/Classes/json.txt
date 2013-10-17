@@ -191,9 +191,8 @@ Returns a reference to the element at position `i` in a json array.
     const json& get(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
-    json& get(const std::string& name, json& default_val)
-    const json& get(const std::string& name, const json& default_val) const
-If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise returns `default_val`.
+    json get(const std::string& name, const json& default_val) const
+If `name` matches the name of a member in the json object, returns the json object, otherwise returns `default_val`.
 
     bool as_bool() const
 
@@ -211,6 +210,9 @@ If value is long long, returns value, if value is unsigned long long or double, 
 
     std::string as_string() const
 If value is string, returns value, otherwise returns result of `to_string`.
+
+    char as_char() const
+If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
 
     template <class T>
     const T& custom_data() const
