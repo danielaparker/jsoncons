@@ -76,9 +76,7 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
-#ifdef JSONCONS_BUFFER_READ
         input_buffer_ = new Char[buffer_capacity_];
-#endif
     }
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_listener<Char>& handler)
@@ -91,27 +89,19 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     { 
-#ifdef JSONCONS_BUFFER_READ
         input_buffer_ = new Char[buffer_capacity_];
-#endif
     }
 
     ~basic_json_reader()
     {
-#ifdef JSONCONS_BUFFER_READ
         delete[] input_buffer_;
-#endif
     }
 
     void read();
 
     bool eof() const
     {
-#ifdef JSONCONS_BUFFER_READ
         return buffer_position_ > buffer_length_ && is_.eof();
-#else
-        return is_.eof();
-#endif
     }
 
     size_t buffer_capacity() const
@@ -158,7 +148,6 @@ private:
 
     void read_data_block()
     {
-#ifdef JSONCONS_BUFFER_READ
         buffer_position_ = 0;
         if (!is_.eof())
         {
@@ -169,12 +158,10 @@ private:
         {
             buffer_length_ = 0;
         }
-#endif
     }
 
     Char read_ch()
     {
-#ifdef JSONCONS_BUFFER_READ
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
@@ -198,21 +185,10 @@ private:
         }
 
         return c;
-#else
-        Char c = static_cast<Char>(is_.get());
-        if (c == '\n')
-        {
-            ++line_;
-            column_ = 0;
-        }
-        ++column_;
-        return c;
-#endif
     }
 
     Char peek()
     {
-#ifdef JSONCONS_BUFFER_READ
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
@@ -224,25 +200,15 @@ private:
         }
 
         return c;
-#else
-        Char c = is_.peek();
-        return c;
-#endif
     }
 
     void skip_ch()
     {
-#ifdef JSONCONS_BUFFER_READ
         read_ch();
-#else
-        is_.ignore();
-        ++column_;
-#endif
     }
 
     void unread_ch(Char ch)
     {
-#ifdef JSONCONS_BUFFER_READ
         if (buffer_position_ > 0)
         {
             --buffer_position_;
@@ -253,15 +219,6 @@ private:
                 column_ = 0;
             }
         }
-#else
-        is_.putback(ch);
-        --column_;
-        if (ch == '\n')
-        {
-            --line_;
-            column_ = 0;
-        }
-#endif
     }
 
     unsigned long column_;
