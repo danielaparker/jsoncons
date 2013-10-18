@@ -511,7 +511,7 @@ void basic_json_reader<Char>::skip_separator()
                     {
                         ignore_single_line_comment();
                     }
-                    if (next == '/')
+                    if (next == '*')
                     {
                         ignore_multi_line_comment();
                     }

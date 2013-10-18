@@ -85,7 +85,7 @@ public:
         stack_.pop_back();
         os_.put('}');
 
-        end_structure();
+        end_value();
     }
 
     virtual void begin_array()
@@ -111,7 +111,7 @@ public:
         stack_.pop_back();
         os_.put(']');
 
-        end_structure();
+        end_value();
     }
 
     virtual void name(const std::basic_string<Char>& name)
@@ -235,14 +235,6 @@ protected:
         if (!stack_.empty() && !stack_.back().is_object())
         {
             begin_element();
-        }
-    }
-
-    void end_structure()
-    {
-        if (!stack_.empty())
-        {
-            ++stack_.back().count_;
         }
     }
 
