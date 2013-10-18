@@ -68,5 +68,5 @@ line and column information is provided in the [[parsing_context]] parameter.
 
 ### Accessors
 
-    json_input_handler& input_handler()
+    json_input_handler& parent()
 Returns a reference to the parent input handler. 
