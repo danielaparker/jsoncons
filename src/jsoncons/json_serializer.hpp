@@ -293,7 +293,5 @@ private:
 
 typedef basic_json_serializer<char> json_serializer;
 
-typedef basic_output_format<char> output_format;
-
 }
 #endif
