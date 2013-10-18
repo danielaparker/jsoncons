@@ -19,10 +19,7 @@ Renamed two virtual base classes:
 - json_listener renamed to json_input_handler
 - json_writer renamed to json_output_handler
 
-Added json_filter class
-
-Release 0.34
-------------
+- Added json_filter class
 
 - json get method that takes default argument now returns a value rather than a reference
 - Issue in csv_reader related to get method issue fixed
