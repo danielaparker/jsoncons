@@ -1,6 +1,6 @@
 The `json_serializer` class is an instantiation of the 
 `basic_json_serializer` class template that uses char as the 
-character type. It implements [[json_writer]] supporting pretty 
+character type. It implements [[json_output_handler]] supporting pretty 
 serialization.
 
 ### Header
@@ -9,7 +9,7 @@ serialization.
 
 ### Implemented interfaces
 
-[[json_writer]]
+[[json_output_handler]]
 
 ### Constructors
 

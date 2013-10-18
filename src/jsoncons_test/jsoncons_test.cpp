@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
+#include "jsoncons/json_filter.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -17,8 +18,10 @@ using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;
-using jsoncons::json_listener;
+using jsoncons::json_input_handler;
+using jsoncons::json_output_handler;
 using std::string;
+using jsoncons::json_filter;
 
 BOOST_AUTO_TEST_CASE( test1 )
 {
@@ -399,46 +402,46 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::string john_food("spaghetti");
 
     output_format format(true);
-    json_serializer writer(os, format);
+    json_serializer handler(os, format);
 
     std::clock_t t = std::clock();
 
-    writer.begin_array();
+    handler.begin_array();
     for (size_t i = 0; i < 100; ++i)
     {
-        writer.begin_object();
-        writer.name(person);
-        writer.begin_object();
-        writer.name(first_name);
-        writer.value(john_first_name);
-        writer.name(last_name);
-        writer.value(john_last_name);
-        writer.name(birthdate);
-        writer.value(john_birthdate);
-        writer.name(sex);
-        writer.value(john_sex);
-        writer.name(salary);
-        writer.value((long long)70000);
-        writer.name(interests);
-        writer.begin_array();
-        writer.value(reading);
-        writer.value(mountain_biking);
-        writer.value(hacking);
-        writer.end_array();
-        writer.name(favorites);
-        writer.begin_object();
-        writer.name(color);
-        writer.value(john_color);
-        writer.name(sport);
-        writer.value(john_sport);
-        writer.name(food);
-        writer.value(john_food);
-        writer.end_object();
+        handler.begin_object();
+        handler.name(person);
+        handler.begin_object();
+        handler.name(first_name);
+        handler.value(john_first_name);
+        handler.name(last_name);
+        handler.value(john_last_name);
+        handler.name(birthdate);
+        handler.value(john_birthdate);
+        handler.name(sex);
+        handler.value(john_sex);
+        handler.name(salary);
+        handler.value((long long)70000);
+        handler.name(interests);
+        handler.begin_array();
+        handler.value(reading);
+        handler.value(mountain_biking);
+        handler.value(hacking);
+        handler.end_array();
+        handler.name(favorites);
+        handler.begin_object();
+        handler.name(color);
+        handler.value(john_color);
+        handler.name(sport);
+        handler.value(john_sport);
+        handler.name(food);
+        handler.value(john_food);
+        handler.end_object();
 
-        writer.end_object();
-        writer.end_object();
+        handler.end_object();
+        handler.end_object();
     }
-    writer.end_array();
+    handler.end_array();
     os.flush();
     std::clock_t s = std::clock() - t;
     std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds to write.\n";
@@ -452,40 +455,12 @@ BOOST_AUTO_TEST_CASE(test_big_file)
  
 }
 
-class my_json_filter : public json_listener
+class my_json_filter : public json_filter
 {
 public:
-    my_json_filter(std::ostream& os)
-        : serializer_(os, output_format(true))
+    my_json_filter(json_output_handler& output_handler)
+        : json_filter(output_handler)
     {
-    }
-
-    virtual void begin_json() 
-    {
-    }
-
-    virtual void end_json() 
-    {
-    }
-
-    virtual void begin_object(const parsing_context& context)
-    {
-        serializer_.begin_object();
-    }
-
-    virtual void end_object(const parsing_context& context) 
-    {
-        serializer_.end_object();
-    }
-
-    virtual void begin_array(const parsing_context& context) 
-    {
-        serializer_.begin_array();
-    }
-
-    virtual void end_array(const parsing_context& context) 
-    {
-        serializer_.end_array();
     }
 
     virtual void name(const std::string& name, const parsing_context& context) 
@@ -493,7 +468,7 @@ public:
         name_ = name;
         if (name != "name")
         {
-            serializer_.name(name);
+            input_handler().name(name,context);
         }
     }
 
@@ -503,14 +478,14 @@ public:
         {
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t",end_first);
-            serializer_.name("first-name");
+            input_handler().name("first-name",context);
             std::string first = value.substr(0,end_first);
-            serializer_.value(first);
+            input_handler().value(first,context);
             if (start_last != std::string::npos)
             {
-                serializer_.name("last-name");
+                input_handler().name("last-name",context);
                 std::string last = value.substr(start_last);
-                serializer_.value(last);
+                input_handler().value(last,context);
             }
             else 
             {
@@ -521,36 +496,10 @@ public:
         }
         else
         {
-            serializer_.value(value);
+            input_handler().value(value,context);
         }
     }
-
-    virtual void value(double value, const parsing_context& context) 
-    {
-        serializer_.value(value);
-    }
-
-    virtual void value(long long value, const parsing_context& context) 
-    {
-        serializer_.value(value);
-    }
-
-    virtual void value(unsigned long long value, const parsing_context& context) 
-    {
-        serializer_.value(value);
-    }
-
-    virtual void value(bool value, const parsing_context& context) 
-    {
-        serializer_.value(value);
-    }
-
-    virtual void null_value(const parsing_context& context)
-    {
-        serializer_.null_value();
-    }
 private:
-    json_serializer serializer_;
     std::string name_;
 };
 
@@ -561,7 +510,8 @@ BOOST_AUTO_TEST_CASE(test_filter)
     std::ifstream is(in_file,std::ofstream::binary);
     std::ofstream os(out_file);
 
-    my_json_filter filter(os);
+    json_serializer serializer(os, output_format(true));
+    my_json_filter filter(serializer);
     json_reader reader(is,filter);
 	reader.read();
 }

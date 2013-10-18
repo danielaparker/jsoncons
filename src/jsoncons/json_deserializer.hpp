@@ -15,12 +15,12 @@
 #include <cstdlib>
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
-#include "jsoncons/json_listener.hpp"
+#include "jsoncons/json_input_handler.hpp"
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_deserializer : public basic_json_listener<Char>
+class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     enum structure_type {object_t, array_t};
     struct stack_item

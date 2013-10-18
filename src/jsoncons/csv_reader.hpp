@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_listener.hpp"
+#include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
@@ -46,7 +46,7 @@ public:
     */
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_listener<Char>& handler)
+                     basic_json_input_handler<Char>& handler)
 
        : is_(is), 
          handler_(handler), 
@@ -61,7 +61,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_listener<Char>& handler,
+                     basic_json_input_handler<Char>& handler,
                      const basic_json<Char>& params)
 
        : is_(is), 
@@ -77,7 +77,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_listener<Char>& handler,
+                     basic_json_input_handler<Char>& handler,
                      basic_error_handler<Char>& err_handler)
        : is_(is), 
          handler_(handler), 
@@ -91,7 +91,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_listener<Char>& handler,
+                     basic_json_input_handler<Char>& handler,
                      basic_error_handler<Char>& err_handler,
                      const basic_json<Char>& params)
        : is_(is), 
@@ -257,7 +257,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    basic_json_listener<Char>& handler_;
+    basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
     char value_separator_;
     bool assume_header_;

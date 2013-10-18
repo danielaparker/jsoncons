@@ -15,13 +15,13 @@
 #include <cstring>
 #include <ostream>
 #include "jsoncons/json_exception.hpp"
-#include "jsoncons/json_writer.hpp"
+#include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
 
 namespace jsoncons {
 
 template <class Char,class T> inline
-void serialize(basic_json_writer<Char>& os, const T& val)
+void serialize(basic_json_output_handler<Char>& os, const T& val)
 {
     os.null_value();
 }
@@ -34,7 +34,7 @@ public:
     {
     }
 
-    virtual void to_stream(basic_json_writer<Char>& os) const = 0;
+    virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
 
     virtual basic_custom_data<Char>* clone() const = 0;
 };
@@ -52,7 +52,7 @@ public:
         return new custom_data_wrapper<Char,T>(data_);
     }
 
-    virtual void to_stream(basic_json_writer<Char>& os) const
+    virtual void to_stream(basic_json_output_handler<Char>& os) const
     {
         jsoncons::serialize(os,data_);
     }
@@ -602,7 +602,7 @@ public:
         return type_;
     }
 
-    void to_stream(basic_json_writer<Char>& writer) const;
+    void to_stream(basic_json_output_handler<Char>& handler) const;
 
 private:
     value_type type_;

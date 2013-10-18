@@ -16,7 +16,7 @@ using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;
-using jsoncons::json_listener;
+using jsoncons::json_input_handler;
 using jsoncons::error_handler;
 using jsoncons::json_parse_exception;
 using std::string;
