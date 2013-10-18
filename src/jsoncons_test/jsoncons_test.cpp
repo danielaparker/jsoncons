@@ -458,8 +458,8 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 class my_json_filter : public json_filter
 {
 public:
-    my_json_filter(json_output_handler& output_handler)
-        : json_filter(output_handler)
+    my_json_filter(json_output_handler& parent)
+        : json_filter(parent)
     {
     }
 

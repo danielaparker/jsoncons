@@ -10,9 +10,9 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 ### Constructors
 
-    basic_json_filter(basic_json_input_handler<Char>& handler)
+    basic_json_filter(basic_json_input_handler<Char>& parent)
 
-    basic_json_filter(basic_json_output_handler<Char>& handler)
+    basic_json_filter(basic_json_output_handler<Char>& output_handler)
 
 ### Event handler methods
 
