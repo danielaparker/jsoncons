@@ -468,7 +468,7 @@ public:
         name_ = name;
         if (name != "name")
         {
-            input_handler().name(name,context);
+            parent().name(name,context);
         }
     }
 
@@ -478,14 +478,14 @@ public:
         {
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t",end_first);
-            input_handler().name("first-name",context);
+            parent().name("first-name",context);
             std::string first = value.substr(0,end_first);
-            input_handler().value(first,context);
+            parent().value(first,context);
             if (start_last != std::string::npos)
             {
-                input_handler().name("last-name",context);
+                parent().name("last-name",context);
                 std::string last = value.substr(start_last);
-                input_handler().value(last,context);
+                parent().value(last,context);
             }
             else 
             {
@@ -496,7 +496,7 @@ public:
         }
         else
         {
-            input_handler().value(value,context);
+            parent().value(value,context);
         }
     }
 private:

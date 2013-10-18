@@ -179,7 +179,7 @@ public:
         input_handler_.null_value(context);
     }
 
-    basic_json_input_handler<Char>& input_handler() 
+    basic_json_input_handler<Char>& parent() 
     {
         return input_handler_;
     }
