@@ -15,9 +15,10 @@ Release 0.34
 ------------
 
 - json get method that takes default argument now returns a value rather than a reference
-- issue in csv_reader related to get method issue fixed
-- isue with const json operator[] fixed
-- added as_char method to json
+- Issue in csv_reader related to get method issue fixed
+- Issue with const json operator[] fixed
+- Added as_char method to json
+- Improved exception safety, some opportunites for memory leaks in the presence of exceptions removed
 
 Release 0.33
 ------------
