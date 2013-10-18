@@ -18,13 +18,13 @@
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_writer.hpp"
+#include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_serializer : public basic_json_writer<Char>
+class basic_json_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
     {

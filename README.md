@@ -11,6 +11,16 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.40
+------------
+
+Renamed two virtual base classes:
+
+- json_listener renamed to json_input_handler
+- json_writer renamed to json_output_handler
+
+Added json_filter class
+
 Release 0.34
 ------------
 

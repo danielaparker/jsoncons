@@ -583,53 +583,53 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 }
 
 template <class Char>
-void basic_json<Char>::to_stream(basic_json_writer<Char>& writer) const
+void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
 {
     switch (type_)
     {
     case string_t:
-        writer.value(*(value_.string_value_));
+        handler.value(*(value_.string_value_));
         break;
     case double_t:
-        writer.value(value_.double_value_);
+        handler.value(value_.double_value_);
         break;
     case longlong_t:
-        writer.value(value_.longlong_value_);
+        handler.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        writer.value(value_.ulonglong_value_);
+        handler.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        writer.value(value_.bool_value_);
+        handler.value(value_.bool_value_);
         break;
     case null_t:
-        writer.null_value();
+        handler.null_value();
         break;
     case object_t:
 		{
-        writer.begin_object();
+        handler.begin_object();
         json_object<Char>* o = value_.object_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            writer.name(it->first);
-            it->second.to_stream(writer);
+            handler.name(it->first);
+            it->second.to_stream(handler);
         }
-        writer.end_object();
+        handler.end_object();
 		}
         break;
     case array_t:
 		{
-        writer.begin_array();
+        handler.begin_array();
         json_array<Char>* o = value_.array_;
         for (auto it = o->begin(); it != o->end(); ++it)
         {
-            it->to_stream(writer);
+            it->to_stream(handler);
         }
-        writer.end_array();
+        handler.end_array();
 		}
         break;
     case custom_t:
-        value_.userdata_->to_stream(writer);
+        value_.userdata_->to_stream(handler);
         break;
     default:
         // throw

@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_JSON_IN_STREAM_HPP
-#define JSONCONS_JSON_IN_STREAM_HPP
+#ifndef JSONCONS_JSON_INPUT_HANDLER_HPP
+#define JSONCONS_JSON_INPUT_HANDLER_HPP
 
 #include <string>
 
@@ -16,7 +16,7 @@ template <class Char>
 class basic_parsing_context;
 
 template <class Char>
-class basic_json_listener
+class basic_json_input_handler
 {
 public:
     virtual void begin_json() = 0;
@@ -46,7 +46,7 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 };
 
-typedef basic_json_listener<char> json_listener;
+typedef basic_json_input_handler<char> json_input_handler;
 
 }
 

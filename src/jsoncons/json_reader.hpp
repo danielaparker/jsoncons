@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/json_char_traits.hpp"
-#include "jsoncons/json_listener.hpp"
+#include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/error_handler.hpp"
 
 namespace jsoncons {
@@ -66,7 +66,7 @@ public:
       \param is The input stream to read from
     */
     basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_listener<Char>& handler,
+                      basic_json_input_handler<Char>& handler,
                       basic_error_handler<Char>& err_handler)
        : is_(is), 
          handler_(handler), 
@@ -80,7 +80,7 @@ public:
         input_buffer_ = &buffer_[0];
     }
     basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_listener<Char>& handler)
+                      basic_json_input_handler<Char>& handler)
         
        : is_(is), 
          handler_(handler), 
@@ -234,7 +234,7 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    basic_json_listener<Char>& handler_;
+    basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
 };
 

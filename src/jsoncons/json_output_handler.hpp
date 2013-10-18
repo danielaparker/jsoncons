@@ -5,15 +5,15 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_JSON_OUT_STREAM_HPP
-#define JSONCONS_JSON_OUT_STREAM_HPP
+#ifndef JSONCONS_JSON_OUTPUT_HANDLER_HPP
+#define JSONCONS_JSON_OUTPUT_HANDLER_HPP
 
 #include <string>
 
 namespace jsoncons {
 
 template <class Char>
-class basic_json_writer
+class basic_json_output_handler
 {
 public:
 
@@ -41,7 +41,7 @@ public:
 };
 
 template <class Char>
-class basic_null_json_writer : public basic_json_writer<Char>
+class basic_null_json_output_handler : public basic_json_output_handler<Char>
 {
 public:
 
@@ -90,9 +90,9 @@ public:
     }
 };
 
-typedef basic_null_json_writer<char> null_json_writer;
+typedef basic_null_json_output_handler<char> null_json_output_handler;
 
-typedef basic_json_writer<char> json_writer;
+typedef basic_json_output_handler<char> json_output_handler;
 
 }
 #endif

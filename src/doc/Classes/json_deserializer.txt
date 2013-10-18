@@ -6,7 +6,7 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
 ### Base classes
 
-[[json_listener]]
+[[json_input_handler]]
 
 ### Event handler methods
 
