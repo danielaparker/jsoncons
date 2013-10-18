@@ -71,30 +71,31 @@ public:
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
+         buffer_(default_max_buffer_length),
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
-        input_buffer_ = new Char[buffer_capacity_];
+        input_buffer_ = &buffer_[0];
     }
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_listener<Char>& handler)
         
        : is_(is), 
          handler_(handler), 
-         err_handler_(default_err_handler), 
+         err_handler_(default_err_handler),
+         buffer_(default_max_buffer_length), 
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     { 
-        input_buffer_ = new Char[buffer_capacity_];
+        input_buffer_ = &buffer_[0];
     }
 
     ~basic_json_reader()
     {
-        delete[] input_buffer_;
     }
 
     void read();
@@ -112,6 +113,8 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
+        buffer_.resize(buffer_capacity);
+        input_buffer_ = &buffer_[0];
     }
 
     virtual unsigned long line_number() const
@@ -227,6 +230,7 @@ private:
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
     Char *input_buffer_;
+    std::vector<Char> buffer_;
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;

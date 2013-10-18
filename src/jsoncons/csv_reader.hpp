@@ -50,7 +50,8 @@ public:
 
        : is_(is), 
          handler_(handler), 
-         err_handler_(default_err_handler), 
+         err_handler_(default_err_handler),
+         buffer_(default_max_buffer_length), 
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
@@ -65,7 +66,8 @@ public:
 
        : is_(is), 
          handler_(handler), 
-         err_handler_(default_err_handler), 
+         err_handler_(default_err_handler),
+         buffer_(default_max_buffer_length), 
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
@@ -105,7 +107,7 @@ public:
 
     void init(const basic_json<Char>& params)
     {
-        input_buffer_ = new Char[buffer_capacity_];
+        input_buffer_ = &buffer_[0];
 
         value_separator_ = params.get("field_delimiter",",").as_char();
 
@@ -118,7 +120,6 @@ public:
 
     ~basic_csv_reader()
     {
-        delete[] input_buffer_;
     }
 
     void read();
@@ -136,6 +137,8 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
+        buffer_.resize(buffer_capacity);
+        input_buffer_ = &buffer_[0];
     }
 
     virtual unsigned long line_number() const
@@ -249,6 +252,7 @@ private:
     std::basic_string<Char> string_buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
+    std::vector<Char> buffer_;
     Char *input_buffer_;
     size_t buffer_capacity_;
     int buffer_position_;
