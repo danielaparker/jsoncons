@@ -5,7 +5,7 @@ The jsoncons library implements C++ classes for the construction of [JavaScript 
 
 The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
 
-To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory.
+To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
 It has been tested with MS Visual C++ 10, SP1
 
@@ -14,7 +14,7 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.41
 ------------
 
-- Added non-member overload swap(json&a js,on&b)
+- Added non-member overload swap(json& a, json& b)
 - Fixed bug with multi line /**/ comments 
 - Added begin_json and end_json methods to json_output_handler
 - json_deserializer should now satisfy basic exception safety (no leak guarantee)
