@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include "jsoncons/csv_reader.hpp"
+#include "jsoncons_ext/csv/csv_reader.hpp"
 #include "jsoncons/json_reader.hpp"
 #include <sstream>
 #include <vector>
@@ -13,7 +13,7 @@
 using jsoncons::json_deserializer;
 using jsoncons::output_format;
 using jsoncons::json;
-using jsoncons::csv_reader;
+using jsoncons_ext::csv::csv_reader;
 using jsoncons::json_reader;
 using jsoncons::pretty_print;
 using std::string;

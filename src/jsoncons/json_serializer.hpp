@@ -62,6 +62,14 @@ public:
         restore();
     }
 
+    virtual void begin_json()
+    {
+    }
+
+    virtual void end_json()
+    {
+    }
+
     virtual void begin_object()
     {
         begin_structure();

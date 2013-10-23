@@ -41,7 +41,7 @@ Parses an input stream of JSON text and returns a json object or array value
 Parses a string of JSON text and returns a json object or array value
 
     static json parse_file(const std::string& filename)
-Opens a file of JSON text as a binary stream and reads it into memory before parsing, for very large files, use `parse` instead. Returns a json object or array value.
+Parses JSON text from a file opened as a binary stream, and returns a json object or array value.
 
     static json make_array(size_t n)
 Makes an array of n elements. Each element is a json null value.
@@ -269,10 +269,13 @@ Inserts json value into stream using specified [output_format](output_format).
     void to_stream(json_output_handler& handler) const;
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
-### Non-member functions
+### Non-member overloads
 
     ostream& operator<< (ostream& os, const json& val)
 Inserts json value into stream.
+
+    void swap(json& a, json& b)
+Exchanges the values of `a` and `b`
 
 ### Examples
 

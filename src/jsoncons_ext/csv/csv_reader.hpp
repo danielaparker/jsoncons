@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_CSV_READER_HPP
-#define JSONCONS_CSV_READER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_READER_HPP
+#define JSONCONS_EXT_CSV_CSV_READER_HPP
 
 #include <string>
 #include <sstream>
@@ -21,12 +21,12 @@
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
 
-namespace jsoncons {
+namespace jsoncons_ext { namespace csv {
 
 template<class Char>
-class basic_csv_reader : private basic_parsing_context<Char>
+class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
-    static default_error_handler default_err_handler;
+    static jsoncons::default_error_handler default_err_handler;
 
     struct stack_item
     {
@@ -46,7 +46,7 @@ public:
     */
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler)
+                     jsoncons::basic_json_input_handler<Char>& handler)
 
        : is_(is), 
          handler_(handler), 
@@ -61,8 +61,8 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     const basic_json<Char>& params)
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     const jsoncons::basic_json<Char>& params)
 
        : is_(is), 
          handler_(handler), 
@@ -77,8 +77,8 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     basic_error_handler<Char>& err_handler)
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler)
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
@@ -91,9 +91,9 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     basic_error_handler<Char>& err_handler,
-                     const basic_json<Char>& params)
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler,
+                     const jsoncons::basic_json<Char>& params)
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
@@ -105,7 +105,7 @@ public:
         init(params);
     }
 
-    void init(const basic_json<Char>& params)
+    void init(const jsoncons::basic_json<Char>& params)
     {
         input_buffer_ = &buffer_[0];
 
@@ -257,8 +257,8 @@ private:
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    basic_json_input_handler<Char>& handler_;
-    basic_error_handler<Char>& err_handler_;
+    jsoncons::basic_json_input_handler<Char>& handler_;
+    jsoncons::basic_error_handler<Char>& err_handler_;
     char value_separator_;
     bool assume_header_;
     char quote_char_;
@@ -266,7 +266,7 @@ private:
 };
 
 template<class Char>
-default_error_handler basic_csv_reader<Char>::default_err_handler;
+jsoncons::default_error_handler basic_csv_reader<Char>::default_err_handler;
 
 template<class Char>
 void basic_csv_reader<Char>::read()
@@ -723,6 +723,6 @@ void basic_csv_reader<Char>::fast_skip_white_space()
 
 typedef basic_csv_reader<char> csv_reader;
 
-}
+}}
 
 #endif

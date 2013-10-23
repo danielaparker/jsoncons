@@ -33,10 +33,12 @@ public:
 
     virtual void begin_json()
     {
+        writer_.begin_json();
     }
 
     virtual void end_json()
     {
+        writer_.end_json();
     }
 
     virtual void begin_object(const basic_parsing_context<Char>& context)
