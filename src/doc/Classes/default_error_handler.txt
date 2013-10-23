@@ -1,3 +1,5 @@
+    jsoncons::default_error_handler
+
 ### Header
 
     #include "jsoncons/error_handler.hpp"
