@@ -14,7 +14,12 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.41
 ------------
 
-- Added non-member overload swap(json&a json&b)
+- Added non-member overload swap(json&a js,on&b)
+- Fixed bug with multi line /**/ comments 
+- Added begin_json and end_json methods to json_output_handler
+- json_deserializer should now satisfy basic exception safety (no leak guarantee)
+- Moved csv_reader.hpp to jsoncons_ext/csv directory
+- Changed csv_reader namespace to jsoncons_ext::csv
 
 Release 0.40
 ------------
