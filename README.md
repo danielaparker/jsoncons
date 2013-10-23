@@ -20,6 +20,8 @@ Release 0.41
 - json_deserializer should now satisfy basic exception safety (no leak guarantee)
 - Moved csv_reader.hpp to jsoncons_ext/csv directory
 - Changed csv_reader namespace to jsoncons_ext::csv
+- json::parse_file no longer reads the entire file into memory before parsing
+  (it now uses json_reader default buffering)
 
 Release 0.40
 ------------
