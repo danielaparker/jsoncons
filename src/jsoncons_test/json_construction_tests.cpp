@@ -268,8 +268,7 @@ BOOST_AUTO_TEST_CASE(test_multiple)
         reader.read();
         if (!reader.eof())
         {
-            json val;
-            handler.root().swap(val);
+            json val = std::move(handler.root());
             std::cout << val << std::endl;
         }
     }

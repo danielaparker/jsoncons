@@ -557,8 +557,6 @@ public:
 
     Char as_char() const;
 
-    void swap(basic_json<Char>& o) throw();
-
     basic_json<Char>& at(size_t i);
 
     const basic_json<Char>& at(size_t i) const;
@@ -604,6 +602,12 @@ public:
 
     void to_stream(basic_json_output_handler<Char>& handler) const;
 
+    friend void swap(basic_json<Char>& a, basic_json<Char>& b)
+    {
+        using std::swap;
+        swap(a.type_,b.type_);
+        swap(a.value_,b.value_);
+    }
 private:
     value_type type_;
     union

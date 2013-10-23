@@ -6,6 +6,12 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
 
 ### Event handler methods
 
+    virtual void begin_json()
+Receive notification of the start of a JSON document
+
+    virtual void end_json()
+Receive notification of the end of a JSON document
+
     virtual void begin_object()
 Receive notification of the start of a JSON object
 

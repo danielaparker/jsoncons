@@ -212,7 +212,7 @@ basic_json<Char>::~basic_json()
 template <class Char>
 basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 {
-    rhs.swap(*this);
+    swap(*this,rhs);
     return *this;
 }
 
@@ -293,13 +293,6 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
         break;
     }
     return false;
-}
-
-template <class Char>
-void basic_json<Char>::swap(basic_json<Char>& o) throw()
-{
-    std::swap(type_,o.type_);
-    std::swap(value_,o.value_);
 }
 
 template <class Char>
@@ -720,8 +713,7 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val;
-    handler.root().swap(val);
+    basic_json<Char> val = std::move(handler.root());
     return val;
 }
 
@@ -732,8 +724,7 @@ basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val;
-    handler.root().swap(val);
+    basic_json<Char> val = std::move(handler.root());
     return val;
 }
 
@@ -745,23 +736,11 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
-    is.seekg(0,std::ios_base::end);
-    std::ios::pos_type pos = is.tellg();
-    is.seekg(0,std::ios_base::beg);
-
-    size_t length = static_cast<size_t>(pos);
-
-    if (length == 0)
-    {
-        throw json_exception_1<char>("File %s is empty", filename);
-    }
-
+ 
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
-    parser.buffer_capacity(length);
     parser.read();
-    basic_json<Char> val;
-    handler.root().swap(val);
+    basic_json<Char> val = std::move(handler.root());
     return val;
 }
 

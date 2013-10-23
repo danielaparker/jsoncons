@@ -11,10 +11,13 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
-Release 0.40
+Release 0.41
 ------------
 
-Renamed two virtual base classes:
+- Added non-member overload swap(json&a json&b)
+
+Release 0.40
+------------
 
 - json_listener renamed to json_input_handler
 - json_writer renamed to json_output_handler
