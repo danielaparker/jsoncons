@@ -18,6 +18,7 @@
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/error_handler.hpp"
+#include "jsoncons/json_exception.hpp"
 
 namespace jsoncons {
 
@@ -77,6 +78,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         input_buffer_ = &buffer_[0];
     }
     basic_json_reader(std::basic_istream<Char>& is,
@@ -91,6 +96,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     { 
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         input_buffer_ = &buffer_[0];
     }
 
@@ -141,8 +150,8 @@ private:
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
-    void fast_ignore_single_line_comment();
-    void fast_ignore_multi_line_comment();
+    bool fast_ignore_single_line_comment();
+    bool fast_ignore_multi_line_comment();
     bool read_until_match_fails(char char1, char char2, char char3);
     void fast_skip_white_space();
     bool read_until_match_fails(char char1, char char2, char char3, char char4);
@@ -838,7 +847,7 @@ void basic_json_reader<Char>::parse_string()
 template<class Char>
 void basic_json_reader<Char>::ignore_single_line_comment()
 {
-    bool done = false;
+    bool done = fast_ignore_single_line_comment();
     while (!done)
     {
         Char c = read_ch();
@@ -849,48 +858,64 @@ void basic_json_reader<Char>::ignore_single_line_comment()
         if (c == '\n')
         {
             done = true;
-            break;
         }
     }
 }
 
 template<class Char>
-void basic_json_reader<Char>::fast_ignore_single_line_comment()
+bool basic_json_reader<Char>::fast_ignore_single_line_comment()
 {
-    while (buffer_position_ < buffer_length_)
+    bool done = false;
+    while (!done && buffer_position_ < buffer_length_)
     {
         if (input_buffer_[buffer_position_] == '\n')
         {
-            break;
-        }
-        ++buffer_position_;
-        ++column_;
-    }
-}
-
-template<class Char>
-void basic_json_reader<Char>::fast_ignore_multi_line_comment()
-{
-    while (buffer_position_ < buffer_length_)
-    {
-        if (input_buffer_[buffer_position_] == '*')
-        {
-            break;
-        }
-        if (input_buffer_[buffer_position_] == '\n')
-        {
+            done = true;
             ++line_;
-            column_ = 0;
+            column_ = 1;
+        }
+        else
+        {
+            ++column_;
         }
         ++buffer_position_;
-        ++column_;
     }
+    return done;
+}
+
+template<class Char>
+bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
+{
+    bool done = false;
+    while (!done && buffer_position_ < buffer_length_-1)
+    {
+        if (input_buffer_[buffer_position_] == '*' && input_buffer_[buffer_position_+1] == '/')
+        {
+            done = true;
+            buffer_position_ += 2;
+            ++column_ += 2;
+        }
+        else
+        {
+            if (input_buffer_[buffer_position_] == '\n')
+            {
+                ++line_;
+                column_ = 1;
+            }
+            else
+            {
+                ++column_;
+            }
+            ++buffer_position_;
+        }
+    }
+    return done;
 }
 
 template<class Char>
 void basic_json_reader<Char>::ignore_multi_line_comment()
 {
-    bool done = false;
+    bool done = fast_ignore_multi_line_comment();
     while (!done)
     {
         Char c = read_ch();
@@ -908,8 +933,8 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
             if (next == '/')
             {
                 done = true;
+                skip_ch();
             }
-            break;
         }
     }
 }

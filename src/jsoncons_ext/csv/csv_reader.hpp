@@ -57,6 +57,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         init(json::an_object);
     }
 
@@ -73,6 +77,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         init(params);
     }
 
@@ -87,6 +95,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         init(json::an_object);
     }
 
@@ -102,6 +114,10 @@ public:
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
+        if (!is.good())
+        {
+            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+        }
         init(params);
     }
 
