@@ -189,7 +189,10 @@ private:
                 ++line_;
                 column_ = 0;
             }
-            ++column_;
+            else
+            {
+                ++column_;
+            }
         }
         else
         {
@@ -224,11 +227,14 @@ private:
         if (buffer_position_ > 0)
         {
             --buffer_position_;
-            --column_;
             if (ch == '\n')
             {
                 --line_;
                 column_ = 0;
+            }
+            else
+            {
+                --column_;
             }
         }
     }
@@ -872,7 +878,7 @@ bool basic_json_reader<Char>::fast_ignore_single_line_comment()
         {
             done = true;
             ++line_;
-            column_ = 1;
+            column_ = 0;
         }
         else
         {
@@ -900,7 +906,7 @@ bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
             if (input_buffer_[buffer_position_] == '\n')
             {
                 ++line_;
-                column_ = 1;
+                column_ = 0;
             }
             else
             {
@@ -948,8 +954,10 @@ void basic_json_reader<Char>::fast_skip_white_space()
         switch (input_buffer_[buffer_position_])
         {
         case '\n':
+            ++buffer_position_;
             ++line_;
             column_ = 0;
+            break;
         case '\t':
         case '\v':
         case '\f':
