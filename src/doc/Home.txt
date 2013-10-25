@@ -2,9 +2,9 @@ The jsoncons library implements C++ classes for the construction of [JavaScript 
 
 The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
 
-To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory.
+To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-All jsoncons classes and functions are in namespace `jsoncons`.
+All core jsoncons classes and functions are in namespace `jsoncons`. Extensions are in namespace `jsoncons_ext`.
 
 ### Features
 
@@ -18,6 +18,8 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 * Supports optional escaping of non-ascii UTF-8 octets
 * Supports storing custom data types in a json object, with specialized serialization
 * Supports reading JSON values from CSV files
+
+### Roadmap
 
 [[Roadmap]]
 
@@ -44,6 +46,8 @@ All jsoncons classes and functions are in namespace `jsoncons`.
 [[json_deserializer]]
 
 ### Extensions
+
+#### csv
 
 [[csv_reader]]
 

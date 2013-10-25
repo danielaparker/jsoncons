@@ -66,6 +66,11 @@ public:
     {
     }
 
+    json_array(std::vector<basic_json<Char>> elements)
+        : elements_(elements)
+    {
+    }
+
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)
@@ -74,7 +79,7 @@ public:
 
     json_array<Char>* clone() 
     {
-        return new json_array(elements_.begin(),elements_.end());
+        return new json_array(elements_);
     }
 
     ~json_array()
@@ -154,12 +159,8 @@ public:
 
     json_object<Char>* clone() 
     {
-        std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members(members_.size());
-        for (size_t i = 0; i < members_.size(); ++i)
-        {
-            
-            members[i] = std::pair<std::basic_string<Char>,basic_json<Char>>(members_[i].first,members_[i].second);
-        }
+        std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members(members_);
+
         return new json_object(members);
     }
 
