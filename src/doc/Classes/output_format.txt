@@ -1,3 +1,5 @@
+    jsoncons::output_format
+
 The output_format class is an instantiation of the basic_output_format class template that uses char as the character type.
 
 ### Header
