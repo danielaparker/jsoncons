@@ -14,6 +14,7 @@
 #include <istream>
 #include <ostream>
 #include <cstdlib>
+#include <limits>
 
 namespace jsoncons {
 
@@ -28,7 +29,7 @@ public:
     basic_output_format()
         : indenting_(false), 
           indent_(default_indent),
-          precision_(17),
+          precision_(16),
           set_format_flags_(0),
           unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
@@ -42,7 +43,7 @@ public:
 
     basic_output_format(bool indenting)
         : indenting_(indenting), 
-          precision_(17),
+          precision_(16),
           set_format_flags_(0),
           unset_format_flags_(0),
           indent_(default_indent),
@@ -185,6 +186,12 @@ public:
     {
         neg_inf_replacement_ = replacement;
     } 
+
+    void fixed_decimal_places(std::streamsize n)
+    {
+        set_format_flags_ |= std::ios::fixed;
+        precision_ = n;
+    }
 private:
     bool indenting_;
     size_t indent_;
@@ -200,6 +207,7 @@ private:
     std::basic_string<Char> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
+    size_t max_decimal_places;
 };
 
 typedef basic_output_format<char> output_format;

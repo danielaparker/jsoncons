@@ -213,6 +213,9 @@ If value is long long, returns value, if value is unsigned long long or double, 
     std::string as_string() const
 If value is string, returns value, otherwise returns result of `to_string`.
 
+    std::string as_string(const output_format& format) const
+If value is string, returns value, otherwise returns result of `to_string(format)`.
+
     char as_char() const
 If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
 

@@ -177,6 +177,11 @@ public:
             return val_.get(name_).as_string();
         }
 
+        std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
+        {
+            return val_.get(name_).as_string(format);
+        }
+
         Char as_char() const
         {
             return val_.get(name_).as_char();
@@ -554,6 +559,8 @@ public:
     // Returns a reference to the custom data associated with name
 
     std::basic_string<Char> as_string() const;
+
+    std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
 
     Char as_char() const;
 

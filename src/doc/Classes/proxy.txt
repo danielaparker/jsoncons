@@ -34,6 +34,8 @@ Returns `true` if a json string, object or array has no elements, otherwise `fal
 
     std::string as_string() const
 
+    std::string as_string(const output_format& format) const
+
     char as_char() const
 
     bool as_bool() const

@@ -159,9 +159,7 @@ public:
 
     json_object<Char>* clone() 
     {
-        std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members(members_);
-
-        return new json_object(members);
+        return new json_object(members_);
     }
 
     size_t size() const {return members_.size();}

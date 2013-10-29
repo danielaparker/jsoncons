@@ -63,6 +63,9 @@ The default is "null"
     void precision(std::streamsize prec)
 Sets the floating point decimal precision
 
+    void fixed_decimal_places(std::streamsize prec)
+Sets the `std::ios::fixed` bit of the format flags and sets `precision` to `prec`.
+
     void set_format_flags(std::ios_base::fmtflags flags)
 
     void unset_format_flags(std::ios_base::fmtflags flags)
