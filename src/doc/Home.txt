@@ -11,6 +11,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 * Implements parsing and serializing JSON text in UTF-8
 * Supports event based JSON parsing and serializing with user defined input and output handlers
 * Uses the standard C++ input/output streams library
+* Guarantees basic exception safety (no leaks)
 * Accepts and ignores single line comments that start with `//`, and multi line comments that start with `/*` and end with `*/`
 * Supports optional escaping of the solidus (`/`) character
 * Supports `Nan`, `Inf` and `-Inf` replacement
@@ -55,16 +56,120 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 ### First example
 
+Here is a sample json file (`books.json`):
+
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+
+This is how to read the document with `jsoncons`: 
+
     #include <string>
     #include "jsoncons/json.hpp"
 
     using jsoncons::json;
+    using jsoncons::output_format;
+    using std::string;
 
-    std::string input = "{\"city\":\"Toronto\", \"number\":100.5}";
-    json o = json::parse_string(input);
+    try
+    {
+        json books = json::parse_file("input/books.json");
 
-    std::string city = o["city"].as_string();  
-    double num = o["number"].as_double();  
+        for (size_t i = 0; i < books.size(); ++i)
+        {
+            json& book = books[i];
+            string author = book["author"].as_string();
+            string title = book["title"].as_string();
+            double price = book["price"].as_double();
+            std::cout << author << ", " << title << ", " << price << std::endl;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
+The output is
+
+    Haruki Murakami, Kafka on the Shore, 25.17
+    Charles Bukowski, Women: A Novel, 12
+    Member price not found.
+
+Note the following:
+
+- The assignment `json& book = books[i]` is to a reference, the reference identifies a [[json]] object owned by `books`. 
+- The book "Cutter's Way" has no price, so `book["price"]` throws a [[json_exception]] ("Member price not found")
+
+Instead of having the exception, let's use an accessor that evaluates to a string and substitutes "N/A" for the missing price: 
+
+    try
+    {
+        json books = json::parse_file("input/books.json");
+
+        for (size_t i = 0; i < books.size(); ++i)
+        {
+            json& book = books[i];
+            string author = book["author"].as_string();
+            string title = book["title"].as_string();
+            string price = book.get("price","N/A").as_string();
+            std::cout << author << ", " << title << ", " << price << std::endl;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
+Now the output is
+
+    Haruki Murakami, Kafka on the Shore, 25.17
+    Charles Bukowski, Women: A Novel, 12
+    Ivan Passer, Cutter's Way, N/A
+
+Note the following:
+
+- By default, when expressing a floating-point value as a string with `as_string()`, `jsoncons` uses default floating-point notation and a precision of 16.
+
+Let's change the floating-point notation to 'fixed' and a precision of 2.
+
+    try
+    {
+        json books = json::parse_file("input/books.json");
+
+        output_format format;
+        format.fixed_decimal_places(2);
+        for (size_t i = 0; i < books.size(); ++i)
+        {
+            json& book = books[i];
+            string author = book["author"].as_string();
+            string title = book["title"].as_string();
+            string price = book.get("price","N/A").as_string(format);
+            std::cout << author << ", " << title << ", " << price << std::endl;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
+This time the output is
+
+    Haruki Murakami, Kafka on the Shore, 25.17
+    Charles Bukowski, Women: A Novel, 12.00
+    Ivan Passer, Cutter's Way, N/A
 
 ### User specified `Nan`, `Inf` and `-Inf` replacement
 

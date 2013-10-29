@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_comma_delimited_file)
 {
     std::cout << "###test_csv_reader" << std::endl;
 
-    std::string in_file = "../../input/countries.csv";
+    std::string in_file = "input/countries.csv";
     std::ifstream is(in_file);
 
     json_deserializer handler;
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 {
     std::cout << "###test_csv_reader" << std::endl;
 
-    std::string in_file = "../../input/employees.txt";
+    std::string in_file = "input/employees.txt";
     std::ifstream is(in_file);
 
     json_deserializer handler;

@@ -1024,6 +1024,18 @@ std::basic_string<Char> basic_json<Char>::as_string() const
 }
 
 template <class Char>
+std::basic_string<Char> basic_json<Char>::as_string(const basic_output_format<Char>& format) const
+{
+    switch (type_)
+    {
+    case string_t:
+        return *(value_.string_value_);
+    default:
+        return to_string(format);
+    }
+}
+
+template <class Char>
 Char basic_json<Char>::as_char() const
 {
     switch (type_)

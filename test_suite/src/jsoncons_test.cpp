@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE(test_u0000)
 
 BOOST_AUTO_TEST_CASE(parse_file)
 {
-    json obj = json::parse_file("../../input/persons.json");
+    json obj = json::parse_file("input/persons.json");
     std::cout << obj << std::endl;
 }
 
@@ -505,7 +505,7 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_filter)
 {
-    std::string in_file = "../../input/address-book.json";
+    std::string in_file = "input/address-book.json";
     std::string out_file = "../../output/address-book-new.json";
     std::ifstream is(in_file,std::ofstream::binary);
     std::ofstream os(out_file);

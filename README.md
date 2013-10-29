@@ -11,6 +11,15 @@ It has been tested with MS Visual C++ 10, SP1
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.42
+------------
+
+- Fixed another bug with multi line /**/ comments 
+- Minor fixes to reporting line and column number of errors
+- Added fixed_decimal_places setter to output_format
+- Added version of `as_string` to `json` that takes `output_format` as a parameter
+- Reorganization of test cases and examples in source tree
+
 Release 0.41
 ------------
 

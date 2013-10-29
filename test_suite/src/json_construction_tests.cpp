@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_construction_from_string)
 
 BOOST_AUTO_TEST_CASE(test_construction_from_file)
 {
-    json val = json::parse_file("../../input/members.json");
+    json val = json::parse_file("input/members.json");
 
 	std::cout << pretty_print(val) << std::endl;
 }
