@@ -22,7 +22,7 @@ Bug fixes
 
 Performance enhancements
 
-- json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocation.
+- json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocations.
 
 Release 0.42
 ------------
