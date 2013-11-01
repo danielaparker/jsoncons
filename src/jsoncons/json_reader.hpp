@@ -69,14 +69,15 @@ public:
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_error_handler<Char>& err_handler)
-       : is_(is), 
-         handler_(handler), 
+       : is_(is),
+         handler_(handler),
          err_handler_(err_handler),
          buffer_(default_max_buffer_length),
-         input_buffer_(0), 
-         buffer_position_(0), 
+         input_buffer_(0),
+         buffer_position_(0),
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
     {
         if (!is.good())
         {
@@ -86,16 +87,17 @@ public:
     }
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
-        
-       : is_(is), 
-         handler_(handler), 
+
+       : is_(is),
+         handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length), 
-         input_buffer_(0), 
-         buffer_position_(0), 
+         buffer_(default_max_buffer_length),
+         input_buffer_(0),
+         buffer_position_(0),
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
-    { 
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
+    {
         if (!is.good())
         {
             JSONCONS_THROW_EXCEPTION("Input stream is invalid");
@@ -136,6 +138,11 @@ public:
         return column_;
     }
 
+    virtual size_t minimum_structure_capacity() const
+    {
+        return minimum_structure_capacity_;
+    }
+
     virtual const std::basic_string<Char>& buffer() const
     {
         return string_buffer_;
@@ -145,6 +152,12 @@ private:
     basic_json_reader(const basic_json_reader&); // noop
     basic_json_reader& operator = (const basic_json_reader&); // noop
 
+    size_t estimate_minimum_array_capacity() const;
+    size_t estimate_minimum_object_capacity() const;
+    size_t skip_array(size_t pos) const;
+    size_t skip_object(size_t pos) const;
+    size_t skip_string(size_t pos) const;
+    size_t skip_number(size_t pos) const;
     void skip_separator();
     void parse_number(Char c);
     void parse_string();
@@ -164,7 +177,7 @@ private:
         if (!is_.eof())
         {
             is_.read(input_buffer_, buffer_capacity_);
-            buffer_length_ = static_cast<int>(is_.gcount());
+            buffer_length_ = static_cast<size_t>(is_.gcount());
         }
         else
         {
@@ -180,7 +193,6 @@ private:
         }
         Char c = 0;
 
-        //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
         {
             c = input_buffer_[buffer_position_++];
@@ -239,6 +251,7 @@ private:
         }
     }
 
+    size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
@@ -247,8 +260,8 @@ private:
     Char *input_buffer_;
     std::vector<Char> buffer_;
     size_t buffer_capacity_;
-    int buffer_position_;
-    int buffer_length_;
+    size_t buffer_position_;
+    size_t buffer_length_;
     basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
 };
@@ -257,26 +270,26 @@ template<class Char>
 default_error_handler basic_json_reader<Char>::default_err_handler;
 
 inline
-unsigned long long string_to_ulonglong(const char* s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
+unsigned long long string_to_ulonglong(const char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
 {
-	unsigned long long n = 0;
+    unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
         char c = s[i];
         if (c >= '0' && c <= '9')
         {
-			if (n > max_value/10)
-			{
-		        throw std::overflow_error("Integer overflow");
-			}
-            n = n * 10;
-			long long k = (c - '0'); 
-			if (n > max_value - k)
-			{
+            if (n > max_value / 10)
+            {
                 throw std::overflow_error("Integer overflow");
-			}
+            }
+            n = n * 10;
+            long long k = (c - '0');
+            if (n > max_value - k)
+            {
+                throw std::overflow_error("Integer overflow");
+            }
 
-			n += k;
+            n += k;
         }
     }
     return n;
@@ -338,15 +351,21 @@ void basic_json_reader<Char>::read()
                 handler_.begin_json();
             }
             stack_.push_back(stack_item(object_t));
+            minimum_structure_capacity_ = estimate_minimum_object_capacity();
             handler_.begin_object(*this);
+            minimum_structure_capacity_ = 0;
             break;
         case begin_array:
             if (stack_.size() == 0)
             {
                 handler_.begin_json();
             }
-            stack_.push_back(stack_item(array_t));
-            handler_.begin_array(*this);
+            {
+                stack_.push_back(stack_item(array_t));
+                minimum_structure_capacity_ = estimate_minimum_array_capacity();
+                handler_.begin_array(*this);
+                minimum_structure_capacity_ = 0;
+            }
             break;
         default:
             if (stack_.size() > 0)
@@ -369,13 +388,13 @@ void basic_json_reader<Char>::read()
                         parse_string();
                         if (stack_.back().is_object() && !stack_.back().received_name_)
                         {
-                            handler_.name(string_buffer_,*this);
+                            handler_.name(string_buffer_, *this);
                             skip_separator();
                             stack_.back().received_name_ = true;
                         }
                         else
                         {
-                            handler_.value(string_buffer_,*this);
+                            handler_.value(string_buffer_, *this);
                             stack_.back().comma_ = false;
                             stack_.back().received_name_ = false;
                             ++stack_.back().count_;
@@ -441,7 +460,7 @@ void basic_json_reader<Char>::read()
                     {
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                     }
-                    handler_.value(true,*this);
+                    handler_.value(true, *this);
                     stack_.back().comma_ = false;
                     stack_.back().received_name_ = false;
                     ++stack_.back().count_;
@@ -451,7 +470,7 @@ void basic_json_reader<Char>::read()
                     {
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                     }
-                    handler_.value(false,*this);
+                    handler_.value(false, *this);
                     stack_.back().comma_ = false;
                     stack_.back().received_name_ = false;
                     ++stack_.back().count_;
@@ -623,7 +642,7 @@ bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, cha
 }
 
 template<class Char>
-void basic_json_reader<Char>::parse_number(Char c) 
+void basic_json_reader<Char>::parse_number(Char c)
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -677,14 +696,14 @@ void basic_json_reader<Char>::parse_number(Char c)
                     }
                     if (has_neg)
                         d = -d;
-                    handler_.value(d,*this);
+                    handler_.value(d, *this);
                 }
                 else if (has_neg)
                 {
                     try
                     {
-                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max()));
-                        handler_.value(-d,*this);
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max()));
+                        handler_.value(-d, *this);
                     }
                     catch (const std::exception&)
                     {
@@ -700,16 +719,16 @@ void basic_json_reader<Char>::parse_number(Char c)
                         {
                             if (has_neg)
                                 d = -d;
-                            handler_.value(d,*this);
+                            handler_.value(d, *this);
                         }
                     }
                 }
-                else 
+                else
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max());
-                        handler_.value(d,*this);
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max());
+                        handler_.value(d, *this);
                     }
                     catch (const std::exception&)
                     {
@@ -724,7 +743,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         {
                             if (has_neg)
                                 d = -d;
-                            handler_.value(d,*this);
+                            handler_.value(d, *this);
                         }
                     }
                 }
@@ -893,9 +912,9 @@ template<class Char>
 bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
 {
     bool done = false;
-    while (!done && buffer_position_ < buffer_length_-1)
+    while (!done && buffer_position_ < buffer_length_ - 1)
     {
-        if (input_buffer_[buffer_position_] == '*' && input_buffer_[buffer_position_+1] == '/')
+        if (input_buffer_[buffer_position_] == '*' && input_buffer_[buffer_position_ + 1] == '/')
         {
             done = true;
             buffer_position_ += 2;
@@ -996,6 +1015,236 @@ unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
         }
     }
     return cp;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
+{
+    size_t size = 0;
+    size_t pos = buffer_position_;
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case end_array:
+            done = true;
+            break;
+        case begin_array:
+            pos = skip_array(pos + 1);
+            ++size;
+            break;
+        case begin_object:
+            pos = skip_object(pos + 1);
+            ++size;
+            break;
+        case '\"':
+            pos = skip_string(pos + 1);
+            ++size;
+            break;
+        case 't':
+            pos += 4;
+            ++size;
+            break;
+        case 'f':
+            pos += 5;
+            ++size;
+            break;
+        case 'n':
+            pos += 4;
+            ++size;
+            break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '-':
+            pos = skip_number(pos + 1);
+            ++size;
+            break;
+        default:
+            ++pos;
+            break;
+        }
+    }
+
+    return size;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
+{
+    size_t size = 0;
+    size_t pos = buffer_position_;
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case end_object:
+            done = true;
+            break;
+        case '\"':
+            pos = skip_string(pos + 1);
+            break;
+		case ':':
+            ++size;
+            ++pos;
+            break;
+        case begin_array:
+            pos = skip_array(pos + 1);
+            break;
+        case begin_object:
+            pos = skip_object(pos + 1);
+            break;
+        case 't':
+            pos += 4;
+            break;
+        case 'f':
+            pos += 5;
+            break;
+        case 'n':
+            pos += 4;
+            break;
+        default:
+            ++pos;
+            break;
+        }
+    }
+
+    return size;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::skip_array(size_t pos) const
+{
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case begin_array:
+            pos = skip_array(pos + 1);
+            break;
+        case begin_object:
+            pos = skip_object(pos + 1);
+            break;
+        case '\"':
+            pos = skip_string(pos + 1);
+            break;
+        case end_array:
+            done = true;
+            ++pos;
+            break;
+        default:
+            ++pos;
+            break;
+        }
+    }
+
+    return pos;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::skip_string(size_t pos) const
+{
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case '\\':
+            ++pos;
+            if (pos < buffer_length_ && buffer_[pos] == 'u')
+            {
+                pos += 4;
+            }
+            else
+            {
+                ++pos;
+            }
+            break;
+        case '\"':
+            done = true;
+            ++pos;
+            break;
+        default:
+            ++pos;
+            break;
+        }
+    }
+
+    return pos;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::skip_number(size_t pos) const
+{
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '-':
+        case '+':
+        case '.':
+        case 'e':
+        case 'E':
+            ++pos;
+            break;
+        default:
+            done = true;
+            break;
+        }
+    }
+
+    return pos;
+}
+
+template<class Char>
+size_t basic_json_reader<Char>::skip_object(size_t pos) const
+{
+    bool done = false;
+    while (!done && pos < buffer_length_)
+    {
+        switch (buffer_[pos])
+        {
+        case begin_object:
+            pos = skip_object(pos + 1);
+            break;
+        case begin_array:
+            pos = skip_array(pos + 1);
+            break;
+        case '\"':
+            pos = skip_string(pos + 1);
+            break;
+        case end_object:
+            done = true;
+            ++pos;
+            break;
+        default:
+            ++pos;
+            break;
+        }
+    }
+
+    return pos;
 }
 
 template<class Char>
