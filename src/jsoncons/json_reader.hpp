@@ -817,7 +817,7 @@ void basic_json_reader<Char>::parse_string()
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
-                    string_buffer_.push_back('\n');
+                    string_buffer_.push_back('\b');
                     break;
                 case 'f':
                     skip_ch();
@@ -825,7 +825,7 @@ void basic_json_reader<Char>::parse_string()
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
-                    string_buffer_.push_back('\n');
+                    string_buffer_.push_back('\f');
                     break;
                 case 'r':
                     skip_ch();
@@ -833,7 +833,7 @@ void basic_json_reader<Char>::parse_string()
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
-                    string_buffer_.push_back('\n');
+                    string_buffer_.push_back('\r');
                     break;
                 case 't':
                     skip_ch();
@@ -841,7 +841,7 @@ void basic_json_reader<Char>::parse_string()
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
-                    string_buffer_.push_back('\n');
+                    string_buffer_.push_back('\t');
                     break;
                 case 'u':
                     {
