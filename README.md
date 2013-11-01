@@ -11,6 +11,11 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.43
+------------
+
+- json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocation.
+
 Release 0.42
 ------------
 
