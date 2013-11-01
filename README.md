@@ -14,15 +14,15 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.43
 ------------
 
-This release is fully backwards compatible with 0.4*, and backwards compatible back to 0.32 apart from the two name changes in 0.41
+This release is fully backwards compatible with 0.4*, and mostly backwards compatible to 0.32 apart from the two name changes in 0.41
 
 Bug fixes
 
-- When reading the escaped characters "\b", "\f", "\r" and "\t", json_reader was replacing them with the linefeed character, this has been fixed.
+- When reading the escaped characters "\b", "\f", "\r" and "\t" appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.
 
 Functional enhancements
 
-- For line reporting in error messages, now recognizes \r\n, \n alone or \r alone.
+- For line reporting in parser error messages, now recognizes \r\n, \n alone or \r alone.
 
 Non functional enhancements
 
