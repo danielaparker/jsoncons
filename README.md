@@ -14,6 +14,14 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.43
 ------------
 
+This release is fully backwards compatible with 0.4*, and backwards compatible back to 0.32 apart from the two name changes in 0.41
+
+Bug fixes
+
+- When reading the escaped characters "\b", "\f", "\r" and "\t", json_reader was replacing them with the linefeed character, this has been fixed.
+
+Performance enhancements
+
 - json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocation.
 
 Release 0.42
