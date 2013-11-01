@@ -20,7 +20,11 @@ Bug fixes
 
 - When reading the escaped characters "\b", "\f", "\r" and "\t", json_reader was replacing them with the linefeed character, this has been fixed.
 
-Memory and performance enhancements
+Functional enhancements
+
+- For line reporting in error messages, now recognizes \r\n, \n alone or \r alone.
+
+Non functional enhancements
 
 - json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocations.
 
