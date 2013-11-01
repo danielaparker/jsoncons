@@ -22,7 +22,7 @@ Bug fixes
 
 Functional enhancements
 
-- For line reporting in parser error messages, now recognizes \r\n, \n alone or \r alone.
+- For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone.
 
 Non functional enhancements
 
