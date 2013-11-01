@@ -167,6 +167,11 @@ public:
         return column_;
     }
 
+    virtual size_t minimum_structure_capacity() const
+    {
+        return 0;
+    }
+
     virtual const std::basic_string<Char>& buffer() const
     {
         return string_buffer_;
@@ -194,7 +199,7 @@ private:
         if (!is_.eof())
         {
             is_.read(input_buffer_, buffer_capacity_);
-            buffer_length_ = static_cast<int>(is_.gcount());
+            buffer_length_ = static_cast<size_t>(is_.gcount());
         }
         else
         {
@@ -271,8 +276,8 @@ private:
     std::vector<Char> buffer_;
     Char *input_buffer_;
     size_t buffer_capacity_;
-    int buffer_position_;
-    int buffer_length_;
+    size_t buffer_position_;
+    size_t buffer_length_;
     jsoncons::basic_json_input_handler<Char>& handler_;
     jsoncons::basic_error_handler<Char>& err_handler_;
     char value_separator_;

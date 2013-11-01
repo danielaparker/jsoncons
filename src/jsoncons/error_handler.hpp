@@ -77,6 +77,7 @@ class basic_parsing_context
 public:
     virtual unsigned long line_number() const = 0;
     virtual unsigned long column_number() const = 0;
+    virtual size_t minimum_structure_capacity() const = 0;
     virtual const std::basic_string<Char>& buffer() const = 0;
 };
 

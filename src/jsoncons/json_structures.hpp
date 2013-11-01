@@ -88,6 +88,8 @@ public:
 
     size_t size() const {return elements_.size();}
 
+    size_t capacity() const {return elements_.capacity();}
+
     void clear() {elements_.clear();}
 
     void reserve(size_t n) {elements_.reserve(n);}
@@ -163,6 +165,8 @@ public:
     }
 
     size_t size() const {return members_.size();}
+
+    size_t capacity() const {return members_.capacity();}
 
     void clear() {members_.clear();}
 

@@ -26,16 +26,19 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
     enum structure_type {object_t, array_t};
     struct stack_item
     {
-        stack_item(structure_type type)
+        stack_item(structure_type type, size_t minimum_structure_capacity)
             : type_(type)
         {
+            minimum_structure_capacity_ = minimum_structure_capacity;
             switch (type)
             {
             case object_t:
                 structure_.object_ = new json_object<Char>();
+                structure_.object_->reserve(minimum_structure_capacity);
                 break;
             case array_t:
                 structure_.array_ =  new json_array<Char>();
+                structure_.array_->reserve(minimum_structure_capacity);
                 break;
             }
         }
@@ -54,6 +57,7 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             json_object<Char>* object_;
             json_array<Char>* array_;
         } structure_;
+        size_t minimum_structure_capacity_;
     };
 
 public:
@@ -93,11 +97,12 @@ public:
 
     virtual void begin_object(const basic_parsing_context<Char>& context)
     {
-        stack_.push_back(stack_item(object_t));
+        stack_.push_back(stack_item(object_t,context.minimum_structure_capacity()));
     }
 
     virtual void end_object(const basic_parsing_context<Char>& context)
     {
+        //std::cout << "OBJECT minimum=" << stack_.back().minimum_structure_capacity_ << ", actual=" << stack_.back().structure_.object_->capacity() << ", size=" << stack_.back().structure_.object_->size() << std::endl;
 		std::unique_ptr<json_object<Char>> var = std::unique_ptr<json_object<Char>>(stack_.back().structure_.object_);
         var->sort_members();
 		stack_.pop_back();
@@ -123,11 +128,12 @@ public:
 
     virtual void begin_array(const basic_parsing_context<Char>& context)
     {
-        stack_.push_back(stack_item(array_t));
+        stack_.push_back(stack_item(array_t,context.minimum_structure_capacity()));
     }
 
     virtual void end_array(const basic_parsing_context<Char>& context)
     {
+        //std::cout << "ARRAY minimum=" << stack_.back().minimum_structure_capacity_ << ", actual=" << stack_.back().structure_.array_->capacity() << ", size=" << stack_.back().structure_.array_->size() << std::endl;
         json_array<Char>* var = stack_.back().structure_.array_;
         stack_.pop_back();
         if (stack_.size() > 0)
