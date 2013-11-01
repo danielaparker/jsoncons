@@ -196,7 +196,13 @@ private:
         if (buffer_position_ < buffer_length_)
         {
             c = input_buffer_[buffer_position_++];
-            if (c == '\n')
+            if (c == '\r' && peek() == '\n')
+            {
+                ++buffer_position_;
+                ++line_;
+                column_ = 0;
+            }
+            else if (c == '\n' || c == '\r')
             {
                 ++line_;
                 column_ = 0;
@@ -205,6 +211,27 @@ private:
             {
                 ++column_;
             }
+        }
+        else
+        {
+            buffer_position_++;
+        }
+
+        return c;
+    }
+
+    Char read_non_lf_ch()
+    {
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_data_block();
+        }
+
+        Char c = 0;
+        if (buffer_position_ < buffer_length_)
+        {
+            c = input_buffer_[buffer_position_++];
+            ++column_;
         }
         else
         {
@@ -234,20 +261,12 @@ private:
         read_ch();
     }
 
-    void unread_ch(Char ch)
+    void unread_last_non_lf_ch()
     {
         if (buffer_position_ > 0)
         {
             --buffer_position_;
-            if (ch == '\n')
-            {
-                --line_;
-                column_ = 0;
-            }
-            else
-            {
-                --column_;
-            }
+            --column_;
         }
     }
 
@@ -655,7 +674,7 @@ void basic_json_reader<Char>::parse_number(Char c)
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        Char c = read_non_lf_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -684,7 +703,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             break;
         default:
             {
-                unread_ch(c);
+                unread_last_non_lf_ch();
                 if (has_frac_or_exp)
                 {
                     const Char *begin = string_buffer_.c_str();
@@ -891,19 +910,29 @@ template<class Char>
 bool basic_json_reader<Char>::fast_ignore_single_line_comment()
 {
     bool done = false;
-    while (!done && buffer_position_ < buffer_length_)
+    const size_t end = buffer_length_ - 1;
+    while (!done && buffer_position_ < end)
     {
-        if (input_buffer_[buffer_position_] == '\n')
+        Char c = input_buffer_[buffer_position_];
+        if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
         {
             done = true;
             ++line_;
             column_ = 0;
+            buffer_position_ += 2;
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            done = true;
+            ++line_;
+            column_ = 0;
+            ++buffer_position_;
         }
         else
         {
             ++column_;
+            ++buffer_position_;
         }
-        ++buffer_position_;
     }
     return done;
 }
@@ -912,25 +941,34 @@ template<class Char>
 bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
 {
     bool done = false;
-    while (!done && buffer_position_ < buffer_length_ - 1)
+    const size_t end = buffer_length_ - 1;
+
+    while (!done && buffer_position_ < end)
     {
-        if (input_buffer_[buffer_position_] == '*' && input_buffer_[buffer_position_ + 1] == '/')
+        Char c = input_buffer_[buffer_position_];
+        if (c == '*' && input_buffer_[buffer_position_ + 1] == '/')
         {
             done = true;
             buffer_position_ += 2;
-            ++column_ += 2;
+            column_ += 2;
+        }
+        else if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
+        {
+            done = true;
+            ++line_;
+            column_ = 0;
+            buffer_position_ += 2;
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            done = true;
+            ++line_;
+            column_ = 0;
+            ++buffer_position_;
         }
         else
         {
-            if (input_buffer_[buffer_position_] == '\n')
-            {
-                ++line_;
-                column_ = 0;
-            }
-            else
-            {
-                ++column_;
-            }
+            ++column_;
             ++buffer_position_;
         }
     }
@@ -968,10 +1006,25 @@ template<class Char>
 void basic_json_reader<Char>::fast_skip_white_space()
 {
     bool done = false;
-    while (!done && buffer_position_ < buffer_length_)
+    const size_t end = buffer_length_ - 1;
+    while (!done && buffer_position_ < end)
     {
         switch (input_buffer_[buffer_position_])
         {
+        case '\r':
+            if (input_buffer_[buffer_position_ + 1] == '\n')
+            {
+                ++line_;
+                column_ = 0;
+                buffer_position_ += 2;
+            }
+            else
+            {
+                ++line_;
+                column_ = 0;
+                ++buffer_position_;
+            }
+            break;
         case '\n':
             ++buffer_position_;
             ++line_;
@@ -980,7 +1033,6 @@ void basic_json_reader<Char>::fast_skip_white_space()
         case '\t':
         case '\v':
         case '\f':
-        case '\r':
         case ' ':
             ++buffer_position_;
             ++column_;
@@ -1093,7 +1145,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
         case '\"':
             pos = skip_string(pos + 1);
             break;
-		case ':':
+        case ':':
             ++size;
             ++pos;
             break;
