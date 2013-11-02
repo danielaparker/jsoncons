@@ -160,7 +160,7 @@ public:
         }
         else
         {
-            if (format_.least_trailing_zeros())
+            if (format_.remove_trailing_zeros())
             {
                 char buffer[32];
                 int len = c99_snprintf(buffer, 32, "%#.*g", 16, value);
