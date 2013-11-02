@@ -365,6 +365,11 @@ public:
             val_.get(name_).to_stream(os,format);
         }
 
+        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+        {
+            val_.get(name_).to_stream(os,format,indenting);
+        }
+
         friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const proxy& o)
         {
             o.to_stream(os);
@@ -476,6 +481,8 @@ public:
     void to_stream(std::basic_ostream<Char>& os) const;
 
     void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const;
+
+    void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const;
 
     bool is_null() const
     {

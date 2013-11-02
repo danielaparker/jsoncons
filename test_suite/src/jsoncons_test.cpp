@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer serializer(os,output_format(true));
+    json_serializer serializer(os,output_format(),true);
     o.to_stream(serializer);
     std::cout << os.str() << std::endl;
 }
@@ -335,8 +335,8 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
 
     root["persons"].add(std::move(person));
 
-    output_format format(true);
-    root.to_stream(std::cout,format);
+    output_format format;
+    root.to_stream(std::cout,format,true);
     std::cout << std::endl;
 }
 
@@ -401,8 +401,8 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::string john_sport("soccer");
     std::string john_food("spaghetti");
 
-    output_format format(true);
-    json_serializer handler(os, format);
+    output_format format;
+    json_serializer handler(os, format, true);
 
     std::clock_t t = std::clock();
 
@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
     std::ifstream is(in_file,std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, output_format(true));
+    json_serializer serializer(os, output_format(), true);
     my_json_filter filter(serializer);
     json_reader reader(is,filter);
 	reader.read();

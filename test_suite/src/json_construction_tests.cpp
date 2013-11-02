@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     arr.add(number);
     arr.add(obj);
 
-    output_format format(true);
-    arr.to_stream(std::cout,format);
+    output_format format;
+    arr.to_stream(std::cout,format,true);
     std::cout << std::endl;
 }
 

@@ -11,7 +11,6 @@
 #include <ctime>
 
 using jsoncons::json_deserializer;
-using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons_ext::csv::csv_reader;
 using jsoncons::json_reader;

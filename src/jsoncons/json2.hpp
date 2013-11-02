@@ -640,6 +640,12 @@ void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_outpu
 }
 
 template <class Char>
+void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+{
+    to_stream(basic_json_serializer<Char>(os,format,indenting));
+}
+
+template <class Char>
 const basic_json<Char> basic_json<Char>::an_object(new json_object<Char>());
 
 template <class Char>
@@ -1074,7 +1080,7 @@ public:
 
     void to_stream(std::basic_ostream<Char>& os) const
     {
-        o_.to_stream(os,format_);
+        o_.to_stream(os,format_,true);
     }
 
     const basic_json<Char>& o_;
