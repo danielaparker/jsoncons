@@ -85,7 +85,7 @@ In your code you will pass `my_json_filter` to the constructor of [[json_reader]
     std::ifstream is(in_file,std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, output_format(true));
+    json_serializer serializer(os, true);
     my_json_filter filter(serializer);
     json_reader reader(is,filter);
 	reader.read();

@@ -19,13 +19,12 @@ The default indent is 4
 ### Constructors
 
     output_format()
+Constructs an `output_format` with default values. 
 
     output_format(bool indenting)
+Deprecated. Instead use `pretty_print` on [[json]] values, or use `indenting' parameter in [[json_serializer]] constructor 
 
 ### Accessors
-
-    bool indenting() const
-Returns `true` if indenting is turned on, the default is `false`.
 
     size_t indent() const
 Returns the level of indentation, the default is 4
@@ -63,9 +62,10 @@ The default is "null"
     std::string neg_inf_replacement() const 
 The default is "null"
 
-### Modifiers
+    bool indenting() const
+Deprecated. 
 
-    void indenting(bool value)
+### Modifiers
 
     void indent(size_t value)
 
@@ -96,3 +96,14 @@ Sets the floating point format and the specified precision. Valid values for for
     void pos_inf_replacement(const std::string& replacement)
 
     void neg_inf_replacement(const std::string& replacement)
+Sets replacement text for negative infinity.
+
+    void indenting(bool value)
+Deprecated.
+
+    void precision(size_t prec)
+Deprecated, instead use `set_floating_point_format`
+
+    void void fixed_decimal_places(size_t prec)
+Deprecated, instead use `set_floating_point_format`
+

@@ -169,6 +169,20 @@ public:
         indenting_ = value;
     }
 
+    // Deprecated, instead use set_floating_point_format
+    void precision(size_t prec)
+    {
+        precision_ = prec;
+    }
+
+    // Deprecated, instead use set_floating_point_format
+    void fixed_decimal_places(size_t prec)
+    {
+        least_trailing_zeros_ = false;
+        set_format_flags_ |= std::ios::fixed;
+        precision_ = prec;
+    }
+
     void indent(size_t value)
     {
         indent_ = value;
