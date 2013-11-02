@@ -62,7 +62,7 @@ public:
 
 //  Accessors
 
-    bool least_trailing_zeros() const
+    bool remove_trailing_zeros() const
     {
         return least_trailing_zeros_;
     }
@@ -77,7 +77,7 @@ public:
         return indent_;
     }
 
-    std::streamsize precision() const 
+    size_t precision() const 
     {
         return precision_; 
     }
@@ -230,7 +230,7 @@ private:
     bool least_trailing_zeros_;
     bool indenting_;
     size_t indent_;
-    std::streamsize precision_;
+    size_t precision_;
     std::ios_base::fmtflags set_format_flags_;
     std::ios_base::fmtflags unset_format_flags_;
 

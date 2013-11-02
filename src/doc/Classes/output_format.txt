@@ -8,6 +8,11 @@ The output_format class is an instantiation of the basic_output_format class tem
 
 ### Member constants
 
+    least_trailing_zeros
+    fixed
+    scientific
+Floating point formats.
+
     default_indent
 The default indent is 4
 
@@ -25,8 +30,8 @@ Returns `true` if indenting is turned on, the default is `false`.
     size_t indent() const
 Returns the level of indentation, the default is 4
 
-    std::streamsize precision() const 
-Returns the floating-point decimal precision, the default is 16
+    size_t precision() const 
+Returns the floating-point decimal precision, the default is 16 for the `least_trailing_zeros` floating point format, and 17 for `fixed` and `scientific`.
 
     std::ios_base::fmtflags set_format_flags() const
 
