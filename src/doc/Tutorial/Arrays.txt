@@ -30,9 +30,9 @@ The output is
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    output_format format(true);
+    output_format format;
     format.precision(6);
-    std::cout << pretty_print(a,format) << std::endl;
+    std::cout << pretty_print(a,format,true) << std::endl;
 
 The output is
 
