@@ -22,6 +22,7 @@ using jsoncons::json_input_handler;
 using jsoncons::json_output_handler;
 using std::string;
 using jsoncons::json_filter;
+using jsoncons::pretty_print;
 
 BOOST_AUTO_TEST_CASE( test1 )
 {
@@ -164,7 +165,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer serializer(os, output_format(), true);
+    json_serializer serializer(os, true);
     o.to_stream(serializer);
     std::cout << os.str() << std::endl;
 }
