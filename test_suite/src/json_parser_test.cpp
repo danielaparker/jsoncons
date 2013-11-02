@@ -109,4 +109,13 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
 }
 
+BOOST_AUTO_TEST_CASE(test_escaped_characters)
+{
+    std::string input("[\"\\n\\b\\f\\r\\t\"]");
+    std::string expected("\n\b\f\r\t");
+
+    json o = json::parse_string(input);
+    BOOST_CHECK(expected == o[0].as_string());
+}
+
 

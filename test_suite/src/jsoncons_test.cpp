@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer serializer(os,output_format(),true);
+    json_serializer serializer(os,true);
     o.to_stream(serializer);
     std::cout << os.str() << std::endl;
 }
@@ -506,11 +506,11 @@ private:
 BOOST_AUTO_TEST_CASE(test_filter)
 {
     std::string in_file = "input/address-book.json";
-    std::string out_file = "../../output/address-book-new.json";
+    std::string out_file = "output/address-book-new.json";
     std::ifstream is(in_file,std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, output_format(), true);
+    json_serializer serializer(os, true);
     my_json_filter filter(serializer);
     json_reader reader(is,filter);
 	reader.read();
