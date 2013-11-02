@@ -62,11 +62,11 @@ The default is "null"
 
     void indent(size_t value)
 
-    void precision(std::streamsize prec)
-Sets the floating point decimal precision
+    void set_floating_point_format(fp_format format)
+Sets the floating point format using the default precision. Valid values for format are `output_format::least_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
 
-    void fixed_decimal_places(std::streamsize prec)
-Sets the `std::ios::fixed` bit of the format flags and sets `precision` to `prec`.
+    void set_floating_point_format(fp_format format, size_t prec)
+Sets the floating point format and the specified precision. Valid values for format are `output_format::least_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
 
     void set_format_flags(std::ios_base::fmtflags flags)
 

@@ -55,7 +55,8 @@ public:
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
     {
         if (!is.good())
         {
@@ -75,7 +76,8 @@ public:
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
     {
         if (!is.good())
         {
@@ -93,7 +95,8 @@ public:
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
     {
         if (!is.good())
         {
@@ -112,7 +115,8 @@ public:
          input_buffer_(0), 
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length)
+         buffer_capacity_(default_max_buffer_length),
+         minimum_structure_capacity_(0)
     {
         if (!is.good())
         {
@@ -169,7 +173,7 @@ public:
 
     virtual size_t minimum_structure_capacity() const
     {
-        return 0;
+        return minimum_structure_capacity_;
     }
 
     virtual const std::basic_string<Char>& buffer() const
@@ -268,6 +272,7 @@ private:
         }
     }
 
+    size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
@@ -315,6 +320,7 @@ void basic_csv_reader<Char>::read()
 template<class Char>
 void basic_csv_reader<Char>::read_array_of_arrays()
 {
+    size_t row_capacity = 0;
     stack_.push_back(stack_item());
     while (!eof())
     {
@@ -369,12 +375,18 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             }
             if (stack_.size() > 0)
             {
+                if (line_ == 1)
+                {
+                    ++row_capacity;
+                }
                 if (c == quote_char_)
                 {
                     parse_quoted_string();
                     if (!stack_.back().array_begun_)
                     {
+                        minimum_structure_capacity_ = row_capacity;
                         handler_.begin_array(*this);
+                        minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
                     handler_.value(string_buffer_,*this);
@@ -385,7 +397,9 @@ void basic_csv_reader<Char>::read_array_of_arrays()
                     parse_string();
                     if (!stack_.back().array_begun_)
                     {
+                        minimum_structure_capacity_ = row_capacity;
                         handler_.begin_array(*this);
+                        minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
                     handler_.value(string_buffer_,*this);
@@ -472,7 +486,9 @@ void basic_csv_reader<Char>::read_array_of_objects()
                     parse_quoted_string();
                     if (!stack_.back().array_begun_)
                     {
+                        minimum_structure_capacity_ = header.size();
                         handler_.begin_object(*this);
+                        minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
                     if (column_index < header.size())
@@ -493,7 +509,9 @@ void basic_csv_reader<Char>::read_array_of_objects()
                     {
                         if (!stack_.back().array_begun_)
                         {
+                            minimum_structure_capacity_ = header.size();
                             handler_.begin_object(*this);
+                            minimum_structure_capacity_ = 0;
                             stack_.back().array_begun_ = true;
                         }
                         if (column_index < header.size())
