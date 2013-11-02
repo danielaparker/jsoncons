@@ -20,6 +20,10 @@ Bug fixes
 
 - When reading the escaped characters "\b", "\f", "\r" and "\t" appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.
 
+Removed
+
+- Removed modifiers `precision` and `fixed_decimal_places` from output_format. Use `set_floating_point_precision` instead.
+
 Functional enhancements
 
 - For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone.

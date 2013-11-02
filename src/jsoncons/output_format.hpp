@@ -24,13 +24,16 @@ class basic_output_format
 public:
     static const size_t default_indent = 4;
 
+    enum fp_format{least_trailing_zeros, fixed, scientific};
+
 //  Constructors
 
     basic_output_format()
         : indenting_(false), 
+          least_trailing_zeros_(true), 
           indent_(default_indent),
           precision_(16),
-          set_format_flags_(0),
+          set_format_flags_(std::ios::showpoint),
           unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -43,8 +46,9 @@ public:
 
     basic_output_format(bool indenting)
         : indenting_(indenting), 
+          least_trailing_zeros_(true), 
           precision_(16),
-          set_format_flags_(0),
+          set_format_flags_(std::ios::showpoint),
           unset_format_flags_(0),
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
@@ -57,6 +61,11 @@ public:
     }
 
 //  Accessors
+
+    bool least_trailing_zeros() const
+    {
+        return least_trailing_zeros_;
+    }
 
     bool indenting() const
     {
@@ -116,6 +125,42 @@ public:
 
 //  Modifiers
 
+    void set_floating_point_format(fp_format format)
+    {
+        switch (format)
+        {
+        case least_trailing_zeros:
+            set_floating_point_format(format,16);
+            break;
+        case fixed:
+            set_floating_point_format(format,17);
+            break;
+        case scientific:
+            set_floating_point_format(format,17);
+            break;
+        }
+    }
+
+    void set_floating_point_format(fp_format format, size_t precision)
+    {
+        switch (format)
+        {
+        case least_trailing_zeros:
+            least_trailing_zeros_ = true;
+            precision_ = precision;
+            break;
+        case fixed:
+            least_trailing_zeros_ = false;
+            set_format_flags_ |= std::ios::fixed;
+            precision_ = precision;
+            break;
+        case scientific:
+            set_format_flags_ |= std::ios::scientific;
+            precision_ = precision;
+            break;
+        }
+    }
+
     void indenting(bool value)
     {
         indenting_ = value;
@@ -124,11 +169,6 @@ public:
     void indent(size_t value)
     {
         indent_ = value;
-    }
-
-    void precision(std::streamsize prec)
-    {
-        precision_ = prec; 
     }
 
     void set_format_flags(std::ios_base::fmtflags flags)
@@ -186,13 +226,8 @@ public:
     {
         neg_inf_replacement_ = replacement;
     } 
-
-    void fixed_decimal_places(std::streamsize n)
-    {
-        set_format_flags_ |= std::ios::fixed;
-        precision_ = n;
-    }
 private:
+    bool least_trailing_zeros_;
     bool indenting_;
     size_t indent_;
     std::streamsize precision_;

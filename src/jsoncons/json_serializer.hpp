@@ -23,13 +23,13 @@
 
 namespace jsoncons {
 
-template <class Char>
+template<class Char>
 class basic_json_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
     {
         stack_item(bool is_object)
-            : is_object_(is_object), count_(0), content_indented_(false)
+           : is_object_(is_object), count_(0), content_indented_(false)
         {
         }
         bool is_object() const
@@ -43,14 +43,14 @@ class basic_json_serializer : public basic_json_output_handler<Char>
     };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-        : os_(os), indent_(0)
+       : os_(os), indent_(0)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
         init();
     }
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-        : os_(os), format_(format), indent_(0)
+       : os_(os), format_(format), indent_(0)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
@@ -125,9 +125,9 @@ public:
     virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
-        os_.put('\"'); 
-        escape_string<Char>(name,format_,os_); 
-        os_.put('\"'); 
+        os_.put('\"');
+        escape_string<Char>(name, format_, os_);
+        os_.put('\"');
         os_.put(':');
     }
 
@@ -136,7 +136,7 @@ public:
         begin_value();
 
         os_.put('\"');
-        escape_string<Char>(value,format_,os_);
+        escape_string<Char>(value, format_, os_);
         os_.put('\"');
 
         end_value();
@@ -160,7 +160,21 @@ public:
         }
         else
         {
-            os_  << value;
+            if (format_.least_trailing_zeros())
+            {
+                char buffer[32];
+                int len = c99_snprintf(buffer, 32, "%#.*g", 16, value);
+                while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
+                {
+                    --len;
+                }
+                buffer[len] = 0;
+                os_ << buffer;
+            }
+            else
+            {
+                os_  << value;
+            }
         }
 
         end_value();
