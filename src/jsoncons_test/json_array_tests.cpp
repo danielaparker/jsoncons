@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    output_format format(true);
-    format.precision(6);
+    output_format format;
+    format.set_floating_point_format(output_format::fixed,6);
     std::cout << pretty_print(a,format) << std::endl;
 }
 

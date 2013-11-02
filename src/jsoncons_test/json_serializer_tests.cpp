@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1,0) = 3;
     A(1,1) = 4;
 
-    output_format format(true); // pretty printing
-    json_serializer os(std::cout,format);
+    output_format format; 
+    json_serializer os(std::cout,format,true); // pretty printing
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {

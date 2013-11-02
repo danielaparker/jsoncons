@@ -44,6 +44,7 @@ public:
     {
     }
 
+    // Deprecated
     basic_output_format(bool indenting)
         : indenting_(indenting), 
           least_trailing_zeros_(true), 
@@ -67,6 +68,7 @@ public:
         return least_trailing_zeros_;
     }
 
+    // Deprecated
     bool indenting() const
     {
         return indenting_;
@@ -161,6 +163,7 @@ public:
         }
     }
 
+    // Deprecated
     void indenting(bool value)
     {
         indenting_ = value;

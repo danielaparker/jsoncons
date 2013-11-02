@@ -12,7 +12,6 @@
 
 using jsoncons::parsing_context;
 using jsoncons::json_deserializer;
-using jsoncons::output_format;
 using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;

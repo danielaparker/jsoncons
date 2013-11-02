@@ -43,14 +43,31 @@ class basic_json_serializer : public basic_json_output_handler<Char>
     };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-       : os_(os), indent_(0)
+       : os_(os), indent_(0), indenting_(false)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
         init();
     }
+
+    basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
+       : os_(os), indent_(0), indenting_(indenting)
+    {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+        init();
+    }
+
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-       : os_(os), format_(format), indent_(0)
+       : os_(os), format_(format), indent_(0), 
+         indenting_(format.indenting()) // Deprecated behavior
+    {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+        init();
+    }
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
+       : os_(os), format_(format), indent_(0), indenting_(indenting)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
@@ -74,7 +91,7 @@ public:
     {
         begin_structure();
 
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        if (indenting_ && !stack_.empty() && stack_.back().is_object())
         {
             write_indent();
         }
@@ -86,7 +103,7 @@ public:
     virtual void end_object()
     {
         unindent();
-        if (format_.indenting() && !stack_.empty())
+        if (indenting_ && !stack_.empty())
         {
             write_indent();
         }
@@ -100,7 +117,7 @@ public:
     {
         begin_structure();
 
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        if (indenting_ && !stack_.empty() && stack_.back().is_object())
         {
             write_indent();
         }
@@ -112,7 +129,7 @@ public:
     virtual void end_array()
     {
         unindent();
-        if (format_.indenting() && !stack_.empty() && stack_.back().content_indented_)
+        if (indenting_ && !stack_.empty() && stack_.back().content_indented_)
         {
             write_indent();
         }
@@ -225,7 +242,7 @@ protected:
             {
                 os_.put(',');
             }
-            if (format_.indenting())
+            if (indenting_)
             {
                 write_indent();
             }
@@ -303,6 +320,8 @@ private:
         os_.precision(original_precision_);
         os_.flags(original_format_flags_);
     }
+
+    bool indenting_;
 };
 
 typedef basic_json_serializer<char> json_serializer;
