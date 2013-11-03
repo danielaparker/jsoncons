@@ -24,9 +24,17 @@ Deprecated
 
 - Deprecated modifiers `precision` and `fixed_decimal_places` from output_format. Use `set_floating_point_precision` instead.
 
-Functional enhancements
+- Deprecated constructor that takes `indenting` parameter from `output_format`. For pretty printing with indenting, use the `pretty_print` function or pass the `indenting` parameter in `json_serializer`.
+
+Changes
+
+- When serializing floating point values to a stream, previous versions defaulted to default floating point precision with a precision of 16. This has been changed to truncate trailing zeros  but keep one if immediately after a decimal point.
+
+New features
 
 - For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone.
+
+- Added `set_floating_point_format` methods to `output_format` to give more control over floating point notation.
 
 Non functional enhancements
 
