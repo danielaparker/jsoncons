@@ -9,43 +9,6 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
-void second_example_a()
-{
-    try
-    {
-        json books(json::an_array);
-
-        {
-            json book(json::an_object);
-            book["title"] = "Kafka on the Shore";
-            book["author"] = "Haruki Murakami";
-            book["price"] = 25.17;
-            books.add(std::move(book));
-        }
-
-        {
-            json book(json::an_object);
-            book["title"] = "Women: A Novel";
-            book["author"] = "Charles Bukowski";
-            book["price"] = 12.00;
-            books.add(std::move(book));
-        }
-
-        {
-            json book(json::an_object);
-            book["title"] = "Cutter's Way";
-            book["author"] = "Ivan Passer";
-            books.add(std::move(book));
-        }
-
-        std::cout << pretty_print(books) << std::endl;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-}
-
 void first_example_a()
 {
     try
@@ -104,6 +67,43 @@ void first_example_c()
             string price = book.get("price","N/A").as_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+void second_example_a()
+{
+    try
+    {
+        json books(json::an_array);
+
+        {
+            json book(json::an_object);
+            book["title"] = "Kafka on the Shore";
+            book["author"] = "Haruki Murakami";
+            book["price"] = 25.17;
+            books.add(std::move(book));
+        }
+
+        {
+            json book(json::an_object);
+            book["title"] = "Women: A Novel";
+            book["author"] = "Charles Bukowski";
+            book["price"] = 12.00;
+            books.add(std::move(book));
+        }
+
+        {
+            json book(json::an_object);
+            book["title"] = "Cutter's Way";
+            book["author"] = "Ivan Passer";
+            books.add(std::move(book));
+        }
+
+        std::cout << pretty_print(books) << std::endl;
     }
     catch (const std::exception& e)
     {

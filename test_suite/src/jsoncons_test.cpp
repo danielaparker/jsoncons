@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
 
 BOOST_AUTO_TEST_CASE(test_big_file)
 {
-    std::ofstream os("test.json",std::ofstream::binary);
+    std::ofstream os("output/test.json",std::ofstream::binary);
 
     std::string person("person");
     std::string first_name("first_name");
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::clock_t s = std::clock() - t;
     std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds to write.\n";
 
-    std::ifstream is("test.json",std::ofstream::binary);
+    std::ifstream is("output/test.json",std::ofstream::binary);
     t = std::clock();
 
     json root = json::parse(is);

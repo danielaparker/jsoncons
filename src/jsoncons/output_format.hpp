@@ -24,13 +24,13 @@ class basic_output_format
 public:
     static const size_t default_indent = 4;
 
-    enum fp_format{least_trailing_zeros, fixed, scientific};
+    enum fp_format{truncate_trailing_zeros, fixed, scientific};
 
 //  Constructors
 
     basic_output_format()
         : indenting_(false), 
-          least_trailing_zeros_(true), 
+          floating_point_format_(truncate_trailing_zeros),
           indent_(default_indent),
           precision_(16),
           set_format_flags_(std::ios::showpoint),
@@ -47,7 +47,7 @@ public:
     // Deprecated
     basic_output_format(bool indenting)
         : indenting_(indenting), 
-          least_trailing_zeros_(true), 
+          floating_point_format_(truncate_trailing_zeros), 
           precision_(16),
           set_format_flags_(std::ios::showpoint),
           unset_format_flags_(0),
@@ -63,9 +63,19 @@ public:
 
 //  Accessors
 
-    bool remove_trailing_zeros() const
+    bool truncate_trailing_zeros_notation() const
     {
-        return least_trailing_zeros_;
+        return floating_point_format_ == truncate_trailing_zeros;
+    }
+
+    bool fixed_notation() const
+    {
+        return floating_point_format_ == fixed;
+    }
+
+    bool scientific_notation() const
+    {
+        return floating_point_format_ == scientific;
     }
 
     // Deprecated
@@ -131,7 +141,7 @@ public:
     {
         switch (format)
         {
-        case least_trailing_zeros:
+        case truncate_trailing_zeros:
             set_floating_point_format(format,16);
             break;
         case fixed:
@@ -145,20 +155,15 @@ public:
 
     void set_floating_point_format(fp_format format, size_t precision)
     {
+        floating_point_format_ = format;
+        precision_ = precision;
         switch (format)
         {
-        case least_trailing_zeros:
-            least_trailing_zeros_ = true;
-            precision_ = precision;
-            break;
         case fixed:
-            least_trailing_zeros_ = false;
             set_format_flags_ |= std::ios::fixed;
-            precision_ = precision;
             break;
         case scientific:
             set_format_flags_ |= std::ios::scientific;
-            precision_ = precision;
             break;
         }
     }
@@ -178,8 +183,7 @@ public:
     // Deprecated, instead use set_floating_point_format
     void fixed_decimal_places(size_t prec)
     {
-        least_trailing_zeros_ = false;
-        set_format_flags_ |= std::ios::fixed;
+        floating_point_format_ = truncate_trailing_zeros_;
         precision_ = prec;
     }
 
@@ -244,7 +248,6 @@ public:
         neg_inf_replacement_ = replacement;
     } 
 private:
-    bool least_trailing_zeros_;
     bool indenting_;
     size_t indent_;
     size_t precision_;
@@ -260,6 +263,7 @@ private:
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     size_t max_decimal_places;
+    fp_format floating_point_format_;
 };
 
 typedef basic_output_format<char> output_format;

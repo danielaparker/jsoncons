@@ -59,7 +59,7 @@ public:
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-       : os_(os), format_(format), indent_(0), 
+       : os_(os), format_(format), indent_(0),
          indenting_(format.indenting()) // Deprecated behavior
     {
         original_precision_ = os.precision();
@@ -175,25 +175,22 @@ public:
         {
             os_  << format_.neg_inf_replacement();
         }
+        else if (format_.truncate_trailing_zeros_notation())
+        {
+            char buffer[32];
+            int len = c99_snprintf(buffer, 32, "%#.*g", format_.precision(), value);
+            while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
+            {
+                --len;
+            }
+            buffer[len] = 0;
+            os_ << buffer;
+        }
         else
         {
-            if (format_.remove_trailing_zeros())
-            {
-                char buffer[32];
-                int len = c99_snprintf(buffer, 32, "%#.*g", 16, value);
-                while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
-                {
-                    --len;
-                }
-                buffer[len] = 0;
-                os_ << buffer;
-            }
-            else
-            {
-                os_  << value;
-            }
+            os_  << value;
         }
-
+        
         end_value();
     }
 
