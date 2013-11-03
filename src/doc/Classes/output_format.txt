@@ -8,10 +8,13 @@ The output_format class is an instantiation of the basic_output_format class tem
 
 ### Member constants
 
-    least_trailing_zeros
-    fixed
-    scientific
-Floating point formats. The default format is `least_trailing_zeros`
+Floating point format | Description | Default precision | Example
+-------------      | -------------  | ------------- | ------------- 
+truncate_trailing_zeros      | Truncate trailing zeros but keep one if immediately after a decimal point. Precision means the maximum number of significant digits. | 16 | 0 is written as 0.0         
+fixed | Write floating point values in fixed-point notation. Precision means the number of digits to appear after the decimal point. | 6 | 0 is written as 0.000000 under the default precision
+scientific | Write floating-point values in scientific notation. Precision means the number of digits to appear after the decimal point. | 6 | |             
+
+Floating point formats. The default format is `truncate_trailing_zeros`. This is the preferred format for json serializiation. 
 
     default_indent
 The default indent is 4
@@ -30,9 +33,9 @@ Deprecated. Instead use `pretty_print` on [[json]] values, or use `indenting' pa
 Returns the level of indentation, the default is 4
 
     size_t precision() const 
-Returns the floating-point decimal precision, the default is 16 for the `least_trailing_zeros` floating point format, and 17 for `fixed` and `scientific`.
+Returns the floating-point decimal precision, the default is 16 for the `truncate_trailing_zeros` floating point format, and 17 for `fixed` and `scientific`.
 
-    bool remove_trailing_zeros() const
+    bool truncate_trailing_zeros_notation() const
 
     std::ios_base::fmtflags set_format_flags() const
 
@@ -70,10 +73,10 @@ Deprecated.
     void indent(size_t value)
 
     void set_floating_point_format(fp_format format)
-Sets the floating point format using the default precision. Valid values for format are `output_format::least_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
+Sets the floating point format using the default precision. Valid values for format are `output_format::truncate_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
 
     void set_floating_point_format(fp_format format, size_t prec)
-Sets the floating point format and the specified precision. Valid values for format are `output_format::least_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
+Sets the floating point format and the specified precision. Valid values for format are `output_format::truncate_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
 
     void set_format_flags(std::ios_base::fmtflags flags)
 

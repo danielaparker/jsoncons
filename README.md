@@ -11,7 +11,7 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
-Release 0.43
+Release 0.50
 ------------
 
 This release is fully backwards compatible with 0.4*, and mostly backwards compatible to 0.32 apart from the two name changes in 0.41
