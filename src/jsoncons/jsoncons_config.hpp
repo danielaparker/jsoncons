@@ -20,6 +20,8 @@
 
 namespace jsoncons {
 
+#define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
 inline bool is_nan(double x) { return _isnan( x ) != 0; }

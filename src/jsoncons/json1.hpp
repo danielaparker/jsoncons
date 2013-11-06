@@ -79,7 +79,7 @@ template <class Char>
 class basic_json
 {
 public:
-    enum value_type {object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
+    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
 
     static const basic_json<Char> an_object;
     static const basic_json<Char> an_array;
@@ -528,7 +528,7 @@ public:
 
     bool is_object() const
     {
-        return type_ == object_t;
+        return type_ == object_t || type_ == empty_object_t;
     }
 
     bool is_array() const
@@ -623,7 +623,10 @@ public:
         swap(a.value_,b.value_);
     }
 private:
-    value_type type_;
+	static basic_json<Char> empty_object;
+	basic_json(value_type t);
+
+	value_type type_;
     union
     {
         double double_value_;

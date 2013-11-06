@@ -112,7 +112,7 @@ Note
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params(json::an_object);
+    json paramsjson();
     params["field_delimiter"] = "\t";
     params["has_header"] = true;
 

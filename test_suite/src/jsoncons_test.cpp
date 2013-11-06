@@ -22,6 +22,7 @@ using jsoncons::json_input_handler;
 using jsoncons::json_output_handler;
 using std::string;
 using jsoncons::json_filter;
+using jsoncons::pretty_print;
 
 BOOST_AUTO_TEST_CASE( test1 )
 {
@@ -41,7 +42,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
 BOOST_AUTO_TEST_CASE(test_assignment)
 {
-    json root(json::an_object);
+    json root;
 
 	root["double_1"] = json(10.0);
 
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
     BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
-    root["myobject"] = json::an_object;
+    root["myobject"] = json();
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
     root["myobject"]["int_2"] = json(long long(0));
@@ -71,19 +72,19 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
 BOOST_AUTO_TEST_CASE(test_array)
 {
-    json root(json::an_object);
+    json root;
 
     root["addresses"];
 
     std::vector<json> addresses;
-    json address1(json::an_object);
+    json address1;
     address1["city"] = json("San Francisco");
     address1["state"] = json("CA");
     address1["zip"] = json("94107");
     address1["country"] = json("USA");
     addresses.push_back(address1);
 
-    json address2(json::an_object);
+    json address2;
     address2["city"] = json("Sunnyvale");
     address2["state"] = json("CA");
     address2["zip"] = json("94085");
@@ -118,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_null)
     json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
 
-    json obj(json::an_object);
+    json obj;
     obj["field"] = json::null;
     std::cout << obj << std::endl;
 }
@@ -185,7 +186,7 @@ BOOST_AUTO_TEST_CASE(test_array2)
 
 BOOST_AUTO_TEST_CASE(test_nan_replacement)
 {
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -194,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
 {
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -210,7 +211,7 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 {
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -225,7 +226,7 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_object_iterator)
 {
-    json obj(json::an_object);
+    json obj;
     obj["city"] = "Toronto";
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
@@ -320,29 +321,27 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 
 BOOST_AUTO_TEST_CASE(constructing_structures)
 {
-	json root = json(json::an_object);
+	json root;
 
     root["persons"] = json(json::an_array);
 
-    json person(json::an_object);
+    json person;
     person["first_name"] = "John";
     person["last_name"] = "Smith";
     person["birth_date"] = "1972-01-30";
-    json address(json::an_object);
+    json address;
     address["city"] = "Toronto";
     address["country"] = "Canada";
     person["address"] = std::move(address);
 
     root["persons"].add(std::move(person));
 
-    output_format format;
-    root.to_stream(std::cout,format,true);
-    std::cout << std::endl;
+    std::cout << pretty_print(root) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_defaults)
 {
-    json obj(json::an_object);
+    json obj;
 
     obj["field1"] = 1;
     obj["field3"] = "Toronto";

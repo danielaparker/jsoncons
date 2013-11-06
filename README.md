@@ -11,6 +11,23 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.60
+------------
+
+Changes
+
+The default constructor now constructs an empty object rather than a `null` object. In practice this means that instead of writing
+
+    json o(json::an_object);
+    o["name"] = json::an_object;
+
+you can simply write 
+
+    json o;
+    o["name"] = json();
+
+The older notation is still supported, though.
+
 Release 0.50
 ------------
 
@@ -18,12 +35,11 @@ This release is fully backwards compatible with 0.4*, and mostly backwards compa
 
 Bug fixes
 
-- When reading the escaped characters "\b", "\f", "\r" and "\t" appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.
+- When reading the escaped characters "\\b", "\\f", "\\r" and "\\t" appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.
 
 Deprecated 
 
-- Deprecated modifiers `precision` and `fixed_decimal_places` from output_format. Use `set_floating_point_precision` instead.
-
+- Deprecated modifiers `precision` and `fixed_decimal_places` from output_format. Use `set_floating_point_format` instead.
 - Deprecated constructor that takes `indenting` parameter from `output_format`. For pretty printing with indenting, use the `pretty_print` function or pass the `indenting` parameter in `json_serializer`.
 
 Changes
@@ -32,8 +48,7 @@ Changes
 
 New features
 
-- For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone.
-
+- For line reporting in parser error messages, json_reader now recognizes \\r\\n, \\n alone or \\r alone (\\r alone is new.)
 - Added `set_floating_point_format` methods to `output_format` to give more control over floating point notation.
 
 Non functional enhancements

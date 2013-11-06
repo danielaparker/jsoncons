@@ -42,7 +42,7 @@ typename basic_json<Char>::proxy& basic_json<Char>::proxy::operator=(const basic
 template <class Char>
 basic_json<Char>::basic_json()
 {
-    type_ = null_t;
+    type_ = empty_object_t;
 }
 
 template <class Char>
@@ -59,11 +59,13 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     type_ = val.type_;
     switch (type_)
     {
+    case null_t:
+    case empty_object_t:
+        break;
     case double_t:
     case longlong_t:
     case ulonglong_t:
     case bool_t:
-    case null_t:
         value_ = val.value_;
         break;
     case string_t:
@@ -89,7 +91,7 @@ basic_json<Char>::basic_json(basic_json&& other)
 {
     type_ = other.type_;
     value_ = other.value_;
-    other.type_ = null_t;
+    other.type_ = empty_object_t;
 }
 
 template <class Char>
@@ -184,15 +186,22 @@ basic_json<Char>::basic_json(const Char* s)
 }
 
 template <class Char>
+basic_json<Char>::basic_json(value_type t)
+{
+    type_ = t;
+}
+
+template <class Char>
 basic_json<Char>::~basic_json()
 {
     switch (type_)
     {
+    case null_t:
+    case empty_object_t:
     case double_t:
     case longlong_t:
     case ulonglong_t:
     case bool_t:
-    case null_t:
         break;
     case string_t:
         delete value_.string_value_;
@@ -274,6 +283,7 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
     case bool_t:
         return value_.bool_value_ == rhs.value_.bool_value_;
     case null_t:
+    case empty_object_t:
         return true;
     case string_t:
         return *(value_.string_value_) == *(rhs.value_.string_value_);
@@ -301,6 +311,8 @@ basic_json<Char>& basic_json<Char>::at(size_t i)
         return value_.object_->at(i);
     case array_t:
         return value_.array_->at(i);
+    case empty_object_t:
+        JSONCONS_THROW_EXCEPTION("Out of bounds");
     default:
         JSONCONS_THROW_EXCEPTION("Not an array or object");
     }
@@ -315,6 +327,8 @@ const basic_json<Char>& basic_json<Char>::at(size_t i) const
         return value_.object_->at(i);
     case array_t:
         return value_.array_->at(i);
+    case empty_object_t:
+        JSONCONS_THROW_EXCEPTION("Out of bounds");
     default:
         JSONCONS_THROW_EXCEPTION("Not an array or object");
     }
@@ -327,6 +341,8 @@ basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name)
     {
     case object_t:
         return value_.object_->get(name);
+    case empty_object_t:
+        JSONCONS_THROW_EXCEPTION("Name not found");
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -341,6 +357,8 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     {
     case object_t:
         return value_.object_->get(name);
+    case empty_object_t:
+        JSONCONS_THROW_EXCEPTION("Name not found");
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -355,6 +373,8 @@ basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name, cons
     {
     case object_t:
         return has_member(name) ? value_.object_->get(name) : default_val;
+    case empty_object_t:
+        JSONCONS_THROW_EXCEPTION("Name not found");
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -370,6 +390,11 @@ void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json
     case object_t:
         value_.object_->set(name,value);
         break;
+    case empty_object_t:
+        type_ = object_t;
+        value_.object_ = new json_object<Char>();
+        value_.object_->set(name,value);
+        break;
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
@@ -383,6 +408,11 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
     switch (type_)
     {
     case object_t:
+        value_.object_->set(name,value);
+        break;
+    case empty_object_t:
+        type_ = object_t;
+        value_.object_ = new json_object<Char>();
         value_.object_->set(name,value);
         break;
     default:
@@ -401,6 +431,11 @@ void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, cons
     case object_t:
         value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
+    case empty_object_t:
+        type_ = object_t;
+        value_.object_ = new json_object<Char>();
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
@@ -415,6 +450,11 @@ void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value
     switch (type_)
     {
     case object_t:
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    case empty_object_t:
+        type_ = object_t;
+        value_.object_ = new json_object<Char>();
         value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
@@ -523,6 +563,8 @@ size_t basic_json<Char>::size() const
 {
     switch (type_)
     {
+    case empty_object_t:
+        return 0;
     case object_t:
         return value_.object_->size();
     case array_t:
@@ -607,6 +649,12 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         handler.end_object();
 		}
         break;
+    case empty_object_t:
+        {
+        handler.begin_object();
+        handler.end_object();
+        }
+        break;
     case array_t:
 		{
         handler.begin_array();
@@ -646,13 +694,16 @@ void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_outpu
 }
 
 template <class Char>
+basic_json<Char> basic_json<Char>::empty_object(new json_object<Char>());
+
+template <class Char>
 const basic_json<Char> basic_json<Char>::an_object(new json_object<Char>());
 
 template <class Char>
 const basic_json<Char> basic_json<Char>::an_array(new json_array<Char>());
 
 template <class Char>
-const basic_json<Char> basic_json<Char>::null = basic_json<Char>();
+const basic_json<Char> basic_json<Char>::null = basic_json<Char>(basic_json<Char>::null_t);
 
 template <class Char> 
 basic_json<Char> basic_json<Char>::make_array(size_t n)
@@ -754,6 +805,8 @@ typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
     {
     case object_t:
         return value_.object_->begin();
+    case empty_object_t:
+        return basic_json<Char>::empty_object.begin_members();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
     }
@@ -766,6 +819,8 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members
     {
     case object_t:
         return value_.object_->begin();
+    case empty_object_t:
+        return basic_json<Char>::empty_object.begin_members();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
     }
@@ -778,6 +833,8 @@ typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
     {
     case object_t:
         return value_.object_->end();
+    case empty_object_t:
+        return basic_json<Char>::empty_object.end_members();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
     }
@@ -790,6 +847,8 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members()
     {
     case object_t:
         return value_.object_->end();
+    case empty_object_t:
+        return basic_json<Char>::empty_object.end_members();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
     }
