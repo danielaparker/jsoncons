@@ -80,7 +80,7 @@ Note that the parser accepts and ignores the single line comment that starts wit
     json number(10.5);
 
     // An object value with four members
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -132,7 +132,7 @@ The output is
 
 ### Accessing object members
 
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -152,7 +152,7 @@ The output is
 
 ### Missing values and defaults
 
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
@@ -179,7 +179,7 @@ The output is
 
 ### Iterating over the members of an object
 
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;

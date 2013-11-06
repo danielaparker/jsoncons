@@ -1,5 +1,6 @@
-Provides contextual information for the element being parsed. 
-This information may be used for error reporting.
+    jsoncons::parsing_context
+
+Provides contextual information for the element being parsed. This information may be used for error reporting.
 
 ### Header
 
@@ -14,6 +15,9 @@ Line numbers start at 1.
     virtual unsigned long column_number() const = 0
 Returns the column number to the end of the text being parsed.
 Column numbers start at 1.
+
+    virtual size_t minimum_structure_capacity() const = 0
+Provides a hint to the [[output_handler]] for how many elements to reserve for a json array or object
 
     virtual const std::string& buffer() const = 0;
 Returns a reference to a string buffer of text 

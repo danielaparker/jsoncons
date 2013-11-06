@@ -21,7 +21,7 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_is_type)
 {
-    json obj(json::an_object);
+    json obj;
 
     // tests for proxy is_type methods
     obj["string"] = "val1";
@@ -57,10 +57,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     obj["null1"] = json::null;
     BOOST_CHECK(obj["null1"].is_null());
 
-    obj["null2"] = json();
-    BOOST_CHECK(obj["null2"].is_null());
-
-    obj["object"] = json(json::an_object);
+    obj["object"] = json();
     BOOST_CHECK(obj["object"].is_object());
 
     obj["array"] = json(json::an_array);

@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     json number(10.5);
 
     // An object value with four members
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_from_container)
 
 BOOST_AUTO_TEST_CASE(test_accessing)
 {
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_accessing)
 
 BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 {
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 
 BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 {
-    json obj(json::an_object);
+    json obj;
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
     obj["events_attended"] = 10;
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
 
 BOOST_AUTO_TEST_CASE(test_userdata)
 {
-    json obj(json::an_object);
+    json obj;
     matrix<double> A(2,2);
     A(0,0) = 1;
     A(0,1) = 2;

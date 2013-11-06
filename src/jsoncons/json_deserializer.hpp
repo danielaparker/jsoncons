@@ -235,13 +235,12 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().pair_.second = basic_json<Char>();	    
+            stack_.back().pair_.second = basic_json<Char>::null;	    
             stack_.back().structure_.object_->push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(std::move(stack_.back().pair_)));
         } 
         else
         {
-            basic_json<Char> val;
-            stack_.back().structure_.array_->push_back(val);
+            stack_.back().structure_.array_->push_back(basic_json<Char>::null);
         }
     }
 

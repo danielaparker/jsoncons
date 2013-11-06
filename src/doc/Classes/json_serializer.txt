@@ -1,9 +1,6 @@
     jsoncons::json_serializer
 
-The `json_serializer` class is an instantiation of the 
-`basic_json_serializer` class template that uses char as the 
-character type. It implements [[json_output_handler]] supporting pretty 
-serialization.
+The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [[json_output_handler]] and supports pretty print serialization.
 
 ### Header
 
@@ -86,8 +83,7 @@ Receive notification of `null`
         A(1,0) = 3;
         A(1,1) = 4;
 
-        output_format format(true); // pretty printing
-        json_serializer os(std::cout,format);
+        json_serializer os(std::cout, true);  // pretty printing
         os.begin_array();
         for (size_t i = 0; i < A.size1(); ++i)
         {
