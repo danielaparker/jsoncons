@@ -20,7 +20,11 @@
 
 namespace jsoncons {
 
+// Follow boost
+#if _MSC_VER < 1700
+#define JSONCONS_NO_CXX11_AUTO_DECLARATIONS
 #define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#endif // _MSC_VER < 1600
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )

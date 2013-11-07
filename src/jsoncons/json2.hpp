@@ -402,6 +402,44 @@ void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json
     }
 }
 
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
+
+template <class Char>
+template <class T>
+void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value)
+{
+    switch (type_)
+    {
+    case object_t:
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    case empty_object_t:
+        type_ = object_t;
+        value_.object_ = new json_object<Char>();
+        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+        }
+    }
+}
+
+template <class Char>
+void basic_json<Char>::add(basic_json<Char>&& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->push_back(value);
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
 template <class Char>
 void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 {
@@ -422,30 +460,11 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
     }
 }
 
-template <class Char>
-template <class T>
-void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, const T& value)
-{
-    switch (type_)
-    {
-    case object_t:
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-        break;
-    case empty_object_t:
-        type_ = object_t;
-        value_.object_ = new json_object<Char>();
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
-        }
-    }
-}
+#endif
 
 template <class Char>
 template <class T>
-void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value)
+void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, const T& value)
 {
     switch (type_)
     {
@@ -498,21 +517,6 @@ void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
 
 template <class Char>
 void basic_json<Char>::add(const basic_json<Char>& value)
-{
-    switch (type_)
-    {
-    case array_t:
-        value_.array_->push_back(value);
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template <class Char>
-void basic_json<Char>::add(basic_json<Char>&& value)
 {
     switch (type_)
     {
