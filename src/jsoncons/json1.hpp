@@ -305,12 +305,24 @@ public:
             return val_.get(name_).set(name,value);
         }
 
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
         void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
             return val_.get(name_).set(name,value);
         }
 
+        void add(basic_json<Char>&& value)
+        {
+            val_.get(name_).add(value);
+        }
+
+        template <class T>
+        void add_custom_data(T&& value)
+        {
+            val_.get(name_).add_custom_data(value);
+        }
+#endif
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
@@ -328,19 +340,8 @@ public:
             val_.get(name_).add(value);
         }
 
-        void add(basic_json<Char>&& value)
-        {
-            val_.get(name_).add(value);
-        }
-
         template <class T>
         void add_custom_data(const T& value)
-        {
-            val_.get(name_).add_custom_data(value);
-        }
-
-        template <class T>
-        void add_custom_data(T&& value)
         {
             val_.get(name_).add_custom_data(value);
         }
@@ -591,17 +592,21 @@ public:
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
+ 
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
-
-    template <class T>
-    void set_custom_data(const std::basic_string<Char>& name, const T& value);
 
     template <class T>
     void set_custom_data(std::basic_string<Char>&& name, T&& value);
 
-    void add(const basic_json<Char>& value);
-
     void add(basic_json<Char>&& value);
+
+#endif
+
+    template <class T>
+    void set_custom_data(const std::basic_string<Char>& name, const T& value);
+
+    void add(const basic_json<Char>& value);
 
     template <class T>
     void add_custom_data(const T& value);
