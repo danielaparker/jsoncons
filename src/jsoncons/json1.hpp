@@ -322,15 +322,15 @@ public:
         {
             val_.get(name_).add_custom_data(value);
         }
-#endif
-        template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, const T& value)
-        {
-            return val_.get(name_).set_custom_data(name,value);
-        }
 
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, T&& value)
+        {
+            return val_.get(name_).set_custom_data(name,value);
+        }
+#endif
+        template <class T>
+        void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
             return val_.get(name_).set_custom_data(name,value);
         }
@@ -409,8 +409,6 @@ public:
     explicit basic_json();
 
     basic_json(const basic_json& val);
-
-    basic_json(basic_json&& val);
 
     basic_json(double val);
 
@@ -593,13 +591,18 @@ public:
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
- 
+
+    basic_json(basic_json&& val);
+
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
+
+    void add(basic_json<Char>&& value);
 
     template <class T>
     void set_custom_data(std::basic_string<Char>&& name, T&& value);
 
-    void add(basic_json<Char>&& value);
+    template <class T>
+    void add_custom_data(T&& value);
 
 #endif
 
@@ -610,9 +613,6 @@ public:
 
     template <class T>
     void add_custom_data(const T& value);
-
-    template <class T>
-    void add_custom_data(T&& value);
 
     value_type type() const
     {
