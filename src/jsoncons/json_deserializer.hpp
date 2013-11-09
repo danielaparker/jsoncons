@@ -25,17 +25,17 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     struct stack_item
     {
-        stack_item(typename basic_json<Char>::value_type type, size_t minimum_structure_capacity)
+        stack_item(json_base::value_type type, size_t minimum_structure_capacity)
             : type_(type)
         {
             minimum_structure_capacity_ = minimum_structure_capacity;
             switch (type)
             {
-            case basic_json<Char>::object_t:
+            case json_base::object_t:
                 structure_.object_ = new json_object<Char>();
                 structure_.object_->reserve(minimum_structure_capacity);
                 break;
-            case basic_json<Char>::array_t:
+            case json_base::array_t:
                 structure_.array_ =  new json_array<Char>();
                 structure_.array_->reserve(minimum_structure_capacity);
                 break;
@@ -43,15 +43,15 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
         }
         bool is_object() const
         {
-            return type_ == basic_json<Char>::object_t;
+            return type_ == json_base::object_t;
         }
         bool is_array() const
         {
-            return type_ == basic_json<Char>::array_t;
+            return type_ == json_base::array_t;
         }
 
         std::pair<std::basic_string<Char>,basic_json<Char>> pair_;
-        typename basic_json<Char>::value_type type_;
+        json_base::value_type type_;
         union {
             json_object<Char>* object_;
             json_array<Char>* array_;
@@ -71,10 +71,10 @@ public:
                 {
                     switch (stack_[i].type_)
                     {
-                    case basic_json<Char>::object_t:
+                    case json_base::object_t:
                         delete stack_[i].structure_.object_;
                         break;
-                    case basic_json<Char>::array_t:
+                    case json_base::array_t:
                         delete stack_[i].structure_.array_;
                         break;
                     }
@@ -96,7 +96,7 @@ public:
 
     virtual void begin_object(const basic_parsing_context<Char>& context)
     {
-        stack_.push_back(stack_item(basic_json<Char>::object_t,context.minimum_structure_capacity()));
+        stack_.push_back(stack_item(json_base::object_t,context.minimum_structure_capacity()));
     }
 
     virtual void end_object(const basic_parsing_context<Char>& context)
@@ -127,7 +127,7 @@ public:
 
     virtual void begin_array(const basic_parsing_context<Char>& context)
     {
-        stack_.push_back(stack_item(basic_json<Char>::array_t,context.minimum_structure_capacity()));
+        stack_.push_back(stack_item(json_base::array_t,context.minimum_structure_capacity()));
     }
 
     virtual void end_array(const basic_parsing_context<Char>& context)
