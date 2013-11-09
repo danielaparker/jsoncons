@@ -324,7 +324,7 @@ public:
         }
 
         template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, T&& value)
+        void set_custom_data(std::basic_string<Char>&& name, T&& value)
         {
             return val_.get(name_).set_custom_data(name,value);
         }
@@ -621,11 +621,37 @@ public:
 
     void to_stream(basic_json_output_handler<Char>& handler) const;
 
+    void swap(basic_json<Char>& b)
+    {
+        using std::swap;
+        swap(type_,b.type_);
+
+        switch (b.type_)
+        {
+        case null_t:
+        case empty_object_t:
+            value_ = b.value_;
+            break;
+        default:
+            switch (type_)
+            {
+            case null_t:
+            case empty_object_t:
+                b.value_ = value_;
+                break;
+            default:
+                swap(value_,b.value_);
+                break;
+            }
+        }
+    }
+
     friend void swap(basic_json<Char>& a, basic_json<Char>& b)
     {
         using std::swap;
-        swap(a.type_,b.type_);
-        swap(a.value_,b.value_);
+        a.swap(b);
+        //swap(a.type_,b.type_);
+        //swap(a.value_,b.value_);
     }
 private:
 	static basic_json<Char> empty_object;
