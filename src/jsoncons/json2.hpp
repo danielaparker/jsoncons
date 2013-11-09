@@ -181,6 +181,25 @@ template <class Char>
 basic_json<Char>::basic_json(value_type t)
 {
     type_ = t;
+    switch (type_)
+    {
+    case null_t:
+    case empty_object_t:
+    case double_t:
+    case longlong_t:
+    case ulonglong_t:
+    case bool_t:
+        break;
+    case string_t:
+        value_.string_value_ = new std::basic_string<Char>();
+        break;
+    case array_t:
+        value_.array_ = new json_array<Char>();
+        break;
+    case object_t:
+        value_.object_ = new json_object<Char>();
+        break;
+    }
 }
 
 template <class Char>
@@ -213,7 +232,7 @@ basic_json<Char>::~basic_json()
 template <class Char>
 basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 {
-    swap(*this,rhs);
+    rhs.swap(*this);
     return *this;
 }
 
@@ -771,7 +790,8 @@ basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val = std::move(handler.root());
+    basic_json<Char> val;
+    handler.root().swap(val);
     return val;
 }
 
@@ -782,7 +802,8 @@ basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val = std::move(handler.root());
+    basic_json<Char> val;
+    handler.root().swap(val);
     return val;
 }
 
@@ -798,7 +819,8 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val = std::move(handler.root());
+    basic_json<Char> val;
+    handler.root().swap(val);
     return val;
 }
 
@@ -950,6 +972,14 @@ void basic_json<Char>::reserve(size_t n)
         break;
     case object_t:
         value_.object_->reserve(n);
+        break;
+    case empty_object_t:
+        if (n > 0)
+        {
+            type_ = object_t;
+            value_.object_ = new json_object<Char>();
+            value_.object_->reserve(n);
+        }
         break;
     }
 }
