@@ -26,6 +26,15 @@ namespace jsoncons {
 #define JSONCONS_NO_CXX11_RVALUE_REFERENCES
 #endif // _MSC_VER < 1600
 
+//
+// Move support:
+//
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#define JSONCONS_MOVE(x) std::move(x)
+#else
+#define JSONCONS_MOVE(x) x
+#endif
+
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
 inline bool is_nan(double x) { return _isnan( x ) != 0; }
