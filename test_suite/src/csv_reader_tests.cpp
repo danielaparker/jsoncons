@@ -69,3 +69,23 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     std::cout << pretty_print(employees) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
+{
+    std::cout << "###test_csv_reader" << std::endl;
+
+    std::string in_file = "input/employees.json";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+    json params;
+    params["field_delimiter"] = "\t";
+
+    json_reader reader(is,handler);
+    reader.read();
+    json employees = std::move(handler.root());
+
+    csv_serializer serializer(std::cout,params);
+
+    employees.to_stream(serializer);
+}
+

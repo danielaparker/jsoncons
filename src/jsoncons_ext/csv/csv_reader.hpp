@@ -129,7 +129,7 @@ public:
     {
         input_buffer_ = &buffer_[0];
 
-        value_separator_ = params.get("field_delimiter",",").as_char();
+        field_delimiter_ = params.get("field_delimiter",",").as_char();
 
         assume_header_ = params.get("has_header",false).as_bool();
 
@@ -285,10 +285,10 @@ private:
     size_t buffer_length_;
     jsoncons::basic_json_input_handler<Char>& handler_;
     jsoncons::basic_error_handler<Char>& err_handler_;
-    char value_separator_;
     bool assume_header_;
-    char quote_char_;
-    char quote_escape_char_;
+    Char field_delimiter_;
+    Char quote_char_;
+    Char quote_escape_char_;
 };
 
 template<class Char>
@@ -369,7 +369,7 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             }
             continue;
         default:
-            if (c == value_separator_)
+            if (c == field_delimiter_)
             {
                 c = read_ch();
             }
@@ -477,7 +477,7 @@ void basic_csv_reader<Char>::read_array_of_objects()
         default:
             if (stack_.size() > 0)
             {
-                if (c == value_separator_)
+                if (c == field_delimiter_)
                 {
                     c = read_ch();
                 }
@@ -597,7 +597,7 @@ void basic_csv_reader<Char>::parse_string()
         else if (c == '\r')
         {
         }
-        else if (c == value_separator_ || c == '\n')
+        else if (c == field_delimiter_ || c == '\n')
         {
             done = true;
             unread_ch(c);
@@ -647,7 +647,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
         {
             done = true;
         }
-        else if (c == value_separator_ || c == '\n')
+        else if (c == field_delimiter_ || c == '\n')
         {
             done = true;
             unread_ch(c);

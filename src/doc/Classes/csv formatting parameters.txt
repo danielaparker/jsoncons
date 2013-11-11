@@ -5,3 +5,4 @@ has_header      | Assume first row in file is header, use field names to constru
 field_delimiter    | Field delimiter              | ,             
 quote_char         | Quote character              | "             
 quote_escape_char  | Character to escape quote character (by default the quote character is doubled)| "             
+quote_style|all, minimal, none, or nonnumeric|minimal
