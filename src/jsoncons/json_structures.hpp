@@ -225,7 +225,7 @@ public:
         {
             return false;
         }
-        for (auto it = members_.begin(); it != members_.end(); ++it)
+        for (const_iterator it = members_.begin(); it != members_.end(); ++it)
         {
             bool exists = std::binary_search(rhs.members_.begin(),rhs.members_.end(),*it,member_compare<Char>());
             if (!exists)
@@ -288,7 +288,7 @@ void json_object<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& v
 template <class Char>
 basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) 
 {
-    auto it = find(name);
+    iterator it = find(name);
     if (it == end())
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);

@@ -21,8 +21,13 @@
 namespace jsoncons {
 
 // Follow boost
+
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
+#else
+#  define BOOST_NO_CXX11_RVALUE_REFERENCES
+#endif
+
 #if _MSC_VER < 1600
-#define JSONCONS_NO_CXX11_AUTO_DECLARATIONS
 #define JSONCONS_NO_CXX11_RVALUE_REFERENCES
 #endif // _MSC_VER < 1600
 

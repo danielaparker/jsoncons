@@ -102,26 +102,34 @@ public:
     virtual void end_object(const basic_parsing_context<Char>& context)
     {
         //std::cout << "OBJECT minimum=" << stack_.back().minimum_structure_capacity_ << ", actual=" << stack_.back().structure_.object_->capacity() << ", size=" << stack_.back().structure_.object_->size() << std::endl;
-		std::unique_ptr<json_object<Char>> var = std::unique_ptr<json_object<Char>>(stack_.back().structure_.object_);
-        var->sort_members();
-		stack_.pop_back();
+		json_object<Char>* var = stack_.back().structure_.object_;
+        stack_.pop_back();
+        try
+        {
+            var->sort_members();
+        }
+        catch (...)
+        {
+            delete var;
+            throw;
+        }
         if (stack_.size() > 0)
         {
             if (stack_.back().is_object())
             {
-                stack_.back().pair_.second = basic_json<Char>(var.release());	    
+                stack_.back().pair_.second = basic_json<Char>(var);	    
                 stack_.back().structure_.object_->push_back(JSONCONS_MOVE(stack_.back().pair_));
             }
             else
             {
-                basic_json<Char> val(var.release());	    
+                basic_json<Char> val(var);	    
                 stack_.back().structure_.array_->push_back(JSONCONS_MOVE(val));
             }
         }
         else
         {
-            basic_json<Char> val(var.release());	    
-            root_ = JSONCONS_MOVE(val);
+            basic_json<Char> val(var);	    
+            root_.swap(val);
         }
     }
 
