@@ -664,7 +664,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
 		{
         handler.begin_object();
         json_object<Char>* o = value_.object_;
-        for (auto it = o->begin(); it != o->end(); ++it)
+        for (const_object_iterator it = o->begin(); it != o->end(); ++it)
         {
             handler.name(it->first);
             it->second.to_stream(handler);
@@ -682,7 +682,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
 		{
         handler.begin_array();
         json_array<Char>* o = value_.array_;
-        for (auto it = o->begin(); it != o->end(); ++it)
+        for (const_array_iterator it = o->begin(); it != o->end(); ++it)
         {
             it->to_stream(handler);
         }
@@ -1211,9 +1211,9 @@ void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
-    auto begin = s.begin();
-    auto end = s.end();
-    for (auto it = begin; it != end; ++it)
+    std::basic_string<Char>::const_iterator begin = s.begin();
+    std::basic_string<Char>::const_iterator end = s.end();
+    for (std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
     {
         Char c = *it;
         switch (c)
