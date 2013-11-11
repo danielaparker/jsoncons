@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_JSON_SERIALIZER_HPP
-#define JSONCONS_JSON_SERIALIZER_HPP
+#ifndef JSONCONS_EXT_CSV_CSV_SERIALIZER_HPP
+#define JSONCONS_EXT_CSV_CSV_SERIALIZER_HPP
 
 #include <string>
 #include <sstream>
@@ -21,15 +21,15 @@
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
 
-namespace jsoncons {
+namespace jsoncons_ext { namespace csv {
 
-template <class Char>
-class basic_csv_serializer : public basic_json_output_handler<Char>
+template<class Char>
+class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item
     {
         stack_item(bool is_object)
-            : is_object_(is_object), count_(0), content_indented_(false)
+           : is_object_(is_object), count_(0), content_indented_(false)
         {
         }
         bool is_object() const
@@ -43,14 +43,31 @@ class basic_csv_serializer : public basic_json_output_handler<Char>
     };
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
-        : os_(os), indent_(0)
+       : os_(os), indent_(0), indenting_(false)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
         init();
     }
-    basic_csv_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-        : os_(os), format_(format), indent_(0)
+
+    basic_csv_serializer(std::basic_ostream<Char>& os, bool indenting)
+       : os_(os), indent_(0), indenting_(indenting)
+    {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+        init();
+    }
+
+    basic_csv_serializer(std::basic_ostream<Char>& os, const jsoncons::basic_output_format<Char>& format)
+       : os_(os), format_(format), indent_(0),
+         indenting_(format.indenting()) // Deprecated behavior
+    {
+        original_precision_ = os.precision();
+        original_format_flags_ = os.flags();
+        init();
+    }
+    basic_csv_serializer(std::basic_ostream<Char>& os, const jsoncons::basic_output_format<Char>& format, bool indenting)
+       : os_(os), format_(format), indent_(0), indenting_(indenting)
     {
         original_precision_ = os.precision();
         original_format_flags_ = os.flags();
@@ -62,64 +79,66 @@ public:
         restore();
     }
 
+    virtual void begin_json()
+    {
+    }
+
+    virtual void end_json()
+    {
+    }
+
     virtual void begin_object()
     {
         begin_structure();
 
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
+        if (indenting_ && !stack_.empty() && stack_.back().is_object())
         {
             write_indent();
         }
         stack_.push_back(stack_item(true));
         os_.put('{');
-        indent();
     }
 
     virtual void end_object()
     {
-        unindent();
-        if (format_.indenting() && !stack_.empty())
+        if (indenting_ && !stack_.empty())
         {
             write_indent();
         }
         stack_.pop_back();
         os_.put('}');
 
-        end_structure();
+        end_value();
     }
 
     virtual void begin_array()
     {
+        if (!stack_.empty())
+        {
+            stack_.back().count_ = 0;
+        }
         begin_structure();
 
-        if (format_.indenting() && !stack_.empty() && stack_.back().is_object())
-        {
-            write_indent();
-        }
         stack_.push_back(stack_item(false));
-        os_.put('[');
-        indent();
     }
 
     virtual void end_array()
     {
-        unindent();
-        if (format_.indenting() && !stack_.empty() && stack_.back().content_indented_)
+        if (stack_.size() == 2)
         {
-            write_indent();
+            os_.put('\n');
         }
         stack_.pop_back();
-        os_.put(']');
 
-        end_structure();
+        end_value();
     }
 
     virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
-        os_.put('\"'); 
-        escape_string<Char>(name,format_,os_); 
-        os_.put('\"'); 
+        os_.put('\"');
+        jsoncons::escape_string<Char>(name, format_, os_);
+        os_.put('\"');
         os_.put(':');
     }
 
@@ -128,7 +147,7 @@ public:
         begin_value();
 
         os_.put('\"');
-        escape_string<Char>(value,format_,os_);
+        jsoncons::escape_string<Char>(value, format_, os_);
         os_.put('\"');
 
         end_value();
@@ -138,23 +157,34 @@ public:
     {
         begin_value();
 
-        if (is_nan(value) && format_.replace_nan())
+        if (jsoncons::is_nan(value) && format_.replace_nan())
         {
             os_  << format_.nan_replacement();
         }
-        else if (is_pos_inf(value) && format_.replace_pos_inf())
+        else if (jsoncons::is_pos_inf(value) && format_.replace_pos_inf())
         {
             os_  << format_.pos_inf_replacement();
         }
-        else if (is_neg_inf(value) && format_.replace_neg_inf())
+        else if (jsoncons::is_neg_inf(value) && format_.replace_neg_inf())
         {
             os_  << format_.neg_inf_replacement();
+        }
+        else if (format_.truncate_trailing_zeros_notation())
+        {
+            char buffer[32];
+            int len = jsoncons::c99_snprintf(buffer, 32, "%#.*g", format_.precision(), value);
+            while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
+            {
+                --len;
+            }
+            buffer[len] = 0;
+            os_ << buffer;
         }
         else
         {
             os_  << value;
         }
-
+        
         end_value();
     }
 
@@ -180,7 +210,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
+        os_ << (value ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
 
         end_value();
     }
@@ -189,7 +219,7 @@ public:
     {
         begin_value();
 
-        os_ << json_char_traits<Char>::null_literal();
+        os_ << jsoncons::json_char_traits<Char>::null_literal();
 
         end_value();
     }
@@ -203,7 +233,7 @@ protected:
             {
                 os_.put(',');
             }
-            if (format_.indenting())
+            if (indenting_)
             {
                 write_indent();
             }
@@ -238,24 +268,6 @@ protected:
         }
     }
 
-    void end_structure()
-    {
-        if (!stack_.empty())
-        {
-            ++stack_.back().count_;
-        }
-    }
-
-    void indent()
-    {
-        indent_ += format_.indent();
-    }
-
-    void unindent()
-    {
-        indent_ -= format_.indent();
-    }
-
     void write_indent()
     {
         if (!stack_.empty())
@@ -270,7 +282,7 @@ protected:
     }
 
     std::basic_ostream<Char>& os_;
-    basic_output_format<Char> format_;
+    jsoncons::basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
     std::streamsize original_precision_;
@@ -289,9 +301,12 @@ private:
         os_.precision(original_precision_);
         os_.flags(original_format_flags_);
     }
+
+    bool indenting_;
 };
 
 typedef basic_csv_serializer<char> csv_serializer;
 
-}
+}}
+
 #endif
