@@ -106,7 +106,7 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
     enum quote_style_enum{quote_all,quote_minimal,quote_none,quote_nonnumeric};
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
-       : os_(os), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"'), quote_style_(quote_minimal)
+       : os_(os), line_delimiter_("\n"), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"'), quote_style_(quote_minimal)
     {
         init();
     }
