@@ -229,7 +229,7 @@ public:
 
         end_value();
     }
-protected:
+private:
 
     void begin_element()
     {
@@ -303,7 +303,6 @@ protected:
     int indent_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-private:
 
     void init()
     {

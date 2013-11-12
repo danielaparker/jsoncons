@@ -116,6 +116,7 @@ public:
        : os_(os), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"')
     {
 
+        line_delimiter_ = params.get("line_delimiter","\n").as_string();
         field_delimiter_ = params.get("field_delimiter",",").as_char();
         quote_char_ = params.get("quote_char","\"").as_char();
         quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
@@ -126,12 +127,15 @@ public:
         }
         else if (quote_style == csv_char_traits<Char>::minimal_literal())
         {
+            quote_style_ = quote_minimal;
         }
         else if (quote_style == csv_char_traits<Char>::none_literal())
         {
+            quote_style_ = quote_none;
         }
         else if (quote_style == csv_char_traits<Char>::nonnumeric_literal())
         {
+            quote_style_ = quote_nonnumeric;
         }
         else 
         {
@@ -171,7 +175,11 @@ public:
     {
         if (stack_.size() == 2)
         {
-            os_.put('\n');
+            os_ << line_delimiter_;
+            if (stack_[0].count_ == 0)
+            {
+                os_ << header_os_.str() << line_delimiter_;
+            }
         }
         stack_.pop_back();
 
@@ -187,7 +195,7 @@ public:
     {
         if (stack_.size() == 2)
         {
-            os_.put('\n');
+            os_ << line_delimiter_;
         }
         stack_.pop_back();
 
@@ -221,6 +229,22 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            if (stack_.back().count_ > 0)
+            {
+                header_os_.put(field_delimiter_);
+            }
+            bool quote = false;
+            if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
+                (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(value,field_delimiter_)))
+            {
+                quote = true;
+                header_os_.put(quote_char_);
+            }
+            jsoncons_ext::csv::escape_string<Char>(value, quote_char_, quote_escape_char_, header_os_);
+            if (quote)
+            {
+                header_os_.put(quote_char_);
+            }
             ++stack_.back().count_;
         }
         else if (stack_.size() == 2)
@@ -248,6 +272,11 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            if (stack_.back().count_ > 0)
+            {
+                header_os_.put(field_delimiter_);
+                header_os_  << value;
+            }
         }
         else if (stack_.size() == 2)
         {
@@ -289,6 +318,11 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            if (stack_.back().count_ > 0)
+            {
+                header_os_.put(field_delimiter_);
+                header_os_  << value;
+            }
         }
         else if (stack_.size() == 2)
         {
@@ -304,6 +338,11 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            if (stack_.back().count_ > 0)
+            {
+                header_os_.put(field_delimiter_);
+                header_os_  << value;
+            }
         }
         else if (stack_.size() == 2)
         {
@@ -319,6 +358,11 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            if (stack_.back().count_ > 0)
+            {
+                header_os_.put(field_delimiter_);
+                header_os_ << (value ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
+            }
         }
         else if (stack_.size() == 2)
         {
@@ -344,7 +388,7 @@ public:
             end_value();
         }
     }
-protected:
+private:
 
     void begin_value()
     {
@@ -364,7 +408,6 @@ protected:
             ++stack_.back().count_;
         }
     }
-private:
 
     void init()
     {
@@ -389,6 +432,8 @@ private:
     Char quote_escape_char_;
     Char field_delimiter_;
     quote_style_enum quote_style_;
+    std::basic_ostringstream<Char> header_os_;
+    std::basic_string<Char> line_delimiter_;
 };
 
 typedef basic_csv_serializer<char> csv_serializer;
