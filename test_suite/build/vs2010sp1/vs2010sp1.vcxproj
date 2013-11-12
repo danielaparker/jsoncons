@@ -78,7 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\csv_reader_tests.cpp" />
+    <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\jsoncons_test.cpp" />
     <ClCompile Include="..\..\src\json_accessor_tests.cpp" />
     <ClCompile Include="..\..\src\json_array_tests.cpp" />

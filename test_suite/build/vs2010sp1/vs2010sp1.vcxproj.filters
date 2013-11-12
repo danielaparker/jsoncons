@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\csv_reader_tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\json_accessor_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +37,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\jsoncons_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\csv_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
