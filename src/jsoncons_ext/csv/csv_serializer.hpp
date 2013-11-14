@@ -225,152 +225,63 @@ public:
         }
     }
 
-    virtual void value(const std::basic_string<Char>& value)
+    virtual void value(const std::basic_string<Char>& val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
-            if (stack_.back().count_ > 0)
-            {
-                header_os_.put(field_delimiter_);
-            }
-            bool quote = false;
-            if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-                (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(value,field_delimiter_)))
-            {
-                quote = true;
-                header_os_.put(quote_char_);
-            }
-            jsoncons_ext::csv::escape_string<Char>(value, quote_char_, quote_escape_char_, header_os_);
-            if (quote)
-            {
-                header_os_.put(quote_char_);
-            }
-            ++stack_.back().count_;
+            value(val,header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            bool quote = false;
-            if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-                (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(value,field_delimiter_)))
-            {
-                quote = true;
-                os_.put(quote_char_);
-            }
-            jsoncons_ext::csv::escape_string<Char>(value, quote_char_, quote_escape_char_, os_);
-            if (quote)
-            {
-                os_.put(quote_char_);
-            }
-
-            end_value();
+            value(val,os_);
         }
     }
 
-    virtual void value(double value)
+    virtual void value(double val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
-            if (stack_.back().count_ > 0)
-            {
-                header_os_.put(field_delimiter_);
-                header_os_  << value;
-            }
+            value(val,header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            if (jsoncons::is_nan(value) && format_.replace_nan())
-            {
-                os_  << format_.nan_replacement();
-            }
-            else if (jsoncons::is_pos_inf(value) && format_.replace_pos_inf())
-            {
-                os_  << format_.pos_inf_replacement();
-            }
-            else if (jsoncons::is_neg_inf(value) && format_.replace_neg_inf())
-            {
-                os_  << format_.neg_inf_replacement();
-            }
-            else if (format_.truncate_trailing_zeros_notation())
-            {
-                char buffer[32];
-                int len = jsoncons::c99_snprintf(buffer, 32, "%#.*g", format_.precision(), value);
-                while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
-                {
-                    --len;
-                }
-                buffer[len] = 0;
-                os_ << buffer;
-            }
-            else
-            {
-                os_  << value;
-            }
-            
-            end_value();
+            value(val,os_);
         }
     }
 
-    virtual void value(long long value)
+    virtual void value(long long val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
-            if (stack_.back().count_ > 0)
-            {
-                header_os_.put(field_delimiter_);
-                header_os_  << value;
-            }
+            value(val,header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            os_  << value;
-
-            end_value();
+            value(val,os_);
         }
     }
 
-    virtual void value(unsigned long long value)
+    virtual void value(unsigned long long val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
-            if (stack_.back().count_ > 0)
-            {
-                header_os_.put(field_delimiter_);
-                header_os_  << value;
-            }
+            value(val,header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            os_  << value;
-
-            end_value();
+            value(val,os_);
         }
     }
 
-    virtual void value(bool value)
+    virtual void value(bool val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
-            if (stack_.back().count_ > 0)
-            {
-                header_os_.put(field_delimiter_);
-                header_os_ << (value ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
-            }
+            value(val,header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            os_ << (value ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
-
-            end_value();
+            value(val,os_);
         }
     }
 
@@ -378,25 +289,115 @@ public:
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
+            null_value(header_os_);
         }
         else if (stack_.size() == 2)
         {
-            begin_value();
-
-            os_ << jsoncons::json_char_traits<Char>::null_literal();
-
-            end_value();
+            null_value(os_);
         }
     }
 private:
 
-    void begin_value()
+    virtual void value(const std::basic_string<Char>& val, std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        bool quote = false;
+        if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
+            (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(val,field_delimiter_)))
+        {
+            quote = true;
+            os.put(quote_char_);
+        }
+        jsoncons_ext::csv::escape_string<Char>(val, quote_char_, quote_escape_char_, os);
+        if (quote)
+        {
+            os.put(quote_char_);
+        }
+
+        end_value();
+    }
+
+    virtual void value(double val, std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        if (jsoncons::is_nan(val) && format_.replace_nan())
+        {
+            os  << format_.nan_replacement();
+        }
+        else if (jsoncons::is_pos_inf(val) && format_.replace_pos_inf())
+        {
+            os  << format_.pos_inf_replacement();
+        }
+        else if (jsoncons::is_neg_inf(val) && format_.replace_neg_inf())
+        {
+            os  << format_.neg_inf_replacement();
+        }
+        else if (format_.truncate_trailing_zeros_notation())
+        {
+            char buffer[32];
+            int len = jsoncons::c99_snprintf(buffer, 32, "%#.*g", format_.precision(), val);
+            while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
+            {
+                --len;
+            }
+            buffer[len] = 0;
+            os << buffer;
+        }
+        else
+        {
+            os  << val;
+        }
+
+        end_value();
+        
+    }
+
+    virtual void value(long long val, std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        os  << val;
+
+        end_value();
+    }
+
+    virtual void value(unsigned long long val, std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        os  << val;
+
+        end_value();
+    }
+
+    virtual void value(bool val, std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        os << (val ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
+
+        end_value();
+    }
+
+    virtual void null_value(std::basic_ostream<Char>& os)
+    {
+        begin_value(os);
+
+        os << jsoncons::json_char_traits<Char>::null_literal();
+
+        end_value();
+        
+    }
+
+    void begin_value(std::basic_ostream<Char>& os)
     {
         if (!stack_.empty())
         {
             if (stack_.back().count_ > 0)
             {
-                os_.put(field_delimiter_);
+                os.put(field_delimiter_);
             }
         }
     }
