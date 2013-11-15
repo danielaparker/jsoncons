@@ -52,6 +52,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [[csv_reader]]
 
+[[csv_serializer]]
+
 ## Examples
 
 ### First example
@@ -136,21 +138,17 @@ Instead of having the exception, let's use an accessor that evaluates to a strin
 Now the output is
 
     Haruki Murakami, Kafka on the Shore, 25.17
-    Charles Bukowski, Women: A Novel, 12
+    Charles Bukowski, Women: A Novel, 12.0
     Ivan Passer, Cutter's Way, N/A
 
-Note the following:
-
-- By default, when expressing a floating-point value as a string with `as_string()`, `jsoncons` uses default floating-point notation and a precision of 16.
-
-Let's change the floating-point notation to 'fixed' and a precision of 2.
+By default, when formatting a floating-point value with `as_string()`, `jsoncons` truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and a precision of 2.
 
     try
     {
         json books = json::parse_file("input/books.json");
 
         output_format format;
-        format.fixed_decimal_places(2);
+        format.set_floating_point_format(output_format::fixed,2);
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
@@ -171,9 +169,59 @@ This time the output is
     Charles Bukowski, Women: A Novel, 12.00
     Ivan Passer, Cutter's Way, N/A
 
+### Second example
+
+This example shows how to create the `books.json` file in code.
+
+    json books(json::an_array);
+
+    {
+        json book;
+        book["title"] = "Kafka on the Shore";
+        book["author"] = "Haruki Murakami";
+        book["price"] = 25.17;
+        books.add(std::move(book));
+    }
+
+    {
+        json book;
+        book["title"] = "Women: A Novel";
+        book["author"] = "Charles Bukowski";
+        book["price"] = 12.00;
+        books.add(std::move(book));
+    }
+
+    {
+        json book;
+        book["title"] = "Cutter's Way";
+        book["author"] = "Ivan Passer";
+        books.add(std::move(book));
+    }
+
+    std::cout << pretty_print(books) << std::endl;
+
+The output is
+
+    [
+        {
+            "author":"Haruki Murakami",
+            "price":25.17,
+            "title":"Kafka on the Shore"
+        },
+        {
+            "author":"Charles Bukowski",
+            "price":12.0,
+            "title":"Women: A Novel"
+        },
+        {
+            "author":"Ivan Passer",
+            "title":"Cutter's Way"
+        }
+    ]
+
 ### User specified `Nan`, `Inf` and `-Inf` replacement
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -205,8 +253,7 @@ The output is
         reader.read();
         if (!reader.eof())
         {
-            json val;
-            handler.root().swap(val);
+            json val = std::move(handler.root());
             std::cout << val << std::endl;
         }
     }

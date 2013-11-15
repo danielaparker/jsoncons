@@ -1,6 +1,6 @@
     jsoncons_ext::csv::csv_serializer
 
-The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses char as the character type. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
+The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses char as the character type.  It implements [[json_output_handler]] and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
 
 ### Header
 
@@ -8,47 +8,56 @@ The `csv_serializer` class is an instantiation of the `basic_csv_serializer` cla
 
 ### Constructors
 
-    csv_serializer(std::ostream& os,
-               json_input_handler& handler)
-Constructs a `csv_serializer` that is associated with an input stream
-`os` of CSV text and a [[json_input_handler]] handler that receives
-notification of JSON events. Uses default [[csv formatting parameters]].
+    csv_serializer(std::ostream& os)
+Constructs a `csv_serializer` that is associated with an output stream
+`os`. Uses default [[csv formatting parameters]].
 
     csv_serializer(std::ostream& os,
-               json_input_handler& handler,
-               const json& params)
-Constructs a `csv_serializer` that is associated with an input stream
-`os` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events, and [[csv formatting parameters]].
-
-    csv_serializer(std::ostream& os,
-               json_input_handler& handler,
-               error_handler& err_handler)
-Constructs a `csv_serializer` that is associated with an input stream
-`os` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events and the specified [[error_handler]].
-Uses default [[csv formatting parameters]].
-
-    csv_serializer(std::ostream& os,
-               json_input_handler& handler,
-               error_handler& err_handler,
-               const json& params)
-Constructs a `csv_serializer` that is associated with an input stream
-`os` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events, the specified [[error_handler]],
-and [[csv formatting parameters]].
+                   const json& params)
+Constructs a `csv_serializer` that is associated with an output stream
+`os` and [[csv formatting parameters]].
 
 ### Member functions
 
-    bool eof() const
-Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
-    void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_input_handler]] handler, such as a [[json_deserializer]].
+### Destructor
 
-    size_t buffer_capacity() const
+    virtual ~json_serializer()
 
-    void buffer_capacity(size_t buffer_capacity)
+### Event handler methods
+
+    virtual void begin_object()
+Receive notification of the start of a JSON object
+
+    virtual void end_object()
+Receive notification of the end of a JSON object
+
+    virtual void begin_array()
+Receive notification of the start of a JSON array
+
+    virtual void end_array()
+Receive notification of the end of a JSON object
+
+    virtual void name(const std::string& name)
+Receive notification of the `name` of a name value pair
+
+    virtual void value(const std::string& value)
+Receive notification of a `string` value
+
+    virtual void value(double value)
+Receive notification of a floating point number
+
+    virtual void value(long_long_type value)
+Receive notification of a signed integer
+
+    virtual void value(ulong_long_type value)
+Receive notification of a non-negative integer
+
+    virtual void value(bool value)
+Receive notification of a boolean value
+
+    virtual void null_value()
+Receive notification of `null`
 
 ### Examples
 

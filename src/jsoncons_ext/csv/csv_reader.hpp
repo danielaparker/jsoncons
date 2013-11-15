@@ -20,6 +20,7 @@
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
+#include "jsoncons_ext/csv/csv_common.hpp"
 
 namespace jsoncons_ext { namespace csv {
 

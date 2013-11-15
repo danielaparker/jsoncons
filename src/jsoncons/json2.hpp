@@ -115,7 +115,7 @@ basic_json<Char>::basic_json(double val)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(long long val)
+basic_json<Char>::basic_json(long_long_type val)
 {
     type_ = longlong_t;
     value_.longlong_value_ = val;
@@ -150,7 +150,7 @@ basic_json<Char>::basic_json(unsigned long val)
 }
 
 template <class Char>
-basic_json<Char>::basic_json(unsigned long long val)
+basic_json<Char>::basic_json(ulong_long_type val)
 {
     type_ = ulonglong_t;
     value_.ulonglong_value_ = val;
@@ -1049,38 +1049,38 @@ unsigned int basic_json<Char>::as_uint() const
 }
 
 template <class Char>
-long long basic_json<Char>::as_longlong() const
+long_long_type basic_json<Char>::as_longlong() const
 {
     switch (type_)
     {
     case double_t:
-        return static_cast<long long>(value_.double_value_);
+        return static_cast<long_long_type>(value_.double_value_);
     case longlong_t:
-        return static_cast<long long>(value_.longlong_value_);
+        return static_cast<long_long_type>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<long long>(value_.ulonglong_value_);
+        return static_cast<long_long_type>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a long long");
+        JSONCONS_THROW_EXCEPTION("Not a long_long_type");
     }
 }
 
 template <class Char>
-unsigned long long basic_json<Char>::as_ulonglong() const
+ulong_long_type basic_json<Char>::as_ulonglong() const
 {
     switch (type_)
     {
     case double_t:
-        return static_cast<unsigned long long>(value_.double_value_);
+        return static_cast<ulong_long_type>(value_.double_value_);
     case longlong_t:
-        return static_cast<unsigned long long>(value_.longlong_value_);
+        return static_cast<ulong_long_type>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<unsigned long long>(value_.ulonglong_value_);
+        return static_cast<ulong_long_type>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
+        JSONCONS_THROW_EXCEPTION("Not a ulong_long_type");
     }
 }
 

@@ -9,6 +9,7 @@
 #define JSONCONS_JSON_INPUT_HANDLER_HPP
 
 #include <string>
+#include "jsoncons/jsoncons_config.hpp"
 
 namespace jsoncons {
 
@@ -37,9 +38,9 @@ public:
 
     virtual void value(double value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void value(long_long_type value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void value(ulong_long_type value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void value(bool value, const basic_parsing_context<Char>& context) = 0;
 

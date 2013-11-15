@@ -93,10 +93,10 @@ Constructs a `integer` value
     json(unsigned long val);
 Constructs a `unsigned integer` value
 
-    json(long long val);
+    json(long_long_type val);
 Constructs a `integer` value
 
-    json(unsigned long long val);
+    json(ulong_long_type val);
 Constructs a `unsigned integer` value
 
     json(const std::string& val);
@@ -205,10 +205,10 @@ If value is double, returns value, if value is signed or unsigned integer, casts
 
     unsigned int as_uint() const
 
-    long long as_longlong() const
-If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.
+    long_long_type as_longlong() const
+If value is long_long_type, returns value, if value is ulong_long_type or double, casts to long_long_type, if value is bool, returns 1 if true and 0 if false, otherwise throws.
 
-    unsigned long long as_ulonglong() const
+    ulong_long_type as_ulonglong() const
 
     std::string as_string() const
 If value is string, returns value, otherwise returns result of `to_string`.
