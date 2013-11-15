@@ -212,12 +212,12 @@ public:
             return val_.get(name_).as_uint();
         }
 
-        long long as_longlong() const
+        long_long_type as_longlong() const
         {
             return val_.get(name_).as_longlong();
         }
 
-        unsigned long long as_ulonglong() const
+        ulong_long_type as_ulonglong() const
         {
             return val_.get(name_).as_ulonglong();
         }
@@ -425,9 +425,9 @@ public:
 
     basic_json(unsigned long val);
 
-    basic_json(long long val);
+    basic_json(long_long_type val);
 
-    basic_json(unsigned long long val);
+    basic_json(ulong_long_type val);
 
     basic_json(const Char* val);
 
@@ -557,9 +557,9 @@ public:
 
     unsigned int as_uint() const;
 
-    long long as_longlong() const;
+    long_long_type as_longlong() const;
 
-    unsigned long long as_ulonglong() const;
+    ulong_long_type as_ulonglong() const;
 
     template <class T>
     const T& custom_data() const;
@@ -666,8 +666,8 @@ private:
     union
     {
         double double_value_;
-        long long longlong_value_;
-        unsigned long long ulonglong_value_;
+        long_long_type longlong_value_;
+        ulong_long_type ulonglong_value_;
         bool bool_value_;
         json_object<Char>* object_;
         json_array<Char>* array_;

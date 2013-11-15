@@ -90,5 +90,8 @@ inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
 
 #endif
 
+typedef long long long_long_type;
+typedef unsigned long long ulong_long_type;
+
 }
 #endif

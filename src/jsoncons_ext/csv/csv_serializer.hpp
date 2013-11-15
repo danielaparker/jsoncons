@@ -11,15 +11,16 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <istream>
 #include <ostream>
 #include <cstdlib>
+#include <map>
 #include "jsoncons/jsoncons_config.hpp"
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json2.hpp"
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
+#include "jsoncons_ext/csv/csv_common.hpp"
 
 namespace jsoncons_ext { namespace csv {
 
@@ -91,7 +92,7 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), content_indented_(false)
+           : is_object_(is_object), count_(0), skip_(false)
         {
         }
         bool is_object() const
@@ -101,7 +102,7 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 
         bool is_object_;
         size_t count_;
-        bool content_indented_;
+        bool skip_;
     };
     enum quote_style_enum{quote_all,quote_minimal,quote_none,quote_nonnumeric};
 public:
@@ -144,15 +145,6 @@ public:
         init();
     }
 
-/*    basic_csv_serializer(std::basic_ostream<Char>& os, const jsoncons::basic_output_format<Char>& format)
-       : os_(os), format_(format), indent_(0),
-         indenting_(format.indenting()) // Deprecated behavior
-    {
-        original_precision_ = os.precision();
-        original_format_flags_ = os.flags();
-        init();
-    }
-*/
     ~basic_csv_serializer()
     {
         restore();
@@ -222,6 +214,19 @@ public:
             {
                 os_.put(quote_char_);
             }
+            header_[name] = stack_.back().count_;
+        }
+        else
+        {
+            std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
+            if (it == header_.end())
+            {
+                std::cout << " Not found ";
+            }
+            else
+            {
+                std::cout << " (" << it->second << " " << stack_.back().count_ << ") ";
+            }
         }
     }
 
@@ -249,7 +254,7 @@ public:
         }
     }
 
-    virtual void value(long long val)
+    virtual void value(long_long_type val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
@@ -261,7 +266,7 @@ public:
         }
     }
 
-    virtual void value(unsigned long long val)
+    virtual void value(ulong_long_type val)
     {
         if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
         {
@@ -354,7 +359,7 @@ private:
         
     }
 
-    virtual void value(long long val, std::basic_ostream<Char>& os)
+    virtual void value(long_long_type val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -363,7 +368,7 @@ private:
         end_value();
     }
 
-    virtual void value(unsigned long long val, std::basic_ostream<Char>& os)
+    virtual void value(ulong_long_type val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -435,6 +440,7 @@ private:
     quote_style_enum quote_style_;
     std::basic_ostringstream<Char> header_os_;
     std::basic_string<Char> line_delimiter_;
+    std::map<std::basic_string<Char>,size_t> header_;
 };
 
 typedef basic_csv_serializer<char> csv_serializer;

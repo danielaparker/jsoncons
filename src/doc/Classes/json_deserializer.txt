@@ -46,11 +46,11 @@ line and column information is provided in the [[parsing_context]] parameter.
 Receive notification of a floating point number. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(long long value, const parsing_context& context)
+    virtual void value(long_long_type value, const parsing_context& context)
 Receive notification of a signed integer. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(unsigned long long value, const parsing_context& context)
+    virtual void value(ulong_long_type value, const parsing_context& context)
 Receive notification of a non-negative integer. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
