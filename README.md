@@ -16,7 +16,9 @@ Release 0.60
 
 ### Changes
 
-The default constructor now constructs an empty object rather than a `null` object. In practice this means that instead of writing
+- The default constructor now constructs an empty object rather than a `null` object. 
+
+In practice this means that instead of writing
 
     json o(json::an_object);
     o["name"] = json::an_object;
