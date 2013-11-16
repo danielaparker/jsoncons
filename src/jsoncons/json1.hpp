@@ -376,6 +376,11 @@ public:
             val_.get(name_).to_stream(os,format,indenting);
         }
 
+        void swap(basic_json<Char>& val)
+        {
+            val_.swap(val);
+        }
+
         friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const proxy& o)
         {
             o.to_stream(os);

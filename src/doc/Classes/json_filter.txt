@@ -1,3 +1,5 @@
+    jsoncons::json_filter
+
 The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses char as the character type.
 
 ### Header
@@ -42,23 +44,23 @@ line and column information is provided in the [[parsing_context]] parameter.
 Receive notification of the `name` part of a name-value pair. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter.  
 
-    virtual void value(const std::string& value, const parsing_context& context)
+    virtual void value(const std::string& val, const parsing_context& context)
 Receive notification of a string value. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(double value, const parsing_context& context)
+    virtual void value(double val, const parsing_context& context)
 Receive notification of a floating point number. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(long_long_type value, const parsing_context& context)
+    virtual void value(long_long_type val, const parsing_context& context)
 Receive notification of a signed integer. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(ulong_long_type value, const parsing_context& context)
+    virtual void value(ulong_long_type val, const parsing_context& context)
 Receive notification of a non-negative integer. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void value(bool value, const parsing_context& context)
+    virtual void value(bool val, const parsing_context& context)
 Receive notification of a boolean value. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 

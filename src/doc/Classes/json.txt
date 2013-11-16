@@ -241,6 +241,7 @@ Inserts a new member into a json object.
 
     template <class T>
     void set_custom_data(const std::string& name, const T& value)
+Inserts custom data of type `T` into a json object.
 
     void add(const json& val)
     void add(json&& val)
@@ -248,6 +249,10 @@ Adds a new element at the end of a json array. The content of `val` is copied (o
 
     template <class T>
     void add_custom_data(const T& value)
+Adds custom data of type `T` into a json array
+
+    void swap(json& val)
+Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
 ### Relational operators
 
