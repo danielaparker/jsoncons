@@ -196,109 +196,137 @@ public:
 
     virtual void name(const std::basic_string<Char>& name)
     {
-        if (stack_.size() == 2 && stack_[0].count_ == 0)
+        if (stack_.size() == 2)
         {
-            if (stack_.back().count_ > 0)
+            if (stack_[0].count_ == 0)
             {
-                os_.put(field_delimiter_);
-            }
-            bool quote = false;
-            if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-                (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(name,field_delimiter_)))
-            {
-                quote = true;
-                os_.put(quote_char_);
-            }
-            jsoncons_ext::csv::escape_string<Char>(name, quote_char_, quote_escape_char_, os_);
-            if (quote)
-            {
-                os_.put(quote_char_);
-            }
-            header_[name] = stack_.back().count_;
-        }
-        else
-        {
-            std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
-            if (it == header_.end())
-            {
-                std::cout << " Not found ";
+                if (stack_.back().count_ > 0)
+                {
+                    os_.put(field_delimiter_);
+                }
+                bool quote = false;
+                if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
+                    (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(name,field_delimiter_)))
+                {
+                    quote = true;
+                    os_.put(quote_char_);
+                }
+                jsoncons_ext::csv::escape_string<Char>(name, quote_char_, quote_escape_char_, os_);
+                if (quote)
+                {
+                    os_.put(quote_char_);
+                }
+                header_[name] = stack_.back().count_;
             }
             else
             {
-                std::cout << " (" << it->second << " " << stack_.back().count_ << ") ";
+                std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
+                if (it == header_.end())
+                {
+                    stack_.back().skip_ = true;
+                    //std::cout << " Not found ";
+                }
+                else
+                {
+                    stack_.back().skip_ = false;
+                    while (stack_.back().count_ < it->second)
+                    {
+                        os_.put(field_delimiter_);
+                        ++stack_.back().count_;
+                    }
+                //    std::cout << " (" << it->second << " " << stack_.back().count_ << ") ";
+                }
             }
         }
     }
 
     virtual void value(const std::basic_string<Char>& val)
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            value(val,header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            value(val,os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
         }
     }
 
     virtual void value(double val)
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            value(val,header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            value(val,os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
         }
     }
 
     virtual void value(long_long_type val)
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            value(val,header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            value(val,os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
         }
     }
 
     virtual void value(ulong_long_type val)
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            value(val,header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            value(val,os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
         }
     }
 
     virtual void value(bool val)
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            value(val,header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            value(val,os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
         }
     }
 
     virtual void null_value()
     {
-        if (stack_.size() == 2 && stack_.back().is_object() && stack_[0].count_ == 0)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            null_value(header_os_);
-        }
-        else if (stack_.size() == 2)
-        {
-            null_value(os_);
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                null_value(header_os_);
+            }
+            else
+            {
+                null_value(os_);
+            }
         }
     }
 private:
