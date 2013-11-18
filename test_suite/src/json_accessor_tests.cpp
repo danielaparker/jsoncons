@@ -22,9 +22,17 @@ using boost::numeric::ublas::matrix;
 BOOST_AUTO_TEST_CASE(test_is_type)
 {
     json obj;
+    BOOST_CHECK(obj.is_undefined());
+    std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
     // tests for proxy is_type methods
     obj["string"] = "val1";
+    std::cout << "type=" << obj.type() << std::endl;
+
+    BOOST_CHECK(obj.is_object());
+
+
+
     BOOST_CHECK(obj["string"].is_string());
 
     obj["double"] = 10.7;
@@ -58,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["null1"].is_null());
 
     obj["object"] = json();
-    BOOST_CHECK(obj["object"].is_object());
+    BOOST_CHECK(obj["object"].is_undefined());
 
     obj["array"] = json(json::an_array);
     BOOST_CHECK(obj["array"].is_array());
@@ -69,7 +77,6 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 
     // tests for json is_type methods
 
-    BOOST_CHECK(obj.is_object());
 
     json str = obj["string"];
     BOOST_CHECK(str.is_string());

@@ -78,7 +78,7 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
 class json_base
 {
 public:
-    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
+    enum value_type {undefined_t,object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
 };
 
 template <class Char>
@@ -106,14 +106,14 @@ public:
             return val_.get(name_).size();
         }
 
-        bool is_null() const
-        {
-            return val_.get(name_).is_null();
-        }
-
         bool has_member(const std::basic_string<Char>& name) const
         {
             return val_.get(name_).has_member(name);
+        }
+
+        bool is_null() const
+        {
+            return val_.get(name_).is_null();
         }
 
         bool is_empty() const
@@ -124,6 +124,11 @@ public:
         void reserve(size_t n)
         {
             return val_.get(name_).reserve(n);
+        }
+
+        bool is_undefined() const
+        {
+            return val_.get(name_).is_undefined();
         }
 
         bool is_string() const
@@ -535,9 +540,14 @@ public:
         return type_ == bool_t;
     }
 
+    bool is_undefined() const
+    {
+        return type_ == undefined_t;
+    }
+
     bool is_object() const
     {
-        return type_ == object_t || type_ == empty_object_t;
+        return type_ == object_t;
     }
 
     bool is_array() const
@@ -639,14 +649,14 @@ public:
         switch (b.type_)
         {
         case null_t:
-        case empty_object_t:
+        case undefined_t:
             value_ = b.value_;
             break;
         default:
             switch (type_)
             {
             case null_t:
-            case empty_object_t:
+            case undefined_t:
                 b.value_ = value_;
                 break;
             default:
