@@ -22,9 +22,8 @@ namespace jsoncons {
 
 // Follow boost
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
-#else
-#  define BOOST_NO_CXX11_RVALUE_REFERENCES
+#if !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   define JSONCONS_NO_CXX11_RVALUE_REFERENCES
 #endif
 
 #if _MSC_VER < 1600
@@ -89,9 +88,6 @@ inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
 #define c99_snprintf std::snprintf
 
 #endif
-
-typedef long long long_long_type;
-typedef unsigned long long ulong_long_type;
 
 }
 #endif

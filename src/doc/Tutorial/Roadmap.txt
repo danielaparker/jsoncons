@@ -1,8 +1,8 @@
-- Add csv_serializer for serializing json to csv files
+Enhancements
 
-- Add support for reading from and serializing to a bson binary format document
+- Add support for legacy compilers without move semantics and `long long`
 
 - Add support for `basic_json<wchar_t>` (`wjson`), `basic_json_reader<wchar_t>` (`wjson_reader`) etc., initially for 16 bit `wchar_t`
 
-
+- Add extension for reading from and serializing to binary formats (bson,bjson,ubjson) 
 

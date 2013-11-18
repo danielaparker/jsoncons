@@ -194,7 +194,7 @@ public:
         end_value();
     }
 
-    virtual void value(long_long_type value)
+    virtual void value(long long value)
     {
         begin_value();
 
@@ -203,7 +203,7 @@ public:
         end_value();
     }
 
-    virtual void value(ulong_long_type value)
+    virtual void value(unsigned long long value)
     {
         begin_value();
 
