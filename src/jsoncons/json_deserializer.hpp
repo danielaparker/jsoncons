@@ -196,7 +196,7 @@ public:
         }
     }
 
-    virtual void value(long_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
@@ -210,7 +210,7 @@ public:
         }
     }
 
-    virtual void value(ulong_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {

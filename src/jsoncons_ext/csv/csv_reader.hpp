@@ -20,7 +20,6 @@
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
-#include "jsoncons_ext/csv/csv_common.hpp"
 
 namespace jsoncons_ext { namespace csv {
 
@@ -193,9 +192,7 @@ private:
     void parse_string();
     void parse_quoted_string();
     void ignore_single_line_comment();
-    void ignore_multi_line_comment();
     void fast_ignore_single_line_comment();
-    void fast_ignore_multi_line_comment();
     void fast_skip_white_space();
 
     void read_data_block()
@@ -358,15 +355,6 @@ void basic_csv_reader<Char>::read_array_of_arrays()
                     }
                     ignore_single_line_comment();
                 }
-                if (next == '*')
-                {
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    ignore_multi_line_comment();
-                }
             }
             continue;
         default:
@@ -464,15 +452,6 @@ void basic_csv_reader<Char>::read_array_of_objects()
                     }
                     ignore_single_line_comment();
                 }
-                if (next == '*')
-                {
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    ignore_multi_line_comment();
-                }
             }
             continue;
         default:
@@ -565,10 +544,6 @@ void basic_csv_reader<Char>::skip_separator()
                     if (next == '/')
                     {
                         ignore_single_line_comment();
-                    }
-                    if (next == '/')
-                    {
-                        ignore_multi_line_comment();
                     }
                 }
             }
@@ -686,52 +661,6 @@ void basic_csv_reader<Char>::fast_ignore_single_line_comment()
         }
         ++buffer_position_;
         ++column_;
-    }
-}
-
-template<class Char>
-void basic_csv_reader<Char>::fast_ignore_multi_line_comment()
-{
-    while (buffer_position_ < buffer_length_)
-    {
-        if (input_buffer_[buffer_position_] == '*')
-        {
-            break;
-        }
-        if (input_buffer_[buffer_position_] == '\n')
-        {
-            ++line_;
-            column_ = 0;
-        }
-        ++buffer_position_;
-        ++column_;
-    }
-}
-
-template<class Char>
-void basic_csv_reader<Char>::ignore_multi_line_comment()
-{
-    bool done = false;
-    while (!done)
-    {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        if (c == '*')
-        {
-            Char next = peek();
-            if (eof())
-            {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            if (next == '/')
-            {
-                done = true;
-            }
-            break;
-        }
     }
 }
 

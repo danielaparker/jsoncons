@@ -20,6 +20,10 @@
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_exception.hpp"
 
+#ifdef max
+#undef max
+#endif
+
 namespace jsoncons {
 
 template<class Char>
@@ -289,9 +293,9 @@ template<class Char>
 default_error_handler basic_json_reader<Char>::default_err_handler;
 
 inline
-ulong_long_type string_to_ulonglong(const char *s, size_t length, const ulong_long_type max_value) throw(std::overflow_error)
+unsigned long long string_to_ulonglong(const char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
 {
-    ulong_long_type n = 0;
+    unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
         char c = s[i];
@@ -302,7 +306,7 @@ ulong_long_type string_to_ulonglong(const char *s, size_t length, const ulong_lo
                 throw std::overflow_error("Integer overflow");
             }
             n = n * 10;
-            long_long_type k = (c - '0');
+            long long k = (c - '0');
             if (n > max_value - k)
             {
                 throw std::overflow_error("Integer overflow");
@@ -721,7 +725,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        long_long_type d = static_cast<long_long_type>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long_long_type>::max()));
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max()));
                         handler_.value(-d, *this);
                     }
                     catch (const std::exception&)
@@ -746,7 +750,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        ulong_long_type d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<ulong_long_type>::max());
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max());
                         handler_.value(d, *this);
                     }
                     catch (const std::exception&)

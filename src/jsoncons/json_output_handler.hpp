@@ -27,9 +27,9 @@ public:
 
     virtual void value(double value) = 0;
 
-    virtual void value(long_long_type value) = 0;
+    virtual void value(long long value) = 0;
 
-    virtual void value(ulong_long_type value) = 0;
+    virtual void value(unsigned long long value) = 0;
 
     virtual void value(bool value) = 0;
 
@@ -69,11 +69,11 @@ public:
     {
     }
 
-    virtual void value(long_long_type value) 
+    virtual void value(long long value) 
     {
     }
 
-    virtual void value(ulong_long_type value) 
+    virtual void value(unsigned long long value) 
     {
     }
 

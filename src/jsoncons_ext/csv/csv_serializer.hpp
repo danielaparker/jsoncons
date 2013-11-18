@@ -20,7 +20,6 @@
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
-#include "jsoncons_ext/csv/csv_common.hpp"
 
 namespace jsoncons_ext { namespace csv {
 
@@ -270,7 +269,7 @@ public:
         }
     }
 
-    virtual void value(long_long_type val)
+    virtual void value(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -285,7 +284,7 @@ public:
         }
     }
 
-    virtual void value(ulong_long_type val)
+    virtual void value(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -387,7 +386,7 @@ private:
         
     }
 
-    virtual void value(long_long_type val, std::basic_ostream<Char>& os)
+    virtual void value(long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -396,7 +395,7 @@ private:
         end_value();
     }
 
-    virtual void value(ulong_long_type val, std::basic_ostream<Char>& os)
+    virtual void value(unsigned long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 

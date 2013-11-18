@@ -76,12 +76,12 @@ public:
         writer_.value(value);
     }
 
-    virtual void value(long_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value(ulong_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
@@ -161,12 +161,12 @@ public:
         parent_.value(value,context);
     }
 
-    virtual void value(long_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value(ulong_long_type value, const basic_parsing_context<Char>& context)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }

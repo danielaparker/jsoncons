@@ -30,7 +30,9 @@ you can simply write
 
 The older notation is still supported, though.
 
-- Integer types `long long` and `unsigned long long` have been replaced with the typedefs `long_long_type` and `ulong_long_type`. There are no implications for existing code.
+### Enhancements
+
+- Added `swap` member function to `json`
 
 ### New extensions
 
