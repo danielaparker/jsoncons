@@ -43,6 +43,7 @@ template <class Char>
 basic_json<Char>::basic_json()
 {
     type_ = undefined_t;
+    value_.reserved_ = 0;
 }
 
 template <class Char>
@@ -184,6 +185,8 @@ basic_json<Char>::basic_json(value_type t)
     switch (type_)
     {
     case undefined_t:
+        value_.reserved_ = 0;
+        break;
     case null_t:
     case double_t:
     case long_long_t:
@@ -392,9 +395,13 @@ void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json
         value_.object_->set(name,value);
         break;
     case undefined_t:
+		{
         type_ = object_t;
+        size_t reserved = value_.reserved_;
         value_.object_ = new json_object<Char>();
+        value_.object_->reserve(reserved);
         value_.object_->set(name,value);
+		}
         break;
     default:
         {
@@ -411,6 +418,7 @@ basic_json<Char>::basic_json(basic_json&& other)
     type_ = other.type_;
     value_ = other.value_;
     other.type_ = undefined_t;
+    other.value_.reserved_ = 0;
 }
 
 template <class Char>
@@ -423,9 +431,13 @@ void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value
         value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     case undefined_t:
-        type_ = object_t;
-        value_.object_ = new json_object<Char>();
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        {
+            type_ = object_t;
+            size_t reserved = value_.reserved_;
+            value_.object_ = new json_object<Char>();
+            value_.object_->reserve(reserved);
+            value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
         break;
     default:
         {
@@ -443,9 +455,13 @@ void basic_json<Char>::add(basic_json<Char>&& value)
         value_.array_->push_back(value);
         break;
     case undefined_t:
-        type_ = array_t;
-        value_.array_ = new json_array<Char>();
-        value_.array_->push_back(value);
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->push_back(value);
+        }
         break;
     default:
         {
@@ -463,9 +479,13 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
         value_.object_->set(name,value);
         break;
     case undefined_t:
-        type_ = object_t;
-        value_.object_ = new json_object<Char>();
-        value_.object_->set(name,value);
+        {
+            type_ = object_t;
+            size_t reserved = value_.reserved_;
+            value_.object_ = new json_object<Char>();
+            value_.object_->reserve(reserved);
+            value_.object_->set(name,value);
+        }
         break;
     default:
         {
@@ -484,9 +504,13 @@ void basic_json<Char>::add_custom_data(T&& value)
         value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     case undefined_t:
-        type_ = array_t;
-        value_.array_ = new json_array<Char>();
-        value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
         break;
     default:
         {
@@ -507,9 +531,13 @@ void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, cons
         value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         break;
     case undefined_t:
-        type_ = object_t;
-        value_.object_ = new json_object<Char>();
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        {
+            type_ = object_t;
+            size_t reserved = value_.reserved_;
+            value_.object_ = new json_object<Char>();
+            value_.object_->reserve(reserved);
+            value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
         break;
     default:
         {
@@ -557,6 +585,15 @@ void basic_json<Char>::add(const basic_json<Char>& value)
     {
     case array_t:
         value_.array_->push_back(value);
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->push_back(value);
+        }
         break;
     default:
         {
@@ -709,9 +746,6 @@ void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_outpu
 {
     to_stream(basic_json_serializer<Char>(os,format,indenting));
 }
-
-template <class Char>
-basic_json<Char> basic_json<Char>::empty_object(new json_object<Char>());
 
 template <class Char>
 const basic_json<Char> basic_json<Char>::an_object(new json_object<Char>());
@@ -959,6 +993,28 @@ void basic_json<Char>::reserve(size_t n)
     case object_t:
         value_.object_->reserve(n);
         break;
+    case undefined_t:
+        value_.reserved_ = n;
+        break;
+    }
+}
+
+template <class Char>
+size_t basic_json<Char>::capacity() const
+{
+    switch (type_)
+    {
+    case array_t:
+        return value_.array_->capacity();
+        break;
+    case object_t:
+        return value_.object_->capacity();
+        break;
+    case undefined_t:
+        return value_.reserved_;
+        break;
+    default:
+        return 0;
     }
 }
 

@@ -121,9 +121,14 @@ public:
             return val_.get(name_).is_empty();
         }
 
+        size_t capacity() const
+        {
+            return val_.get(name_).capacity();
+        }
+
         void reserve(size_t n)
         {
-            return val_.get(name_).reserve(n);
+            val_.get(name_).reserve(n);
         }
 
         bool is_undefined() const
@@ -312,14 +317,14 @@ public:
 
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
-            return val_.get(name_).set(name,value);
+            val_.get(name_).set(name,value);
         }
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
         void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
-            return val_.get(name_).set(name,value);
+            val_.get(name_).set(name,value);
         }
 
         void add(basic_json<Char>&& value)
@@ -336,13 +341,13 @@ public:
         template <class T>
         void set_custom_data(std::basic_string<Char>&& name, T&& value)
         {
-            return val_.get(name_).set_custom_data(name,value);
+            val_.get(name_).set_custom_data(name,value);
         }
 #endif
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
-            return val_.get(name_).set_custom_data(name,value);
+            val_.get(name_).set_custom_data(name,value);
         }
 
         void add(const basic_json<Char>& value)
@@ -562,6 +567,8 @@ public:
 
     bool is_empty() const;
 
+    size_t capacity() const;
+
     void reserve(size_t n);
 
     bool as_bool() const;
@@ -668,18 +675,15 @@ public:
 
     friend void swap(basic_json<Char>& a, basic_json<Char>& b)
     {
-        using std::swap;
         a.swap(b);
-        //swap(a.type_,b.type_);
-        //swap(a.value_,b.value_);
     }
 private:
-	static basic_json<Char> empty_object;
 	basic_json(value_type t);
 
 	value_type type_;
     union
     {
+        size_t reserved_; // For undefined_t
         double double_value_;
         long long longlong_value_;
         unsigned long long ulonglong_value_;
