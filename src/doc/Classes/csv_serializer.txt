@@ -61,35 +61,9 @@ Receive notification of `null`
 
 ### Examples
 
-### Reading a comma delimted file into an array of json values
+### Serializing an array of json values to a comma delimted file
 
-#### Comma delimited input file 
-
-    country_code,name
-    ABW,ARUBA
-    ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-    VUT,VANUATU
-    WLF,WALLIS & FUTUNA ISLANDS
-
-Note 
-
-- The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
-- The third record has a field value that contains an embedded comma, so it must be quoted.
-
-#### Reading the comma delimited file with csv_serializer
-
-    std::string in_file = "countries.csv";
-    std::ifstream is(in_file);
-
-    json_deserializer handler;
-
-    csv_serializer reader(is,handler);
-    reader.read();
-    json countries = std::move(handler.root());
-
-    std::cout << countries << std::endl;
-
-#### Output 
+#### JSON input file 
 
     [
         ["country_code","name"],
@@ -99,39 +73,36 @@ Note
         ["WLF","WALLIS & FUTUNA ISLANDS"]
     ]
 
-### Reading a tab delimted file into an array of json objects
-
-#### Tab delimited input file
-
-    employee-no	employee-name	dept	salary	note
-    00000001	Smith, Matthew	sales	150,000.00	
-    00000002	Brown, Sarah	sales	89,000.00	
-    00000003	Oberc, Scott	finance	110,000.00	
-    00000004	Scott, Colette	sales	75,000.00	"""Exemplary"" employee
-    Dependable, trustworthy"
-
 Note 
 
-- The first record is a header line, which will be used to associate data values with names
-- The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
+- The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
+- The third record has a field value that contains an embedded comma, so it must be quoted.
 
-#### Reading the tab delimited file with csv_serializer
+#### Reading the comma delimited file with csv_serializer
 
-    std::string in_file = "employees.txt";
+    std::string in_file = "input/countries.json";
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json paramsjson();
-    params["field_delimiter"] = "\t";
-    params["has_header"] = true;
-
-    csv_serializer reader(is,handler,params);
+    json_reader reader(is,handler);
     reader.read();
-    json employees = std::move(handler.root());
+    json countries = std::move(handler.root());
 
-    std::cout << employees << std::endl;
+    csv_serializer serializer(std::cout);
 
-#### Output
+    countries.to_stream(serializer);
+
+#### Output 
+
+    country_code,name
+    ABW,ARUBA
+    ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+    VUT,VANUATU
+    WLF,WALLIS & FUTUNA ISLANDS
+
+### Serializing an array of json objects to a tab delimted file
+
+#### JSON input file
 
     [
         {
@@ -163,3 +134,35 @@ Note
             "salary":"75,000.00"
         }
     ]
+
+Note 
+
+- The first record is a header line, which will be used to associate data values with names
+- The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
+
+#### Reading the tab delimited file with csv_serializer
+
+    std::string in_file = "input/employees.json";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+    json params;
+    params["field_delimiter"] = "\t";
+
+    json_reader reader(is,handler);
+    reader.read();
+    json employees = std::move(handler.root());
+
+    csv_serializer serializer(std::cout,params);
+
+    employees.to_stream(serializer);
+
+#### Tab delimited output file
+
+    employee-no	employee-name	dept	salary	note
+    00000001	Smith, Matthew	sales	150,000.00	
+    00000002	Brown, Sarah	sales	89,000.00	
+    00000003	Oberc, Scott	finance	110,000.00	
+    00000004	Scott, Colette	sales	75,000.00	"""Exemplary"" employee
+    Dependable, trustworthy"
+

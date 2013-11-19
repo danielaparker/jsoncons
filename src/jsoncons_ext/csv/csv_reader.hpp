@@ -136,6 +136,8 @@ public:
         quote_char_ = params.get("quote_char","\"").as_char();
 
         quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
+
+        comment_symbol_ = params.get("comment_symbol","\0").as_char();
     }
 
     ~basic_csv_reader()
@@ -287,6 +289,7 @@ private:
     Char field_delimiter_;
     Char quote_char_;
     Char quote_escape_char_;
+    Char comment_symbol_;
 };
 
 template<class Char>
@@ -339,26 +342,17 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             break;
         case '\r':
             continue;
-        case '/':
+        default:
+            if (column_ == 1 && c == comment_symbol_)
             {
-                Char next = peek();
+                skip_ch();
                 if (eof())
                 {
                     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
-                if (next == '/')
-                {
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    ignore_single_line_comment();
-                }
+                ignore_single_line_comment();
             }
-            continue;
-        default:
-            if (c == field_delimiter_)
+            else if (c == field_delimiter_)
             {
                 c = read_ch();
             }
@@ -436,26 +430,17 @@ void basic_csv_reader<Char>::read_array_of_objects()
             break;
         case '\r':
             continue;
-        case '/':
+        default:
+            if (column_ == 1 && c == comment_symbol_)
             {
-                Char next = peek();
+                skip_ch();
                 if (eof())
                 {
                     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
-                if (next == '/')
-                {
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    ignore_single_line_comment();
-                }
+                ignore_single_line_comment();
             }
-            continue;
-        default:
-            if (stack_.size() > 0)
+            else if (stack_.size() > 0)
             {
                 if (c == field_delimiter_)
                 {
@@ -536,20 +521,20 @@ void basic_csv_reader<Char>::skip_separator()
         case ' ':
             fast_skip_white_space();
             continue;
-        case '/':
-            {
-                if (!eof())
-                {
-                    Char next = peek();
-                    if (next == '/')
-                    {
-                        ignore_single_line_comment();
-                    }
-                }
-            }
-            break;
         default:
-            err_handler_.fatal_error("JPE106", "Expected :", *this);
+            if (c == comment_symbol_)
+            {
+                skip_ch();
+                if (eof())
+                {
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                }
+                ignore_single_line_comment();
+            }
+            else
+            {
+                err_handler_.fatal_error("JPE106", "Expected :", *this);
+            }
         }
     }
 
