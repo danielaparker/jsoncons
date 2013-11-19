@@ -16,19 +16,29 @@ Release 0.60
 
 ### Changes
 
-- The default constructor now constructs an empty object rather than a `null` object. 
+- The default constructor now constructs an `undefined` value rather than a `null` object. The type will be fixed to an object or array with the first operation that sets an object member or adds an array element. Values left undefined are excluded during serialization.
 
 In practice this means that instead of writing
 
     json o(json::an_object);
-    o["name"] = json::an_object;
+    o["field1"] = 99;
+
+or
+
+    json o(json::an_array);
+    o.add(99);
 
 you can simply write 
 
     json o;
-    o["name"] = json();
+    o["field1"] = 99;
 
-The older notation is still supported, though.
+or
+
+    json o;
+    o.add(99);
+
+The older notation is still supported, though, and needed if you want to create an empty object or an empty arry.
 
 ### Enhancements
 
