@@ -75,8 +75,7 @@ Receive notification of `null`
 
 Note 
 
-- The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
-- The third record has a field value that contains an embedded comma, so it must be quoted.
+- The third array element has a value that contains a comma, in the CSV file this value will be quoted.
 
 #### Reading the comma delimited file with csv_serializer
 
@@ -123,7 +122,6 @@ Note
             "dept":"finance",
             "employee-name":"Oberc, Scott",
             "employee-no":"00000003",
-            "note":"",
             "salary":"110,000.00"
         },
         {
@@ -131,14 +129,15 @@ Note
             "employee-name":"Scott, Colette",
             "employee-no":"00000004",
             "note":"\"Exemplary\" employee\nDependable, trustworthy",
+            "comment":"Team player",
             "salary":"75,000.00"
         }
     ]
 
 Note 
 
-- The first record is a header line, which will be used to associate data values with names
-- The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
+- The names in the first object in the array will be used for the header row of the CSV file
+- The fourth object has a `note` member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.
 
 #### Reading the tab delimited file with csv_serializer
 
@@ -159,10 +158,9 @@ Note
 
 #### Tab delimited output file
 
-    employee-no	employee-name	dept	salary	note
-    00000001	Smith, Matthew	sales	150,000.00	
-    00000002	Brown, Sarah	sales	89,000.00	
-    00000003	Oberc, Scott	finance	110,000.00	
-    00000004	Scott, Colette	sales	75,000.00	"""Exemplary"" employee
-    Dependable, trustworthy"
-
+    dept    employee-name   employee-no     note    salary
+    sales   Smith, Matthew  00000001                150,000.00
+    sales   Brown, Sarah    00000002                89,000.00
+    finance Oberc, Scott    00000003                110,000.00
+    sales   Scott, Colette  00000004        ""Exemplary"" employee
+    Dependable, trustworthy 75,000.00

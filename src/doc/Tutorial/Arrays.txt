@@ -3,7 +3,39 @@
     using jsoncons::json;
     using jsoncons::pretty_print;
 
-## Constructing a one dimensional array
+### Creating an array of elements (initial value is undefined)
+
+    json cities;  // undefined
+    std::cout << cities << std::endl;  // no output 
+
+    cities.add("Toronto");  // becomes a json array
+    cities.add("Vancouver");
+    cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
+
+    std::cout << cities << std::endl;
+
+The output is
+
+
+    ["Montreal","Toronto","Vancouver"]
+
+### Creating an array of elements (initial value is a json array)
+
+    json cities(json::an_array);  // an array
+    std::cout << cities << std::endl;  // output is "[]"
+
+    cities.add("Toronto");  
+    cities.add("Vancouver");
+    cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
+
+    std::cout << cities << std::endl;
+
+The output is
+
+    []
+    ["Montreal","Toronto","Vancouver"]
+
+### Making a one dimensional array of size 10 initialized with zeros
 
     json a = json::make_array(10,0);
 	a[1] = 1;
@@ -14,7 +46,7 @@ The output is
 
     [0,1,2,0,0,0,0,0,0,0]
 
-## Constructing a two dimensional array
+### Making a two dimensional array of size 10x8 initialized with zeros
 
     json a = json::make_2d_array(10,8,0);
     a[0][0] = "Tenor";
@@ -40,7 +72,7 @@ The output is
         ["2Y",0.18,0.009,-0.005]
     ]
 
-## Constructing a three dimensional array
+### Making a three dimensional array of size 4x3x2 initialized with zeros
 
     json a = json::make_3d_array(4,3,2,0);
     a[0][2][0] = 2;

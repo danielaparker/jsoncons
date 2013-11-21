@@ -70,9 +70,6 @@ Note that the parser accepts and ignores the single line comment that starts wit
 
 ### With code
 
-    // A null value
-    json null_val;
-
     // A boolean value
     json flag(true);
 
@@ -87,8 +84,8 @@ Note that the parser accepts and ignores the single line comment that starts wit
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr(json::an_array);
-    arr.add(null_val);
+    json arr;
+    arr.add(json::null);
     arr.add(flag);
     arr.add(number);
     arr.add(obj);
@@ -199,7 +196,7 @@ The output is
 
 ### Iterating over the elements of an array
 
-    json arr(json::an_array);
+    json arr;
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");

@@ -19,6 +19,41 @@ using jsoncons::basic_json_reader;
 using std::string;
 using boost::numeric::ublas::matrix;
 
+BOOST_AUTO_TEST_CASE(test_add_element_to_array)
+{
+    json arr;
+    BOOST_CHECK(arr.is_undefined());
+    arr.add("Toronto");
+    BOOST_CHECK(arr.is_array());
+    arr.add("Vancouver");
+    arr.add(0,"Montreal");
+
+    BOOST_CHECK(arr.size() == 3);
+
+    BOOST_CHECK(arr[0].as_string() == std::string("Montreal"));
+    BOOST_CHECK(arr[1].as_string() == std::string("Toronto"));
+    BOOST_CHECK(arr[2].as_string() == std::string("Vancouver"));
+}
+
+BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
+{
+    json cities; 
+    BOOST_CHECK(cities.is_undefined());
+    cities.reserve(10);  // still undefined, storage is still unallocated
+    BOOST_CHECK(cities.is_undefined());
+    BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.size() == 0);
+
+    cities.add("Toronto");  // becomes a json array, storage for 10 elements is allocated, size is 1
+    BOOST_CHECK(cities.is_array());
+    BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.size() == 1);
+    cities.add("Vancouver");
+    cities.add(0,"Montreal");
+    BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.size() == 3);
+}
+
 BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
 	std::cout << "!!!Test one dim array" <<std::endl;

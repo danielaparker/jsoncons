@@ -331,6 +331,10 @@ void basic_csv_reader<Char>::read_array_of_arrays()
             column_ = 0;
         }
 
+        if (c == field_delimiter_)
+        {
+            skip_ch();
+        }
         if (column_ == 0) // Just got newline
         {
             if (stack_.back().array_begun_)
@@ -348,10 +352,6 @@ void basic_csv_reader<Char>::read_array_of_arrays()
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             ignore_single_line_comment();
-        }
-        else if (c == field_delimiter_)
-        {
-            handler_.value("",*this);
         }
         else
         {
@@ -428,27 +428,48 @@ void basic_csv_reader<Char>::read_array_of_objects()
             ++line_;
             column_ = 0;
         }
-        if (stack_.size() > 0)
+        if (c == field_delimiter_)
         {
-            if (column_ == 0) // Just got newline
+            skip_ch();
+        }
+        if (column_ == 0) // Just got newline
+        {
+            if (stack_.back().array_begun_)
             {
-                if (stack_.back().array_begun_)
-                {
-                    handler_.end_object(*this);
-                }
-                stack_.pop_back();
-                stack_.push_back(stack_item());
-                ++row_index;
-                column_index = 0;
+                handler_.end_object(*this);
             }
-            //else if (c == field_delimiter_)
-            //{
-                //handler_.name(header[column_index],*this);
-                //handler_.value("",*this);
-            //}
-            else if (c == quote_char_)
+            stack_.pop_back();
+            stack_.push_back(stack_item());
+            ++row_index;
+            column_index = 0;
+        }
+        else if (c == quote_char_)
+        {
+            parse_quoted_string();
+            if (!stack_.back().array_begun_)
             {
-                parse_quoted_string();
+                minimum_structure_capacity_ = header.size();
+                handler_.begin_object(*this);
+                minimum_structure_capacity_ = 0;
+                stack_.back().array_begun_ = true;
+            }
+            if (column_index < header.size())
+            {
+                handler_.name(header[column_index],*this);
+                handler_.value(string_buffer_,*this);
+            }
+            ++column_index;
+        }
+        else
+        {
+            unread_last_ch();
+            parse_string();
+            if (row_index == 0)
+            {
+                header.push_back(string_buffer_);
+            }
+            else
+            {
                 if (!stack_.back().array_begun_)
                 {
                     minimum_structure_capacity_ = header.size();
@@ -461,34 +482,10 @@ void basic_csv_reader<Char>::read_array_of_objects()
                     handler_.name(header[column_index],*this);
                     handler_.value(string_buffer_,*this);
                 }
-                ++column_index;
             }
-            else
-            {
-                unread_last_ch();
-                parse_string();
-                if (row_index == 0)
-                {
-                    header.push_back(string_buffer_);
-                }
-                else
-                {
-                    if (!stack_.back().array_begun_)
-                    {
-                        minimum_structure_capacity_ = header.size();
-                        handler_.begin_object(*this);
-                        minimum_structure_capacity_ = 0;
-                        stack_.back().array_begun_ = true;
-                    }
-                    if (column_index < header.size())
-                    {
-                        handler_.name(header[column_index],*this);
-                        handler_.value(string_buffer_,*this);
-                    }
-                }
-                ++column_index;
-            }
+            ++column_index;
         }
+        
     }
 
     if (stack_.size() > 1)
@@ -528,6 +525,7 @@ void basic_csv_reader<Char>::parse_string()
         else if (c == field_delimiter_)
         {
             done = true;
+            unread_last_ch();
         }
         else 
         {
@@ -588,6 +586,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
         else if (c == field_delimiter_)
         {
             done = true;
+            unread_last_ch();
         }
     }
 }
