@@ -82,10 +82,6 @@ public:
         return new json_array(elements_);
     }
 
-    ~json_array()
-    {
-    }
-
     size_t size() const {return elements_.size();}
 
     size_t capacity() const {return elements_.capacity();}
@@ -105,7 +101,13 @@ public:
 
     const basic_json<Char>& at(size_t i) const {return elements_[i];}
 
-    void push_back(basic_json<Char> value);
+    void push_back(basic_json<Char>&& value);
+
+    void push_back(const basic_json<Char>& value);
+
+    void add(size_t index, basic_json<Char>&& value);
+
+    void add(size_t index, const basic_json<Char>& value);
 
     iterator begin() {return elements_.begin();}
 
@@ -155,10 +157,6 @@ public:
     {
     }
 
-    ~json_object()
-    {
-    }
-
     json_object<Char>* clone() 
     {
         return new json_object(members_);
@@ -204,7 +202,12 @@ public:
 
     void insert(const_iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member);
 
-    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>> member)
+    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>>&& member)
+    {
+        members_.push_back(member);
+    }
+
+    void push_back(const std::pair<std::basic_string<Char>,basic_json<Char>>& member)
     {
         members_.push_back(member);
     }
@@ -240,9 +243,29 @@ public:
 };
 
 template <class Char>
-void json_array<Char>::push_back(basic_json<Char> value)
+void json_array<Char>::push_back(basic_json<Char>&& value)
 {
     elements_.push_back(value);
+}
+
+template <class Char>
+void json_array<Char>::push_back(const basic_json<Char>& value)
+{
+    elements_.push_back(value);
+}
+
+template <class Char>
+void json_array<Char>::add(size_t index, basic_json<Char>&& value)
+{
+    json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+    elements_.insert(position, value);
+}
+
+template <class Char>
+void json_array<Char>::add(size_t index, const basic_json<Char>& value)
+{
+    json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+    elements_.insert(position, value);
 }
 
 template <class Char>
@@ -322,8 +345,6 @@ typename json_object<Char>::const_iterator json_object<Char>::find(const std::ba
     const_iterator it = std::lower_bound(begin(),end(),name, comp);
     return (it != end() && it->name_ == name) ? it : end();
 }
-
-
 
 }
 

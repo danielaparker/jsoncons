@@ -1,6 +1,6 @@
 Enhancements
 
-- Add support for legacy compilers without move semantics and `long long`
+- Complete support for legacy compilers without move semantics 
 
 - Add support for `basic_json<wchar_t>` (`wjson`), `basic_json_reader<wchar_t>` (`wjson_reader`) etc., initially for 16 bit `wchar_t`
 

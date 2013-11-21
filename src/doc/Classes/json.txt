@@ -158,6 +158,8 @@ Increases the capacity of a json object or array to allow at least `n` members o
 
 ### Accessors
 
+    bool is_undefined() const
+
     bool is_null() const
 
     bool has_member(const std::string& name) const
@@ -250,9 +252,23 @@ Inserts custom data of type `T` into a json object.
     void add(json&& val)
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
 
+    void add(size_t index, const json& val)
+    void add(size_t index, json&& val)
+Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.
+The content of `val` is copied (or moved) to the new element.
+
     template <class T>
-    void add_custom_data(const T& value)
-Adds custom data of type `T` into a json array
+    void add_custom_data(const T& val)
+    template <class T>
+    void add_custom_data(T&& val)
+Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied (or moved) to the new element.
+
+    template <class T>
+    void add_custom_data(size_t index, const T& val)
+    template <class T>
+    void add_custom_data(size_t index, T&& val)
+Adds a new custom data element of type `T` at the specified index of a json array, shifting all elements currently at or above that index to the right.
+The content of `val` is copied (or moved) to the new element.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.

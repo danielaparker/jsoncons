@@ -18,6 +18,8 @@
 #include <cstdarg>
 #include <limits> // std::numeric_limits
 
+#define JSONCONS_NO_MACRO_EXPANSION 
+
 namespace jsoncons {
 
 // Follow boost

@@ -643,7 +643,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max()));
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION()));
                         handler_.value(-d,*this);
                     }
                     catch (const std::exception&)
@@ -668,7 +668,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max());
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXPANSION());
                         handler_.value(d,*this);
                     }
                     catch (const std::exception&)

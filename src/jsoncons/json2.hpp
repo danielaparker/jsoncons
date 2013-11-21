@@ -471,6 +471,30 @@ void basic_json<Char>::add(basic_json<Char>&& value)
 }
 
 template <class Char>
+void basic_json<Char>::add(size_t index, basic_json<Char>&& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->add(index, value);
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->add(index,value);
+        }
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
 void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 {
     switch (type_)
@@ -510,6 +534,31 @@ void basic_json<Char>::add_custom_data(T&& value)
             value_.array_ = new json_array<Char>();
             value_.array_->reserve(reserved);
             value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::add_custom_data(size_t index, T&& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->add(index, basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->add(index, basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
         }
         break;
     default:
@@ -603,6 +652,30 @@ void basic_json<Char>::add(const basic_json<Char>& value)
 }
 
 template <class Char>
+void basic_json<Char>::add(size_t index, const basic_json<Char>& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->add(index,value);
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->add(index,value);
+        }
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
 template <class T>
 void basic_json<Char>::add_custom_data(const T& value)
 {
@@ -610,6 +683,40 @@ void basic_json<Char>::add_custom_data(const T& value)
     {
     case array_t:
         value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
+        break;
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+        }
+    }
+}
+
+template <class Char>
+template <class T>
+void basic_json<Char>::add_custom_data(size_t index, const T& value)
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->add(index,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        break;
+    case undefined_t:
+        {
+            type_ = array_t;
+            size_t reserved = value_.reserved_;
+            value_.array_ = new json_array<Char>();
+            value_.array_->reserve(reserved);
+            value_.array_->add(index, basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        }
         break;
     default:
         {
