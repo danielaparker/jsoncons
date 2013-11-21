@@ -38,11 +38,13 @@ or
     json o;
     o.add(99);
 
-The older notation is still supported, though, and needed if you want to create an empty object or an empty arry.
+The older notation is still supported, though, and still needed if you want to create an empty object or an empty arry.
 
 ### Enhancements
 
 - Added `swap` member function to `json`
+
+- Added `add` and `add_custom_data` overrides to `json` that take an index value, for adding a new element at the specified index and shifting all elements currently at or above that index to the right.
 
 ### New extensions
 

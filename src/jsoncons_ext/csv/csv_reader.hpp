@@ -190,12 +190,9 @@ private:
     void read_array_of_arrays();
     void read_array_of_objects();
 
-    void skip_separator();
     void parse_string();
     void parse_quoted_string();
     void ignore_single_line_comment();
-    void fast_ignore_single_line_comment();
-    void fast_skip_white_space();
 
     void read_data_block()
     {
@@ -223,17 +220,12 @@ private:
         if (buffer_position_ < buffer_length_)
         {
             c = input_buffer_[buffer_position_++];
-            if (c == '\n')
-            {
-                ++line_;
-                column_ = 0;
-            }
-            ++column_;
         }
         else
         {
             buffer_position_++;
         }
+        ++column_;
 
         return c;
     }
@@ -258,17 +250,12 @@ private:
         read_ch();
     }
 
-    void unread_ch(Char ch)
+    void unread_last_ch()
     {
         if (buffer_position_ > 0)
         {
             --buffer_position_;
             --column_;
-            if (ch == '\n')
-            {
-                --line_;
-                column_ = 0;
-            }
         }
     }
 
@@ -330,32 +317,44 @@ void basic_csv_reader<Char>::read_array_of_arrays()
         {
             continue;
         }
-        switch (c)
+
+        // Check new line
+        if (c == '\r' && peek() == '\n')
         {
-        case '\n':
+            skip_ch();
+            ++line_;
+            column_ = 0;
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            ++line_;
+            column_ = 0;
+        }
+
+        if (column_ == 0) // Just got newline
+        {
             if (stack_.back().array_begun_)
             {
                 handler_.end_array(*this);
             }
             stack_.pop_back();
             stack_.push_back(stack_item());
-            break;
-        case '\r':
-            continue;
-        default:
-            if (column_ == 1 && c == comment_symbol_)
+        }
+        else if (column_ == 1 && c == comment_symbol_)
+        {
+            skip_ch();
+            if (eof())
             {
-                skip_ch();
-                if (eof())
-                {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                }
-                ignore_single_line_comment();
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
-            else if (c == field_delimiter_)
-            {
-                c = read_ch();
-            }
+            ignore_single_line_comment();
+        }
+        else if (c == field_delimiter_)
+        {
+            handler_.value("",*this);
+        }
+        else
+        {
             if (stack_.size() > 0)
             {
                 if (line_ == 1)
@@ -376,7 +375,7 @@ void basic_csv_reader<Char>::read_array_of_arrays()
                 }
                 else
                 {
-                    unread_ch(c);
+                    unread_last_ch();
                     parse_string();
                     if (!stack_.back().array_begun_)
                     {
@@ -416,39 +415,64 @@ void basic_csv_reader<Char>::read_array_of_objects()
         {
             continue;
         }
-        switch (c)
+
+        // Check new line
+        if (c == '\r' && peek() == '\n')
         {
-        case '\n':
-            ++row_index;
-            column_index = 0;
-            if (stack_.back().array_begun_)
+            skip_ch();
+            ++line_;
+            column_ = 0;
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            ++line_;
+            column_ = 0;
+        }
+        if (stack_.size() > 0)
+        {
+            if (column_ == 0) // Just got newline
             {
-                handler_.end_object(*this);
-            }
-            stack_.pop_back();
-            stack_.push_back(stack_item());
-            break;
-        case '\r':
-            continue;
-        default:
-            if (column_ == 1 && c == comment_symbol_)
-            {
-                skip_ch();
-                if (eof())
+                if (stack_.back().array_begun_)
                 {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                    handler_.end_object(*this);
                 }
-                ignore_single_line_comment();
+                stack_.pop_back();
+                stack_.push_back(stack_item());
+                ++row_index;
+                column_index = 0;
             }
-            else if (stack_.size() > 0)
+            //else if (c == field_delimiter_)
+            //{
+                //handler_.name(header[column_index],*this);
+                //handler_.value("",*this);
+            //}
+            else if (c == quote_char_)
             {
-                if (c == field_delimiter_)
+                parse_quoted_string();
+                if (!stack_.back().array_begun_)
                 {
-                    c = read_ch();
+                    minimum_structure_capacity_ = header.size();
+                    handler_.begin_object(*this);
+                    minimum_structure_capacity_ = 0;
+                    stack_.back().array_begun_ = true;
                 }
-                if (c == quote_char_)
+                if (column_index < header.size())
                 {
-                    parse_quoted_string();
+                    handler_.name(header[column_index],*this);
+                    handler_.value(string_buffer_,*this);
+                }
+                ++column_index;
+            }
+            else
+            {
+                unread_last_ch();
+                parse_string();
+                if (row_index == 0)
+                {
+                    header.push_back(string_buffer_);
+                }
+                else
+                {
                     if (!stack_.back().array_begun_)
                     {
                         minimum_structure_capacity_ = header.size();
@@ -462,31 +486,7 @@ void basic_csv_reader<Char>::read_array_of_objects()
                         handler_.value(string_buffer_,*this);
                     }
                 }
-                else
-                {
-                    unread_ch(c);
-                    parse_string();
-                    if (row_index == 0)
-                    {
-                        header.push_back(string_buffer_);
-                    }
-                    else
-                    {
-                        if (!stack_.back().array_begun_)
-                        {
-                            minimum_structure_capacity_ = header.size();
-                            handler_.begin_object(*this);
-                            minimum_structure_capacity_ = 0;
-                            stack_.back().array_begun_ = true;
-                        }
-                        if (column_index < header.size())
-                        {
-                            handler_.name(header[column_index],*this);
-                            handler_.value(string_buffer_,*this);
-                        }
-						++column_index;
-                    }
-                }
+                ++column_index;
             }
         }
     }
@@ -502,50 +502,9 @@ void basic_csv_reader<Char>::read_array_of_objects()
 }
 
 template<class Char>
-void basic_csv_reader<Char>::skip_separator()
-{
-    while (!eof())
-    {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF, expected :", *this);
-        }
-        switch (c)
-        {
-        case '\n':
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
-            fast_skip_white_space();
-            continue;
-        default:
-            if (c == comment_symbol_)
-            {
-                skip_ch();
-                if (eof())
-                {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                }
-                ignore_single_line_comment();
-            }
-            else
-            {
-                err_handler_.fatal_error("JPE106", "Expected :", *this);
-            }
-        }
-    }
-
-    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-}
-
-template<class Char>
 void basic_csv_reader<Char>::parse_string()
 {
     string_buffer_.clear();
-    //std::cout << "start string" << std::endl;
 
     bool done = false;
     while (!done)
@@ -555,13 +514,20 @@ void basic_csv_reader<Char>::parse_string()
         {
             done = true;
         }
-        else if (c == '\r')
-        {
-        }
-        else if (c == field_delimiter_ || c == '\n')
+        // Check new line
+        if (c == '\r' && peek() == '\n')
         {
             done = true;
-            unread_ch(c);
+            unread_last_ch();
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            done = true;
+            unread_last_ch();
+        }
+        else if (c == field_delimiter_)
+        {
+            done = true;
         }
         else 
         {
@@ -608,10 +574,20 @@ void basic_csv_reader<Char>::parse_quoted_string()
         {
             done = true;
         }
-        else if (c == field_delimiter_ || c == '\n')
+        // Check new line
+        if (c == '\r' && peek() == '\n')
         {
             done = true;
-            unread_ch(c);
+            unread_last_ch();
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            done = true;
+            unread_last_ch();
+        }
+        else if (c == field_delimiter_)
+        {
+            done = true;
         }
     }
 }
@@ -625,54 +601,26 @@ void basic_csv_reader<Char>::ignore_single_line_comment()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            done = true;
         }
-        if (c == '\n')
+        // Check new line
+        if (c == '\r' && peek() == '\n')
         {
             done = true;
-            break;
+            unread_last_ch();
         }
-    }
-}
-
-template<class Char>
-void basic_csv_reader<Char>::fast_ignore_single_line_comment()
-{
-    while (buffer_position_ < buffer_length_)
-    {
-        if (input_buffer_[buffer_position_] == '\n')
+        else if (c == '\n' || c == '\r')
         {
-            break;
-        }
-        ++buffer_position_;
-        ++column_;
-    }
-}
-
-template<class Char>
-void basic_csv_reader<Char>::fast_skip_white_space()
-{
-    bool done = false;
-    while (!done && buffer_position_ < buffer_length_)
-    {
-        switch (input_buffer_[buffer_position_])
-        {
-        case '\n':
-            ++line_;
-            column_ = 0;
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
-            ++buffer_position_;
-            ++column_;
-            break;
-        default:
             done = true;
-            break;
+            unread_last_ch();
+        }
+        else if (c == field_delimiter_)
+        {
+            done = true;
+            unread_last_ch();
         }
     }
+    
 }
 
 typedef basic_csv_reader<char> csv_reader;

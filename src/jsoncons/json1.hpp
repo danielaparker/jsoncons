@@ -332,10 +332,21 @@ public:
             val_.get(name_).add(value);
         }
 
+        void add(size_t index, basic_json<Char>&& value)
+        {
+            val_.get(name_).add(index, value);
+        }
+       
         template <class T>
         void add_custom_data(T&& value)
         {
             val_.get(name_).add_custom_data(value);
+        }
+
+        template <class T>
+        void add_custom_data(size_t index, T&& value)
+        {
+            val_.get(name_).add_custom_data(index, value);
         }
 
         template <class T>
@@ -355,10 +366,21 @@ public:
             val_.get(name_).add(value);
         }
 
+        void add(size_t index, const basic_json<Char>& value)
+        {
+            val_.get(name_).add(index, value);
+        }
+
         template <class T>
         void add_custom_data(const T& value)
         {
             val_.get(name_).add_custom_data(value);
+        }
+
+        template <class T>
+        void add_custom_data(size_t index, const T& value)
+        {
+            val_.get(name_).add_custom_data(index, value);
         }
 
         std::basic_string<Char> to_string() const
@@ -625,11 +647,16 @@ public:
 
     void add(basic_json<Char>&& value);
 
+    void add(size_t index, basic_json<Char>&& value);
+
     template <class T>
     void set_custom_data(std::basic_string<Char>&& name, T&& value);
 
     template <class T>
     void add_custom_data(T&& value);
+
+    template <class T>
+    void add_custom_data(size_t index, T&& value);
 
 #endif
 
@@ -638,8 +665,13 @@ public:
 
     void add(const basic_json<Char>& value);
 
+    void add(size_t index, const basic_json<Char>& value);
+
     template <class T>
     void add_custom_data(const T& value);
+
+    template <class T>
+    void add_custom_data(size_t index, const T& value);
 
     value_type type() const
     {

@@ -20,10 +20,6 @@
 #include "jsoncons/error_handler.hpp"
 #include "jsoncons/json_exception.hpp"
 
-#ifdef max
-#undef max
-#endif
-
 namespace jsoncons {
 
 template<class Char>
@@ -725,7 +721,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max()));
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION()));
                         handler_.value(-d, *this);
                     }
                     catch (const std::exception&)
@@ -750,7 +746,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max());
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXPANSION());
                         handler_.value(d, *this);
                     }
                     catch (const std::exception&)
