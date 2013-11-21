@@ -46,6 +46,8 @@ The older notation is still supported, though, and still needed if you want to c
 
 - Added `add` and `add_custom_data` overrides to `json` that take an index value, for adding a new element at the specified index and shifting all elements currently at or above that index to the right.
 
+- Added `is_undefined` and `capacity` member functions to `json`
+
 ### New extensions
 
 - `csv_serializer` has been added to the `csv` extension

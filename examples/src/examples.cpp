@@ -3,6 +3,7 @@
 
 #include <string>
 #include "jsoncons/json.hpp"
+#include "array_examples.h"
 
 using jsoncons::json;
 using jsoncons::pretty_print;
@@ -78,7 +79,7 @@ void second_example_a()
 {
     try
     {
-        json books(json::an_array);
+        json books;
 
         {
             json book;
@@ -118,6 +119,10 @@ int main()
     first_example_c();
 
     second_example_a();
+
+    add_element_to_undefined();
+    add_element_to_array();
+    reserve_array_capacity();
     return 0;
 }
 
