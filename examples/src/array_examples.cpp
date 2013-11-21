@@ -42,7 +42,7 @@ void reserve_array_capacity()
     cities.add(0,"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
-    std::cout << pretty_print(cities) << std::endl;
+    std::cout << cities << std::endl;
 }
 
 

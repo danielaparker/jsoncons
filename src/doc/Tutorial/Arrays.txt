@@ -35,6 +35,25 @@ The output is
     []
     ["Montreal","Toronto","Vancouver"]
 
+### Creating an array of elements with reserved storage (initial value is undefined)
+
+    json cities;  // undefined
+    cities.reserve(10);  // still undefined, storage is still unallocated
+    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
+
+    cities.add("Toronto");  // becomes a json array, storage for 10 elements is allocated, size is 1
+    cities.add("Vancouver");
+    cities.add(0,"Montreal");
+    std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
+
+    std::cout << cities << std::endl;
+
+The output is
+
+    capacity=10, size=0
+    capacity=10, size=3
+    ["Montreal","Toronto","Vancouver"]
+
 ### Making a one dimensional array of size 10 initialized with zeros
 
     json a = json::make_array(10,0);
