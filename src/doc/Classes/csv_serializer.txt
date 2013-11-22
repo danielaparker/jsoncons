@@ -77,7 +77,7 @@ Note
 
 - The third array element has a value that contains a comma, in the CSV file this value will be quoted.
 
-#### Reading the comma delimited file with csv_serializer
+#### Serializing the comma delimited file with csv_serializer
 
     std::string in_file = "input/countries.json";
     std::ifstream is(in_file);
