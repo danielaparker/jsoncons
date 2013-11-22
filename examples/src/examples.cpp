@@ -4,6 +4,7 @@
 #include <string>
 #include "jsoncons/json.hpp"
 #include "array_examples.h"
+#include "csv_examples.h"
 
 using jsoncons::json;
 using jsoncons::pretty_print;
@@ -123,6 +124,13 @@ int main()
     add_element_to_undefined();
     add_element_to_array();
     reserve_array_capacity();
+    make_1_dimensional_array();
+    make_2_dimensional_array();
+    make_3_dimensional_array();
+
+    read_csv_file();
+    write_csv_file();
+
     return 0;
 }
 

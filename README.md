@@ -38,7 +38,7 @@ or
     json o;
     o.add(99);
 
-The older notation is still supported, though, and still needed if you want to create an empty object or an empty arry.
+The older notation is still supported, though, and still needed if you want to create an empty object or an empty arry (see the Arrays tutorial for an example.)
 
 ### Enhancements
 

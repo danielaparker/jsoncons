@@ -65,9 +65,9 @@ The output is
 
     [0,1,2,0,0,0,0,0,0,0]
 
-### Making a two dimensional array of size 10x8 initialized with zeros
+### Making a two dimensional array of size 3x4 initialized with zeros
 
-    json a = json::make_2d_array(10,8,0);
+    json a = json::make_2d_array(3,4,0);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
 	a[0][2] = "25-d-MS";
