@@ -80,10 +80,10 @@ void second_example_a()
 {
     try
     {
-        json books;
+        json books(json::an_array);
 
         {
-            json book;
+            json book(json::an_object);
             book["title"] = "Kafka on the Shore";
             book["author"] = "Haruki Murakami";
             book["price"] = 25.17;
@@ -91,7 +91,7 @@ void second_example_a()
         }
 
         {
-            json book;
+            json book(json::an_object);
             book["title"] = "Women: A Novel";
             book["author"] = "Charles Bukowski";
             book["price"] = 12.00;
@@ -99,7 +99,7 @@ void second_example_a()
         }
 
         {
-            json book;
+            json book(json::an_object);
             book["title"] = "Cutter's Way";
             book["author"] = "Ivan Passer";
             books.add(std::move(book));
@@ -121,7 +121,6 @@ int main()
 
     second_example_a();
 
-    add_element_to_undefined();
     add_element_to_array();
     reserve_array_capacity();
     make_1_dimensional_array();
