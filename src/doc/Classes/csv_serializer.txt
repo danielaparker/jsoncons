@@ -145,7 +145,7 @@ Note
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params;
+    json params(json::an_object);
     params["field_delimiter"] = "\t";
 
     json_reader reader(is,handler);

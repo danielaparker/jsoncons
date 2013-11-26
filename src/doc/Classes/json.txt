@@ -158,8 +158,6 @@ Increases the capacity of a json object or array to allow at least `n` members o
 
 ### Accessors
 
-    bool is_undefined() const
-
     bool is_null() const
 
     bool has_member(const std::string& name) const
@@ -310,7 +308,7 @@ Exchanges the values of `a` and `b`
 
 ### Accessors and defaults
 
-    json objjson();
+    json obj(json::an_object);
 
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
@@ -335,7 +333,7 @@ The output is
 
 ### Nulls
 
-    json objjson();
+    json obj(json::an_object);
     obj["field1"] = json::null;
     obj["field2"] = json();
     std::cout << obj << std::endl;
@@ -374,7 +372,7 @@ The output is
 
 ### Object iterator
 
-    json objjson();
+    json obj(json::an_object);
     obj["city"] = "Toronto";
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
@@ -410,16 +408,16 @@ The output is
 
 ### Constructing json structures
 
-	json root;
+	json root(json::an_array);
 
     root["persons"] = json(json::an_array);
 
-    json person;
+    json person(json::an_object);
     person["first_name"] = "John";
     person["last_name"] = "Smith";
     person["birth_date"] = "1972-01-30";
     
-    json address;
+    json address(json::an_object);
     address["city"] = "Toronto";
     address["country"] = "Canada";
     
@@ -449,7 +447,7 @@ The output is
 
 ### Default NaN, inf and -inf replacement
 
-    json obj;
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -461,7 +459,7 @@ The output is
 
 ### Custom NaN, inf and -inf replacement
 
-    json obj;
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -480,7 +478,7 @@ The output is
 
 ### Suppressing NaN, inf and -inf replacement
 
-    json obj;
+    json obj(json::an_object);
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;

@@ -14,44 +14,17 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.60a
 -------------
 
-Release 0.60 introduced a bug with the `undefined` value, which could result in undefined behaviour. This has been fixed.
+Release 0.60 introduced a bug, which could result in undefined behaviour. This has been fixed in 0.60a.
 
-Release 0.60
-------------
+(0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this has been fixed in 0.60a, but documentation of the feature has been removed and this feature itself will be removed in a subsequent release as adding no real value.)
 
-### Changes
-
-- The default constructor now constructs an `undefined` value rather than a `null` object. The type will be fixed to an object or array with the first operation that sets an object member or adds an array element. 
-
-In practice this means that instead of writing
-
-    json o(json::an_object);
-    o["field1"] = 99;
-
-or
-
-    json o(json::an_array);
-    o.add(99);
-
-you can simply write 
-
-    json o;
-    o["field1"] = 99;
-
-or
-
-    json o;
-    o.add(99);
-
-The older notation is still supported, though, and still needed if you want to create an empty object or an empty arry (see the Arrays tutorial for an example.)
-
-### Enhancements
+### 0.60 Enhancements
 
 - Added `swap` member function to `json`
 
 - Added `add` and `add_custom_data` overrides to `json` that take an index value, for adding a new element at the specified index and shifting all elements currently at or above that index to the right.
 
-- Added `is_undefined` and `capacity` member functions to `json`
+- Added `capacity` member functions to `json`
 
 ### New extensions
 
