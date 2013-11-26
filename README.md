@@ -11,12 +11,12 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
-Release 0.60a
+Release 0.60b
 -------------
 
-Release 0.60 introduced a bug, which could result in undefined behaviour. This has been fixed in 0.60a.
+This release (0.60b) is fully backwards compatible with 0.50.
 
-(0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this has been fixed in 0.60a, but documentation of the feature has been removed and this feature itself will be removed in the next release as adding complexity but no real value.)
+A change introduced with 0.60 has been reversed. 0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this was fixed in 0.60a, but this feature and related documentation has been removed because it added complexity but no real value.
 
 ### 0.60 Enhancements
 
@@ -26,7 +26,7 @@ Release 0.60 introduced a bug, which could result in undefined behaviour. This h
 
 - Added `capacity` member functions to `json`
 
-### New extensions
+### 0.60  extensions
 
 - `csv_serializer` has been added to the `csv` extension
 

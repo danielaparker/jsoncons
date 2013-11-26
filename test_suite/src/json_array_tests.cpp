@@ -21,10 +21,9 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 {
-    json arr;
-    BOOST_CHECK(arr.is_undefined());
-    arr.add("Toronto");
+    json arr(json::an_array);
     BOOST_CHECK(arr.is_array());
+    arr.add("Toronto");
     arr.add("Vancouver");
     arr.add(0,"Montreal");
 
@@ -37,10 +36,9 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
-    json cities; 
-    BOOST_CHECK(cities.is_undefined());
-    cities.reserve(10);  // still undefined, storage is still unallocated
-    BOOST_CHECK(cities.is_undefined());
+    json cities(json::an_array); 
+    BOOST_CHECK(cities.is_array());
+    cities.reserve(10);  // storage is allocated
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 

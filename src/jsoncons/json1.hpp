@@ -78,7 +78,7 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
 class json_base
 {
 public:
-    enum value_type {undefined_t,object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
+    enum value_type {object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
 };
 
 template <class Char>
@@ -129,11 +129,6 @@ public:
         void reserve(size_t n)
         {
             val_.get(name_).reserve(n);
-        }
-
-        bool is_undefined() const
-        {
-            return val_.get(name_).is_undefined();
         }
 
         bool is_string() const
@@ -567,11 +562,6 @@ public:
         return type_ == bool_t;
     }
 
-    bool is_undefined() const
-    {
-        return type_ == undefined_t;
-    }
-
     bool is_object() const
     {
         return type_ == object_t;
@@ -713,7 +703,6 @@ private:
 	value_type type_;
     union
     {
-        size_t reserved_; // For undefined_t
         double double_value_;
         long long longlong_value_;
         unsigned long long ulonglong_value_;

@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\src\csv_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\json_undefined_tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\my_custom_data.hpp">

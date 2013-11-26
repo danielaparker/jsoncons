@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\array_examples.cpp" />
+    <ClCompile Include="..\..\src\csv_examples.cpp" />
     <ClCompile Include="..\..\src\examples.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
