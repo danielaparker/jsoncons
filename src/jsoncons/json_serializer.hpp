@@ -177,6 +177,7 @@ public:
         }
         else if (format_.truncate_trailing_zeros_notation())
         {
+
             char buffer[32];
             int len = c99_snprintf(buffer, 32, "%#.*g", format_.precision(), value);
             while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')

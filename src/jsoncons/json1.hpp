@@ -683,26 +683,24 @@ public:
     void swap(basic_json<Char>& b)
     {
         using std::swap;
-        swap(type_,b.type_);
 
-        switch (b.type_)
+        /*switch (type_)
         {
         case null_t:
-        case undefined_t:
-            value_ = b.value_;
             break;
         default:
-            switch (type_)
+            switch (b.type_)
             {
             case null_t:
-            case undefined_t:
                 b.value_ = value_;
                 break;
             default:
                 swap(value_,b.value_);
                 break;
             }
-        }
+        }*/
+        swap(type_,b.type_);
+        swap(value_,b.value_);
     }
 
     friend void swap(basic_json<Char>& a, basic_json<Char>& b)

@@ -92,3 +92,19 @@ BOOST_AUTO_TEST_CASE(test_undefined_serialization)
 
     BOOST_CHECK(os.str().length() == 0);
 }
+
+BOOST_AUTO_TEST_CASE(test_serialize_undefined_member)
+{
+    std::ostringstream os;
+
+    json root;
+    root["field1"] = json();
+    BOOST_CHECK(root.is_object());
+    BOOST_CHECK(root["field1"].is_undefined());
+
+    std::cout << root << std::endl;
+    os << root;
+
+    BOOST_CHECK(os.str() == std::string("{}"));
+}
+

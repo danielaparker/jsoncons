@@ -60,9 +60,9 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     type_ = val.type_;
     switch (type_)
     {
-    case undefined_t:
     case null_t:
         break;
+    case undefined_t:
     case double_t:
     case long_long_t:
     case ulong_long_t:
