@@ -3,21 +3,7 @@
     using jsoncons::json;
     using jsoncons::pretty_print;
 
-### Creating an array of elements (initial value is undefined)
-
-    json cities;  // undefined
-
-    cities.add("Toronto");  // becomes a json array
-    cities.add("Vancouver");
-    cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
-
-    std::cout << cities << std::endl;
-
-The output is
-
-    ["Montreal","Toronto","Vancouver"]
-
-### Creating an array of elements (initial value is a json array)
+### Creating an array of elements 
 
     json cities(json::an_array);  // an array
     std::cout << cities << std::endl;  // output is "[]"
@@ -33,10 +19,10 @@ The output is
     []
     ["Montreal","Toronto","Vancouver"]
 
-### Creating an array of elements with reserved storage (initial value is undefined)
+### Creating an array of elements with reserved storage 
 
-    json cities;  // undefined
-    cities.reserve(10);  // still undefined, storage is still unallocated
+    json cities(json::an_array);  
+    cities.reserve(10);  // storage is reserved
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
     cities.add("Toronto");  // becomes a json array, storage for 10 elements is allocated, size is 1

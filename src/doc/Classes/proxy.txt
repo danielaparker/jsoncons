@@ -16,8 +16,6 @@ Increases the capacity of a json object or array to allow at least `n` members o
 
 ### Accessors
 
-    bool is_undefined() const
-
     bool is_null() const
 
     bool has_member(const std::string& name) const
