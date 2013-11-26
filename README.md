@@ -11,12 +11,17 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.60a
+-------------
+
+Release 0.60 introduced a bug with the `undefined` value, which could result in undefined behaviour. This has been fixed.
+
 Release 0.60
 ------------
 
 ### Changes
 
-- The default constructor now constructs an `undefined` value rather than a `null` object. The type will be fixed to an object or array with the first operation that sets an object member or adds an array element. Values left undefined are excluded during serialization.
+- The default constructor now constructs an `undefined` value rather than a `null` object. The type will be fixed to an object or array with the first operation that sets an object member or adds an array element. 
 
 In practice this means that instead of writing
 
