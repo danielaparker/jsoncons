@@ -6,7 +6,6 @@
 ### Creating an array of elements (initial value is undefined)
 
     json cities;  // undefined
-    std::cout << cities << std::endl;  // no output 
 
     cities.add("Toronto");  // becomes a json array
     cities.add("Vancouver");
@@ -15,7 +14,6 @@
     std::cout << cities << std::endl;
 
 The output is
-
 
     ["Montreal","Toronto","Vancouver"]
 
