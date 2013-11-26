@@ -815,6 +815,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
 		}
         break;
     case undefined_t:
+        handler.null_value(); // for now
         break;
     case array_t:
 		{
