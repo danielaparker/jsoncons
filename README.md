@@ -16,7 +16,7 @@ Release 0.60a
 
 Release 0.60 introduced a bug, which could result in undefined behaviour. This has been fixed in 0.60a.
 
-(0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this has been fixed in 0.60a, but documentation of the feature has been removed and this feature itself will be removed in a subsequent release as adding no real value.)
+(0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this has been fixed in 0.60a, but documentation of the feature has been removed and this feature itself will be removed in the next release as adding complexity but no real value.)
 
 ### 0.60 Enhancements
 
