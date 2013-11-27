@@ -25,7 +25,7 @@ The output is
     cities.reserve(10);  // storage is reserved
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
-    cities.add("Toronto");  // becomes a json array, storage for 10 elements is allocated, size is 1
+    cities.add("Toronto");  
     cities.add("Vancouver");
     cities.add(0,"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
