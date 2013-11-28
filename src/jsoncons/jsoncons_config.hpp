@@ -91,5 +91,103 @@ inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
 
 #endif
 
+#ifdef _MSC_VER
+template <class Char>
+std::basic_string<Char> double_to_string(double val, size_t precision)
+{
+    std::basic_string<Char> s;
+	char buf[_CVTBUFSIZE];
+    int decimal = 0;
+    int sign = 0;
+
+    int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal, &sign);
+    if (err != 0)
+    {
+        throw std::exception("Failed attempting double to string conversion");
+    }
+    if (sign != 0)
+    {
+        s.push_back('-');
+    }
+
+    int len = std::strlen(buf);
+
+    while (len >= 2 && buf[len - 1] == '0' && (len - 1) != decimal)
+    {
+        --len;
+    }
+
+    if (decimal == 0)
+    {
+        s.push_back('0');
+        s.push_back('.');
+    }
+    s.push_back(buf[0]);
+	for (int i = 1; i < len; ++i)
+	{
+        if (i == decimal)
+        {
+            s.push_back('.');
+        }
+		s.push_back(buf[i]);
+	}
+    if (decimal < 0 || decimal > len)
+    {
+        s.push_back('.');
+        s.push_back('0');
+        s.push_back('e');
+        if (decimal > len)
+        {
+            s.push_back('+');
+        }
+        int n = decimal - len;
+        char b[32];
+        int err2 = _itoa_s(n,b,32,10);
+        if (err2 != 0)
+        {
+            throw std::exception("Failed attempting double to string conversion");
+        }
+        int m = std::strlen(b);
+        for (int i = 0; i < m; ++i)
+        {
+            s.push_back(b[i]);
+        }
+    }
+	return s;
 }
+#else
+template <class Char>
+std::basic_string<Char> double_to_string(double val, size_t precision)
+{
+    std::basic_ostringstream<Char> os;
+    std::locale mylocale("C");
+    os.imbue(mylocale);
+    os << std::showpoint << std::setprecision(precision) << val;
+    std::basic_string<Char> s = os.str();
+
+    std::basic_string<Char>::size_type exp_pos= s.find('e');
+    std::basic_string<Char> exp;
+    if (exp_pos != std::basic_string<Char>::npos)
+    {
+        exp = s.substr(exp_pos);
+        s.erase(exp_pos);
+    }
+
+    int len = s.size();
+    while (len >= 2 && s[len - 1] == '0' && s[len - 2] != '.')
+    {
+        --len;
+    }
+    s.erase(len);
+    if (exp_pos != std::basic_string<Char>::npos)
+    {
+        s.append(exp);
+    }
+
+    return s;
+}
+#endif
+
+}
+
 #endif
