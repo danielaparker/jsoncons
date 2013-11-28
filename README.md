@@ -11,6 +11,11 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.70
+-------------
+
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid `json` output when running on a locale like German or Spanish. Default double to string conversion is now performed by the method `double_to_string`, which is defined in `jsoncons_config.hpp`.
+
 Release 0.60b
 -------------
 
@@ -18,7 +23,7 @@ This release (0.60b) is fully backwards compatible with 0.50.
 
 A change introduced with 0.60 has been reversed. 0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this was fixed in 0.60a, but this feature and related documentation has been removed because it added complexity but no real value.
 
-### 0.60 Enhancements
+### Enhancements
 
 - Added `swap` member function to `json`
 
