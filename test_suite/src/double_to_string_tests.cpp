@@ -49,6 +49,11 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     s = jsoncons::double_to_string<char>(x, 16);
     BOOST_CHECK(s == std::string("1.0"));
 
+    x = 1.1;
+    s = jsoncons::double_to_string<char>(x, 17);
+    std::cout << s << std::endl;
+    BOOST_CHECK(s == std::string("1.1000000000000001"));
+
     x = -1;
     s = jsoncons::double_to_string<char>(x, 16);
     BOOST_CHECK(s == std::string("-1.0"));
