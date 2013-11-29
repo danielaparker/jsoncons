@@ -1,6 +1,10 @@
-Enhancements
+0.70 release
 
-- Complete support for legacy compilers without move semantics 
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid `json` output when running on a locale like German or Spanish. Default double to string conversion is now performed by the method `double_to_string`, which is defined in `jsoncons_config.hpp`.
+
+- Support for legacy compilers without move semantics 
+
+Later releases
 
 - Add support for `basic_json<wchar_t>` (`wjson`), `basic_json_reader<wchar_t>` (`wjson_reader`) etc., initially for 16 bit `wchar_t`
 

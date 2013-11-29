@@ -706,16 +706,18 @@ void basic_json_reader<Char>::parse_number(Char c)
                 unread_last_non_lf_ch();
                 if (has_frac_or_exp)
                 {
-                    const Char *begin = string_buffer_.c_str();
-                    Char *end;
-                    double d = json_char_traits<Char>::string_to_double(begin, &end);
-                    if (end == begin)
+                    try
+                    {
+                        double d = string_to_double(string_buffer_);
+                        if (has_neg)
+                            d = -d;
+                        handler_.value(d,*this);
+                    }
+                    catch (...)
                     {
                         err_handler_.fatal_error("JPE203", "Invalid double value", *this);
+                        handler_.null_value(*this);
                     }
-                    if (has_neg)
-                        d = -d;
-                    handler_.value(d, *this);
                 }
                 else if (has_neg)
                 {
@@ -726,19 +728,15 @@ void basic_json_reader<Char>::parse_number(Char c)
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = string_buffer_.c_str();
-                        Char *end;
-                        double d = json_char_traits<Char>::string_to_double(begin, &end);
-                        if (end == begin)
+                        try
                         {
-                            err_handler_.error("JPE203", "Invalid double value", *this);
-                            handler_.null_value(*this);
+                            double d = string_to_double(string_buffer_);
+                            handler_.value(-d,*this);
                         }
-                        else
+                        catch (...)
                         {
-                            if (has_neg)
-                                d = -d;
-                            handler_.value(d, *this);
+                            err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
+                            handler_.null_value(*this);
                         }
                     }
                 }
@@ -751,18 +749,15 @@ void basic_json_reader<Char>::parse_number(Char c)
                     }
                     catch (const std::exception&)
                     {
-                        const Char *begin = string_buffer_.c_str();
-                        Char *end;
-                        double d = json_char_traits<Char>::string_to_double(begin, &end);
-                        if (end == begin)
+                        try
                         {
-                            err_handler_.error("JPE203", "Invalid double value", *this);
+                            double d = string_to_double(string_buffer_);
+                            handler_.value(d,*this);
                         }
-                        else
+                        catch (...)
                         {
-                            if (has_neg)
-                                d = -d;
-                            handler_.value(d, *this);
+                            err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
+                            handler_.null_value(*this);
                         }
                     }
                 }

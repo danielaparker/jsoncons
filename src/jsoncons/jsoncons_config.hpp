@@ -100,6 +100,11 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     int decimal = 0;
     int sign = 0;
 
+    if (precision >= _CVTBUFSIZE)
+    {
+        precision = _CVTBUFSIZE - 1;
+    }
+
     int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal, &sign);
     if (err != 0)
     {
@@ -110,7 +115,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         s.push_back('-');
     }
 
-    int len = std::strlen(buf);
+    int len = precision;
 
     while (len >= 2 && buf[len - 1] == '0' && (len - 1) != decimal)
     {
@@ -160,10 +165,9 @@ template <class Char>
 std::basic_string<Char> double_to_string(double val, size_t precision)
 {
     std::basic_ostringstream<Char> os;
-    std::locale mylocale("C");
-    os.imbue(mylocale);
+    os.imbue(std::locale::classic());
     os << std::showpoint << std::setprecision(precision) << val;
-    std::basic_string<Char> s = os.str();
+    std::basic_string<Char> s(JSONCONS_MOVE(os.str()));
 
     std::basic_string<Char>::size_type exp_pos= s.find('e');
     std::basic_string<Char> exp;
@@ -185,6 +189,51 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     }
 
     return s;
+}
+#endif
+
+#ifdef _MSC_VER
+inline
+double string_to_double(const std::string& s)
+{
+    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+	const char* begin = &s[0];
+    char* end = const_cast<char*>(begin)+s.size();
+    double val = _strtod_l(begin,&end,locale);
+    if (begin == end)
+    {
+        throw std::exception("Invalid double value");
+    }
+    return val;
+}
+inline
+double string_to_double(const std::wstring& s)
+{
+    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
+
+	const wchar_t* begin = &s[0];
+    wchar_t* end = const_cast<wchar_t*>(begin)+s.size();
+    double val = _wcstod_l(begin,&end,locale);
+    if (begin == end)
+    {
+        throw std::exception("Invalid double value");
+    }
+    return val;
+}
+#else
+template <class Char> inline
+double string_to_double(const std::basic_string<Char>& s)
+{
+    std::basic_stringstream<Char> ss(s); 
+    ss.imbue(std::locale::classic());
+    double val;
+	ss >> val;
+    if (ss.fail())
+    {
+        throw std::exception("Invalid double value");
+    }
+    return val;
 }
 #endif
 
