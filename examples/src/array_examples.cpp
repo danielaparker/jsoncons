@@ -9,6 +9,38 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
+void construct_json_from_vector()
+{
+    json root(json::an_object);
+
+    root["addresses"];
+
+    std::vector<json> addresses;
+    json address1(json::an_object);
+    address1["city"] = json("San Francisco");
+    address1["state"] = json("CA");
+    address1["zip"] = json("94107");
+    address1["country"] = json("USA");
+    addresses.push_back(address1);
+
+    json address2(json::an_object);
+    address2["city"] = json("Sunnyvale");
+    address2["state"] = json("CA");
+    address2["zip"] = json("94085");
+    address2["country"] = json("USA");
+    addresses.push_back(address2);
+
+    root["addresses"] = json(addresses.begin(),addresses.end());
+
+    std::cout << pretty_print(root) << std::endl;
+
+    std::cout << "size=" << root["addresses"].size() << std::endl;
+    for (size_t i = 0; i < root["addresses"].size(); ++i)
+    {
+        std::cout << root["addresses"][i] << std::endl;
+    }
+}
+
 void add_element_to_array()
 {
     json cities(json::an_array);  // an array
@@ -74,4 +106,15 @@ void make_3_dimensional_array()
     std::cout << pretty_print(a) << std::endl;
 }
 
+void run_array_examples()
+{
+    std::cout << "Array examples\n" << std::endl;
+    construct_json_from_vector();
+    add_element_to_array();
+    reserve_array_capacity();
+    make_1_dimensional_array();
+    make_2_dimensional_array();
+    make_3_dimensional_array();
+    std::cout << std::endl;
+}
 

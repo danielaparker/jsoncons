@@ -21,5 +21,26 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_string_to_double)
 {
+    char* begin = "1.15507e-173";
+    char* endptr = begin + strlen(begin);
+    double value1 = 1.15507e-173;
+    double value2 = strtod( begin, &endptr );
+    double value3 = jsoncons::string_to_double(begin);
+
+    BOOST_CHECK(value1 == value2);
+    BOOST_CHECK(value2 == value3);
 }
+
+BOOST_AUTO_TEST_CASE(test_wstring_to_double)
+{
+    wchar_t* begin = L"1.15507e-173";
+    wchar_t* endptr = begin + wcslen(begin);
+    double value1 = 1.15507e-173;
+    double value2 = wcstod( begin, &endptr );
+    double value3 = jsoncons::string_to_double(begin);
+
+    BOOST_CHECK(value1 == value2);
+    BOOST_CHECK(value2 == value3);
+}
+
 

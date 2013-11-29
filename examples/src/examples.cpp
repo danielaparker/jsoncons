@@ -3,13 +3,14 @@
 
 #include <string>
 #include "jsoncons/json.hpp"
-#include "array_examples.h"
 #include "csv_examples.h"
 
 using jsoncons::json;
 using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
+
+void run_array_examples();
 
 void first_example_a()
 {
@@ -121,11 +122,7 @@ int main()
 
     second_example_a();
 
-    add_element_to_array();
-    reserve_array_capacity();
-    make_1_dimensional_array();
-    make_2_dimensional_array();
-    make_3_dimensional_array();
+    run_array_examples();
 
     read_csv_file();
     write_csv_file();

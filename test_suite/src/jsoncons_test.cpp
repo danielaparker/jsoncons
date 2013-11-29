@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE( test1 )
     std::istringstream is("{\"unicode_string_1\":\"\\uD800\\uDC00\"}");
 
     json root = json::parse(is);
-    std::cout << "root type=" << root.type() << std::endl;
+    BOOST_CHECK(root.is_object());
 
     root["double_1"] = json(10.0);
 
@@ -58,12 +58,14 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myarray"] = json::an_array;
 
     json double_2 = root["myobject"]["double_2"];
-    json int_2 = root["myobject"]["double_2"];
 
     BOOST_CHECK_CLOSE(double_2.as_double(), 7.0, 0.000001);
-    BOOST_CHECK_CLOSE(int_2.as_int(), 7.0, 0);
+    BOOST_CHECK(double_2.as_int() == 7);
+    BOOST_CHECK(root["myobject"]["bool_2"].as_bool());
+    BOOST_CHECK(root["myobject"]["int_2"].as_longlong() == 0);
+    BOOST_CHECK(root["myobject"]["string_2"].as_string() == std::string("my string"));
 
-	std::cout << root << std::endl;
+	//std::cout << root << std::endl;
 
     //json double_2_value = root["double_2"];
 
@@ -93,15 +95,8 @@ BOOST_AUTO_TEST_CASE(test_array)
     
     root["addresses"] = json(addresses.begin(),addresses.end());
 
-    std::cout << root << std::endl;
-
     BOOST_CHECK(root["addresses"].size() == 2);
 
-    std::cout << "size=" << root["addresses"].size() << std::endl;
-    for (size_t i = 0; i < root["addresses"].size(); ++i)
-    {
-        std::cout << root["addresses"][i] << std::endl;
-    }
 }
 
 BOOST_AUTO_TEST_CASE(example)

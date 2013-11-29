@@ -2,19 +2,16 @@
 
 The output_format class is an instantiation of the basic_output_format class template that uses char as the character type.
 
+Floating point serialization attempts to produce digits in decimal format. If it cannot, it produces digits in exponential format. By default trailing zeros are removed, except the one immediately after a decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `16`.  
+
 ### Header
 
     #include "jsoncons/output_format.hpp"
 
 ### Member constants
 
-Floating point format | Description | Default precision | Example
--------------      | -------------  | ------------- | ------------- 
-truncate_trailing_zeros      | Truncate trailing zeros but keep one if immediately after a decimal point. Precision means the maximum number of significant digits. | 16 | 0 is written as 0.0         
-fixed | Write floating point values in fixed-point notation. Precision means the number of digits to appear after the decimal point. | 6 | 0 is written as 0.000000 under the default precision
-scientific | Write floating-point values in scientific notation. Precision means the number of digits to appear after the decimal point. | 6 | |             
-
-Floating point formats. The default format is `truncate_trailing_zeros`. This is the preferred format for json serializiation. 
+    default_precision
+The default precision is 16
 
     default_indent
 The default indent is 4
@@ -23,9 +20,6 @@ The default indent is 4
 
     output_format()
 Constructs an `output_format` with default values. 
-
-    output_format(bool indenting)
-Deprecated. Instead use `pretty_print` on [[json]] values, or use `indenting' parameter in [[json_serializer]] constructor 
 
 ### Accessors
 
@@ -105,8 +99,7 @@ Sets replacement text for negative infinity.
 Deprecated.
 
     void precision(size_t prec)
-Deprecated, instead use `set_floating_point_format`
 
     void void fixed_decimal_places(size_t prec)
-Deprecated, instead use `set_floating_point_format`
+Deprecated
 
