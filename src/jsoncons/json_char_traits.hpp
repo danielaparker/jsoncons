@@ -35,11 +35,6 @@ struct json_char_traits<wchar_t>
     static const std::wstring true_literal() {return L"true";};
 
     static const std::wstring false_literal() {return L"false";};
-
-    static const double string_to_double(const wchar_t* str, wchar_t** endptr)
-    {
-        return std::wcstod(str,endptr);
-    }
 };
 
 template <>
@@ -48,11 +43,6 @@ struct json_char_traits<char>
     static size_t cstring_len(const char* s)
     {
         return std::strlen(s);
-    }
-
-    static const double string_to_double(const char* str, char** endptr)
-    {
-        return std::strtod(str,endptr);
     }
 
     static const std::string null_literal() {return "null";};

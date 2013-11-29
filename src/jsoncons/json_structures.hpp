@@ -101,13 +101,24 @@ public:
 
     const basic_json<Char>& at(size_t i) const {return elements_[i];}
 
-    void push_back(basic_json<Char>&& value);
-
     void push_back(const basic_json<Char>& value);
 
-    void add(size_t index, basic_json<Char>&& value);
-
     void add(size_t index, const basic_json<Char>& value);
+
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
+
+    void push_back(basic_json<Char>&& value)
+    {
+        elements_.push_back(value);
+    }
+
+    void add(size_t index, basic_json<Char>&& value)
+    {
+        json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        elements_.insert(position, value);
+    }
+
+#endif
 
     iterator begin() {return elements_.begin();}
 
@@ -188,8 +199,23 @@ public:
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
-    void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
+#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
+    void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
+    {
+        iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
+        if (it != end() && (*it).first == name)
+        {
+            remove(it);
+        }
+        insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
+    }
+
+    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>>&& member)
+    {
+        members_.push_back(member);
+    }
+#endif
     void remove(iterator at); 
 
     basic_json<Char>& get(const std::basic_string<Char>& name);
@@ -201,11 +227,6 @@ public:
     const_iterator find(const std::basic_string<Char>& name) const;
 
     void insert(const_iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member);
-
-    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>>&& member)
-    {
-        members_.push_back(member);
-    }
 
     void push_back(const std::pair<std::basic_string<Char>,basic_json<Char>>& member)
     {
@@ -243,22 +264,9 @@ public:
 };
 
 template <class Char>
-void json_array<Char>::push_back(basic_json<Char>&& value)
-{
-    elements_.push_back(value);
-}
-
-template <class Char>
 void json_array<Char>::push_back(const basic_json<Char>& value)
 {
     elements_.push_back(value);
-}
-
-template <class Char>
-void json_array<Char>::add(size_t index, basic_json<Char>&& value)
-{
-    json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
-    elements_.insert(position, value);
 }
 
 template <class Char>
@@ -288,17 +296,6 @@ void json_object<Char>::remove(iterator at)
 
 template <class Char>
 void json_object<Char>::set(const std::basic_string<Char>& name, const basic_json<Char>& value)
-{
-    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
-    if (it != end() && (*it).first == name)
-    {
-        remove(it);
-    }
-    insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
-}
-
-template <class Char>
-void json_object<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
     if (it != end() && (*it).first == name)
