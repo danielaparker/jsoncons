@@ -2,7 +2,7 @@
 
 The output_format class is an instantiation of the basic_output_format class template that uses char as the character type.
 
-Floating point serialization attempts to produce digits in decimal format. If it cannot, it produces digits in exponential format. By default trailing zeros are removed, except the one immediately after a decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `16`.  
+Floating point serialization attempts to produce digits in decimal format. If it cannot, it produces digits in exponential format. By default trailing zeros are removed, except the one immediately after a decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `16`. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, there will be less space saving from removing trailing zeros, e.g. 1.1 becomes 1.1000000000000001. 
 
 ### Header
 
@@ -27,9 +27,7 @@ Constructs an `output_format` with default values.
 Returns the level of indentation, the default is 4
 
     size_t precision() const 
-Returns the floating-point decimal precision, the default is 16 for the `truncate_trailing_zeros` floating point format, and 17 for `fixed` and `scientific`.
-
-    bool truncate_trailing_zeros_notation() const
+Returns the maximum number of significant digits.
 
     std::ios_base::fmtflags set_format_flags() const
 
@@ -59,18 +57,9 @@ The default is "null"
     std::string neg_inf_replacement() const 
 The default is "null"
 
-    bool indenting() const
-Deprecated. 
-
 ### Modifiers
 
     void indent(size_t value)
-
-    void set_floating_point_format(fp_format format)
-Sets the floating point format using the default precision. Valid values for format are `output_format::truncate_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
-
-    void set_floating_point_format(fp_format format, size_t prec)
-Sets the floating point format and the specified precision. Valid values for format are `output_format::truncate_trailing_zeros`, `output_format::fixed` and `output_format::scientific`.
 
     void set_format_flags(std::ios_base::fmtflags flags)
 
@@ -95,11 +84,21 @@ Sets the floating point format and the specified precision. Valid values for for
     void neg_inf_replacement(const std::string& replacement)
 Sets replacement text for negative infinity.
 
-    void indenting(bool value)
-Deprecated.
-
     void precision(size_t prec)
 
+### Deprecated
+
+    bool indenting() const
+Use the `indenting` parameter on one of the `json_serializer` constructors.
+
     void void fixed_decimal_places(size_t prec)
-Deprecated
+
+    void indenting(bool value)
+
+    void set_floating_point_format(fp_format format)
+
+    void set_floating_point_format(fp_format format, size_t prec)
+Use `precision(prec)` to set the maximum number of significant digits.
+
+    bool truncate_trailing_zeros_notation() const
 

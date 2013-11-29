@@ -146,16 +146,14 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
             s.push_back('+');
         }
         int n = decimal - len;
-        char b[32];
-        int err2 = _itoa_s(n,b,32,10);
+        int err2 = _itoa_s(n,buf,_CVTBUFSIZE,10);
         if (err2 != 0)
         {
             throw std::exception("Failed attempting double to string conversion");
         }
-        int m = std::strlen(b);
-        for (int i = 0; i < m; ++i)
+        for (int i = 0; i < _CVTBUFSIZE && buf[i]; ++i)
         {
-            s.push_back(b[i]);
+            s.push_back(buf[i]);
         }
     }
 	return s;
