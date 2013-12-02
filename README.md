@@ -14,9 +14,9 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.70
 -------------
 
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid `json` output when running on a locale like German or Spanish. Default double to string conversion is now performed by the method `double_to_string`, which is defined in `jsoncons_config.hpp`.
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid `json` output when running on a locale like German or Spanish. The period character (‘.’) is now always used as the decimal point, non English locales are ignored.
 
-- `output_format` methods that support alternative floating point formatting, e.g. `fixed`, have been deprecated.
+- The `output_format` methods that support alternative floating point formatting, e.g. `fixed`, have been deprecated.
 
 - Added a template method as_vector<T> to json. If a `json` value is an array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`. For example
 
