@@ -24,7 +24,7 @@ Release 0.70
 
     json val = json::parse_string(s);
 
-    std::vector<double> v = val.as_vector<int>(); 
+    std::vector<int> v = val.as_vector<int>(); 
 
 Release 0.60b
 -------------

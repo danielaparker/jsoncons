@@ -38,17 +38,6 @@ The output is
     capacity=10, size=3
     ["Montreal","Toronto","Vancouver"]
 
-### Making a one dimensional array of size 10 initialized with zeros
-
-    json a = json::make_array(10,0);
-	a[1] = 1;
-	a[2] = 2;
-    std::cout << pretty_print(a) << std::endl;
-
-The output is
-
-    [0,1,2,0,0,0,0,0,0,0]
-
 ### Accessing a `json` value as a `std::vector`
 
     std::string s = "{\"my-array\" : [1,2,3,4]}";
@@ -67,6 +56,17 @@ The output is
 The output is
 
     1,2,3,4
+
+### Making a one dimensional array of size 10 initialized with zeros
+
+    json a = json::make_array(10,0);
+	a[1] = 1;
+	a[2] = 2;
+    std::cout << pretty_print(a) << std::endl;
+
+The output is
+
+    [0,1,2,0,0,0,0,0,0,0]
 
 ### Making a two dimensional array of size 3x4 initialized with zeros
 
