@@ -1,13 +1,3 @@
-0.70 release
-
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid `json` output (with commas instead of periods) when running on a locale like German or Spanish. This will be fixed.
-
-- Similar issues apply to using std::strtod for deserialization. This will also be fixed.
-
-- Support for legacy compilers without move semantics 
-
-Later releases
-
 - Add support for `basic_json<wchar_t>` (`wjson`), `basic_json_reader<wchar_t>` (`wjson_reader`) etc., initially assuming `utf16`
 
 - Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) 

@@ -18,9 +18,10 @@ Release 0.70
 
 - The `output_format` methods that support alternative floating point formatting, e.g. `fixed`, have been deprecated.
 
-- Added a template method as_vector<T> to json. If a `json` value is an array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`. For example
+- Added a template method as_vector<T> to the `json` class. If a `json` value is an array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`. For example
 
     std::string s("[0,1,2,3]");
+
     json val = json::parse_string(s);
 
     std::vector<double> v = val.as_vector<int>(); 
