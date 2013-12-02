@@ -54,29 +54,6 @@ void first_example_b()
     }
 }
 
-void first_example_c()
-{
-    try
-    {
-        json books = json::parse_file("input/books.json");
-
-        output_format format;
-        format.set_floating_point_format(output_format::fixed,2);
-        for (size_t i = 0; i < books.size(); ++i)
-        {
-            json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
-            string price = book.get("price","N/A").as_string(format);
-            std::cout << author << ", " << title << ", " << price << std::endl;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-}
-
 void second_example_a()
 {
     try
@@ -118,7 +95,6 @@ int main()
 {
     first_example_a();
     first_example_b();
-    first_example_c();
 
     second_example_a();
 
