@@ -9,6 +9,22 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
+void accessing_a_json_value_as_a_vector()
+{
+    std::string s = "{\"my-array\" : [1,2,3,4]}";
+    json val = json::parse_string(s);
+    std::vector<int> v = val["my-array"].as_vector<int>();
+    for (size_t i = 0; i < v.size(); ++i)
+    {
+        if (i > 0)
+        {
+            std::cout << ",";
+        }
+        std::cout << v[i]; 
+    }
+    std::cout << std::endl;
+}
+
 void construct_json_from_vector()
 {
     json root(json::an_object);
@@ -92,9 +108,7 @@ void make_2_dimensional_array()
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    output_format format;
-    format.set_floating_point_format(output_format::fixed,6);
-    std::cout << pretty_print(a,format) << std::endl;
+    std::cout << pretty_print(a) << std::endl;
 }
 
 void make_3_dimensional_array()
@@ -112,9 +126,11 @@ void run_array_examples()
     construct_json_from_vector();
     add_element_to_array();
     reserve_array_capacity();
+    accessing_a_json_value_as_a_vector();
     make_1_dimensional_array();
     make_2_dimensional_array();
     make_3_dimensional_array();
+
     std::cout << std::endl;
 }
 
