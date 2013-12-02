@@ -43,6 +43,11 @@ Increases the capacity of a json object or array to allow at least `n` members o
     std::string as_string(const output_format& format) const
 
     char as_char() const
+If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
+
+    template <class T>
+    std::vector<T> as_vector() const
+If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and double.
 
     bool as_bool() const
 

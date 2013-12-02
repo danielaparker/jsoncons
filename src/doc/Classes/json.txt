@@ -223,6 +223,10 @@ If value is string, returns value, otherwise returns result of `to_string(format
 If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
 
     template <class T>
+    std::vector<T> as_vector() const
+If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
+
+    template <class T>
     const T& custom_data() const
 If the value is custom, returns a reference to the custom value, otherwise throws  
 
