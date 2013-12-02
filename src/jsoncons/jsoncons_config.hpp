@@ -97,7 +97,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
 {
     std::basic_string<Char> s;
 	char buf[_CVTBUFSIZE];
-    int decimal = 0;
+    int decimal_point = 0;
     int sign = 0;
 
     if (precision >= _CVTBUFSIZE)
@@ -105,7 +105,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         precision = _CVTBUFSIZE - 1;
     }
 
-    int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal, &sign);
+    int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal_point, &sign);
     if (err != 0)
     {
         throw std::exception("Failed attempting double to string conversion");
@@ -116,6 +116,19 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     }
 
     int len = precision;
+
+    int decimal;
+    int exponent;
+    if (decimal_point < 0 || decimal_point > len)
+    {
+        decimal = 1;
+        exponent = decimal_point - 1;
+    }
+    else
+    {
+        decimal = decimal_point;
+        exponent = 0;
+    }
 
     while (len >= 2 && buf[len - 1] == '0' && (len - 1) != decimal)
     {
@@ -136,17 +149,14 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         }
 		s.push_back(buf[i]);
 	}
-    if (decimal < 0 || decimal > len)
+    if (exponent != 0)
     {
-        s.push_back('.');
-        s.push_back('0');
         s.push_back('e');
-        if (decimal > len)
+        if (exponent > 0)
         {
             s.push_back('+');
         }
-        int n = decimal - len;
-        int err2 = _itoa_s(n,buf,_CVTBUFSIZE,10);
+        int err2 = _itoa_s(exponent,buf,_CVTBUFSIZE,10);
         if (err2 != 0)
         {
             throw std::exception("Failed attempting double to string conversion");

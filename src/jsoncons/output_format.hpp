@@ -44,45 +44,7 @@ public:
     {
     }
 
-    // Deprecated
-    basic_output_format(bool indenting)
-        : indenting_(indenting), 
-          floating_point_format_(truncate_trailing_zeros), 
-          precision_(16),
-          set_format_flags_(std::ios::showpoint),
-          unset_format_flags_(0),
-          indent_(default_indent),
-          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
-          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
-          nan_replacement_(json_char_traits<Char>::null_literal()),
-          escape_all_non_ascii_(false),
-          escape_solidus_(false)
-    {
-    }
-
 //  Accessors
-
-    bool truncate_trailing_zeros_notation() const
-    {
-        return floating_point_format_ == truncate_trailing_zeros;
-    }
-
-    bool fixed_notation() const
-    {
-        return floating_point_format_ == fixed;
-    }
-
-    bool scientific_notation() const
-    {
-        return floating_point_format_ == scientific;
-    }
-
-    // Deprecated
-    bool indenting() const
-    {
-        return indenting_;
-    }
 
     size_t indent() const
     {
@@ -92,16 +54,6 @@ public:
     size_t precision() const 
     {
         return precision_; 
-    }
-
-    std::ios_base::fmtflags set_format_flags() const
-    {
-        return set_format_flags_;
-    }
-
-    std::ios_base::fmtflags unset_format_flags() const
-    {
-        return unset_format_flags_;
     }
 
     bool escape_all_non_ascii() const
@@ -137,69 +89,9 @@ public:
 
 //  Modifiers
 
-    void set_floating_point_format(fp_format format)
-    {
-        switch (format)
-        {
-        case truncate_trailing_zeros:
-            set_floating_point_format(format,16);
-            break;
-        case fixed:
-            set_floating_point_format(format,17);
-            break;
-        case scientific:
-            set_floating_point_format(format,17);
-            break;
-        }
-    }
-
-    void set_floating_point_format(fp_format format, size_t precision)
-    {
-        floating_point_format_ = format;
-        precision_ = precision;
-        switch (format)
-        {
-        case fixed:
-            set_format_flags_ |= std::ios::fixed;
-            break;
-        case scientific:
-            set_format_flags_ |= std::ios::scientific;
-            break;
-        }
-    }
-
-    // Deprecated
-    void indenting(bool value)
-    {
-        indenting_ = value;
-    }
-
-    // Deprecated, instead use set_floating_point_format
     void precision(size_t prec)
     {
         precision_ = prec;
-    }
-
-    // Deprecated, instead use set_floating_point_format
-    void fixed_decimal_places(size_t prec)
-    {
-        floating_point_format_ = truncate_trailing_zeros_;
-        precision_ = prec;
-    }
-
-    void indent(size_t value)
-    {
-        indent_ = value;
-    }
-
-    void set_format_flags(std::ios_base::fmtflags flags)
-    {
-        set_format_flags_ = flags;
-    }
-
-    void unset_format_flags(std::ios_base::fmtflags flags)
-    {
-        unset_format_flags_ = flags;
     }
 
     void escape_all_non_ascii(bool value)
@@ -247,6 +139,110 @@ public:
     {
         neg_inf_replacement_ = replacement;
     } 
+
+// Deprecated
+    basic_output_format(bool indenting)
+        : indenting_(indenting), 
+          floating_point_format_(truncate_trailing_zeros), 
+          precision_(16),
+          set_format_flags_(std::ios::showpoint),
+          unset_format_flags_(0),
+          indent_(default_indent),
+          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
+          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
+          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+          nan_replacement_(json_char_traits<Char>::null_literal()),
+          escape_all_non_ascii_(false),
+          escape_solidus_(false)
+    {
+    }
+
+    bool indenting() const
+    {
+        return indenting_;
+    }
+
+    std::ios_base::fmtflags set_format_flags() const
+    {
+        return set_format_flags_;
+    }
+
+    std::ios_base::fmtflags unset_format_flags() const
+    {
+        return unset_format_flags_;
+    }
+
+    void set_floating_point_format(fp_format format)
+    {
+        switch (format)
+        {
+        case truncate_trailing_zeros:
+            set_floating_point_format(format,16);
+            break;
+        case fixed:
+            set_floating_point_format(format,17);
+            break;
+        case scientific:
+            set_floating_point_format(format,17);
+            break;
+        }
+    }
+
+    void set_floating_point_format(fp_format format, size_t precision)
+    {
+        floating_point_format_ = format;
+        precision_ = precision;
+        switch (format)
+        {
+        case fixed:
+            set_format_flags_ |= std::ios::fixed;
+            break;
+        case scientific:
+            set_format_flags_ |= std::ios::scientific;
+            break;
+        }
+    }
+
+    void indenting(bool value)
+    {
+        indenting_ = value;
+    }
+
+    void fixed_decimal_places(size_t prec)
+    {
+        floating_point_format_ = default_notation_;
+        precision_ = prec;
+    }
+
+    void indent(size_t value)
+    {
+        indent_ = value;
+    }
+
+    void set_format_flags(std::ios_base::fmtflags flags)
+    {
+        set_format_flags_ = flags;
+    }
+
+    void unset_format_flags(std::ios_base::fmtflags flags)
+    {
+        unset_format_flags_ = flags;
+    }
+
+    bool truncate_trailing_zeros_notation() const
+    {
+        return floating_point_format_ == truncate_trailing_zeros;
+    }
+
+    bool fixed_notation() const
+    {
+        return floating_point_format_ == fixed;
+    }
+
+    bool scientific_notation() const
+    {
+        return floating_point_format_ == scientific;
+    }
 private:
     bool indenting_;
     size_t indent_;

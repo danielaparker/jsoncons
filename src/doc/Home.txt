@@ -148,7 +148,7 @@ By default, when formatting a floating-point value with `as_string()`, `jsoncons
         json books = json::parse_file("input/books.json");
 
         output_format format;
-        format.set_floating_point_format(output_format::fixed,2);
+        format.floating_point_notation(output_format::fixed).precision(2);
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];

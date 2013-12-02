@@ -1102,6 +1102,42 @@ unsigned long long basic_json<Char>::as_ulonglong() const
 }
 
 template <class Char>
+long basic_json<Char>::as_long() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<long long>(value_.double_value_);
+    case long_long_t:
+        return static_cast<long long>(value_.longlong_value_);
+    case ulong_long_t:
+        return static_cast<long long>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a long");
+    }
+}
+
+template <class Char>
+unsigned long basic_json<Char>::as_ulong() const
+{
+    switch (type_)
+    {
+    case double_t:
+        return static_cast<unsigned long long>(value_.double_value_);
+    case long_long_t:
+        return static_cast<unsigned long long>(value_.longlong_value_);
+    case ulong_long_t:
+        return static_cast<unsigned long long>(value_.ulonglong_value_);
+    case bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an unsigned long");
+    }
+}
+
+template <class Char>
 template <class T>
 const T& basic_json<Char>::custom_data() const
 {

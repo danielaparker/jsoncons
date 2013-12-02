@@ -29,10 +29,6 @@ Returns the level of indentation, the default is 4
     size_t precision() const 
 Returns the maximum number of significant digits.
 
-    std::ios_base::fmtflags set_format_flags() const
-
-    std::ios_base::fmtflags unset_format_flags() const
-
     bool escape_all_non_ascii() const
 The default is false
 
@@ -61,10 +57,6 @@ The default is "null"
 
     void indent(size_t value)
 
-    void set_format_flags(std::ios_base::fmtflags flags)
-
-    void unset_format_flags(std::ios_base::fmtflags flags)
-
     void escape_all_non_ascii(bool value)
 
     void escape_solidus(bool value)
@@ -88,8 +80,14 @@ Sets replacement text for negative infinity.
 
 ### Deprecated
 
+    std::ios_base::fmtflags set_format_flags() const
+
+    std::ios_base::fmtflags unset_format_flags() const
+
     bool indenting() const
 Use the `indenting` parameter on one of the `json_serializer` constructors.
+
+    bool truncate_trailing_zeros_notation() const
 
     void void fixed_decimal_places(size_t prec)
 
@@ -100,5 +98,7 @@ Use the `indenting` parameter on one of the `json_serializer` constructors.
     void set_floating_point_format(fp_format format, size_t prec)
 Use `precision(prec)` to set the maximum number of significant digits.
 
-    bool truncate_trailing_zeros_notation() const
+    void set_format_flags(std::ios_base::fmtflags flags)
+
+    void unset_format_flags(std::ios_base::fmtflags flags)
 

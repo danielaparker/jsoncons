@@ -217,6 +217,16 @@ public:
             return val_.get(name_).as_uint();
         }
 
+        long as_long() const
+        {
+            return val_.get(name_).as_long();
+        }
+
+        unsigned long as_ulong() const
+        {
+            return val_.get(name_).as_ulong();
+        }
+
         long long as_longlong() const
         {
             return val_.get(name_).as_longlong();
@@ -225,6 +235,12 @@ public:
         unsigned long long as_ulonglong() const
         {
             return val_.get(name_).as_ulonglong();
+        }
+
+        template <class T>
+        std::vector<T> as_vector() const
+        {
+            return val_.get(name_).as_vector<T>();
         }
 
         template <class T>
@@ -413,6 +429,7 @@ public:
             o.to_stream(os);
             return os;
         }
+
     private:
         proxy(); // nopop
         proxy& operator = (const proxy& other); // noop
@@ -591,6 +608,10 @@ public:
 
     unsigned int as_uint() const;
 
+    long as_long() const;
+
+    unsigned long as_ulong() const;
+
     long long as_longlong() const;
 
     unsigned long long as_ulonglong() const;
@@ -691,6 +712,119 @@ public:
         }*/
         swap(type_,b.type_);
         swap(value_,b.value_);
+    }
+
+    template <class T>
+    std::vector<T> as_vector() const;
+
+    template<>
+    std::vector<std::string> as_vector() const
+    {
+        std::vector<std::string> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_string();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<bool> as_vector() const
+    {
+        std::vector<bool> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_bool();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<char> as_vector() const
+    {
+        std::vector<char> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_char();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<double> as_vector() const
+    {
+        std::vector<double> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_double();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<int> as_vector() const
+    {
+        std::vector<int> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_int();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<unsigned int> as_vector() const
+    {
+        std::vector<unsigned int> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_uint();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<long> as_vector() const
+    {
+        std::vector<long> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_long();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<unsigned long> as_vector() const
+    {
+        std::vector<unsigned long> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_ulong();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<long long> as_vector() const
+    {
+        std::vector<long long> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_longlong();
+        }
+        return v;
+    }
+
+    template<>
+    std::vector<unsigned long long> as_vector() const
+    {
+        std::vector<unsigned long long> v(size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = operator[](i).as_ulonglong();
+        }
+        return v;
     }
 
     friend void swap(basic_json<Char>& a, basic_json<Char>& b)

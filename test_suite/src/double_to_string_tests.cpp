@@ -29,6 +29,22 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     s = jsoncons::double_to_string<char>(x, 16);
     BOOST_CHECK(s == std::string("1.0e-100"));
 
+    x = 0.123456789e-100;
+    s = jsoncons::double_to_string<char>(x, 16);
+    BOOST_CHECK(s == std::string("1.23456789e-101"));
+
+    x = 0.123456789e100;
+    s = jsoncons::double_to_string<char>(x, 16);
+    BOOST_CHECK(s == std::string("1.23456789e+99") || s == std::string("1.23456789e+099"));
+
+    x = 1234563;
+    s = jsoncons::double_to_string<char>(x, 6);
+    BOOST_CHECK(s == std::string("1.23456e+6") || s == std::string("1.23456e+006"));
+
+    x = 0.0000001234563;
+    s = jsoncons::double_to_string<char>(x, 6);
+    BOOST_CHECK(s == std::string("1.23456e-7") || s == std::string("1.23456e-007"));
+
     x = -1.0e+100;
     s = jsoncons::double_to_string<char>(x, 16);
     BOOST_CHECK(s == std::string("-1.0e+100") || s == std::string("-1.0e100"));
@@ -49,9 +65,12 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     s = jsoncons::double_to_string<char>(x, 16);
     BOOST_CHECK(s == std::string("1.0"));
 
+    x = 0.1;
+    s = jsoncons::double_to_string<char>(x, 16);
+    BOOST_CHECK(s == std::string("0.1"));
+
     x = 1.1;
     s = jsoncons::double_to_string<char>(x, 17);
-    std::cout << s << std::endl;
     BOOST_CHECK(s == std::string("1.1000000000000001"));
 
     x = -1;
