@@ -14,6 +14,9 @@ Returns the size of the storage space currently allocated for a json object or a
     void reserve(size_t n)
 Increases the capacity of a json object or array to allow at least `n` members or elements. 
 
+    void resize(size_t n)
+Resizes a json array so that it contains `n` elements. 
+
 ### Accessors
 
     bool is_null() const
@@ -98,7 +101,10 @@ If the value is custom, returns a reference to the custom value, otherwise throw
 Remove all elements from an array or object value, otherwise do nothing
 
     void remove_range(size_t from_index, size_t to_index)
-Removes all elements from an array value whose index is between `from_index`, inclusive, and `to_index`, exclusive.
+Removes all elements from an array value whose index is between `from_index`, the first element to be removed, and `to_index`, one after the last element to be removed.
+
+    void remove_member(const std::string& name)
+Remove a member from a `json` object
 
     void set(const std::string& k, const json& val)
     void set(std::string&& k, json&& val)

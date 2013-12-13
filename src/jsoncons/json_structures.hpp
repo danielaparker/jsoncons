@@ -90,11 +90,13 @@ public:
 
     void reserve(size_t n) {elements_.reserve(n);}
 
+    void resize(size_t n) {elements_.resize(n);}
+
     void remove_range(size_t from_index, size_t to_index) 
     {
-        JSONCONS_ASSERT(from <= to);
-        JSONCONS_ASSERT(to <= elements_.size());
-        elements_.erase(elements_.begin()+from,elements_.begin()+to);
+        JSONCONS_ASSERT(from_index <= to_index);
+        JSONCONS_ASSERT(to_index <= elements_.size());
+        elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
     basic_json<Char>& at(size_t i) {return elements_[i];}
@@ -183,9 +185,18 @@ public:
 
     void remove_range(size_t from_index, size_t to_index) 
     {
-        JSONCONS_ASSERT(from <= to);
-        JSONCONS_ASSERT(to <= members_.size());
-        members_.erase(members_.begin()+from,members_.begin()+to);
+        JSONCONS_ASSERT(from_index <= to_index);
+        JSONCONS_ASSERT(to_index <= members_.size());
+        members_.erase(members_.begin()+from_index,members_.begin()+to_index);
+    }
+
+    void remove(const std::basic_string<Char>& name) 
+    {
+        iterator it = find(name);
+        if (it != members_.end())
+        {
+            members_.erase(it);
+        }
     }
 
     const std::pair<std::basic_string<Char>,basic_json<Char>>& get(size_t i) const 

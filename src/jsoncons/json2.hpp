@@ -537,10 +537,23 @@ void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
     switch (type_)
     {
     case array_t:
-        value_.array_->remove_range(from, to);
+        value_.array_->remove_range(from_index, to_index);
         break;
     case object_t:
-        value_.object_->remove_range(from, to);
+        value_.object_->remove_range(from_index, to_index);
+        break;
+    default:
+        break;
+    }
+}
+
+template <class Char>
+void basic_json<Char>::remove_member(const std::basic_string<Char>& name)
+{
+    switch (type_)
+    {
+    case object_t:
+        value_.object_->remove(name);
         break;
     default:
         break;
@@ -981,6 +994,17 @@ void basic_json<Char>::reserve(size_t n)
         break;
     case object_t:
         value_.object_->reserve(n);
+        break;
+    }
+}
+
+template <class Char>
+void basic_json<Char>::resize(size_t n) 
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->resize(n);
         break;
     }
 }

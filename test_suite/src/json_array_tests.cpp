@@ -34,6 +34,22 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
     BOOST_CHECK(arr[2].as_string() == std::string("Vancouver"));
 }
 
+BOOST_AUTO_TEST_CASE(test_array_remove_range)
+{
+    json arr(json::an_array);
+    BOOST_CHECK(arr.is_array());
+    arr.add("Toronto");
+    arr.add("Vancouver");
+    arr.add(0,"Montreal");
+
+    BOOST_CHECK(arr.size() == 3);
+
+    arr.remove_range(1,3);
+
+    BOOST_CHECK(arr.size() == 1);
+    BOOST_CHECK(arr[0] == std::string("Montreal"));
+}
+
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
     json cities(json::an_array); 
