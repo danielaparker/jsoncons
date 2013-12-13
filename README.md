@@ -11,6 +11,15 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.71
+-------------
+
+- Added `resize` method to `json` for resizing json `arrays` 
+
+- Fixed issue with `remove_range` method (templated code failed to compile if calling this method.)
+
+- Added `remove_member` method to remove a member from a `json` object
+
 Release 0.70
 -------------
 

@@ -131,6 +131,11 @@ public:
             val_.get(name_).reserve(n);
         }
 
+        void resize(size_t n)
+        {
+            val_.get(name_).resize(n);
+        }
+
         bool is_string() const
         {
             return val_.get(name_).is_string();
@@ -325,6 +330,12 @@ public:
             val_.get(name_).remove_range(size_t from_index, size_t to_index);
         }
         // Remove a range of elements from an array 
+
+        void remove_member(const std::basic_string<Char>& name)
+        {
+            val_.get(name_).remove_member(name);
+        }
+        // Remove a member from an object 
 
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
@@ -600,6 +611,8 @@ public:
 
     void reserve(size_t n);
 
+    void resize(size_t n);
+
     bool as_bool() const;
 
     double as_double() const;
@@ -647,6 +660,9 @@ public:
 
     void remove_range(size_t from_index, size_t to_index);
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+
+    void remove_member(const std::basic_string<Char>& name);
+    // Removes a member from an object value
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 

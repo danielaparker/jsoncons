@@ -48,6 +48,9 @@
     <ClCompile Include="..\..\src\string_to_double_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\json_object_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\my_custom_data.hpp">
