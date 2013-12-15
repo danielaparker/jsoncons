@@ -120,7 +120,7 @@ void make_3_dimensional_array()
     std::cout << pretty_print(a) << std::endl;
 }
 
-void run_array_examples()
+void array_examples()
 {
     std::cout << "Array examples\n" << std::endl;
     construct_json_from_vector();

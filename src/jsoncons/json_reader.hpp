@@ -947,20 +947,6 @@ bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
             buffer_position_ += 2;
             column_ += 2;
         }
-        else if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
-        {
-            done = true;
-            ++line_;
-            column_ = 0;
-            buffer_position_ += 2;
-        }
-        else if (c == '\n' || c == '\r')
-        {
-            done = true;
-            ++line_;
-            column_ = 0;
-            ++buffer_position_;
-        }
         else
         {
             ++column_;

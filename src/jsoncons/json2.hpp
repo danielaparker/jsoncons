@@ -405,22 +405,6 @@ basic_json<Char>::basic_json(basic_json&& other)
 }
 
 template <class Char>
-template <class T>
-void basic_json<Char>::set_custom_data(std::basic_string<Char>&& name, T&& value)
-{
-    switch (type_)
-    {
-    case object_t:
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
-        }
-    }
-}
-
-template <class Char>
 void basic_json<Char>::add(basic_json<Char>&& value)
 {
     switch (type_)
@@ -461,38 +445,6 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
-        }
-    }
-}
-
-template <class Char>
-template <class T>
-void basic_json<Char>::add_custom_data(T&& value)
-{
-    switch (type_)
-    {
-    case array_t:
-        value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template <class Char>
-template <class T>
-void basic_json<Char>::add_custom_data(size_t index, T&& value)
-{
-    switch (type_)
-    {
-    case array_t:
-        value_.array_->add(index, basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
         }
     }
 }
@@ -538,9 +490,6 @@ void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
     {
     case array_t:
         value_.array_->remove_range(from_index, to_index);
-        break;
-    case object_t:
-        value_.object_->remove_range(from_index, to_index);
         break;
     default:
         break;
@@ -597,7 +546,9 @@ void basic_json<Char>::add_custom_data(const T& value)
     switch (type_)
     {
     case array_t:
-        value_.array_->push_back(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+		{
+        add(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+		}
         break;
     default:
         {
@@ -999,7 +950,7 @@ void basic_json<Char>::reserve(size_t n)
 }
 
 template <class Char>
-void basic_json<Char>::resize(size_t n) 
+void basic_json<Char>::resize_array(size_t n) 
 {
     switch (type_)
     {
@@ -1168,7 +1119,7 @@ const T& basic_json<Char>::custom_data() const
     switch (type_)
     {
     case custom_t:
-        return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data_;
+        return static_cast<const custom_data_wrapper<Char,T>*>(value_.userdata_)->data1_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1181,7 +1132,10 @@ T& basic_json<Char>::custom_data()
     switch (type_)
     {
     case custom_t:
-        return static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_)->data_;
+		{
+        custom_data_wrapper<Char,T>* p = static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_);
+        return p->data1_;
+		}
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }

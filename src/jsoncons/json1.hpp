@@ -43,21 +43,23 @@ template <class Char, class T>
 class custom_data_wrapper : public basic_custom_data<Char>
 {
 public:
+    typedef custom_data_wrapper<Char,T>* Ptr;
+
     custom_data_wrapper(const T& value)
-        : data_(value)
+        : data1_(value)
     {
     }
     virtual basic_custom_data<Char>* clone() const
     {
-        return new custom_data_wrapper<Char,T>(data_);
+        return new custom_data_wrapper<Char,T>(data1_);
     }
 
     virtual void to_stream(basic_json_output_handler<Char>& os) const
     {
-        jsoncons::serialize(os,data_);
+        jsoncons::serialize(os,data1_);
     }
 
-    T data_;
+    T data1_;
 };
 
 template <class Char>
@@ -131,9 +133,9 @@ public:
             val_.get(name_).reserve(n);
         }
 
-        void resize(size_t n)
+        void resize_array(size_t n)
         {
-            val_.get(name_).resize(n);
+            val_.get(name_).resize_array(n);
         }
 
         bool is_string() const
@@ -357,24 +359,6 @@ public:
         void add(size_t index, basic_json<Char>&& value)
         {
             val_.get(name_).add(index, value);
-        }
-       
-        template <class T>
-        void add_custom_data(T&& value)
-        {
-            val_.get(name_).add_custom_data(value);
-        }
-
-        template <class T>
-        void add_custom_data(size_t index, T&& value)
-        {
-            val_.get(name_).add_custom_data(index, value);
-        }
-
-        template <class T>
-        void set_custom_data(std::basic_string<Char>&& name, T&& value)
-        {
-            val_.get(name_).set_custom_data(name,value);
         }
 #endif
         template <class T>
@@ -611,7 +595,7 @@ public:
 
     void reserve(size_t n);
 
-    void resize(size_t n);
+    void resize_array(size_t n);
 
     bool as_bool() const;
 
@@ -675,16 +659,6 @@ public:
     void add(basic_json<Char>&& value);
 
     void add(size_t index, basic_json<Char>&& value);
-
-    template <class T>
-    void set_custom_data(std::basic_string<Char>&& name, T&& value);
-
-    template <class T>
-    void add_custom_data(T&& value);
-
-    template <class T>
-    void add_custom_data(size_t index, T&& value);
-
 #endif
 
     template <class T>

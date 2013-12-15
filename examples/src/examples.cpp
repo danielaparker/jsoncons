@@ -10,7 +10,8 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
-void run_array_examples();
+void array_examples();
+void custom_data_examples();
 
 void first_example_a()
 {
@@ -98,7 +99,8 @@ int main()
 
     second_example_a();
 
-    run_array_examples();
+    array_examples();
+    custom_data_examples();
 
     read_csv_file();
     write_csv_file();

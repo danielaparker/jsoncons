@@ -14,7 +14,7 @@ Returns the size of the storage space currently allocated for a json object or a
     void reserve(size_t n)
 Increases the capacity of a json object or array to allow at least `n` members or elements. 
 
-    void resize(size_t n)
+    void resize_array(size_t n)
 Resizes a json array so that it contains `n` elements. 
 
 ### Accessors
@@ -126,16 +126,12 @@ The content of `val` is copied (or moved) to the new element.
 
     template <class T>
     void add_custom_data(const T& val)
-    template <class T>
-    void add_custom_data(T&& val)
-Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied (or moved) to the new element.
+Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied to the new element.
 
     template <class T>
     void add_custom_data(size_t index, const T& val)
-    template <class T>
-    void add_custom_data(size_t index, T&& val)
 Adds a new custom data element of type `T` at the specified index of a json array, shifting all elements currently at or above that index to the right.
-The content of `val` is copied (or moved) to the new element.
+The content of `val` is copied to the new element.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.

@@ -103,9 +103,16 @@ public:
 
     const basic_json<Char>& at(size_t i) const {return elements_[i];}
 
-    void push_back(const basic_json<Char>& value);
+    void push_back(const basic_json<Char>& value)
+    {
+        elements_.push_back(value);
+    }
 
-    void add(size_t index, const basic_json<Char>& value);
+    void add(size_t index, const basic_json<Char>& value)
+    {
+        json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        elements_.insert(position, value);
+    }
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
@@ -274,18 +281,6 @@ public:
     std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
 };
 
-template <class Char>
-void json_array<Char>::push_back(const basic_json<Char>& value)
-{
-    elements_.push_back(value);
-}
-
-template <class Char>
-void json_array<Char>::add(size_t index, const basic_json<Char>& value)
-{
-    json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
-    elements_.insert(position, value);
-}
 
 template <class Char>
 void json_object<Char>::sort_members()
