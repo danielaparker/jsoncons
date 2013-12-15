@@ -24,5 +24,8 @@
     <ClCompile Include="..\..\src\csv_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\custom_data_examples.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

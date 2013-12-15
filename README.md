@@ -14,11 +14,15 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.71
 -------------
 
-- Added `resize` method to `json` for resizing json `arrays` 
+- Added `resize_array` method to `json` for resizing json `arrays` 
 
 - Fixed issue with `remove_range` method (templated code failed to compile if calling this method.)
 
 - Added `remove_member` method to remove a member from a `json` object
+
+- Fixed issue with multiline line comments, added test case
+
+- Fixed issue with adding custom data to a json array using `add_custom_data`, added examples.
 
 Release 0.70
 -------------

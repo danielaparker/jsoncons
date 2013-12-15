@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
 	reader.read();
 }
 
-BOOST_AUTO_TEST_CASE( test_wjson2 )
+BOOST_AUTO_TEST_CASE(test_wjson2 )
 {
     wjson root(wjson::an_object);
     root[L"field1"] = L"test";
@@ -518,5 +518,12 @@ BOOST_AUTO_TEST_CASE( test_wjson2 )
     root[L"field3"] = true;
     //std::wcout << root << L"\n";
     //wjson root = wjson::parse(L"{}");
+}
+
+BOOST_AUTO_TEST_CASE(test_multiline_comments)
+{
+    json obj = json::parse_file("input/json-multiline-comment.json");
+    BOOST_CHECK(obj.is_array());
+    BOOST_CHECK_EQUAL(obj.size(),0);
 }
 
