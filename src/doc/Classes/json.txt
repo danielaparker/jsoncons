@@ -162,6 +162,9 @@ Increases the capacity of a json object or array to allow at least `n` members o
     void resize_array(size_t n)
 Resizes a json array so that it contains `n` elements. 
 
+    void resize_array(size_t n, const json& val)
+Resizes a json array so that it contains `n` elements that are initialized to `val`. 
+
 ### Accessors
 
     bool is_null() const
