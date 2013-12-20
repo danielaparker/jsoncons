@@ -30,7 +30,7 @@ The former notation is still supported, though.
 
 - Added a static method `json::make_array` that takes no arguments and makes an empty `json` array
 
-Then
+Note that
 
     json arr(json::an_array)
 
