@@ -36,16 +36,16 @@ Note that
 
     json arr(json::an_array);
 
-and
+is the same as
 
     json arr = json::make_array();
 
-are equivalent, as are
+and
 
     json arr(json::an_array);
     arr.resize_array(10,0.0);
 
-and
+is the same as
 
     json arr = json::make_array(10,0.0);
 
