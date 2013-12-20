@@ -36,7 +36,7 @@ Note that
 
     json arr(json::an_array);
 
-is the same as
+does the same as
 
     json arr = json::make_array();
 
@@ -45,7 +45,7 @@ and
     json arr(json::an_array);
     arr.resize_array(10,0.0);
 
-is the same as
+does the same as
 
     json arr = json::make_array(10,0.0);
 
