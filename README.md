@@ -49,7 +49,7 @@ is equivalent to
 
     json arr = json::make_array(10,0.0);
 
-For consistency the `json::make_array` method is now favored in the documentation. 
+For consistency the `json::make_array` notation is now favored in the documentation. 
 
 Release 0.71
 -------------
