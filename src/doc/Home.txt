@@ -176,7 +176,7 @@ This example shows how to create the `books.json` file in code.
     json books(json::an_array);
 
     {
-        json book(json::an_object);
+        json book;
         book["title"] = "Kafka on the Shore";
         book["author"] = "Haruki Murakami";
         book["price"] = 25.17;
@@ -184,7 +184,7 @@ This example shows how to create the `books.json` file in code.
     }
 
     {
-        json book(json::an_object);
+        json book;
         book["title"] = "Women: A Novel";
         book["author"] = "Charles Bukowski";
         book["price"] = 12.00;
@@ -192,7 +192,7 @@ This example shows how to create the `books.json` file in code.
     }
 
     {
-        json book(json::an_object);
+        json book;
         book["title"] = "Cutter's Way";
         book["author"] = "Ivan Passer";
         books.add(std::move(book));
@@ -221,7 +221,7 @@ The output is
 
 ### User specified `Nan`, `Inf` and `-Inf` replacement
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;

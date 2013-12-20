@@ -80,7 +80,7 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
 class json_base
 {
 public:
-    enum value_type {object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
+    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
 };
 
 template <class Char>
@@ -576,7 +576,7 @@ public:
 
     bool is_object() const
     {
-        return type_ == object_t;
+        return type_ == object_t || type_ == empty_object_t;
     }
 
     bool is_array() const

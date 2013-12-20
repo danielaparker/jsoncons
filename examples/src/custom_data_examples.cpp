@@ -15,7 +15,7 @@ using jsoncons::custom_data_wrapper;
 
 void put_custom_data_in_object()
 {
-    json obj(json::an_object);
+    json obj;
     std::vector<double> v(4);
     v[0] = 0;
     v[1] = 1;

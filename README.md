@@ -11,6 +11,23 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
 
+Release 0.80
+-------------
+
+- The default constructor now constructs an empty object (rather than a null object.)
+
+This means that instead of
+
+    json obj(json::an_object);
+    obj["field"] = "field";
+
+you can simply write
+
+    json obj;
+    obj["field"] = "field";
+
+The old notation is still supported, though.
+
 Release 0.71
 -------------
 

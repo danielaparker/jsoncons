@@ -27,19 +27,19 @@ void accessing_a_json_value_as_a_vector()
 
 void construct_json_from_vector()
 {
-    json root(json::an_object);
+    json root;
 
     root["addresses"];
 
     std::vector<json> addresses;
-    json address1(json::an_object);
+    json address1;
     address1["city"] = json("San Francisco");
     address1["state"] = json("CA");
     address1["zip"] = json("94107");
     address1["country"] = json("USA");
     addresses.push_back(address1);
 
-    json address2(json::an_object);
+    json address2;
     address2["city"] = json("Sunnyvale");
     address2["state"] = json("CA");
     address2["zip"] = json("94085");
