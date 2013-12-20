@@ -28,17 +28,26 @@ you can simply write
 
 The former notation is still supported, though.
 
-- Added a static method `json::make_array` that takes no arguments and makes an empty `json` array
+- Added a version of 'resize_array' to `json` that resizes the array to `n` elements and initializes them to a specified value.
+
+- Added a static method to `json`, `make_array`, that takes no arguments and makes an empty `json` array
 
 Note that
 
-    json arr(json::an_array)
+    json arr(json::an_array);
 
 and
 
     json arr = json::make_array();
 
-are equivalent.
+are equivalent, as are
+
+    json arr(json::an_array);
+    arr.resize_array(10,0.0);
+
+and
+
+    json arr = json::make_array(10,0.0);
 
 Release 0.71
 -------------

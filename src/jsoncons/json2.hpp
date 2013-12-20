@@ -1011,6 +1011,17 @@ void basic_json<Char>::resize_array(size_t n)
 }
 
 template <class Char>
+void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val) 
+{
+    switch (type_)
+    {
+    case array_t:
+        value_.array_->resize(n,val);
+        break;
+    }
+}
+
+template <class Char>
 size_t basic_json<Char>::capacity() const
 {
     switch (type_)

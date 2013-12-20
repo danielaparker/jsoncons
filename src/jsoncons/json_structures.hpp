@@ -92,6 +92,8 @@ public:
 
     void resize(size_t n) {elements_.resize(n);}
 
+    void resize(size_t n, const basic_json<Char>& val) {elements_.resize(n,val);}
+
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);

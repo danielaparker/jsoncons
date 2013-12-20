@@ -138,6 +138,11 @@ public:
             val_.get(name_).resize_array(n);
         }
 
+        void resize_array(size_t n, const basic_json<Char>& val)
+        {
+            val_.get(name_).resize_array(n,val);
+        }
+
         bool is_string() const
         {
             return val_.get(name_).is_string();
@@ -598,6 +603,8 @@ public:
     void reserve(size_t n);
 
     void resize_array(size_t n);
+
+    void resize_array(size_t n, const basic_json<Char>& val);
 
     bool as_bool() const;
 
