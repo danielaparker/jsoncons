@@ -91,9 +91,19 @@ void make_empty_array()
     std::cout << pretty_print(a) << std::endl;
 }
 
-void make_1_dimensional_array()
+void make_1_dimensional_array_1()
 {
-    std::cout << "1 dimensional array" <<std::endl;
+    std::cout << "1 dimensional array 1" <<std::endl;
+    json a(json::an_array);
+    a.resize_array(10,0);
+    a[1] = 1;
+    a[2] = 2;
+    std::cout << pretty_print(a) << std::endl;
+}
+
+void make_1_dimensional_array_2()
+{ 
+    std::cout << "1 dimensional array 2" <<std::endl;
     json a = json::make_array(10,0);
     a[1] = 1;
     a[2] = 2;
@@ -137,7 +147,8 @@ void array_examples()
     reserve_array_capacity();
     accessing_a_json_value_as_a_vector();
     make_empty_array();
-    make_1_dimensional_array();
+    make_1_dimensional_array_1();
+    make_1_dimensional_array_2();
     make_2_dimensional_array();
     make_3_dimensional_array();
 
