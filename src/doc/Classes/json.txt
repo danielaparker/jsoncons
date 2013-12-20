@@ -356,7 +356,7 @@ The output is
 
 ### Array
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add(10);
     arr.add(20);
     arr.add(30);
@@ -402,7 +402,7 @@ The output is
 
 ### Array iterator
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add("Montreal");
@@ -422,7 +422,7 @@ The output is
 
 	json root;
 
-    root["persons"] = json(json::an_array);
+    root["persons"] = json::make_array();
 
     json person;
     person["first_name"] = "John";

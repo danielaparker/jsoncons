@@ -21,7 +21,7 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 {
-    json arr(json::an_array);
+    json arr = json::make_array();
     BOOST_CHECK(arr.is_array());
     arr.add("Toronto");
     arr.add("Vancouver");
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 
 BOOST_AUTO_TEST_CASE(test_array_remove_range)
 {
-    json arr(json::an_array);
+    json arr = json::make_array();
     BOOST_CHECK(arr.is_array());
     arr.add("Toronto");
     arr.add("Vancouver");
@@ -52,13 +52,13 @@ BOOST_AUTO_TEST_CASE(test_array_remove_range)
 
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
-    json cities(json::an_array); 
+    json cities = json::make_array();
     BOOST_CHECK(cities.is_array());
     cities.reserve(10);  // storage is allocated
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
-    cities.add("Toronto");  // becomes a json array, storage for 10 elements is allocated, size is 1
+    cities.add("Toronto");  
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);

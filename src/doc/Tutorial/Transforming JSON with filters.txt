@@ -25,7 +25,6 @@ You can achieve the desired result by subclassing the [[json_filter]] class, ove
 
     using jsoncons::parsing_context;
     using jsoncons::json_serializer;
-    using jsoncons::output_format;
     using jsoncons::json_reader;
     using jsoncons::json_input_handler;
     using jsoncons::json_output_handler;

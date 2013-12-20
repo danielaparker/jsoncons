@@ -141,39 +141,11 @@ Now the output is
     Charles Bukowski, Women: A Novel, 12.0
     Ivan Passer, Cutter's Way, N/A
 
-By default, when formatting a floating-point value with `as_string()`, `jsoncons` truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and a precision of 2.
-
-    try
-    {
-        json books = json::parse_file("input/books.json");
-
-        output_format format;
-        format.floating_point_notation(output_format::fixed).precision(2);
-        for (size_t i = 0; i < books.size(); ++i)
-        {
-            json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
-            string price = book.get("price","N/A").as_string(format);
-            std::cout << author << ", " << title << ", " << price << std::endl;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-
-This time the output is
-
-    Haruki Murakami, Kafka on the Shore, 25.17
-    Charles Bukowski, Women: A Novel, 12.00
-    Ivan Passer, Cutter's Way, N/A
-
 ### Second example
 
 This example shows how to create the `books.json` file in code.
 
-    json books(json::an_array);
+    json books = json::make_array();
 
     {
         json book;
