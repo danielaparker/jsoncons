@@ -82,6 +82,15 @@ void reserve_array_capacity()
     std::cout << cities << std::endl;
 }
 
+void make_empty_array()
+{
+    std::cout << "empty array" <<std::endl;
+    json a = json::make_array();
+    a.add(1);
+    a.add(2);
+    std::cout << pretty_print(a) << std::endl;
+}
+
 void make_1_dimensional_array()
 {
     std::cout << "1 dimensional array" <<std::endl;
@@ -127,6 +136,7 @@ void array_examples()
     add_element_to_array();
     reserve_array_capacity();
     accessing_a_json_value_as_a_vector();
+    make_empty_array();
     make_1_dimensional_array();
     make_2_dimensional_array();
     make_3_dimensional_array();

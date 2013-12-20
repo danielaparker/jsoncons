@@ -11,7 +11,7 @@ You may want to insert a custom data type such as a boost matrix into a `json` o
 and later access it by name. You can do so with the `set_custom_data` and `custom_data` 
 methods, like this:
 
-    json obj(json::an_object);
+    json obj;
 
     matrix<double> A(2,2);
     A(0,0) = 1;

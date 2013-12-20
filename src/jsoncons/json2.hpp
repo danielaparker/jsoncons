@@ -739,6 +739,12 @@ template <class Char>
 const basic_json<Char> basic_json<Char>::null = basic_json<Char>(basic_json<Char>::null_t);
 
 template <class Char> 
+basic_json<Char> basic_json<Char>::make_array()
+{
+    return basic_json<Char>(new json_array<Char>());
+}
+
+template <class Char> 
 basic_json<Char> basic_json<Char>::make_array(size_t n)
 {
     return basic_json<Char>(new json_array<Char>(n));
