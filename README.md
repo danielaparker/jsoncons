@@ -30,7 +30,7 @@ The former notation is still supported, though.
 
 - Added a version of 'resize_array' to `json` that resizes the array to `n` elements and initializes them to a specified value.
 
-- Added a static method to `json`, `make_array`, that takes no arguments and makes an empty `json` array
+- Added a version of the static method `json::make_array` that takes no arguments and makes an empty `json` array
 
 Note that
 
