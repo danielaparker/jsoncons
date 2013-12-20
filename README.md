@@ -28,6 +28,8 @@ you can simply write
 
 The old notation is still supported, though.
 
+- Added a static method `json::make_array` that takes no arguments and makes an empty `json` array
+
 Release 0.71
 -------------
 
@@ -55,6 +57,8 @@ Release 0.70
     json val = json::parse_string(s);
 
     std::vector<int> v = val.as_vector<int>(); 
+
+- Undeprecated the `json` member function `precision`
 
 Release 0.60b
 -------------

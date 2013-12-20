@@ -45,15 +45,18 @@ Parses a string of JSON text and returns a json object or array value
     static json parse_file(const std::string& filename)
 Parses JSON text from a file opened as a binary stream, and returns a json object or array value.
 
+    static json make_array()
+Makes an empty array.
+
     static json make_array(size_t n)
-Makes an array of n elements. Each element is a json null value.
+Makes an array of n elements. Each element is an empty json object.
 
     static json make_array(size_t n, const json& val)
 Makes an array of n elements. Each element is a copy of `val`.
 
     static json make_2d_array(size_t m, size_t n)
 Makes an m dimensional array of n dimensional arrays of elements. 
-Each element is a json null value.
+Each element is an empty json object.
 
     static json make_2d_array(size_t m, size_t n, const json& val)
 Makes an m dimensional array of n dimensional arrays of elements. 
@@ -61,7 +64,7 @@ Each element is a copy of the json value `val`.
 
     static json make_3d_array(size_t m, size_t n, size_t k)
 Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
-Each element is a json null value.
+Each element is an empty json object.
 
     static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
 Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 

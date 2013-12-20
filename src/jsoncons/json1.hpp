@@ -443,6 +443,8 @@ public:
 
     static basic_json parse_file(const std::string& s);
 
+    static basic_json make_array();
+
     static basic_json make_array(size_t n);
 
     static basic_json make_array(size_t n, const basic_json<Char>& val);
