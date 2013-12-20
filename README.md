@@ -14,7 +14,7 @@ Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=na
 Release 0.80
 -------------
 
-- The default constructor now constructs an empty object (rather than a null object.)
+- The default constructor now constructs an empty object (rather than a null object.) While this is a change, it's unlikely to break exisitng code (all test cases passed without modification.)
 
 This means that instead of
 
@@ -36,7 +36,7 @@ Note that
 
     json arr(json::an_array);
 
-does the same as
+is equivalent to
 
     json arr = json::make_array();
 
@@ -45,9 +45,11 @@ and
     json arr(json::an_array);
     arr.resize_array(10,0.0);
 
-does the same as
+is equivalent to
 
     json arr = json::make_array(10,0.0);
+
+For consistency the `json::make_array` method is now favored in the documentation. 
 
 Release 0.71
 -------------
