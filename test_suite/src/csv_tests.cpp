@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params(json::an_object);
+    json params;
     params["field_delimiter"] = "\t";
     params["has_header"] = true;
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params(json::an_object);
+    json params;
     params["field_delimiter"] = "\t";
 
     json_reader reader(is,handler);

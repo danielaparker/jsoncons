@@ -21,7 +21,7 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_is_type)
 {
-    json obj(json::an_object);
+    json obj;
     BOOST_CHECK(obj.is_object());
     std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
@@ -63,10 +63,10 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     obj["null1"] = json::null;
     BOOST_CHECK(obj["null1"].is_null());
 
-    obj["object"] = json(json::an_object);
+    obj["object"] = json::an_object;
     BOOST_CHECK(obj["object"].is_object());
 
-    obj["array"] = json(json::an_array);
+    obj["array"] = json::an_array;
     BOOST_CHECK(obj["array"].is_array());
 
     matrix<double> A;
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
 {
     std::string s("[0,1,2,3]");
     json val = json::parse_string(s);
-    json root(json::an_object);
+    json root;
     root["val"] = val;
     std::vector<int> v = root["val"].as_vector<int>();
     BOOST_CHECK(v.size() == 4);

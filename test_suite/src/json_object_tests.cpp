@@ -21,7 +21,7 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_remove_member)
 {
-    json o(json::an_object);
+    json o;
     o["key"] = "Hello";
 
     JSONCONS_ASSERT(o.size() == 1);

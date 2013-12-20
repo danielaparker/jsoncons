@@ -314,7 +314,7 @@ Exchanges the values of `a` and `b`
 
 ### Accessors and defaults
 
-    json obj(json::an_object);
+    json obj;
 
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
@@ -339,7 +339,7 @@ The output is
 
 ### Nulls
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = json::null;
     obj["field2"] = json();
     std::cout << obj << std::endl;
@@ -378,7 +378,7 @@ The output is
 
 ### Object iterator
 
-    json obj(json::an_object);
+    json obj;
     obj["city"] = "Toronto";
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
@@ -414,16 +414,16 @@ The output is
 
 ### Constructing json structures
 
-	json root(json::an_object);
+	json root;
 
     root["persons"] = json(json::an_array);
 
-    json person(json::an_object);
+    json person;
     person["first_name"] = "John";
     person["last_name"] = "Smith";
     person["birth_date"] = "1972-01-30";
     
-    json address(json::an_object);
+    json address;
     address["city"] = "Toronto";
     address["country"] = "Canada";
     
@@ -453,7 +453,7 @@ The output is
 
 ### Default NaN, inf and -inf replacement
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -465,7 +465,7 @@ The output is
 
 ### Custom NaN, inf and -inf replacement
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
@@ -484,7 +484,7 @@ The output is
 
 ### Suppressing NaN, inf and -inf replacement
 
-    json obj(json::an_object);
+    json obj;
     obj["field1"] = std::sqrt(-1.0);
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
