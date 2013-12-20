@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
 {
 	json root;
 
-    root["persons"] = json(json::an_array);
+    root["persons"] = json::make_array();
 
     json person;
     person["first_name"] = "John";

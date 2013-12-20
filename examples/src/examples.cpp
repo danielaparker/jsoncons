@@ -59,7 +59,7 @@ void second_example_a()
 {
     try
     {
-        json books(json::an_array);
+        json books = json::make_array();
 
         {
             json book;
