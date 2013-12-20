@@ -26,9 +26,19 @@ you can simply write
     json obj;
     obj["field"] = "field";
 
-The old notation is still supported, though.
+The former notation is still supported, though.
 
 - Added a static method `json::make_array` that takes no arguments and makes an empty `json` array
+
+Then
+
+    json arr(json::an_array)
+
+and
+
+    json arr = json::make_array();
+
+are equivalent.
 
 Release 0.71
 -------------

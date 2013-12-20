@@ -73,7 +73,7 @@ Each element is a copy of the json value `val`.
 ### Constructors
 
     explicit json()
-Constructs a `null` value. 
+Constructs an empty json object. 
 
     json(const json& val);
 Constructs a copy of val
