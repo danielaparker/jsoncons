@@ -24,7 +24,7 @@ class basic_output_format
 public:
     static const size_t default_indent = 4;
 
-    enum fp_format{truncate_trailing_zeros, fixed, scientific};
+    enum fp_format{truncate_trailing_zeros, fixed, scientific}; // Deprecated
 
 //  Constructors
 
@@ -34,6 +34,7 @@ public:
           indent_(default_indent),
           precision_(16),
           set_format_flags_(std::ios::showpoint),
+          floatfield_(0),
           unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -140,12 +141,28 @@ public:
         neg_inf_replacement_ = replacement;
     } 
 
-// Deprecated
+    std::ios_base::fmtflags floatfield() const
+    {
+        return floatfield_;
+    }
+
+    void floatfield(std::ios_base::fmtflags flags)
+    {
+        floatfield_ = flags;
+    }
+
+    void indent(size_t value)
+    {
+        indent_ = value;
+    }
+// Deprecated methods - will be removed in a later version
+
     basic_output_format(bool indenting)
         : indenting_(indenting), 
           floating_point_format_(truncate_trailing_zeros), 
           precision_(16),
           set_format_flags_(std::ios::showpoint),
+          floatfield_(0),
           unset_format_flags_(0),
           indent_(default_indent),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
@@ -196,9 +213,11 @@ public:
         {
         case fixed:
             set_format_flags_ |= std::ios::fixed;
+            floatfield_ |= std::ios::fixed;
             break;
         case scientific:
             set_format_flags_ |= std::ios::scientific;
+            floatfield_ |= std::ios::scientific;
             break;
         }
     }
@@ -210,18 +229,14 @@ public:
 
     void fixed_decimal_places(size_t prec)
     {
-        floating_point_format_ = default_notation_;
+        floatfield_ |= std::ios::fixed;
         precision_ = prec;
-    }
-
-    void indent(size_t value)
-    {
-        indent_ = value;
     }
 
     void set_format_flags(std::ios_base::fmtflags flags)
     {
         set_format_flags_ = flags;
+        floatfield_ |= (flags & std::ios::floatfield);
     }
 
     void unset_format_flags(std::ios_base::fmtflags flags)
@@ -247,6 +262,7 @@ private:
     bool indenting_;
     size_t indent_;
     size_t precision_;
+    std::ios_base::fmtflags floatfield_;
     std::ios_base::fmtflags set_format_flags_;
     std::ios_base::fmtflags unset_format_flags_;
 
