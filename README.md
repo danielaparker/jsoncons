@@ -11,8 +11,10 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
-Release 0.80
--------------
+Release 0.80a
+--------------
+
+- Added accessor and modifier methods `floatfield` to `output_format` to provide a supported way to set the floatfield format flag to `fixed` or `scientific` with a specified number of decimal places (this can be done in older versions, but only with deprecated methods.)
 
 - The default constructor now constructs an empty object (rather than a null object.) While this is a change, it's unlikely to break exisitng code (all test cases passed without modification.)
 
