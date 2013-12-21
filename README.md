@@ -9,7 +9,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.
 
-Releases are on sourceforge https://sourceforge.net/projects/jsoncons/?source=navbar
+Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
 Release 0.80
 -------------

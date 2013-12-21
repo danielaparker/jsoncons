@@ -175,14 +175,18 @@ public:
         {
             os_  << format_.neg_inf_replacement();
         }
-        else if (format_.truncate_trailing_zeros_notation())
+        else if (format_.floatfield() != 0)
+        {
+            std::basic_ostringstream<Char> os;
+            os.imbue(std::locale::classic());
+            os.setf(format_.floatfield(), std::ios::floatfield);
+            os << std::showpoint << std::setprecision(format_.precision()) << value;
+            os_ << JSONCONS_MOVE(os.str());
+        }
+        else 
         {
             std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
             os_ << buf;
-        }
-        else
-        {
-            os_  << value;
         }
         
         end_value();

@@ -46,7 +46,7 @@ public:
     {
         std::ostringstream os;
         os << message_ << " on line " << line_number_ << " at column " << column_number_;
-        const_cast<std::string&>(message_) = os.str();
+        const_cast<std::string&>(message_) = JSONCONS_MOVE(os.str());
         return message_.c_str();
     }
 
