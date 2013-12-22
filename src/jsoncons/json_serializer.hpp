@@ -181,7 +181,7 @@ public:
             os.imbue(std::locale::classic());
             os.setf(format_.floatfield(), std::ios::floatfield);
             os << std::showpoint << std::setprecision(format_.precision()) << value;
-            os_ << JSONCONS_MOVE(os.str());
+            os_ << os.str();
         }
         else 
         {
