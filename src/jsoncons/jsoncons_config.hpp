@@ -175,7 +175,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     std::basic_ostringstream<Char> os;
     os.imbue(std::locale::classic());
     os << std::showpoint << std::setprecision(precision) << val;
-    std::basic_string<Char> s(JSONCONS_MOVE(os.str()));
+    std::basic_string<Char> s(os.str());
 
     std::basic_string<Char>::size_type exp_pos= s.find('e');
     std::basic_string<Char> exp;

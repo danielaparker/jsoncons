@@ -641,7 +641,7 @@ std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
     to_stream(basic_json_serializer<Char>(os)); 
-    return JSONCONS_MOVE(os.str());
+    return os.str();
 }
 
 template <class Char>
@@ -649,7 +649,7 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
 {
     std::basic_ostringstream<Char> os;
     to_stream(basic_json_serializer<Char>(os,format)); 
-    return JSONCONS_MOVE(os.str());
+    return os.str();
 }
 
 template <class Char>
