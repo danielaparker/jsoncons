@@ -346,7 +346,7 @@ const basic_json<Char>& basic_json<Char>::at(size_t i) const
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name) 
+basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name) 
 {
     switch (type_)
     {
@@ -362,7 +362,7 @@ basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name)
 }
 
 template <class Char>
-const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name) const
+const basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name) const
 {
     switch (type_)
     {
@@ -370,6 +370,22 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
         JSONCONS_THROW_EXCEPTION_1("%s not found", name);
     case object_t:
         return value_.object_->get(name);
+    default:
+        {
+            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+        }
+    }
+}
+
+template <class Char>
+basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name) const
+{
+    switch (type_)
+    {
+    case empty_object_t:
+        return basic_json<Char>::null;
+    case object_t:
+        return has_member(name) ? value_.object_->get(name) : basic_json<Char>::null;
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);

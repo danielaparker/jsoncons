@@ -197,16 +197,19 @@ Returns a reference to the value at position i in a json object or array.
     const proxy operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a [proxy](proxy) object to its mapped value.
 
+    json& at(const std::string& name)
+    const json& at(const std::string& name) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+
     json& at(size_t i)
     const json& at(size_t i) const
 Returns a reference to the element at position `i` in a json array.
 
-    json& get(const std::string& name)
-    const json& get(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+    json get(const std::string& name) const
+If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns `json::null`.
 
     json get(const std::string& name, const json& default_val) const
-If `name` matches the name of a member in the json object, returns the json object, otherwise returns `default_val`.
+If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns `default_val`.
 
     bool as_bool() const
 
@@ -347,12 +350,11 @@ The output is
 
     json obj;
     obj["field1"] = json::null;
-    obj["field2"] = json();
     std::cout << obj << std::endl;
 
 The output is 
 
-    {"field1":null,"field2":null}
+    {"field1":null}
 
 ### Array
 
