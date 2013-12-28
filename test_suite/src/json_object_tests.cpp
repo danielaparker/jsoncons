@@ -18,6 +18,7 @@ using jsoncons::wjson;
 using jsoncons::basic_json_reader;
 using std::string;
 using boost::numeric::ublas::matrix;
+using jsoncons::json_exception;
 
 BOOST_AUTO_TEST_CASE(test_remove_member)
 {
@@ -109,5 +110,38 @@ BOOST_AUTO_TEST_CASE(test_empty_object_assignment)
     c = a;
     BOOST_CHECK(c.size() == 0);
     BOOST_CHECK(c.is_object());
+}
+
+BOOST_AUTO_TEST_CASE(test_get)
+{
+    json a;
+
+    a["field1"] = "value1";
+
+    std::string s1 = a.get("field1").as_string();
+    std::string s1a = a.at("field1").as_string();
+    std::string s2 = a.get("field2").as_string();
+    BOOST_REQUIRE_THROW(a.at("field2"), json_exception);
+
+    BOOST_CHECK(s1 == std::string("value1"));
+    BOOST_CHECK(s1a == std::string("value1"));
+    BOOST_CHECK(s2 == std::string("null"));
+}
+
+BOOST_AUTO_TEST_CASE(test_proxy_get)
+{
+    json a;
+
+    a["object1"] = json();
+    a["object1"]["field1"] = "value1";
+
+    std::string s1 = a["object1"].get("field1").as_string();
+    std::string s1a = a["object1"].at("field1").as_string();
+    std::string s2 = a["object1"].get("field2").as_string();
+    BOOST_REQUIRE_THROW(a["object1"].at("field2"), json_exception);
+
+    BOOST_CHECK(s1 == std::string("value1"));
+    BOOST_CHECK(s1a == std::string("value1"));
+    BOOST_CHECK(s2 == std::string("null"));
 }
 
