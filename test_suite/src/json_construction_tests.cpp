@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_accessing)
     obj["accept_waiver_of_liability"] = true;
 
     std::string first_name = obj["first_name"].as_string();
-    std::string last_name = obj.get("last_name").as_string();
+    std::string last_name = obj.at("last_name").as_string();
     int events_attended = obj["events_attended"].as_int();
     bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as_bool();
 
