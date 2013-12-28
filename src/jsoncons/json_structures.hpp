@@ -213,9 +213,9 @@ public:
         return members_[i];
     }
 
-    basic_json<Char>& at(size_t i) {return members_[i].value_;}
+    basic_json<Char>& at(size_t i) {return members_[i].second;}
 
-    const basic_json<Char>& at(size_t i) const {return members_[i].value_;}
+    const basic_json<Char>& at(size_t i) const {return members_[i].second;}
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
