@@ -719,9 +719,6 @@ public:
     }
 
     template <class T>
-    T as_value() const;
-
-    template <class T>
     std::vector<T> as_vector() const
     {
         std::vector<T> v(size());
@@ -731,6 +728,16 @@ public:
         }
         return v;
     }
+
+    friend void swap(basic_json<Char>& a, basic_json<Char>& b)
+    {
+        a.swap(b);
+    }
+private:
+	basic_json(value_type t);
+
+    template <class T>
+    T as_value() const;
 
     template<>
     std::basic_string<Char> as_value() const
@@ -791,13 +798,6 @@ public:
     {
         return as_ulonglong();
     }
-
-    friend void swap(basic_json<Char>& a, basic_json<Char>& b)
-    {
-        a.swap(b);
-    }
-private:
-	basic_json(value_type t);
 
 	value_type type_;
     union
