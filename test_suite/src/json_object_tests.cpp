@@ -145,3 +145,34 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     BOOST_CHECK(s2 == std::string("null"));
 }
 
+BOOST_AUTO_TEST_CASE(test_const_member_read)
+{
+    json a;
+
+    a["field1"] = 10;
+
+    a["field2"];
+
+    const json b(a);
+
+    int val1 = b["field1"].as_int(); 
+    BOOST_CHECK(val1 == 10);
+    BOOST_REQUIRE_THROW(b["field2"], json_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_proxy_const_member_read)
+{
+    json a;
+
+    a["object1"] = json();
+    a["object1"]["field1"] = "value1";
+    a["object1"]["field2"]; // No throw yet
+
+    const json b(a);
+
+    std::string s1 = b["object1"]["field1"].as_string();
+    BOOST_REQUIRE_THROW(b["object1"]["field2"], json_exception);
+
+    BOOST_CHECK(s1 == std::string("value1"));
+}
+

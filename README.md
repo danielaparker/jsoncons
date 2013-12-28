@@ -11,8 +11,10 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
-Release 0.82
-------------
+Release 0.82a
+-------------
+
+- The const version of the json `operator[](const std::string& name)` didn't need to return a proxy, the return value has been changed to `const json&`.
 
 - For consistency between `get` with two arguments and `get` with one, `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw)
 

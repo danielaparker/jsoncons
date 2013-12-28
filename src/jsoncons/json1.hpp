@@ -306,9 +306,9 @@ public:
             return proxy(val_.at(name_),name);
         }
 
-        const proxy operator[](const std::basic_string<Char>& name) const
+        const basic_json<Char>& operator[](const std::basic_string<Char>& name) const
         {
-            return proxy(val_.at(name_),name);
+            return val_.at(name_).at(name);
         }
 
         basic_json<Char>& at(const std::basic_string<Char>& name)
@@ -532,7 +532,7 @@ public:
 
     proxy operator[](const std::basic_string<Char>& name);
 
-    const proxy operator[](const std::basic_string<Char>& name) const;
+    const basic_json<Char>& operator[](const std::basic_string<Char>& name) const;
 
     std::basic_string<Char> to_string() const;
 
