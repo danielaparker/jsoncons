@@ -105,67 +105,67 @@ public:
 
         size_t size() const
         {
-            return val_.get(name_).size();
+            return val_.at(name_).size();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
         {
-            return val_.get(name_).has_member(name);
+            return val_.at(name_).has_member(name);
         }
 
         bool is_null() const
         {
-            return val_.get(name_).is_null();
+            return val_.at(name_).is_null();
         }
 
         bool is_empty() const
         {
-            return val_.get(name_).is_empty();
+            return val_.at(name_).is_empty();
         }
 
         size_t capacity() const
         {
-            return val_.get(name_).capacity();
+            return val_.at(name_).capacity();
         }
 
         void reserve(size_t n)
         {
-            val_.get(name_).reserve(n);
+            val_.at(name_).reserve(n);
         }
 
         void resize_array(size_t n)
         {
-            val_.get(name_).resize_array(n);
+            val_.at(name_).resize_array(n);
         }
 
         void resize_array(size_t n, const basic_json<Char>& val)
         {
-            val_.get(name_).resize_array(n,val);
+            val_.at(name_).resize_array(n,val);
         }
 
         bool is_string() const
         {
-            return val_.get(name_).is_string();
+            return val_.at(name_).is_string();
         }
 
         bool is_number() const
         {
-            return val_.get(name_).is_number();
+            return val_.at(name_).is_number();
         }
 
         bool is_longlong() const
         {
-            return val_.get(name_).is_longlong();
+            return val_.at(name_).is_longlong();
         }
 
         bool is_ulonglong() const
         {
-            return val_.get(name_).is_ulonglong();
+            return val_.at(name_).is_ulonglong();
         }
 
         bool is_double() const
         {
-            return val_.get(name_).is_double();
+            return val_.at(name_).is_double();
         }
 
         bool is_numeric() const
@@ -176,107 +176,107 @@ public:
 
         bool is_bool() const
         {
-            return val_.get(name_).is_bool();
+            return val_.at(name_).is_bool();
         }
 
         bool is_object() const
         {
-            return val_.get(name_).is_object();
+            return val_.at(name_).is_object();
         }
 
         bool is_array() const
         {
-            return val_.get(name_).is_array();
+            return val_.at(name_).is_array();
         }
  
         bool is_custom() const
         {
-            return val_.get(name_).is_custom();
+            return val_.at(name_).is_custom();
         }
 
         std::basic_string<Char> as_string() const
         {
-            return val_.get(name_).as_string();
+            return val_.at(name_).as_string();
         }
 
         std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
         {
-            return val_.get(name_).as_string(format);
+            return val_.at(name_).as_string(format);
         }
 
         Char as_char() const
         {
-            return val_.get(name_).as_char();
+            return val_.at(name_).as_char();
         }
 
         bool as_bool() const
         {
-            return val_.get(name_).as_bool();
+            return val_.at(name_).as_bool();
         }
 
         double as_double() const
         {
-            return val_.get(name_).as_double();
+            return val_.at(name_).as_double();
         }
 
         int as_int() const
         {
-            return val_.get(name_).as_int();
+            return val_.at(name_).as_int();
         }
 
         unsigned int as_uint() const
         {
-            return val_.get(name_).as_uint();
+            return val_.at(name_).as_uint();
         }
 
         long as_long() const
         {
-            return val_.get(name_).as_long();
+            return val_.at(name_).as_long();
         }
 
         unsigned long as_ulong() const
         {
-            return val_.get(name_).as_ulong();
+            return val_.at(name_).as_ulong();
         }
 
         long long as_longlong() const
         {
-            return val_.get(name_).as_longlong();
+            return val_.at(name_).as_longlong();
         }
 
         unsigned long long as_ulonglong() const
         {
-            return val_.get(name_).as_ulonglong();
+            return val_.at(name_).as_ulonglong();
         }
 
         template <class T>
         std::vector<T> as_vector() const
         {
-            return val_.get(name_).as_vector<T>();
+            return val_.at(name_).as_vector<T>();
         }
 
         template <class T>
         const T& custom_data() const
         {
-            return val_.get(name_).custom_data<T>();
+            return val_.at(name_).custom_data<T>();
         }
         // Returns a const reference to the custom data associated with name
 
         template <class T>
         T& custom_data() 
         {
-            return val_.get(name_).custom_data<T>();
+            return val_.at(name_).custom_data<T>();
         }
         // Returns a reference to the custom data associated with name
 
         operator basic_json&()
         {
-            return val_.get(name_);
+            return val_.at(name_);
         }
 
         operator const basic_json&() const
         {
-            return val_.get(name_);
+            return val_.at(name_);
         }
 
         proxy& operator=(const basic_json& val);
@@ -293,130 +293,135 @@ public:
 
         basic_json<Char>& operator[](size_t i)
         {
-            return val_.get(name_)[i];
+            return val_.at(name_)[i];
         }
 
         const basic_json<Char>& operator[](size_t i) const
         {
-            return val_.get(name_)[i];
+            return val_.at(name_)[i];
         }
 
         proxy operator[](const std::basic_string<Char>& name)
         {
-            return proxy(val_.get(name_),name);
+            return proxy(val_.at(name_),name);
         }
 
         const proxy operator[](const std::basic_string<Char>& name) const
         {
-            return proxy(val_.get(name_),name);
+            return proxy(val_.at(name_),name);
         }
 
-        basic_json<Char>& get(const std::basic_string<Char>& name)
+        basic_json<Char>& at(const std::basic_string<Char>& name)
         {
-            return val_.get(name_).get(name);
+            return val_.at(name_).at(name);
         }
 
-        const basic_json<Char>& get(const std::basic_string<Char>& name) const
+        const basic_json<Char>& at(const std::basic_string<Char>& name) const
         {
-            return val_.get(name_).get(name);
+            return val_.at(name_).at(name);
+        }
+
+        basic_json<Char> get(const std::basic_string<Char>& name) const
+        {
+            return val_.at(name_).get(name);
         }
 
         basic_json<Char> get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
         {
-            return val_.get(name_).get(name,default_val);
+            return val_.at(name_).get(name,default_val);
         }
 
         void clear()
         {
-            val_.get(name_).clear();
+            val_.at(name_).clear();
         }
         // Remove all elements from an array or object
 
         void remove_range(size_t from_index, size_t to_index)
         {
-            val_.get(name_).remove_range(size_t from_index, size_t to_index);
+            val_.at(name_).remove_range(size_t from_index, size_t to_index);
         }
         // Remove a range of elements from an array 
 
         void remove_member(const std::basic_string<Char>& name)
         {
-            val_.get(name_).remove_member(name);
+            val_.at(name_).remove_member(name);
         }
         // Remove a member from an object 
 
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
-            val_.get(name_).set(name,value);
+            val_.at(name_).set(name,value);
         }
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
         void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
-            val_.get(name_).set(name,value);
+            val_.at(name_).set(name,value);
         }
 
         void add(basic_json<Char>&& value)
         {
-            val_.get(name_).add(value);
+            val_.at(name_).add(value);
         }
 
         void add(size_t index, basic_json<Char>&& value)
         {
-            val_.get(name_).add(index, value);
+            val_.at(name_).add(index, value);
         }
 #endif
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
-            val_.get(name_).set_custom_data(name,value);
+            val_.at(name_).set_custom_data(name,value);
         }
 
         void add(const basic_json<Char>& value)
         {
-            val_.get(name_).add(value);
+            val_.at(name_).add(value);
         }
 
         void add(size_t index, const basic_json<Char>& value)
         {
-            val_.get(name_).add(index, value);
+            val_.at(name_).add(index, value);
         }
 
         template <class T>
         void add_custom_data(const T& value)
         {
-            val_.get(name_).add_custom_data(value);
+            val_.at(name_).add_custom_data(value);
         }
 
         template <class T>
         void add_custom_data(size_t index, const T& value)
         {
-            val_.get(name_).add_custom_data(index, value);
+            val_.at(name_).add_custom_data(index, value);
         }
 
         std::basic_string<Char> to_string() const
         {
-            return val_.get(name_).to_string();
+            return val_.at(name_).to_string();
         }
 
         std::basic_string<Char> to_string(const basic_output_format<Char>& format) const
         {
-            return val_.get(name_).to_string(format);
+            return val_.at(name_).to_string(format);
         }
 
         void to_stream(std::basic_ostream<Char>& os) const
         {
-            val_.get(name_).to_stream(os);
+            val_.at(name_).to_stream(os);
         }
 
         void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
         {
-            val_.get(name_).to_stream(os,format);
+            val_.at(name_).to_stream(os,format);
         }
 
         void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
         {
-            val_.get(name_).to_stream(os,format,indenting);
+            val_.at(name_).to_stream(os,format,indenting);
         }
 
         void swap(basic_json<Char>& val)
@@ -636,13 +641,13 @@ public:
 
     Char as_char() const;
 
-    basic_json<Char>& at(size_t i);
+    basic_json<Char>& at(const std::basic_string<Char>& name);
+    const basic_json<Char>& at(const std::basic_string<Char>& name) const;
 
+    basic_json<Char>& at(size_t i);
     const basic_json<Char>& at(size_t i) const;
 
-    basic_json<Char>& get(const std::basic_string<Char>& name);
-
-    const basic_json<Char>& get(const std::basic_string<Char>& name) const;
+    basic_json<Char> get(const std::basic_string<Char>& name) const;
 
     basic_json<Char> get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
 

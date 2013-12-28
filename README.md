@@ -11,6 +11,13 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Release 0.82
+------------
+
+- For consistency between `get` with two arguments and `get` with one, `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw)
+
+- `json& at(const std::name& name)` and `json& at(const std::name& name)` have been added to replace the old get with one argument.
+
 Release 0.81
 ------------
 
