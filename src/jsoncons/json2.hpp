@@ -635,9 +635,9 @@ typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_s
 }
 
 template <class Char>
-const typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_string<Char>& name) const
+const basic_json<Char>& basic_json<Char>::operator[](const std::basic_string<Char>& name) const
 {
-    return proxy(const_cast<basic_json<Char>&>(*this),name);
+    return at(name);
 }
 
 template <class Char>

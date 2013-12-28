@@ -194,8 +194,10 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 Returns a reference to the value at position i in a json object or array.
 
     proxy operator[](const std::string& name)
-    const proxy operator[](const std::string& name) const
-If `name` matches the name of a member in the json object, returns a [proxy](proxy) object to its mapped value.
+Returns a [[proxy]] object to its mapped value. If written to, inserts a new member or replaces an existing member `name`. If read, if `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws. 
+
+    const json& operator[](const std::string& name) const
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
     json& at(const std::string& name)
     const json& at(const std::string& name) const
@@ -257,9 +259,9 @@ Removes all elements from an array value whose index is between `from_index`, th
     void remove_member(const std::string& name)
 Remove a member from a `json` object
 
-    void set(const std::string& k, const json& val)
-    void set(std::string&& k, json&& val)
-Inserts a new member into a json object.
+    void set(const std::string& name, const json& val)
+    void set(std::string&& name, json&& val)
+Inserts a new member or replaces an existing member in a json object.
 
     template <class T>
     void set_custom_data(const std::string& name, const T& value)
