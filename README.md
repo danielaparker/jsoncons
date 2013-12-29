@@ -14,11 +14,11 @@ Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=
 Release 0.82a
 -------------
 
-- The const version of the json `operator[](const std::string& name)` didn't need to return a proxy, the return value has been changed to `const json&`.
+- The const version of the json `operator[](const std::string& name)` didn't need to return a proxy, the return value has been changed to `const json&` (this change is transparent to the user.) 
 
-- For consistency between `get` with two arguments and `get` with one, `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw)
+- For consistency between `get` with two arguments and `get` with one, `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw.) This way both `get` methods return copies and both return default values if no keyed value exists.
 
-- `json& at(const std::name& name)` and `json& at(const std::name& name)` have been added to replace the old get with one argument.
+- non-const and const methods `json& at(const std::name& name)` have been added to replace the old single argument get method. These have the same behavior as the corresponding `operator[]` functions, but the non-const `at` is more efficient.
 
 Release 0.81
 ------------
