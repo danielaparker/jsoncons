@@ -194,18 +194,18 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 Returns a reference to the value at position i in a json object or array.
 
     proxy operator[](const std::string& name)
-Returns a [[proxy]] object to its mapped value. If written to, inserts a new member or replaces an existing member `name`. If read, if `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws. 
+Returns a [[proxy]] object to its keyed value. If written to, inserts a new member or replaces an existing member `name`. If read, if `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws. 
 
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
     json& at(const std::string& name)
     const json& at(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.  These have the same behavior as the corresponding `operator[]` functions, but the non-const `at` is more efficient (doesn't have to return a proxy.)
 
     json& at(size_t i)
     const json& at(size_t i) const
-Returns a reference to the element at position `i` in a json array.
+Returns a reference to the element at position `i` in a json array.  These have the same behavior as the corresponding `operator[]` functions.
 
     json get(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns `json::null`.
