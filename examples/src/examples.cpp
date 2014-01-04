@@ -117,6 +117,27 @@ void second_example_a()
     }
 }
 
+void more_examples()
+{
+	json image_sizing;  
+	image_sizing["resolution"] = 144; 
+	image_sizing["long_edge"] = 9.84;
+	image_sizing["size_units"] =  "cm";
+	image_sizing["resize_to_fit"] = true;
+	std::cout << pretty_print(image_sizing) << std::endl;
+
+    json image_formats = json::make_array();
+    image_formats.add("JPEG");
+    image_formats.add("PSD");
+    image_formats.add("TIFF");
+    image_formats.add("DNG");
+
+    json file_export;
+    file_export["image_formats"] = std::move(image_formats);
+    file_export["image_sizing"] = std::move(image_sizing);
+    std::cout << pretty_print(file_export) << std::endl;
+}
+
 int main()
 {
     first_example_a();
@@ -130,6 +151,8 @@ int main()
 
     read_csv_file();
     write_csv_file();
+
+	more_examples();
 
     return 0;
 }

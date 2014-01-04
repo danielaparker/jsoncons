@@ -1,2 +1,0 @@
-The `proxy` class wraps a reference to a json object and a reference to a member name, returned by `operator[](const std::string& name)`. It supports the public interface to [[json]].
-

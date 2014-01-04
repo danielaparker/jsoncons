@@ -20,9 +20,6 @@ A random access iterator to `json`
     const_array_iterator
 A random access iterator to `const json`
 
-    proxy
-A [[proxy]] object wraps a pair of references to a json object and a member name, returned by `operator[](const std::string& name)`.
-
 ### Member constants
 
     an_object
@@ -193,8 +190,8 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.
 
-    proxy operator[](const std::string& name)
-Returns a [[proxy]] object to its keyed value. If written to, inserts a new member or replaces an existing member `name`. If read, if `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws. 
+    json& operator[](const std::string& name)
+Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
@@ -207,11 +204,11 @@ If `name` matches the name of a member in the json object, returns a reference t
     const json& at(size_t i) const
 Returns a reference to the element at position `i` in a json array.  These have the same behavior as the corresponding `operator[]` functions.
 
-    json get(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns `json::null`.
+    const json& get(const std::string& name) const
+If `name` matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to `json::null`.
 
-    json get(const std::string& name, const json& default_val) const
-If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns `default_val`.
+    const json get(const std::string& name, const json& default_val) const
+If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
 
     bool as_bool() const
 
