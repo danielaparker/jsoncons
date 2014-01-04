@@ -25,20 +25,6 @@
 
 namespace jsoncons {
 
-// proxy
-template <class Char>
-basic_json<Char>::proxy::proxy(basic_json<Char>& var, const std::basic_string<Char>& name)
-    : val_(var), name_(name)
-{
-}
-
-template <class Char>
-typename basic_json<Char>::proxy& basic_json<Char>::proxy::operator=(const basic_json& val)
-{
-    val_.set(name_, val);
-    return *this;
-}
-
 template <class Char>
 basic_json<Char>::basic_json()
 {
@@ -245,7 +231,7 @@ bool basic_json<Char>::operator!=(const basic_json<Char>& rhs) const
 template <class Char>
 bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
 {
-    if (is_numeric() && rhs.is_numeric())
+    if (is_number() && rhs.is_number())
     {
         switch (type_)
         {
@@ -378,14 +364,17 @@ const basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name
 }
 
 template <class Char>
-basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name) const
+const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name) const
 {
     switch (type_)
     {
     case empty_object_t:
         return basic_json<Char>::null;
     case object_t:
-        return has_member(name) ? value_.object_->get(name) : basic_json<Char>::null;
+		{
+        const_object_iterator it = value_.object_->find(name);
+        return it != end_members() ? it->second : basic_json<Char>::null;
+		}
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -394,14 +383,17 @@ basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name) cons
 }
 
 template <class Char>
-basic_json<Char> basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
 {
     switch (type_)
     {
     case empty_object_t:
-        return default_val;
+        return const_val_proxy(default_val);
     case object_t:
-        return has_member(name) ? value_.object_->get(name) : default_val;
+		{
+        const_object_iterator it = value_.object_->find(name);
+        return it != end_members() ? const_val_proxy(it->second) : const_val_proxy(default_val);
+		}
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -629,9 +621,9 @@ size_t basic_json<Char>::size() const
 }
 
 template <class Char>
-typename basic_json<Char>::proxy basic_json<Char>::operator[](const std::basic_string<Char>& name)
+typename basic_json<Char>::object_key_proxy basic_json<Char>::operator[](const std::basic_string<Char>& name)
 {
-    return proxy(*this,name);
+    return object_key_proxy(*this,name);
 }
 
 template <class Char>

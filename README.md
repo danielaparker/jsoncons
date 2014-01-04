@@ -11,6 +11,15 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Release 0.83
+------------
+
+Optimizations - should not break 0.82a code
+
+- `get(const std::name& name) const` now returns `const json&` if keyed value exists, otherwise a const reference to json::null
+
+- `get(const std::string& name, const json& default_val) const` now returns `const json` (actually a proxy that evaluates to `const json` if read)
+
 Release 0.82a
 -------------
 
