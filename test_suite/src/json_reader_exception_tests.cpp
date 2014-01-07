@@ -44,10 +44,12 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();
+        BOOST_CHECK(0 != 0); 
     }
     catch (const json_parse_exception& e)
     {
-        std::cout << "***" << e.what() << "," << e.line_number() << "," << e.column_number() << std::endl;
+        BOOST_CHECK(e.line_number() == 14);
+        BOOST_CHECK(e.column_number() == 30);
     }
 } 
 
@@ -60,11 +62,13 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     {
         json_deserializer handler;
         json_reader reader(is,handler);
-        reader.read();
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
     }
     catch (const json_parse_exception& e)
     {
-        std::cout << "***" << e.what() << "," << e.line_number() << "," << e.column_number() << std::endl;
+        BOOST_CHECK(e.line_number() == 17);
+        BOOST_CHECK(e.column_number() == 9);
     }
 } 
 

@@ -240,7 +240,7 @@ public:
             return val_.custom_data<T>();
         }
 
-        operator const basic_json() const
+        operator basic_json() const
         {
             return val_;
         }
@@ -684,6 +684,9 @@ public:
     static basic_json make_array(size_t n);
 
     static basic_json make_array(size_t n, const basic_json<Char>& val);
+
+    template <class InputIterator>
+    static basic_json make_array(InputIterator first, InputIterator last);
 
     static basic_json make_2d_array(size_t m, size_t n);
 

@@ -7,7 +7,9 @@
                 "events_attended":10,
                 "accept_waiver_of_liability" : true
             },
-            /* Missing *left* brace */
+            /* Missing 
+               *left* 
+               brace */
 
                  "first_name":"John",
                  "last_name":"Doe",

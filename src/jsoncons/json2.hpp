@@ -764,6 +764,13 @@ basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& 
     return basic_json<Char>(new json_array<Char>(n,val));
 }
 
+template <class Char>
+template <class InputIterator>
+basic_json<Char> basic_json<Char>::make_array(InputIterator first, InputIterator last)
+{
+    return basic_json<Char>(first, last);
+}
+
 template <class Char> 
 basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
 {

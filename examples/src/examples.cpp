@@ -136,6 +136,10 @@ void more_examples()
     file_export["image_formats"] = std::move(image_formats);
     file_export["image_sizing"] = std::move(image_sizing);
     std::cout << pretty_print(file_export) << std::endl;
+
+	size_t n = 10, m = 3;
+	std::vector<size_t> x(n,m);
+	x[5] = 3;
 }
 
 int main()
