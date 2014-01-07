@@ -108,7 +108,6 @@ public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
        : os_(os), line_delimiter_("\n"), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"'), quote_style_(quote_minimal)
     {
-        init();
     }
 
     basic_csv_serializer(std::basic_ostream<Char>& os,
@@ -141,12 +140,10 @@ public:
         {
             JSONCONS_THROW_EXCEPTION("Unrecognized quote style.");
         }
-        init();
     }
 
     ~basic_csv_serializer()
     {
-        restore();
     }
 
     virtual void begin_json()
@@ -366,20 +363,18 @@ private:
         {
             os  << format_.neg_inf_replacement();
         }
-        else if (format_.truncate_trailing_zeros_notation())
+        else if (format_.floatfield() != 0)
         {
-            char buffer[32];
-            int len = jsoncons::c99_snprintf(buffer, 32, "%#.*g", format_.precision(), val);
-            while (len >= 2 && buffer[len - 1] == '0' && buffer[len - 2] != '.')
-            {
-                --len;
-            }
-            buffer[len] = 0;
-            os << buffer;
+            std::basic_ostringstream<Char> ss;
+            ss.imbue(std::locale::classic());
+            ss.setf(format_.floatfield(), std::ios::floatfield);
+            ss << std::showpoint << std::setprecision(format_.precision()) << val;
+            os << ss.str();
         }
-        else
+        else 
         {
-            os  << val;
+            std::basic_string<Char> buf = jsoncons::double_to_string<Char>(val,format_.precision());
+            os << buf;
         }
 
         end_value();
@@ -441,20 +436,6 @@ private:
             ++stack_.back().count_;
         }
     }
-
-    void init()
-    {
-        os_.setf(format_.set_format_flags());
-        os_.unsetf(format_.unset_format_flags());
-        os_.precision(format_.precision());
-    }
-
-    void restore()
-    {
-        os_.precision(original_precision_);
-        os_.flags(original_format_flags_);
-    }
-
 
     std::basic_ostream<Char>& os_;
     jsoncons::basic_output_format<Char> format_;

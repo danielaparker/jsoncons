@@ -1265,7 +1265,7 @@ class basic_pretty_print
 public:
 
     basic_pretty_print(basic_json<Char>& o)
-        : o_(o), format_(true)
+        : o_(o)
     {
     }
 
