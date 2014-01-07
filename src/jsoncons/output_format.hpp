@@ -24,18 +24,12 @@ class basic_output_format
 public:
     static const size_t default_indent = 4;
 
-    enum fp_format{truncate_trailing_zeros, fixed, scientific}; // Deprecated
-
 //  Constructors
 
     basic_output_format()
-        : indenting_(false), 
-          floating_point_format_(truncate_trailing_zeros),
-          indent_(default_indent),
+        : indent_(default_indent),
           precision_(16),
-          set_format_flags_(std::ios::showpoint),
           floatfield_(0),
-          unset_format_flags_(0),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
@@ -155,116 +149,10 @@ public:
     {
         indent_ = value;
     }
-// Deprecated methods - will be removed in a later version
-
-    basic_output_format(bool indenting)
-        : indenting_(indenting), 
-          floating_point_format_(truncate_trailing_zeros), 
-          precision_(16),
-          set_format_flags_(std::ios::showpoint),
-          floatfield_(0),
-          unset_format_flags_(0),
-          indent_(default_indent),
-          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
-          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
-          nan_replacement_(json_char_traits<Char>::null_literal()),
-          escape_all_non_ascii_(false),
-          escape_solidus_(false)
-    {
-    }
-
-    bool indenting() const
-    {
-        return indenting_;
-    }
-
-    std::ios_base::fmtflags set_format_flags() const
-    {
-        return set_format_flags_;
-    }
-
-    std::ios_base::fmtflags unset_format_flags() const
-    {
-        return unset_format_flags_;
-    }
-
-    void set_floating_point_format(fp_format format)
-    {
-        switch (format)
-        {
-        case truncate_trailing_zeros:
-            set_floating_point_format(format,16);
-            break;
-        case fixed:
-            set_floating_point_format(format,17);
-            break;
-        case scientific:
-            set_floating_point_format(format,17);
-            break;
-        }
-    }
-
-    void set_floating_point_format(fp_format format, size_t precision)
-    {
-        floating_point_format_ = format;
-        precision_ = precision;
-        switch (format)
-        {
-        case fixed:
-            set_format_flags_ |= std::ios::fixed;
-            floatfield_ |= std::ios::fixed;
-            break;
-        case scientific:
-            set_format_flags_ |= std::ios::scientific;
-            floatfield_ |= std::ios::scientific;
-            break;
-        }
-    }
-
-    void indenting(bool value)
-    {
-        indenting_ = value;
-    }
-
-    void fixed_decimal_places(size_t prec)
-    {
-        floatfield_ |= std::ios::fixed;
-        precision_ = prec;
-    }
-
-    void set_format_flags(std::ios_base::fmtflags flags)
-    {
-        set_format_flags_ = flags;
-        floatfield_ |= (flags & std::ios::floatfield);
-    }
-
-    void unset_format_flags(std::ios_base::fmtflags flags)
-    {
-        unset_format_flags_ = flags;
-    }
-
-    bool truncate_trailing_zeros_notation() const
-    {
-        return floating_point_format_ == truncate_trailing_zeros;
-    }
-
-    bool fixed_notation() const
-    {
-        return floating_point_format_ == fixed;
-    }
-
-    bool scientific_notation() const
-    {
-        return floating_point_format_ == scientific;
-    }
 private:
-    bool indenting_;
     size_t indent_;
     size_t precision_;
     std::ios_base::fmtflags floatfield_;
-    std::ios_base::fmtflags set_format_flags_;
-    std::ios_base::fmtflags unset_format_flags_;
 
     bool replace_nan_;
     bool replace_pos_inf_;
@@ -274,8 +162,6 @@ private:
     std::basic_string<Char> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
-    size_t max_decimal_places;
-    fp_format floating_point_format_;
 };
 
 typedef basic_output_format<char> output_format;

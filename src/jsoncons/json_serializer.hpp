@@ -45,38 +45,25 @@ public:
     basic_json_serializer(std::basic_ostream<Char>& os)
        : os_(os), indent_(0), indenting_(false)
     {
-        original_precision_ = os.precision();
-        original_format_flags_ = os.flags();
-        init();
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
        : os_(os), indent_(0), indenting_(indenting)
     {
-        original_precision_ = os.precision();
-        original_format_flags_ = os.flags();
-        init();
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
        : os_(os), format_(format), indent_(0),
-         indenting_(format.indenting()) // Deprecated behavior
+         indenting_(false) // Deprecated behavior
     {
-        original_precision_ = os.precision();
-        original_format_flags_ = os.flags();
-        init();
     }
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
        : os_(os), format_(format), indent_(0), indenting_(indenting)
     {
-        original_precision_ = os.precision();
-        original_format_flags_ = os.flags();
-        init();
     }
 
     ~basic_json_serializer()
     {
-        restore();
     }
 
     virtual void begin_json()
@@ -301,19 +288,6 @@ private:
     int indent_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-
-    void init()
-    {
-        os_.setf(format_.set_format_flags());
-        os_.unsetf(format_.unset_format_flags());
-        os_.precision(format_.precision());
-    }
-
-    void restore()
-    {
-        os_.precision(original_precision_);
-        os_.flags(original_format_flags_);
-    }
 
     bool indenting_;
 };
