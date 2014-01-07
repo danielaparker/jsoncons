@@ -18,14 +18,18 @@ Optimizations - should not break 0.82a code
 
 - `get(const std::name& name) const` now returns `const json&` if keyed value exists, otherwise a const reference to json::null
 
-- `get(const std::string& name, const json& default_val) const` now returns `const json` (actually a proxy that evaluates to `const json` if read)
+- `get(const std::string& name, const json& default_val) const` now returns `const json` (actually a const proxy that evaluates to `json` if read)
+
+Bug fixes
+
+- Line number not incremented within multiline comment - fixed
 
 Release 0.82a
 -------------
 
 - The const version of the json `operator[](const std::string& name)` didn't need to return a proxy, the return value has been changed to `const json&` (this change is transparent to the user.) 
 
-- For consistency between `get` with two arguments and `get` with one, `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw.) This way both `get` methods return copies and both return default values if no keyed value exists.
+- `get(const std::name& name)` has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw.) This way both `get` methods return default values if no keyed value exists.
 
 - non-const and const methods `json& at(const std::name& name)` have been added to replace the old single argument get method. These have the same behavior as the corresponding `operator[]` functions, but the non-const `at` is more efficient.
 

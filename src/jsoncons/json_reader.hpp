@@ -941,7 +941,19 @@ bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
     while (!done && buffer_position_ < end)
     {
         Char c = input_buffer_[buffer_position_];
-        if (c == '*' && input_buffer_[buffer_position_ + 1] == '/')
+        if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
+        {
+            ++line_;
+            column_ = 0;
+            buffer_position_ += 2;
+        }
+        else if (c == '\n' || c == '\r')
+        {
+            ++line_;
+            column_ = 0;
+            ++buffer_position_;
+        }
+        else if (c == '*' && input_buffer_[buffer_position_ + 1] == '/')
         {
             done = true;
             buffer_position_ += 2;
