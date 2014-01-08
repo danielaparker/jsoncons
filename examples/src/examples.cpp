@@ -6,6 +6,8 @@
 #include "csv_examples.h"
 
 using jsoncons::json;
+using jsoncons::json_deserializer;
+using jsoncons::json_reader;
 using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
@@ -117,6 +119,28 @@ void second_example_a()
     }
 }
 
+void mulitple_json_objects()
+{
+    std::ifstream is("input/multiple-json-objects.json");
+    if (!is.is_open())
+    {
+        throw std::exception("Cannot open file");
+    }
+
+    json_deserializer handler;
+    json_reader reader(is,handler);
+
+    while (!reader.eof())
+    {
+        reader.read();
+        if (!reader.eof())
+        {
+            json val = std::move(handler.root());
+            std::cout << val << std::endl;
+        }
+    }
+}
+
 void more_examples()
 {
 	json image_sizing;  
@@ -157,6 +181,7 @@ int main()
     write_csv_file();
 
 	more_examples();
+    mulitple_json_objects();
 
     return 0;
 }

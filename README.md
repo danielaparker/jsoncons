@@ -24,6 +24,8 @@ Bug fixes
 
 - Line number not incremented within multiline comment - fixed
 
+- Removed deprecated output_format properties (too much bagage to carry around)
+
 Release 0.82a
 -------------
 

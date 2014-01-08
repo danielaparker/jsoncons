@@ -685,9 +685,6 @@ public:
 
     static basic_json make_array(size_t n, const basic_json<Char>& val);
 
-    template <class InputIterator>
-    static basic_json make_array(InputIterator first, InputIterator last);
-
     static basic_json make_2d_array(size_t m, size_t n);
 
     static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);

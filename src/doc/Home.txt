@@ -242,12 +242,21 @@ The output is
 
 ### Reading multiple JSON objects from a stream
 
-    std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
-    std::cout << in << std::endl;
+Here is a sample json file containing multiple json objects (`multiple-json-objects.json`):
 
-    std::istringstream is(in);
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
 
-    jsoncons::json_deserializer handler;
+and here is the code to read them: 
+
+    std::ifstream is("input/multiple-json-objects.json");
+    if (!is.is_open())
+    {
+        throw std::exception("Cannot open file");
+    }
+
+    json_deserializer handler;
     json_reader reader(is,handler);
 
     while (!reader.eof())
@@ -262,9 +271,9 @@ The output is
 
 The output is
 
-    {"a":1,"b":2,"c":3}{"a":4,"b":5,"c":6}
     {"a":1,"b":2,"c":3}
     {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
 
 ### Optional escaping of non-ASCII UTF8 octets 
 
