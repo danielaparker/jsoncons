@@ -86,27 +86,4 @@ Sets replacement text for negative infinity.
     void floatfield(std::ios_base::fmtflags flags)
 Allows the floatfield format flag to be set to a specific notation (either `std::ios::fixed` or `std::ios::scientific`.) In the fixed and scientific notations, the precision field specifies the number of digits to display after the decimal point.
 
-### Deprecated
-
-    std::ios_base::fmtflags set_format_flags() const
-
-    std::ios_base::fmtflags unset_format_flags() const
-
-    bool indenting() const
-Use the `indenting` parameter on one of the `json_serializer` constructors.
-
-    bool truncate_trailing_zeros_notation() const
-
-    void void fixed_decimal_places(size_t prec)
-
-    void indenting(bool value)
-
-    void set_floating_point_format(fp_format format)
-
-    void set_floating_point_format(fp_format format, size_t prec)
-Use `precision(prec)` to set the maximum number of significant digits.
-
-    void set_format_flags(std::ios_base::fmtflags flags)
-
-    void unset_format_flags(std::ios_base::fmtflags flags)
 
