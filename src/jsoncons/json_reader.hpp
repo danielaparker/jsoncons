@@ -886,23 +886,33 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
     {
         while (!done && buffer_position_ < buffer_length_)
         {
-            Char c = read_ch();
-            if (eof())
+            Char c = buffer_[buffer_position_++];
+            ++column_;
+            switch (c)
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            if (c == '*')
-            {
-                Char next = peek();
-                if (eof())
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
                 {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                    ++buffer_position_;
                 }
-                if (next == '/')
+                ++line_;
+                column_ = 0;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 0;
+                break;
+            case '*':
                 {
-                    done = true;
-                    skip_ch();
+                    Char next = buffer_[buffer_position_];
+                    if (next == '/')
+                    {
+                        done = true;
+                        buffer_position_++;
+                        column_++;
+                    }
                 }
+                break;
             }
         }
         if (!done)
