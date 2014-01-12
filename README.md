@@ -14,7 +14,7 @@ Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=
 Release 0.83
 ------------
 
-Optimizations - should not break 0.82a code
+Optimizations (very unlikely to break earlier code)
 
 - `get(const std::name& name) const` now returns `const json&` if keyed value exists, otherwise a const reference to json::null
 
@@ -23,6 +23,8 @@ Optimizations - should not break 0.82a code
 Bug fixes
 
 - Line number not incremented within multiline comment - fixed
+
+Deprecated features removed
 
 - Removed deprecated output_format properties (too much bagage to carry around)
 
