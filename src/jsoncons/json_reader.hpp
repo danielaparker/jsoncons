@@ -168,7 +168,6 @@ private:
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
-    bool fast_ignore_single_line_comment();
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
 
@@ -832,50 +831,40 @@ void basic_json_reader<Char>::parse_string()
 template<class Char>
 void basic_json_reader<Char>::ignore_single_line_comment()
 {
-    bool done = fast_ignore_single_line_comment();
+    bool done = false;
     while (!done)
     {
-        Char c = read_ch();
-        if (eof())
+        while (!done && buffer_position_ < buffer_length_)
         {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        if (c == '\n')
-        {
-            done = true;
-        }
-    }
-}
-
-template<class Char>
-bool basic_json_reader<Char>::fast_ignore_single_line_comment()
-{
-    bool done = false;
-    const size_t end = buffer_length_ - 1;
-    while (!done && buffer_position_ < end)
-    {
-        Char c = input_buffer_[buffer_position_];
-        if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
-        {
-            done = true;
-            ++line_;
-            column_ = 0;
-            buffer_position_ += 2;
-        }
-        else if (c == '\n' || c == '\r')
-        {
-            done = true;
-            ++line_;
-            column_ = 0;
-            ++buffer_position_;
-        }
-        else
-        {
+            Char c = buffer_[buffer_position_++];
             ++column_;
-            ++buffer_position_;
+            switch (c)
+            {
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
+                {
+                    ++buffer_position_;
+                }
+                ++line_;
+                column_ = 0;
+                done = true;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 0;
+                done = true;
+                break;
+            }
+        }
+        if (!done)
+        {
+            read_data_block();
+            if (eof())
+            {
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            }
         }
     }
-    return done;
 }
 
 template<class Char>
