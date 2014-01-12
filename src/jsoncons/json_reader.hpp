@@ -703,96 +703,103 @@ void basic_json_reader<Char>::parse_number(Char c)
     bool done = false;
     while (!done)
     {
-        Char c = read_non_lf_ch();
-        if (eof())
+        while (!done && buffer_position_ < buffer_length_)
         {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        switch (c)
-        {
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            string_buffer_.push_back(c);
-            break;
-        case '-':
-        case '+':
-        case '.':
-        case 'e':
-        case 'E':
-            has_frac_or_exp = true;
-            string_buffer_.push_back(c);
-            break;
-        default:
+            Char c = buffer_[buffer_position_++]; // shouldn't be lf
+            switch (c)
             {
-                unread_last_non_lf_ch();
-                if (has_frac_or_exp)
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                string_buffer_.push_back(c);
+                break;
+            case '-':
+            case '+':
+            case '.':
+            case 'e':
+            case 'E':
+                has_frac_or_exp = true;
+                string_buffer_.push_back(c);
+                break;
+            default:
                 {
-                    try
-                    {
-                        double d = string_to_double(string_buffer_);
-                        if (has_neg)
-                            d = -d;
-                        handler_.value(d,*this);
-                    }
-                    catch (...)
-                    {
-                        err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                        handler_.null_value(*this);
-                    }
-                }
-                else if (has_neg)
-                {
-                    try
-                    {
-                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION()));
-                        handler_.value(-d, *this);
-                    }
-                    catch (const std::exception&)
+                    --buffer_position_;
+                    if (has_frac_or_exp)
                     {
                         try
                         {
                             double d = string_to_double(string_buffer_);
-                            handler_.value(-d,*this);
-                        }
-                        catch (...)
-                        {
-                            err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                            handler_.null_value(*this);
-                        }
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXPANSION());
-                        handler_.value(d, *this);
-                    }
-                    catch (const std::exception&)
-                    {
-                        try
-                        {
-                            double d = string_to_double(string_buffer_);
+                            if (has_neg)
+                                d = -d;
                             handler_.value(d,*this);
                         }
                         catch (...)
                         {
-                            err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
+                            err_handler_.fatal_error("JPE203", "Invalid double value", *this);
                             handler_.null_value(*this);
                         }
                     }
+                    else if (has_neg)
+                    {
+                        try
+                        {
+                            long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION()));
+                            handler_.value(-d, *this);
+                        }
+                        catch (const std::exception&)
+                        {
+                            try
+                            {
+                                double d = string_to_double(string_buffer_);
+                                handler_.value(-d,*this);
+                            }
+                            catch (...)
+                            {
+                                err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
+                                handler_.null_value(*this);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXPANSION());
+                            handler_.value(d, *this);
+                        }
+                        catch (const std::exception&)
+                        {
+                            try
+                            {
+                                double d = string_to_double(string_buffer_);
+                                handler_.value(d,*this);
+                            }
+                            catch (...)
+                            {
+                                err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
+                                handler_.null_value(*this);
+                            }
+                        }
+                    }
+                    done = true;
                 }
-                done = true;
+                break;
             }
-            break;
+        }
+        if (!done)
+        {
+            read_data_block();
+            if (eof())
+            {
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            }
         }
     }
 }
