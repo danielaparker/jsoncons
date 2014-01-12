@@ -72,9 +72,11 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(err_handler),
-         buffer_(default_max_buffer_length),
+         buffer_(default_max_buffer_length+1),
          input_buffer_(0),
          buffer_position_(0),
+         bof_(true),
+         eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
@@ -91,9 +93,11 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length),
+         buffer_(default_max_buffer_length+1),
          input_buffer_(0),
          buffer_position_(0),
+         bof_(true),
+         eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
@@ -113,7 +117,7 @@ public:
 
     bool eof() const
     {
-        return buffer_position_ > buffer_length_ && is_.eof();
+        return eof_;
     }
 
     size_t buffer_capacity() const
@@ -124,7 +128,7 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity);
+        buffer_.resize(buffer_capacity+1);
         input_buffer_ = &buffer_[0];
     }
 
@@ -176,12 +180,35 @@ private:
         buffer_position_ = 0;
         if (!is_.eof())
         {
-            is_.read(input_buffer_, buffer_capacity_);
-            buffer_length_ = static_cast<size_t>(is_.gcount());
+            if (bof_)
+            {
+                is_.read(input_buffer_, buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(is_.gcount());
+                bof_ = false;
+                if (buffer_length_ == 0)
+                {
+                    eof_ = true;
+                }
+                else if (!is_.eof())
+                {
+                    --buffer_length_;
+                }
+            }
+            else
+            {
+                input_buffer_[0] = input_buffer_[buffer_length_];
+                is_.read(input_buffer_+1, buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(is_.gcount());
+                if (is_.eof())
+                {
+                    ++buffer_length_;
+                }
+		    }
         }
         else
         {
             buffer_length_ = 0;
+            eof_ = true;
         }
     }
 
@@ -212,10 +239,10 @@ private:
                 ++column_;
             }
         }
-        else
-        {
-            buffer_position_++;
-        }
+        //else
+        //{
+        //    buffer_position_++;
+        //}
 
         return c;
     }
@@ -283,6 +310,8 @@ private:
     size_t buffer_length_;
     basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
+    bool bof_;
+    bool eof_;
 };
 
 template<class Char>
@@ -776,109 +805,97 @@ void basic_json_reader<Char>::parse_string()
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
-        if (eof())
+        while (!done && buffer_position_ < buffer_length_)
         {
-            err_handler_.fatal_error("JPE101", "EOF, expected \"", *this);
-        }
-        if (is_control_character(c))
-        {
-            err_handler_.error("JPE201", "Illegal control character in string", *this);
-        }
-        switch (c)
-        {
-        case '\\':
-            if (!eof())
+            Char c = buffer_[buffer_position_++];
+            switch (c)
             {
-                Char next = peek();
-                switch (next)
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
                 {
-                case '\"':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\"');
-                    break;
+                    ++buffer_position_;
+                }
+                ++line_;
+                column_ = 0;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 0;
+                break;
+            default:
+                if (is_control_character(c))
+                {
+                    err_handler_.error("JPE201", "Illegal control character in string", *this);
+                }
+                switch (c)
+                {
                 case '\\':
-                    skip_ch();
-                    if (eof())
                     {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\\');
-                    break;
-                case '/':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('/');
-                    break;
-                case 'n':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\n');
-                    break;
-                case 'b':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\b');
-                    break;
-                case 'f':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\f');
-                    break;
-                case 'r':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\r');
-                    break;
-                case 't':
-                    skip_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    string_buffer_.push_back('\t');
-                    break;
-                case 'u':
-                    {
-                        skip_ch();
-                        if (eof())
+                        Char next = buffer_[buffer_position_];
+                        switch (next)
                         {
-                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                        case '\"':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\"');
+                            break;
+                        case '\\':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\\');
+                            break;
+                        case '/':
+                            ++buffer_position_;
+                            string_buffer_.push_back('/');
+                            break;
+                        case 'n':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\n');
+                            break;
+                        case 'b':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\b');
+                            break;
+                        case 'f':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\f');
+                            break;
+                        case 'r':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\r');
+                            break;
+                        case 't':
+                            ++buffer_position_;
+                            string_buffer_.push_back('\t');
+                            break;
+                        case 'u':
+                            {
+                                ++buffer_position_;
+                                unsigned int cp = decode_unicode_codepoint();
+                                json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
+                            }
+                            break;
+                        default:
+                            err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
                         }
-                        unsigned int cp = decode_unicode_codepoint();
-                        json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
                     }
+                    break;
+                case '\"':
+                    done = true;
                     break;
                 default:
-                    err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
+                    string_buffer_.push_back(c);
+                    break;
                 }
+                ++column_;
+                break;
             }
-            break;
-        case '\"':
-            done = true;
-            break;
-        default:
-            string_buffer_.push_back(c);
-            break;
+        }
+        if (!done)
+        {
+            read_data_block();
+            if (eof())
+            {
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            }
         }
     }
 }
