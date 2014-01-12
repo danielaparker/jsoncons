@@ -47,7 +47,65 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 };
 
+template <class Char>
+class basic_null_json_input_handler : public basic_json_input_handler<Char>
+{
+public:
+    virtual void begin_json() 
+    {
+    }
+
+    virtual void end_json()
+    {
+    }
+
+    virtual void begin_object(const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void end_object(const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void begin_array(const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void end_array(const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void value(double value, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void value(long long value, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void value(bool value, const basic_parsing_context<Char>& context) 
+    {
+    }
+
+    virtual void null_value(const basic_parsing_context<Char>& context) 
+    {
+    }
+};
+
 typedef basic_json_input_handler<char> json_input_handler;
+typedef basic_json_input_handler<char> null_json_input_handler;
 
 }
 
