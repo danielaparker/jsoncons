@@ -61,6 +61,7 @@ public:
     static const char name_separator = ':';
     static const char value_separator = ',';
 
+    static const size_t read_ahead_length = 5;
     static const size_t default_max_buffer_length = 16384;
     //!  Parse an input stream of JSON text into a json object
     /*!
@@ -72,7 +73,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(err_handler),
-         buffer_(default_max_buffer_length+1),
+         buffer_(default_max_buffer_length+read_ahead_length),
          input_buffer_(0),
          buffer_position_(0),
          bof_(true),
@@ -93,7 +94,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length+1),
+         buffer_(default_max_buffer_length+read_ahead_length),
          input_buffer_(0),
          buffer_position_(0),
          bof_(true),
@@ -128,7 +129,7 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity+1);
+        buffer_.resize(buffer_capacity+read_ahead_length);
         input_buffer_ = &buffer_[0];
     }
 
@@ -169,9 +170,7 @@ private:
     void ignore_multi_line_comment();
     bool fast_ignore_single_line_comment();
     bool fast_ignore_multi_line_comment();
-    bool read_until_match_fails(char char1, char char2, char char3);
     void fast_skip_white_space();
-    bool read_until_match_fails(char char1, char char2, char char3, char char4);
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
 
@@ -191,17 +190,20 @@ private:
                 }
                 else if (!is_.eof())
                 {
-                    --buffer_length_;
+                    buffer_length_ -= read_ahead_length;
                 }
             }
             else
             {
-                input_buffer_[0] = input_buffer_[buffer_length_];
-                is_.read(input_buffer_+1, buffer_capacity_);
+                for (size_t i = 0; i < read_ahead_length; ++i)
+                {
+                    input_buffer_[i] = input_buffer_[buffer_length_+i];
+                }
+                is_.read(input_buffer_+read_ahead_length, buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
                 if (is_.eof())
                 {
-                    ++buffer_length_;
+                    buffer_length_ += read_ahead_length;
                 }
 		    }
         }
@@ -521,30 +523,33 @@ void basic_json_reader<Char>::read()
                         }
                         break;
                     case 't':
-                        if (!read_until_match_fails('r', 'u', 'e'))
+                        if (!(buffer_[buffer_position_] == 'r' && buffer_[buffer_position_+1] == 'u' && buffer_[buffer_position_+2] == 'e'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
+                        buffer_position_ += 3;
                         handler_.value(true, *this);
                         stack_.back().comma_ = false;
                         stack_.back().received_name_ = false;
                         ++stack_.back().count_;
                         break;
                     case 'f':
-                        if (!read_until_match_fails('a', 'l', 's', 'e'))
+                        if (!(buffer_[buffer_position_] == 'a' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 's' && buffer_[buffer_position_+3] == 'e'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
+                        buffer_position_ += 4;
                         handler_.value(false, *this);
                         stack_.back().comma_ = false;
                         stack_.back().received_name_ = false;
                         ++stack_.back().count_;
                         break;
                     case 'n':
-                        if (!read_until_match_fails('u', 'l', 'l'))
+                        if (!(buffer_[buffer_position_] == 'u' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 'l'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
+                        buffer_position_ += 3;
                         handler_.null_value(*this);
                         stack_.back().comma_ = false;
                         stack_.back().received_name_ = false;
@@ -635,84 +640,6 @@ void basic_json_reader<Char>::skip_separator()
     }
 
     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-}
-
-template<class Char>
-bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, char char3)
-{
-    if (!eof())
-    {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        if (c == char1)
-        {
-            Char c = read_ch();
-            if (eof())
-            {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            if (c == char2)
-            {
-                Char c = read_ch();
-                if (eof())
-                {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                }
-                if (c = char3)
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-template<class Char>
-bool basic_json_reader<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
-{
-    if (!eof())
-    {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        if (c == char1)
-        {
-            Char c = read_ch();
-            if (eof())
-            {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            if (c == char2)
-            {
-                Char c = read_ch();
-                if (eof())
-                {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                }
-                if (c = char3)
-                {
-                    Char c = read_ch();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    if (c = char4)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-
-    return false;
 }
 
 template<class Char>
