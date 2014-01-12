@@ -351,210 +351,236 @@ void basic_json_reader<Char>::read()
 
     while (!eof())
     {
-        Char c = read_ch();
-        if (eof())
+        while (buffer_position_ < buffer_length_)
         {
-            continue;
-        }
-        switch (c)
-        {
-        case '\n':
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
-            fast_skip_white_space();
-            continue;
-        case '/':
+            //Char c = read_non_lf_ch();
+            Char c = buffer_[buffer_position_++];
+            //if (eof())
+            //{
+            //    continue;
+            //}
+            switch (c)
             {
-                Char next = peek();
-                if (eof())
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
                 {
-                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                    ++buffer_position_;
                 }
-                if (next == '/')
+                ++line_;
+                column_ = 0;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 0;
+                break;
+            case '\t':
+            case '\v':
+            case '\f':
+            case ' ':
+                ++column_;
+                break;
+            case '/':
+                ++column_;
                 {
-                    skip_ch();
+                    Char next = peek();
                     if (eof())
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                     }
-                    ignore_single_line_comment();
-                }
-                if (next == '*')
-                {
-                    skip_ch();
-                    if (eof())
+                    if (next == '/')
                     {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
-                    ignore_multi_line_comment();
-                }
-            }
-            continue;
-        case begin_object:
-            if (stack_.size() == 0)
-            {
-                handler_.begin_json();
-            }
-            stack_.push_back(stack_item(object_t));
-            minimum_structure_capacity_ = estimate_minimum_object_capacity();
-            handler_.begin_object(*this);
-            minimum_structure_capacity_ = 0;
-            break;
-        case begin_array:
-            if (stack_.size() == 0)
-            {
-                handler_.begin_json();
-            }
-            {
-                stack_.push_back(stack_item(array_t));
-                minimum_structure_capacity_ = estimate_minimum_array_capacity();
-                handler_.begin_array(*this);
-                minimum_structure_capacity_ = 0;
-            }
-            break;
-        default:
-            if (stack_.size() > 0)
-            {
-                switch (c)
-                {
-                case value_separator:
-                    if (stack_.back().count_ == 0)
-                    {
-                        err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
-                    }
-                    stack_.back().comma_ = true;
-                    break;
-                case '\"':
-                    if (stack_.back().count_ > 0 && !stack_.back().comma_)
-                    {
-                        err_handler_.fatal_error("JPE102", "Expected comma", *this);
-                    }
-                    {
-                        parse_string();
-                        if (stack_.back().is_object() && !stack_.back().received_name_)
+                        skip_ch();
+                        if (eof())
                         {
-                            handler_.name(string_buffer_, *this);
-                            skip_separator();
-                            stack_.back().received_name_ = true;
+                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                        }
+                        ignore_single_line_comment();
+                    }
+                    if (next == '*')
+                    {
+                        skip_ch();
+                        if (eof())
+                        {
+                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                        }
+                        ignore_multi_line_comment();
+                    }
+                }
+                continue;
+            case begin_object:
+                ++column_;
+                if (stack_.size() == 0)
+                {
+                    handler_.begin_json();
+                }
+                stack_.push_back(stack_item(object_t));
+                minimum_structure_capacity_ = estimate_minimum_object_capacity();
+                handler_.begin_object(*this);
+                minimum_structure_capacity_ = 0;
+                break;
+            case begin_array:
+                ++column_;
+                if (stack_.size() == 0)
+                {
+                    handler_.begin_json();
+                }
+                {
+                    stack_.push_back(stack_item(array_t));
+                    minimum_structure_capacity_ = estimate_minimum_array_capacity();
+                    handler_.begin_array(*this);
+                    minimum_structure_capacity_ = 0;
+                }
+                break;
+            default:
+                ++column_;
+                if (stack_.size() > 0)
+                {
+                    switch (c)
+                    {
+                    case value_separator:
+                        if (stack_.back().count_ == 0)
+                        {
+                            err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                        }
+                        stack_.back().comma_ = true;
+                        break;
+                    case '\"':
+                        if (stack_.back().count_ > 0 && !stack_.back().comma_)
+                        {
+                            err_handler_.fatal_error("JPE102", "Expected comma", *this);
+                        }
+                        {
+                            parse_string();
+                            if (stack_.back().is_object() && !stack_.back().received_name_)
+                            {
+                                handler_.name(string_buffer_, *this);
+                                skip_separator();
+                                stack_.back().received_name_ = true;
+                            }
+                            else
+                            {
+                                handler_.value(string_buffer_, *this);
+                                stack_.back().comma_ = false;
+                                stack_.back().received_name_ = false;
+                                ++stack_.back().count_;
+                            }
+                        }
+                        break;
+                    case end_object:
+                        {
+                            if (!stack_.back().is_object())
+                            {
+                                err_handler_.fatal_error("JPE103", "Unexpected }", *this);
+                            }
+                            if (stack_.back().comma_)
+                            {
+                                err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                            }
+                            if (stack_.back().received_name_)
+                            {
+                                err_handler_.fatal_error("JPE107", "Value not found", *this);
+                            }
+                            handler_.end_object(*this);
+                            stack_.pop_back();
+                        }
+                        if (stack_.size() > 0)
+                        {
+                            stack_.back().received_name_ = false;
+                            stack_.back().comma_ = false;
+                            ++stack_.back().count_;
                         }
                         else
                         {
-                            handler_.value(string_buffer_, *this);
-                            stack_.back().comma_ = false;
+                            handler_.end_json();
+                            return;
+                        }
+                        break;
+                    case end_array:
+                        {
+                            if (!stack_.back().is_array())
+                            {
+                                err_handler_.fatal_error("JPE104", "Unexpected ]", *this);
+                            }
+                            if (stack_.back().comma_)
+                            {
+                                err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                            }
+                            handler_.end_array(*this);
+                            stack_.pop_back();
+                        }
+                        if (stack_.size() > 0)
+                        {
                             stack_.back().received_name_ = false;
+                            stack_.back().comma_ = false;
                             ++stack_.back().count_;
                         }
-                    }
-                    break;
-                case end_object:
-                    {
-                        if (!stack_.back().is_object())
+                        else
                         {
-                            err_handler_.fatal_error("JPE103", "Unexpected }", *this);
+                            handler_.end_json();
+                            return;
                         }
-                        if (stack_.back().comma_)
+                        break;
+                    case 't':
+                        if (!read_until_match_fails('r', 'u', 'e'))
                         {
-                            err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
-                        if (stack_.back().received_name_)
+                        handler_.value(true, *this);
+                        stack_.back().comma_ = false;
+                        stack_.back().received_name_ = false;
+                        ++stack_.back().count_;
+                        break;
+                    case 'f':
+                        if (!read_until_match_fails('a', 'l', 's', 'e'))
                         {
-                            err_handler_.fatal_error("JPE107", "Value not found", *this);
+                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
-                        handler_.end_object(*this);
-                        stack_.pop_back();
-                    }
-                    if (stack_.size() > 0)
-                    {
+                        handler_.value(false, *this);
+                        stack_.back().comma_ = false;
+                        stack_.back().received_name_ = false;
+                        ++stack_.back().count_;
+                        break;
+                    case 'n':
+                        if (!read_until_match_fails('u', 'l', 'l'))
+                        {
+                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                        }
+                        handler_.null_value(*this);
+                        stack_.back().comma_ = false;
+                        stack_.back().received_name_ = false;
+                        ++stack_.back().count_;
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                    case '-':
+                        parse_number(c);
                         stack_.back().received_name_ = false;
                         stack_.back().comma_ = false;
                         ++stack_.back().count_;
-                    }
-                    else
-                    {
-                        handler_.end_json();
-                        return;
-                    }
-                    break;
-                case end_array:
-                    {
-                        if (!stack_.back().is_array())
-                        {
-                            err_handler_.fatal_error("JPE104", "Unexpected ]", *this);
-                        }
-                        if (stack_.back().comma_)
-                        {
-                            err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
-                        }
-                        handler_.end_array(*this);
-                        stack_.pop_back();
-                    }
-                    if (stack_.size() > 0)
-                    {
-                        stack_.back().received_name_ = false;
-                        stack_.back().comma_ = false;
-                        ++stack_.back().count_;
-                    }
-                    else
-                    {
-                        handler_.end_json();
-                        return;
-                    }
-                    break;
-                case 't':
-                    if (!read_until_match_fails('r', 'u', 'e'))
-                    {
+                        break;
+                    default:
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                        break;
                     }
-                    handler_.value(true, *this);
-                    stack_.back().comma_ = false;
-                    stack_.back().received_name_ = false;
-                    ++stack_.back().count_;
-                    break;
-                case 'f':
-                    if (!read_until_match_fails('a', 'l', 's', 'e'))
-                    {
-                        err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
-                    }
-                    handler_.value(false, *this);
-                    stack_.back().comma_ = false;
-                    stack_.back().received_name_ = false;
-                    ++stack_.back().count_;
-                    break;
-                case 'n':
-                    if (!read_until_match_fails('u', 'l', 'l'))
-                    {
-                        err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
-                    }
-                    handler_.null_value(*this);
-                    stack_.back().comma_ = false;
-                    stack_.back().received_name_ = false;
-                    ++stack_.back().count_;
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                case '-':
-                    parse_number(c);
-                    stack_.back().received_name_ = false;
-                    stack_.back().comma_ = false;
-                    ++stack_.back().count_;
-                    break;
-                default:
-                    err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                     break;
                 }
-                break;
             }
+        }
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_data_block();
+            //if (eof())
+            //{
+            //    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            //}
         }
     }
 
@@ -1023,40 +1049,41 @@ template<class Char>
 void basic_json_reader<Char>::fast_skip_white_space()
 {
     bool done = false;
-    const size_t end = buffer_length_ - 1;
-    while (!done && buffer_position_ < end)
+    while (!eof() && !done)
     {
-        switch (input_buffer_[buffer_position_])
+        while (!done && buffer_position_ < buffer_length_)
         {
-        case '\r':
-            if (input_buffer_[buffer_position_ + 1] == '\n')
+            switch (input_buffer_[buffer_position_])
             {
-                ++line_;
-                column_ = 0;
-                buffer_position_ += 2;
-            }
-            else
-            {
-                ++line_;
-                column_ = 0;
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
+                {
+                    ++buffer_position_;
+                }
                 ++buffer_position_;
+                ++line_;
+                column_ = 0;
+                break;
+            case '\n':
+                ++buffer_position_;
+                ++line_;
+                column_ = 0;
+                break;
+            case '\t':
+            case '\v':
+            case '\f':
+            case ' ':
+                ++buffer_position_;
+                ++column_;
+                break;
+            default:
+                done = true;
+                break;
             }
-            break;
-        case '\n':
-            ++buffer_position_;
-            ++line_;
-            column_ = 0;
-            break;
-        case '\t':
-        case '\v':
-        case '\f':
-        case ' ':
-            ++buffer_position_;
-            ++column_;
-            break;
-        default:
-            done = true;
-            break;
+        }
+        if (!done)
+        {
+            read_data_block();
         }
     }
 }

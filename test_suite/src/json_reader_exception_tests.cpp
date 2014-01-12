@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     }
     catch (const json_parse_exception& e)
     {
-        BOOST_CHECK(e.line_number() == 14);
-        BOOST_CHECK(e.column_number() == 30);
+        BOOST_CHECK_EQUAL(e.line_number(), 14);
+        BOOST_CHECK_EQUAL(e.column_number(), 30);
     }
 } 
 
@@ -67,8 +67,8 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     }
     catch (const json_parse_exception& e)
     {
-        BOOST_CHECK(e.line_number() == 17);
-        BOOST_CHECK(e.column_number() == 9);
+        BOOST_CHECK_EQUAL(e.line_number(),17);
+        BOOST_CHECK_EQUAL(e.column_number(), 9);
     }
 } 
 
