@@ -169,8 +169,6 @@ private:
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
     bool fast_ignore_single_line_comment();
-    bool fast_ignore_multi_line_comment();
-    void fast_skip_white_space();
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
 
@@ -240,31 +238,6 @@ private:
             {
                 ++column_;
             }
-        }
-        //else
-        //{
-        //    buffer_position_++;
-        //}
-
-        return c;
-    }
-
-    Char read_non_lf_ch()
-    {
-        if (buffer_position_ >= buffer_length_)
-        {
-            read_data_block();
-        }
-
-        Char c = 0;
-        if (buffer_position_ < buffer_length_)
-        {
-            c = input_buffer_[buffer_position_++];
-            ++column_;
-        }
-        else
-        {
-            buffer_position_++;
         }
 
         return c;
@@ -355,12 +328,7 @@ void basic_json_reader<Char>::read()
     {
         while (buffer_position_ < buffer_length_)
         {
-            //Char c = read_non_lf_ch();
             Char c = buffer_[buffer_position_++];
-            //if (eof())
-            //{
-            //    continue;
-            //}
             switch (c)
             {
             case '\r':
@@ -384,27 +352,15 @@ void basic_json_reader<Char>::read()
             case '/':
                 ++column_;
                 {
-                    Char next = peek();
-                    if (eof())
-                    {
-                        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                    }
+                    Char next = buffer_[buffer_position_];
                     if (next == '/')
                     {
-                        skip_ch();
-                        if (eof())
-                        {
-                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                        }
+                        ++buffer_position_;
                         ignore_single_line_comment();
                     }
                     if (next == '*')
                     {
-                        skip_ch();
-                        if (eof())
-                        {
-                            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-                        }
+                        ++buffer_position_;
                         ignore_multi_line_comment();
                     }
                 }
@@ -598,28 +554,35 @@ void basic_json_reader<Char>::read()
 template<class Char>
 void basic_json_reader<Char>::skip_separator()
 {
-    while (!eof())
+    bool done = false;
+    while (!done)
     {
-        Char c = read_ch();
-        if (eof())
+        while (!done && buffer_position_ < buffer_length_)
         {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF, expected :", *this);
-        }
-        switch (c)
-        {
-        case '\n':
-        case '\t':
-        case '\v':
-        case '\f':
-        case '\r':
-        case ' ':
-            fast_skip_white_space();
-            continue;
-        case '/':
+            Char c = buffer_[buffer_position_++];
+            ++column_;
+            switch (c)
             {
-                if (!eof())
+            case '\r':
+                if (buffer_[buffer_position_] == '\n')
                 {
-                    Char next = peek();
+                    ++buffer_position_;
+                }
+                ++line_;
+                column_ = 0;
+                break;
+            case '\n':
+                ++line_;
+                column_ = 0;
+                break;
+            case '\t':
+            case '\v':
+            case '\f':
+            case ' ':
+                break;
+            case '/':
+                {
+                    Char next = buffer_[buffer_position_];
                     if (next == '/')
                     {
                         ignore_single_line_comment();
@@ -629,17 +592,23 @@ void basic_json_reader<Char>::skip_separator()
                         ignore_multi_line_comment();
                     }
                 }
+                break;
+            case name_separator:
+                done = true;
+                break;
+            default:
+                err_handler_.fatal_error("JPE106", "Expected :", *this);
             }
-            break;
-        case name_separator:
-            //parse_value(handler_);
-            return;
-        default:
-            err_handler_.fatal_error("JPE106", "Expected :", *this);
+        }
+        if (!done)
+        {
+            read_data_block();
+            if (eof())
+            {
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            }
         }
     }
-
-    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
 }
 
 template<class Char>
@@ -910,107 +879,39 @@ bool basic_json_reader<Char>::fast_ignore_single_line_comment()
 }
 
 template<class Char>
-bool basic_json_reader<Char>::fast_ignore_multi_line_comment()
-{
-    bool done = false;
-    const size_t end = buffer_length_ - 1;
-
-    while (!done && buffer_position_ < end)
-    {
-        Char c = input_buffer_[buffer_position_];
-        if (c == '\r' && input_buffer_[buffer_position_ + 1] == '\n')
-        {
-            ++line_;
-            column_ = 0;
-            buffer_position_ += 2;
-        }
-        else if (c == '\n' || c == '\r')
-        {
-            ++line_;
-            column_ = 0;
-            ++buffer_position_;
-        }
-        else if (c == '*' && input_buffer_[buffer_position_ + 1] == '/')
-        {
-            done = true;
-            buffer_position_ += 2;
-            column_ += 2;
-        }
-        else
-        {
-            ++column_;
-            ++buffer_position_;
-        }
-    }
-    return done;
-}
-
-template<class Char>
 void basic_json_reader<Char>::ignore_multi_line_comment()
 {
-    bool done = fast_ignore_multi_line_comment();
+    bool done = false;
     while (!done)
     {
-        Char c = read_ch();
-        if (eof())
+        while (!done && buffer_position_ < buffer_length_)
         {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
-        if (c == '*')
-        {
-            Char next = peek();
+            Char c = read_ch();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
-            if (next == '/')
+            if (c == '*')
             {
-                done = true;
-                skip_ch();
-            }
-        }
-    }
-}
-
-template<class Char>
-void basic_json_reader<Char>::fast_skip_white_space()
-{
-    bool done = false;
-    while (!eof() && !done)
-    {
-        while (!done && buffer_position_ < buffer_length_)
-        {
-            switch (input_buffer_[buffer_position_])
-            {
-            case '\r':
-                if (buffer_[buffer_position_] == '\n')
+                Char next = peek();
+                if (eof())
                 {
-                    ++buffer_position_;
+                    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
-                ++buffer_position_;
-                ++line_;
-                column_ = 0;
-                break;
-            case '\n':
-                ++buffer_position_;
-                ++line_;
-                column_ = 0;
-                break;
-            case '\t':
-            case '\v':
-            case '\f':
-            case ' ':
-                ++buffer_position_;
-                ++column_;
-                break;
-            default:
-                done = true;
-                break;
+                if (next == '/')
+                {
+                    done = true;
+                    skip_ch();
+                }
             }
         }
         if (!done)
         {
             read_data_block();
+            if (eof())
+            {
+                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+            }
         }
     }
 }
