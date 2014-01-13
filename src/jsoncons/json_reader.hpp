@@ -27,29 +27,17 @@ class basic_json_reader : private basic_parsing_context<Char>
 {
     static default_error_handler default_err_handler;
 
-    enum structure_type {object_t, array_t};
     struct stack_item
     {
-        stack_item(structure_type type)
-           : type_(type), count_(0), comma_(false)
+        stack_item(bool type)
+           : is_object_(type), value_count_(0), name_count_(0), comma_(false)
         {
-            received_name_ = false;
         }
 
-        bool is_object() const
-        {
-            return type_ == object_t;
-        }
-
-        bool is_array() const
-        {
-            return type_ == array_t;
-        }
-
-        size_t count_;
-        structure_type type_;
+        size_t value_count_;
+        bool is_object_;
         bool comma_;
-        bool received_name_;
+        size_t name_count_;
 
     };
 public:
@@ -307,7 +295,7 @@ void basic_json_reader<Char>::read()
                 {
                     handler_.begin_json();
                 }
-                stack_.push_back(stack_item(object_t));
+                stack_.push_back(stack_item(true));
                 minimum_structure_capacity_ = estimate_minimum_object_capacity();
                 handler_.begin_object(*this);
                 minimum_structure_capacity_ = 0;
@@ -318,7 +306,7 @@ void basic_json_reader<Char>::read()
                     handler_.begin_json();
                 }
                 {
-                    stack_.push_back(stack_item(array_t));
+                    stack_.push_back(stack_item(false));
                     minimum_structure_capacity_ = estimate_minimum_array_capacity();
                     handler_.begin_array(*this);
                     minimum_structure_capacity_ = 0;
@@ -330,37 +318,36 @@ void basic_json_reader<Char>::read()
                     switch (c)
                     {
                     case value_separator:
-                        if (stack_.back().count_ == 0)
+                        if (stack_.back().value_count_ == 0)
                         {
                             err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
                         }
                         stack_.back().comma_ = true;
                         break;
                     case '\"':
-                        if (stack_.back().count_ > 0 && !stack_.back().comma_)
+                        if (stack_.back().value_count_ > 0 && !stack_.back().comma_)
                         {
                             err_handler_.fatal_error("JPE102", "Expected comma", *this);
                         }
                         {
                             parse_string();
-                            if (stack_.back().is_object() && !stack_.back().received_name_)
+                            if (stack_.back().is_object_ && stack_.back().name_count_ == stack_.back().value_count_)
                             {
                                 handler_.name(string_buffer_, *this);
                                 skip_separator();
-                                stack_.back().received_name_ = true;
+                                ++stack_.back().name_count_;
                             }
                             else
                             {
                                 handler_.value(string_buffer_, *this);
                                 stack_.back().comma_ = false;
-                                stack_.back().received_name_ = false;
-                                ++stack_.back().count_;
+                                ++stack_.back().value_count_;
                             }
                         }
                         break;
                     case end_object:
                         {
-                            if (!stack_.back().is_object())
+                            if (!stack_.back().is_object_)
                             {
                                 err_handler_.fatal_error("JPE103", "Unexpected }", *this);
                             }
@@ -368,7 +355,7 @@ void basic_json_reader<Char>::read()
                             {
                                 err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
                             }
-                            if (stack_.back().received_name_)
+                            if (stack_.back().name_count_ != stack_.back().value_count_)
                             {
                                 err_handler_.fatal_error("JPE107", "Value not found", *this);
                             }
@@ -377,9 +364,8 @@ void basic_json_reader<Char>::read()
                         }
                         if (stack_.size() > 0)
                         {
-                            stack_.back().received_name_ = false;
                             stack_.back().comma_ = false;
-                            ++stack_.back().count_;
+                            ++stack_.back().value_count_;
                         }
                         else
                         {
@@ -389,7 +375,7 @@ void basic_json_reader<Char>::read()
                         break;
                     case end_array:
                         {
-                            if (!stack_.back().is_array())
+                            if (stack_.back().is_object_)
                             {
                                 err_handler_.fatal_error("JPE104", "Unexpected ]", *this);
                             }
@@ -402,9 +388,8 @@ void basic_json_reader<Char>::read()
                         }
                         if (stack_.size() > 0)
                         {
-                            stack_.back().received_name_ = false;
                             stack_.back().comma_ = false;
-                            ++stack_.back().count_;
+                            ++stack_.back().value_count_;
                         }
                         else
                         {
@@ -420,8 +405,7 @@ void basic_json_reader<Char>::read()
                         buffer_position_ += 3;
                         handler_.value(true, *this);
                         stack_.back().comma_ = false;
-                        stack_.back().received_name_ = false;
-                        ++stack_.back().count_;
+                        ++stack_.back().value_count_;
                         break;
                     case 'f':
                         if (!(buffer_[buffer_position_] == 'a' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 's' && buffer_[buffer_position_+3] == 'e'))
@@ -431,8 +415,7 @@ void basic_json_reader<Char>::read()
                         buffer_position_ += 4;
                         handler_.value(false, *this);
                         stack_.back().comma_ = false;
-                        stack_.back().received_name_ = false;
-                        ++stack_.back().count_;
+                        ++stack_.back().value_count_;
                         break;
                     case 'n':
                         if (!(buffer_[buffer_position_] == 'u' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 'l'))
@@ -442,8 +425,7 @@ void basic_json_reader<Char>::read()
                         buffer_position_ += 3;
                         handler_.null_value(*this);
                         stack_.back().comma_ = false;
-                        stack_.back().received_name_ = false;
-                        ++stack_.back().count_;
+                        ++stack_.back().value_count_;
                         break;
                     case '0':
                     case '1':
@@ -457,9 +439,8 @@ void basic_json_reader<Char>::read()
                     case '9':
                     case '-':
                         parse_number(c);
-                        stack_.back().received_name_ = false;
                         stack_.back().comma_ = false;
-                        ++stack_.back().count_;
+                        ++stack_.back().value_count_;
                         break;
                     default:
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
