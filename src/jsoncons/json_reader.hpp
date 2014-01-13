@@ -61,7 +61,7 @@ public:
     static const char name_separator = ':';
     static const char value_separator = ',';
 
-    static const size_t read_ahead_length = 5;
+    static const size_t read_ahead_length = 12;
     static const size_t default_max_buffer_length = 16384;
     //!  Parse an input stream of JSON text into a json object
     /*!
@@ -73,8 +73,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(err_handler),
-         buffer_(default_max_buffer_length+read_ahead_length),
-         input_buffer_(0),
+         buffer_(default_max_buffer_length+2*read_ahead_length),
          buffer_position_(0),
          bof_(true),
          eof_(false),
@@ -86,7 +85,6 @@ public:
         {
             JSONCONS_THROW_EXCEPTION("Input stream is invalid");
         }
-        input_buffer_ = &buffer_[0];
     }
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
@@ -94,8 +92,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length+read_ahead_length),
-         input_buffer_(0),
+         buffer_(default_max_buffer_length+2*read_ahead_length),
          buffer_position_(0),
          bof_(true),
          eof_(false),
@@ -107,7 +104,6 @@ public:
         {
             JSONCONS_THROW_EXCEPTION("Input stream is invalid");
         }
-        input_buffer_ = &buffer_[0];
     }
 
     ~basic_json_reader()
@@ -130,7 +126,6 @@ public:
     {
         buffer_capacity_ = buffer_capacity;
         buffer_.resize(buffer_capacity+read_ahead_length);
-        input_buffer_ = &buffer_[0];
     }
 
     virtual unsigned long line_number() const
@@ -178,7 +173,7 @@ private:
         {
             if (bof_)
             {
-                is_.read(input_buffer_, buffer_capacity_);
+                is_.read(&buffer_[0], buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
                 bof_ = false;
                 if (buffer_length_ == 0)
@@ -194,13 +189,17 @@ private:
             {
                 for (size_t i = 0; i < read_ahead_length; ++i)
                 {
-                    input_buffer_[i] = input_buffer_[buffer_length_+i];
+                    buffer_[i] = buffer_[buffer_length_+i];
                 }
-                is_.read(input_buffer_+read_ahead_length, buffer_capacity_);
+                is_.read(&buffer_[0]+read_ahead_length, buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
                 if (is_.eof())
                 {
                     buffer_length_ += read_ahead_length;
+                    for (size_t i = 0; i < read_ahead_length; ++i)
+                    {
+                        buffer_[buffer_length_+i] = 0;
+                    }
                 }
 		    }
         }
@@ -208,66 +207,6 @@ private:
         {
             buffer_length_ = 0;
             eof_ = true;
-        }
-    }
-
-    Char read_ch()
-    {
-        if (buffer_position_ >= buffer_length_)
-        {
-            read_data_block();
-        }
-        Char c = 0;
-
-        if (buffer_position_ < buffer_length_)
-        {
-            c = input_buffer_[buffer_position_++];
-            if (c == '\r' && peek() == '\n')
-            {
-                ++buffer_position_;
-                ++line_;
-                column_ = 0;
-            }
-            else if (c == '\n' || c == '\r')
-            {
-                ++line_;
-                column_ = 0;
-            }
-            else
-            {
-                ++column_;
-            }
-        }
-
-        return c;
-    }
-
-    Char peek()
-    {
-        if (buffer_position_ >= buffer_length_)
-        {
-            read_data_block();
-        }
-        Char c = 0;
-        if (buffer_position_ < buffer_length_)
-        {
-            c = input_buffer_[buffer_position_];
-        }
-
-        return c;
-    }
-
-    void skip_ch()
-    {
-        read_ch();
-    }
-
-    void unread_last_non_lf_ch()
-    {
-        if (buffer_position_ > 0)
-        {
-            --buffer_position_;
-            --column_;
         }
     }
 
@@ -328,6 +267,7 @@ void basic_json_reader<Char>::read()
         while (buffer_position_ < buffer_length_)
         {
             Char c = buffer_[buffer_position_++];
+            ++column_;
             switch (c)
             {
             case '\r':
@@ -346,10 +286,8 @@ void basic_json_reader<Char>::read()
             case '\v':
             case '\f':
             case ' ':
-                ++column_;
                 break;
             case '/':
-                ++column_;
                 {
                     Char next = buffer_[buffer_position_];
                     if (next == '/')
@@ -365,7 +303,6 @@ void basic_json_reader<Char>::read()
                 }
                 continue;
             case begin_object:
-                ++column_;
                 if (stack_.size() == 0)
                 {
                     handler_.begin_json();
@@ -376,7 +313,6 @@ void basic_json_reader<Char>::read()
                 minimum_structure_capacity_ = 0;
                 break;
             case begin_array:
-                ++column_;
                 if (stack_.size() == 0)
                 {
                     handler_.begin_json();
@@ -389,7 +325,6 @@ void basic_json_reader<Char>::read()
                 }
                 break;
             default:
-                ++column_;
                 if (stack_.size() > 0)
                 {
                     switch (c)
@@ -916,31 +851,6 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
 }
 
 template<class Char>
-unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
-{
-
-    unsigned int cp = decode_unicode_escape_sequence();
-    if (cp >= 0xD800 && cp <= 0xDBFF)
-    {
-        // surrogate pairs
-        if (read_ch() == '\\' && read_ch() == 'u')
-        {
-            if (eof())
-            {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            }
-            unsigned int surrogate_pair = decode_unicode_escape_sequence();
-            cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
-        }
-        else
-        {
-            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
-        }
-    }
-    return cp;
-}
-
-template<class Char>
 size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
 {
     size_t size = 0;
@@ -1171,17 +1081,35 @@ size_t basic_json_reader<Char>::skip_object(size_t pos) const
 }
 
 template<class Char>
+unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
+{
+    unsigned int cp = decode_unicode_escape_sequence();
+    if (cp >= 0xD800 && cp <= 0xDBFF)
+    {
+        // surrogate pairs
+        if (buffer_[buffer_position_++] == '\\' && buffer_[buffer_position_++] == 'u')
+        {
+            column_ += 2;
+            unsigned int surrogate_pair = decode_unicode_escape_sequence();
+            cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
+        }
+        else
+        {
+            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
+        }
+    }
+    return cp;
+}
+
+template<class Char>
 unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     unsigned int cp = 0;
     size_t index = 0;
-    while (!eof() && index < 4)
+    while (index < 4)
     {
-        Char c = read_ch();
-        if (eof())
-        {
-            err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-        }
+        Char c = buffer_[buffer_position_++];
+        ++column_;
         const unsigned int u(c >= 0 ? c : 256 + c);
         cp *= 16;
         if (u >= '0'  &&  u <= '9')
