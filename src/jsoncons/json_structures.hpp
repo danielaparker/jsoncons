@@ -226,7 +226,7 @@ public:
         iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
         if (it != end() && (*it).first == name)
         {
-            remove(it);
+            it = remove(it);
         }
         insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
     }
@@ -236,7 +236,7 @@ public:
         members_.push_back(member);
     }
 #endif
-    void remove(iterator at); 
+    iterator remove(iterator at); 
 
     basic_json<Char>& get(const std::basic_string<Char>& name);
 
@@ -297,9 +297,9 @@ void json_object<Char>::insert(const_iterator it, std::pair<std::basic_string<Ch
 }
 
 template <class Char>
-void json_object<Char>::remove(iterator at)
+typename json_object<Char>::iterator json_object<Char>::remove(iterator at)
 {
-    members_.erase(at);
+    return members_.erase(at);
 }
 
 template <class Char>
@@ -308,7 +308,7 @@ void json_object<Char>::set(const std::basic_string<Char>& name, const basic_jso
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
     if (it != end() && (*it).first == name)
     {
-        remove(it);
+        it = remove(it);
     }
     insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
 }
