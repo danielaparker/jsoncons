@@ -235,6 +235,13 @@ public:
     {
         members_.push_back(member);
     }
+
+    void push_back(std::basic_string<Char>&& name, basic_json<Char>&& val)
+    {
+        members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>());
+        members_.back().first.swap(name);
+        members_.back().second.swap(val);
+    }
 #endif
     void remove(iterator at); 
 
