@@ -133,12 +133,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>(value)));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
         } 
         else 
         {
-            basic_json<Char> val(value);
-            stack_.back().array_->push_back(JSONCONS_MOVE(val));
+            stack_.back().array_->push_back(basic_json<Char>(value));
         }
     }
 
@@ -146,12 +145,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>(value)));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
         } 
         else
         {
-            basic_json<Char> val(value);
-            stack_.back().array_->push_back(val);
+            stack_.back().array_->push_back(basic_json<Char>(value));
         }
     }
 
@@ -159,12 +157,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>(value)));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
         } 
         else
         {
-            basic_json<Char> val(value);
-            stack_.back().array_->push_back(val);
+            stack_.back().array_->push_back(basic_json<Char>(value));
         }
     }
 
@@ -172,12 +169,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>(value)));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
         } 
         else
         {
-            basic_json<Char> val(value);
-            stack_.back().array_->push_back(val);
+            stack_.back().array_->push_back(basic_json<Char>(value));
         }
     }
 
@@ -185,12 +181,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>(value)));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
         } 
         else
         {
-            basic_json<Char> val(value);
-            stack_.back().array_->push_back(val);
+            stack_.back().array_->push_back(basic_json<Char>(value));
         }
     }
 
@@ -198,7 +193,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(member_type(stack_.back().name_,basic_json<Char>::null));
+            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(basic_json<Char>::null));
         } 
         else
         {
