@@ -61,7 +61,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(err_handler),
-         buffer_(default_max_buffer_length+2*read_ahead_length),
+         buffer_(default_max_buffer_length + 2 * read_ahead_length),
          buffer_position_(0),
          bof_(true),
          eof_(false),
@@ -80,7 +80,7 @@ public:
        : is_(is),
          handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length+2*read_ahead_length),
+         buffer_(default_max_buffer_length + 2 * read_ahead_length),
          buffer_position_(0),
          bof_(true),
          eof_(false),
@@ -113,7 +113,7 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity+read_ahead_length);
+        buffer_.resize(buffer_capacity + read_ahead_length);
     }
 
     virtual unsigned long line_number() const
@@ -177,19 +177,19 @@ private:
             {
                 for (size_t i = 0; i < read_ahead_length; ++i)
                 {
-                    buffer_[i] = buffer_[buffer_length_+i];
+                    buffer_[i] = buffer_[buffer_length_ + i];
                 }
-                is_.read(&buffer_[0]+read_ahead_length, buffer_capacity_);
+                is_.read(&buffer_[0] + read_ahead_length, buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
                 if (is_.eof())
                 {
                     buffer_length_ += read_ahead_length;
                     for (size_t i = 0; i < read_ahead_length; ++i)
                     {
-                        buffer_[buffer_length_+i] = 0;
+                        buffer_[buffer_length_ + i] = 0;
                     }
                 }
-		    }
+            }
         }
         else
         {
@@ -398,7 +398,7 @@ void basic_json_reader<Char>::read()
                         }
                         break;
                     case 't':
-                        if (!(buffer_[buffer_position_] == 'r' && buffer_[buffer_position_+1] == 'u' && buffer_[buffer_position_+2] == 'e'))
+                        if (!(buffer_[buffer_position_] == 'r' && buffer_[buffer_position_ + 1] == 'u' && buffer_[buffer_position_ + 2] == 'e'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -408,7 +408,7 @@ void basic_json_reader<Char>::read()
                         ++stack_.back().value_count_;
                         break;
                     case 'f':
-                        if (!(buffer_[buffer_position_] == 'a' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 's' && buffer_[buffer_position_+3] == 'e'))
+                        if (!(buffer_[buffer_position_] == 'a' && buffer_[buffer_position_ + 1] == 'l' && buffer_[buffer_position_ + 2] == 's' && buffer_[buffer_position_ + 3] == 'e'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -418,7 +418,7 @@ void basic_json_reader<Char>::read()
                         ++stack_.back().value_count_;
                         break;
                     case 'n':
-                        if (!(buffer_[buffer_position_] == 'u' && buffer_[buffer_position_+1] == 'l' && buffer_[buffer_position_+2] == 'l'))
+                        if (!(buffer_[buffer_position_] == 'u' && buffer_[buffer_position_ + 1] == 'l' && buffer_[buffer_position_ + 2] == 'l'))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -575,7 +575,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_.value(d,*this);
+                            handler_.value(d, *this);
                         }
                         catch (...)
                         {
@@ -595,7 +595,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.value(-d,*this);
+                                handler_.value(-d, *this);
                             }
                             catch (...)
                             {
@@ -616,7 +616,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.value(d,*this);
+                                handler_.value(d, *this);
                             }
                             catch (...)
                             {
@@ -652,84 +652,67 @@ void basic_json_reader<Char>::parse_string()
         while (!done && buffer_position_ < buffer_length_)
         {
             Char c = buffer_[buffer_position_++];
+            ++column_;
+            if (is_control_character(c))
+            {
+                err_handler_.error("JPE201", "Illegal control character in string", *this);
+            }
             switch (c)
             {
-            case '\r':
-                if (buffer_[buffer_position_] == '\n')
+            case '\\':
                 {
-                    ++buffer_position_;
+                    Char next = buffer_[buffer_position_];
+                    switch (next)
+                    {
+                    case '\"':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\"');
+                        break;
+                    case '\\':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\\');
+                        break;
+                    case '/':
+                        ++buffer_position_;
+                        string_buffer_.push_back('/');
+                        break;
+                    case 'n':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\n');
+                        break;
+                    case 'b':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\b');
+                        break;
+                    case 'f':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\f');
+                        break;
+                    case 'r':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\r');
+                        break;
+                    case 't':
+                        ++buffer_position_;
+                        string_buffer_.push_back('\t');
+                        break;
+                    case 'u':
+                        {
+                            ++buffer_position_;
+                            unsigned int cp = decode_unicode_codepoint();
+                            json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
+                        }
+                        break;
+                    default:
+                        err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
+                    }
                 }
-                ++line_;
-                column_ = 0;
                 break;
-            case '\n':
-                ++line_;
-                column_ = 0;
+            case '\"':
+                done = true;
                 break;
             default:
-                if (is_control_character(c))
-                {
-                    err_handler_.error("JPE201", "Illegal control character in string", *this);
-                }
-                switch (c)
-                {
-                case '\\':
-                    {
-                        Char next = buffer_[buffer_position_];
-                        switch (next)
-                        {
-                        case '\"':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\"');
-                            break;
-                        case '\\':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\\');
-                            break;
-                        case '/':
-                            ++buffer_position_;
-                            string_buffer_.push_back('/');
-                            break;
-                        case 'n':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\n');
-                            break;
-                        case 'b':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\b');
-                            break;
-                        case 'f':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\f');
-                            break;
-                        case 'r':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\r');
-                            break;
-                        case 't':
-                            ++buffer_position_;
-                            string_buffer_.push_back('\t');
-                            break;
-                        case 'u':
-                            {
-                                ++buffer_position_;
-                                unsigned int cp = decode_unicode_codepoint();
-                                json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
-                            }
-                            break;
-                        default:
-                            err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
-                        }
-                    }
-                    break;
-                case '\"':
-                    done = true;
-                    break;
-                default:
-                    string_buffer_.push_back(c);
-                    break;
-                }
-                ++column_;
+                string_buffer_.push_back(c);
                 break;
             }
         }
