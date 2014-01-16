@@ -137,7 +137,7 @@ public:
         } 
         else 
         {
-            stack_.back().array_->push_back(basic_json<Char>(value));
+            stack_.back().array_->push_back(JSONCONS_MOVE(basic_json<Char>(value)));
         }
     }
 

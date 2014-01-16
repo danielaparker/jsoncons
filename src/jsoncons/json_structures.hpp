@@ -219,6 +219,11 @@ public:
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
+    void push_back(const std::basic_string<Char>& name, const basic_json<Char>& val)
+    {
+        members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(name,val));
+    }
+
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
@@ -231,11 +236,6 @@ public:
         insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
     }
 
-    void push_back(std::pair<std::basic_string<Char>,basic_json<Char>>&& member)
-    {
-        members_.push_back(member);
-    }
-
     void push_back(std::basic_string<Char>&& name, basic_json<Char>&& val)
     {
         members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>());
@@ -243,6 +243,7 @@ public:
         members_.back().second.swap(val);
     }
 #endif
+
     iterator remove(iterator at); 
 
     basic_json<Char>& get(const std::basic_string<Char>& name);
@@ -254,11 +255,6 @@ public:
     const_iterator find(const std::basic_string<Char>& name) const;
 
     void insert(const_iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member);
-
-    void push_back(const std::pair<std::basic_string<Char>,basic_json<Char>>& member)
-    {
-        members_.push_back(member);
-    }
 
     void sort_members();
 
