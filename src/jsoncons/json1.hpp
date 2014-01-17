@@ -257,7 +257,7 @@ public:
 
         const basic_json<Char>& operator[](size_t i) const
         {
-            return val_.[i];
+            return val_[i];
         }
 
         const basic_json<Char>& operator[](const std::basic_string<Char>& name) const
@@ -471,20 +471,20 @@ public:
         template <class T>
         std::vector<T> as_vector() const
         {
-            return val_.at(name_).as_vector<T>();
+            return val_.at(name_).template as_vector<T>();
         }
 
         template <class T>
         const T& custom_data() const
         {
-            return val_.at(name_).custom_data<T>();
+            return val_.at(name_).template custom_data<T>();
         }
         // Returns a const reference to the custom data associated with name
 
         template <class T>
         T& custom_data() 
         {
-            return val_.at(name_).custom_data<T>();
+            return val_.at(name_).template custom_data<T>();
         }
         // Returns a reference to the custom data associated with name
 
@@ -562,7 +562,7 @@ public:
 
         void remove_range(size_t from_index, size_t to_index)
         {
-            val_.at(name_).remove_range(size_t from_index, size_t to_index);
+            val_.at(name_).remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
 
@@ -945,7 +945,7 @@ public:
         std::vector<T> v(size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = at(i).as_value<T>();
+            v[i] = as_value<Char,T>(at(i)).get();
         }
         return v;
     }
@@ -957,68 +957,62 @@ public:
 private:
 	basic_json(value_type t);
 
-    template <class T>
-    T as_value() const;
-
-    template<>
-    std::basic_string<Char> as_value() const
+    template<typename C, typename T>
+    class as_value
     {
-        return as_string();
-    }
+    public:
+        as_value (const basic_json<C>& value) : value_(value)
+        {}
 
-    template<>
-    bool as_value() const
-    {
-        return as_bool();
-    }
+        T get () const
+        {
+            return static_cast<T>(*this);
+        }
+        
+        operator std::basic_string<C> () const
+        {
+            return value_.as_string();
+        }
+        operator bool () const
+        {
+            return value_.as_bool();
+        }
+        operator char () const
+        {
+            return value_.as_char();
+        }
+        operator double () const
+        {
+            return value_.as_double();
+        }
+        operator int () const
+        {
+            return value_.as_int();
+        }
+        operator unsigned int () const
+        {
+            return value_.as_uint();
+        }
+        operator long () const
+        {
+            return value_.as_long();
+        }
+        operator unsigned long () const
+        {
+            return value_.as_ulong();
+        }
+        operator long long () const
+        {
+            return value_.as_longlong();
+        }
+        operator unsigned long long () const
+        {
+            return value_.as_ulonglong();
+        }
 
-    template<>
-    char as_value() const
-    {
-        return as_char();
-    }
-
-    template<>
-    double as_value() const
-    {
-        return as_double();
-    }
-
-    template<>
-    int as_value() const
-    {
-        return as_int();
-    }
-
-    template<>
-    unsigned int as_value() const
-    {
-        return as_uint();
-    }
-
-    template<>
-    long as_value() const
-    {
-        return as_long();
-    }
-
-    template<>
-    unsigned long as_value() const
-    {
-        return as_ulong();
-    }
-
-    template<>
-    long long as_value() const
-    {
-        return as_longlong();
-    }
-
-    template<>
-    unsigned long long as_value() const
-    {
-        return as_ulonglong();
-    }
+    private:
+        const basic_json<C>& value_;
+    };
 
 	value_type type_;
     union

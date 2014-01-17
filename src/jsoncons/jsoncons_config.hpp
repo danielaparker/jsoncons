@@ -8,11 +8,13 @@
 #ifndef JSONCONS_JSONCONS_CONFIG_HPP
 #define JSONCONS_JSONCONS_CONFIG_HPP
 
+#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <istream>
 #include <ostream>
+#include <iomanip>
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
@@ -24,14 +26,23 @@ namespace jsoncons {
 
 // Follow boost
 
-#if !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#if defined(__clang__)
+//  Clang C++ emulates GCC, so it has to appear early.
+#   if !__has_feature(cxx_rvalue_references)
+#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#   endif
+#elif defined(__GNUC__)
+#   if !((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__))
+#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#   endif
+#elif defined(_MSC_VER)
+#   if _MSC_VER < 1600
+#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
+#   endif // _MSC_VER < 1600
+#else
+#   error "Unknown compiler"
 #endif
-
-#if _MSC_VER < 1600
-#define JSONCONS_NO_CXX11_RVALUE_REFERENCES
-#endif // _MSC_VER < 1600
-
+    
 //
 // Move support:
 //
@@ -41,6 +52,19 @@ namespace jsoncons {
 #define JSONCONS_MOVE(x) x
 #endif
 
+#if defined (__clang__)
+#   if defined(_GLIBCXX_USE_NOEXCEPT)
+#      define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
+#   else
+#      define JSONCONS_NOEXCEPT noexcept
+#   endif
+#elif defined(__GNUC__)
+#   define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
+#else
+#   define JSONCONS_NOEXCEPT
+#endif
+
+    
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
 inline bool is_nan(double x) { return _isnan( x ) != 0; }
@@ -84,8 +108,8 @@ int c99_snprintf(char* str, size_t size, const char* format, ...)
 }
 #else
 inline bool is_nan(double x) { return std::isnan( x ); }
-inline bool is_pos_inf(double x) {return std::isinf() && x > 0;}
-inline bool is_neg_inf(double x) {return  std::isinf() && x > 0;}
+inline bool is_pos_inf(double x) {return std::isinf(x) && x > 0;}
+inline bool is_neg_inf(double x) {return  std::isinf(x) && x > 0;}
 
 #define c99_snprintf std::snprintf
 
@@ -108,7 +132,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal_point, &sign);
     if (err != 0)
     {
-        throw std::exception("Failed attempting double to string conversion");
+        throw std::runtime_error("Failed attempting double to string conversion");
     }
     if (sign != 0)
     {
@@ -159,7 +183,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         int err2 = _itoa_s(exponent,buf,_CVTBUFSIZE,10);
         if (err2 != 0)
         {
-            throw std::exception("Failed attempting double to string conversion");
+            throw std::runtime_error("Failed attempting double to string conversion");
         }
         for (int i = 0; i < _CVTBUFSIZE && buf[i]; ++i)
         {
@@ -177,7 +201,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     os << std::showpoint << std::setprecision(precision) << val;
     std::basic_string<Char> s(os.str());
 
-    std::basic_string<Char>::size_type exp_pos= s.find('e');
+    typename std::basic_string<Char>::size_type exp_pos= s.find('e');
     std::basic_string<Char> exp;
     if (exp_pos != std::basic_string<Char>::npos)
     {
@@ -211,7 +235,7 @@ double string_to_double(const std::string& s)
     double val = _strtod_l(begin,&end,locale);
     if (begin == end)
     {
-        throw std::exception("Invalid double value");
+        throw std::invalid_argument("Invalid double value");
     }
     return val;
 }
@@ -225,7 +249,7 @@ double string_to_double(const std::wstring& s)
     double val = _wcstod_l(begin,&end,locale);
     if (begin == end)
     {
-        throw std::exception("Invalid double value");
+        throw std::invalid_argument("Invalid double value");
     }
     return val;
 }
@@ -239,7 +263,7 @@ double string_to_double(const std::basic_string<Char>& s)
 	ss >> val;
     if (ss.fail())
     {
-        throw std::exception("Invalid double value");
+        throw std::invalid_argument("Invalid double value");
     }
     return val;
 }

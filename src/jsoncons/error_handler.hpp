@@ -42,7 +42,7 @@ public:
           column_number_(other.column_number_)
     {
     }
-    const char* what() const
+    const char* what() const JSONCONS_NOEXCEPT
     {
         std::ostringstream os;
         os << message_ << " on line " << line_number_ << " at column " << column_number_;

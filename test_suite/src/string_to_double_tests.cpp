@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <cwchar>
 
 using jsoncons::json_serializer;
 using jsoncons::output_format;
@@ -25,7 +26,7 @@ BOOST_AUTO_TEST_CASE(test_string_to_double)
     char* endptr = begin + strlen(begin);
     double value1 = 1.15507e-173;
     double value2 = strtod( begin, &endptr );
-    double value3 = jsoncons::string_to_double(begin);
+    double value3 = jsoncons::string_to_double(std::string(begin));
 
     BOOST_CHECK(value1 == value2);
     BOOST_CHECK(value2 == value3);
@@ -37,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_wstring_to_double)
     wchar_t* endptr = begin + wcslen(begin);
     double value1 = 1.15507e-173;
     double value2 = wcstod( begin, &endptr );
-    double value3 = jsoncons::string_to_double(begin);
+    double value3 = jsoncons::string_to_double(std::wstring(begin));
 
     BOOST_CHECK(value1 == value2);
     BOOST_CHECK(value2 == value3);
