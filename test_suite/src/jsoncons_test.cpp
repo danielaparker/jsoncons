@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"] = json(json::an_object);
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
-    root["myobject"]["int_2"] = json(long long(0));
+    root["myobject"]["int_2"] = json(0LL);
     root["myobject"]["string_2"] = json("my string");
     root["myarray"] = json::an_array;
 

@@ -39,11 +39,11 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
 
     x = 1234563;
     s = jsoncons::double_to_string<char>(x, 6);
-    BOOST_CHECK(s == std::string("1.23456e+6") || s == std::string("1.23456e+006"));
+    BOOST_CHECK(s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006"));
 
     x = 0.0000001234563;
     s = jsoncons::double_to_string<char>(x, 6);
-    BOOST_CHECK(s == std::string("1.23456e-7") || s == std::string("1.23456e-007"));
+    BOOST_CHECK(s == std::string("1.23456e-7") || s == std::string("1.23456e-07") || s == std::string("1.23456e-007"));
 
     x = -1.0e+100;
     s = jsoncons::double_to_string<char>(x, 16);

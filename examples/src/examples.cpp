@@ -1,6 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#include <stdexcept>
 #include <string>
 #include "jsoncons/json.hpp"
 #include "csv_examples.h"
@@ -124,7 +125,7 @@ void mulitple_json_objects()
     std::ifstream is("input/multiple-json-objects.json");
     if (!is.is_open())
     {
-        throw std::exception("Cannot open file");
+        throw std::runtime_error("Cannot open file");
     }
 
     json_deserializer handler;
