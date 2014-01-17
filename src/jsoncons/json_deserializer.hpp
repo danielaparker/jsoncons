@@ -17,6 +17,7 @@
 #include "jsoncons/json_char_traits.hpp"
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_input_handler.hpp"
+#include "jsoncons/json_structures.hpp"
 
 namespace jsoncons {
 
@@ -33,15 +34,35 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             minimum_structure_capacity_ = minimum_structure_capacity;
             if (is_object_)
             {
-                object_.reset(new json_object<Char>());
+                object_ = new json_object<Char>();
                 object_->reserve(minimum_structure_capacity);
             }
             else
             {
-                array_.reset(new json_array<Char>());
+                array_ = new json_array<Char>();
                 array_->reserve(minimum_structure_capacity);
             }
         }
+
+        void destroy()
+        {
+            try
+            {
+                if (is_object_)
+                {
+                    delete object_;
+                }
+                else
+                {
+                    delete array_;
+                }
+            }
+            catch (...)
+            {
+                // no throw
+            }
+        }
+
         bool is_object() const
         {
             return is_object_;
@@ -51,16 +72,24 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             return !is_object_;
         }
 
+        json_object<Char>* release_object() {json_object<Char>* p(0); std::swap(p,object_); return p;}
+
+        json_array<Char>* release_array() {json_array<Char>* p(0); std::swap(p,array_); return p;}
+
         std::basic_string<Char> name_;
         bool is_object_;
-        std::unique_ptr<json_object<Char>> object_;
-        std::unique_ptr<json_array<Char>> array_;
+        json_object<Char>* object_;
+        json_array<Char>* array_;
         size_t minimum_structure_capacity_;
     };
 
 public:
     ~basic_json_deserializer()
     {
+        for (size_t i = 0; i < stack_.size(); ++i)
+        {
+            stack_[i].destroy();
+        }
     }
 
     virtual void begin_json()
@@ -79,7 +108,7 @@ public:
     virtual void end_object(const basic_parsing_context<Char>& context)
     {
         stack_.back().object_->sort_members();
-        basic_json<Char> val(stack_.back().object_.release());	    
+        basic_json<Char> val(stack_.back().release_object());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -105,7 +134,7 @@ public:
 
     virtual void end_array(const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(stack_.back().array_.release());	    
+        basic_json<Char> val(stack_.back().release_array());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {

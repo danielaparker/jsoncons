@@ -139,8 +139,6 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    std::vector<basic_json<Char>> elements_;
-
     bool operator==(const json_array<Char>& rhs) const
     {
         if (size() != rhs.size())
@@ -156,6 +154,10 @@ public:
         }
         return true;
     }
+private:
+    std::vector<basic_json<Char>> elements_;
+    json_array(const json_array<Char>&);
+    json_array& operator=(const json_array<Char>&);
 };
 
 template <class Char>
@@ -283,7 +285,10 @@ public:
         return true;
     }
 
+private:
     std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
+    json_object(const json_object<Char>&);
+    json_object<Char>& operator=(const json_object<Char>&);
 };
 
 
