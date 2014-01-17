@@ -66,6 +66,7 @@ public:
          bof_(true),
          eof_(false),
          buffer_length_(0),
+         estimation_buffer_length_(default_max_buffer_length),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
     {
@@ -84,7 +85,8 @@ public:
          buffer_position_(0),
          bof_(true),
          eof_(false),
-         buffer_length_(0),
+         buffer_length_(default_max_buffer_length),
+         estimation_buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
     {
@@ -209,6 +211,7 @@ private:
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
+    size_t estimation_buffer_length_;
     basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
     bool bof_;
@@ -653,12 +656,42 @@ void basic_json_reader<Char>::parse_string()
         {
             Char c = buffer_[buffer_position_++];
             ++column_;
-            if (is_control_character(c))
-            {
-                err_handler_.error("JPE201", "Illegal control character in string", *this);
-            }
             switch (c)
             {
+            case 0x00:
+            case 0x01:
+            case 0x02:
+            case 0x03:
+			case 0x04:
+            case 0x05:
+            case 0x06:
+            case 0x07:
+            case 0x08:
+            case 0x09:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+            case 0x0d:
+            case 0x0e:
+            case 0x0f:
+            case 0x10:
+            case 0x11:
+            case 0x12:
+            case 0x13:
+            case 0x14:
+            case 0x15:
+            case 0x16:
+            case 0x17:
+            case 0x18:
+            case 0x19:
+            case 0x1a:
+            case 0x1b:
+            case 0x1c:
+            case 0x1d:
+            case 0x1e:
+            case 0x1f:
+                err_handler_.error("JPE201", "Illegal control character in string", *this);
+                break;
             case '\\':
                 {
                     Char next = buffer_[buffer_position_];
@@ -820,7 +853,8 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     size_t size = 0;
     size_t pos = buffer_position_;
     bool done = false;
-    while (!done && pos < buffer_length_)
+    const size_t end = std::min(buffer_length_,estimation_buffer_length_);
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
@@ -880,7 +914,8 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     size_t size = 0;
     size_t pos = buffer_position_;
     bool done = false;
-    while (!done && pos < buffer_length_)
+    const size_t end = std::min(buffer_length_,estimation_buffer_length_);
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
