@@ -29,7 +29,7 @@ public:
     basic_output_format()
         : indent_(default_indent),
           precision_(16),
-          floatfield_(0),
+          floatfield_(std::ios_base::fmtflags(0)),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
           pos_inf_replacement_(json_char_traits<Char>::null_literal()),
           neg_inf_replacement_(json_char_traits<Char>::null_literal()),
