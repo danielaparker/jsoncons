@@ -69,9 +69,9 @@ void escape_string(const std::basic_string<Char>& s,
                    Char quote_char, Char quote_escape_char,
                    std::basic_ostream<Char>& os)
 {
-    std::basic_string<Char>::const_iterator begin = s.begin();
-    std::basic_string<Char>::const_iterator end = s.end();
-    for (std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
+    typename std::basic_string<Char>::const_iterator begin = s.begin();
+    typename std::basic_string<Char>::const_iterator end = s.end();
+    for (typename std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
     {
         Char c = *it;
         if (c == quote_char)
@@ -216,7 +216,7 @@ public:
             }
             else
             {
-                std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
+                typename std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
                 if (it == header_.end())
                 {
                     stack_.back().skip_ = true;

@@ -53,8 +53,8 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
 
         std::basic_string<Char> name_;
         bool is_object_;
-        std::auto_ptr<json_object<Char>> object_;
-        std::auto_ptr<json_array<Char>> array_;
+        std::unique_ptr<json_object<Char>> object_;
+        std::unique_ptr<json_array<Char>> array_;
         size_t minimum_structure_capacity_;
     };
 

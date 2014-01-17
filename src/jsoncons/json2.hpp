@@ -648,7 +648,8 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    to_stream(basic_json_serializer<Char>(os)); 
+    basic_json_serializer<Char> serializer(os);
+    to_stream(serializer);
     return os.str();
 }
 
@@ -656,7 +657,8 @@ template <class Char>
 std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Char>& format) const
 {
     std::basic_ostringstream<Char> os;
-    to_stream(basic_json_serializer<Char>(os,format)); 
+    basic_json_serializer<Char> serializer(os,format);
+    to_stream(serializer);
     return os.str();
 }
 
@@ -722,19 +724,22 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
-    to_stream(basic_json_serializer<Char>(os)); 
+    basic_json_serializer<Char> serializer(os);
+    to_stream(serializer); 
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
 {
-    to_stream(basic_json_serializer<Char>(os,format));
+    basic_json_serializer<Char> serializer(os,format);
+    to_stream(serializer);
 }
 
 template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
 {
-    to_stream(basic_json_serializer<Char>(os,format,indenting));
+    basic_json_serializer<Char> serializer(os,format,indenting);
+    to_stream(serializer);
 }
 
 template <class Char>
@@ -1309,9 +1314,9 @@ void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
-    std::basic_string<Char>::const_iterator begin = s.begin();
-    std::basic_string<Char>::const_iterator end = s.end();
-    for (std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
+    typename std::basic_string<Char>::const_iterator begin = s.begin();
+    typename std::basic_string<Char>::const_iterator end = s.end();
+    for (typename std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
     {
         Char c = *it;
         switch (c)

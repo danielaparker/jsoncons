@@ -62,7 +62,7 @@ public:
         {
             JSONCONS_THROW_EXCEPTION("Input stream is invalid");
         }
-        init(json::an_object);
+        init(jsoncons::json::an_object);
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
@@ -102,7 +102,7 @@ public:
         {
             JSONCONS_THROW_EXCEPTION("Input stream is invalid");
         }
-        init(json::an_object);
+        init(jsoncons::json::an_object);
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
