@@ -115,8 +115,8 @@ public:
         // Do nothing
     }
     virtual void error(const std::string& error_code, 
-                               const std::string& message, 
-                               const basic_parsing_context<Char>& context) throw (json_parse_exception)
+                       const std::string& message, 
+                       const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
