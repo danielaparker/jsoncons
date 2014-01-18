@@ -11,7 +11,7 @@ It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clan
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
-Release 0.84a
+Release 0.84b
 -------------
 
 Fixed issues with column numbers reported with exceptions
