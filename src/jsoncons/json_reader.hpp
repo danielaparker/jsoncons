@@ -117,7 +117,7 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity + read_ahead_length);
+        buffer_.resize(buffer_capacity + 2*read_ahead_length);
     }
 
     virtual unsigned long line_number() const
