@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_exception_true_eof)
+BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
 {
     std::istringstream is("[tru");
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_exception_false_eof)
+BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
 {
     std::istringstream is("[fals");
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_exception_null_eof)
+BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
 {
     std::istringstream is("[nul");
 
@@ -163,6 +163,63 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 		//std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_true_eof)
+{
+    std::istringstream is("[true");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 5);
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_false_eof)
+{
+    std::istringstream is("[false");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 6);
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_null_eof)
+{
+    std::istringstream is("[null");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
 } 
 

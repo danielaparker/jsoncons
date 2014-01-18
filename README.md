@@ -11,8 +11,10 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
-Release 0.84
-------------
+Release 0.84a
+-------------
+
+Fixed issues with column numbers reported with exceptions
 
 Performance enhancements to json_reader and json_deserializer
 

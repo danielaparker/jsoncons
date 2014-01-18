@@ -422,6 +422,7 @@ void basic_json_reader<Char>::read()
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
+                        column_ += 3;
                         handler_.value(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
@@ -432,6 +433,7 @@ void basic_json_reader<Char>::read()
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 4;
+                        column_ += 4;
                         handler_.value(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
@@ -442,6 +444,7 @@ void basic_json_reader<Char>::read()
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
+                        column_ += 3;
                         handler_.null_value(*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
