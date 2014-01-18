@@ -85,7 +85,7 @@ public:
          buffer_position_(0),
          bof_(true),
          eof_(false),
-         buffer_length_(default_max_buffer_length),
+         buffer_length_(0),
          estimation_buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
@@ -170,7 +170,7 @@ private:
                 {
                     eof_ = true;
                 }
-                else if (!is_.eof())
+                else if (buffer_length_ == buffer_capacity_)
                 {
                     buffer_length_ -= read_ahead_length;
                 }
@@ -253,6 +253,7 @@ void basic_json_reader<Char>::read()
     line_ = 1;
     column_ = 0;
 
+    read_data_block();
     while (!eof())
     {
         while (buffer_position_ < buffer_length_)
@@ -546,6 +547,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         while (!done && buffer_position_ < buffer_length_)
         {
             Char c = buffer_[buffer_position_++]; // shouldn't be lf
+            ++column_;
             switch (c)
             {
             case '0':

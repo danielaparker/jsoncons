@@ -72,3 +72,41 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     }
 } 
 
+BOOST_AUTO_TEST_CASE(test_exception_array_eof)
+{
+    std::istringstream is("[100");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 4);
+    }
+} 
+
+/*BOOST_AUTO_TEST_CASE(test_exception_bad_utf8)
+{
+    std::istringstream is("[\"\\u0040");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        //BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),17);
+        BOOST_CHECK_EQUAL(e.column_number(), 9);
+    }
+}*/ 
+

@@ -11,6 +11,16 @@ It has been tested with MS Visual C++ 10, SP1 and Intel C++ Studio XE 2013. Note
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Release 0.84
+------------
+
+Performance enhancements to json_reader and json_deserializer
+
+Incorporates two patches contributed by Marc Chevrier:
+
+- Issue with set member on json object when a member with that name already exists
+- clang port
+
 Release 0.83
 ------------
 
