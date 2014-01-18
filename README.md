@@ -18,7 +18,7 @@ Performance enhancements to json_reader and json_deserializer
 
 Incorporates two patches contributed by Marc Chevrier:
 
-- Issue with set member on json object when a member with that name already exists
+- Fixed issue with set member on json object when a member with that name already exists
 - clang port
 
 Release 0.83

@@ -66,6 +66,7 @@ public:
          bof_(true),
          eof_(false),
          buffer_length_(0),
+         hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
@@ -86,6 +87,7 @@ public:
          bof_(true),
          eof_(false),
          buffer_length_(0),
+         hard_buffer_length_(0),
          estimation_buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          minimum_structure_capacity_(0)
@@ -168,11 +170,17 @@ private:
                 bof_ = false;
                 if (buffer_length_ == 0)
                 {
+                    hard_buffer_length_ = 0;
                     eof_ = true;
                 }
                 else if (buffer_length_ == buffer_capacity_)
                 {
+                    hard_buffer_length_ = buffer_length_;
                     buffer_length_ -= read_ahead_length;
+                }
+                else
+                {
+                    hard_buffer_length_ = buffer_length_;
                 }
             }
             else
@@ -183,19 +191,25 @@ private:
                 }
                 is_.read(&buffer_[0] + read_ahead_length, buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
-                if (is_.eof())
+                if (!is_.eof())
+                {
+                    hard_buffer_length_ = buffer_length_ + read_ahead_length;
+                }
+                else
                 {
                     buffer_length_ += read_ahead_length;
                     for (size_t i = 0; i < read_ahead_length; ++i)
                     {
                         buffer_[buffer_length_ + i] = 0;
                     }
+                    hard_buffer_length_ = buffer_length_;
                 }
             }
         }
         else
         {
             buffer_length_ = 0;
+            hard_buffer_length_ = 0;
             eof_ = true;
         }
     }
@@ -211,6 +225,7 @@ private:
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
+    size_t hard_buffer_length_;
     size_t estimation_buffer_length_;
     basic_json_input_handler<Char>& handler_;
     basic_error_handler<Char>& err_handler_;
@@ -1085,6 +1100,10 @@ template<class Char>
 unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
 {
     unsigned int cp = decode_unicode_escape_sequence();
+    if (hard_buffer_length_ - buffer_position_ < 2)
+    {
+        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+    }
     if (cp >= 0xD800 && cp <= 0xDBFF)
     {
         // surrogate pairs
@@ -1105,6 +1124,10 @@ unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
 template<class Char>
 unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
+    if (hard_buffer_length_ - buffer_position_ < 4)
+    {
+        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+    }
     unsigned int cp = 0;
     size_t index = 0;
     while (index < 4)

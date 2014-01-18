@@ -85,28 +85,84 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
     }
     catch (const json_parse_exception& e)
     {
-		std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 4);
     }
 } 
 
-/*BOOST_AUTO_TEST_CASE(test_exception_bad_utf8)
+BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
 {
-    std::istringstream is("[\"\\u0040");
+    std::istringstream is("[\"\\u");
 
     try
     {
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        //BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0); 
     }
     catch (const json_parse_exception& e)
     {
-		std::cout << e.what() << std::endl;
-        BOOST_CHECK_EQUAL(e.line_number(),17);
-        BOOST_CHECK_EQUAL(e.column_number(), 9);
+		//std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 3);
     }
-}*/ 
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_true_eof)
+{
+    std::istringstream is("[tru");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		//std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 2);
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_false_eof)
+{
+    std::istringstream is("[fals");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		//std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 2);
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_exception_null_eof)
+{
+    std::istringstream is("[nul");
+
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();  // must throw
+        BOOST_CHECK(0 != 0); 
+    }
+    catch (const json_parse_exception& e)
+    {
+		//std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(e.line_number(),1);
+        BOOST_CHECK_EQUAL(e.column_number(), 2);
+    }
+} 
 
