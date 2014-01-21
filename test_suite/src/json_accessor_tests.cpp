@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 {
     json obj;
     BOOST_CHECK(obj.is_object());
+    BOOST_CHECK(obj.is<json::object_type>());
     std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
     // tests for proxy is_type methods
@@ -30,44 +31,57 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     std::cout << "type=" << obj.type() << std::endl;
 
     BOOST_CHECK(obj.is_object());
+    BOOST_CHECK(obj.is<json::object_type>());
 
     BOOST_CHECK(obj["string"].is_string());
+    BOOST_CHECK(obj["string"].is<std::string>());
 
     obj["double"] = 10.7;
     BOOST_CHECK(obj["double"].is_double());
+    BOOST_CHECK(obj["double"].is<double>());
 
     obj["int"] = -10;
     BOOST_CHECK(obj["int"].is_longlong());
+    BOOST_CHECK(obj["int"].is<long long>());
 
     obj["uint"] = 10u;
     BOOST_CHECK(obj["uint"].is_ulonglong());
+    BOOST_CHECK(obj["uint"].is<unsigned long long>());
 
     obj["long"] = static_cast<long>(10);
     BOOST_CHECK(obj["long"].is_longlong());
+    BOOST_CHECK(obj["long"].is<long long>());
 
     obj["ulong"] = static_cast<unsigned long>(10);
     BOOST_CHECK(obj["ulong"].is_ulonglong());
+    BOOST_CHECK(obj["ulong"].is<unsigned long long>());
 
     obj["longlong"] = static_cast<long long>(10);
     BOOST_CHECK(obj["longlong"].is_longlong());
+    BOOST_CHECK(obj["longlong"].is<long long>());
 
     obj["ulonglong"] = static_cast<unsigned long long>(10);
     BOOST_CHECK(obj["ulonglong"].is_ulonglong());
+    BOOST_CHECK(obj["ulonglong"].is<unsigned long long>());
 
     obj["true"] = true;
     BOOST_CHECK(obj["true"].is_bool());
+    BOOST_CHECK(obj["true"].is<bool>());
 
     obj["false"] = false;
     BOOST_CHECK(obj["false"].is_bool());
+    BOOST_CHECK(obj["false"].is<bool>());
 
     obj["null1"] = json::null;
     BOOST_CHECK(obj["null1"].is_null());
 
     obj["object"] = json::an_object;
     BOOST_CHECK(obj["object"].is_object());
+    BOOST_CHECK(obj["object"].is<json::object_type>());
 
     obj["array"] = json::an_array;
     BOOST_CHECK(obj["array"].is_array());
+    BOOST_CHECK(obj["array"].is<json::array_type>());
 
     matrix<double> A;
     obj.set_custom_data("custom",A);
@@ -77,6 +91,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 
     json str = obj["string"];
     BOOST_CHECK(str.is_string());
+    BOOST_CHECK(str.is<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(test_as_vector_of_double)
