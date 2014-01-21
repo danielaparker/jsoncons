@@ -92,6 +92,9 @@ public:
     static const basic_json<Char> an_array;
     static const basic_json<Char> null;
 
+    typedef json_object<Char> object_type;
+    typedef json_array<Char> array_type;
+    
     typedef typename json_object<Char>::iterator object_iterator;
     typedef typename json_object<Char>::const_iterator const_object_iterator;
 
@@ -111,6 +114,12 @@ public:
         bool has_member(const std::basic_string<Char>& name) const
         {
             return val_.has_member(name);
+        }
+
+        template<typename T>
+        bool is() const
+        {
+            return val_.template is<T>();
         }
 
         bool is_null() const
@@ -181,6 +190,12 @@ public:
         std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
         {
             return val_.as_string(format);
+        }
+
+        template<typename T>
+        T as() const
+        {
+            return val_.template as<T>();
         }
 
         Char as_char() const
@@ -368,6 +383,12 @@ public:
             val_.at(name_).resize_array(n,val);
         }
 
+        template<typename T>
+        bool is() const
+        {
+            return val_.at(name_).template is<T>();
+        }
+
         bool is_string() const
         {
             return val_.at(name_).is_string();
@@ -421,6 +442,12 @@ public:
         std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
         {
             return val_.at(name_).as_string(format);
+        }
+
+        template<typename T>
+        T as() const
+        {
+            return val_.at(name_).template as<T>();
         }
 
         Char as_char() const
@@ -777,6 +804,12 @@ public:
 
     bool has_member(const std::basic_string<Char>& name) const;
 
+    template<typename T>
+    bool is() const
+    {
+        return is_type<Char,T>(*this);
+    }
+
     bool is_string() const
     {
         return type_ == string_t;
@@ -831,6 +864,12 @@ public:
     void resize_array(size_t n);
 
     void resize_array(size_t n, const basic_json<Char>& val);
+
+    template<typename T>
+    T as() const
+    {
+        return as_value<Char,T>(*this);
+    }
 
     bool as_bool() const;
 
@@ -956,6 +995,184 @@ public:
     }
 private:
 	basic_json(value_type t);
+
+    template<typename C, typename T>
+    class is_type
+    {
+    public:
+        is_type (const basic_json<C>& value)
+        {}
+
+        operator bool () const
+        {
+            return false;
+        }
+    };
+    template<typename C>
+    class is_type<C,std::basic_string<C>>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_string();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,bool>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_bool();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,double>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_double();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,int>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_longlong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,unsigned int>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_ulonglong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,long>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_longlong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,unsigned long>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_ulonglong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,long long>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_longlong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,unsigned long long>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_ulonglong();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,object_type>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_object();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,array_type>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return value_.is_array();
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
 
     template<typename C, typename T>
     class as_value
