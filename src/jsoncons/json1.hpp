@@ -84,7 +84,7 @@ public:
 };
 
 template <class Char>
-class basic_json : private json_base
+class basic_json : public json_base
 {
 public:
 
@@ -109,6 +109,11 @@ public:
         size_t size() const
         {
             return val_.size();
+        }
+
+        value_type type() const
+        {
+            return val_.type();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
@@ -346,6 +351,11 @@ public:
         size_t size() const
         {
             return val_.at(name_).size();
+        }
+
+        value_type type() const
+        {
+            return val_.at(name_).type();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
