@@ -30,12 +30,15 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json root = json::parse(is);
     BOOST_CHECK(root.is_object());
+    BOOST_CHECK(root.is<json::object_type>());
 
     root["double_1"] = json(10.0);
 
     json double_1 = root["double_1"];
 
     BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
+
+    BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
     json copy = root;
 }
@@ -64,6 +67,10 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     BOOST_CHECK(root["myobject"]["bool_2"].as_bool());
     BOOST_CHECK(root["myobject"]["int_2"].as_longlong() == 0);
     BOOST_CHECK(root["myobject"]["string_2"].as_string() == std::string("my string"));
+
+    BOOST_CHECK(root["myobject"]["bool_2"].as<bool>());
+    BOOST_CHECK(root["myobject"]["int_2"].as<long long>() == 0);
+    BOOST_CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
 	//std::cout << root << std::endl;
 
@@ -150,6 +157,14 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     BOOST_CHECK(root["neg-integer"].as_int() == -87654321);
     BOOST_CHECK_CLOSE(root["double"].as_double(), 123456.01, 0.0000001);
     BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
+    
+    BOOST_CHECK(!root["bool1"].as<bool>());
+    BOOST_CHECK(root["bool2"].as<bool>());
+    BOOST_CHECK(root["integer"].as<int>() == 12345678);
+    BOOST_CHECK(root["integer"].as<unsigned int>() == 12345678);
+    BOOST_CHECK(root["neg-integer"].as<int>() == -87654321);
+    BOOST_CHECK_CLOSE(root["double"].as<double>(), 123456.01, 0.0000001);
+    BOOST_CHECK(root["escaped-string"].as<std::string>() == std::string("\\\n"));
 }
 
 BOOST_AUTO_TEST_CASE(test_serialize)
@@ -524,6 +539,7 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
 {
     json obj = json::parse_file("input/json-multiline-comment.json");
     BOOST_CHECK(obj.is_array());
+    BOOST_CHECK(obj.is<json::array_type>());
     BOOST_CHECK_EQUAL(obj.size(),0);
 }
 
