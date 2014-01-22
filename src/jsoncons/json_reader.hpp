@@ -146,11 +146,11 @@ private:
 
     size_t estimate_minimum_array_capacity() const;
     size_t estimate_minimum_object_capacity() const;
-    size_t skip_array(size_t pos) const;
-    size_t skip_object(size_t pos) const;
-    size_t skip_string(size_t pos) const;
-    size_t skip_number(size_t pos) const;
-    void skip_separator();
+    size_t skip_array(size_t pos, const size_t end) const;
+    size_t skip_object(size_t pos, const size_t end) const;
+    size_t skip_string(size_t pos, const size_t end) const;
+    size_t skip_number(size_t pos, const size_t end) const;
+    void parse_separator();
     void parse_number(Char c);
     void parse_string();
     void ignore_single_line_comment();
@@ -353,7 +353,7 @@ void basic_json_reader<Char>::read()
                             if (stack_.back().is_object_ && stack_.back().name_count_ == stack_.back().value_count_)
                             {
                                 handler_.name(string_buffer_, *this);
-                                skip_separator();
+                                parse_separator();
                                 ++stack_.back().name_count_;
                             }
                             else
@@ -489,12 +489,13 @@ void basic_json_reader<Char>::read()
 }
 
 template<class Char>
-void basic_json_reader<Char>::skip_separator()
+void basic_json_reader<Char>::parse_separator()
 {
     bool done = false;
     while (!done)
     {
-        while (!done && buffer_position_ < buffer_length_)
+        const size_t end = buffer_length_;
+        while (!done && buffer_position_ < end)
         {
             Char c = buffer_[buffer_position_++];
             ++column_;
@@ -562,7 +563,8 @@ void basic_json_reader<Char>::parse_number(Char c)
     bool done = false;
     while (!done)
     {
-        while (!done && buffer_position_ < buffer_length_)
+        const size_t end = buffer_length_;
+        while (!done && buffer_position_ < end)
         {
             Char c = buffer_[buffer_position_++]; // shouldn't be lf
             ++column_;
@@ -672,7 +674,8 @@ void basic_json_reader<Char>::parse_string()
     bool done = false;
     while (!done)
     {
-        while (!done && buffer_position_ < buffer_length_)
+        const size_t end = buffer_length_;
+        while (!done && buffer_position_ < end)
         {
             Char c = buffer_[buffer_position_++];
             ++column_;
@@ -786,7 +789,8 @@ void basic_json_reader<Char>::ignore_single_line_comment()
     bool done = false;
     while (!done)
     {
-        while (!done && buffer_position_ < buffer_length_)
+        const size_t end = buffer_length_;
+        while (!done && buffer_position_ < end)
         {
             Char c = buffer_[buffer_position_++];
             ++column_;
@@ -825,7 +829,8 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
     bool done = false;
     while (!done)
     {
-        while (!done && buffer_position_ < buffer_length_)
+        const size_t end = buffer_length_;
+        while (!done && buffer_position_ < end)
         {
             Char c = buffer_[buffer_position_++];
             ++column_;
@@ -882,15 +887,15 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
             done = true;
             break;
         case begin_array:
-            pos = skip_array(pos + 1);
+            pos = skip_array(pos + 1,end);
             ++size;
             break;
         case begin_object:
-            pos = skip_object(pos + 1);
+            pos = skip_object(pos + 1,end);
             ++size;
             break;
         case '\"':
-            pos = skip_string(pos + 1);
+            pos = skip_string(pos + 1,end);
             ++size;
             break;
         case 't':
@@ -916,7 +921,7 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
         case '8':
         case '9':
         case '-':
-            pos = skip_number(pos + 1);
+            pos = skip_number(pos + 1,end);
             ++size;
             break;
         default:
@@ -943,17 +948,17 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
             done = true;
             break;
         case '\"':
-            pos = skip_string(pos + 1);
+            pos = skip_string(pos + 1,end);
             break;
         case ':':
             ++size;
             ++pos;
             break;
         case begin_array:
-            pos = skip_array(pos + 1);
+            pos = skip_array(pos + 1,end);
             break;
         case begin_object:
-            pos = skip_object(pos + 1);
+            pos = skip_object(pos + 1,end);
             break;
         case 't':
             pos += 4;
@@ -974,21 +979,21 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
 }
 
 template<class Char>
-size_t basic_json_reader<Char>::skip_array(size_t pos) const
+size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < buffer_length_)
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
         case begin_array:
-            pos = skip_array(pos + 1);
+            pos = skip_array(pos + 1, end);
             break;
         case begin_object:
-            pos = skip_object(pos + 1);
+            pos = skip_object(pos + 1, end);
             break;
         case '\"':
-            pos = skip_string(pos + 1);
+            pos = skip_string(pos + 1, end);
             break;
         case end_array:
             done = true;
@@ -1004,10 +1009,10 @@ size_t basic_json_reader<Char>::skip_array(size_t pos) const
 }
 
 template<class Char>
-size_t basic_json_reader<Char>::skip_string(size_t pos) const
+size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < buffer_length_)
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
@@ -1036,10 +1041,10 @@ size_t basic_json_reader<Char>::skip_string(size_t pos) const
 }
 
 template<class Char>
-size_t basic_json_reader<Char>::skip_number(size_t pos) const
+size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < buffer_length_)
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
@@ -1070,21 +1075,21 @@ size_t basic_json_reader<Char>::skip_number(size_t pos) const
 }
 
 template<class Char>
-size_t basic_json_reader<Char>::skip_object(size_t pos) const
+size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < buffer_length_)
+    while (!done && pos < end)
     {
         switch (buffer_[pos])
         {
         case begin_object:
-            pos = skip_object(pos + 1);
+            pos = skip_object(pos + 1, end);
             break;
         case begin_array:
-            pos = skip_array(pos + 1);
+            pos = skip_array(pos + 1, end);
             break;
         case '\"':
-            pos = skip_string(pos + 1);
+            pos = skip_string(pos + 1, end);
             break;
         case end_object:
             done = true;
