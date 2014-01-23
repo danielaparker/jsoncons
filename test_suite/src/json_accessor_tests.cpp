@@ -19,6 +19,88 @@ using jsoncons::basic_json_reader;
 using std::string;
 using boost::numeric::ublas::matrix;
 
+BOOST_AUTO_TEST_CASE(test_as)
+{
+    json obj;
+    obj["field1"] = 10;
+    obj["field2"] = true;
+
+    std::string s = obj["field1"].as<std::string>();
+    BOOST_CHECK_EQUAL(s,std::string("10"));
+    int int_val = obj["field2"].as<int>();
+    BOOST_CHECK_EQUAL(int_val,1);
+    int short_val = obj["field2"].as<short>();
+    BOOST_CHECK_EQUAL(short_val,1);
+    int ushort_val = obj["field2"].as<unsigned short>();
+    BOOST_CHECK_EQUAL(ushort_val,unsigned short(1));
+    char char_val = obj["field2"].as<char>();
+    BOOST_CHECK_EQUAL(char_val,char(1));
+
+    json parent;
+    parent["child"] = obj;
+    s = parent["child"]["field1"].as<std::string>();
+    BOOST_CHECK_EQUAL(s,std::string("10"));
+    int_val = parent["child"]["field2"].as<int>();
+    BOOST_CHECK_EQUAL(int_val,1);
+    short_val = parent["child"]["field2"].as<short>();
+    BOOST_CHECK_EQUAL(short_val,1);
+}
+
+BOOST_AUTO_TEST_CASE(test_is)
+{
+    json obj;
+    obj["field1"] = 10;
+    obj["field2"] = -10;
+    obj["field3"] = 10U;
+
+	BOOST_CHECK(obj["field1"].type() == json::longlong_t);
+	BOOST_CHECK(obj["field2"].type() == json::longlong_t);
+	BOOST_CHECK(obj["field3"].type() == json::ulonglong_t);
+
+    BOOST_CHECK(!obj["field1"].is<std::string>());
+    BOOST_CHECK(obj["field1"].is<int>());
+    BOOST_CHECK(obj["field1"].is<long>());
+    BOOST_CHECK(obj["field1"].is<long long>());
+    BOOST_CHECK(!obj["field1"].is<unsigned int>());
+    BOOST_CHECK(!obj["field1"].is<unsigned long>());
+    BOOST_CHECK(!obj["field1"].is<unsigned long long>());
+    BOOST_CHECK(!obj["field1"].is<double>());
+
+    BOOST_CHECK(!obj["field2"].is<std::string>());
+    BOOST_CHECK(obj["field2"].is<int>());
+    BOOST_CHECK(obj["field2"].is<long>());
+    BOOST_CHECK(obj["field2"].is<long long>());
+    BOOST_CHECK(!obj["field2"].is<unsigned int>());
+    BOOST_CHECK(!obj["field2"].is<unsigned long>());
+    BOOST_CHECK(!obj["field2"].is<unsigned long long>());
+    BOOST_CHECK(!obj["field2"].is<double>());
+
+    BOOST_CHECK(!obj["field3"].is<std::string>());
+    BOOST_CHECK(!obj["field3"].is<int>());
+    BOOST_CHECK(!obj["field3"].is<long>());
+    BOOST_CHECK(!obj["field3"].is<long long>());
+    BOOST_CHECK(obj["field3"].is<unsigned int>());
+    BOOST_CHECK(obj["field3"].is<unsigned long>());
+    BOOST_CHECK(obj["field3"].is<unsigned long long>());
+    BOOST_CHECK(!obj["field3"].is<double>());
+}
+
+BOOST_AUTO_TEST_CASE(test_is2)
+{
+    json obj = json::parse_string("{\"field1\":10}");
+
+	BOOST_CHECK(obj["field1"].type() == json::ulonglong_t);
+
+    BOOST_CHECK(!obj["field1"].is<std::string>());
+    BOOST_CHECK(!obj["field1"].is<int>());
+    BOOST_CHECK(!obj["field1"].is<long>());
+    BOOST_CHECK(!obj["field1"].is<long long>());
+    BOOST_CHECK(obj["field1"].is<unsigned int>());
+    BOOST_CHECK(obj["field1"].is<unsigned long>());
+    BOOST_CHECK(obj["field1"].is<unsigned long long>());
+    BOOST_CHECK(!obj["field1"].is<double>());
+}
+
 BOOST_AUTO_TEST_CASE(test_is_type)
 {
     json obj;

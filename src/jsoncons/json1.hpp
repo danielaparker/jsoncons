@@ -80,11 +80,11 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
 class json_base
 {
 public:
-    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,long_long_t,ulong_long_t,bool_t,null_t,custom_t};
+    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
 };
 
 template <class Char>
-class basic_json : private json_base
+class basic_json : public json_base
 {
 public:
 
@@ -109,6 +109,11 @@ public:
         size_t size() const
         {
             return val_.size();
+        }
+
+        value_type type() const
+        {
+            return val_.type();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
@@ -346,6 +351,11 @@ public:
         size_t size() const
         {
             return val_.at(name_).size();
+        }
+
+        value_type type() const
+        {
+            return val_.at(name_).type();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
@@ -817,17 +827,17 @@ public:
 
     bool is_number() const
     {
-        return type_ == double_t || type_ == long_long_t || type_ == ulong_long_t;
+        return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }
 
     bool is_longlong() const
     {
-        return type_ == long_long_t;
+        return type_ == longlong_t;
     }
 
     bool is_ulonglong() const
     {
-        return type_ == ulong_long_t;
+        return type_ == ulonglong_t;
     }
 
     bool is_double() const
@@ -1205,6 +1215,14 @@ private:
         operator int () const
         {
             return value_.as_int();
+        }
+        operator short () const
+        {
+            return static_cast<short>(value_.as_longlong());
+        }
+        operator unsigned short () const
+        {
+            return static_cast<unsigned short>(value_.as_ulonglong());
         }
         operator unsigned int () const
         {
