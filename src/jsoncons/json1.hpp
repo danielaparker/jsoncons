@@ -8,6 +8,7 @@
 #ifndef JSONCONS_JSON1_HPP
 #define JSONCONS_JSON1_HPP
 
+#include <limits>
 #include <string>
 #include <vector>
 #include <exception>
@@ -1006,6 +1007,23 @@ public:
 private:
 	basic_json(value_type t);
 
+    template<typename T>
+    static bool is_convertible_to (const basic_json<Char>& object)
+    {
+        if (object.is_longlong())
+        {
+            long long data = object.as_longlong();
+            return data >= std::numeric_limits<T>::min() && data <= std::numeric_limits<T>::max() ? true : false;
+        }
+        else if (object.is_ulonglong())
+        {
+            unsigned long long data = object.as_ulonglong();
+            return data <= std::numeric_limits<T>::max() ? true : false;
+        }
+        
+        return false;
+    }
+    
     template<typename C, typename T>
     class is_type
     {
@@ -1064,6 +1082,66 @@ private:
         const basic_json<C>& value_;
     };
     template<typename C>
+    class is_type<C,char>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return is_convertible_to<char>(value_);
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,unsigned char>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return is_convertible_to<unsigned char>(value_);
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,short>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return is_convertible_to<short>(value_);
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
+    class is_type<C,unsigned short>
+    {
+      public:
+        is_type (const basic_json<C>& value) : value_(value)
+        {}
+        
+        operator bool () const
+        {
+            return is_convertible_to<unsigned short>(value_);
+        }
+
+      private:
+        const basic_json<C>& value_;
+    };
+    template<typename C>
     class is_type<C,int>
     {
       public:
@@ -1072,7 +1150,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_longlong();
+            return is_convertible_to<int>(value_);
         }
 
       private:
@@ -1087,7 +1165,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_ulonglong();
+            return is_convertible_to<unsigned int>(value_);
         }
 
       private:
@@ -1102,7 +1180,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_longlong();
+            return is_convertible_to<long>(value_);
         }
 
       private:
@@ -1117,7 +1195,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_ulonglong();
+            return is_convertible_to<unsigned long>(value_);
         }
 
       private:
@@ -1132,7 +1210,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_longlong();
+            return is_convertible_to<long long>(value_);
         }
 
       private:
@@ -1147,7 +1225,7 @@ private:
         
         operator bool () const
         {
-            return value_.is_ulonglong();
+            return is_convertible_to<unsigned long long>(value_);
         }
 
       private:

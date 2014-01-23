@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_as)
     int short_val = obj["field2"].as<short>();
     BOOST_CHECK_EQUAL(short_val,1);
     int ushort_val = obj["field2"].as<unsigned short>();
-    BOOST_CHECK_EQUAL(ushort_val,unsigned short(1));
+    BOOST_CHECK_EQUAL(ushort_val,static_cast<unsigned short>(1));
     char char_val = obj["field2"].as<char>();
     BOOST_CHECK_EQUAL(char_val,char(1));
 
