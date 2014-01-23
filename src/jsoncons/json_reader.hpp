@@ -715,7 +715,7 @@ void basic_json_reader<Char>::parse_number(Char c)
     }
 }
 
-template<class Char>
+template<class Char> 
 void basic_json_reader<Char>::parse_string()
 {
     string_buffer_.clear();
