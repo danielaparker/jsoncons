@@ -11,8 +11,19 @@ It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clan
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Release 0.85
+------------
+
+Fixes issue with 0.84b
+
+Incorporates patch contributed by Marc Chevrier:
+
+- as<T>
+
 Release 0.84b
 -------------
+
+0.84b has been removed from the distribution. A defect was introduced in this release.
 
 Fixed issues with column numbers reported with exceptions
 

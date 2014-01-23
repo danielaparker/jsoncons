@@ -160,6 +160,19 @@ private:
 
     void read_data_block()
     {
+        if (buffer_position_ < buffer_length_)
+        {
+            return; // exhaust buffer first
+        }
+        JSONCONS_ASSERT(buffer_position_ <= hard_buffer_length_);
+        JSONCONS_ASSERT(buffer_position_ - buffer_length_ < read_ahead_length);
+
+        size_t extra = 0;
+        if (buffer_position_ > buffer_length_)
+        {
+            extra = buffer_position_ - buffer_length_;
+        }
+
         buffer_position_ = 0;
         if (!is_.eof())
         {
@@ -183,21 +196,24 @@ private:
                     hard_buffer_length_ = buffer_length_;
                 }
             }
-            else
+            else // not eof
             {
-                for (size_t i = 0; i < read_ahead_length; ++i)
+                size_t unread = read_ahead_length - extra;
+                size_t real_buffer_length = buffer_length_ + extra;
+                for (size_t i = 0; i < unread; ++i)
                 {
-                    buffer_[i] = buffer_[buffer_length_ + i];
+                    buffer_[i] = buffer_[real_buffer_length + i];
                 }
-                is_.read(&buffer_[0] + read_ahead_length, buffer_capacity_);
+                is_.read(&buffer_[0] + unread, buffer_capacity_);
                 buffer_length_ = static_cast<size_t>(is_.gcount());
                 if (!is_.eof())
                 {
+                    buffer_length_ -= extra;
                     hard_buffer_length_ = buffer_length_ + read_ahead_length;
                 }
                 else
                 {
-                    buffer_length_ += read_ahead_length;
+                    buffer_length_ += unread;
                     for (size_t i = 0; i < read_ahead_length; ++i)
                     {
                         buffer_[buffer_length_ + i] = 0;
@@ -212,6 +228,7 @@ private:
             hard_buffer_length_ = 0;
             eof_ = true;
         }
+        
     }
 
     size_t minimum_structure_capacity_;
@@ -268,7 +285,10 @@ void basic_json_reader<Char>::read()
     line_ = 1;
     column_ = 0;
 
-    read_data_block();
+    if (buffer_position_ >= buffer_length_)
+    {
+        read_data_block();
+    }
     while (!eof())
     {
         while (buffer_position_ < buffer_length_)
@@ -278,12 +298,12 @@ void basic_json_reader<Char>::read()
             switch (c)
             {
             case '\r':
+                ++line_;
+                column_ = 0;
                 if (buffer_[buffer_position_] == '\n')
                 {
                     ++buffer_position_;
                 }
-                ++line_;
-                column_ = 0;
                 break;
             case '\n':
                 ++line_;
@@ -293,6 +313,23 @@ void basic_json_reader<Char>::read()
             case '\v':
             case '\f':
             case ' ':
+                {
+                    size_t count = 0;
+                    if (buffer_[buffer_position_] == ' ')
+                    {
+                        ++count; 
+                    }
+                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' '))
+                    {
+                        ++count; 
+                    }
+                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' ') & (buffer_[buffer_position_+2] == ' '))
+                    {
+                        ++count; 
+                    }
+                    buffer_position_ += count;
+                    column_ += count;
+                }
                 break;
             case '/':
                 {
@@ -350,10 +387,26 @@ void basic_json_reader<Char>::read()
                         }
                         {
                             parse_string();
+                            size_t count1 = 0;
                             if (stack_.back().is_object_ && stack_.back().name_count_ == stack_.back().value_count_)
                             {
                                 handler_.name(string_buffer_, *this);
-                                parse_separator();
+                                count1 = 0;
+                                if (buffer_[buffer_position_] == ':')
+                                {
+                                    ++count1;
+                                }
+                                if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ':'))
+                                {
+                                    count1 += 2;
+                                }
+                                buffer_position_ += count1;
+                                column_ += count1;
+                                
+                                if (count1 == 0)
+                                {
+                                    parse_separator();
+                                }
                                 ++stack_.back().name_count_;
                             }
                             else
@@ -475,10 +528,6 @@ void basic_json_reader<Char>::read()
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
-            //if (eof())
-            //{
-            //    err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
-            //}
         }
     }
 
