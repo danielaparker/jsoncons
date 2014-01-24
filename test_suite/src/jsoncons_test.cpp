@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json root = json::parse(is);
     BOOST_CHECK(root.is_object());
-    BOOST_CHECK(root.is<json::object_type>());
+    BOOST_CHECK(root.is<json::object>());
 
     root["double_1"] = json(10.0);
 
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
 {
     json obj = json::parse_file("input/json-multiline-comment.json");
     BOOST_CHECK(obj.is_array());
-    BOOST_CHECK(obj.is<json::array_type>());
+    BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(),0);
 }
 

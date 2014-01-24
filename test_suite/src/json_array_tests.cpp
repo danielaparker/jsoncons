@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 {
     json arr = json::make_array();
     BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array_type>());
+    BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add(0,"Montreal");
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_array_remove_range)
 {
     json arr = json::make_array();
     BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array_type>());
+    BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add(0,"Montreal");
@@ -60,14 +60,14 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
     json cities = json::make_array();
     BOOST_CHECK(cities.is_array());
-    BOOST_CHECK(cities.is<json::array_type>());
+    BOOST_CHECK(cities.is<json::array>());
     cities.reserve(10);  // storage is allocated
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
     cities.add("Toronto");  
     BOOST_CHECK(cities.is_array());
-    BOOST_CHECK(cities.is<json::array_type>());
+    BOOST_CHECK(cities.is<json::array>());
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
