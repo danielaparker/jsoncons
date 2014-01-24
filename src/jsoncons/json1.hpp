@@ -82,21 +82,18 @@ class json_base
 {
 public:
     enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
-    struct object {};
-    struct array {};
+    struct object_type {};
+    struct array_type {};
+    struct null_type {};
 };
 
 template <class Char>
 class basic_json : public json_base
 {
 public:
-
     static const basic_json<Char> an_object;
     static const basic_json<Char> an_array;
     static const basic_json<Char> null;
-
-    typedef json_object<Char> object_type;
-    typedef json_array<Char> array_type;
     
     typedef typename json_object<Char>::iterator object_iterator;
     typedef typename json_object<Char>::const_iterator const_object_iterator;
@@ -1015,12 +1012,17 @@ private:
         return false;
     }
 
-    bool is_type(json_base::object) const
+    bool is_type(json_base::null_type) const
+    {
+        return type_ == null_t;
+    }
+
+    bool is_type(json_base::object_type) const
     {
         return type_ == object_t || type_ == empty_object_t;
     }
 
-    bool is_type(json_base::array) const
+    bool is_type(json_base::array_type) const
     {
         return type_ == array_t;
     }
