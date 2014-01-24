@@ -24,29 +24,29 @@ class my_error_handler : public error_handler
 {
 
 public:
-    my_error_handler(std::string error_code, 
+    my_error_handler(std::string error_code,
                      std::string fatal_error_code)
-        : error_code_(error_code), 
+        : error_code_(error_code),
           fatal_error_code_(fatal_error_code)
     {
     }
 
-    virtual void warning(const std::string& error_code, 
-                         const std::string& message, 
+    virtual void warning(const std::string& error_code,
+                         const std::string& message,
                          const parsing_context& context) throw(json_parse_exception)
     {
     }
 
-    virtual void error(const std::string& error_code, 
-                       const std::string& message, 
+    virtual void error(const std::string& error_code,
+                       const std::string& message,
                        const parsing_context& context) throw(json_parse_exception)
     {
         BOOST_CHECK(error_code == error_code_);
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
 
-    virtual void fatal_error(const std::string& error_code, 
-                             const std::string& message, 
+    virtual void fatal_error(const std::string& error_code,
+                             const std::string& message,
                              const parsing_context& context) throw(json_parse_exception)
     {
         if (error_code != fatal_error_code_)
