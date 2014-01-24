@@ -1025,6 +1025,8 @@ private:
         if (object.is_longlong())
         {
             long long data = object.as_longlong();
+            if (std::is_signed<T>::value  == false && data < 0)
+                return false;
             return data >= std::numeric_limits<T>::min() && data <= std::numeric_limits<T>::max() ? true : false;
         }
         else if (object.is_ulonglong())
