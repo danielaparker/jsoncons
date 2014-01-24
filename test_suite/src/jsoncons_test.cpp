@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     address2["zip"] = json("94085");
     address2["country"] = json("USA");
     addresses.push_back(address2);
-    
+
     root["addresses"] = json(addresses.begin(),addresses.end());
 
     BOOST_CHECK(root["addresses"].size() == 2);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     BOOST_CHECK(root["neg-integer"].as_int() == -87654321);
     BOOST_CHECK_CLOSE(root["double"].as_double(), 123456.01, 0.0000001);
     BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
-    
+
     BOOST_CHECK(!root["bool1"].as<bool>());
     BOOST_CHECK(root["bool2"].as<bool>());
     BOOST_CHECK(root["integer"].as<int>() == 12345678);
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
         std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
     }
     std::cout << "]" << std::endl;
-    
+
     std::ostringstream os;
     output_format format;
     format.escape_all_non_ascii(true);
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     json root = json::parse(is);
     s = std::clock() - t;
     std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds.\n";
- 
+
 }
 
 class my_json_filter : public json_filter
@@ -476,7 +476,7 @@ public:
     {
     }
 
-    virtual void name(const std::string& name, const parsing_context& context) 
+    virtual void name(const std::string& name, const parsing_context& context)
     {
         name_ = name;
         if (name != "name")
@@ -485,7 +485,7 @@ public:
         }
     }
 
-    virtual void value(const std::string& value, const parsing_context& context) 
+    virtual void value(const std::string& value, const parsing_context& context)
     {
         if (name_ == "name")
         {
@@ -500,10 +500,10 @@ public:
                 std::string last = value.substr(start_last);
                 parent().value(last,context);
             }
-            else 
+            else
             {
-                std::cerr << "Incomplete name \"" << value 
-                          << "\" at line " << context.line_number() 
+                std::cerr << "Incomplete name \"" << value
+                          << "\" at line " << context.line_number()
                           << " and column " << context.column_number() << std::endl;
             }
         }

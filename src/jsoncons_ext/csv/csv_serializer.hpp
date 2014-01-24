@@ -124,7 +124,7 @@ public:
 
     basic_csv_serializer(std::basic_ostream<Char>& os,
                          const jsoncons::basic_json<Char>& params)
-       : 
+       :
        os_(os),
        format_(),
        stack_(),

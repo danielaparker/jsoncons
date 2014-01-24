@@ -13,7 +13,7 @@
 
 namespace jsoncons {
 
-template<> 
+template<>
 inline void serialize(json_output_handler& os, const boost::numeric::ublas::matrix<double>& A)
 {
     os.begin_array();

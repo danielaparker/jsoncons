@@ -107,14 +107,14 @@ public:
 
     typedef json_object<Char> object_type;
     typedef json_array<Char> array_type;
-    
+
     typedef typename json_object<Char>::iterator object_iterator;
     typedef typename json_object<Char>::const_iterator const_object_iterator;
 
     typedef typename json_array<Char>::iterator array_iterator;
     typedef typename json_array<Char>::const_iterator const_array_iterator;
 
-    class const_val_proxy 
+    class const_val_proxy
     {
     public:
         friend class basic_json<Char>;
@@ -356,7 +356,7 @@ public:
         const basic_json<Char>& val_;
     };
 
-    class object_key_proxy 
+    class object_key_proxy
     {
     public:
         friend class basic_json<Char>;
@@ -451,7 +451,7 @@ public:
         {
             return val_.at(name_).is_array();
         }
- 
+
         bool is_custom() const
         {
             return val_.at(name_).is_custom();
@@ -532,7 +532,7 @@ public:
         // Returns a const reference to the custom data associated with name
 
         template <class T>
-        T& custom_data() 
+        T& custom_data()
         {
             return val_.at(name_).template custom_data<T>();
         }
@@ -614,13 +614,13 @@ public:
         {
             val_.at(name_).remove_range(from_index, to_index);
         }
-        // Remove a range of elements from an array 
+        // Remove a range of elements from an array
 
         void remove_member(const std::basic_string<Char>& name)
         {
             val_.at(name_).remove_member(name);
         }
-        // Remove a member from an object 
+        // Remove a member from an object
 
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
@@ -712,7 +712,7 @@ public:
         object_key_proxy(); // nopop
         object_key_proxy& operator = (const object_key_proxy& other); // noop
 
-        object_key_proxy(basic_json<Char>& var, 
+        object_key_proxy(basic_json<Char>& var,
               const std::basic_string<Char>& name)
             : val_(var), name_(name)
         {
@@ -800,7 +800,7 @@ public:
 
     bool operator==(const basic_json<Char>& rhs) const;
 
-    size_t size() const; 
+    size_t size() const;
 
     basic_json<Char>& operator[](size_t i);
 
@@ -1032,10 +1032,10 @@ private:
             unsigned long long data = object.as_ulonglong();
             return data <= std::numeric_limits<T>::max() ? true : false;
         }
-        
+
         return false;
     }
-    
+
     template<typename C, typename T>
     class is_type
     {
@@ -1054,7 +1054,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return value_.is_string();
@@ -1069,7 +1069,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return value_.is_bool();
@@ -1084,7 +1084,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return value_.is_double();
@@ -1099,7 +1099,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<char>(value_);
@@ -1114,7 +1114,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<unsigned char>(value_);
@@ -1129,7 +1129,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<short>(value_);
@@ -1144,7 +1144,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<unsigned short>(value_);
@@ -1159,7 +1159,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<int>(value_);
@@ -1174,7 +1174,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<unsigned int>(value_);
@@ -1189,7 +1189,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<long>(value_);
@@ -1204,7 +1204,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<unsigned long>(value_);
@@ -1219,7 +1219,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<long long>(value_);
@@ -1234,7 +1234,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return is_convertible_to<unsigned long long>(value_);
@@ -1249,7 +1249,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return value_.is_object();
@@ -1264,7 +1264,7 @@ private:
       public:
         is_type (const basic_json<C>& value) : value_(value)
         {}
-        
+
         operator bool () const
         {
             return value_.is_array();
@@ -1285,7 +1285,7 @@ private:
         {
             return static_cast<T>(*this);
         }
-        
+
         operator std::basic_string<C> () const
         {
             return value_.as_string();

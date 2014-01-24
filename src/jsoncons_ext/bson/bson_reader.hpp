@@ -69,12 +69,12 @@ public:
     basic_bson_reader(std::basic_istream<Char>& is,
                       jsoncons::basic_json_input_handler<Char>& handler,
                       jsoncons::basic_error_handler<Char>& err_handler)
-       : is_(is), 
-         handler_(handler), 
+       : is_(is),
+         handler_(handler),
          err_handler_(err_handler),
          buffer_(default_max_buffer_length),
-         input_buffer_(0), 
-         buffer_position_(0), 
+         input_buffer_(0),
+         buffer_position_(0),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
     {
@@ -82,16 +82,16 @@ public:
     }
     basic_bson_reader(std::basic_istream<Char>& is,
                       jsoncons::basic_json_input_handler<Char>& handler)
-        
-       : is_(is), 
-         handler_(handler), 
+
+       : is_(is),
+         handler_(handler),
          err_handler_(default_err_handler),
-         buffer_(default_max_buffer_length), 
-         input_buffer_(0), 
-         buffer_position_(0), 
+         buffer_(default_max_buffer_length),
+         input_buffer_(0),
+         buffer_position_(0),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length)
-    { 
+    {
         input_buffer_ = &buffer_[0];
     }
 
@@ -583,7 +583,7 @@ bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, cha
 }
 
 template<class Char>
-void basic_bson_reader<Char>::parse_number(Char c) 
+void basic_bson_reader<Char>::parse_number(Char c)
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -662,7 +662,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                         }
                     }
                 }
-                else 
+                else
                 {
                     try
                     {

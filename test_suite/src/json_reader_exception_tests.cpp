@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
     catch (const json_exception&)
     {
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_left_brace)
 {
@@ -44,14 +44,14 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(e.line_number(), 14);
         BOOST_CHECK_EQUAL(e.column_number(), 30);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_right_brace)
 {
@@ -63,14 +63,14 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(e.line_number(),17);
         BOOST_CHECK_EQUAL(e.column_number(), 9);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_array_eof)
 {
@@ -81,14 +81,14 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 4);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
 {
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 3);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
 {
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
 {
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
 {
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_true_eof)
 {
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_false_eof)
 {
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 6);
     }
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 {
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();  // must throw
-        BOOST_CHECK(0 != 0); 
+        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
@@ -221,5 +221,5 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
-} 
+}
 

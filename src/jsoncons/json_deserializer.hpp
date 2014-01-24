@@ -108,7 +108,7 @@ public:
     virtual void end_object(const basic_parsing_context<Char>& context)
     {
         stack_.back().object_->sort_members();
-        basic_json<Char> val(stack_.back().release_object());	    
+        basic_json<Char> val(stack_.back().release_object());
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -134,7 +134,7 @@ public:
 
     virtual void end_array(const basic_parsing_context<Char>& context)
     {
-        basic_json<Char> val(stack_.back().release_array());	    
+        basic_json<Char> val(stack_.back().release_array());
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -163,8 +163,8 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else 
+        }
+        else
         {
             stack_.back().array_->push_back(JSONCONS_MOVE(basic_json<Char>(value)));
         }
@@ -175,7 +175,7 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
-        } 
+        }
         else
         {
             stack_.back().array_->push_back(basic_json<Char>(value));
@@ -187,7 +187,7 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
-        } 
+        }
         else
         {
             stack_.back().array_->push_back(basic_json<Char>(value));
@@ -199,7 +199,7 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
-        } 
+        }
         else
         {
             stack_.back().array_->push_back(basic_json<Char>(value));
@@ -211,7 +211,7 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(value));
-        } 
+        }
         else
         {
             stack_.back().array_->push_back(basic_json<Char>(value));
@@ -223,7 +223,7 @@ public:
         if (stack_.back().is_object())
         {
             stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<Char>(basic_json<Char>::null));
-        } 
+        }
         else
         {
             stack_.back().array_->push_back(basic_json<Char>::null);

@@ -144,8 +144,8 @@ void mulitple_json_objects()
 
 void more_examples()
 {
-	json image_sizing;  
-	image_sizing["resolution"] = 144; 
+	json image_sizing;
+	image_sizing["resolution"] = 144;
 	image_sizing["long_edge"] = 9.84;
 	image_sizing["size_units"] =  "cm";
 	image_sizing["resize_to_fit"] = true;

@@ -7,7 +7,7 @@
 
 #ifndef JSONCONS_JSON2_HPP
 #define JSONCONS_JSON2_HPP
- 
+
 #include <string>
 #include <vector>
 #include <exception>
@@ -308,7 +308,7 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::at(size_t i) 
+basic_json<Char>& basic_json<Char>::at(size_t i)
 {
     switch (type_)
     {
@@ -340,7 +340,7 @@ const basic_json<Char>& basic_json<Char>::at(size_t i) const
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name) 
+basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name)
 {
     switch (type_)
     {
@@ -733,7 +733,7 @@ template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
     basic_json_serializer<Char> serializer(os);
-    to_stream(serializer); 
+    to_stream(serializer);
 }
 
 template <class Char>
@@ -759,25 +759,25 @@ const basic_json<Char> basic_json<Char>::an_array(new json_array<Char>());
 template <class Char>
 const basic_json<Char> basic_json<Char>::null = basic_json<Char>(basic_json<Char>::null_t);
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array()
 {
     return basic_json<Char>(new json_array<Char>());
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array(size_t n)
 {
     return basic_json<Char>(new json_array<Char>(n));
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& val)
 {
     return basic_json<Char>(new json_array<Char>(n,val));
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -788,7 +788,7 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic_json<Char>& val)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -799,7 +799,7 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -810,7 +810,7 @@ basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -821,7 +821,7 @@ basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, c
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
     basic_json_deserializer<Char> handler;
@@ -852,7 +852,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
- 
+
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
@@ -1004,7 +1004,7 @@ bool basic_json<Char>::is_empty() const
 }
 
 template <class Char>
-void basic_json<Char>::reserve(size_t n) 
+void basic_json<Char>::reserve(size_t n)
 {
     switch (type_)
     {
@@ -1021,7 +1021,7 @@ void basic_json<Char>::reserve(size_t n)
 }
 
 template <class Char>
-void basic_json<Char>::resize_array(size_t n) 
+void basic_json<Char>::resize_array(size_t n)
 {
     switch (type_)
     {
@@ -1032,7 +1032,7 @@ void basic_json<Char>::resize_array(size_t n)
 }
 
 template <class Char>
-void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val) 
+void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val)
 {
     switch (type_)
     {
@@ -1207,7 +1207,7 @@ const T& basic_json<Char>::custom_data() const
 
 template <class Char>
 template <class T>
-T& basic_json<Char>::custom_data() 
+T& basic_json<Char>::custom_data()
 {
     switch (type_)
     {
@@ -1312,7 +1312,7 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_p
 
 typedef basic_pretty_print<char> pretty_print;
 
-inline 
+inline
 char to_hex_character(unsigned char c)
 {
     JSONCONS_ASSERT( c <= 0xF );
@@ -1327,7 +1327,7 @@ bool is_non_ascii_character(unsigned int c)
 }
 
 template <class Char>
-void escape_string(const std::basic_string<Char>& s, 
+void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
@@ -1373,9 +1373,9 @@ void escape_string(const std::basic_string<Char>& s,
                 os << '\\';
                 os << 'u';
                 os << to_hex_character(cp >>12 & 0x000F );
-                os << to_hex_character(cp >>8  & 0x000F ); 
-                os << to_hex_character(cp >>4  & 0x000F ); 
-                os << to_hex_character(cp     & 0x000F ); 
+                os << to_hex_character(cp >>8  & 0x000F );
+                os << to_hex_character(cp >>4  & 0x000F );
+                os << to_hex_character(cp     & 0x000F );
             }
             else if (format.escape_solidus() && c == '/')
             {

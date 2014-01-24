@@ -20,7 +20,7 @@
 #include <cstdarg>
 #include <limits> // std::numeric_limits
 
-#define JSONCONS_NO_MACRO_EXPANSION 
+#define JSONCONS_NO_MACRO_EXPANSION
 
 namespace jsoncons {
 
@@ -42,7 +42,7 @@ namespace jsoncons {
 #else
 #   error "Unknown compiler"
 #endif
-    
+
 //
 // Move support:
 //
@@ -64,7 +64,7 @@ namespace jsoncons {
 #   define JSONCONS_NOEXCEPT
 #endif
 
-    
+
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
 inline bool is_nan(double x) { return _isnan( x ) != 0; }
@@ -81,7 +81,7 @@ inline bool is_neg_inf(double x)
     return is_inf(x) && x < 0;
 }
 
-inline 
+inline
 int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
 {
     int count = -1;
@@ -94,7 +94,7 @@ int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
     return count;
 }
 
-inline 
+inline
 int c99_snprintf(char* str, size_t size, const char* format, ...)
 {
     int count;
@@ -257,7 +257,7 @@ double string_to_double(const std::wstring& s)
 template <class Char> inline
 double string_to_double(const std::basic_string<Char>& s)
 {
-    std::basic_stringstream<Char> ss(s); 
+    std::basic_stringstream<Char> ss(s);
     ss.imbue(std::locale::classic());
     double val;
 	ss >> val;

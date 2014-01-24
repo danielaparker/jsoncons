@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
-    cities.add("Toronto");  
+    cities.add("Toronto");
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array_type>());
     BOOST_CHECK(cities.capacity() == 10);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
     BOOST_CHECK(a[1].as_longlong() == 1);
     BOOST_CHECK(a[2].as_longlong() == 2);
     BOOST_CHECK(a[9].as_longlong() == 0);
-    
+
     BOOST_CHECK(a[1].as<long long>() == 1);
     BOOST_CHECK(a[2].as<long long>() == 2);
     BOOST_CHECK(a[9].as<long long>() == 0);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     BOOST_CHECK(a.size() == 3);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
-	a[0][2] = "25-d-MS"; 
+	a[0][2] = "25-d-MS";
     a[0][3] = "25-d-RR";
     a[1][0] = "1Y";
     a[1][1] = 0.20;
