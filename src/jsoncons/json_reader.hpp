@@ -30,7 +30,11 @@ class basic_json_reader : private basic_parsing_context<Char>
     struct stack_item
     {
         stack_item(bool type)
-           : is_object_(type), value_count_(0), name_count_(0), comma_(false)
+           :
+           value_count_(0),
+           is_object_(type),
+           comma_(false),
+           name_count_(0)
         {
         }
 
@@ -58,18 +62,24 @@ public:
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_error_handler<Char>& err_handler)
-       : is_(is),
-         handler_(handler),
-         err_handler_(err_handler),
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is),
          buffer_(default_max_buffer_length + 2 * read_ahead_length),
+         input_buffer_(0),
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
-         bof_(true),
-         eof_(false),
          buffer_length_(0),
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         handler_(handler),
+         err_handler_(err_handler),
+         bof_(true),
+         eof_(false)
     {
         if (!is.good())
         {
@@ -79,18 +89,24 @@ public:
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
 
-       : is_(is),
-         handler_(handler),
-         err_handler_(default_err_handler),
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is),
          buffer_(default_max_buffer_length + 2 * read_ahead_length),
+         input_buffer_(0),
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
-         bof_(true),
-         eof_(false),
          buffer_length_(0),
          hard_buffer_length_(0),
-         estimation_buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         estimation_buffer_length_(default_max_buffer_length),
+         handler_(handler),
+         err_handler_(default_err_handler),
+         bof_(true),
+         eof_(false)
     {
         if (!is.good())
         {
@@ -228,7 +244,7 @@ private:
             hard_buffer_length_ = 0;
             eof_ = true;
         }
-        
+
     }
 
     size_t minimum_structure_capacity_;
@@ -237,8 +253,8 @@ private:
     std::basic_string<Char> string_buffer_;
     std::vector<stack_item> stack_;
     std::basic_istream<Char>& is_;
-    Char *input_buffer_;
     std::vector<Char> buffer_;
+    Char *input_buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
@@ -317,15 +333,15 @@ void basic_json_reader<Char>::read()
                     size_t count = 0;
                     if (buffer_[buffer_position_] == ' ')
                     {
-                        ++count; 
+                        ++count;
                     }
                     if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' '))
                     {
-                        ++count; 
+                        ++count;
                     }
                     if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' ') & (buffer_[buffer_position_+2] == ' '))
                     {
-                        ++count; 
+                        ++count;
                     }
                     buffer_position_ += count;
                     column_ += count;
@@ -402,7 +418,7 @@ void basic_json_reader<Char>::read()
                                 }
                                 buffer_position_ += count1;
                                 column_ += count1;
-                                
+
                                 if (count1 == 0)
                                 {
                                     parse_separator();
@@ -715,7 +731,7 @@ void basic_json_reader<Char>::parse_number(Char c)
     }
 }
 
-template<class Char> 
+template<class Char>
 void basic_json_reader<Char>::parse_string()
 {
     string_buffer_.clear();

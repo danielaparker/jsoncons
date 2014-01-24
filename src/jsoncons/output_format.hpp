@@ -27,15 +27,18 @@ public:
 //  Constructors
 
     basic_output_format()
-        : indent_(default_indent),
-          precision_(16),
-          floatfield_(std::ios_base::fmtflags(0)),
-          replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
-          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
-          nan_replacement_(json_char_traits<Char>::null_literal()),
-          escape_all_non_ascii_(false),
-          escape_solidus_(false)
+        :
+        indent_(default_indent),
+        precision_(16),
+        floatfield_(std::ios_base::fmtflags(0)),
+        replace_nan_(true),
+        replace_pos_inf_(true),
+        replace_neg_inf_(true),
+        nan_replacement_(json_char_traits<Char>::null_literal()),
+        pos_inf_replacement_(json_char_traits<Char>::null_literal()),
+        neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+        escape_all_non_ascii_(false),
+        escape_solidus_(false)
     {
     }
 
@@ -46,9 +49,9 @@ public:
         return indent_;
     }
 
-    size_t precision() const 
+    size_t precision() const
     {
-        return precision_; 
+        return precision_;
     }
 
     bool escape_all_non_ascii() const
@@ -67,17 +70,17 @@ public:
 
     bool replace_neg_inf() const {return replace_neg_inf_;}
 
-    std::basic_string<Char> nan_replacement() const 
+    std::basic_string<Char> nan_replacement() const
     {
         return nan_replacement_;
     }
 
-    std::basic_string<Char> pos_inf_replacement() const 
+    std::basic_string<Char> pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
-    std::basic_string<Char> neg_inf_replacement() const 
+    std::basic_string<Char> neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }
@@ -133,7 +136,7 @@ public:
     void neg_inf_replacement(const std::basic_string<Char>& replacement)
     {
         neg_inf_replacement_ = replacement;
-    } 
+    }
 
     std::ios_base::fmtflags floatfield() const
     {

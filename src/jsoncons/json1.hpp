@@ -81,7 +81,19 @@ std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const ba
 class json_base
 {
 public:
-    enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
+    enum value_type
+    {
+        empty_object_t,
+        object_t,
+        array_t,
+        string_t,
+        double_t,
+        longlong_t,
+        ulonglong_t,
+        bool_t,
+        null_t,
+        custom_t
+    };
 };
 
 template <class Char>
