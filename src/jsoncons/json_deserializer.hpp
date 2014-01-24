@@ -236,7 +236,7 @@ public:
     }
 
 private:
-	basic_json<Char> root_;
+    basic_json<Char> root_;
     std::vector<stack_item> stack_;
 };
 

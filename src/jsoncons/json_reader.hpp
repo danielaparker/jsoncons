@@ -750,7 +750,7 @@ void basic_json_reader<Char>::parse_string()
             case 0x01:
             case 0x02:
             case 0x03:
-			case 0x04:
+            case 0x04:
             case 0x05:
             case 0x06:
             case 0x07:

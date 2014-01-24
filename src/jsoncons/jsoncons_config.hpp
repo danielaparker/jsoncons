@@ -120,7 +120,7 @@ template <class Char>
 std::basic_string<Char> double_to_string(double val, size_t precision)
 {
     std::basic_string<Char> s;
-	char buf[_CVTBUFSIZE];
+    char buf[_CVTBUFSIZE];
     int decimal_point = 0;
     int sign = 0;
 
@@ -165,14 +165,14 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         s.push_back('.');
     }
     s.push_back(buf[0]);
-	for (int i = 1; i < len; ++i)
-	{
+    for (int i = 1; i < len; ++i)
+    {
         if (i == decimal)
         {
             s.push_back('.');
         }
-		s.push_back(buf[i]);
-	}
+        s.push_back(buf[i]);
+    }
     if (exponent != 0)
     {
         s.push_back('e');
@@ -190,7 +190,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
             s.push_back(buf[i]);
         }
     }
-	return s;
+    return s;
 }
 #else
 template <class Char>
@@ -230,7 +230,7 @@ double string_to_double(const std::string& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-	const char* begin = &s[0];
+    const char* begin = &s[0];
     char* end = const_cast<char*>(begin)+s.size();
     double val = _strtod_l(begin,&end,locale);
     if (begin == end)
@@ -244,7 +244,7 @@ double string_to_double(const std::wstring& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-	const wchar_t* begin = &s[0];
+    const wchar_t* begin = &s[0];
     wchar_t* end = const_cast<wchar_t*>(begin)+s.size();
     double val = _wcstod_l(begin,&end,locale);
     if (begin == end)
@@ -260,7 +260,7 @@ double string_to_double(const std::basic_string<Char>& s)
     std::basic_stringstream<Char> ss(s);
     ss.imbue(std::locale::classic());
     double val;
-	ss >> val;
+    ss >> val;
     if (ss.fail())
     {
         throw std::invalid_argument("Invalid double value");

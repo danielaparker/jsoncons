@@ -144,12 +144,12 @@ void mulitple_json_objects()
 
 void more_examples()
 {
-	json image_sizing;
-	image_sizing["resolution"] = 144;
-	image_sizing["long_edge"] = 9.84;
-	image_sizing["size_units"] =  "cm";
-	image_sizing["resize_to_fit"] = true;
-	std::cout << pretty_print(image_sizing) << std::endl;
+    json image_sizing;
+    image_sizing["resolution"] = 144;
+    image_sizing["long_edge"] = 9.84;
+    image_sizing["size_units"] =  "cm";
+    image_sizing["resize_to_fit"] = true;
+    std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = json::make_array();
     image_formats.add("JPEG");
@@ -162,9 +162,9 @@ void more_examples()
     file_export["image_sizing"] = std::move(image_sizing);
     std::cout << pretty_print(file_export) << std::endl;
 
-	size_t n = 10, m = 3;
-	std::vector<size_t> x(n,m);
-	x[5] = 3;
+    size_t n = 10, m = 3;
+    std::vector<size_t> x(n,m);
+    x[5] = 3;
 }
 
 int main()
@@ -181,7 +181,7 @@ int main()
     read_csv_file();
     write_csv_file();
 
-	more_examples();
+    more_examples();
     mulitple_json_objects();
 
     return 0;

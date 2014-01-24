@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 {
     json root;
 
-	root["double_1"] = json(10.0);
+    root["double_1"] = json(10.0);
 
     json double_1 = root["double_1"];
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     BOOST_CHECK(root["myobject"]["int_2"].as<long long>() == 0);
     BOOST_CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
-	//std::cout << root << std::endl;
+    //std::cout << root << std::endl;
 
     //json double_2_value = root["double_2"];
 
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 
-	json arr2 = json::parse_string(outputStr);
+    json arr2 = json::parse_string(outputStr);
     std::string s2 = arr2[0].as_string();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 
 BOOST_AUTO_TEST_CASE(constructing_structures)
 {
-	json root;
+    json root;
 
     root["persons"] = json::make_array();
 
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
     {
         std::string input("{\"field1\":\n\"value}");
         std::cout << input << std::endl;
-	json obj = json::parse_string(input);
+    json obj = json::parse_string(input);
     }
     catch (const std::exception& e)
     {
@@ -526,7 +526,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
     json_serializer serializer(os, true);
     my_json_filter filter(serializer);
     json_reader reader(is,filter);
-	reader.read();
+    reader.read();
 }
 
 BOOST_AUTO_TEST_CASE(test_wjson2 )
