@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 {
     json obj;
     BOOST_CHECK(obj.is_object());
-    BOOST_CHECK(obj.is<json::object_type>());
+    BOOST_CHECK(obj.is<json::object>());
     std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
     // tests for proxy is_type methods
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     std::cout << "type=" << obj.type() << std::endl;
 
     BOOST_CHECK(obj.is_object());
-    BOOST_CHECK(obj.is<json::object_type>());
+    BOOST_CHECK(obj.is<json::object>());
 
     BOOST_CHECK(obj["string"].is_string());
     BOOST_CHECK(obj["string"].is<std::string>());
@@ -159,11 +159,11 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 
     obj["object"] = json::an_object;
     BOOST_CHECK(obj["object"].is_object());
-    BOOST_CHECK(obj["object"].is<json::object_type>());
+    BOOST_CHECK(obj["object"].is<json::object>());
 
     obj["array"] = json::an_array;
     BOOST_CHECK(obj["array"].is_array());
-    BOOST_CHECK(obj["array"].is<json::array_type>());
+    BOOST_CHECK(obj["array"].is<json::array>());
 
     matrix<double> A;
     obj.set_custom_data("custom",A);

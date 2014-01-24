@@ -82,6 +82,8 @@ class json_base
 {
 public:
     enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
+    struct object {};
+    struct array {};
 };
 
 template <class Char>
@@ -818,7 +820,7 @@ public:
     template<typename T>
     bool is() const
     {
-        return is_type<Char,T>(*this);
+        return is_type(T());
     }
 
     bool is_string() const
@@ -1007,260 +1009,145 @@ public:
 private:
 	basic_json(value_type t);
 
-    template<typename T>
-    static bool is_convertible_to (const basic_json<Char>& object)
+    template <class T>
+    bool is_type(T) const
     {
-        if (object.is_longlong())
-        {
-            long long data = object.as_longlong();
-            return data >= std::numeric_limits<T>::min() && data <= std::numeric_limits<T>::max() ? true : false;
-        }
-        else if (object.is_ulonglong())
-        {
-            unsigned long long data = object.as_ulonglong();
-            return data <= std::numeric_limits<T>::max() ? true : false;
-        }
-        
         return false;
     }
-    
-    template<typename C, typename T>
-    class is_type
-    {
-    public:
-        is_type (const basic_json<C>& value)
-        {}
 
-        operator bool () const
+    bool is_type(json_base::object) const
+    {
+        return type_ == object_t || type_ == empty_object_t;
+    }
+
+    bool is_type(json_base::array) const
+    {
+        return type_ == array_t;
+    }
+
+    bool is_type(bool) const
+    {
+        return type_ == bool_t;
+    }
+
+    bool is_type(double) const
+    {
+        return type_ == double_t;
+    }
+
+    bool is_type(float) const
+    {
+        return type_ == double_t && value_.double_value >= -std::numeric_limits<float>::max() && value_.double_value <= std::numeric_limits<float>::max();
+    }
+
+    bool is_type(std::basic_string<Char>) const
+    {
+        return type_ == string_t;
+    }
+
+    bool is_type(short) const
+    {
+        switch (type_)
         {
+        case longlong_t:
+            return value_.longlong_value_ >= std::numeric_limits<short>::min() JSONCONS_NO_MACRO_EXPANSION && value_.longlong_value_ <= std::numeric_limits<short>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<short>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
             return false;
         }
-    };
-    template<typename C>
-    class is_type<C,std::basic_string<C>>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return value_.is_string();
-        }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,bool>
+    bool is_type(unsigned short) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return value_.is_bool();
+        case longlong_t:
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned short>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned short>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,double>
+    bool is_type(int) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return value_.is_double();
+        case longlong_t:
+            return value_.longlong_value_ >= std::numeric_limits<int>::min() JSONCONS_NO_MACRO_EXPANSION && value_.longlong_value_ <= std::numeric_limits<int>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<int>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,char>
+    bool is_type(unsigned int) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return is_convertible_to<char>(value_);
+        case longlong_t:
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned int>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned int>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned char>
+    bool is_type(long) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return is_convertible_to<unsigned char>(value_);
+        case longlong_t:
+            return value_.longlong_value_ >= std::numeric_limits<long>::min() JSONCONS_NO_MACRO_EXPANSION && value_.longlong_value_ <= std::numeric_limits<long>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<long>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,short>
+    bool is_type(unsigned long) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return is_convertible_to<short>(value_);
+        case longlong_t:
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned long>::max() JSONCONS_NO_MACRO_EXPANSION;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned long>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned short>
+    bool is_type(long long) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return is_convertible_to<unsigned short>(value_);
+        case longlong_t:
+            return true;
+        case ulonglong_t:
+            return value_.ulonglong_value_ <= std::numeric_limits<long long>::max() JSONCONS_NO_MACRO_EXPANSION;
+        default:
+            return false;
         }
+    }
 
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,int>
+    bool is_type(unsigned long long) const
     {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
+        switch (type_)
         {
-            return is_convertible_to<int>(value_);
+        case longlong_t:
+            return value_.longlong_value_ >= 0;
+        case ulonglong_t:
+            return true;
+        default:
+            return false;
         }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned int>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return is_convertible_to<unsigned int>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return is_convertible_to<long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return is_convertible_to<unsigned long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,long long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return is_convertible_to<long long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned long long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return is_convertible_to<unsigned long long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,object_type>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return value_.is_object();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,array_type>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-        
-        operator bool () const
-        {
-            return value_.is_array();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
+    }
 
     template<typename C, typename T>
     class as_value
