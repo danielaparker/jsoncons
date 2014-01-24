@@ -20,6 +20,7 @@ template <class Char>
 class basic_json_input_handler
 {
 public:
+    virtual ~basic_json_input_handler() {}
     virtual void begin_json() = 0;
 
     virtual void end_json() = 0;
