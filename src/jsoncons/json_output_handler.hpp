@@ -16,6 +16,7 @@ template <class Char>
 class basic_json_output_handler
 {
 public:
+    virtual ~basic_json_output_handler() {}
 
     virtual void begin_json() = 0;
 

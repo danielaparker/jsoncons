@@ -75,6 +75,7 @@ template<class Char>
 class basic_parsing_context
 {
 public:
+    virtual ~basic_parsing_context() {}
     virtual unsigned long line_number() const = 0;
     virtual unsigned long column_number() const = 0;
     virtual size_t minimum_structure_capacity() const = 0;
