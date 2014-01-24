@@ -53,7 +53,9 @@ linkflags = [
 cpppath = [
     Dir('src')
 ]
-libs = []
+libs = [
+    'boost_unit_test_framework'
+]
 libpath = []
 
 
@@ -136,7 +138,7 @@ if (GetOption('ccache')  and GetOption('ccache') == 'yes') or (SCutils.which('cc
 sources = SCutils.RGlob(['*.cpp'], Dir('test_suite/src'))
 
 
-env.Program('unit_test', source = sources)
+env.Program('test_suite/unit_test', source = sources)
 
 
 

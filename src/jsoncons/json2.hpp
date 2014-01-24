@@ -23,6 +23,11 @@
 #include "jsoncons/json_deserializer.hpp"
 #include "jsoncons/json_serializer.hpp"
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
+
+
 namespace jsoncons {
 
 template <class Char>
@@ -185,6 +190,9 @@ basic_json<Char>::basic_json(value_type t)
     case object_t:
         value_.object_ = new json_object<Char>();
         break;
+
+    case custom_t:
+        assert(false);
     }
 }
 
@@ -1385,4 +1393,5 @@ void escape_string(const std::basic_string<Char>& s,
 
 }
 
+#pragma GCC diagnostic pop
 #endif

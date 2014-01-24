@@ -65,7 +65,7 @@ struct csv_char_traits<wchar_t>
 };
 
 template <class Char>
-void escape_string(const std::basic_string<Char>& s, 
+void escape_string(const std::basic_string<Char>& s,
                    Char quote_char, Char quote_escape_char,
                    std::basic_ostream<Char>& os)
 {
@@ -106,19 +106,39 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
     enum quote_style_enum{quote_all,quote_minimal,quote_none,quote_nonnumeric};
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
-       : os_(os), line_delimiter_("\n"), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"'), quote_style_(quote_minimal)
+       :
+       os_(os),
+       format_(),
+       stack_(),
+       original_precision_(),
+       original_format_flags_(),
+       quote_char_('\"'),
+       quote_escape_char_('\"'),
+       field_delimiter_(','),
+       quote_style_(quote_minimal),
+       header_os_(),
+       line_delimiter_("\n"),
+       header_()
     {
     }
 
     basic_csv_serializer(std::basic_ostream<Char>& os,
                          const jsoncons::basic_json<Char>& params)
-       : os_(os), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"')
+       : 
+       os_(os),
+       format_(),
+       stack_(),
+       original_precision_(),
+       original_format_flags_(),
+       quote_char_(params.get("quote_char","\"").as_char()),
+       quote_escape_char_(params.get("quote_escape_char","\"").as_char()),
+       field_delimiter_(params.get("field_delimiter",",").as_char()),
+       quote_style_(quote_minimal),
+       header_os_(),
+       line_delimiter_(params.get("line_delimiter","\n").as_string()),
+       header_()
     {
 
-        line_delimiter_ = params.get("line_delimiter","\n").as_string();
-        field_delimiter_ = params.get("field_delimiter",",").as_char();
-        quote_char_ = params.get("quote_char","\"").as_char();
-        quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
         std::basic_string<Char> quote_style = params.get("quote_style","minimal").as_string();
         if (quote_style == csv_char_traits<Char>::all_literal())
         {
@@ -136,7 +156,7 @@ public:
         {
             quote_style_ = quote_nonnumeric;
         }
-        else 
+        else
         {
             JSONCONS_THROW_EXCEPTION("Unrecognized quote style.");
         }
@@ -371,14 +391,14 @@ private:
             ss << std::showpoint << std::setprecision(format_.precision()) << val;
             os << ss.str();
         }
-        else 
+        else
         {
             std::basic_string<Char> buf = jsoncons::double_to_string<Char>(val,format_.precision());
             os << buf;
         }
 
         end_value();
-        
+
     }
 
     virtual void value(long long val, std::basic_ostream<Char>& os)
@@ -415,7 +435,7 @@ private:
         os << jsoncons::json_char_traits<Char>::null_literal();
 
         end_value();
-        
+
     }
 
     void begin_value(std::basic_ostream<Char>& os)

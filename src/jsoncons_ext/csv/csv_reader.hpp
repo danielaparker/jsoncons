@@ -48,15 +48,25 @@ public:
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler)
 
-       : is_(is), 
-         handler_(handler), 
-         err_handler_(default_err_handler),
+       : 
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is), 
          buffer_(default_max_buffer_length), 
          input_buffer_(0), 
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         handler_(handler), 
+         err_handler_(default_err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
     {
         if (!is.good())
         {
@@ -69,15 +79,25 @@ public:
                      jsoncons::basic_json_input_handler<Char>& handler,
                      const jsoncons::basic_json<Char>& params)
 
-       : is_(is), 
-         handler_(handler), 
-         err_handler_(default_err_handler),
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is), 
          buffer_(default_max_buffer_length), 
          input_buffer_(0), 
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         handler_(handler), 
+         err_handler_(default_err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
     {
         if (!is.good())
         {
@@ -89,14 +109,28 @@ public:
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
                      jsoncons::basic_error_handler<Char>& err_handler)
-       : is_(is), 
-         handler_(handler), 
-         err_handler_(err_handler),
+       : 
+
+         minimum_structure_capacity_(),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is), 
+         buffer_(),
          input_buffer_(0), 
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         handler_(handler), 
+         err_handler_(err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
+
+       
     {
         if (!is.good())
         {
@@ -109,14 +143,25 @@ public:
                      jsoncons::basic_json_input_handler<Char>& handler,
                      jsoncons::basic_error_handler<Char>& err_handler,
                      const jsoncons::basic_json<Char>& params)
-       : is_(is), 
-         handler_(handler), 
-         err_handler_(err_handler),
+       : 
+         minimum_structure_capacity_(),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         is_(is), 
+         buffer_(),
          input_buffer_(0), 
+         buffer_capacity_(default_max_buffer_length),
          buffer_position_(0), 
          buffer_length_(0),
-         buffer_capacity_(default_max_buffer_length),
-         minimum_structure_capacity_(0)
+         handler_(handler), 
+         err_handler_(err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
     {
         if (!is.good())
         {
