@@ -1017,7 +1017,7 @@ public:
         a.swap(b);
     }
 private:
-	basic_json(value_type t);
+    basic_json(value_type t);
 
     template<typename T>
     static bool is_convertible_to (const basic_json<Char>& object)
@@ -1339,7 +1339,7 @@ private:
         const basic_json<C>& value_;
     };
 
-	value_type type_;
+    value_type type_;
     union
     {
         double double_value_;

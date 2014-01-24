@@ -73,7 +73,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         break;
     default:
         // throw
-		break;
+        break;
     }
 }
 
@@ -216,7 +216,7 @@ basic_json<Char>::~basic_json()
         break;
     case object_t:
         delete value_.object_;
-		break;
+        break;
     case custom_t:
         delete value_.userdata_;
         break;
@@ -379,10 +379,10 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     case empty_object_t:
         return basic_json<Char>::null;
     case object_t:
-		{
+        {
         const_object_iterator it = value_.object_->find(name);
         return it != end_members() ? it->second : basic_json<Char>::null;
-		}
+        }
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -398,10 +398,10 @@ typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basi
     case empty_object_t:
         return const_val_proxy(default_val);
     case object_t:
-		{
+        {
         const_object_iterator it = value_.object_->find(name);
         return it != end_members() ? const_val_proxy(it->second) : const_val_proxy(default_val);
-		}
+        }
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -585,9 +585,9 @@ void basic_json<Char>::add_custom_data(const T& value)
     switch (type_)
     {
     case array_t:
-		{
+        {
         add(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-		}
+        }
         break;
     default:
         {
@@ -698,7 +698,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         handler.end_object();
         break;
     case object_t:
-		{
+        {
         handler.begin_object();
         json_object<Char>* o = value_.object_;
         for (const_object_iterator it = o->begin(); it != o->end(); ++it)
@@ -707,10 +707,10 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
             it->second.to_stream(handler);
         }
         handler.end_object();
-		}
+        }
         break;
     case array_t:
-		{
+        {
         handler.begin_array();
         json_array<Char>* o = value_.array_;
         for (const_array_iterator it = o->begin(); it != o->end(); ++it)
@@ -718,7 +718,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
             it->to_stream(handler);
         }
         handler.end_array();
-		}
+        }
         break;
     case custom_t:
         value_.userdata_->to_stream(handler);
@@ -911,7 +911,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members()
     switch (type_)
     {
     case empty_object_t:
-		return an_object.end_members();
+        return an_object.end_members();
     case object_t:
         return value_.object_->end();
     default:
@@ -1212,10 +1212,10 @@ T& basic_json<Char>::custom_data()
     switch (type_)
     {
     case custom_t:
-		{
+        {
         custom_data_wrapper<Char,T>* p = static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_);
         return p->data1_;
-		}
+        }
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1288,7 +1288,7 @@ public:
                        const basic_output_format<Char>& format)
         : o_(o), format_(format)
     {
-	;
+    ;
     }
 
     void to_stream(std::basic_ostream<Char>& os) const

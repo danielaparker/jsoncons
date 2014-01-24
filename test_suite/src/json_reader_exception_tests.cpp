@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     }
     catch (const json_parse_exception& e)
     {
-		//std::cout << e.what() << std::endl;
+        //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 3);
     }
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     }
     catch (const json_parse_exception& e)
     {
-		//std::cout << e.what() << std::endl;
+        //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     }
     catch (const json_parse_exception& e)
     {
-		//std::cout << e.what() << std::endl;
+        //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     }
     catch (const json_parse_exception& e)
     {
-		//std::cout << e.what() << std::endl;
+        //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 2);
     }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
     }
     catch (const json_parse_exception& e)
     {
-		std::cout << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
     }
     catch (const json_parse_exception& e)
     {
-		std::cout << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 6);
     }
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
     }
     catch (const json_parse_exception& e)
     {
-		std::cout << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
