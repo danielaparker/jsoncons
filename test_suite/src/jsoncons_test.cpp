@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json root = json::parse(is);
     BOOST_CHECK(root.is_object());
-    BOOST_CHECK(root.is<json::object>());
+    BOOST_CHECK(root.is<json::object_type>());
 
     root["double_1"] = json(10.0);
 
@@ -120,6 +120,7 @@ BOOST_AUTO_TEST_CASE(test_null)
 {
     json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
+    BOOST_CHECK(nullval.is<json::null_type>());
 
     json obj;
     obj["field"] = json::null;
@@ -150,6 +151,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     std::cout << root << std::endl;
 
     BOOST_CHECK(root["null"].is_null());
+    BOOST_CHECK(root["null"].is<json::null_type>());
     BOOST_CHECK(!root["bool1"].as_bool());
     BOOST_CHECK(root["bool2"].as_bool());
     BOOST_CHECK(root["integer"].as_int() == 12345678);
@@ -539,7 +541,7 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
 {
     json obj = json::parse_file("input/json-multiline-comment.json");
     BOOST_CHECK(obj.is_array());
-    BOOST_CHECK(obj.is<json::array>());
+    BOOST_CHECK(obj.is<json::array_type>());
     BOOST_CHECK_EQUAL(obj.size(),0);
 }
 
