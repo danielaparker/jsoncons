@@ -192,7 +192,7 @@ basic_json<Char>::basic_json(value_type t)
         break;
 
     case custom_t:
-        assert(false);
+        JSONCONS_ASSERT(false);
     }
 }
 
