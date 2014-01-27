@@ -544,7 +544,7 @@ void basic_json_reader<C>::parse_separator()
     while (!done)
     {
         const size_t end = buffer_length_;
-        while (!done && buffer_position_ < end)
+        while (!done & (buffer_position_ < end))
         {
             C c = buffer_[buffer_position_++];
             ++column_;
@@ -613,7 +613,7 @@ void basic_json_reader<C>::parse_number(C c)
     while (!done)
     {
         const size_t end = buffer_length_;
-        while (!done && buffer_position_ < end)
+        while (!done & (buffer_position_ < end))
         {
             C c = buffer_[buffer_position_++]; // shouldn't be lf
             ++column_;
@@ -724,7 +724,7 @@ void basic_json_reader<C>::parse_string()
     while (!done)
     {
         const size_t end = buffer_length_;
-        while (!done && buffer_position_ < end)
+        while (!done & (buffer_position_ < end))
         {
             C c = buffer_[buffer_position_++];
             ++column_;
@@ -839,7 +839,7 @@ void basic_json_reader<C>::ignore_single_line_comment()
     while (!done)
     {
         const size_t end = buffer_length_;
-        while (!done && buffer_position_ < end)
+        while (!done & (buffer_position_ < end))
         {
             C c = buffer_[buffer_position_++];
             ++column_;
@@ -879,7 +879,7 @@ void basic_json_reader<C>::ignore_multi_line_comment()
     while (!done)
     {
         const size_t end = buffer_length_;
-        while (!done && buffer_position_ < end)
+        while (!done & (buffer_position_ < end))
         {
             C c = buffer_[buffer_position_++];
             ++column_;
