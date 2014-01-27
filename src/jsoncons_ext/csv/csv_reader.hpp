@@ -23,8 +23,8 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template<class Char>
-class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
+template<class C>
+class basic_csv_reader : private jsoncons::basic_parsing_context<C>
 {
     static jsoncons::default_error_handler default_err_handler;
 
@@ -45,8 +45,8 @@ public:
       \param is The input stream to read from
     */
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler)
+    basic_csv_reader(std::basic_istream<C>& is,
+                     jsoncons::basic_json_input_handler<C>& handler)
 
        : is_(is), 
          handler_(handler), 
@@ -65,9 +65,9 @@ public:
         init(jsoncons::json::an_object);
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     const jsoncons::basic_json<Char>& params)
+    basic_csv_reader(std::basic_istream<C>& is,
+                     jsoncons::basic_json_input_handler<C>& handler,
+                     const jsoncons::basic_json<C>& params)
 
        : is_(is), 
          handler_(handler), 
@@ -86,9 +86,9 @@ public:
         init(params);
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_error_handler<Char>& err_handler)
+    basic_csv_reader(std::basic_istream<C>& is,
+                     jsoncons::basic_json_input_handler<C>& handler,
+                     jsoncons::basic_error_handler<C>& err_handler)
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
@@ -105,10 +105,10 @@ public:
         init(jsoncons::json::an_object);
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_error_handler<Char>& err_handler,
-                     const jsoncons::basic_json<Char>& params)
+    basic_csv_reader(std::basic_istream<C>& is,
+                     jsoncons::basic_json_input_handler<C>& handler,
+                     jsoncons::basic_error_handler<C>& err_handler,
+                     const jsoncons::basic_json<C>& params)
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
@@ -125,7 +125,7 @@ public:
         init(params);
     }
 
-    void init(const jsoncons::basic_json<Char>& params)
+    void init(const jsoncons::basic_json<C>& params)
     {
         input_buffer_ = &buffer_[0];
 
@@ -178,7 +178,7 @@ public:
         return minimum_structure_capacity_;
     }
 
-    virtual const std::basic_string<Char>& buffer() const
+    virtual const std::basic_string<C>& buffer() const
     {
         return string_buffer_;
     }
@@ -208,13 +208,13 @@ private:
         }
     }
 
-    Char read_ch()
+    C read_ch()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
         }
-        Char c = 0;
+        C c = 0;
 
         //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
@@ -230,13 +230,13 @@ private:
         return c;
     }
 
-    Char peek()
+    C peek()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
         }
-        Char c = 0;
+        C c = 0;
         if (buffer_position_ < buffer_length_)
         {
             c = input_buffer_[buffer_position_];
@@ -262,28 +262,28 @@ private:
     size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
-    std::basic_string<Char> string_buffer_;
+    std::basic_string<C> string_buffer_;
     std::vector<stack_item> stack_;
-    std::basic_istream<Char>& is_;
-    std::vector<Char> buffer_;
-    Char *input_buffer_;
+    std::basic_istream<C>& is_;
+    std::vector<C> buffer_;
+    C *input_buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
-    jsoncons::basic_json_input_handler<Char>& handler_;
-    jsoncons::basic_error_handler<Char>& err_handler_;
+    jsoncons::basic_json_input_handler<C>& handler_;
+    jsoncons::basic_error_handler<C>& err_handler_;
     bool assume_header_;
-    Char field_delimiter_;
-    Char quote_char_;
-    Char quote_escape_char_;
-    Char comment_symbol_;
+    C field_delimiter_;
+    C quote_char_;
+    C quote_escape_char_;
+    C comment_symbol_;
 };
 
-template<class Char>
-jsoncons::default_error_handler basic_csv_reader<Char>::default_err_handler;
+template<class C>
+jsoncons::default_error_handler basic_csv_reader<C>::default_err_handler;
 
-template<class Char>
-void basic_csv_reader<Char>::read()
+template<class C>
+void basic_csv_reader<C>::read()
 {
     line_ = 1;
     column_ = 0;
@@ -305,14 +305,14 @@ void basic_csv_reader<Char>::read()
     handler_.end_json();
 }
 
-template<class Char>
-void basic_csv_reader<Char>::read_array_of_arrays()
+template<class C>
+void basic_csv_reader<C>::read_array_of_arrays()
 {
     size_t row_capacity = 0;
     stack_.push_back(stack_item());
     while (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             continue;
@@ -400,8 +400,8 @@ void basic_csv_reader<Char>::read_array_of_arrays()
     }
 }
 
-template<class Char>
-void basic_csv_reader<Char>::read_array_of_objects()
+template<class C>
+void basic_csv_reader<C>::read_array_of_objects()
 {
     std::vector<std::string> header;
     size_t row_index = 0;
@@ -410,7 +410,7 @@ void basic_csv_reader<Char>::read_array_of_objects()
     stack_.push_back(stack_item());
     while (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             continue;
@@ -498,15 +498,15 @@ void basic_csv_reader<Char>::read_array_of_objects()
     }
 }
 
-template<class Char>
-void basic_csv_reader<Char>::parse_string()
+template<class C>
+void basic_csv_reader<C>::parse_string()
 {
     string_buffer_.clear();
 
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             done = true;
@@ -534,8 +534,8 @@ void basic_csv_reader<Char>::parse_string()
     }
 }
 
-template<class Char>
-void basic_csv_reader<Char>::parse_quoted_string()
+template<class C>
+void basic_csv_reader<C>::parse_quoted_string()
 {
     string_buffer_.clear();
 
@@ -543,7 +543,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
     //std::cout << "start quoted string" << std::endl;
     while (!done_string)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "EOF, expected quote character", *this);
@@ -567,7 +567,7 @@ void basic_csv_reader<Char>::parse_quoted_string()
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             done = true;
@@ -591,13 +591,13 @@ void basic_csv_reader<Char>::parse_quoted_string()
     }
 }
 
-template<class Char>
-void basic_csv_reader<Char>::ignore_single_line_comment()
+template<class C>
+void basic_csv_reader<C>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             done = true;

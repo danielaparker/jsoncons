@@ -17,7 +17,7 @@
 
 namespace jsoncons {
 
-template <class Char>
+template <class C>
 struct json_char_traits
 {
 };

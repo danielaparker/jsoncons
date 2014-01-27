@@ -21,13 +21,13 @@
 
 namespace jsoncons {
 
-template <class Char,class T> inline
-void serialize(basic_json_output_handler<Char>& os, const T& val)
+template <class C,class T> inline
+void serialize(basic_json_output_handler<C>& os, const T& val)
 {
     os.null_value();
 }
 
-template <class Char>
+template <class C>
 class basic_custom_data
 {
 public:
@@ -35,27 +35,27 @@ public:
     {
     }
 
-    virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
+    virtual void to_stream(basic_json_output_handler<C>& os) const = 0;
 
-    virtual basic_custom_data<Char>* clone() const = 0;
+    virtual basic_custom_data<C>* clone() const = 0;
 };
 
-template <class Char, class T>
-class custom_data_wrapper : public basic_custom_data<Char>
+template <class C, class T>
+class custom_data_wrapper : public basic_custom_data<C>
 {
 public:
-    typedef custom_data_wrapper<Char,T>* Ptr;
+    typedef custom_data_wrapper<C,T>* Ptr;
 
     custom_data_wrapper(const T& value)
         : data1_(value)
     {
     }
-    virtual basic_custom_data<Char>* clone() const
+    virtual basic_custom_data<C>* clone() const
     {
-        return new custom_data_wrapper<Char,T>(data1_);
+        return new custom_data_wrapper<C,T>(data1_);
     }
 
-    virtual void to_stream(basic_json_output_handler<Char>& os) const
+    virtual void to_stream(basic_json_output_handler<C>& os) const
     {
         jsoncons::serialize(os,data1_);
     }
@@ -63,20 +63,20 @@ public:
     T data1_;
 };
 
-template <class Char>
+template <class C>
 class json_object;
 
-template <class Char>
+template <class C>
 class json_array;
 
-template <class Char>
+template <class C>
 class json_string;
 
-template <class Char>
+template <class C>
 class basic_output_format;
 
-template <class Char>
-std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
+template <class C>
+std::basic_string<C> escape_string(const std::basic_string<C>& s, const basic_output_format<C>& format);
 
 class json_base
 {
@@ -87,24 +87,24 @@ public:
     struct null_type {};
 };
 
-template <class Char>
+template <class C>
 class basic_json : public json_base
 {
 public:
-    static const basic_json<Char> an_object;
-    static const basic_json<Char> an_array;
-    static const basic_json<Char> null;
+    static const basic_json<C> an_object;
+    static const basic_json<C> an_array;
+    static const basic_json<C> null;
     
-    typedef typename json_object<Char>::iterator object_iterator;
-    typedef typename json_object<Char>::const_iterator const_object_iterator;
+    typedef typename json_object<C>::iterator object_iterator;
+    typedef typename json_object<C>::const_iterator const_object_iterator;
 
-    typedef typename json_array<Char>::iterator array_iterator;
-    typedef typename json_array<Char>::const_iterator const_array_iterator;
+    typedef typename json_array<C>::iterator array_iterator;
+    typedef typename json_array<C>::const_iterator const_array_iterator;
 
     class const_val_proxy 
     {
     public:
-        friend class basic_json<Char>;
+        friend class basic_json<C>;
 
         size_t size() const
         {
@@ -116,7 +116,7 @@ public:
             return val_.type();
         }
 
-        bool has_member(const std::basic_string<Char>& name) const
+        bool has_member(const std::basic_string<C>& name) const
         {
             return val_.has_member(name);
         }
@@ -150,6 +150,11 @@ public:
         bool is_number() const
         {
             return val_.is_number();
+        }
+
+        bool is_numeric() const
+        {
+            return val_.is_numeric();
         }
 
         bool is_longlong() const
@@ -187,12 +192,12 @@ public:
             return val_.is_custom();
         }
 
-        std::basic_string<Char> as_string() const
+        std::basic_string<C> as_string() const
         {
             return val_.as_string();
         }
 
-        std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
+        std::basic_string<C> as_string(const basic_output_format<C>& format) const
         {
             return val_.as_string(format);
         }
@@ -203,7 +208,7 @@ public:
             return val_.template as<T>();
         }
 
-        Char as_char() const
+        C as_char() const
         {
             return val_.as_char();
         }
@@ -265,7 +270,7 @@ public:
             return val_;
         }
 
-        bool operator==(const basic_json<Char>& val) const
+        bool operator==(const basic_json<C>& val) const
         {
             return val_ == val;
         }
@@ -275,57 +280,57 @@ public:
             return val_ != val;
         }
 
-        const basic_json<Char>& operator[](size_t i) const
+        const basic_json<C>& operator[](size_t i) const
         {
             return val_[i];
         }
 
-        const basic_json<Char>& operator[](const std::basic_string<Char>& name) const
+        const basic_json<C>& operator[](const std::basic_string<C>& name) const
         {
             return val_.at(name);
         }
 
-        const basic_json<Char>& at(const std::basic_string<Char>& name) const
+        const basic_json<C>& at(const std::basic_string<C>& name) const
         {
             return val_.at(name);
         }
 
-        const basic_json<Char>& get(const std::basic_string<Char>& name) const
+        const basic_json<C>& get(const std::basic_string<C>& name) const
         {
             return val_.get(name);
         }
 
-        const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+        const_val_proxy get(const std::basic_string<C>& name, const basic_json<C>& default_val) const
         {
             return val_.get(name,default_val);
         }
 
-        std::basic_string<Char> to_string() const
+        std::basic_string<C> to_string() const
         {
             return val_.to_string();
         }
 
-        std::basic_string<Char> to_string(const basic_output_format<Char>& format) const
+        std::basic_string<C> to_string(const basic_output_format<C>& format) const
         {
             return val_.to_string(format);
         }
 
-        void to_stream(std::basic_ostream<Char>& os) const
+        void to_stream(std::basic_ostream<C>& os) const
         {
             val_.to_stream(os);
         }
 
-        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+        void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format) const
         {
             val_.to_stream(os,format);
         }
 
-        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+        void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format, bool indenting) const
         {
             val_.to_stream(os,format,indenting);
         }
 
-        friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const const_val_proxy& o)
+        friend std::basic_ostream<C>& operator<<(std::basic_ostream<C>& os, const const_val_proxy& o)
         {
             o.to_stream(os);
             return os;
@@ -335,18 +340,18 @@ public:
         const_val_proxy(); // nopop
         const_val_proxy& operator = (const const_val_proxy& other); // noop
 
-        const_val_proxy(const basic_json<Char>& val)
+        const_val_proxy(const basic_json<C>& val)
             : val_(val)
         {
         }
 
-        const basic_json<Char>& val_;
+        const basic_json<C>& val_;
     };
 
     class object_key_proxy 
     {
     public:
-        friend class basic_json<Char>;
+        friend class basic_json<C>;
 
         size_t size() const
         {
@@ -358,7 +363,7 @@ public:
             return val_.at(name_).type();
         }
 
-        bool has_member(const std::basic_string<Char>& name) const
+        bool has_member(const std::basic_string<C>& name) const
         {
             return val_.at(name_).has_member(name);
         }
@@ -388,7 +393,7 @@ public:
             val_.at(name_).resize_array(n);
         }
 
-        void resize_array(size_t n, const basic_json<Char>& val)
+        void resize_array(size_t n, const basic_json<C>& val)
         {
             val_.at(name_).resize_array(n,val);
         }
@@ -407,6 +412,11 @@ public:
         bool is_number() const
         {
             return val_.at(name_).is_number();
+        }
+
+        bool is_numeric() const
+        {
+            return val_.at(name_).is_numeric();
         }
 
         bool is_longlong() const
@@ -444,12 +454,12 @@ public:
             return val_.at(name_).is_custom();
         }
 
-        std::basic_string<Char> as_string() const
+        std::basic_string<C> as_string() const
         {
             return val_.at(name_).as_string();
         }
 
-        std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
+        std::basic_string<C> as_string(const basic_output_format<C>& format) const
         {
             return val_.at(name_).as_string(format);
         }
@@ -460,7 +470,7 @@ public:
             return val_.at(name_).template as<T>();
         }
 
-        Char as_char() const
+        C as_char() const
         {
             return val_.at(name_).as_char();
         }
@@ -551,42 +561,42 @@ public:
             return val_ != val;
         }
 
-        basic_json<Char>& operator[](size_t i)
+        basic_json<C>& operator[](size_t i)
         {
             return val_.at(name_)[i];
         }
 
-        const basic_json<Char>& operator[](size_t i) const
+        const basic_json<C>& operator[](size_t i) const
         {
             return val_.at(name_)[i];
         }
 
-        object_key_proxy operator[](const std::basic_string<Char>& name)
+        object_key_proxy operator[](const std::basic_string<C>& name)
         {
             return object_key_proxy(val_.at(name_),name);
         }
 
-        const basic_json<Char>& operator[](const std::basic_string<Char>& name) const
+        const basic_json<C>& operator[](const std::basic_string<C>& name) const
         {
             return val_.at(name_).at(name);
         }
 
-        basic_json<Char>& at(const std::basic_string<Char>& name)
+        basic_json<C>& at(const std::basic_string<C>& name)
         {
             return val_.at(name_).at(name);
         }
 
-        const basic_json<Char>& at(const std::basic_string<Char>& name) const
+        const basic_json<C>& at(const std::basic_string<C>& name) const
         {
             return val_.at(name_).at(name);
         }
 
-        const basic_json<Char>& get(const std::basic_string<Char>& name) const
+        const basic_json<C>& get(const std::basic_string<C>& name) const
         {
             return val_.at(name_).get(name);
         }
 
-        const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+        const_val_proxy get(const std::basic_string<C>& name, const basic_json<C>& default_val) const
         {
             return val_.at(name_).get(name,default_val);
         }
@@ -603,46 +613,46 @@ public:
         }
         // Remove a range of elements from an array 
 
-        void remove_member(const std::basic_string<Char>& name)
+        void remove_member(const std::basic_string<C>& name)
         {
             val_.at(name_).remove_member(name);
         }
         // Remove a member from an object 
 
-        void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
+        void set(const std::basic_string<C>& name, const basic_json<C>& value)
         {
             val_.at(name_).set(name,value);
         }
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
-        void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
+        void set(std::basic_string<C>&& name, basic_json<C>&& value)
 
         {
             val_.at(name_).set(name,value);
         }
 
-        void add(basic_json<Char>&& value)
+        void add(basic_json<C>&& value)
         {
             val_.at(name_).add(value);
         }
 
-        void add(size_t index, basic_json<Char>&& value)
+        void add(size_t index, basic_json<C>&& value)
         {
             val_.at(name_).add(index, value);
         }
 #endif
         template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, const T& value)
+        void set_custom_data(const std::basic_string<C>& name, const T& value)
         {
             val_.at(name_).set_custom_data(name,value);
         }
 
-        void add(const basic_json<Char>& value)
+        void add(const basic_json<C>& value)
         {
             val_.at(name_).add(value);
         }
 
-        void add(size_t index, const basic_json<Char>& value)
+        void add(size_t index, const basic_json<C>& value)
         {
             val_.at(name_).add(index, value);
         }
@@ -659,37 +669,37 @@ public:
             val_.at(name_).add_custom_data(index, value);
         }
 
-        std::basic_string<Char> to_string() const
+        std::basic_string<C> to_string() const
         {
             return val_.at(name_).to_string();
         }
 
-        std::basic_string<Char> to_string(const basic_output_format<Char>& format) const
+        std::basic_string<C> to_string(const basic_output_format<C>& format) const
         {
             return val_.at(name_).to_string(format);
         }
 
-        void to_stream(std::basic_ostream<Char>& os) const
+        void to_stream(std::basic_ostream<C>& os) const
         {
             val_.at(name_).to_stream(os);
         }
 
-        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+        void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format) const
         {
             val_.at(name_).to_stream(os,format);
         }
 
-        void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+        void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format, bool indenting) const
         {
             val_.at(name_).to_stream(os,format,indenting);
         }
 
-        void swap(basic_json<Char>& val)
+        void swap(basic_json<C>& val)
         {
             val_.swap(val);
         }
 
-        friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const object_key_proxy& o)
+        friend std::basic_ostream<C>& operator<<(std::basic_ostream<C>& os, const object_key_proxy& o)
         {
             o.to_stream(os);
             return os;
@@ -699,20 +709,20 @@ public:
         object_key_proxy(); // nopop
         object_key_proxy& operator = (const object_key_proxy& other); // noop
 
-        object_key_proxy(basic_json<Char>& var, 
-              const std::basic_string<Char>& name)
+        object_key_proxy(basic_json<C>& var, 
+              const std::basic_string<C>& name)
             : val_(var), name_(name)
         {
         }
 
-        basic_json<Char>& val_;
+        basic_json<C>& val_;
 
-        const std::basic_string<Char>& name_;
+        const std::basic_string<C>& name_;
     };
 
-    static basic_json parse(std::basic_istream<Char>& is);
+    static basic_json parse(std::basic_istream<C>& is);
 
-    static basic_json parse_string(const std::basic_string<Char>& s);
+    static basic_json parse_string(const std::basic_string<C>& s);
 
     static basic_json parse_file(const std::string& s);
 
@@ -720,15 +730,15 @@ public:
 
     static basic_json make_array(size_t n);
 
-    static basic_json make_array(size_t n, const basic_json<Char>& val);
+    static basic_json make_array(size_t n, const basic_json<C>& val);
 
     static basic_json make_2d_array(size_t m, size_t n);
 
-    static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);
+    static basic_json make_2d_array(size_t m, size_t n, const basic_json<C>& val);
 
     static basic_json make_3d_array(size_t m, size_t n, size_t k);
 
-    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val);
+    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<C>& val);
 
     explicit basic_json();
 
@@ -748,20 +758,20 @@ public:
 
     basic_json(unsigned long long val);
 
-    basic_json(const Char* val);
+    basic_json(const C* val);
 
-    basic_json(const std::basic_string<Char>& val);
+    basic_json(const std::basic_string<C>& val);
 
     basic_json(bool val);
 
     template <class InputIterator>
     basic_json(InputIterator first, InputIterator last);
 
-    explicit basic_json(json_object<Char>* var);
+    explicit basic_json(json_object<C>* var);
 
-    explicit basic_json(json_array<Char>* var);
+    explicit basic_json(json_array<C>* var);
 
-    explicit basic_json(basic_custom_data<Char>* var);
+    explicit basic_json(basic_custom_data<C>* var);
 
     ~basic_json();
 
@@ -781,38 +791,38 @@ public:
 
     const_array_iterator end_elements() const;
 
-    basic_json& operator=(basic_json<Char> rhs);
+    basic_json& operator=(basic_json<C> rhs);
 
-    bool operator!=(const basic_json<Char>& rhs) const;
+    bool operator!=(const basic_json<C>& rhs) const;
 
-    bool operator==(const basic_json<Char>& rhs) const;
+    bool operator==(const basic_json<C>& rhs) const;
 
     size_t size() const; 
 
-    basic_json<Char>& operator[](size_t i);
+    basic_json<C>& operator[](size_t i);
 
-    const basic_json<Char>& operator[](size_t i) const;
+    const basic_json<C>& operator[](size_t i) const;
 
-    object_key_proxy operator[](const std::basic_string<Char>& name);
+    object_key_proxy operator[](const std::basic_string<C>& name);
 
-    const basic_json<Char>& operator[](const std::basic_string<Char>& name) const;
+    const basic_json<C>& operator[](const std::basic_string<C>& name) const;
 
-    std::basic_string<Char> to_string() const;
+    std::basic_string<C> to_string() const;
 
-    std::basic_string<Char> to_string(const basic_output_format<Char>& format) const;
+    std::basic_string<C> to_string(const basic_output_format<C>& format) const;
 
-    void to_stream(std::basic_ostream<Char>& os) const;
+    void to_stream(std::basic_ostream<C>& os) const;
 
-    void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const;
+    void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format) const;
 
-    void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const;
+    void to_stream(std::basic_ostream<C>& os, const basic_output_format<C>& format, bool indenting) const;
 
     bool is_null() const
     {
         return type_ == null_t;
     }
 
-    bool has_member(const std::basic_string<Char>& name) const;
+    bool has_member(const std::basic_string<C>& name) const;
 
     template<typename T>
     bool is() const
@@ -825,7 +835,7 @@ public:
         return type_ == string_t;
     }
 
-    bool is_number() const
+    bool is_numeric() const
     {
         return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }
@@ -873,12 +883,12 @@ public:
 
     void resize_array(size_t n);
 
-    void resize_array(size_t n, const basic_json<Char>& val);
+    void resize_array(size_t n, const basic_json<C>& val);
 
     template<typename T>
     T as() const
     {
-        return as_value<Char,T>(*this);
+        return as_value<C,T>(*this);
     }
 
     bool as_bool() const;
@@ -905,21 +915,21 @@ public:
     T& custom_data();
     // Returns a reference to the custom data associated with name
 
-    std::basic_string<Char> as_string() const;
+    std::basic_string<C> as_string() const;
 
-    std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
+    std::basic_string<C> as_string(const basic_output_format<C>& format) const;
 
-    Char as_char() const;
+    C as_char() const;
 
-    basic_json<Char>& at(const std::basic_string<Char>& name);
-    const basic_json<Char>& at(const std::basic_string<Char>& name) const;
+    basic_json<C>& at(const std::basic_string<C>& name);
+    const basic_json<C>& at(const std::basic_string<C>& name) const;
 
-    basic_json<Char>& at(size_t i);
-    const basic_json<Char>& at(size_t i) const;
+    basic_json<C>& at(size_t i);
+    const basic_json<C>& at(size_t i) const;
 
-    const basic_json<Char>& get(const std::basic_string<Char>& name) const;
+    const basic_json<C>& get(const std::basic_string<C>& name) const;
 
-    const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const;
+    const_val_proxy get(const std::basic_string<C>& name, const basic_json<C>& default_val) const;
 
     // Modifiers
 
@@ -929,28 +939,28 @@ public:
     void remove_range(size_t from_index, size_t to_index);
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove_member(const std::basic_string<Char>& name);
+    void remove_member(const std::basic_string<C>& name);
     // Removes a member from an object value
 
-    void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
+    void set(const std::basic_string<C>& name, const basic_json<C>& value);
 
 #ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
     basic_json(basic_json&& val);
 
-    void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
+    void set(std::basic_string<C>&& name, basic_json<C>&& value);
 
-    void add(basic_json<Char>&& value);
+    void add(basic_json<C>&& value);
 
-    void add(size_t index, basic_json<Char>&& value);
+    void add(size_t index, basic_json<C>&& value);
 #endif
 
     template <class T>
-    void set_custom_data(const std::basic_string<Char>& name, const T& value);
+    void set_custom_data(const std::basic_string<C>& name, const T& value);
 
-    void add(const basic_json<Char>& value);
+    void add(const basic_json<C>& value);
 
-    void add(size_t index, const basic_json<Char>& value);
+    void add(size_t index, const basic_json<C>& value);
 
     template <class T>
     void add_custom_data(const T& value);
@@ -963,27 +973,12 @@ public:
         return type_;
     }
 
-    void to_stream(basic_json_output_handler<Char>& handler) const;
+    void to_stream(basic_json_output_handler<C>& handler) const;
 
-    void swap(basic_json<Char>& b)
+    void swap(basic_json<C>& b)
     {
         using std::swap;
 
-        /*switch (type_)
-        {
-        case null_t:
-            break;
-        default:
-            switch (b.type_)
-            {
-            case null_t:
-                b.value_ = value_;
-                break;
-            default:
-                swap(value_,b.value_);
-                break;
-            }
-        }*/
         swap(type_,b.type_);
         swap(value_,b.value_);
     }
@@ -994,14 +989,20 @@ public:
         std::vector<T> v(size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = as_value<Char,T>(at(i)).get();
+            v[i] = as_value<C,T>(at(i)).get();
         }
         return v;
     }
 
-    friend void swap(basic_json<Char>& a, basic_json<Char>& b)
+    friend void swap(basic_json<C>& a, basic_json<C>& b)
     {
         a.swap(b);
+    }
+
+//  Deprecated
+    bool is_number() const
+    {
+        return is_numeric();
     }
 private:
 	basic_json(value_type t);
@@ -1042,7 +1043,7 @@ private:
         return type_ == double_t && value_.double_value >= -std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXPANSION() && value_.double_value <= std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXPANSION();
     }
 
-    bool is_type(std::basic_string<Char>) const
+    bool is_type(std::basic_string<C>) const
     {
         return type_ == string_t;
     }
@@ -1223,12 +1224,13 @@ private:
         long long longlong_value_;
         unsigned long long ulonglong_value_;
         bool bool_value_;
-        json_object<Char>* object_;
-        json_array<Char>* array_;
-        std::basic_string<Char>* string_value_;
-        basic_custom_data<Char>* userdata_;
+        json_object<C>* object_;
+        json_array<C>* array_;
+        std::basic_string<C>* string_value_;
+        basic_custom_data<C>* userdata_;
     } value_;
 };
+
 
 }
 

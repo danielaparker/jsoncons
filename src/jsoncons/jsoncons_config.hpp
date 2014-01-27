@@ -116,10 +116,10 @@ inline bool is_neg_inf(double x) {return  std::isinf(x) && x > 0;}
 #endif
 
 #ifdef _MSC_VER
-template <class Char>
-std::basic_string<Char> double_to_string(double val, size_t precision)
+template <class C>
+std::basic_string<C> double_to_string(double val, size_t precision)
 {
-    std::basic_string<Char> s;
+    std::basic_string<C> s;
 	char buf[_CVTBUFSIZE];
     int decimal_point = 0;
     int sign = 0;
@@ -193,17 +193,17 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
 	return s;
 }
 #else
-template <class Char>
-std::basic_string<Char> double_to_string(double val, size_t precision)
+template <class C>
+std::basic_string<C> double_to_string(double val, size_t precision)
 {
-    std::basic_ostringstream<Char> os;
+    std::basic_ostringstream<C> os;
     os.imbue(std::locale::classic());
     os << std::showpoint << std::setprecision(precision) << val;
-    std::basic_string<Char> s(os.str());
+    std::basic_string<C> s(os.str());
 
-    typename std::basic_string<Char>::size_type exp_pos= s.find('e');
-    std::basic_string<Char> exp;
-    if (exp_pos != std::basic_string<Char>::npos)
+    typename std::basic_string<C>::size_type exp_pos= s.find('e');
+    std::basic_string<C> exp;
+    if (exp_pos != std::basic_string<C>::npos)
     {
         exp = s.substr(exp_pos);
         s.erase(exp_pos);
@@ -215,7 +215,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         --len;
     }
     s.erase(len);
-    if (exp_pos != std::basic_string<Char>::npos)
+    if (exp_pos != std::basic_string<C>::npos)
     {
         s.append(exp);
     }
@@ -254,10 +254,10 @@ double string_to_double(const std::wstring& s)
     return val;
 }
 #else
-template <class Char> inline
-double string_to_double(const std::basic_string<Char>& s)
+template <class C> inline
+double string_to_double(const std::basic_string<C>& s)
 {
-    std::basic_stringstream<Char> ss(s); 
+    std::basic_stringstream<C> ss(s); 
     ss.imbue(std::locale::classic());
     double val;
 	ss >> val;

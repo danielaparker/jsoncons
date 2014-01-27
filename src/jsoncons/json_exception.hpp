@@ -49,11 +49,11 @@ private:
     std::string message_;
 };
 
-template <class Char>
+template <class C>
 class json_exception_1 : public json_exception
 {
 public:
-    json_exception_1(const std::string& format, const std::basic_string<Char>& arg1) JSONCONS_NOEXCEPT
+    json_exception_1(const std::string& format, const std::basic_string<C>& arg1) JSONCONS_NOEXCEPT
         : format_(format), arg1_(arg1)
     {
     }
@@ -67,12 +67,12 @@ public:
     }
 private:
     std::string format_;
-    std::basic_string<Char> arg1_;
+    std::basic_string<C> arg1_;
     char message_[255];
 };
 
 #define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0((x))
-#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<Char>((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<C>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) {std::cerr << #x; abort();}
 
 }

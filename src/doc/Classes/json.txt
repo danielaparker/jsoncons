@@ -170,7 +170,7 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
     bool is_string() const
 
-    bool is_number() const
+    bool is_numeric() const
 
     bool is_longlong() const
 
