@@ -260,7 +260,7 @@ unsigned long long string_to_ulonglong(const char *s, size_t length, const unsig
     for (size_t i = 0; i < length; ++i)
     {
         char c = s[i];
-        if (c >= '0' && c <= '9')
+        if ((c >= '0') & (c <= '9'))
         {
             if (n > max_value / 10)
             {
@@ -381,14 +381,14 @@ void basic_json_reader<C>::read()
                         stack_.back().comma_ = true;
                         break;
                     case '\"':
-                        if (stack_.back().value_count_ > 0 && !stack_.back().comma_)
+                        if ((stack_.back().value_count_ > 0) & !stack_.back().comma_)
                         {
                             err_handler_.fatal_error("JPE102", "Expected comma", *this);
                         }
                         {
                             parse_string();
                             size_t count1 = 0;
-                            if (stack_.back().is_object_ && stack_.back().name_count_ == stack_.back().value_count_)
+                            if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
                                 handler_.name(string_buffer_, *this);
                                 count1 = 0;
@@ -470,7 +470,7 @@ void basic_json_reader<C>::read()
                         }
                         break;
                     case 't':
-                        if (!(buffer_[buffer_position_] == 'r' && buffer_[buffer_position_ + 1] == 'u' && buffer_[buffer_position_ + 2] == 'e'))
+                        if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -481,7 +481,7 @@ void basic_json_reader<C>::read()
                         ++stack_.back().value_count_;
                         break;
                     case 'f':
-                        if (!(buffer_[buffer_position_] == 'a' && buffer_[buffer_position_ + 1] == 'l' && buffer_[buffer_position_ + 2] == 's' && buffer_[buffer_position_ + 3] == 'e'))
+                        if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -492,7 +492,7 @@ void basic_json_reader<C>::read()
                         ++stack_.back().value_count_;
                         break;
                     case 'n':
-                        if (!(buffer_[buffer_position_] == 'u' && buffer_[buffer_position_ + 1] == 'l' && buffer_[buffer_position_ + 2] == 'l'))
+                        if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                         {
                             err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                         }
@@ -928,7 +928,7 @@ size_t basic_json_reader<C>::estimate_minimum_array_capacity() const
     size_t pos = buffer_position_;
     bool done = false;
     const size_t end = std::min(buffer_length_,estimation_buffer_length_);
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
@@ -989,7 +989,7 @@ size_t basic_json_reader<C>::estimate_minimum_object_capacity() const
     size_t pos = buffer_position_;
     bool done = false;
     const size_t end = std::min(buffer_length_,estimation_buffer_length_);
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
@@ -1031,7 +1031,7 @@ template<class C>
 size_t basic_json_reader<C>::skip_array(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
@@ -1061,13 +1061,13 @@ template<class C>
 size_t basic_json_reader<C>::skip_string(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
         case '\\':
             ++pos;
-            if (pos < buffer_length_ && buffer_[pos] == 'u')
+            if ((pos < buffer_length_) & (buffer_[pos] == 'u'))
             {
                 pos += 4;
             }
@@ -1093,7 +1093,7 @@ template<class C>
 size_t basic_json_reader<C>::skip_number(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
@@ -1127,7 +1127,7 @@ template<class C>
 size_t basic_json_reader<C>::skip_object(size_t pos, const size_t end) const
 {
     bool done = false;
-    while (!done && pos < end)
+    while (!done & (pos < end))
     {
         switch (buffer_[pos])
         {
