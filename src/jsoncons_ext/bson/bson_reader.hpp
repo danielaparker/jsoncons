@@ -22,8 +22,8 @@
 
 namespace jsoncons_ext { namespace bson {
 
-template<class Char>
-class basic_bson_reader : private jsoncons::basic_parsing_context<Char>
+template<class C>
+class basic_bson_reader : private jsoncons::basic_parsing_context<C>
 {
     static jsoncons::default_error_handler default_err_handler;
 
@@ -66,9 +66,9 @@ public:
     /*!
       \param is The input stream to read from
     */
-    basic_bson_reader(std::basic_istream<Char>& is,
-                      jsoncons::basic_json_input_handler<Char>& handler,
-                      jsoncons::basic_error_handler<Char>& err_handler)
+    basic_bson_reader(std::basic_istream<C>& is,
+                      jsoncons::basic_json_input_handler<C>& handler,
+                      jsoncons::basic_error_handler<C>& err_handler)
        : is_(is), 
          handler_(handler), 
          err_handler_(err_handler),
@@ -80,8 +80,8 @@ public:
     {
         input_buffer_ = &buffer_[0];
     }
-    basic_bson_reader(std::basic_istream<Char>& is,
-                      jsoncons::basic_json_input_handler<Char>& handler)
+    basic_bson_reader(std::basic_istream<C>& is,
+                      jsoncons::basic_json_input_handler<C>& handler)
         
        : is_(is), 
          handler_(handler), 
@@ -128,7 +128,7 @@ public:
         return column_;
     }
 
-    virtual const std::basic_string<Char>& buffer() const
+    virtual const std::basic_string<C>& buffer() const
     {
         return string_buffer_;
     }
@@ -138,7 +138,7 @@ private:
     basic_bson_reader& operator = (const basic_bson_reader&); // noop
 
     void skip_separator();
-    void parse_number(Char c);
+    void parse_number(C c);
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
@@ -164,13 +164,13 @@ private:
         }
     }
 
-    Char read_ch()
+    C read_ch()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
         }
-        Char c = 0;
+        C c = 0;
 
         //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
@@ -191,13 +191,13 @@ private:
         return c;
     }
 
-    Char peek()
+    C peek()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_data_block();
         }
-        Char c = 0;
+        C c = 0;
         if (buffer_position_ < buffer_length_)
         {
             c = input_buffer_[buffer_position_];
@@ -211,7 +211,7 @@ private:
         read_ch();
     }
 
-    void unread_ch(Char ch)
+    void unread_ch(C ch)
     {
         if (buffer_position_ > 0)
         {
@@ -227,30 +227,30 @@ private:
 
     unsigned long column_;
     unsigned long line_;
-    std::basic_string<Char> string_buffer_;
+    std::basic_string<C> string_buffer_;
     std::vector<stack_item> stack_;
-    std::basic_istream<Char>& is_;
-    Char *input_buffer_;
-    std::vector<Char> buffer_;
+    std::basic_istream<C>& is_;
+    C *input_buffer_;
+    std::vector<C> buffer_;
     size_t buffer_capacity_;
     int buffer_position_;
     int buffer_length_;
-    jsoncons::basic_json_input_handler<Char>& handler_;
-    jsoncons::basic_error_handler<Char>& err_handler_;
+    jsoncons::basic_json_input_handler<C>& handler_;
+    jsoncons::basic_error_handler<C>& err_handler_;
 };
 
-template<class Char>
-jsoncons::default_error_handler basic_bson_reader<Char>::default_err_handler;
+template<class C>
+jsoncons::default_error_handler basic_bson_reader<C>::default_err_handler;
 
-template<class Char>
-void basic_bson_reader<Char>::read()
+template<class C>
+void basic_bson_reader<C>::read()
 {
     line_ = 1;
     column_ = 0;
 
     while (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             continue;
@@ -267,7 +267,7 @@ void basic_bson_reader<Char>::read()
             continue;
         case '/':
             {
-                Char next = peek();
+                C next = peek();
                 if (eof())
                 {
                     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -457,12 +457,12 @@ void basic_bson_reader<Char>::read()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::skip_separator()
+template<class C>
+void basic_bson_reader<C>::skip_separator()
 {
     while (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF, expected :", *this);
@@ -481,7 +481,7 @@ void basic_bson_reader<Char>::skip_separator()
             {
                 if (!eof())
                 {
-                    Char next = peek();
+                    C next = peek();
                     if (next == '/')
                     {
                         ignore_single_line_comment();
@@ -504,26 +504,26 @@ void basic_bson_reader<Char>::skip_separator()
     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
 }
 
-template<class Char>
-bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, char char3)
+template<class C>
+bool basic_bson_reader<C>::read_until_match_fails(char char1, char char2, char char3)
 {
     if (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == char1)
         {
-            Char c = read_ch();
+            C c = read_ch();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             if (c == char2)
             {
-                Char c = read_ch();
+                C c = read_ch();
                 if (eof())
                 {
                     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -539,33 +539,33 @@ bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
-bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
+template<class C>
+bool basic_bson_reader<C>::read_until_match_fails(char char1, char char2, char char3, char char4)
 {
     if (!eof())
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == char1)
         {
-            Char c = read_ch();
+            C c = read_ch();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
             }
             if (c == char2)
             {
-                Char c = read_ch();
+                C c = read_ch();
                 if (eof())
                 {
                     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                 }
                 if (c = char3)
                 {
-                    Char c = read_ch();
+                    C c = read_ch();
                     if (eof())
                     {
                         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -582,8 +582,8 @@ bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
-void basic_bson_reader<Char>::parse_number(Char c) 
+template<class C>
+void basic_bson_reader<C>::parse_number(C c) 
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -596,7 +596,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -690,15 +690,15 @@ void basic_bson_reader<Char>::parse_number(Char c)
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::parse_string()
+template<class C>
+void basic_bson_reader<C>::parse_string()
 {
     string_buffer_.clear();
 
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "EOF, expected \"", *this);
@@ -712,7 +712,7 @@ void basic_bson_reader<Char>::parse_string()
         case '\\':
             if (!eof())
             {
-                Char next = peek();
+                C next = peek();
                 switch (next)
                 {
                 case '\"':
@@ -787,7 +787,7 @@ void basic_bson_reader<Char>::parse_string()
                             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                         }
                         unsigned int cp = decode_unicode_codepoint();
-                        json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
+                        json_char_traits<C>::append_codepoint_to_string(cp, string_buffer_);
                     }
                     break;
                 default:
@@ -805,13 +805,13 @@ void basic_bson_reader<Char>::parse_string()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::ignore_single_line_comment()
+template<class C>
+void basic_bson_reader<C>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -824,8 +824,8 @@ void basic_bson_reader<Char>::ignore_single_line_comment()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::fast_ignore_single_line_comment()
+template<class C>
+void basic_bson_reader<C>::fast_ignore_single_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
@@ -838,8 +838,8 @@ void basic_bson_reader<Char>::fast_ignore_single_line_comment()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::fast_ignore_multi_line_comment()
+template<class C>
+void basic_bson_reader<C>::fast_ignore_multi_line_comment()
 {
     while (buffer_position_ < buffer_length_)
     {
@@ -857,20 +857,20 @@ void basic_bson_reader<Char>::fast_ignore_multi_line_comment()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::ignore_multi_line_comment()
+template<class C>
+void basic_bson_reader<C>::ignore_multi_line_comment()
 {
     bool done = false;
     while (!done)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
         }
         if (c == '*')
         {
-            Char next = peek();
+            C next = peek();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -884,8 +884,8 @@ void basic_bson_reader<Char>::ignore_multi_line_comment()
     }
 }
 
-template<class Char>
-void basic_bson_reader<Char>::fast_skip_white_space()
+template<class C>
+void basic_bson_reader<C>::fast_skip_white_space()
 {
     bool done = false;
     while (!done && buffer_position_ < buffer_length_)
@@ -910,8 +910,8 @@ void basic_bson_reader<Char>::fast_skip_white_space()
     }
 }
 
-template<class Char>
-unsigned int basic_bson_reader<Char>::decode_unicode_codepoint()
+template<class C>
+unsigned int basic_bson_reader<C>::decode_unicode_codepoint()
 {
 
     unsigned int cp = decode_unicode_escape_sequence();
@@ -935,14 +935,14 @@ unsigned int basic_bson_reader<Char>::decode_unicode_codepoint()
     return cp;
 }
 
-template<class Char>
-unsigned int basic_bson_reader<Char>::decode_unicode_escape_sequence()
+template<class C>
+unsigned int basic_bson_reader<C>::decode_unicode_escape_sequence()
 {
     unsigned int cp = 0;
     size_t index = 0;
     while (!eof() && index < 4)
     {
-        Char c = read_ch();
+        C c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
