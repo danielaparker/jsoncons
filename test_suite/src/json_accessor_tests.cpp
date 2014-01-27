@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(test_as)
     int ushort_val = obj["field2"].as<unsigned short>();
     BOOST_CHECK_EQUAL(ushort_val,static_cast<unsigned short>(1));
     char char_val = obj["field2"].as<char>();
-    BOOST_CHECK_EQUAL(char_val,char(1));
+    BOOST_CHECK_EQUAL(int(char_val),1);
 
     json parent;
     parent["child"] = obj;
