@@ -82,6 +82,7 @@ public:
     struct object_type {};
     struct array_type {};
     struct null_type {};
+    struct custom_type {};
 };
 
 template <class C>
@@ -1169,6 +1170,11 @@ private:
         }
     }
 
+    bool is_type(json_base::custom_type) const
+    {
+        return type_ == custom_t;
+    }
+
     template<typename C, typename T>
     class as_value
     {
@@ -1179,6 +1185,16 @@ private:
         T get () const
         {
             return static_cast<T>(*this);
+        }
+
+        operator object_type () const
+        {
+            return *this;
+        }
+
+        operator array_type () const
+        {
+            return *this;
         }
         
         operator std::basic_string<C> () const

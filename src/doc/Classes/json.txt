@@ -8,6 +8,14 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 ### Member types
 
+    object_type
+
+    array_type
+
+    null_type
+
+    custom_type
+
     object_iterator
 A random access iterator to `std::pair<std::string,json>`
 
@@ -164,9 +172,22 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    bool is_null() const
-
     bool has_member(const std::string& name) const
+Returns `true` if a json object has a member named `name`, otherwise `false`.    
+
+    template <typename T>
+    bool is() const
+Returns `true` if json value is of type `T`, `false` otherwise.  
+`is<short>`, `is<unsigned short>`, `is<int>`, `is<unsigned int>`, `is<long>`, `is<unsigned long>`, `is<long long>`, `is<unsigned long long>` all return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
+`is<float>` and `is<double>` returns true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
+`is<std::string>` returns `true` if the json value is of string type, `false` otherwise.  
+`is<bool>` returns `true` if the json value is of boolean type, `false` otherwise.  
+`is<json::object_type>` returns `true` if the json value is an object, `false` otherwise.  
+`is<json::array_type>` returns `true` if the json value is an array, `false` otherwise.  
+`is<json::null_type>` returns `true` if the json value is null, `false` otherwise.  
+`is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.
+
+    bool is_null() const
 
     bool is_string() const
 
@@ -209,6 +230,10 @@ If `name` matches the name of a member in the json object, returns a const refer
 
     const json get(const std::string& name, const json& default_val) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
+
+    template <typename T>
+    T as() const
+Attempts to coerce the json value to the template type
 
     bool as_bool() const
 
