@@ -79,9 +79,9 @@ class json_base
 {
 public:
     enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
-    struct object_type {};
-    struct array_type {};
     struct null_type {};
+    struct object {};
+    struct array {};
     struct custom_type {};
 };
 
@@ -1036,12 +1036,12 @@ private:
         return type_ == null_t;
     }
 
-    bool is_type(json_base::object_type) const
+    bool is_type(json_base::object) const
     {
         return type_ == object_t || type_ == empty_object_t;
     }
 
-    bool is_type(json_base::array_type) const
+    bool is_type(json_base::array) const
     {
         return type_ == array_t;
     }
@@ -1187,12 +1187,17 @@ private:
             return static_cast<T>(*this);
         }
 
-        operator object_type () const
+        operator object () const
         {
             return *this;
         }
 
-        operator array_type () const
+        operator array () const
+        {
+            return *this;
+        }
+
+        operator null_type () const
         {
             return *this;
         }
