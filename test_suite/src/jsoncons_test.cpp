@@ -53,12 +53,12 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
     BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
 
-    root["myobject"] = json(json::an_object);
+    root["myobject"] = json();
     root["myobject"]["double_2"] = json(7.0);
     root["myobject"]["bool_2"] = json(true);
     root["myobject"]["int_2"] = json(0LL);
     root["myobject"]["string_2"] = json("my string");
-    root["myarray"] = json::an_array;
+    root["myarray"] = json::make_array();
 
     json double_2 = root["myobject"]["double_2"];
 
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_array_iterator)
 {
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add("Montreal");
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
 
 BOOST_AUTO_TEST_CASE(test_wjson2 )
 {
-    wjson root(wjson::an_object);
+    wjson root;
     root[L"field1"] = L"test";
     root[L"field2"] = 3.9;
     root[L"field3"] = true;
