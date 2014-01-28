@@ -70,9 +70,6 @@ template <class C>
 class json_array;
 
 template <class C>
-class json_string;
-
-template <class C>
 class basic_output_format;
 
 template <class C>
@@ -790,6 +787,26 @@ public:
     array_iterator end_elements();
 
     const_array_iterator end_elements() const;
+
+    basic_json& operator=(const char* rhs);
+
+    basic_json& operator=(const std::basic_string<C>& rhs);
+
+    basic_json& operator=(bool rhs);
+
+    basic_json& operator=(int rhs);
+
+    basic_json& operator=(unsigned int rhs);
+
+    basic_json& operator=(long rhs);
+
+    basic_json& operator=(unsigned long rhs);
+
+    basic_json& operator=(long long rhs);
+
+    basic_json& operator=(unsigned long long rhs);
+
+    basic_json& operator=(double rhs);
 
     basic_json& operator=(basic_json<C> rhs);
 

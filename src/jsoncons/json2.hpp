@@ -216,6 +216,206 @@ basic_json<C>::~basic_json()
 }
 
 template <class C>
+basic_json<C>& basic_json<C>::operator=(const char* rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = string_t;
+        value_.string_value_ = new std::basic_string<C>(rhs);
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(const std::basic_string<C>& rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = string_t;
+        value_.string_value_ = new std::basic_string<C>(rhs);
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(int rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(unsigned int rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(unsigned long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(unsigned long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(bool rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = bool_t;
+        value_.bool_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
+basic_json<C>& basic_json<C>::operator=(double rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = double_t;
+        value_.double_value_ = rhs;
+        break;
+    default:
+        basic_json<C>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class C>
 basic_json<C>& basic_json<C>::operator=(basic_json<C> rhs)
 {
     rhs.swap(*this);

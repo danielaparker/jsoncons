@@ -109,10 +109,10 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    BOOST_CHECK(a[0][0].as_string() == std::string("Tenor"));
+    BOOST_CHECK_EQUAL(a[0][0].as_string(), std::string("Tenor"));
     BOOST_CHECK_CLOSE(a[2][3].as_double(), -0.005, 0.00000001);
 
-    BOOST_CHECK(a[0][0].as<std::string>() == std::string("Tenor"));
+    BOOST_CHECK_EQUAL(a[0][0].as<std::string>(), std::string("Tenor"));
     BOOST_CHECK_CLOSE(a[2][3].as<double>(), -0.005, 0.00000001);
 }
 
