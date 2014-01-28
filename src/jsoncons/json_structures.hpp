@@ -233,9 +233,13 @@ public:
         iterator it = std::lower_bound(begin(),end(),name ,key_compare<C>());
         if (it != end() && (*it).first == name)
         {
-            it = remove(it);
+            //it = remove(it);
+            *it = std::pair<std::basic_string<C>,basic_json<C>>(name,value);
         }
-        insert(it,std::pair<std::basic_string<C>,basic_json<C>>(name,value));
+        else
+        {
+            insert(it,std::pair<std::basic_string<C>,basic_json<C>>(name,value));
+        }
     }
 
     void push_back(std::basic_string<C>&& name, basic_json<C>&& val)
@@ -316,9 +320,13 @@ void json_object<C>::set(const std::basic_string<C>& name, const basic_json<C>& 
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<C>());
     if (it != end() && (*it).first == name)
     {
-        it = remove(it);
+        //it = remove(it);
+        *it = std::pair<std::basic_string<C>,basic_json<C>>(name,value);
     }
-    insert(it,std::pair<std::basic_string<C>,basic_json<C>>(name,value));
+    else
+    {
+        insert(it,std::pair<std::basic_string<C>,basic_json<C>>(name,value));
+    }
 }
 
 template <class C>
