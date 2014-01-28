@@ -94,7 +94,7 @@ void make_empty_array()
 void make_1_dimensional_array_1()
 {
     std::cout << "1 dimensional array 1" <<std::endl;
-    json a(json::an_array);
+    json a = json::make_array();
     a.resize_array(10,0);
     a[1] = 1;
     a[2] = 2;
