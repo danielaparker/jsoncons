@@ -24,7 +24,7 @@ Incorporates a number of patches contributed by Marc Chevrier:
 
 - Fixed issue with set member on json object when a member with that name already exists
 - clang port
-- cmake build files
+- cmake build files for examples and test suite
 - json template method is<T> for examining the types of json values
 - json template method as<T> for accessing json values
 
