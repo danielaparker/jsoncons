@@ -30,6 +30,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [[Arrays]]
 
+[[Introspection]]
+
 [[Custom data]]
 
 [[Transforming JSON with filters]]
