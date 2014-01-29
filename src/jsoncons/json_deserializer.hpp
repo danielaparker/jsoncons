@@ -24,8 +24,6 @@ namespace jsoncons {
 template <class C>
 class basic_json_deserializer : public basic_json_input_handler<C>
 {
-    typedef std::pair<std::basic_string<C>,basic_json<C>> member_type;
-
     struct stack_item
     {
         stack_item(bool is_object, size_t minimum_structure_capacity)

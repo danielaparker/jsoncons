@@ -1058,7 +1058,7 @@ private:
 
     bool is_type(float) const
     {
-        return type_ == double_t && value_.double_value >= -std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXPANSION() && value_.double_value <= std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXPANSION();
+        return type_ == double_t && value_.double_value >= -std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXP() && value_.double_value <= std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXP();
     }
 
     bool is_type(std::basic_string<C>) const
@@ -1071,9 +1071,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXPANSION() && value_.longlong_value_ <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && value_.longlong_value_ <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1084,9 +1084,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1097,9 +1097,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXPANSION() && value_.longlong_value_ <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && value_.longlong_value_ <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1110,9 +1110,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1123,9 +1123,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXPANSION() && value_.longlong_value_ <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && value_.longlong_value_ <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1136,9 +1136,9 @@ private:
         switch (type_)
         {
         case longlong_t:
-            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.longlong_value_ >= 0 && value_.longlong_value_ <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }
@@ -1151,7 +1151,7 @@ private:
         case longlong_t:
             return true;
         case ulonglong_t:
-            return value_.ulonglong_value_ <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION();
+            return value_.ulonglong_value_ <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
         default:
             return false;
         }

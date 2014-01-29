@@ -11,17 +11,22 @@ It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clan
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
-Release 0.84b
--------------
+Release 0.90
+------------
 
-Fixed issues with column numbers reported with exceptions
+This release should be fully backwards compatible with 0.83. `json::an_object` and `json::an_array` have been dropped from the json documentation as they are no longer needed, but they're still there.
 
-Performance enhancements to json_reader and json_deserializer
+Includes performance enhancements to json_reader and json_deserializer
 
-Incorporates two patches contributed by Marc Chevrier:
+Fixes issues with column numbers reported with exceptions
+
+Incorporates a number of patches contributed by Marc Chevrier:
 
 - Fixed issue with set member on json object when a member with that name already exists
 - clang port
+- cmake build files
+- json template method is<T> for examining the types of json values
+- json template method as<T> for accessing json values
 
 Release 0.83
 ------------
