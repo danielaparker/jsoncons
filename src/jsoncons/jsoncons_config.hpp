@@ -20,7 +20,7 @@
 #include <cstdarg>
 #include <limits> // std::numeric_limits
 
-#define JSONCONS_NO_MACRO_EXPANSION 
+#define JSONCONS_NO_MACRO_EXP 
 
 namespace jsoncons {
 

@@ -15,6 +15,7 @@ The `json` class is an instantiation of the `basic_json` class template that use
     array
 
     custom_type
+Type tags that can be used with `is<T>` and `as<T>`
 
     object_iterator
 A random access iterator to `std::pair<std::string,json>`
