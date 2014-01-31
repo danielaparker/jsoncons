@@ -952,12 +952,30 @@ template <class C>
 const basic_json<C> basic_json<C>::null = basic_json<C>(basic_json<C>::null_t);
 
 template <class C> 
+basic_json<C> basic_json<C>::make_array()
+{
+    return basic_json<C>(new json_array<C>());
+}
+
+template <class C> 
+basic_json<C> basic_json<C>::make_array(size_t n)
+{
+    return basic_json<C>(new json_array<C>(n));
+}
+
+template <class C> 
+basic_json<C> basic_json<C>::make_array(size_t n, const basic_json<C>& val)
+{
+    return basic_json<C>(new json_array<C>(n,val));
+}
+
+template <class C> 
 basic_json<C> basic_json<C>::make_2d_array(size_t m, size_t n)
 {
     basic_json<C> a(basic_json<C>(new json_array<C>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<C>::make_array<1>(n);
+        a[i] = basic_json<C>::make_array(n);
     }
     return a;
 }
@@ -968,7 +986,7 @@ basic_json<C> basic_json<C>::make_2d_array(size_t m, size_t n, const basic_json<
     basic_json<C> a(basic_json<C>(new json_array<C>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<C>::make_array<1>(n,val);
+        a[i] = basic_json<C>::make_array(n,val);
     }
     return a;
 }
