@@ -113,7 +113,7 @@ void make_1_dimensional_array_2()
 void make_2_dimensional_array()
 {
     std::cout << "2 dimensional array" <<std::endl;
-    json a = json::make_2d_array(3,4,0);
+    json a = json::make_array<2>(3,4,0);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
     a[0][2] = "25-d-MS"; 
@@ -133,7 +133,7 @@ void make_2_dimensional_array()
 void make_3_dimensional_array()
 {
     std::cout << "3 dimensional array" <<std::endl;
-    json a = json::make_3d_array(4,3,2,0);
+    json a = json::make_array<3>(4,3,2,0);
     a[0][2][0] = 2;
     a[0][2][1] = 3;
     std::cout << pretty_print(a) << std::endl;
