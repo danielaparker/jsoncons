@@ -11,6 +11,11 @@ It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clan
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Release 0.90a
+-------------
+
+Fixed issue affecting clang compile
+
 Release 0.90
 ------------
 
