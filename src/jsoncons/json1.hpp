@@ -906,7 +906,7 @@ public:
     template<typename T>
     T as() const
     {
-        return as_value<C,T>(*this);
+        return as_value<T>(*this);
     }
 
     bool as_bool() const;
@@ -1007,7 +1007,7 @@ public:
         std::vector<T> v(size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = as_value<C,T>(at(i)).get();
+            v[i] = as_value<T>(at(i)).get();
         }
         return v;
     }
@@ -1175,7 +1175,7 @@ private:
         return type_ == custom_t;
     }
 
-    template<typename C, typename T>
+    template<typename T>
     class as_value
     {
     public:
