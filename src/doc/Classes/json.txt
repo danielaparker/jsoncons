@@ -18,10 +18,10 @@ The `json` class is an instantiation of the `basic_json` class template that use
 Type tags that can be used with `is<T>` and `as<T>`
 
     object_iterator
-A random access iterator to `std::pair<std::string,json>`
+A random access iterator to `json::name_value_pair`
 
     const_object_iterator
-A random access iterator to `const std::pair<std::string,json>`
+A random access iterator to `const json::name_value_pair`
 
     array_iterator
 A random access iterator to `json`
@@ -412,7 +412,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << it->first << "=" << it->second.as_string() << std::endl;
+        std::cout << it->name << "=" << it->second.as_string() << std::endl;
     }
 
 The output is
