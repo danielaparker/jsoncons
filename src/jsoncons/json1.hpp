@@ -724,6 +724,42 @@ public:
 
     static basic_json parse_file(const std::string& s);
 
+    template<int size>
+    static typename std::enable_if<size==1,basic_json>::type make_array()
+    {
+        return build_array<C,size>()();
+    }
+    template<int size>
+    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
+    {
+        return build_array<C,size>()(n);
+    }
+    template<int size>
+    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n, const basic_json<C>& val)
+    {
+        return build_array<C,size>()(n, val);
+    }
+    template<int size>
+    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n)
+    {
+        return build_array<C,size>()(m, n);
+    }
+    template<int size>
+    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n, const basic_json<C>& val)
+    {
+        return build_array<C,size>()(m, n, val);
+    }
+    template<int size>
+    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k)
+    {
+        return build_array<C,size>()(m, n, k);
+    }
+    template<int size>
+    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k, const basic_json<C>& val)
+    {
+        return build_array<C,size>()(m, n, k, val);
+    }
+
     static basic_json make_array();
 
     static basic_json make_array(size_t n);
@@ -1253,6 +1289,53 @@ private:
 
     private:
         const basic_json<C>& value_;
+    };
+
+    template<typename Char, size_t size>
+    class build_array
+    {};
+    template<typename Char>
+    class build_array<Char,1>
+    {
+    public:
+        basic_json<Char> operator() ()
+        {
+            return basic_json<Char>::make_array();
+        }
+        basic_json<Char> operator() (size_t n)
+        {
+            return basic_json<Char>::make_array(n);
+        }
+        basic_json<Char> operator() (size_t n, const basic_json<Char>& val)
+        {
+            return basic_json<Char>::make_array(n, val);
+        }
+    };
+    template<typename Char>
+    class build_array<Char,2>
+    {
+    public:
+        basic_json<Char> operator() (size_t m, size_t n)
+        {
+            return basic_json<Char>::make_2d_array(m, n);
+        }
+        basic_json<Char> operator() (size_t m, size_t n, const basic_json<Char>& val)
+        {
+            return basic_json<Char>::make_2d_array(m, n, val);
+        }
+    };
+    template<typename Char>
+    class build_array<Char,3>
+    {
+    public:
+        basic_json<Char> operator() (size_t m, size_t n, size_t k)
+        {
+            return basic_json<Char>::make_3d_array (m, n, k);
+        }
+        basic_json<Char> operator() (size_t m, size_t n, size_t k, const basic_json<Char>& val)
+        {
+            return basic_json<Char>::make_3d_array (m, n, k, val);
+        }
     };
 
 	value_type type_;
