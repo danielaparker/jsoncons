@@ -89,6 +89,47 @@ template <class C>
 class basic_json : public json_base
 {
 public:
+    class name_value_pair
+    {
+    public:
+        name_value_pair()
+        {
+        }
+        name_value_pair(const name_value_pair& pair)
+            : name(pair.name), value(pair.value)
+        {
+        }
+        name_value_pair(name_value_pair&& pair)
+            //: name(std::move(pair.name)), value(std::move(pair.value))
+        {
+            name.swap(pair.name);
+            value.swap(pair.value);
+        }
+        name_value_pair(const std::basic_string<C>& nam, const basic_json<C>& val)
+            : name(nam), value(val)
+        {
+        }
+        name_value_pair(std::basic_string<C>&& nam, basic_json<C>&& val)
+            : name(nam), value(val)
+        {
+        }
+
+        name_value_pair& operator=(name_value_pair rhs)
+        {
+            swap(rhs);
+            return *this;
+        }
+
+        void swap(name_value_pair& pair)
+        {
+            name.swap(pair.name);
+            value.swap(pair.value);
+        }
+
+        std::basic_string<C> name;
+        basic_json<C> value;
+    };
+
     static const basic_json<C> an_object;
     static const basic_json<C> an_array;
     static const basic_json<C> null;
@@ -799,7 +840,7 @@ public:
     basic_json(bool val);
 
     template <class InputIterator>
-    basic_json(InputIterator first, InputIterator last);
+    basic_json(InputIterator name, InputIterator last);
 
     explicit basic_json(json_object<C>* var);
 
@@ -881,7 +922,7 @@ public:
     template<typename T>
     bool is() const
     {
-        return is_type(T());
+        return is_type(*this,T());
     }
 
     bool is_string() const
@@ -1062,47 +1103,47 @@ private:
 	basic_json(value_type t);
 
     template <class T>
-    bool is_type(T) const
+    bool is_type(const basic_json<C>& val, T) const
     {
         return false;
     }
 
-    bool is_type(json_base::null_type) const
+    bool is_type(const basic_json<C>& val, json_base::null_type) const
     {
         return type_ == null_t;
     }
 
-    bool is_type(json_base::object) const
+    bool is_type(const basic_json<C>& val, json_base::object) const
     {
         return type_ == object_t || type_ == empty_object_t;
     }
 
-    bool is_type(json_base::array) const
+    bool is_type(const basic_json<C>& val, json_base::array) const
     {
         return type_ == array_t;
     }
 
-    bool is_type(bool) const
+    bool is_type(const basic_json<C>& val, bool) const
     {
         return type_ == bool_t;
     }
 
-    bool is_type(double) const
+    bool is_type(const basic_json<C>& val, double) const
     {
         return type_ == double_t;
     }
 
-    bool is_type(float) const
+    bool is_type(const basic_json<C>& val, float) const
     {
         return type_ == double_t && value_.double_value >= -std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXP() && value_.double_value <= std::numeric_limits<float>::max JSONCONS_NO_MACRO_EXP();
     }
 
-    bool is_type(std::basic_string<C>) const
+    bool is_type(const basic_json<C>& val, std::basic_string<C>) const
     {
         return type_ == string_t;
     }
 
-    bool is_type(short) const
+    bool is_type(const basic_json<C>& val, short) const
     {
         switch (type_)
         {
@@ -1115,7 +1156,7 @@ private:
         }
     }
 
-    bool is_type(unsigned short) const
+    bool is_type(const basic_json<C>& val, unsigned short) const
     {
         switch (type_)
         {
@@ -1128,7 +1169,7 @@ private:
         }
     }
 
-    bool is_type(int) const
+    bool is_type(const basic_json<C>& val, int) const
     {
         switch (type_)
         {
@@ -1141,7 +1182,7 @@ private:
         }
     }
 
-    bool is_type(unsigned int) const
+    bool is_type(const basic_json<C>& val, unsigned int) const
     {
         switch (type_)
         {
@@ -1154,7 +1195,7 @@ private:
         }
     }
 
-    bool is_type(long) const
+    bool is_type(const basic_json<C>& val, long) const
     {
         switch (type_)
         {
@@ -1167,7 +1208,7 @@ private:
         }
     }
 
-    bool is_type(unsigned long) const
+    bool is_type(const basic_json<C>& val, unsigned long) const
     {
         switch (type_)
         {
@@ -1180,7 +1221,7 @@ private:
         }
     }
 
-    bool is_type(long long) const
+    bool is_type(const basic_json<C>& val, long long) const
     {
         switch (type_)
         {
@@ -1193,7 +1234,7 @@ private:
         }
     }
 
-    bool is_type(unsigned long long) const
+    bool is_type(const basic_json<C>& val, unsigned long long) const
     {
         switch (type_)
         {
@@ -1206,7 +1247,7 @@ private:
         }
     }
 
-    bool is_type(json_base::custom_type) const
+    bool is_type(const basic_json<C>& val, json_base::custom_type) const
     {
         return type_ == custom_t;
     }
@@ -1352,6 +1393,11 @@ private:
     } value_;
 };
 
+template <class C>
+void swap(typename basic_json<C>::name_value_pair& a, typename basic_json<C>::name_value_pair& b)
+{
+    a.swap(b);
+}
 
 }
 

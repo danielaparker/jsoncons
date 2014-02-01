@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->first << ", value=" << it->second.as_string() << std::endl;
+        std::cout << "name=" << it->name << ", value=" << it->value.as_string() << std::endl;
     }
 }
 
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     std::cout << "size json=" << sizeof(json) << std::endl;
     std::cout << "size string=" << sizeof(string) << std::endl;
     std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
-    std::cout << "size map=" << sizeof(std::vector<std::pair<std::string,json>>) << std::endl;
+    std::cout << "size map=" << sizeof(std::vector<json::name_value_pair>) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_userdata)

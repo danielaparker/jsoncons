@@ -184,7 +184,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->first << ", value=" << it->second.as_string() << std::endl;
+        std::cout << "name=" << it->name << ", value=" << it->second.as_string() << std::endl;
     }
 
 The output is

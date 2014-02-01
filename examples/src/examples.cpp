@@ -183,7 +183,7 @@ void introspection_example()
             {
                 for (auto it = elem.begin_members(); it != elem.end_members(); ++it)
                 {
-                    std::cout << "Is member " << it->first << " a string? " << it->second.is<std::string>() << ", or a double? " << it->second.is<double>() << ", or perhaps an int? " << it->second.is<int>() << std::endl;
+                    std::cout << "Is member " << it->name << " a string? " << it->value.is<std::string>() << ", or a double? " << it->value.is<double>() << ", or perhaps an int? " << it->value.is<int>() << std::endl;
 
                 }
             }
