@@ -79,7 +79,7 @@ template <class C>
 std::basic_string<C> escape_string(const std::basic_string<C>& s, const basic_output_format<C>& format);
 
 template <typename C, typename T>
-class as_value
+class value_adapter
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1001,7 +1001,7 @@ public:
     template<typename T>
     bool is() const
     {
-        as_value<C,T> adapter;
+        value_adapter<C,T> adapter;
         return adapter.is(*this);
     }
 
@@ -1063,7 +1063,7 @@ public:
     template<typename T>
     T as() const
     {
-        as_value<C,T> adapter;
+        value_adapter<C,T> adapter;
         return adapter.as(*this);
     }
 
@@ -1160,7 +1160,7 @@ public:
     std::vector<T> as_vector() const
     {
         std::vector<T> v(size());
-        as_value<C,T> adapter;
+        value_adapter<C,T> adapter;
         for (size_t i = 0; i < v.size(); ++i)
         {
             v[i] = adapter.as(at(i));
@@ -1249,7 +1249,7 @@ void swap(typename basic_json<C>::name_value_pair& a, typename basic_json<C>::na
 }
 
 template <typename C>
-class as_value<C,std::basic_string<C>>
+class value_adapter<C,std::basic_string<C>>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1263,7 +1263,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,typename basic_json<C>::object>
+class value_adapter<C,typename basic_json<C>::object>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1277,7 +1277,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,typename basic_json<C>::array>
+class value_adapter<C,typename basic_json<C>::array>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1291,7 +1291,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,typename basic_json<C>::null_type>
+class value_adapter<C,typename basic_json<C>::null_type>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1306,7 +1306,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,bool>
+class value_adapter<C,bool>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1320,7 +1320,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,int>
+class value_adapter<C,int>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1345,7 +1345,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,unsigned int>
+class value_adapter<C,unsigned int>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1370,7 +1370,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,short>
+class value_adapter<C,short>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1395,7 +1395,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,unsigned short>
+class value_adapter<C,unsigned short>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1420,7 +1420,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,long>
+class value_adapter<C,long>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1445,7 +1445,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,unsigned long>
+class value_adapter<C,unsigned long>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1470,7 +1470,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,char>
+class value_adapter<C,char>
 {
 public:
     char as(const basic_json<C>& val) const
@@ -1480,7 +1480,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,double>
+class value_adapter<C,double>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1495,7 +1495,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,long long>
+class value_adapter<C,long long>
 {
 public:
     bool is(const basic_json<C>& val) const
@@ -1520,7 +1520,7 @@ public:
 };
 
 template <typename C>
-class as_value<C,unsigned long long>
+class value_adapter<C,unsigned long long>
 {
 public:
     bool is(const basic_json<C>& val) const
