@@ -93,16 +93,67 @@ class json_base
 {
 public:
     enum value_type {empty_object_t,object_t,array_t,string_t,double_t,longlong_t,ulonglong_t,bool_t,null_t,custom_t};
-    struct null_type {};
-    struct object {};
-    struct array {};
-    struct custom_type {};
 };
 
 template <class C>
 class basic_json : public json_base
 {
 public:
+    class null_type : public basic_json<C> 
+    {
+    public:
+        null_type()
+            : basic_json<C>(null_t)
+        {
+        }
+    };
+    class object : public basic_json<C>
+    {
+    public:
+        object()
+        {
+        }
+        object(json_object<C>* impl)
+            : basic_json<C>(impl)
+        {
+        }
+    };
+    class array : public basic_json<C>
+    {
+    public:
+        array()
+            : basic_json<C>(array_t)
+        {
+        }
+        array(size_t n)
+            : basic_json<C>(array_t)
+        {
+            value_.array_.resize(n);
+        }
+        array(size_t n, const basic_json<C>& val)
+            : basic_json<C>(array_t)
+        {
+            value_.array_.resize(n,val);
+        }
+        array(json_array<C>* impl)
+            : basic_json<C>(impl)
+        {
+        }
+    };
+    struct custom_type {};
+
+    operator array() const
+    {
+        JSONCONS_ASSERT(type_ == array_t);
+        return array(value_.array_->clone());
+    }
+
+    operator object() const
+    {
+        JSONCONS_ASSERT(type_ == object_t);
+        return object(value_.object_->clone());
+    }
+
     class name_value_pair
     {
     public:
@@ -1201,32 +1252,45 @@ public:
 };
 
 template <typename C>
-class as_value<C,json_base::object>
+class as_value<C,typename basic_json<C>::object>
 {
 public:
     bool is(const basic_json<C>& val) const
     {
         return val.is_object();
     }
+    typename basic_json<C>::object as(const basic_json<C>& val) const
+    {
+        return val;
+    }
 };
 
 template <typename C>
-class as_value<C,json_base::array>
+class as_value<C,typename basic_json<C>::array>
 {
 public:
     bool is(const basic_json<C>& val) const
     {
         return val.is_array();
     }
+    typename basic_json<C>::array as(const basic_json<C>& val) const
+    {
+        return val;
+    }
 };
 
 template <typename C>
-class as_value<C,json_base::null_type>
+class as_value<C,typename basic_json<C>::null_type>
 {
 public:
     bool is(const basic_json<C>& val) const
     {
         return val.is_null();
+    }
+    typename basic_json<C>::null_type as(const basic_json<C>& val) const
+    {
+        JSONCONS_ASSERT(val.is_null());
+        return null_type();
     }
 };
 
