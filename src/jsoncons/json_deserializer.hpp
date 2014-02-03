@@ -112,11 +112,11 @@ public:
         {
             if (stack_.back().is_object())
             {
-                stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),JSONCONS_MOVE(val));
+                stack_.back().object_->push_back(std::move(stack_.back().name_),std::move(val));
             }
             else
             {
-                stack_.back().array_->push_back(JSONCONS_MOVE(val));
+                stack_.back().array_->push_back(std::move(val));
             }
         }
         else
@@ -138,16 +138,16 @@ public:
         {
             if (stack_.back().is_object())
             {
-                stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),JSONCONS_MOVE(val));
+                stack_.back().object_->push_back(std::move(stack_.back().name_),std::move(val));
             }
             else
             {
-                stack_.back().array_->push_back(JSONCONS_MOVE(val));
+                stack_.back().array_->push_back(std::move(val));
             }
         }
         else
         {
-            root_ = JSONCONS_MOVE(val);
+            root_ = std::move(val);
         }
     }
 
@@ -160,11 +160,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(value));
         } 
         else 
         {
-            stack_.back().array_->push_back(JSONCONS_MOVE(basic_json<C>(value)));
+            stack_.back().array_->push_back(std::move(basic_json<C>(value)));
         }
     }
 
@@ -172,7 +172,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(value));
         } 
         else
         {
@@ -184,7 +184,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(value));
         } 
         else
         {
@@ -196,7 +196,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(value));
         } 
         else
         {
@@ -208,7 +208,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(value));
         } 
         else
         {
@@ -220,7 +220,7 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(JSONCONS_MOVE(stack_.back().name_),basic_json<C>(basic_json<C>::null));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<C>(basic_json<C>::null));
         } 
         else
         {

@@ -230,7 +230,7 @@ public:
                         os_.put(field_delimiter_);
                         ++stack_.back().count_;
                     }
-                //    std::cout << " (" << it->value << " " << stack_.back().count_ << ") ";
+                //    std::cout << " (" << it->value() << " " << stack_.back().count_ << ") ";
                 }
             }
         }
