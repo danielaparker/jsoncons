@@ -1301,7 +1301,7 @@ public:
     typename basic_json<C>::null_type as(const basic_json<C>& val) const
     {
         JSONCONS_ASSERT(val.is_null());
-        return null_type();
+        return basic_json<C>::null_type();
     }
 };
 
