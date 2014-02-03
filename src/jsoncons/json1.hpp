@@ -161,22 +161,37 @@ public:
         {
         }
         name_value_pair(const name_value_pair& pair)
-            : name(pair.name), value(pair.value)
+            : name_(pair.name_), value_(pair.value_)
         {
         }
         name_value_pair(name_value_pair&& pair)
-            //: name(std::move(pair.name)), value(std::move(pair.value))
+            //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
         {
-            name.swap(pair.name);
-            value.swap(pair.value);
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
         }
         name_value_pair(const std::basic_string<C>& nam, const basic_json<C>& val)
-            : name(nam), value(val)
+            : name_(nam), value_(val)
         {
         }
         name_value_pair(std::basic_string<C>&& nam, basic_json<C>&& val)
-            : name(nam), value(val)
+            : name_(nam), value_(val)
         {
+        }
+
+        const std::basic_string<C>& name() const
+        {
+            return name_;
+        }
+
+        basic_json<C>& value()
+        {
+            return value_;
+        }
+
+        const basic_json<C>& value() const
+        {
+            return value_;
         }
 
         name_value_pair& operator=(name_value_pair rhs)
@@ -187,12 +202,12 @@ public:
 
         void swap(name_value_pair& pair)
         {
-            name.swap(pair.name);
-            value.swap(pair.value);
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
         }
 
-        std::basic_string<C> name;
-        basic_json<C> value;
+        std::basic_string<C> name_;
+        basic_json<C> value_;
     };
 
     static const basic_json<C> an_object;
@@ -728,7 +743,6 @@ public:
             val_.at(name_).set(name,value);
         }
 
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
         void set(std::basic_string<C>&& name, basic_json<C>&& value)
 
         {
@@ -744,7 +758,7 @@ public:
         {
             val_.at(name_).add(index, value);
         }
-#endif
+
         template <class T>
         void set_custom_data(const std::basic_string<C>& name, const T& value)
         {
@@ -1106,8 +1120,6 @@ public:
 
     void set(const std::basic_string<C>& name, const basic_json<C>& value);
 
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
-
     basic_json(basic_json&& val);
 
     void set(std::basic_string<C>&& name, basic_json<C>&& value);
@@ -1115,7 +1127,6 @@ public:
     void add(basic_json<C>&& value);
 
     void add(size_t index, basic_json<C>&& value);
-#endif
 
     template <class T>
     void set_custom_data(const std::basic_string<C>& name, const T& value);

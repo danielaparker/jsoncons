@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->name << ", value=" << it->value.as_string() << std::endl;
+        std::cout << "name=" << it->name() << ", value=" << it->value().as_string() << std::endl;
     }
 }
 

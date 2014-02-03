@@ -573,7 +573,7 @@ const basic_json<C>& basic_json<C>::get(const std::basic_string<C>& name) const
     case object_t:
 		{
         const_object_iterator it = value_.object_->find(name);
-        return it != end_members() ? it->value : basic_json<C>::null;
+        return it != end_members() ? it->value() : basic_json<C>::null;
 		}
     default:
         {
@@ -592,7 +592,7 @@ typename basic_json<C>::const_val_proxy basic_json<C>::get(const std::basic_stri
     case object_t:
 		{
         const_object_iterator it = value_.object_->find(name);
-        return it != end_members() ? const_val_proxy(it->value) : const_val_proxy(default_val);
+        return it != end_members() ? const_val_proxy(it->value()) : const_val_proxy(default_val);
 		}
     default:
         {
@@ -618,8 +618,6 @@ void basic_json<C>::set(const std::basic_string<C>& name, const basic_json<C>& v
         }
     }
 }
-
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
 template <class C>
 basic_json<C>::basic_json(basic_json&& other)
@@ -676,8 +674,6 @@ void basic_json<C>::set(std::basic_string<C>&& name, basic_json<C>&& value)
         }
     }
 }
-
-#endif
 
 template <class C>
 template <class T>
@@ -895,8 +891,8 @@ void basic_json<C>::to_stream(basic_json_output_handler<C>& handler) const
         json_object<C>* o = value_.object_;
         for (const_object_iterator it = o->begin(); it != o->end(); ++it)
         {
-            handler.name(it->name);
-            it->value.to_stream(handler);
+            handler.name(it->name());
+            it->value().to_stream(handler);
         }
         handler.end_object();
 		}
