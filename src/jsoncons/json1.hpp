@@ -128,12 +128,12 @@ public:
         array(size_t n)
             : basic_json<C>(array_t)
         {
-            value_.array_.resize(n);
+            value_.array_->resize(n);
         }
         array(size_t n, const basic_json<C>& val)
             : basic_json<C>(array_t)
         {
-            value_.array_.resize(n,val);
+            value_.array_->resize(n,val);
         }
         array(json_array<C>* impl)
             : basic_json<C>(impl)
