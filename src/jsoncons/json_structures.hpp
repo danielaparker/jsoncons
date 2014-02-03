@@ -219,7 +219,7 @@ public:
 
     void push_back(const std::basic_string<C>& name, const basic_json<C>& val)
     {
-        members_.push_back(basic_json<C>::name_value_pair(name,val));
+        members_.push_back(typename basic_json<C>::name_value_pair(name,val));
     }
 
     void set(std::basic_string<C>&& name, basic_json<C>&& value)
@@ -228,20 +228,20 @@ public:
         if (it != end() && it->name() == name)
         {
             //it = remove(it);
-            *it = basic_json<C>::name_value_pair(name,value);
+            *it = typename basic_json<C>::name_value_pair(name,value);
         }
         else
         {
-            insert(it,basic_json<C>::name_value_pair(name,value));
+            insert(it,typename basic_json<C>::name_value_pair(name,value));
         }
     }
 
     void push_back(std::basic_string<C>&& name, basic_json<C>&& val)
     {
-        members_.push_back(basic_json<C>::name_value_pair());
+        members_.push_back(typename basic_json<C>::name_value_pair());
         members_.back().name_.swap(name);
         members_.back().value_.swap(val);
-        //members_.push_back(basic_json<C>::name_value_pair(name,val)); // much slower on VS 2010
+        //members_.push_back(typename basic_json<C>::name_value_pair(name,val)); // much slower on VS 2010
     }
 
     iterator remove(iterator at); 
@@ -315,11 +315,11 @@ void json_object<C>::set(const std::basic_string<C>& name, const basic_json<C>& 
     if (it != end() && it->name() == name)
     {
         //it = remove(it);
-        *it = basic_json<C>::name_value_pair(name,value);
+        *it = typename basic_json<C>::name_value_pair(name,value);
     }
     else
     {
-        insert(it,basic_json<C>::name_value_pair(name,value));
+        insert(it,typename basic_json<C>::name_value_pair(name,value));
     }
 }
 
