@@ -11,6 +11,12 @@ It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clan
 
 Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
 
+Master
+
+- Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
+- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value()
+- Changed implementation of is<T> and as<T>, the current implementation should be user extensible.
+
 Release 0.90a
 -------------
 
