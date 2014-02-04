@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 
 BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
-    json a = json::make_array<1>(10,0);
+    json a = json::make_multi_array<1>(10,0);
     BOOST_CHECK(a.size() == 10);
     BOOST_CHECK(a[0].as_longlong() == 0);
     a[1] = 1;
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
 
 BOOST_AUTO_TEST_CASE(test_two_dim_array)
 {
-    json a = json::make_array<2>(3,4,0);
+    json a = json::make_multi_array<2>(3,4,0);
     BOOST_CHECK(a.size() == 3);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
 
 BOOST_AUTO_TEST_CASE(test_three_dim_array)
 {
-    json a = json::make_array<3>(4,3,2,0);
+    json a = json::make_multi_array<3>(4,3,2,0);
     BOOST_CHECK(a.size() == 4);
     a[0][2][0] = 2;
 	a[0][2][1] = 3;

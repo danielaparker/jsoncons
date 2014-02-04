@@ -118,28 +118,8 @@ public:
         {
         }
     };
-    class array : public basic_json<C>
-    {
-    public:
-        array()
-            : basic_json<C>(array_t)
-        {
-        }
-        array(size_t n)
-            : basic_json<C>(array_t)
-        {
-            value_.array_->resize(n);
-        }
-        array(size_t n, const basic_json<C>& val)
-            : basic_json<C>(array_t)
-        {
-            value_.array_->resize(n,val);
-        }
-        array(json_array<C>* impl)
-            : basic_json<C>(impl)
-        {
-        }
-    };
+    class array;
+    class array1;
     struct custom_type {};
 
     operator array() const
@@ -845,37 +825,37 @@ public:
     static basic_json parse_file(const std::string& s);
 
     template<int size>
-    static typename std::enable_if<size==1,basic_json>::type make_array()
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
     {
         return build_array<C,size>()();
     }
-    template<int size>
-    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
+    template<size_t size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
     {
         return build_array<C,size>()(n);
     }
-    template<int size>
-    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n, const basic_json<C>& val)
+    template<size_t size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, const basic_json<C>& val)
     {
         return build_array<C,size>()(n, val);
     }
-    template<int size>
-    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n)
+    template<size_t size>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
     {
         return build_array<C,size>()(m, n);
     }
-    template<int size>
-    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n, const basic_json<C>& val)
+    template<size_t size>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, const basic_json<C>& val)
     {
         return build_array<C,size>()(m, n, val);
     }
-    template<int size>
-    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k)
+    template<size_t size>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
     {
         return build_array<C,size>()(m, n, k);
     }
-    template<int size>
-    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k, const basic_json<C>& val)
+    template<size_t size>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, const basic_json<C>& val)
     {
         return build_array<C,size>()(m, n, k, val);
     }
@@ -1541,6 +1521,54 @@ public:
     unsigned long long as(const basic_json<C>& val) const
     {
         return val.as_ulonglong();
+    }
+};
+
+template <typename C>
+class basic_json<C>::array : public basic_json<C>
+{
+public:
+    basic_json<C>::array()
+        : basic_json<C>(array_t)
+    {
+    }
+    array(size_t n)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n);
+    }
+    array(size_t n, const basic_json<C>& val)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n,val);
+    }
+    array(json_array<C>* impl)
+        : basic_json<C>(impl)
+    {
+    }
+};
+
+template <typename C>
+class basic_json<C>::array1 : public basic_json<C>
+{
+public:
+    basic_json<C>::array1()
+        : basic_json<C>(array_t)
+    {
+    }
+    array1(size_t n)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n);
+    }
+    array1(size_t n, const basic_json<C>& val)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n,val);
+    }
+    array1(json_array<C>* impl)
+        : basic_json<C>(impl)
+    {
     }
 };
 
