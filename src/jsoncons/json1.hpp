@@ -99,40 +99,10 @@ template <class C>
 class basic_json : public json_base
 {
 public:
-    class null_type : public basic_json<C> 
-    {
-    public:
-        null_type()
-            : basic_json<C>(null_t)
-        {
-        }
-    };
-    class object : public basic_json<C>
-    {
-    public:
-        object()
-        {
-        }
-        object(json_object<C>* impl)
-            : basic_json<C>(impl)
-        {
-        }
-    };
+    class null_type;
+    class object;
     class array;
-    class array1;
     struct custom_type {};
-
-    operator array() const
-    {
-        JSONCONS_ASSERT(type_ == array_t);
-        return array(value_.array_->clone());
-    }
-
-    operator object() const
-    {
-        JSONCONS_ASSERT(type_ == object_t);
-        return object(value_.object_->clone());
-    }
 
     class name_value_pair
     {
@@ -199,6 +169,24 @@ public:
 
     typedef typename json_array<C>::iterator array_iterator;
     typedef typename json_array<C>::const_iterator const_array_iterator;
+
+    operator null_type() const
+    {
+        JSONCONS_ASSERT(type_ == null_t);
+        return null_type();
+    }
+
+    operator array() const
+    {
+        JSONCONS_ASSERT(type_ == array_t);
+        return array(value_.array_->clone());
+    }
+
+    operator object() const
+    {
+        JSONCONS_ASSERT(type_ == object_t);
+        return object(value_.object_->clone());
+    }
 
     class const_val_proxy 
     {
@@ -1525,13 +1513,34 @@ public:
 };
 
 template <typename C>
+class basic_json<C>::null_type : public basic_json<C> 
+{
+private:
+    null_type()
+        : basic_json<C>(null_t)
+    {
+    }
+};
+
+template <typename C>
+class basic_json<C>::object : public basic_json<C>
+{
+public:
+    object(json_object<C>* impl)
+        : basic_json<C>(impl)
+    {
+    }
+//private:
+    object()
+        : basic_json<C>(object_t)
+    {
+    }
+};
+
+template <typename C>
 class basic_json<C>::array : public basic_json<C>
 {
 public:
-    basic_json<C>::array()
-        : basic_json<C>(array_t)
-    {
-    }
     array(size_t n)
         : basic_json<C>(array_t)
     {
@@ -1546,28 +1555,9 @@ public:
         : basic_json<C>(impl)
     {
     }
-};
-
-template <typename C>
-class basic_json<C>::array1 : public basic_json<C>
-{
-public:
-    basic_json<C>::array1()
+private:
+    array()
         : basic_json<C>(array_t)
-    {
-    }
-    array1(size_t n)
-        : basic_json<C>(array_t)
-    {
-        value_.array_->resize(n);
-    }
-    array1(size_t n, const basic_json<C>& val)
-        : basic_json<C>(array_t)
-    {
-        value_.array_->resize(n,val);
-    }
-    array1(json_array<C>* impl)
-        : basic_json<C>(impl)
     {
     }
 };
