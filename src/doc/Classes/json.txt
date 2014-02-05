@@ -54,21 +54,12 @@ Makes an array of n elements. Each element is an empty json object.
     static json make_array(size_t n, const json& val)
 Makes an array of n elements. Each element is a copy of `val`.
 
-    static json make_2d_array(size_t m, size_t n)
-Makes an m dimensional array of n dimensional arrays of elements. 
-Each element is an empty json object.
+    template <typename N>
+    static json make_multi_array(size1 ... sizeN)
 
-    static json make_2d_array(size_t m, size_t n, const json& val)
-Makes an m dimensional array of n dimensional arrays of elements. 
-Each element is a copy of the json value `val`.
-
-    static json make_3d_array(size_t m, size_t n, size_t k)
-Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
-Each element is an empty json object.
-
-    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
-Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
-Each element is a copy of the json value `val`.
+    template <typename N>
+    static json make_multi_array(size1 ... sizeN, const json& val)
+Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors
 
@@ -235,10 +226,6 @@ Attempts to coerce the json value to the template type
     double as_double() const
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
 
-    int as_int() const
-
-    unsigned int as_uint() const
-
     long long as_longlong() const
 If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.
 
@@ -249,9 +236,6 @@ If value is string, returns value, otherwise returns result of `to_string`.
 
     std::string as_string(const output_format& format) const
 If value is string, returns value, otherwise returns result of `to_string(format)`.
-
-    char as_char() const
-If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
 
     template <class T>
     std::vector<T> as_vector() const
@@ -337,6 +321,29 @@ Inserts json value into stream.
 
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
+
+Deprecated methods
+
+    static json make_2d_array(size_t m, size_t n)
+Use make_multi_array<2>(m,n) instead
+
+    static json make_2d_array(size_t m, size_t n, const json& val)
+Use make_multi_array<2>(m,n,val) instead
+
+    static json make_3d_array(size_t m, size_t n, size_t k)
+Use make_multi_array<3>(m,n,k) instead
+
+    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
+Use make_multi_array<3>(m,n,k,val) instead
+
+    int as_int() const
+Use as<int>() instead
+
+    unsigned int as_uint() const
+Use as<int>() instead
+
+    char as_char() const
+Use as<char>() instead
 
 ### Examples
 
