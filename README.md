@@ -32,15 +32,15 @@ To clean up the interface and avoid too much duplicated functionality, we've dep
 
     make_2d_array
     make_3d_array
-Use make_multi_array<2> and make_multi_array<3> instead
+Use `make_multi_array<2>` and `make_multi_array<3>` instead
 
     as_vector
-Use as<std::vector<int>> etc. instead
+Use `as<std::vector<int>>` etc. instead
 
     as_int
     as_uint
     as_char
-Use as<int>, as<unsigned int>, and as<char> instead
+Use `as<int>`, `as<unsigned int>`, and `as<char>` instead
 
 Release 0.90a
 -------------
