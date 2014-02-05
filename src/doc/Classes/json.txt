@@ -8,6 +8,10 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 ### Member types
 
+    [[name_value_pair]]
+
+`name_value_pair` stores a name and a json value
+
     null_type
 
     object
@@ -30,6 +34,12 @@ A random access iterator to `json`
 A random access iterator to `const json`
 
 ### Member constants
+
+    an_object
+Empty constant json object value
+
+    an_array
+Empty constant json array value
 
     null
 Constant json null value
@@ -322,7 +332,7 @@ Inserts json value into stream.
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
-Deprecated methods
+### Deprecated methods
 
     static json make_2d_array(size_t m, size_t n)
 Use make_multi_array<2>(m,n) instead
