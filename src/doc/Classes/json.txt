@@ -248,10 +248,6 @@ If value is string, returns value, otherwise returns result of `to_string`.
 If value is string, returns value, otherwise returns result of `to_string(format)`.
 
     template <class T>
-    std::vector<T> as_vector() const
-If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
-
-    template <class T>
     const T& custom_data() const
 If the value is custom, returns a reference to the custom value, otherwise throws  
 
@@ -345,6 +341,11 @@ Use make_multi_array<3>(m,n,k) instead
 
     static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
 Use make_multi_array<3>(m,n,k,val) instead
+
+    template <class T>
+    std::vector<T> as_vector() const
+If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
+Use as<std::vector<T>> instead.
 
     int as_int() const
 Use as<int>() instead

@@ -1579,6 +1579,379 @@ void escape_string(const std::basic_string<C>& s,
     }
 }
 
+template <typename C>
+class value_adapter<C,std::basic_string<C>>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_string();
+    }
+    std::basic_string<C> as(const basic_json<C>& val) const
+    {
+        return val.as_string();
+    }
+};
+
+template <typename C>
+class value_adapter<C,typename basic_json<C>::object>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_object();
+    }
+    typename basic_json<C>::object as(const basic_json<C>& val) const
+    {
+        return val;
+    }
+};
+
+template <typename C>
+class value_adapter<C,typename basic_json<C>::array>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_array();
+    }
+    typename basic_json<C>::array as(const basic_json<C>& val) const
+    {
+        return val;
+    }
+};
+
+template <typename C>
+class value_adapter<C,typename basic_json<C>::null_type>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_null();
+    }
+    typename basic_json<C>::null_type as(const basic_json<C>& val) const
+    {
+        JSONCONS_ASSERT(val.is_null());
+        return basic_json<C>::null_type();
+    }
+};
+
+template <typename C>
+class value_adapter<C,bool>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_bool();
+    }
+    bool as(const basic_json<C>& val) const
+    {
+        return val.as_bool();
+    }
+};
+
+template <typename C>
+class value_adapter<C,int>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    int as(const basic_json<C>& val) const
+    {
+        return val.as_int();
+    }
+};
+
+template <typename C>
+class value_adapter<C,unsigned int>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned int as(const basic_json<C>& val) const
+    {
+        return val.as_uint();
+    }
+};
+
+template <typename C>
+class value_adapter<C,short>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    short as(const basic_json<C>& val) const
+    {
+        return (short)val.as_int();
+    }
+};
+
+template <typename C>
+class value_adapter<C,unsigned short>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned short as(const basic_json<C>& val) const
+    {
+        return (unsigned short)val.as_uint();
+    }
+};
+
+template <typename C>
+class value_adapter<C,long>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    long as(const basic_json<C>& val) const
+    {
+        return val.as_long();
+    }
+};
+
+template <typename C>
+class value_adapter<C,unsigned long>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned long as(const basic_json<C>& val) const
+    {
+        return val.as_ulong();
+    }
+};
+
+template <typename C>
+class value_adapter<C,char>
+{
+public:
+    char as(const basic_json<C>& val) const
+    {
+        return val.as_char();
+    }
+};
+
+template <typename C>
+class value_adapter<C,double>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        return val.is_double();
+    }
+
+    double as(const basic_json<C>& val) const
+    {
+        return val.as_double();
+    }
+};
+
+template <typename C>
+class value_adapter<C,long long>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return true;
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    long long as(const basic_json<C>& val) const
+    {
+        return val.as_longlong();
+    }
+};
+
+template <typename C>
+class value_adapter<C,unsigned long long>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0;
+        }
+        else if (val.is_ulonglong())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned long long as(const basic_json<C>& val) const
+    {
+        return val.as_ulonglong();
+    }
+};
+
+template <typename C,typename T>
+class value_adapter<C,std::vector<T>>
+{
+public:
+    bool is(const basic_json<C>& val) const
+    {
+        bool result = val.is_array();
+        for (size_t i = 0; result && i < val.size(); ++i)
+        {
+            if (!val[i].is<T>())
+            {
+                result = false;
+            }
+        }
+        return result;
+    }
+    std::vector<T> as(const basic_json<C>& val) const
+    {
+        std::vector<T> v(val.size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = val[i].as<T>();
+        }
+        return v;
+    }
+};
+
+template <typename C>
+class basic_json<C>::null_type : public basic_json<C> 
+{
+private:
+    null_type()
+        : basic_json<C>(null_t)
+    {
+    }
+};
+
+template <typename C>
+class basic_json<C>::object : public basic_json<C>
+{
+public:
+    object(json_object<C>* impl)
+        : basic_json<C>(impl)
+    {
+    }
+//private:
+    object()
+        : basic_json<C>(object_t)
+    {
+    }
+};
+
+template <typename C>
+class basic_json<C>::array : public basic_json<C>
+{
+public:
+    array(size_t n)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n);
+    }
+    array(size_t n, const basic_json<C>& val)
+        : basic_json<C>(array_t)
+    {
+        value_.array_->resize(n,val);
+    }
+    array(json_array<C>* impl)
+        : basic_json<C>(impl)
+    {
+    }
+private:
+    array()
+        : basic_json<C>(array_t)
+    {
+    }
+};
+
 }
 
 #endif
