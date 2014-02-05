@@ -1884,7 +1884,7 @@ public:
         bool result = val.is_array();
         for (size_t i = 0; result && i < val.size(); ++i)
         {
-            if (!val[i].is<T>())
+            if (!val[i].template is<T>())
             {
                 result = false;
             }
@@ -1896,7 +1896,7 @@ public:
         std::vector<T> v(val.size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = val[i].as<T>();
+            v[i] = val[i].template as<T>();
         }
         return v;
     }
