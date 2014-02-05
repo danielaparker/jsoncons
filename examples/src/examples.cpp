@@ -16,51 +16,8 @@ using std::string;
 void array_examples();
 void custom_data_examples();
 
-template <typename C>
-class E;
-
-template <typename C>
-class A
-{
-public:
-	typedef E<C> B;
-
-	explicit A()
-	{
-	}
-
-	explicit A(const A& a)
-	{
-	}
-
-	explicit A(A&& a)
-	{
-	}
-
-	void f()
-	{
-		std::cout << "Hello world" << std::endl;
-	}
-};
-
-template <typename C>
-class E : public A<C>
-{
-public:
-	explicit E()
-	{
-	}
-	explicit E(size_t n)
-	{
-	}
-};
-
 void first_example_a()
 {
-	E<char> b;
-	A<char> a(b);
-	a.f();
-
     try
     {
         json books = json::parse_file("input/books.json");
