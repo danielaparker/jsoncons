@@ -13,10 +13,33 @@ Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=
 
 Master
 
-- Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
-- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value(), no impact unless using json object iterators
+This release should be largely backwards compatible with 0.90 and 0.83 with one exception: if you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, `first` becomes `name()` and `second` becomes `value`. So note this change:
+
+- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value()
+
+Other new features:
+
 - Changed implementation of is<T> and as<T>, the current implementation should be user extensible
+
 - make_multi_array makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces make_2d_array and make_3d_array, which are now deprecated.
+
+- Added support for is<std::vector<T>> and as<std::vector<T>>
+
+- Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
+
+To clean up the interface and avoid too much duplicated functionality, we've deprecated some json methods (but they still work)
+
+    make_2d_array
+    make_3d_array
+Use make_multi_array<2> and make_multi_array<3> instead
+
+    as_vector
+Use as<std::vector<int>> etc. instead
+
+    as_int
+    as_uint
+    as_char
+Use as<int>, as<unsigned int>, and as<char> instead
 
 Release 0.90a
 -------------
