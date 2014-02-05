@@ -14,15 +14,15 @@ Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=
 Master
 
 - Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
-- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value()
-- Changed implementation of is<T> and as<T>, the current implementation should be user extensible.
+- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value(), no impact unless using json object iterators
+- Changed implementation of is<T> and as<T>, the current implementation should be user extensible
 - Added a constructor way of creating a json array, with optional size and initial value
 
-    json arr(json::array());
+    json arr(json::an_array);
     json arr(json::array(10));
     json arr(json::array(10,10.0));
 
-- make_matrix takes template argument for dimension
+- make_multi_array makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces make_2d_array and make_3d_array, which are now deprecated.
 
 Release 0.90a
 -------------
