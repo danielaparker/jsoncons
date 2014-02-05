@@ -21,7 +21,8 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_array_constructor)
 {
-    json arr(json::array(10,10.0));
+    json arr(json::an_array);
+    arr.resize_array(10,10.0);
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 10);
     BOOST_CHECK_CLOSE(arr[0].as_double(), 10.0, 0.0000001);

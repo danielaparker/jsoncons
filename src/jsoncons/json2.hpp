@@ -1920,27 +1920,12 @@ public:
         : basic_json<C>(impl)
     {
     }
-//private:
-    object()
-        : basic_json<C>(object_t)
-    {
-    }
 };
 
 template <typename C>
 class basic_json<C>::array : public basic_json<C>
 {
 public:
-    array(size_t n)
-        : basic_json<C>(array_t)
-    {
-        value_.array_->resize(n);
-    }
-    array(size_t n, const basic_json<C>& val)
-        : basic_json<C>(array_t)
-    {
-        value_.array_->resize(n,val);
-    }
     array(json_array<C>* impl)
         : basic_json<C>(impl)
     {
