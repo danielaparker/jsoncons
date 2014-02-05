@@ -16,7 +16,7 @@ Master
 
 This release should be largely backwards compatible with 0.90 and 0.83 with one exception: if you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, `first` becomes `name()` and `second` becomes `value()`. So note this change:
 
-- Replaced std::pair<std::basic_string<C>,basic_json<C>> with name_value_pair, with accessors name() and value()
+- Replaced `std::pair<std::string,json>` with `name_value_pair` that has accessors `name()` and `value()`
 
 Other new features:
 
