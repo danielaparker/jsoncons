@@ -22,9 +22,9 @@ Other new features:
 
 - Changed implementation of is<T> and as<T>, the current implementation should be user extensible
 
-- make_multi_array makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces make_2d_array and make_3d_array, which are now deprecated.
+- `make_multi_array<N>` makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces `make_2d_array` and `make_3d_array`, which are now deprecated.
 
-- Added support for is<std::vector<T>> and as<std::vector<T>>
+- Added support for `is<std::vector<T>>` and `as<std::vector<T>>`
 
 - Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
 
