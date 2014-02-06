@@ -182,6 +182,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 `is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
 `is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
 `is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.
+`is<json::std::vector<T>>` returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
 
     bool is_null() const
 
