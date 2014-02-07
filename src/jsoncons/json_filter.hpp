@@ -15,18 +15,18 @@
 
 namespace jsoncons {
 
-template <class C>
-class basic_json_input_output_adapter : public basic_json_input_handler<C>
+template <class Char>
+class basic_json_input_output_adapter : public basic_json_input_handler<Char>
 {
 public:
-    static basic_null_json_output_handler<C> null_writer;
+    static basic_null_json_output_handler<Char> null_writer;
 
     basic_json_input_output_adapter()
         : writer_(null_writer)
     {
     }
 
-    basic_json_input_output_adapter(basic_json_output_handler<C>& handler)
+    basic_json_input_output_adapter(basic_json_output_handler<Char>& handler)
         : writer_(handler)
     {
     }
@@ -41,77 +41,77 @@ public:
         writer_.end_json();
     }
 
-    virtual void begin_object(const basic_parsing_context<C>& context)
+    virtual void begin_object(const basic_parsing_context<Char>& context)
     {
         writer_.begin_object();
     }
 
-    virtual void end_object(const basic_parsing_context<C>& context)
+    virtual void end_object(const basic_parsing_context<Char>& context)
     {
         writer_.end_object();
     }
 
-    virtual void begin_array(const basic_parsing_context<C>& context)
+    virtual void begin_array(const basic_parsing_context<Char>& context)
     {
         writer_.begin_array();
     }
 
-    virtual void end_array(const basic_parsing_context<C>& context)
+    virtual void end_array(const basic_parsing_context<Char>& context)
     {
         writer_.end_array();
     }
 
-    virtual void name(const std::basic_string<C>& name, const basic_parsing_context<C>& context)
+    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
         writer_.name(name);
     }
 
-    virtual void value(const std::basic_string<C>& value, const basic_parsing_context<C>& context)
+    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value(double value, const basic_parsing_context<C>& context)
+    virtual void value(double value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value(long long value, const basic_parsing_context<C>& context)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value(unsigned long long value, const basic_parsing_context<C>& context)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value(bool value, const basic_parsing_context<C>& context)
+    virtual void value(bool value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void null_value(const basic_parsing_context<C>& context)
+    virtual void null_value(const basic_parsing_context<Char>& context)
     {
         writer_.null_value();
     }
 private:
-    basic_json_output_handler<C>& writer_;
+    basic_json_output_handler<Char>& writer_;
 };
 
-template <class C>
-basic_null_json_output_handler<C> basic_json_input_output_adapter<C>::null_writer;
+template <class Char>
+basic_null_json_output_handler<Char> basic_json_input_output_adapter<Char>::null_writer;
 
-template <class C>
-class basic_json_filter : public basic_json_input_handler<C>
+template <class Char>
+class basic_json_filter : public basic_json_input_handler<Char>
 {
 public:
-    basic_json_filter(basic_json_input_handler<C>& parent)
+    basic_json_filter(basic_json_input_handler<Char>& parent)
         : parent_(parent)
     {
     }
 
-    basic_json_filter(basic_json_output_handler<C>& output_handler)
+    basic_json_filter(basic_json_output_handler<Char>& output_handler)
         : input_output_adapter_(output_handler), parent_(input_output_adapter_)
     {
     }
@@ -126,68 +126,68 @@ public:
         parent_.end_json();
     }
 
-    virtual void begin_object(const basic_parsing_context<C>& context)
+    virtual void begin_object(const basic_parsing_context<Char>& context)
     {
         parent_.begin_object(context);
     }
 
-    virtual void end_object(const basic_parsing_context<C>& context)
+    virtual void end_object(const basic_parsing_context<Char>& context)
     {
         parent_.end_object(context);
     }
 
-    virtual void begin_array(const basic_parsing_context<C>& context)
+    virtual void begin_array(const basic_parsing_context<Char>& context)
     {
         parent_.begin_array(context);
     }
 
-    virtual void end_array(const basic_parsing_context<C>& context)
+    virtual void end_array(const basic_parsing_context<Char>& context)
     {
         parent_.end_array(context);
     }
 
-    virtual void name(const std::basic_string<C>& name, const basic_parsing_context<C>& context)
+    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
         parent_.name(name,context);
     }
 
-    virtual void value(const std::basic_string<C>& value, const basic_parsing_context<C>& context)
+    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value(double value, const basic_parsing_context<C>& context)
+    virtual void value(double value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value(long long value, const basic_parsing_context<C>& context)
+    virtual void value(long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value(unsigned long long value, const basic_parsing_context<C>& context)
+    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value(bool value, const basic_parsing_context<C>& context)
+    virtual void value(bool value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void null_value(const basic_parsing_context<C>& context)
+    virtual void null_value(const basic_parsing_context<Char>& context)
     {
         parent_.null_value(context);
     }
 
-    basic_json_input_handler<C>& parent() 
+    basic_json_input_handler<Char>& parent() 
     {
         return parent_;
     }
 private:
-    basic_json_input_output_adapter<C> input_output_adapter_;
-    basic_json_input_handler<C>& parent_;
+    basic_json_input_output_adapter<Char> input_output_adapter_;
+    basic_json_input_handler<Char>& parent_;
 };
 
 typedef basic_json_filter<char> json_filter;
