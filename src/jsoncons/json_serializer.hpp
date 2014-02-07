@@ -23,8 +23,8 @@
 
 namespace jsoncons {
 
-template<class C>
-class basic_json_serializer : public basic_json_output_handler<C>
+template<class Char>
+class basic_json_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
     {
@@ -42,22 +42,22 @@ class basic_json_serializer : public basic_json_output_handler<C>
         bool content_indented_;
     };
 public:
-    basic_json_serializer(std::basic_ostream<C>& os)
+    basic_json_serializer(std::basic_ostream<Char>& os)
        : os_(os), indent_(0), indenting_(false)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<C>& os, bool indenting)
+    basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
        : os_(os), indent_(0), indenting_(indenting)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<C>& os, const basic_output_format<C>& format)
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
        : os_(os), format_(format), indent_(0),
          indenting_(false) // Deprecated behavior
     {
     }
-    basic_json_serializer(std::basic_ostream<C>& os, const basic_output_format<C>& format, bool indenting)
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
        : os_(os), format_(format), indent_(0), indenting_(indenting)
     {
     }
@@ -126,21 +126,21 @@ public:
         end_value();
     }
 
-    virtual void name(const std::basic_string<C>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
         os_.put('\"');
-        escape_string<C>(name, format_, os_);
+        escape_string<Char>(name, format_, os_);
         os_.put('\"');
         os_.put(':');
     }
 
-    virtual void value(const std::basic_string<C>& value)
+    virtual void value(const std::basic_string<Char>& value)
     {
         begin_value();
 
         os_.put('\"');
-        escape_string<C>(value, format_, os_);
+        escape_string<Char>(value, format_, os_);
         os_.put('\"');
 
         end_value();
@@ -164,7 +164,7 @@ public:
         }
         else if (format_.floatfield() != 0)
         {
-            std::basic_ostringstream<C> os;
+            std::basic_ostringstream<Char> os;
             os.imbue(std::locale::classic());
             os.setf(format_.floatfield(), std::ios::floatfield);
             os << std::showpoint << std::setprecision(format_.precision()) << value;
@@ -172,7 +172,7 @@ public:
         }
         else 
         {
-            std::basic_string<C> buf = double_to_string<C>(value,format_.precision());
+            std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
             os_ << buf;
         }
         
@@ -201,7 +201,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? json_char_traits<C>::true_literal() :  json_char_traits<C>::false_literal());
+        os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
 
         end_value();
     }
@@ -210,7 +210,7 @@ public:
     {
         begin_value();
 
-        os_ << json_char_traits<C>::null_literal();
+        os_ << json_char_traits<Char>::null_literal();
 
         end_value();
     }
@@ -282,8 +282,8 @@ private:
         }
     }
 
-    std::basic_ostream<C>& os_;
-    basic_output_format<C> format_;
+    std::basic_ostream<Char>& os_;
+    basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
     std::streamsize original_precision_;

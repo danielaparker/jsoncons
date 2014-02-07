@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-template <class C>
+template <class Char>
 class basic_output_format
 {
 public:
@@ -31,9 +31,9 @@ public:
           precision_(16),
           floatfield_(std::ios_base::fmtflags(0)),
           replace_nan_(true),replace_pos_inf_(true),replace_neg_inf_(true), 
-          pos_inf_replacement_(json_char_traits<C>::null_literal()),
-          neg_inf_replacement_(json_char_traits<C>::null_literal()),
-          nan_replacement_(json_char_traits<C>::null_literal()),
+          pos_inf_replacement_(json_char_traits<Char>::null_literal()),
+          neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+          nan_replacement_(json_char_traits<Char>::null_literal()),
           escape_all_non_ascii_(false),
           escape_solidus_(false)
     {
@@ -67,17 +67,17 @@ public:
 
     bool replace_neg_inf() const {return replace_neg_inf_;}
 
-    std::basic_string<C> nan_replacement() const 
+    std::basic_string<Char> nan_replacement() const 
     {
         return nan_replacement_;
     }
 
-    std::basic_string<C> pos_inf_replacement() const 
+    std::basic_string<Char> pos_inf_replacement() const 
     {
         return pos_inf_replacement_;
     }
 
-    std::basic_string<C> neg_inf_replacement() const 
+    std::basic_string<Char> neg_inf_replacement() const 
     {
         return neg_inf_replacement_;
     }
@@ -120,17 +120,17 @@ public:
         replace_neg_inf_ = replace;
     }
 
-    void nan_replacement(const std::basic_string<C>& replacement)
+    void nan_replacement(const std::basic_string<Char>& replacement)
     {
         nan_replacement_ = replacement;
     }
 
-    void pos_inf_replacement(const std::basic_string<C>& replacement)
+    void pos_inf_replacement(const std::basic_string<Char>& replacement)
     {
         pos_inf_replacement_ = replacement;
     }
 
-    void neg_inf_replacement(const std::basic_string<C>& replacement)
+    void neg_inf_replacement(const std::basic_string<Char>& replacement)
     {
         neg_inf_replacement_ = replacement;
     } 
@@ -157,9 +157,9 @@ private:
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
-    std::basic_string<C> nan_replacement_;
-    std::basic_string<C> pos_inf_replacement_;
-    std::basic_string<C> neg_inf_replacement_;
+    std::basic_string<Char> nan_replacement_;
+    std::basic_string<Char> pos_inf_replacement_;
+    std::basic_string<Char> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
 };

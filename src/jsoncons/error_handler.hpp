@@ -71,19 +71,19 @@ private:
     unsigned long column_number_;
 };
 
-template<class C>
+template<class Char>
 class basic_parsing_context
 {
 public:
     virtual unsigned long line_number() const = 0;
     virtual unsigned long column_number() const = 0;
     virtual size_t minimum_structure_capacity() const = 0;
-    virtual const std::basic_string<C>& buffer() const = 0;
+    virtual const std::basic_string<Char>& buffer() const = 0;
 };
 
 typedef basic_parsing_context<char> parsing_context;
 
-template <class C>
+template <class Char>
 class basic_error_handler
 {
 public:
@@ -93,36 +93,36 @@ public:
 
     virtual void warning(const std::string& error_code, 
                          const std::string& message, 
-                         const basic_parsing_context<C>& context) throw (json_parse_exception) = 0;
+                         const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 
     virtual void error(const std::string& error_code, 
                                const std::string& message, 
-                               const basic_parsing_context<C>& context) throw (json_parse_exception) = 0;
+                               const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
     
     virtual void fatal_error(const std::string& error_code, 
                              const std::string& message, 
-                             const basic_parsing_context<C>& context) throw (json_parse_exception) = 0;
+                             const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 };
 
-template <class C>
-class basic_default_error_handler : public basic_error_handler<C>
+template <class Char>
+class basic_default_error_handler : public basic_error_handler<Char>
 {
 public:
     virtual void warning(const std::string& error_code, 
                          const std::string& message, 
-                         const basic_parsing_context<C>& context) throw (json_parse_exception)
+                         const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
         // Do nothing
     }
     virtual void error(const std::string& error_code, 
                        const std::string& message, 
-                       const basic_parsing_context<C>& context) throw (json_parse_exception)
+                       const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
     virtual void fatal_error(const std::string& error_code, 
                              const std::string& message, 
-                             const basic_parsing_context<C>& context) throw (json_parse_exception) 
+                             const basic_parsing_context<Char>& context) throw (json_parse_exception) 
     {
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }

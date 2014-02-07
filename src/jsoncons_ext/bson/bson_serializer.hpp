@@ -22,8 +22,8 @@
 
 namespace jsoncons_ext { namespace bson {
 
-template <class C>
-class basic_bson_serializer : public jsoncons::basic_json_output_handler<C>
+template <class Char>
+class basic_bson_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item
     {
@@ -40,7 +40,7 @@ class basic_bson_serializer : public jsoncons::basic_json_output_handler<C>
         size_t count_;
     };
 public:
-    basic_bson_serializer(std::basic_ostream<C>& os)
+    basic_bson_serializer(std::basic_ostream<Char>& os)
         : os_(os), size_(4)
     {
     }
@@ -89,21 +89,21 @@ public:
         end_value();
     }
 
-    virtual void name(const std::basic_string<C>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
         //os_.put('\"'); 
-        //escape_string<C>(name,format_,os_); 
+        //escape_string<Char>(name,format_,os_); 
         //os_.put('\"'); 
         //os_.put(':');
     }
 
-    virtual void value(const std::basic_string<C>& value)
+    virtual void value(const std::basic_string<Char>& value)
     {
         begin_value();
 
         //os_.put('\"');
-        //escape_string<C>(value,format_,os_);
+        //escape_string<Char>(value,format_,os_);
         //os_.put('\"');
 
         end_value();
@@ -155,7 +155,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? jsoncons::json_char_traits<C>::true_literal() :  jsoncons::json_char_traits<C>::false_literal());
+        os_ << (value ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
 
         end_value();
     }
@@ -164,7 +164,7 @@ public:
     {
         begin_value();
 
-        os_ << jsoncons::json_char_traits<C>::null_literal();
+        os_ << jsoncons::json_char_traits<Char>::null_literal();
 
         end_value();
     }
@@ -209,7 +209,7 @@ protected:
         }
     }
 
-    std::basic_ostream<C>& os_;
+    std::basic_ostream<Char>& os_;
     std::vector<stack_item> stack_;
     size_t size_;
     std::vector<unsigned char> document_;

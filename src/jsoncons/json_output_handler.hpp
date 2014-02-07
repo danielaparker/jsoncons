@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-template <class C>
+template <class Char>
 class basic_json_output_handler
 {
 public:
@@ -21,9 +21,9 @@ public:
 
     virtual void end_json() = 0;
 
-    virtual void name(const std::basic_string<C>& name) = 0;
+    virtual void name(const std::basic_string<Char>& name) = 0;
 
-    virtual void value(const std::basic_string<C>& value) = 0;
+    virtual void value(const std::basic_string<Char>& value) = 0;
 
     virtual void value(double value) = 0;
 
@@ -44,8 +44,8 @@ public:
     virtual void end_array() = 0;
 };
 
-template <class C>
-class basic_null_json_output_handler : public basic_json_output_handler<C>
+template <class Char>
+class basic_null_json_output_handler : public basic_json_output_handler<Char>
 {
 public:
 
@@ -57,11 +57,11 @@ public:
     {
     }
 
-    virtual void name(const std::basic_string<C>& name) 
+    virtual void name(const std::basic_string<Char>& name) 
     {
     }
 
-    virtual void value(const std::basic_string<C>& value) 
+    virtual void value(const std::basic_string<Char>& value) 
     {
     }
 

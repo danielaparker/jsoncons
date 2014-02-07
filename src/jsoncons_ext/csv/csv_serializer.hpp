@@ -23,7 +23,7 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template <class C>
+template <class Char>
 struct csv_char_traits
 {
 };
@@ -64,16 +64,16 @@ struct csv_char_traits<wchar_t>
     static const std::wstring nonnumeric_literal() {return L"nonumeric";};
 };
 
-template <class C>
-void escape_string(const std::basic_string<C>& s, 
-                   C quote_char, C quote_escape_char,
-                   std::basic_ostream<C>& os)
+template <class Char>
+void escape_string(const std::basic_string<Char>& s, 
+                   Char quote_char, Char quote_escape_char,
+                   std::basic_ostream<Char>& os)
 {
-    typename std::basic_string<C>::const_iterator begin = s.begin();
-    typename std::basic_string<C>::const_iterator end = s.end();
-    for (typename std::basic_string<C>::const_iterator it = begin; it != end; ++it)
+    typename std::basic_string<Char>::const_iterator begin = s.begin();
+    typename std::basic_string<Char>::const_iterator end = s.end();
+    for (typename std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
     {
-        C c = *it;
+        Char c = *it;
         if (c == quote_char)
         {
             os << quote_escape_char << quote_char;
@@ -85,8 +85,8 @@ void escape_string(const std::basic_string<C>& s,
     }
 }
 
-template<class C>
-class basic_csv_serializer : public jsoncons::basic_json_output_handler<C>
+template<class Char>
+class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item
     {
@@ -105,13 +105,13 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<C>
     };
     enum quote_style_enum{quote_all,quote_minimal,quote_none,quote_nonnumeric};
 public:
-    basic_csv_serializer(std::basic_ostream<C>& os)
+    basic_csv_serializer(std::basic_ostream<Char>& os)
        : os_(os), line_delimiter_("\n"), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"'), quote_style_(quote_minimal)
     {
     }
 
-    basic_csv_serializer(std::basic_ostream<C>& os,
-                         const jsoncons::basic_json<C>& params)
+    basic_csv_serializer(std::basic_ostream<Char>& os,
+                         const jsoncons::basic_json<Char>& params)
        : os_(os), field_delimiter_(','), quote_char_('\"'), quote_escape_char_('\"')
     {
 
@@ -119,20 +119,20 @@ public:
         field_delimiter_ = params.get("field_delimiter",",").as_char();
         quote_char_ = params.get("quote_char","\"").as_char();
         quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
-        std::basic_string<C> quote_style = params.get("quote_style","minimal").as_string();
-        if (quote_style == csv_char_traits<C>::all_literal())
+        std::basic_string<Char> quote_style = params.get("quote_style","minimal").as_string();
+        if (quote_style == csv_char_traits<Char>::all_literal())
         {
             quote_style_ = quote_all;
         }
-        else if (quote_style == csv_char_traits<C>::minimal_literal())
+        else if (quote_style == csv_char_traits<Char>::minimal_literal())
         {
             quote_style_ = quote_minimal;
         }
-        else if (quote_style == csv_char_traits<C>::none_literal())
+        else if (quote_style == csv_char_traits<Char>::none_literal())
         {
             quote_style_ = quote_none;
         }
-        else if (quote_style == csv_char_traits<C>::nonnumeric_literal())
+        else if (quote_style == csv_char_traits<Char>::nonnumeric_literal())
         {
             quote_style_ = quote_nonnumeric;
         }
@@ -190,7 +190,7 @@ public:
         end_value();
     }
 
-    virtual void name(const std::basic_string<C>& name)
+    virtual void name(const std::basic_string<Char>& name)
     {
         if (stack_.size() == 2)
         {
@@ -202,12 +202,12 @@ public:
                 }
                 bool quote = false;
                 if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-                    (quote_style_ == quote_minimal && csv_char_traits<C>::contains_char(name,field_delimiter_)))
+                    (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(name,field_delimiter_)))
                 {
                     quote = true;
                     os_.put(quote_char_);
                 }
-                jsoncons_ext::csv::escape_string<C>(name, quote_char_, quote_escape_char_, os_);
+                jsoncons_ext::csv::escape_string<Char>(name, quote_char_, quote_escape_char_, os_);
                 if (quote)
                 {
                     os_.put(quote_char_);
@@ -216,7 +216,7 @@ public:
             }
             else
             {
-                typename std::map<std::basic_string<C>,size_t>::iterator it = header_.find(name);
+                typename std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
                 if (it == header_.end())
                 {
                     stack_.back().skip_ = true;
@@ -236,7 +236,7 @@ public:
         }
     }
 
-    virtual void value(const std::basic_string<C>& val)
+    virtual void value(const std::basic_string<Char>& val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -327,18 +327,18 @@ public:
     }
 private:
 
-    virtual void value(const std::basic_string<C>& val, std::basic_ostream<C>& os)
+    virtual void value(const std::basic_string<Char>& val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
         bool quote = false;
         if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-            (quote_style_ == quote_minimal && csv_char_traits<C>::contains_char(val,field_delimiter_)))
+            (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(val,field_delimiter_)))
         {
             quote = true;
             os.put(quote_char_);
         }
-        jsoncons_ext::csv::escape_string<C>(val, quote_char_, quote_escape_char_, os);
+        jsoncons_ext::csv::escape_string<Char>(val, quote_char_, quote_escape_char_, os);
         if (quote)
         {
             os.put(quote_char_);
@@ -347,7 +347,7 @@ private:
         end_value();
     }
 
-    virtual void value(double val, std::basic_ostream<C>& os)
+    virtual void value(double val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -365,7 +365,7 @@ private:
         }
         else if (format_.floatfield() != 0)
         {
-            std::basic_ostringstream<C> ss;
+            std::basic_ostringstream<Char> ss;
             ss.imbue(std::locale::classic());
             ss.setf(format_.floatfield(), std::ios::floatfield);
             ss << std::showpoint << std::setprecision(format_.precision()) << val;
@@ -373,7 +373,7 @@ private:
         }
         else 
         {
-            std::basic_string<C> buf = jsoncons::double_to_string<C>(val,format_.precision());
+            std::basic_string<Char> buf = jsoncons::double_to_string<Char>(val,format_.precision());
             os << buf;
         }
 
@@ -381,7 +381,7 @@ private:
         
     }
 
-    virtual void value(long long val, std::basic_ostream<C>& os)
+    virtual void value(long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -390,7 +390,7 @@ private:
         end_value();
     }
 
-    virtual void value(unsigned long long val, std::basic_ostream<C>& os)
+    virtual void value(unsigned long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -399,26 +399,26 @@ private:
         end_value();
     }
 
-    virtual void value(bool val, std::basic_ostream<C>& os)
+    virtual void value(bool val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
-        os << (val ? jsoncons::json_char_traits<C>::true_literal() :  jsoncons::json_char_traits<C>::false_literal());
+        os << (val ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
 
         end_value();
     }
 
-    virtual void null_value(std::basic_ostream<C>& os)
+    virtual void null_value(std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
-        os << jsoncons::json_char_traits<C>::null_literal();
+        os << jsoncons::json_char_traits<Char>::null_literal();
 
         end_value();
         
     }
 
-    void begin_value(std::basic_ostream<C>& os)
+    void begin_value(std::basic_ostream<Char>& os)
     {
         if (!stack_.empty())
         {
@@ -437,18 +437,18 @@ private:
         }
     }
 
-    std::basic_ostream<C>& os_;
-    jsoncons::basic_output_format<C> format_;
+    std::basic_ostream<Char>& os_;
+    jsoncons::basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-    C quote_char_;
-    C quote_escape_char_;
-    C field_delimiter_;
+    Char quote_char_;
+    Char quote_escape_char_;
+    Char field_delimiter_;
     quote_style_enum quote_style_;
-    std::basic_ostringstream<C> header_os_;
-    std::basic_string<C> line_delimiter_;
-    std::map<std::basic_string<C>,size_t> header_;
+    std::basic_ostringstream<Char> header_os_;
+    std::basic_string<Char> line_delimiter_;
+    std::map<std::basic_string<Char>,size_t> header_;
 };
 
 typedef basic_csv_serializer<char> csv_serializer;
