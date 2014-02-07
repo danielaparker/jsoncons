@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
     json countries = std::move(handler.root());
 
     std::cout << pretty_print(countries) << std::endl;
-} 
+}
 
 BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 {
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
     csv_serializer serializer(std::cout);
 
     countries.to_stream(serializer);
-} 
+}
 
 BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 {

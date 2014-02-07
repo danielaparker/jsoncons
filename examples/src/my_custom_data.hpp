@@ -13,7 +13,7 @@
 
 namespace jsoncons {
 
-template<> 
+template<>
 inline void serialize(json_output_handler& os, const std::vector<double>& v)
 {
     os.begin_array();

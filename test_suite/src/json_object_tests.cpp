@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_empty_object_assignment)
     BOOST_CHECK(b.is_array());
     BOOST_CHECK(b.is<json::array>());
 
-    b = a;  
+    b = a;
     BOOST_CHECK(b.size() == 0);
     BOOST_CHECK(b.is_object());
     BOOST_CHECK(b.is<json::object>());
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(test_const_member_read)
 
     const json b(a);
 
-    int val1 = b["field1"].as_int(); 
+    int val1 = b["field1"].as_int();
     BOOST_CHECK(val1 == 10);
     BOOST_REQUIRE_THROW(b["field2"], json_exception);
 }

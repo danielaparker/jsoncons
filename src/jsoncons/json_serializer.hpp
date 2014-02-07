@@ -170,12 +170,12 @@ public:
             os << std::showpoint << std::setprecision(format_.precision()) << value;
             os_ << os.str();
         }
-        else 
+        else
         {
             std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
             os_ << buf;
         }
-        
+
         end_value();
     }
 

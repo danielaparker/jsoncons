@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(test_construction_from_file)
 {
     json val = json::parse_file("input/members.json");
 
-	std::cout << pretty_print(val) << std::endl;
+    std::cout << pretty_print(val) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_construction_in_code)
@@ -219,9 +219,9 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     std::cout << obj << std::endl;
 
     matrix<double>& B = obj["mydata"].custom_data<matrix<double>>();
-	
+
     std::cout << B << std::endl;
-       
+
     for (size_t i = 0; i < B.size1(); ++i)
     {
         for (size_t j = 0; j < B.size2(); ++j)

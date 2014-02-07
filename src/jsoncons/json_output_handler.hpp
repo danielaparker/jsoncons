@@ -16,6 +16,7 @@ template <class Char>
 class basic_json_output_handler
 {
 public:
+    virtual ~basic_json_output_handler() {}
 
     virtual void begin_json() = 0;
 
@@ -57,47 +58,47 @@ public:
     {
     }
 
-    virtual void name(const std::basic_string<Char>& name) 
+    virtual void name(const std::basic_string<Char>& name)
     {
     }
 
-    virtual void value(const std::basic_string<Char>& value) 
+    virtual void value(const std::basic_string<Char>& value)
     {
     }
 
-    virtual void value(double value) 
+    virtual void value(double value)
     {
     }
 
-    virtual void value(long long value) 
+    virtual void value(long long value)
     {
     }
 
-    virtual void value(unsigned long long value) 
+    virtual void value(unsigned long long value)
     {
     }
 
-    virtual void value(bool value) 
+    virtual void value(bool value)
     {
     }
 
-    virtual void null_value() 
+    virtual void null_value()
     {
     }
 
-    virtual void begin_object() 
+    virtual void begin_object()
     {
     }
 
-    virtual void end_object() 
+    virtual void end_object()
     {
     }
 
-    virtual void begin_array() 
+    virtual void begin_array()
     {
     }
 
-    virtual void end_array() 
+    virtual void end_array()
     {
     }
 };
