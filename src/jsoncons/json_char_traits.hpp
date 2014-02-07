@@ -78,13 +78,13 @@ struct json_char_traits<char>
         {
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 18) & 0x1fffff) + ((static_cast<unsigned int>(0xff & u) << 12) & 0x3ffff);                
+            cp = ((cp << 18) & 0x1fffff) + ((static_cast<unsigned int>(0xff & u) << 12) & 0x3ffff);
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
             cp += (static_cast<unsigned int>(0xff & u) << 6) & 0xfff;
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
-            cp += (u) & 0x3f; 
+            cp += (u) & 0x3f;
         }
         else
         {

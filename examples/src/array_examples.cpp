@@ -20,7 +20,7 @@ void accessing_a_json_value_as_a_vector()
         {
             std::cout << ",";
         }
-        std::cout << v[i]; 
+        std::cout << v[i];
     }
     std::cout << std::endl;
 }
@@ -61,7 +61,7 @@ void add_element_to_array()
 {
     json cities = json::make_array();  // an empty array
     std::cout << cities << std::endl;  // output is "[]"
-    cities.add("Toronto");  
+    cities.add("Toronto");
     cities.add("Vancouver");
     cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
 
@@ -70,11 +70,11 @@ void add_element_to_array()
 
 void reserve_array_capacity()
 {
-    json cities = json::make_array(); 
+    json cities = json::make_array();
     cities.reserve(10);  // storage is allocated
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
-    cities.add("Toronto");  
+    cities.add("Toronto");
     cities.add("Vancouver");
     cities.add(0,"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
@@ -102,7 +102,7 @@ void make_1_dimensional_array_1()
 }
 
 void make_1_dimensional_array_2()
-{ 
+{
     std::cout << "1 dimensional array 2" <<std::endl;
     json a = json::make_multi_array<1>(10,0);
     a[1] = 1;
@@ -116,7 +116,7 @@ void make_2_dimensional_array()
     json a = json::make_multi_array<2>(3,4,0);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
-    a[0][2] = "25-d-MS"; 
+    a[0][2] = "25-d-MS";
     a[0][3] = "25-d-RR";
     a[1][0] = "1Y";
     a[1][1] = 0.20;

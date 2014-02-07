@@ -92,9 +92,9 @@ public:
     virtual void name(const std::basic_string<Char>& name)
     {
         begin_element();
-        //os_.put('\"'); 
-        //escape_string<Char>(name,format_,os_); 
-        //os_.put('\"'); 
+        //os_.put('\"');
+        //escape_string<Char>(name,format_,os_);
+        //os_.put('\"');
         //os_.put(':');
     }
 

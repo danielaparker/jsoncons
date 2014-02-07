@@ -7,7 +7,7 @@
 
 #ifndef JSONCONS_JSON2_HPP
 #define JSONCONS_JSON2_HPP
- 
+
 #include <string>
 #include <vector>
 #include <exception>
@@ -22,6 +22,11 @@
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json_deserializer.hpp"
 #include "jsoncons/json_serializer.hpp"
+
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
+
 
 namespace jsoncons {
 
@@ -68,7 +73,7 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         break;
     default:
         // throw
-		break;
+        break;
     }
 }
 
@@ -185,6 +190,9 @@ basic_json<Char>::basic_json(value_type t)
     case object_t:
         value_.object_ = new json_object<Char>();
         break;
+
+    case custom_t:
+        JSONCONS_ASSERT(false);
     }
 }
 
@@ -208,7 +216,7 @@ basic_json<Char>::~basic_json()
         break;
     case object_t:
         delete value_.object_;
-		break;
+        break;
     case custom_t:
         delete value_.userdata_;
         break;
@@ -500,7 +508,7 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::at(size_t i) 
+basic_json<Char>& basic_json<Char>::at(size_t i)
 {
     switch (type_)
     {
@@ -532,7 +540,7 @@ const basic_json<Char>& basic_json<Char>::at(size_t i) const
 }
 
 template <class Char>
-basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name) 
+basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name)
 {
     switch (type_)
     {
@@ -571,7 +579,7 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     case empty_object_t:
         return basic_json<Char>::null;
     case object_t:
-		{
+        {
         const_object_iterator it = value_.object_->find(name);
         return it != end_members() ? it->value() : basic_json<Char>::null;
 		}
@@ -590,7 +598,7 @@ typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basi
     case empty_object_t:
         return const_val_proxy(default_val);
     case object_t:
-		{
+        {
         const_object_iterator it = value_.object_->find(name);
         return it != end_members() ? const_val_proxy(it->value()) : const_val_proxy(default_val);
 		}
@@ -773,9 +781,9 @@ void basic_json<Char>::add_custom_data(const T& value)
     switch (type_)
     {
     case array_t:
-		{
+        {
         add(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
-		}
+        }
         break;
     default:
         {
@@ -886,7 +894,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         handler.end_object();
         break;
     case object_t:
-		{
+        {
         handler.begin_object();
         json_object<Char>* o = value_.object_;
         for (const_object_iterator it = o->begin(); it != o->end(); ++it)
@@ -895,10 +903,10 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
             it->value().to_stream(handler);
         }
         handler.end_object();
-		}
+        }
         break;
     case array_t:
-		{
+        {
         handler.begin_array();
         json_array<Char>* o = value_.array_;
         for (const_array_iterator it = o->begin(); it != o->end(); ++it)
@@ -906,7 +914,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
             it->to_stream(handler);
         }
         handler.end_array();
-		}
+        }
         break;
     case custom_t:
         value_.userdata_->to_stream(handler);
@@ -921,7 +929,7 @@ template <class Char>
 void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
 {
     basic_json_serializer<Char> serializer(os);
-    to_stream(serializer); 
+    to_stream(serializer);
 }
 
 template <class Char>
@@ -947,25 +955,25 @@ const basic_json<Char> basic_json<Char>::an_array(new json_array<Char>());
 template <class Char>
 const basic_json<Char> basic_json<Char>::null = basic_json<Char>(basic_json<Char>::null_t);
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array()
 {
     return basic_json<Char>(new json_array<Char>());
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array(size_t n)
 {
     return basic_json<Char>(new json_array<Char>(n));
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& val)
 {
     return basic_json<Char>(new json_array<Char>(n,val));
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -976,7 +984,7 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic_json<Char>& val)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -987,7 +995,7 @@ basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -998,7 +1006,7 @@ basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val)
 {
     basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
@@ -1009,7 +1017,7 @@ basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, c
     return a;
 }
 
-template <class Char> 
+template <class Char>
 basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
 {
     basic_json_deserializer<Char> handler;
@@ -1040,7 +1048,7 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
- 
+
     basic_json_deserializer<Char> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
@@ -1099,7 +1107,7 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members()
     switch (type_)
     {
     case empty_object_t:
-		return an_object.end_members();
+        return an_object.end_members();
     case object_t:
         return value_.object_->end();
     default:
@@ -1192,7 +1200,7 @@ bool basic_json<Char>::is_empty() const
 }
 
 template <class Char>
-void basic_json<Char>::reserve(size_t n) 
+void basic_json<Char>::reserve(size_t n)
 {
     switch (type_)
     {
@@ -1209,7 +1217,7 @@ void basic_json<Char>::reserve(size_t n)
 }
 
 template <class Char>
-void basic_json<Char>::resize_array(size_t n) 
+void basic_json<Char>::resize_array(size_t n)
 {
     switch (type_)
     {
@@ -1220,7 +1228,7 @@ void basic_json<Char>::resize_array(size_t n)
 }
 
 template <class Char>
-void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val) 
+void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val)
 {
     switch (type_)
     {
@@ -1395,15 +1403,15 @@ const T& basic_json<Char>::custom_data() const
 
 template <class Char>
 template <class T>
-T& basic_json<Char>::custom_data() 
+T& basic_json<Char>::custom_data()
 {
     switch (type_)
     {
     case custom_t:
-		{
+        {
         custom_data_wrapper<Char,T>* p = static_cast<custom_data_wrapper<Char,T>*>(value_.userdata_);
         return p->data1_;
-		}
+        }
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1476,7 +1484,7 @@ public:
                        const basic_output_format<Char>& format)
         : o_(o), format_(format)
     {
-	;
+    ;
     }
 
     void to_stream(std::basic_ostream<Char>& os) const
@@ -1500,7 +1508,7 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_p
 
 typedef basic_pretty_print<char> pretty_print;
 
-inline 
+inline
 char to_hex_character(unsigned char c)
 {
     JSONCONS_ASSERT( c <= 0xF );
@@ -1515,7 +1523,7 @@ bool is_non_ascii_character(unsigned int c)
 }
 
 template <class Char>
-void escape_string(const std::basic_string<Char>& s, 
+void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
 {
@@ -1561,9 +1569,9 @@ void escape_string(const std::basic_string<Char>& s,
                 os << '\\';
                 os << 'u';
                 os << to_hex_character(cp >>12 & 0x000F );
-                os << to_hex_character(cp >>8  & 0x000F ); 
-                os << to_hex_character(cp >>4  & 0x000F ); 
-                os << to_hex_character(cp     & 0x000F ); 
+                os << to_hex_character(cp >>8  & 0x000F );
+                os << to_hex_character(cp >>4  & 0x000F );
+                os << to_hex_character(cp     & 0x000F );
             }
             else if (format.escape_solidus() && c == '/')
             {
@@ -1939,4 +1947,5 @@ private:
 
 }
 
+#pragma GCC diagnostic pop
 #endif

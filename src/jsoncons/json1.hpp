@@ -1149,50 +1149,50 @@ public:
 private:
 	basic_json(value_type t);
 
-    template<typename Char, size_t size>
+    template<typename Char2, size_t size>
     class build_array
     {};
-    template<typename Char>
-    class build_array<Char,1>
+    template<typename Char2>
+    class build_array<Char2,1>
     {
     public:
-        basic_json<Char> operator() ()
+        basic_json<Char2> operator() ()
         {
-            return basic_json<Char>::make_array();
+            return basic_json<Char2>::make_array();
         }
-        basic_json<Char> operator() (size_t n)
+        basic_json<Char2> operator() (size_t n)
         {
-            return basic_json<Char>::make_array(n);
+            return basic_json<Char2>::make_array(n);
         }
-        basic_json<Char> operator() (size_t n, const basic_json<Char>& val)
+        basic_json<Char2> operator() (size_t n, const basic_json<Char2>& val)
         {
-            return basic_json<Char>::make_array(n, val);
+            return basic_json<Char2>::make_array(n, val);
         }
     };
-    template<typename Char>
-    class build_array<Char,2>
+    template<typename Char2>
+    class build_array<Char2,2>
     {
     public:
-        basic_json<Char> operator() (size_t m, size_t n)
+        basic_json<Char2> operator() (size_t m, size_t n)
         {
-            return basic_json<Char>::make_2d_array(m, n);
+            return basic_json<Char2>::make_2d_array(m, n);
         }
-        basic_json<Char> operator() (size_t m, size_t n, const basic_json<Char>& val)
+        basic_json<Char2> operator() (size_t m, size_t n, const basic_json<Char2>& val)
         {
-            return basic_json<Char>::make_2d_array(m, n, val);
+            return basic_json<Char2>::make_2d_array(m, n, val);
         }
     };
-    template<typename Char>
-    class build_array<Char,3>
+    template<typename Char2>
+    class build_array<Char2,3>
     {
     public:
-        basic_json<Char> operator() (size_t m, size_t n, size_t k)
+        basic_json<Char2> operator() (size_t m, size_t n, size_t k)
         {
-            return basic_json<Char>::make_3d_array (m, n, k);
+            return basic_json<Char2>::make_3d_array (m, n, k);
         }
-        basic_json<Char> operator() (size_t m, size_t n, size_t k, const basic_json<Char>& val)
+        basic_json<Char2> operator() (size_t m, size_t n, size_t k, const basic_json<Char2>& val)
         {
-            return basic_json<Char>::make_3d_array (m, n, k, val);
+            return basic_json<Char2>::make_3d_array (m, n, k, val);
         }
     };
 
