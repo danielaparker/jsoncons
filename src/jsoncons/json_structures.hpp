@@ -254,7 +254,7 @@ public:
 
     const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(const_iterator it, typename basic_json<Char>::name_value_pair member);
+    void insert(iterator it, typename basic_json<Char>::name_value_pair member);
 
     void sort_members();
 
@@ -297,7 +297,7 @@ void json_object<Char>::sort_members()
 }
 
 template <class Char>
-void json_object<Char>::insert(const_iterator it, typename basic_json<Char>::name_value_pair member)
+void json_object<Char>::insert(iterator it, typename basic_json<Char>::name_value_pair member)
 {
     members_.insert(it,member);
 }
