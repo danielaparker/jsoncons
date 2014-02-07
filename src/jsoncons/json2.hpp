@@ -24,8 +24,10 @@
 #include "jsoncons/json_serializer.hpp"
 
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
+#endif
 
 
 namespace jsoncons {
@@ -1947,5 +1949,8 @@ private:
 
 }
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif
+
 #endif
