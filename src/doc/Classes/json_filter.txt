@@ -64,7 +64,7 @@ line and column information is provided in the [[parsing_context]] parameter.
 Receive notification of a boolean value. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 
-    virtual void null_value(const parsing_context& context)
+    virtual void null(const parsing_context& context)
 Receive notification of a null value. Contextual information including
 line and column information is provided in the [[parsing_context]] parameter. 
 

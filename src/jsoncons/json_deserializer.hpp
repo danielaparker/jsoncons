@@ -216,7 +216,7 @@ public:
         }
     }
 
-    virtual void null_value(const basic_parsing_context<Char>& context)
+    virtual void null(const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {

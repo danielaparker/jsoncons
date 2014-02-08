@@ -331,17 +331,17 @@ public:
         }
     }
 
-    virtual void null_value()
+    virtual void null()
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0)
             {
-                null_value(header_os_);
+                null(header_os_);
             }
             else
             {
-                null_value(os_);
+                null(os_);
             }
         }
     }
@@ -428,7 +428,7 @@ private:
         end_value();
     }
 
-    virtual void null_value(std::basic_ostream<Char>& os)
+    virtual void null(std::basic_ostream<Char>& os)
     {
         begin_value(os);
 

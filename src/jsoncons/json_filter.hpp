@@ -91,9 +91,9 @@ public:
         writer_.value(value);
     }
 
-    virtual void null_value(const basic_parsing_context<Char>& context)
+    virtual void null(const basic_parsing_context<Char>& context)
     {
-        writer_.null_value();
+        writer_.null();
     }
 private:
     basic_json_output_handler<Char>& writer_;
@@ -176,9 +176,9 @@ public:
         parent_.value(value,context);
     }
 
-    virtual void null_value(const basic_parsing_context<Char>& context)
+    virtual void null(const basic_parsing_context<Char>& context)
     {
-        parent_.null_value(context);
+        parent_.null(context);
     }
 
     basic_json_input_handler<Char>& parent()

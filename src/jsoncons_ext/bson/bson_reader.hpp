@@ -421,7 +421,7 @@ void basic_bson_reader<Char>::read()
                     {
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                     }
-                    handler_.null_value(*this);
+                    handler_.null(*this);
                     stack_.back().comma_ = false;
                     stack_.back().received_name_ = false;
                     ++stack_.back().count_;
@@ -638,7 +638,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                     catch (...)
                     {
                         err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                        handler_.null_value(*this);
+                        handler_.null(*this);
                     }
                 }
                 else if (has_neg)
@@ -658,7 +658,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                            handler_.null_value(*this);
+                            handler_.null(*this);
                         }
                     }
                 }
@@ -679,7 +679,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                            handler_.null_value(*this);
+                            handler_.null(*this);
                         }
                     }
                 }

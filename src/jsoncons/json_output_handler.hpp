@@ -34,7 +34,7 @@ public:
 
     virtual void value(bool value) = 0;
 
-    virtual void null_value() = 0;
+    virtual void null() = 0;
 
     virtual void begin_object() = 0;
 
@@ -82,7 +82,7 @@ public:
     {
     }
 
-    virtual void null_value()
+    virtual void null()
     {
     }
 
