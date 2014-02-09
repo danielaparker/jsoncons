@@ -421,7 +421,7 @@ void basic_bson_reader<Char>::read()
                     {
                         err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
                     }
-                    handler_.null_value(*this);
+                    handler_.null(*this);
                     stack_.back().comma_ = false;
                     stack_.back().received_name_ = false;
                     ++stack_.back().count_;
@@ -638,14 +638,14 @@ void basic_bson_reader<Char>::parse_number(Char c)
                     catch (...)
                     {
                         err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                        handler_.null_value(*this);
+                        handler_.null(*this);
                     }
                 }
                 else if (has_neg)
                 {
                     try
                     {
-                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXPANSION()));
+                        long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
                         handler_.value(-d,*this);
                     }
                     catch (const std::exception&)
@@ -658,7 +658,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                            handler_.null_value(*this);
+                            handler_.null(*this);
                         }
                     }
                 }
@@ -666,7 +666,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                 {
                     try
                     {
-                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXPANSION());
+                        unsigned long long d = string_to_ulonglong(&string_buffer_[0],string_buffer_.length(),std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
                         handler_.value(d,*this);
                     }
                     catch (const std::exception&)
@@ -679,7 +679,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                            handler_.null_value(*this);
+                            handler_.null(*this);
                         }
                     }
                 }

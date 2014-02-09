@@ -8,11 +8,24 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 ### Member types
 
+    [[name_value_pair]]
+
+`name_value_pair` stores a name and a json value
+
+    null_type
+
+    object
+
+    array
+
+    custom_type
+Type tags that can be used with `is<T>` and `as<T>`
+
     object_iterator
-A random access iterator to `std::pair<std::string,json>`
+A random access iterator to `json::name_value_pair`
 
     const_object_iterator
-A random access iterator to `const std::pair<std::string,json>`
+A random access iterator to `const json::name_value_pair`
 
     array_iterator
 A random access iterator to `json`
@@ -51,21 +64,12 @@ Makes an array of n elements. Each element is an empty json object.
     static json make_array(size_t n, const json& val)
 Makes an array of n elements. Each element is a copy of `val`.
 
-    static json make_2d_array(size_t m, size_t n)
-Makes an m dimensional array of n dimensional arrays of elements. 
-Each element is an empty json object.
+    template <typename N>
+    static json make_multi_array(size1 ... sizeN)
 
-    static json make_2d_array(size_t m, size_t n, const json& val)
-Makes an m dimensional array of n dimensional arrays of elements. 
-Each element is a copy of the json value `val`.
-
-    static json make_3d_array(size_t m, size_t n, size_t k)
-Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
-Each element is an empty json object.
-
-    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
-Makes an m dimensional array of n dimensional arrays of k dimensional arrays of elements. 
-Each element is a copy of the json value `val`.
+    template <typename N>
+    static json make_multi_array(size1 ... sizeN, const json& val)
+Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors
 
@@ -164,13 +168,27 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    bool is_null() const
-
     bool has_member(const std::string& name) const
+Returns `true` if a json object has a member named `name`, otherwise `false`.    
+
+    template <typename T>
+    bool is() const
+Returns `true` if json value is of type `T`, `false` otherwise.  
+`is<short>`, `is<unsigned short>`, `is<int>`, `is<unsigned int>`, `is<long>`, `is<unsigned long>`, `is<long long>`, `is<unsigned long long>` all return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
+`is<float>` and `is<double>` returns true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
+`is<std::string>` returns `true` if the json value is of string type, `false` otherwise.  
+`is<bool>` returns `true` if the json value is of boolean type, `false` otherwise.  
+`is<json::null_type>` returns `true` if the json value is null, `false` otherwise.  
+`is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
+`is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
+`is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.
+`is<json::std::vector<T>>` returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
+
+    bool is_null() const
 
     bool is_string() const
 
-    bool is_number() const
+    bool is_numeric() const
 
     bool is_longlong() const
 
@@ -210,14 +228,14 @@ If `name` matches the name of a member in the json object, returns a const refer
     const json get(const std::string& name, const json& default_val) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
 
+    template <typename T>
+    T as() const
+Attempts to coerce the json value to the template type
+
     bool as_bool() const
 
     double as_double() const
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
-
-    int as_int() const
-
-    unsigned int as_uint() const
 
     long long as_longlong() const
 If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.
@@ -229,13 +247,6 @@ If value is string, returns value, otherwise returns result of `to_string`.
 
     std::string as_string(const output_format& format) const
 If value is string, returns value, otherwise returns result of `to_string(format)`.
-
-    char as_char() const
-If value is string, returns first character of string or null char if zero length, otherwise evaluates `to_string` and returns first char or null char.
-
-    template <class T>
-    std::vector<T> as_vector() const
-If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
 
     template <class T>
     const T& custom_data() const
@@ -318,6 +329,34 @@ Inserts json value into stream.
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
+### Deprecated methods
+
+    static json make_2d_array(size_t m, size_t n)
+Use make_multi_array<2>(m,n) instead
+
+    static json make_2d_array(size_t m, size_t n, const json& val)
+Use make_multi_array<2>(m,n,val) instead
+
+    static json make_3d_array(size_t m, size_t n, size_t k)
+Use make_multi_array<3>(m,n,k) instead
+
+    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
+Use make_multi_array<3>(m,n,k,val) instead
+
+    template <class T>
+    std::vector<T> as_vector() const
+If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
+Use as<std::vector<T>> instead.
+
+    int as_int() const
+Use as<int>() instead
+
+    unsigned int as_uint() const
+Use as<int>() instead
+
+    char as_char() const
+Use as<char>() instead
+
 ### Examples
 
 ### Accessors and defaults
@@ -392,7 +431,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << it->first << "=" << it->second.as_string() << std::endl;
+        std::cout << it->name << "=" << it->second.as_string() << std::endl;
     }
 
 The output is

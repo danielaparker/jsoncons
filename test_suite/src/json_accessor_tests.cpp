@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(test_as)
     int ushort_val = obj["field2"].as<unsigned short>();
     BOOST_CHECK_EQUAL(ushort_val,static_cast<unsigned short>(1));
     char char_val = obj["field2"].as<char>();
-    BOOST_CHECK_EQUAL(char_val,char(1));
+    BOOST_CHECK_EQUAL(int(char_val),1);
 
     json parent;
     parent["child"] = obj;
@@ -44,6 +44,8 @@ BOOST_AUTO_TEST_CASE(test_as)
     BOOST_CHECK_EQUAL(int_val,1);
     short_val = parent["child"]["field2"].as<short>();
     BOOST_CHECK_EQUAL(short_val,1);
+
+    json x = parent["child"].as<json::object>();
 }
 
 BOOST_AUTO_TEST_CASE(test_is)
@@ -105,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 {
     json obj;
     BOOST_CHECK(obj.is_object());
-    BOOST_CHECK(obj.is<json::object_type>());
+    BOOST_CHECK(obj.is<json::object>());
     std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
     // tests for proxy is_type methods
@@ -113,7 +115,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     std::cout << "type=" << obj.type() << std::endl;
 
     BOOST_CHECK(obj.is_object());
-    BOOST_CHECK(obj.is<json::object_type>());
+    BOOST_CHECK(obj.is<json::object>());
 
     BOOST_CHECK(obj["string"].is_string());
     BOOST_CHECK(obj["string"].is<std::string>());
@@ -157,13 +159,13 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     obj["null1"] = json::null;
     BOOST_CHECK(obj["null1"].is_null());
 
-    obj["object"] = json::an_object;
+    obj["object"] = json();
     BOOST_CHECK(obj["object"].is_object());
-    BOOST_CHECK(obj["object"].is<json::object_type>());
+    BOOST_CHECK(obj["object"].is<json::object>());
 
-    obj["array"] = json::an_array;
+    obj["array"] = json::make_array();
     BOOST_CHECK(obj["array"].is_array());
-    BOOST_CHECK(obj["array"].is<json::array_type>());
+    BOOST_CHECK(obj["array"].is<json::array>());
 
     matrix<double> A;
     obj.set_custom_data("custom",A);
@@ -181,7 +183,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_double)
     std::string s("[0,1.1,2,3.1]");
     json val = json::parse_string(s);
 
-    std::vector<double> v = val.as_vector<double>();
+    std::vector<double> v = val.as<std::vector<double>>(); 
     BOOST_CHECK(v.size() == 4);
     BOOST_CHECK_CLOSE(v[0],0.0,0.0000000001);
     BOOST_CHECK_CLOSE(v[1],1.1,0.0000000001);
@@ -194,7 +196,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_string)
     std::string s("[\"Hello\",\"World\"]");
     json val = json::parse_string(s);
 
-    std::vector<string> v = val.as_vector<std::string>();
+    std::vector<string> v = val.as<std::vector<std::string>>(); 
     BOOST_CHECK(v.size() == 2);
     BOOST_CHECK(v[0] == "Hello");
     BOOST_CHECK(v[1] == "World");
@@ -205,7 +207,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_char)
     std::string s("[\"H\",\"W\"]");
     json val = json::parse_string(s);
 
-    std::vector<char> v = val.as_vector<char>();
+    std::vector<char> v = val.as<std::vector<char>>(); 
     BOOST_CHECK(v.size() == 2);
     BOOST_CHECK(v[0] == 'H');
     BOOST_CHECK(v[1] == 'W');
@@ -216,7 +218,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_bool)
     std::string s("[true,false]");
     json val = json::parse_string(s);
 
-    std::vector<bool> v = val.as_vector<bool>();
+    std::vector<bool> v = val.as<std::vector<bool>>(); 
     BOOST_CHECK(v.size() == 2);
     BOOST_CHECK(v[0]);
     BOOST_CHECK(!v[1]);
@@ -227,42 +229,42 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int)
     std::string s("[0,1,2,3]");
     json val = json::parse_string(s);
 
-    std::vector<int> v = val.as_vector<int>();
+    std::vector<int> v = val.as<std::vector<int>>(); 
     BOOST_CHECK(v.size() == 4);
     BOOST_CHECK(v[0]==0);
     BOOST_CHECK(v[1]==1);
     BOOST_CHECK(v[2]==2);
     BOOST_CHECK(v[3]==3);
 
-    std::vector<unsigned int> v1 = val.as_vector<unsigned int>();
+    std::vector<unsigned int> v1 = val.as<std::vector<unsigned int>>(); 
     BOOST_CHECK(v1.size() == 4);
     BOOST_CHECK(v1[0]==0);
     BOOST_CHECK(v1[1]==1);
     BOOST_CHECK(v1[2]==2);
     BOOST_CHECK(v1[3]==3);
 
-    std::vector<long> v2 = val.as_vector<long>();
+    std::vector<long> v2 = val.as<std::vector<long>>(); 
     BOOST_CHECK(v2.size() == 4);
     BOOST_CHECK(v2[0]==0);
     BOOST_CHECK(v2[1]==1);
     BOOST_CHECK(v2[2]==2);
     BOOST_CHECK(v2[3]==3);
 
-    std::vector<unsigned long> v3 = val.as_vector<unsigned long>();
+    std::vector<unsigned long> v3 = val.as<std::vector<unsigned long>>(); 
     BOOST_CHECK(v3.size() == 4);
     BOOST_CHECK(v3[0]==0);
     BOOST_CHECK(v3[1]==1);
     BOOST_CHECK(v3[2]==2);
     BOOST_CHECK(v3[3]==3);
 
-    std::vector<long long> v4 = val.as_vector<long long>();
+    std::vector<long long> v4 = val.as<std::vector<long long>>(); 
     BOOST_CHECK(v4.size() == 4);
     BOOST_CHECK(v4[0]==0);
     BOOST_CHECK(v4[1]==1);
     BOOST_CHECK(v4[2]==2);
     BOOST_CHECK(v4[3]==3);
 
-    std::vector<unsigned long long> v5 = val.as_vector<unsigned long long>();
+    std::vector<unsigned long long> v5 = val.as<std::vector<unsigned long long>>(); 
     BOOST_CHECK(v5.size() == 4);
     BOOST_CHECK(v5[0]==0);
     BOOST_CHECK(v5[1]==1);
@@ -276,7 +278,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
     json val = json::parse_string(s);
     json root;
     root["val"] = val;
-    std::vector<int> v = root["val"].as_vector<int>();
+    std::vector<int> v = root["val"].as<std::vector<int>>();
     BOOST_CHECK(v.size() == 4);
     BOOST_CHECK(v[0]==0);
     BOOST_CHECK(v[1]==1);

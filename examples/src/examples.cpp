@@ -167,6 +167,30 @@ void more_examples()
     x[5] = 3;
 }
 
+void introspection_example()
+{
+    json val = json::parse_file("input/books.json");
+    std::cout << std::boolalpha;
+    std::cout << "Is this an object? " << val.is<json::object>() << ", or an array? " << val.is<json::array>() << std::endl;
+
+    if (val.is<json::array>())
+    {
+        for (size_t i = 0; i < val.size(); ++i)
+        {
+            json& elem = val[i];
+            std::cout << "Is element " << i << " an object? " << elem.is<json::object>() << std::endl;
+            if (elem.is<json::object>())
+            {
+                for (auto it = elem.begin_members(); it != elem.end_members(); ++it)
+                {
+                    std::cout << "Is member " << it->name() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << std::endl;
+
+                }
+            }
+        }
+    }
+}
+
 int main()
 {
     first_example_a();
@@ -183,6 +207,8 @@ int main()
 
     more_examples();
     mulitple_json_objects();
+
+	introspection_example();
 
     return 0;
 }
