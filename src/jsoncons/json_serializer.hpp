@@ -143,9 +143,10 @@ public:
 
         end_value();
     }
-private:
 
-    virtual void string_value(const std::basic_string<Char>& value)
+protected:
+
+    virtual void value_string(const std::basic_string<Char>& value)
     {
         begin_value();
 
@@ -156,7 +157,7 @@ private:
         end_value();
     }
 
-    virtual void double_value(double value)
+    virtual void value_double(double value)
     {
         begin_value();
 
@@ -189,7 +190,7 @@ private:
         end_value();
     }
 
-    virtual void longlong_value(long long value)
+    virtual void value_longlong(long long value)
     {
         begin_value();
 
@@ -198,7 +199,7 @@ private:
         end_value();
     }
 
-    virtual void ulonglong_value(unsigned long long value)
+    virtual void value_ulonglong(unsigned long long value)
     {
         begin_value();
 
@@ -207,7 +208,7 @@ private:
         end_value();
     }
 
-    virtual void bool_value(bool value)
+    virtual void value_bool(bool value)
     {
         begin_value();
 

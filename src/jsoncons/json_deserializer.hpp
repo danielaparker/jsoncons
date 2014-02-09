@@ -156,66 +156,6 @@ public:
         stack_.back().name_ = name;
     }
 
-    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else 
-        {
-            stack_.back().array_->push_back(std::move(basic_json<Char>(value)));
-        }
-    }
-
-    virtual void value(double value, const basic_parsing_context<Char>& context)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char>(value));
-        }
-    }
-
-    virtual void value(long long value, const basic_parsing_context<Char>& context)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char>(value));
-        }
-    }
-
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char>(value));
-        }
-    }
-
-    virtual void value(bool value, const basic_parsing_context<Char>& context)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char>(value));
-        }
-    }
-
     virtual void null_value(const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
@@ -231,6 +171,66 @@ public:
     basic_json<Char>& root()
     {
         return root_;
+    }
+protected:
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
+        } 
+        else 
+        {
+            stack_.back().array_->push_back(std::move(basic_json<Char>(value)));
+        }
+    }
+
+    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char>(value));
+        }
+    }
+
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char>(value));
+        }
+    }
+
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char>(value));
+        }
+    }
+
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char>(value));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char>(value));
+        }
     }
 
 private:
