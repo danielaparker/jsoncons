@@ -66,34 +66,35 @@ public:
         writer_.name(name);
     }
 
-    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
-    {
-        writer_.value(value);
-    }
-
-    virtual void value(double value, const basic_parsing_context<Char>& context)
-    {
-        writer_.value(value);
-    }
-
-    virtual void value(long long value, const basic_parsing_context<Char>& context)
-    {
-        writer_.value(value);
-    }
-
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
-    {
-        writer_.value(value);
-    }
-
-    virtual void value(bool value, const basic_parsing_context<Char>& context)
-    {
-        writer_.value(value);
-    }
-
     virtual void null_value(const basic_parsing_context<Char>& context)
     {
         writer_.null_value();
+    }
+
+protected:
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    {
+        writer_.value(value);
+    }
+
+    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    {
+        writer_.value(value);
+    }
+
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    {
+        writer_.value(value);
+    }
+
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    {
+        writer_.value(value);
+    }
+
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    {
+        writer_.value(value);
     }
 private:
     basic_json_output_handler<Char>& writer_;
@@ -151,31 +152,6 @@ public:
         parent_.name(name,context);
     }
 
-    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
-    {
-        parent_.value(value,context);
-    }
-
-    virtual void value(double value, const basic_parsing_context<Char>& context)
-    {
-        parent_.value(value,context);
-    }
-
-    virtual void value(long long value, const basic_parsing_context<Char>& context)
-    {
-        parent_.value(value,context);
-    }
-
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
-    {
-        parent_.value(value,context);
-    }
-
-    virtual void value(bool value, const basic_parsing_context<Char>& context)
-    {
-        parent_.value(value,context);
-    }
-
     virtual void null_value(const basic_parsing_context<Char>& context)
     {
         parent_.null_value(context);
@@ -184,6 +160,32 @@ public:
     basic_json_input_handler<Char>& parent()
     {
         return parent_;
+    }
+
+protected:
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    {
+        parent_.value(value,context);
+    }
+
+    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    {
+        parent_.value(value,context);
+    }
+
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    {
+        parent_.value(value,context);
+    }
+
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    {
+        parent_.value(value,context);
+    }
+
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    {
+        parent_.value(value,context);
     }
 private:
     basic_json_input_output_adapter<Char> input_output_adapter_;

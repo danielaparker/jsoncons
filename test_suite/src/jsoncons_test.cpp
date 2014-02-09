@@ -487,7 +487,7 @@ public:
         }
     }
 
-    virtual void value(const std::string& value, const parsing_context& context)
+    virtual void value_string(const std::string& value, const parsing_context& context)
     {
         if (name_ == "name")
         {

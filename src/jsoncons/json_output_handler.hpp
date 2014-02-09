@@ -21,47 +21,47 @@ public:
     // value interface
     void value(const std::basic_string<Char>& value) 
     {
-        string_value(value);
+        value_string(value);
     }
 
     void value(double value)
     {
-        double_value(value);
+        value_double(value);
     }
 
     void value(long long value) 
     {
-        longlong_value(value);
+        value_longlong(value);
     }
 
     void value(unsigned long long value)
     {
-        ulonglong_value(value);
+        value_ulonglong(value);
     }
 
     void value(int value) 
     {
-        longlong_value((long long)value);
+        value_longlong((long long)value);
     }
 
     void value(unsigned int value)
     {
-        ulonglong_value((unsigned long long)value);
+        value_ulonglong((unsigned long long)value);
     }
 
     void value(long value) 
     {
-        longlong_value((long long)value);
+        value_longlong((long long)value);
     }
 
     void value(unsigned long value)
     {
-        ulonglong_value((unsigned long long)value);
+        value_ulonglong((unsigned long long)value);
     }
 
     void value(bool value)
     {
-        bool_value(value);
+        value_bool(value);
     }
 
     virtual void null_value() = 0;
@@ -82,17 +82,17 @@ public:
 
     virtual void end_array() = 0;
 
-private:
+protected:
 
-    virtual void string_value(const std::basic_string<Char>& value) = 0;
+    virtual void value_string(const std::basic_string<Char>& value) = 0;
 
-    virtual void double_value(double value) = 0;
+    virtual void value_double(double value) = 0;
 
-    virtual void longlong_value(long long value) = 0;
+    virtual void value_longlong(long long value) = 0;
 
-    virtual void ulonglong_value(unsigned long long value) = 0;
+    virtual void value_ulonglong(unsigned long long value) = 0;
 
-    virtual void bool_value(bool value) = 0;
+    virtual void value_bool(bool value) = 0;
 };
 
 template <class Char>
@@ -131,25 +131,26 @@ public:
     virtual void null_value()
     {
     }
-private:
 
-    virtual void string_value(const std::basic_string<Char>& value)
+protected:
+
+    virtual void value_string(const std::basic_string<Char>& value)
     {
     }
 
-    virtual void double_value(double value)
+    virtual void value_double(double value)
     {
     }
 
-    virtual void longlong_value(long long value)
+    virtual void value_longlong(long long value)
     {
     }
 
-    virtual void ulonglong_value(unsigned long long value)
+    virtual void value_ulonglong(unsigned long long value)
     {
     }
 
-    virtual void bool_value(bool value)
+    virtual void value_bool(bool value)
     {
     }
 

@@ -270,83 +270,84 @@ public:
             }
         }
     }
+protected:
+
+    virtual void value_string(const std::basic_string<Char>& val)
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
+        }
+    }
+
+    virtual void value_double(double val)
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
+        }
+    }
+
+    virtual void value_longlong(long long val)
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
+        }
+    }
+
+    virtual void value_ulonglong(unsigned long long val)
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
+        }
+    }
+
+    virtual void value_bool(bool val)
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                value(val,header_os_);
+            }
+            else
+            {
+                value(val,os_);
+            }
+        }
+    }
+
 private:
-
-    virtual void string_value(const std::basic_string<Char>& val)
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                value(val,header_os_);
-            }
-            else
-            {
-                value(val,os_);
-            }
-        }
-    }
-
-    virtual void double_value(double val)
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                value(val,header_os_);
-            }
-            else
-            {
-                value(val,os_);
-            }
-        }
-    }
-
-    virtual void longlong_value(long long val)
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                value(val,header_os_);
-            }
-            else
-            {
-                value(val,os_);
-            }
-        }
-    }
-
-    virtual void ulonglong_value(unsigned long long val)
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                value(val,header_os_);
-            }
-            else
-            {
-                value(val,os_);
-            }
-        }
-    }
-
-    virtual void bool_value(bool val)
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                value(val,header_os_);
-            }
-            else
-            {
-                value(val,os_);
-            }
-        }
-    }
-
     virtual void value(const std::basic_string<Char>& val, std::basic_ostream<Char>& os)
     {
         begin_value(os);

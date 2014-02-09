@@ -23,6 +23,31 @@ public:
     virtual ~basic_json_input_handler() {}
     virtual void begin_json() = 0;
 
+    void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    {
+        value_string(value, context);
+    }
+
+    void value(double value, const basic_parsing_context<Char>& context)
+    {
+        value_double(value, context);
+    }
+
+    void value(long long value, const basic_parsing_context<Char>& context) 
+    {
+        value_longlong(value,context);
+    }
+
+    void value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    {
+        value_ulonglong(value,context);
+    }
+
+    void value(bool value, const basic_parsing_context<Char>& context) 
+    {
+        value_bool(value,context);
+    }
+
     virtual void end_json() = 0;
 
     virtual void begin_object(const basic_parsing_context<Char>& context) = 0;
@@ -35,17 +60,18 @@ public:
 
     virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
-
-    virtual void value(double value, const basic_parsing_context<Char>& context) = 0;
-
-    virtual void value(long long value, const basic_parsing_context<Char>& context) = 0;
-
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
-
-    virtual void value(bool value, const basic_parsing_context<Char>& context) = 0;
-
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
+
+protected:
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
+
+    virtual void value_double(double value, const basic_parsing_context<Char>& context) = 0;
+
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context) = 0;
+
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
 template <class Char>
@@ -80,27 +106,27 @@ public:
     {
     }
 
-    virtual void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
-    {
-    }
-
-    virtual void value(double value, const basic_parsing_context<Char>& context)
-    {
-    }
-
-    virtual void value(long long value, const basic_parsing_context<Char>& context)
-    {
-    }
-
-    virtual void value(unsigned long long value, const basic_parsing_context<Char>& context)
-    {
-    }
-
-    virtual void value(bool value, const basic_parsing_context<Char>& context)
-    {
-    }
-
     virtual void null_value(const basic_parsing_context<Char>& context)
+    {
+    }
+protected:
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    {
+    }
+
+    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    {
+    }
+
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    {
+    }
+
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    {
+    }
+
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
     {
     }
 };

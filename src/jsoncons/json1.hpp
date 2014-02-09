@@ -1211,13 +1211,13 @@ private:
 	value_type type_;
     union
     {
-        double double_value_;
-        long long longlong_value_;
-        unsigned long long ulonglong_value_;
+        double value_double_;
+        long long value_longlong_;
+        unsigned long long value_ulonglong_;
         bool bool_value_;
         json_object<Char>* object_;
         json_array<Char>* array_;
-        std::basic_string<Char>* string_value_;
+        std::basic_string<Char>* value_string_;
         basic_custom_data<Char>* userdata_;
     } value_;
 };
