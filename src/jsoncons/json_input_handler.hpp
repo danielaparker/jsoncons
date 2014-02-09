@@ -28,6 +28,11 @@ public:
         value_string(value, context);
     }
 
+    void value(float value, const basic_parsing_context<Char>& context)
+    {
+        value_double((double)value, context);
+    }
+
     void value(double value, const basic_parsing_context<Char>& context)
     {
         value_double(value, context);
@@ -41,6 +46,26 @@ public:
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
         value_ulonglong(value,context);
+    }
+
+    void value(long value, const basic_parsing_context<Char>& context) 
+    {
+        value_longlong((long)value,context);
+    }
+
+    void value(unsigned long value, const basic_parsing_context<Char>& context) 
+    {
+        value_ulonglong((unsigned long)value,context);
+    }
+
+    void value(int value, const basic_parsing_context<Char>& context) 
+    {
+        value_longlong((int)value,context);
+    }
+
+    void value(unsigned int value, const basic_parsing_context<Char>& context) 
+    {
+        value_ulonglong((unsigned int)value,context);
     }
 
     void value(bool value, const basic_parsing_context<Char>& context) 

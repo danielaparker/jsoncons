@@ -11,23 +11,26 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
     virtual void value(const std::string& value)
 Send notification of a `string` value
 
+    virtual void value(float value)
+Send notification of a float number
+
     virtual void value(double value)
 Send notification of a double number
 
     virtual void value(int value)
-Send notification of a signed int number
+Send notification of an int number
 
     virtual void value(unsigned int value)
 Send notification of an unsigned int number
 
     virtual void value(long value)
-Send notification of a signed long number
+Send notification of a long number
 
     virtual void value(unsigned long value)
 Send notification of an unsigned long number
 
     virtual void value(long long value)
-Send notification of a signed long long number
+Send notification of a long long number
 
     virtual void value(unsigned long long value)
 Send notification of an unsigned long long number

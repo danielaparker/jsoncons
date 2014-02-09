@@ -274,6 +274,27 @@ basic_json<Char>& basic_json<Char>::operator=(const std::basic_string<Char>& rhs
 }
 
 template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(Char rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = string_t;
+        value_.value_string_ = new std::basic_string<Char>();
+        value_.value_string_->push_back(rhs);
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
 basic_json<Char>& basic_json<Char>::operator=(int rhs)
 {
     switch (type_)
