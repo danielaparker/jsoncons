@@ -44,6 +44,6 @@ Receive notification of a non-negative integer
     virtual void value(bool value)
 Receive notification of a boolean value
 
-    virtual void null()
+    virtual void value(nullptr_t)
 Receive notification of `null`
 

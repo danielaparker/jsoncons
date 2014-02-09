@@ -331,7 +331,7 @@ public:
         }
     }
 
-    virtual void null()
+    virtual void value(nullptr_t)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {

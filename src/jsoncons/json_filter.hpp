@@ -93,7 +93,7 @@ public:
 
     virtual void null(const basic_parsing_context<Char>& context)
     {
-        writer_.null();
+        writer_.value(nullptr);
     }
 private:
     basic_json_output_handler<Char>& writer_;
