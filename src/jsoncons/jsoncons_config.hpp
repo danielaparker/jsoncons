@@ -111,7 +111,11 @@ inline bool is_nan(double x) { return std::isnan( x ); }
 inline bool is_pos_inf(double x) {return std::isinf(x) && x > 0;}
 inline bool is_neg_inf(double x) {return  std::isinf(x) && x > 0;}
 
+#if __cplusplus >= 201103L
+#define c99_snprintf snprintf
+#else
 #define c99_snprintf std::snprintf
+#endif
 
 #endif
 
