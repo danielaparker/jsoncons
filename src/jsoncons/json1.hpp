@@ -57,7 +57,7 @@ public:
 
     virtual void to_stream(basic_json_output_handler<Char>& os) const
     {
-        jsoncons::serialize(os,data1_);
+        serialize(os,data1_);
     }
 
     T data1_;
