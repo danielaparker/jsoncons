@@ -18,7 +18,7 @@ This release should be largely backwards compatible with 0.90 and 0.83 with two 
 
 1. If you have used object iterators, you will need to replace uses of `std::pair` with `name_value_pair`, in particular, `first` becomes `name()` and `second` becomes `value()`. 
 
-2. If you have subclassed json_input_handler, json_output_handler, or json_filter, and have implemented `value(const std::string& ...`,  `value(double ...`, etc., you will need to modify the names to  `value_string(const std::string& ...`,  `value_double(double ...` (no changes if you are feeding existing implementations.)
+2. If you have subclassed `json_input_handler`, `json_output_handler`, or `json_filter`, and have implemented `value(const std::string& ...`,  `value(double ...`, etc., you will need to modify the names to  `value_string(const std::string& ...`,  `value_double(double ...` (no changes if you are feeding existing implementations.)
 
 The changes are
 
@@ -28,7 +28,7 @@ The changes are
 
 Other new features:
 
-- Changed implementation of is<T> and as<T>, the current implementation should be user extensible
+- Changed implementation of `is<T>` and `as<T>`, the current implementation should be user extensible
 
 - `make_multi_array<N>` makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces `make_2d_array` and `make_3d_array`, which are now deprecated.
 
