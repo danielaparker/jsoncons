@@ -18,25 +18,20 @@ class basic_json_output_handler
 public:
     virtual ~basic_json_output_handler() {}
 
-    // value interface
+    // Overloaded methods
     void value(const std::basic_string<Char>& value) 
     {
         value_string(value);
     }
 
+    void value(float value)
+    {
+        value_double((double)value);
+    }
+
     void value(double value)
     {
         value_double(value);
-    }
-
-    void value(long long value) 
-    {
-        value_longlong(value);
-    }
-
-    void value(unsigned long long value)
-    {
-        value_ulonglong(value);
     }
 
     void value(int value) 
@@ -57,6 +52,16 @@ public:
     void value(unsigned long value)
     {
         value_ulonglong((unsigned long long)value);
+    }
+
+    void value(long long value) 
+    {
+        value_longlong(value);
+    }
+
+    void value(unsigned long long value)
+    {
+        value_ulonglong(value);
     }
 
     void value(bool value)

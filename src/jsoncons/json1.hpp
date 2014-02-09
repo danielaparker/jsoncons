@@ -931,6 +931,8 @@ public:
 
     basic_json& operator=(const std::basic_string<Char>& rhs);
 
+    basic_json& operator=(Char rhs);
+
     basic_json& operator=(bool rhs);
 
     basic_json& operator=(int rhs);
