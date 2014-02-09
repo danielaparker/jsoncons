@@ -11,12 +11,20 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-Master
-------
+0.91 Candidate
+--------------
 
-This release should be largely backwards compatible with 0.90 and 0.83 with one exception: if you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, `first` becomes `name()` and `second` becomes `value()`. So note this change:
+This release should be largely backwards compatible with 0.90 and 0.83 with two exceptions: 
+
+1. If you have used object iterators, you will need to replace uses of `std::pair` with `name_value_pair`, in particular, `first` becomes `name()` and `second` becomes `value()`. 
+
+2. If you have subclassed json_input_handler, json_output_handler, or json_filter, and have implemented `value(const std::string& ...`,  `value(double ...`, etc., you will need to modify the names to  `value_string(const std::string& ...`,  `value_double(double ...` (no changes if you are feeding existing implementations.)
+
+The changes are
 
 - Replaced `std::pair<std::string,json>` with `name_value_pair` that has accessors `name()` and `value()`
+
+- In `json_input_handler` and `json_output_handler`, allowed for overrides of the `value` methods by making them non-virtual and adding protected virtual methods `value_string`, `value_double`, `value_longlong`, `value_ulonglong`, and `value_bool`
 
 Other new features:
 
@@ -27,6 +35,14 @@ Other new features:
 - Added support for `is<std::vector<T>>` and `as<std::vector<T>>`
 
 - Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
+
+Incorporates a number of contributions from Pedro Larroy and the developers of the clearskies_core project:
+
+- build system for posix systems
+- GCC to list of supported compilers
+- Android fix
+- fixed virtual destructors missing in `json_input_handler`, `json_output_handler` and `parsing_context`
+- fixed const_iterator should be iterator in json_object implementation 
 
 To clean up the interface and avoid too much duplicated functionality, we've deprecated some json methods (but they still work)
 
