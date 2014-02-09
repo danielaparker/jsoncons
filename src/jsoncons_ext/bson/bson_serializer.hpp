@@ -160,7 +160,7 @@ public:
         end_value();
     }
 
-    virtual void value(nullptr_t)
+    virtual void null_value()
     {
         begin_value();
 

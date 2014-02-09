@@ -39,15 +39,32 @@ public:
         ulonglong_value(value);
     }
 
+    void value(int value) 
+    {
+        longlong_value((long long)value);
+    }
+
+    void value(unsigned int value)
+    {
+        ulonglong_value((unsigned long long)value);
+    }
+
+    void value(long value) 
+    {
+        longlong_value((long long)value);
+    }
+
+    void value(unsigned long value)
+    {
+        ulonglong_value((unsigned long long)value);
+    }
+
     void value(bool value)
     {
         bool_value(value);
     }
 
-    void value(nullptr_t)
-    {
-        null_value();
-    }
+    virtual void null_value() = 0;
 
 //  Implementation start here
 
@@ -76,8 +93,6 @@ private:
     virtual void ulonglong_value(unsigned long long value) = 0;
 
     virtual void bool_value(bool value) = 0;
-
-    virtual void null_value() = 0;
 };
 
 template <class Char>
@@ -112,6 +127,10 @@ public:
     virtual void end_array()
     {
     }
+
+    virtual void null_value()
+    {
+    }
 private:
 
     virtual void string_value(const std::basic_string<Char>& value)
@@ -131,10 +150,6 @@ private:
     }
 
     virtual void bool_value(bool value)
-    {
-    }
-
-    virtual void null_value()
     {
     }
 

@@ -132,12 +132,12 @@ BOOST_AUTO_TEST_CASE(test_get)
 
     std::string s1 = a.get("field1").as_string();
     std::string s1a = a.at("field1").as_string();
-    std::string s2 = a.get("field2").as_string();
+    std::string s2 = a.get("field2","null").as_string();
     BOOST_REQUIRE_THROW(a.at("field2"), json_exception);
 
     BOOST_CHECK(s1 == std::string("value1"));
     BOOST_CHECK(s1a == std::string("value1"));
-    BOOST_CHECK(s2 == std::string("null"));
+    BOOST_CHECK_EQUAL(s2, std::string("null"));
 }
 
 BOOST_AUTO_TEST_CASE(test_proxy_get)
@@ -150,6 +150,8 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     std::string s1 = a["object1"].get("field1").as_string();
     std::string s1a = a["object1"].at("field1").as_string();
     std::string s2 = a["object1"].get("field2").as_string();
+    a["object1"].get("field2").is_null();
+    std::cout << s2 << std::endl;
     BOOST_REQUIRE_THROW(a["object1"].at("field2"), json_exception);
 
     BOOST_CHECK(s1 == std::string("value1"));

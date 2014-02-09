@@ -134,6 +134,15 @@ public:
         os_.put('\"');
         os_.put(':');
     }
+
+    virtual void null_value()
+    {
+        begin_value();
+
+        os_ << json_char_traits<Char>::null_literal();
+
+        end_value();
+    }
 private:
 
     virtual void string_value(const std::basic_string<Char>& value)
@@ -203,15 +212,6 @@ private:
         begin_value();
 
         os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
-
-        end_value();
-    }
-
-    virtual void null_value()
-    {
-        begin_value();
-
-        os_ << json_char_traits<Char>::null_literal();
 
         end_value();
     }
