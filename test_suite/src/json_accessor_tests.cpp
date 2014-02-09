@@ -24,6 +24,8 @@ BOOST_AUTO_TEST_CASE(test_as)
     json obj;
     obj["field1"] = 10;
     obj["field2"] = true;
+    obj["char_field"] = 'c';
+    obj["string_field"] = "char";
 
     std::string s = obj["field1"].as<std::string>();
     BOOST_CHECK_EQUAL(s,std::string("10"));
@@ -35,6 +37,9 @@ BOOST_AUTO_TEST_CASE(test_as)
     BOOST_CHECK_EQUAL(ushort_val,static_cast<unsigned short>(1));
     char char_val = obj["field2"].as<char>();
     BOOST_CHECK_EQUAL(int(char_val),1);
+
+    BOOST_CHECK(obj["char_field"].is<char>());
+    BOOST_CHECK(!obj["string_field"].is<char>());
 
     json parent;
     parent["child"] = obj;

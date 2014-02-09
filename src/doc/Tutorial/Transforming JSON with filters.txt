@@ -32,12 +32,12 @@ You can achieve the desired result by subclassing the [[json_filter]] class, ove
     class my_json_filter : public json_filter
     {
     public:
-        my_json_filter(json_output_handler& output_handler)
-            : json_filter(output_handler)
+        my_json_filter(json_output_handler& parent)
+            : json_filter(parent)
         {
         }
 
-        virtual void name(const std::string& name, const parsing_context& context) 
+        virtual void name(const std::string& name, const parsing_context& context)
         {
             name_ = name;
             if (name != "name")
@@ -46,7 +46,8 @@ You can achieve the desired result by subclassing the [[json_filter]] class, ove
             }
         }
 
-        virtual void value(const std::string& value, const parsing_context& context) 
+    protected:
+        virtual void value_string(const std::string& value, const parsing_context& context)
         {
             if (name_ == "name")
             {
@@ -61,10 +62,10 @@ You can achieve the desired result by subclassing the [[json_filter]] class, ove
                     std::string last = value.substr(start_last);
                     parent().value(last,context);
                 }
-                else 
+                else
                 {
-                    std::cerr << "Incomplete name \"" << value 
-                              << "\" at line " << context.line_number() 
+                    std::cerr << "Incomplete name \"" << value
+                              << "\" at line " << context.line_number()
                               << " and column " << context.column_number() << std::endl;
                 }
             }

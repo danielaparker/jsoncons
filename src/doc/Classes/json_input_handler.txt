@@ -6,7 +6,45 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 
     #include "jsoncons/json_input_handler.hpp"
 
-### Event handler methods
+### Overloaded methods
+
+    void value(const std::string& value, const parsing_context& context)
+Send notification of a string value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(double value, const parsing_context& context)
+Send notification of a double number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(int value, const parsing_context& context)
+Send notification of an int number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned int value, const parsing_context& context)
+Send notification of an unsigned int number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(long value, const parsing_context& context)
+Send notification of a long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned long value, const parsing_context& context)
+Send notification of an unsigned long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(long long value, const parsing_context& context)
+Send notification of a long long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned long long value, const parsing_context& context)
+Send notification of an unsigned long long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(bool value, const parsing_context& context)
+Send notification of a boolean value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+### Implementing methods
 
     virtual void begin_json()
 Receive notification of the start of JSON text
@@ -34,27 +72,33 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive notification of the `name` part of a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
-    virtual void value(const std::string& value, const parsing_context& context)
-Receive notification of a string value. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void value(double value, const parsing_context& context)
-Receive notification of a floating point number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void value(long long value, const parsing_context& context)
-Receive notification of a signed integer. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void value(unsigned long long value, const parsing_context& context)
-Receive notification of a non-negative integer. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void value(bool value, const parsing_context& context)
-Receive notification of a boolean value. Contextual information including
+    virtual void null_value(const parsing_context& context)
+Receive notification of a null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void null_value(const parsing_context& context)
 Receive notification of a null value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+### Protected implementing methods
+
+    virtual void value_string(const std::string& value, const parsing_context& context)
+Receive notification of a string value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    virtual void value_double(double value, const parsing_context& context)
+Receive notification of a floating point number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    virtual void value_longlong(long long value, const parsing_context& context)
+Receive notification of a signed integer. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    virtual void value_ulonglong(unsigned long long value, const parsing_context& context)
+Receive notification of a non-negative integer. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    virtual void value_bool(bool value, const parsing_context& context)
+Receive notification of a boolean value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
