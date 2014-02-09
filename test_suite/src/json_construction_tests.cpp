@@ -211,16 +211,18 @@ BOOST_AUTO_TEST_CASE(test_userdata)
     A(1,0) = 3;
     A(1,1) = 4;
 
-    std::cout << A << std::endl;
+    //std::cout << A << std::endl;
 
     obj.set_custom_data("mydata",A);
 
     //obj.to_stream(json_serializer(std::cout));
-    std::cout << obj << std::endl;
+    //std::cout << obj << std::endl;
 
     matrix<double>& B = obj["mydata"].custom_data<matrix<double>>();
+    BOOST_CHECK_EQUAL(A.size1(),B.size1());
+    BOOST_CHECK_EQUAL(A.size2(),B.size2());
 
-    std::cout << B << std::endl;
+    //std::cout << B << std::endl;
 
     for (size_t i = 0; i < B.size1(); ++i)
     {
@@ -230,7 +232,12 @@ BOOST_AUTO_TEST_CASE(test_userdata)
         }
     }
 
-    std::cout << pretty_print(obj) << std::endl;
+    BOOST_CHECK_CLOSE(B(0,0),2.0,0.0000001);
+    BOOST_CHECK_CLOSE(B(0,1),3.0,0.0000001);
+    BOOST_CHECK_CLOSE(B(1,0),4.0,0.0000001);
+    BOOST_CHECK_CLOSE(B(1,1),5.0,0.0000001);
+
+    //std::cout << pretty_print(obj) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_userdata_in_array)
