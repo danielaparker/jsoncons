@@ -18,23 +18,44 @@ class basic_json_output_handler
 public:
     virtual ~basic_json_output_handler() {}
 
+    // value interface
+    void value(const std::basic_string<Char>& value) 
+    {
+        string_value(value);
+    }
+
+    void value(double value)
+    {
+        double_value(value);
+    }
+
+    void value(long long value) 
+    {
+        longlong_value(value);
+    }
+
+    void value(unsigned long long value)
+    {
+        ulonglong_value(value);
+    }
+
+    void value(bool value)
+    {
+        bool_value(value);
+    }
+
+    void value(nullptr_t)
+    {
+        null_value();
+    }
+
+//  Implementation start here
+
     virtual void begin_json() = 0;
 
     virtual void end_json() = 0;
 
     virtual void name(const std::basic_string<Char>& name) = 0;
-
-    virtual void value(const std::basic_string<Char>& value) = 0;
-
-    virtual void value(double value) = 0;
-
-    virtual void value(long long value) = 0;
-
-    virtual void value(unsigned long long value) = 0;
-
-    virtual void value(bool value) = 0;
-
-    virtual void value(nullptr_t) = 0;
 
     virtual void begin_object() = 0;
 
@@ -43,6 +64,20 @@ public:
     virtual void begin_array() = 0;
 
     virtual void end_array() = 0;
+
+private:
+
+    virtual void string_value(const std::basic_string<Char>& value) = 0;
+
+    virtual void double_value(double value) = 0;
+
+    virtual void longlong_value(long long value) = 0;
+
+    virtual void ulonglong_value(unsigned long long value) = 0;
+
+    virtual void bool_value(bool value) = 0;
+
+    virtual void null_value() = 0;
 };
 
 template <class Char>
@@ -62,30 +97,6 @@ public:
     {
     }
 
-    virtual void value(const std::basic_string<Char>& value)
-    {
-    }
-
-    virtual void value(double value)
-    {
-    }
-
-    virtual void value(long long value)
-    {
-    }
-
-    virtual void value(unsigned long long value)
-    {
-    }
-
-    virtual void value(bool value)
-    {
-    }
-
-    virtual void value(nullptr_t)
-    {
-    }
-
     virtual void begin_object()
     {
     }
@@ -101,6 +112,32 @@ public:
     virtual void end_array()
     {
     }
+private:
+
+    virtual void string_value(const std::basic_string<Char>& value)
+    {
+    }
+
+    virtual void double_value(double value)
+    {
+    }
+
+    virtual void longlong_value(long long value)
+    {
+    }
+
+    virtual void ulonglong_value(unsigned long long value)
+    {
+    }
+
+    virtual void bool_value(bool value)
+    {
+    }
+
+    virtual void null_value()
+    {
+    }
+
 };
 
 typedef basic_null_json_output_handler<char> null_json_output_handler;

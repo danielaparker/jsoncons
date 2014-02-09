@@ -255,8 +255,9 @@ public:
             }
         }
     }
+private:
 
-    virtual void value(const std::basic_string<Char>& val)
+    virtual void string_value(const std::basic_string<Char>& val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -271,7 +272,7 @@ public:
         }
     }
 
-    virtual void value(double val)
+    virtual void double_value(double val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -286,7 +287,7 @@ public:
         }
     }
 
-    virtual void value(long long val)
+    virtual void longlong_value(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -301,7 +302,7 @@ public:
         }
     }
 
-    virtual void value(unsigned long long val)
+    virtual void ulonglong_value(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -316,7 +317,7 @@ public:
         }
     }
 
-    virtual void value(bool val)
+    virtual void bool_value(bool val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -331,7 +332,7 @@ public:
         }
     }
 
-    virtual void value(nullptr_t)
+    virtual void null_value()
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -345,7 +346,6 @@ public:
             }
         }
     }
-private:
 
     virtual void value(const std::basic_string<Char>& val, std::basic_ostream<Char>& os)
     {
