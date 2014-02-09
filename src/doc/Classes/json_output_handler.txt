@@ -6,7 +6,36 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
 
     #include "jsoncons/json_output_handler.hpp"
 
-### Event handler methods
+### Overloaded methods
+
+    virtual void value(const std::string& value)
+Send notification of a `string` value
+
+    virtual void value(double value)
+Send notification of a double number
+
+    virtual void value(int value)
+Send notification of a signed int number
+
+    virtual void value(unsigned int value)
+Send notification of an unsigned int number
+
+    virtual void value(long value)
+Send notification of a signed long number
+
+    virtual void value(unsigned long value)
+Send notification of an unsigned long number
+
+    virtual void value(long long value)
+Send notification of a signed long long number
+
+    virtual void value(unsigned long long value)
+Send notification of an unsigned long long number
+
+    virtual void value(bool value)
+Send notification of a boolean value
+
+### Implementing methods
 
     virtual void begin_json()
 Receive notification of the start of a JSON document
@@ -29,21 +58,23 @@ Receive notification of the end of a JSON object
     virtual void name(const std::string& name)
 Receive notification of the `name` of a name value pair
 
-    virtual void value(const std::string& value)
-Receive notification of a `string` value
-
-    virtual void value(double value)
-Receive notification of a floating point number
-
-    virtual void value(long long value)
-Receive notification of a signed integer
-
-    virtual void value(unsigned long long value)
-Receive notification of a non-negative integer
-
-    virtual void value(bool value)
-Receive notification of a boolean value
-
     virtual void null_value()
 Receive notification of `null`
+
+### Protected implementing methods
+
+    virtual void value_string(const std::string& value)
+Receive notification of a `string` value
+
+    virtual void value_double(double value)
+Receive notification of a floating point number
+
+    virtual void value_longlong(long long value)
+Receive notification of a signed integer
+
+    virtual void value_ulonglong(unsigned long long value)
+Receive notification of a non-negative integer
+
+    virtual void value_bool(bool value)
+Receive notification of a boolean value
 

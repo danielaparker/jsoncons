@@ -157,6 +157,14 @@ basic_json<Char>::basic_json(bool val)
 }
 
 template <class Char>
+basic_json<Char>::basic_json(Char c)
+{
+    type_ = string_t;
+    value_.value_string_ = new std::basic_string<Char>();
+    value_.value_string_->push_back(c);
+}
+
+template <class Char>
 basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
@@ -1811,9 +1819,13 @@ public:
 };
 
 template <typename Char>
-class value_adapter<Char,char>
+class value_adapter<Char,Char>
 {
 public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_string() && val.as_string().size() == 1;
+    }
     char as(const basic_json<Char>& val) const
     {
         return val.as_char();

@@ -878,6 +878,8 @@ public:
 
     basic_json(const basic_json& val);
 
+    basic_json(Char c);
+
     basic_json(double val);
 
     basic_json(int val);
