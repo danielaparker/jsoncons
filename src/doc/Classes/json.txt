@@ -8,9 +8,9 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 ### Member types
 
-    [[name_value_pair]]
+    name_value_pair
 
-`name_value_pair` stores a name and a json value
+[[name_value_pair]] stores a name and a json value
 
     null_type
 
@@ -55,15 +55,6 @@ Parses a string of JSON text and returns a json object or array value
     static json parse_file(const std::string& filename)
 Parses JSON text from a file opened as a binary stream, and returns a json object or array value.
 
-    static json make_array()
-Makes an empty array.
-
-    static json make_array(size_t n)
-Makes an array of n elements. Each element is an empty json object.
-
-    static json make_array(size_t n, const json& val)
-Makes an array of n elements. Each element is a copy of `val`.
-
     template <typename N>
     static json make_multi_array(size1 ... sizeN)
 
@@ -105,6 +96,9 @@ Constructs a `unsigned integer` value
 
     json(const std::string& val);
 Constructs a `string` value
+
+    json(char val);
+Constructs a `string` value that has one character
 
     json(bool val);
 Constructs a `true` or `false` value
@@ -331,6 +325,12 @@ Exchanges the values of `a` and `b`
 
 ### Deprecated methods
 
+    static json make_array()
+    static json make_array(size_t n)
+    static json make_array(size_t n, const json& val)
+Makes an empty array, an array of n elements, each element an empty json object, or an array of n elements, each element a copy of `val`.
+Use `json val(json::an_array)` or `json::make_multi_array<1>(...)` instead (but `make_array` will continue to work)
+
     static json make_2d_array(size_t m, size_t n)
 Use make_multi_array<2>(m,n) instead
 
@@ -396,7 +396,7 @@ The output is
 
 ### Array
 
-    json arr = json::make_array();
+    json arr(json::an_array);
     arr.add(10);
     arr.add(20);
     arr.add(30);
@@ -442,7 +442,7 @@ The output is
 
 ### Array iterator
 
-    json arr = json::make_array();
+    json arr(json::an_array);
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add("Montreal");
@@ -462,7 +462,7 @@ The output is
 
 	json root;
 
-    root["persons"] = json::make_array();
+    root["persons"] = json::an_array;
 
     json person;
     person["first_name"] = "John";

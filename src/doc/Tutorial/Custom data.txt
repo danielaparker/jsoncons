@@ -94,7 +94,7 @@ the output becomes
 You may also want to add a custom data type to a `json` array. You can do this with 
 the `add_custom_data' method.
 
-    json arr = json::make_array();
+    json arr(json::an_array);
     matrix<double> A(2,2);
     A(0,0) = 1;
     A(0,1) = 2;

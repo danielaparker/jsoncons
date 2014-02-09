@@ -87,7 +87,7 @@ void second_example_a()
 {
     try
     {
-        json books = json::make_array();
+        json books(json::an_array);
 
         {
             json book;
@@ -151,7 +151,7 @@ void more_examples()
     image_sizing["resize_to_fit"] = true;
     std::cout << pretty_print(image_sizing) << std::endl;
 
-    json image_formats = json::make_array();
+    json image_formats(json::an_array);
     image_formats.add("JPEG");
     image_formats.add("PSD");
     image_formats.add("TIFF");

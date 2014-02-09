@@ -46,6 +46,9 @@ Incorporates a number of contributions from Pedro Larroy and the developers of t
 
 To clean up the interface and avoid too much duplicated functionality, we've deprecated some json methods (but they still work)
 
+    make_array
+Use `json val(json::an_array)` or `json::make_multi_array<1>(...)` instead (but `make_array` will continue to work)
+
     make_2d_array
     make_3d_array
 Use `make_multi_array<2>` and `make_multi_array<3>` instead

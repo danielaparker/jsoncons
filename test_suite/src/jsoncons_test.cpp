@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     root["myobject"]["bool_2"] = json(true);
     root["myobject"]["int_2"] = json(0LL);
     root["myobject"]["string_2"] = json("my string");
-    root["myarray"] = json::make_array();
+    root["myarray"] = json::an_array;
 
     json double_2 = root["myobject"]["double_2"];
 
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_array_iterator)
 {
-    json arr = json::make_array();
+    json arr = json::an_array;
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add("Montreal");
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(constructing_structures)
 {
     json root;
 
-    root["persons"] = json::make_array();
+    root["persons"] = json::an_array;
 
     json person;
     person["first_name"] = "John";

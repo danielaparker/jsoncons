@@ -860,20 +860,6 @@ public:
         return build_array<Char,size>()(m, n, k, val);
     }
 
-    static basic_json make_array();
-
-    static basic_json make_array(size_t n);
-
-    static basic_json make_array(size_t n, const basic_json<Char>& val);
-
-    static basic_json make_2d_array(size_t m, size_t n);
-
-    static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);
-
-    static basic_json make_3d_array(size_t m, size_t n, size_t k);
-
-    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val);
-
     explicit basic_json();
 
     basic_json(const basic_json& val);
@@ -1158,6 +1144,19 @@ public:
     }
 
 //  Deprecated
+
+    static basic_json make_array();
+    static basic_json make_array(size_t n);
+    static basic_json make_array(size_t n, const basic_json<Char>& val);
+
+    static basic_json make_2d_array(size_t m, size_t n);
+
+    static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char>& val);
+
+    static basic_json make_3d_array(size_t m, size_t n, size_t k);
+
+    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val);
+
     bool is_number() const
     {
         return is_numeric();
