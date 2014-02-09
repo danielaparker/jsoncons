@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["object"].is_object());
     BOOST_CHECK(obj["object"].is<json::object>());
 
-    obj["array"] = json::make_array();
+    obj["array"] = json::an_array;
     BOOST_CHECK(obj["array"].is_array());
     BOOST_CHECK(obj["array"].is<json::array>());
 

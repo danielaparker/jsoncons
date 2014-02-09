@@ -35,7 +35,7 @@ void put_custom_data_in_object()
 
 void put_custom_data_in_array()
 {
-    json arr = json::make_array();
+    json arr(json::an_array);
     std::vector<double> v(4);
     v[0] = 0;
     v[1] = 1;
