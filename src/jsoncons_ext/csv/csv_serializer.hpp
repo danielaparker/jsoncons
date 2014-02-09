@@ -255,6 +255,21 @@ public:
             }
         }
     }
+
+    virtual void null_value()
+    {
+        if (stack_.size() == 2 && !stack_.back().skip_)
+        {
+            if (stack_.back().is_object() && stack_[0].count_ == 0)
+            {
+                null_value(header_os_);
+            }
+            else
+            {
+                null_value(os_);
+            }
+        }
+    }
 private:
 
     virtual void string_value(const std::basic_string<Char>& val)
@@ -328,21 +343,6 @@ private:
             else
             {
                 value(val,os_);
-            }
-        }
-    }
-
-    virtual void null_value()
-    {
-        if (stack_.size() == 2 && !stack_.back().skip_)
-        {
-            if (stack_.back().is_object() && stack_[0].count_ == 0)
-            {
-                null(header_os_);
-            }
-            else
-            {
-                null(os_);
             }
         }
     }
@@ -428,7 +428,7 @@ private:
         end_value();
     }
 
-    virtual void null(std::basic_ostream<Char>& os)
+    virtual void null_value(std::basic_ostream<Char>& os)
     {
         begin_value(os);
 

@@ -45,7 +45,7 @@ public:
 
     virtual void value(bool value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void null(const basic_parsing_context<Char>& context) = 0;
+    virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 };
 
 template <class Char>
@@ -100,7 +100,7 @@ public:
     {
     }
 
-    virtual void null(const basic_parsing_context<Char>& context)
+    virtual void null_value(const basic_parsing_context<Char>& context)
     {
     }
 };

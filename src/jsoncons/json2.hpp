@@ -889,7 +889,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         handler.value(value_.bool_value_);
         break;
     case null_t:
-        handler.value(nullptr);
+        handler.null_value();
         break;
     case empty_object_t:
         handler.begin_object();

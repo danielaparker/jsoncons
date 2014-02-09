@@ -514,7 +514,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.null(*this);
+                        handler_.null_value(*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -670,7 +670,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                            handler_.null(*this);
+                            handler_.null_value(*this);
                         }
                     }
                     else if (has_neg)
@@ -690,7 +690,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             catch (...)
                             {
                                 err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.null(*this);
+                                handler_.null_value(*this);
                             }
                         }
                     }
@@ -711,7 +711,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             catch (...)
                             {
                                 err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.null(*this);
+                                handler_.null_value(*this);
                             }
                         }
                     }
