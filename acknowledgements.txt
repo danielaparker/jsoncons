@@ -1,0 +1,3 @@
+Andrew Hutko for early code review 	
+
+Marc Chevrier for code review, clang port, build files, and for contributing is<T> and as<T> json methods

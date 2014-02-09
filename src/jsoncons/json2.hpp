@@ -24,8 +24,10 @@
 #include "jsoncons/json_serializer.hpp"
 
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
+#endif
 
 
 namespace jsoncons {
@@ -224,6 +226,206 @@ basic_json<Char>::~basic_json()
 }
 
 template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(const char* rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = string_t;
+        value_.string_value_ = new std::basic_string<Char>(rhs);
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(const std::basic_string<Char>& rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = string_t;
+        value_.string_value_ = new std::basic_string<Char>(rhs);
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(int rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(unsigned int rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(unsigned long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(unsigned long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(bool rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = bool_t;
+        value_.bool_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
+basic_json<Char>& basic_json<Char>::operator=(double rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = double_t;
+        value_.double_value_ = rhs;
+        break;
+    default:
+        basic_json<Char>(rhs).swap(*this);
+        break;
+    }
+    return *this;
+}
+
+template <class Char>
 basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
 {
     rhs.swap(*this);
@@ -381,8 +583,8 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     case object_t:
         {
         const_object_iterator it = value_.object_->find(name);
-        return it != end_members() ? it->second : basic_json<Char>::null;
-        }
+        return it != end_members() ? it->value() : basic_json<Char>::null;
+		}
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -400,8 +602,8 @@ typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basi
     case object_t:
         {
         const_object_iterator it = value_.object_->find(name);
-        return it != end_members() ? const_val_proxy(it->second) : const_val_proxy(default_val);
-        }
+        return it != end_members() ? const_val_proxy(it->value()) : const_val_proxy(default_val);
+		}
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
@@ -426,8 +628,6 @@ void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json
         }
     }
 }
-
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
 template <class Char>
 basic_json<Char>::basic_json(basic_json&& other)
@@ -484,8 +684,6 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
         }
     }
 }
-
-#endif
 
 template <class Char>
 template <class T>
@@ -691,7 +889,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         handler.value(value_.bool_value_);
         break;
     case null_t:
-        handler.null_value();
+        handler.value(nullptr);
         break;
     case empty_object_t:
         handler.begin_object();
@@ -703,8 +901,8 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
         json_object<Char>* o = value_.object_;
         for (const_object_iterator it = o->begin(); it != o->end(); ++it)
         {
-            handler.name(it->first);
-            it->second.to_stream(handler);
+            handler.name(it->name());
+            it->value().to_stream(handler);
         }
         handler.end_object();
         }
@@ -1391,7 +1589,368 @@ void escape_string(const std::basic_string<Char>& s,
     }
 }
 
+template <typename Char>
+class value_adapter<Char,std::basic_string<Char>>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_string();
+    }
+    std::basic_string<Char> as(const basic_json<Char>& val) const
+    {
+        return val.as_string();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,typename basic_json<Char>::object>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_object();
+    }
+    typename basic_json<Char>::object as(const basic_json<Char>& val) const
+    {
+        return val;
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,typename basic_json<Char>::array>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_array();
+    }
+    typename basic_json<Char>::array as(const basic_json<Char>& val) const
+    {
+        return val;
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,typename basic_json<Char>::null_type>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_null();
+    }
+    typename basic_json<Char>::null_type as(const basic_json<Char>& val) const
+    {
+        JSONCONS_ASSERT(val.is_null());
+        return basic_json<Char>::null_type();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,bool>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_bool();
+    }
+    bool as(const basic_json<Char>& val) const
+    {
+        return val.as_bool();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,int>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    int as(const basic_json<Char>& val) const
+    {
+        return val.as_int();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,unsigned int>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned int as(const basic_json<Char>& val) const
+    {
+        return val.as_uint();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,short>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    short as(const basic_json<Char>& val) const
+    {
+        return (short)val.as_int();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,unsigned short>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned short as(const basic_json<Char>& val) const
+    {
+        return (unsigned short)val.as_uint();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,long>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    long as(const basic_json<Char>& val) const
+    {
+        return val.as_long();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,unsigned long>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned long as(const basic_json<Char>& val) const
+    {
+        return val.as_ulong();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,char>
+{
+public:
+    char as(const basic_json<Char>& val) const
+    {
+        return val.as_char();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,double>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return val.is_double();
+    }
+
+    double as(const basic_json<Char>& val) const
+    {
+        return val.as_double();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,long long>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return true;
+        }
+        else if (val.is_ulonglong())
+        {
+            return val.as_ulonglong() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    long long as(const basic_json<Char>& val) const
+    {
+        return val.as_longlong();
+    }
+};
+
+template <typename Char>
+class value_adapter<Char,unsigned long long>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        if (val.is_longlong())
+        {
+            return val.as_longlong() >= 0;
+        }
+        else if (val.is_ulonglong())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned long long as(const basic_json<Char>& val) const
+    {
+        return val.as_ulonglong();
+    }
+};
+
+template <typename Char,typename T>
+class value_adapter<Char,std::vector<T>>
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        bool result = val.is_array();
+        for (size_t i = 0; result && i < val.size(); ++i)
+        {
+            if (!val[i].template is<T>())
+            {
+                result = false;
+            }
+        }
+        return result;
+    }
+    std::vector<T> as(const basic_json<Char>& val) const
+    {
+        std::vector<T> v(val.size());
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] = val[i].template as<T>();
+        }
+        return v;
+    }
+};
+
+template <typename Char>
+class basic_json<Char>::null_type : public basic_json<Char> 
+{
+private:
+    null_type()
+        : basic_json<Char>(null_t)
+    {
+    }
+};
+
+template <typename Char>
+class basic_json<Char>::object : public basic_json<Char>
+{
+public:
+    object(json_object<Char>* impl)
+        : basic_json<Char>(impl)
+    {
+    }
+};
+
+template <typename Char>
+class basic_json<Char>::array : public basic_json<Char>
+{
+public:
+    array(json_array<Char>* impl)
+        : basic_json<Char>(impl)
+    {
+    }
+private:
+    array()
+        : basic_json<Char>(array_t)
+    {
+    }
+};
+
 }
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif
+
 #endif

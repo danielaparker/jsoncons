@@ -27,10 +27,10 @@ template <class Char>
 class key_compare
 {
 public:
-    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char>>& a,
+    bool operator()(const typename basic_json<Char>::name_value_pair& a, 
                     const std::basic_string<Char>& b) const
     {
-        return a.first < b;
+        return a.name() < b;
     }
 };
 
@@ -38,15 +38,15 @@ template <class Char>
 class member_compare
 {
 public:
-    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char>>& a,
-                    const std::pair<std::basic_string<Char>,basic_json<Char>>& b) const
+    bool operator()(const typename basic_json<Char>::name_value_pair& a, 
+                    const typename basic_json<Char>::name_value_pair& b) const
     {
-        return a.first < b.first;
+        return a.name() < b.name();
     }
 };
 
 template <class Char>
-class json_array
+class json_array 
 {
 public:
     typedef typename std::vector<basic_json<Char>>::iterator iterator;
@@ -77,7 +77,7 @@ public:
     {
     }
 
-    json_array<Char>* clone()
+    json_array<Char>* clone() 
     {
         return new json_array(elements_);
     }
@@ -94,7 +94,7 @@ public:
 
     void resize(size_t n, const basic_json<Char>& val) {elements_.resize(n,val);}
 
-    void remove_range(size_t from_index, size_t to_index)
+    void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
         JSONCONS_ASSERT(to_index <= elements_.size());
@@ -116,8 +116,6 @@ public:
         elements_.insert(position, value);
     }
 
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
-
     void push_back(basic_json<Char>&& value)
     {
         elements_.push_back(value);
@@ -128,8 +126,6 @@ public:
         json_array<Char>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
-
-#endif
 
     iterator begin() {return elements_.begin();}
 
@@ -164,8 +160,8 @@ template <class Char>
 class json_object
 {
 public:
-    typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>>::iterator iterator;
-    typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>>::const_iterator const_iterator;
+    typedef typename std::vector<typename basic_json<Char>::name_value_pair>::iterator iterator;
+    typedef typename std::vector<typename basic_json<Char>::name_value_pair>::const_iterator const_iterator;
 
     json_object()
     {
@@ -176,12 +172,12 @@ public:
     {
     }
 
-    json_object(std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members)
+    json_object(std::vector<typename basic_json<Char>::name_value_pair> members)
         : members_(members)
     {
     }
 
-    json_object<Char>* clone()
+    json_object<Char>* clone() 
     {
         return new json_object(members_);
     }
@@ -194,14 +190,14 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
-    void remove_range(size_t from_index, size_t to_index)
+    void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
         JSONCONS_ASSERT(to_index <= members_.size());
         members_.erase(members_.begin()+from_index,members_.begin()+to_index);
     }
 
-    void remove(const std::basic_string<Char>& name)
+    void remove(const std::basic_string<Char>& name) 
     {
         iterator it = find(name);
         if (it != members_.end())
@@ -210,43 +206,45 @@ public:
         }
     }
 
-    const std::pair<std::basic_string<Char>,basic_json<Char>>& get(size_t i) const
+    const typename basic_json<Char>::name_value_pair& get(size_t i) const 
     {
         return members_[i];
     }
 
-    basic_json<Char>& at(size_t i) {return members_[i].second;}
+    basic_json<Char>& at(size_t i) {return members_[i].value();}
 
-    const basic_json<Char>& at(size_t i) const {return members_[i].second;}
+    const basic_json<Char>& at(size_t i) const {return members_[i].value;}
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
     void push_back(const std::basic_string<Char>& name, const basic_json<Char>& val)
     {
-        members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>(name,val));
+        members_.push_back(typename basic_json<Char>::name_value_pair(name,val));
     }
-
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
 
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
     {
         iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
-        if (it != end() && (*it).first == name)
+        if (it != end() && it->name() == name)
         {
-            it = remove(it);
+            //it = remove(it);
+            *it = typename basic_json<Char>::name_value_pair(name,value);
         }
-        insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
+        else
+        {
+            insert(it,typename basic_json<Char>::name_value_pair(name,value));
+        }
     }
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char>&& val)
     {
-        members_.push_back(std::pair<std::basic_string<Char>,basic_json<Char>>());
-        members_.back().first.swap(name);
-        members_.back().second.swap(val);
+        members_.push_back(typename basic_json<Char>::name_value_pair());
+        members_.back().name_.swap(name);
+        members_.back().value_.swap(val);
+        //members_.push_back(typename basic_json<Char>::name_value_pair(name,val)); // much slower on VS 2010
     }
-#endif
 
-    iterator remove(iterator at);
+    iterator remove(iterator at); 
 
     basic_json<Char>& get(const std::basic_string<Char>& name);
 
@@ -256,7 +254,7 @@ public:
 
     const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member);
+    void insert(iterator it, typename basic_json<Char>::name_value_pair member);
 
     void sort_members();
 
@@ -286,7 +284,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<std::basic_string<Char>,basic_json<Char>>> members_;
+    std::vector<typename basic_json<Char>::name_value_pair> members_;
     json_object(const json_object<Char>&);
     json_object<Char>& operator=(const json_object<Char>&);
 };
@@ -299,7 +297,7 @@ void json_object<Char>::sort_members()
 }
 
 template <class Char>
-void json_object<Char>::insert(iterator it, std::pair<std::basic_string<Char>,basic_json<Char>> member)
+void json_object<Char>::insert(iterator it, typename basic_json<Char>::name_value_pair member)
 {
     members_.insert(it,member);
 }
@@ -314,22 +312,26 @@ template <class Char>
 void json_object<Char>::set(const std::basic_string<Char>& name, const basic_json<Char>& value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char>());
-    if (it != end() && (*it).first == name)
+    if (it != end() && it->name() == name)
     {
-        it = remove(it);
+        //it = remove(it);
+        *it = typename basic_json<Char>::name_value_pair(name,value);
     }
-    insert(it,std::pair<std::basic_string<Char>,basic_json<Char>>(name,value));
+    else
+    {
+        insert(it,typename basic_json<Char>::name_value_pair(name,value));
+    }
 }
 
 template <class Char>
-basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name)
+basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& name) 
 {
     iterator it = find(name);
     if (it == end())
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
     }
-    return (*it).second;
+    return it->value();
 }
 
 template <class Char>
@@ -340,7 +342,7 @@ const basic_json<Char>& json_object<Char>::get(const std::basic_string<Char>& na
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
     }
-    return (*it).value_;
+    return it->value_;
 }
 
 template <class Char>
@@ -348,7 +350,7 @@ typename json_object<Char>::iterator json_object<Char>::find(const std::basic_st
 {
     key_compare<Char> comp;
     iterator it = std::lower_bound(begin(),end(), name, comp);
-    return (it != end() && it->first == name) ? it : end();
+    return (it != end() && it->name() == name) ? it : end();
 }
 
 template <class Char>

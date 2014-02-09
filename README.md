@@ -5,23 +5,64 @@ The jsoncons library implements C++ classes for the construction of [JavaScript 
 
 The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
 
+jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10. It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013 and clang 3.3. Note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.
+
+The code repository is on [github](https://github.com/danielaparker/jsoncons), releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
+
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-It has been tested with MS Visual C++ 10, SP1, Intel C++ Studio XE 2013 and clang. Note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.
+Master
+------
 
-Releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar).
+This release should be largely backwards compatible with 0.90 and 0.83 with one exception: if you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, `first` becomes `name()` and `second` becomes `value()`. So note this change:
 
-Release 0.84b
+- Replaced `std::pair<std::string,json>` with `name_value_pair` that has accessors `name()` and `value()`
+
+Other new features:
+
+- Changed implementation of is<T> and as<T>, the current implementation should be user extensible
+
+- `make_multi_array<N>` makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces `make_2d_array` and `make_3d_array`, which are now deprecated.
+
+- Added support for `is<std::vector<T>>` and `as<std::vector<T>>`
+
+- Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics
+
+To clean up the interface and avoid too much duplicated functionality, we've deprecated some json methods (but they still work)
+
+    make_2d_array
+    make_3d_array
+Use `make_multi_array<2>` and `make_multi_array<3>` instead
+
+    as_vector
+Use `as<std::vector<int>>` etc. instead
+
+    as_int
+    as_uint
+    as_char
+Use `as<int>`, `as<unsigned int>`, and `as<char>` instead
+
+Release 0.90a
 -------------
 
-Fixed issues with column numbers reported with exceptions
+Fixed issue affecting clang compile
 
-Performance enhancements to json_reader and json_deserializer
+Release 0.90
+------------
 
-Incorporates two patches contributed by Marc Chevrier:
+This release should be fully backwards compatible with 0.83. 
+
+Includes performance enhancements to json_reader and json_deserializer
+
+Fixes issues with column numbers reported with exceptions
+
+Incorporates a number of patches contributed by Marc Chevrier:
 
 - Fixed issue with set member on json object when a member with that name already exists
 - clang port
+- cmake build files for examples and test suite
+- json template method is<T> for examining the types of json values
+- json template method as<T> for accessing json values
 
 Release 0.83
 ------------

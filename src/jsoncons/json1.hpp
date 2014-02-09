@@ -24,7 +24,7 @@ namespace jsoncons {
 template <class Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T& val)
 {
-    os.null_value();
+    os.value(nullptr);
 }
 
 template <class Char>
@@ -64,13 +64,13 @@ public:
 };
 
 template <class Char>
+class basic_json;
+
+template <class Char>
 class json_object;
 
 template <class Char>
 class json_array;
-
-template <class Char>
-class json_string;
 
 template <class Char>
 class basic_output_format;
@@ -78,10 +78,21 @@ class basic_output_format;
 template <class Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
+template <typename Char, typename T>
+class value_adapter
+{
+public:
+    bool is(const basic_json<Char>& val) const
+    {
+        return false;
+    }
+    T as(const basic_json<Char>& val) const;
+};
+
 class json_base
 {
 public:
-    enum value_type
+    enum value_type 
     {
         empty_object_t,
         object_t,
@@ -100,21 +111,96 @@ template <class Char>
 class basic_json : public json_base
 {
 public:
+    class null_type;
+    class object;
+    class array;
+    struct custom_type {};
+
+    class name_value_pair
+    {
+    public:
+        name_value_pair()
+        {
+        }
+        name_value_pair(const name_value_pair& pair)
+            : name_(pair.name_), value_(pair.value_)
+        {
+        }
+        name_value_pair(name_value_pair&& pair)
+            //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
+        {
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
+        }
+        name_value_pair(const std::basic_string<Char>& nam, const basic_json<Char>& val)
+            : name_(nam), value_(val)
+        {
+        }
+        name_value_pair(std::basic_string<Char>&& nam, basic_json<Char>&& val)
+            : name_(nam), value_(val)
+        {
+        }
+
+        const std::basic_string<Char>& name() const
+        {
+            return name_;
+        }
+
+        basic_json<Char>& value()
+        {
+            return value_;
+        }
+
+        const basic_json<Char>& value() const
+        {
+            return value_;
+        }
+
+        name_value_pair& operator=(name_value_pair rhs)
+        {
+            swap(rhs);
+            return *this;
+        }
+
+        void swap(name_value_pair& pair)
+        {
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
+        }
+
+        std::basic_string<Char> name_;
+        basic_json<Char> value_;
+    };
 
     static const basic_json<Char> an_object;
     static const basic_json<Char> an_array;
     static const basic_json<Char> null;
-
-    typedef json_object<Char> object_type;
-    typedef json_array<Char> array_type;
-
+    
     typedef typename json_object<Char>::iterator object_iterator;
     typedef typename json_object<Char>::const_iterator const_object_iterator;
 
     typedef typename json_array<Char>::iterator array_iterator;
     typedef typename json_array<Char>::const_iterator const_array_iterator;
 
-    class const_val_proxy
+    operator null_type() const
+    {
+        JSONCONS_ASSERT(type_ == null_t);
+        return null_type();
+    }
+
+    operator array() const
+    {
+        JSONCONS_ASSERT(type_ == array_t);
+        return array(value_.array_->clone());
+    }
+
+    operator object() const
+    {
+        JSONCONS_ASSERT(type_ == object_t);
+        return object(value_.object_->clone());
+    }
+
+    class const_val_proxy 
     {
     public:
         friend class basic_json<Char>;
@@ -163,6 +249,11 @@ public:
         bool is_number() const
         {
             return val_.is_number();
+        }
+
+        bool is_numeric() const
+        {
+            return val_.is_numeric();
         }
 
         bool is_longlong() const
@@ -356,7 +447,7 @@ public:
         const basic_json<Char>& val_;
     };
 
-    class object_key_proxy
+    class object_key_proxy 
     {
     public:
         friend class basic_json<Char>;
@@ -422,6 +513,11 @@ public:
             return val_.at(name_).is_number();
         }
 
+        bool is_numeric() const
+        {
+            return val_.at(name_).is_numeric();
+        }
+
         bool is_longlong() const
         {
             return val_.at(name_).is_longlong();
@@ -451,7 +547,7 @@ public:
         {
             return val_.at(name_).is_array();
         }
-
+ 
         bool is_custom() const
         {
             return val_.at(name_).is_custom();
@@ -532,7 +628,7 @@ public:
         // Returns a const reference to the custom data associated with name
 
         template <class T>
-        T& custom_data()
+        T& custom_data() 
         {
             return val_.at(name_).template custom_data<T>();
         }
@@ -614,20 +710,19 @@ public:
         {
             val_.at(name_).remove_range(from_index, to_index);
         }
-        // Remove a range of elements from an array
+        // Remove a range of elements from an array 
 
         void remove_member(const std::basic_string<Char>& name)
         {
             val_.at(name_).remove_member(name);
         }
-        // Remove a member from an object
+        // Remove a member from an object 
 
         void set(const std::basic_string<Char>& name, const basic_json<Char>& value)
         {
             val_.at(name_).set(name,value);
         }
 
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
         void set(std::basic_string<Char>&& name, basic_json<Char>&& value)
 
         {
@@ -643,7 +738,7 @@ public:
         {
             val_.at(name_).add(index, value);
         }
-#endif
+
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, const T& value)
         {
@@ -712,7 +807,7 @@ public:
         object_key_proxy(); // nopop
         object_key_proxy& operator = (const object_key_proxy& other); // noop
 
-        object_key_proxy(basic_json<Char>& var,
+        object_key_proxy(basic_json<Char>& var, 
               const std::basic_string<Char>& name)
             : val_(var), name_(name)
         {
@@ -728,6 +823,42 @@ public:
     static basic_json parse_string(const std::basic_string<Char>& s);
 
     static basic_json parse_file(const std::string& s);
+
+    template<int size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
+    {
+        return build_array<Char,size>()();
+    }
+    template<size_t size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
+    {
+        return build_array<Char,size>()(n);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, const basic_json<Char>& val)
+    {
+        return build_array<Char,size>()(n, val);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
+    {
+        return build_array<Char,size>()(m, n);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, const basic_json<Char>& val)
+    {
+        return build_array<Char,size>()(m, n, val);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
+    {
+        return build_array<Char,size>()(m, n, k);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, const basic_json<Char>& val)
+    {
+        return build_array<Char,size>()(m, n, k, val);
+    }
 
     static basic_json make_array();
 
@@ -768,7 +899,7 @@ public:
     basic_json(bool val);
 
     template <class InputIterator>
-    basic_json(InputIterator first, InputIterator last);
+    basic_json(InputIterator name, InputIterator last);
 
     explicit basic_json(json_object<Char>* var);
 
@@ -794,13 +925,33 @@ public:
 
     const_array_iterator end_elements() const;
 
+    basic_json& operator=(const char* rhs);
+
+    basic_json& operator=(const std::basic_string<Char>& rhs);
+
+    basic_json& operator=(bool rhs);
+
+    basic_json& operator=(int rhs);
+
+    basic_json& operator=(unsigned int rhs);
+
+    basic_json& operator=(long rhs);
+
+    basic_json& operator=(unsigned long rhs);
+
+    basic_json& operator=(long long rhs);
+
+    basic_json& operator=(unsigned long long rhs);
+
+    basic_json& operator=(double rhs);
+
     basic_json& operator=(basic_json<Char> rhs);
 
     bool operator!=(const basic_json<Char>& rhs) const;
 
     bool operator==(const basic_json<Char>& rhs) const;
 
-    size_t size() const;
+    size_t size() const; 
 
     basic_json<Char>& operator[](size_t i);
 
@@ -830,7 +981,8 @@ public:
     template<typename T>
     bool is() const
     {
-        return is_type<Char,T>(*this);
+        value_adapter<Char,T> adapter;
+        return adapter.is(*this);
     }
 
     bool is_string() const
@@ -838,7 +990,7 @@ public:
         return type_ == string_t;
     }
 
-    bool is_number() const
+    bool is_numeric() const
     {
         return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
     }
@@ -891,7 +1043,8 @@ public:
     template<typename T>
     T as() const
     {
-        return as_value<Char,T>(*this);
+        value_adapter<Char,T> adapter;
+        return adapter.as(*this);
     }
 
     bool as_bool() const;
@@ -947,8 +1100,6 @@ public:
 
     void set(const std::basic_string<Char>& name, const basic_json<Char>& value);
 
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
-
     basic_json(basic_json&& val);
 
     void set(std::basic_string<Char>&& name, basic_json<Char>&& value);
@@ -956,7 +1107,6 @@ public:
     void add(basic_json<Char>&& value);
 
     void add(size_t index, basic_json<Char>&& value);
-#endif
 
     template <class T>
     void set_custom_data(const std::basic_string<Char>& name, const T& value);
@@ -982,21 +1132,6 @@ public:
     {
         using std::swap;
 
-        /*switch (type_)
-        {
-        case null_t:
-            break;
-        default:
-            switch (b.type_)
-            {
-            case null_t:
-                b.value_ = value_;
-                break;
-            default:
-                swap(value_,b.value_);
-                break;
-            }
-        }*/
         swap(type_,b.type_);
         swap(value_,b.value_);
     }
@@ -1005,9 +1140,10 @@ public:
     std::vector<T> as_vector() const
     {
         std::vector<T> v(size());
+        value_adapter<Char,T> adapter;
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = as_value<Char,T>(at(i)).get();
+            v[i] = adapter.as(at(i));
         }
         return v;
     }
@@ -1016,332 +1152,63 @@ public:
     {
         a.swap(b);
     }
-private:
-    basic_json(value_type t);
 
-    template<typename T>
-    static bool is_convertible_to (const basic_json<Char>& object)
+//  Deprecated
+    bool is_number() const
     {
-        if (object.is_longlong())
-        {
-            long long data = object.as_longlong();
-            if (std::is_signed<T>::value  == false && data < 0)
-                return false;
-            return data >= std::numeric_limits<T>::min() && data <= std::numeric_limits<T>::max() ? true : false;
-        }
-        else if (object.is_ulonglong())
-        {
-            unsigned long long data = object.as_ulonglong();
-            return data <= std::numeric_limits<T>::max() ? true : false;
-        }
-
-        return false;
+        return is_numeric();
     }
+private:
+	basic_json(value_type t);
 
-    template<typename C, typename T>
-    class is_type
+    template<typename Char2, size_t size>
+    class build_array
+    {};
+    template<typename Char2>
+    class build_array<Char2,1>
     {
     public:
-        is_type (const basic_json<C>& value)
-        {}
-
-        operator bool () const
+        basic_json<Char2> operator() ()
         {
-            return false;
+            return basic_json<Char2>::make_array();
+        }
+        basic_json<Char2> operator() (size_t n)
+        {
+            return basic_json<Char2>::make_array(n);
+        }
+        basic_json<Char2> operator() (size_t n, const basic_json<Char2>& val)
+        {
+            return basic_json<Char2>::make_array(n, val);
         }
     };
-    template<typename C>
-    class is_type<C,std::basic_string<C>>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return value_.is_string();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,bool>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return value_.is_bool();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,double>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return value_.is_double();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,char>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<char>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned char>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<unsigned char>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,short>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<short>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned short>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<unsigned short>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,int>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<int>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned int>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<unsigned int>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<unsigned long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,long long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<long long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,unsigned long long>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return is_convertible_to<unsigned long long>(value_);
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,object_type>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return value_.is_object();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-    template<typename C>
-    class is_type<C,array_type>
-    {
-      public:
-        is_type (const basic_json<C>& value) : value_(value)
-        {}
-
-        operator bool () const
-        {
-            return value_.is_array();
-        }
-
-      private:
-        const basic_json<C>& value_;
-    };
-
-    template<typename C, typename T>
-    class as_value
+    template<typename Char2>
+    class build_array<Char2,2>
     {
     public:
-        as_value (const basic_json<C>& value) : value_(value)
-        {}
-
-        T get () const
+        basic_json<Char2> operator() (size_t m, size_t n)
         {
-            return static_cast<T>(*this);
+            return basic_json<Char2>::make_2d_array(m, n);
         }
-
-        operator std::basic_string<C> () const
+        basic_json<Char2> operator() (size_t m, size_t n, const basic_json<Char2>& val)
         {
-            return value_.as_string();
+            return basic_json<Char2>::make_2d_array(m, n, val);
         }
-        operator bool () const
+    };
+    template<typename Char2>
+    class build_array<Char2,3>
+    {
+    public:
+        basic_json<Char2> operator() (size_t m, size_t n, size_t k)
         {
-            return value_.as_bool();
+            return basic_json<Char2>::make_3d_array (m, n, k);
         }
-        operator char () const
+        basic_json<Char2> operator() (size_t m, size_t n, size_t k, const basic_json<Char2>& val)
         {
-            return value_.as_char();
+            return basic_json<Char2>::make_3d_array (m, n, k, val);
         }
-        operator double () const
-        {
-            return value_.as_double();
-        }
-        operator int () const
-        {
-            return value_.as_int();
-        }
-        operator short () const
-        {
-            return static_cast<short>(value_.as_longlong());
-        }
-        operator unsigned short () const
-        {
-            return static_cast<unsigned short>(value_.as_ulonglong());
-        }
-        operator unsigned int () const
-        {
-            return value_.as_uint();
-        }
-        operator long () const
-        {
-            return value_.as_long();
-        }
-        operator unsigned long () const
-        {
-            return value_.as_ulong();
-        }
-        operator long long () const
-        {
-            return value_.as_longlong();
-        }
-        operator unsigned long long () const
-        {
-            return value_.as_ulonglong();
-        }
-
-    private:
-        const basic_json<C>& value_;
     };
 
-    value_type type_;
+	value_type type_;
     union
     {
         double double_value_;
@@ -1354,6 +1221,12 @@ private:
         basic_custom_data<Char>* userdata_;
     } value_;
 };
+
+template <class Char>
+void swap(typename basic_json<Char>::name_value_pair& a, typename basic_json<Char>::name_value_pair& b)
+{
+    a.swap(b);
+}
 
 }
 

@@ -20,37 +20,11 @@
 #include <cstdarg>
 #include <limits> // std::numeric_limits
 
-#define JSONCONS_NO_MACRO_EXPANSION
+#define JSONCONS_NO_MACRO_EXP 
 
 namespace jsoncons {
 
 // Follow boost
-
-#if defined(__clang__)
-//  Clang C++ emulates GCC, so it has to appear early.
-#   if !__has_feature(cxx_rvalue_references)
-#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
-#   endif
-#elif defined(__GNUC__)
-#   if !((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__))
-#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
-#   endif
-#elif defined(_MSC_VER)
-#   if _MSC_VER < 1600
-#      define JSONCONS_NO_CXX11_RVALUE_REFERENCES
-#   endif // _MSC_VER < 1600
-#else
-#   error "Unknown compiler"
-#endif
-
-//
-// Move support:
-//
-#ifndef JSONCONS_NO_CXX11_RVALUE_REFERENCES
-#define JSONCONS_MOVE(x) std::move(x)
-#else
-#define JSONCONS_MOVE(x) x
-#endif
 
 #if defined (__clang__)
 #   if defined(_GLIBCXX_USE_NOEXCEPT)
