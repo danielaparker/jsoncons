@@ -24,7 +24,7 @@ The changes are
 
 - Replaced `std::pair<std::string,json>` with `name_value_pair` that has accessors `name()` and `value()`
 
-- In `json_input_handler` and `json_output_handler`, allowed for overrides of the `value` methods by making them non-virtual and adding protected virtual methods `value_string`, `value_double`, `value_longlong`, `value_ulonglong`, and `value_bool`
+- In `json_input_handler` and `json_output_handler`, allowed for overrides of the `value` methods by making them non-virtual and adding virtual methods `value_string`, `value_double`, `value_longlong`, `value_ulonglong`, and `value_bool`
 
 Other new features:
 
