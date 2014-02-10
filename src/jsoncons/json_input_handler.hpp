@@ -87,7 +87,7 @@ public:
 
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 
-protected:
+// value(...) implementation
     virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void value_double(double value, const basic_parsing_context<Char>& context) = 0;
@@ -134,7 +134,7 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context)
     {
     }
-protected:
+// value(...) implementation
     virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
     }

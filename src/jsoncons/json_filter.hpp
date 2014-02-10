@@ -71,7 +71,7 @@ public:
         writer_.null_value();
     }
 
-protected:
+// value(...) implementation
     virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
@@ -162,7 +162,7 @@ public:
         return parent_;
     }
 
-protected:
+// value(...) implementation
     virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);

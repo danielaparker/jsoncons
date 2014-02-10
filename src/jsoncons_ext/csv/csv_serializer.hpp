@@ -270,7 +270,7 @@ public:
             }
         }
     }
-protected:
+// value(...) implementation
 
     virtual void value_string(const std::basic_string<Char>& val)
     {

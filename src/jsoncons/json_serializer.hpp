@@ -144,7 +144,7 @@ public:
         end_value();
     }
 
-protected:
+// value(...) implementation
 
     virtual void value_string(const std::basic_string<Char>& value)
     {
