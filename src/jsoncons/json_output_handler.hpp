@@ -87,7 +87,7 @@ public:
 
     virtual void end_array() = 0;
 
-protected:
+// value(...) implementation
 
     virtual void value_string(const std::basic_string<Char>& value) = 0;
 
@@ -137,7 +137,7 @@ public:
     {
     }
 
-protected:
+// value(...) implementation
 
     virtual void value_string(const std::basic_string<Char>& value)
     {

@@ -172,7 +172,9 @@ public:
     {
         return root_;
     }
-protected:
+
+// value(...) implementation
+
     virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())

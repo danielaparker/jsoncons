@@ -168,7 +168,8 @@ public:
 
         end_value();
     }
-protected:
+
+// value(...) implementation
 
     void begin_element()
     {
