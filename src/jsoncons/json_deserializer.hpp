@@ -82,7 +82,7 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
     };
 
 public:
-    ~basic_json_deserializer()
+    virtual ~basic_json_deserializer()
     {
         for (size_t i = 0; i < stack_.size(); ++i)
         {

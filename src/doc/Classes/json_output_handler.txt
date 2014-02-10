@@ -8,34 +8,34 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
 
 ### Overloaded methods
 
-    virtual void value(const std::string& value)
+    void value(const std::string& value)
 Send notification of a `string` value
 
-    virtual void value(float value)
+    void value(float value)
 Send notification of a float number
 
-    virtual void value(double value)
+    void value(double value)
 Send notification of a double number
 
-    virtual void value(int value)
+    void value(int value)
 Send notification of an int number
 
-    virtual void value(unsigned int value)
+    void value(unsigned int value)
 Send notification of an unsigned int number
 
-    virtual void value(long value)
+    void value(long value)
 Send notification of a long number
 
-    virtual void value(unsigned long value)
+    void value(unsigned long value)
 Send notification of an unsigned long number
 
-    virtual void value(long long value)
+    void value(long long value)
 Send notification of a long long number
 
-    virtual void value(unsigned long long value)
+    void value(unsigned long long value)
 Send notification of an unsigned long long number
 
-    virtual void value(bool value)
+    void value(bool value)
 Send notification of a boolean value
 
 ### Implementing methods
@@ -63,8 +63,6 @@ Receive notification of the `name` of a name value pair
 
     virtual void null_value()
 Receive notification of `null`
-
-### Protected implementing methods
 
     virtual void value_string(const std::string& value)
 Receive notification of a `string` value

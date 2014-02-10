@@ -84,8 +84,6 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive notification of a null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-### Protected implementing methods
-
     virtual void value_string(const std::string& value, const parsing_context& context)
 Receive notification of a string value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
