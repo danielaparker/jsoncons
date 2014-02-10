@@ -39,7 +39,7 @@ target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
 
 target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
 
-# special link option on Linux because llvm stl rely on GNU stl
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_tests -Wl,-lstdc++)
 endif()
