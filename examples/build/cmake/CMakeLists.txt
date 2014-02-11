@@ -22,7 +22,7 @@ add_executable (jsoncons_examples ../../src/array_examples.cpp
                                   ../../src/custom_data_examples.cpp
                                   ../../src/examples.cpp)
 
-# special link option on Linux because llvm stl rely on GNU stl
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_examples -Wl,-lstdc++)
 endif()
