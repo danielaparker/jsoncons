@@ -82,8 +82,46 @@ for k, v in ARGLIST:
 
 
 ############################################################################
+# Configure compiler
+
+def sanitize_cenv(s):
+    """Prevent recursions with ccache ccache ..."""
+    l = s.split()
+    last = None
+    res = []
+    for i in l:
+        if i == last:
+            pass
+        else:
+            res.append(i)
+            last = i
+    return ' '.join(res)
+
+
+def get_compiler_only(s):
+    """Get only the compiler (removing ccache) from the compiler string ($CC, $CXX)"""
+    l = s.split()
+    return ' '.join( [ i for i in l if i != "ccache" ] )
+
+
+cc = os.environ.get('CC', 'gcc')
+cxx = os.environ.get('CXX', 'g++')
+if (GetOption('ccache')  and GetOption('ccache') == 'yes') or (SCutils.which('ccache') and not GetOption('ccache') == 'no'):
+    cc ='ccache {0}'.format(cc)
+    cxx ='ccache {0}'.format(cxx)
+
+if get_compiler_only(cxx) == 'clang++':
+    # Fix ccache and clang warnings
+    cxxflags.append("-Qunused-arguments")
+
+
+############################################################################
+
+
+############################################################################
 # Configure debug or release build environment
 #
+
 build = GetOption('build')
 if not build:
     build = 'debug'
@@ -118,6 +156,9 @@ env = Environment(
 
 env.Decider('MD5-timestamp')
 
+# pass these settings to nested environments such as Execute
+env['ENV']['CC'] = env['CC'] = cc
+env['ENV']['CXX'] = env['CXX'] = cxx
 ############################################################################
 
 ############################################################################
@@ -126,14 +167,6 @@ if not SCutils.has_option('verbose'):
     SCutils.setup_quiet_build(env, True if SCutils.has_option('colorblind') else False)
 ############################################################################
 
-
-############################################################################
-# Look if ccache available or is explicitly disabled
-if (GetOption('ccache')  and GetOption('ccache') == 'yes') or (SCutils.which('ccache') and not GetOption('ccache') == 'no'):
-    env['CC'] ='ccache gcc'
-    env['CXX'] ='ccache g++'
-
-############################################################################
 
 
 sources = SCutils.RGlob(['*.cpp'], Dir('test_suite/src'))
