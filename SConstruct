@@ -6,6 +6,7 @@ import SCons.Errors
 import pprint
 import sys
 import platform
+sys.path.append("build/scons")
 from site_scons import SCutils
 from multiprocessing import cpu_count
 
