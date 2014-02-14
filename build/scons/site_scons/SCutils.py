@@ -111,6 +111,24 @@ def which(program):
     return None
 
 
+def sanitize_cenv(s):
+    """Prevent recursions with ccache ccache ..."""
+    l = s.split()
+    last = None
+    res = []
+    for i in l:
+        if i == last:
+            pass
+        else:
+            res.append(i)
+            last = i
+    return ' '.join(res)
+
+
+def get_compiler_only(s):
+    """Get only the compiler (removing ccache) from the compiler string ($CC, $CXX)"""
+    l = s.split()
+    return ' '.join( [ i for i in l if i != "ccache" ] )
 
 
 def isDir( node ):
