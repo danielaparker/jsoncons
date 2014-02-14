@@ -332,30 +332,30 @@ Makes an empty array, an array of n elements, each element an empty json object,
 Use `json val(json::an_array)` or `json::make_multi_array<1>(...)` instead (but `make_array` will continue to work)
 
     static json make_2d_array(size_t m, size_t n)
-Use make_multi_array<2>(m,n) instead
+Use `make_multi_array<2>(m,n)` instead
 
     static json make_2d_array(size_t m, size_t n, const json& val)
-Use make_multi_array<2>(m,n,val) instead
+Use `make_multi_array<2>(m,n,val)` instead
 
     static json make_3d_array(size_t m, size_t n, size_t k)
-Use make_multi_array<3>(m,n,k) instead
+Use `make_multi_array<3>(m,n,k)` instead
 
     static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
-Use make_multi_array<3>(m,n,k,val) instead
+Use `make_multi_array<3>(m,n,k,val)` instead
 
     template <class T>
     std::vector<T> as_vector() const
 If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
-Use as<std::vector<T>> instead.
+Use `as<std::vector<T>>` instead.
 
     int as_int() const
-Use as<int>() instead
+Use `as<int>()` instead
 
     unsigned int as_uint() const
-Use as<int>() instead
+Use `as<int>()` instead
 
     char as_char() const
-Use as<char>() instead
+Use `as<char>()` instead
 
 ### Examples
 

@@ -943,7 +943,7 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     size_t size = 0;
     size_t pos = buffer_position_;
     bool done = false;
-    const size_t end = std::min(buffer_length_,estimation_buffer_length_);
+    const size_t end = std::min JSONCONS_NO_MACRO_EXP(buffer_length_,estimation_buffer_length_);
     while (!done & (pos < end))
     {
         switch (buffer_[pos])
@@ -1004,7 +1004,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     size_t size = 0;
     size_t pos = buffer_position_;
     bool done = false;
-    const size_t end = std::min(buffer_length_,estimation_buffer_length_);
+    const size_t end = std::min JSONCONS_NO_MACRO_EXP(buffer_length_,estimation_buffer_length_);
     while (!done & (pos < end))
     {
         switch (buffer_[pos])
