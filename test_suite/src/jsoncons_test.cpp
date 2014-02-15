@@ -488,7 +488,7 @@ public:
     }
 
 // value(...) implementation
-    virtual void value_string(const std::string& value, const parsing_context& context)
+    virtual void read_value(const std::string& value, const parsing_context& context)
     {
         if (name_ == "name")
         {
