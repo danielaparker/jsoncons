@@ -72,27 +72,27 @@ public:
     }
 
 // value(...) implementation
-    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void read_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    virtual void read_value(double value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    virtual void read_value(long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void read_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
 
-    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    virtual void read_value(bool value, const basic_parsing_context<Char>& context)
     {
         writer_.value(value);
     }
@@ -163,27 +163,27 @@ public:
     }
 
 // value(...) implementation
-    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void read_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    virtual void read_value(double value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    virtual void read_value(long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void read_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    virtual void read_value(bool value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }

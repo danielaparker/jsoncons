@@ -21,52 +21,52 @@ public:
     // Overloaded methods
     void value(const std::basic_string<Char>& value) 
     {
-        value_string(value);
+        write_value(value);
     }
 
     void value(float value)
     {
-        value_double((double)value);
+        write_value((double)value);
     }
 
     void value(double value)
     {
-        value_double(value);
+        write_value(value);
     }
 
     void value(int value) 
     {
-        value_longlong((long long)value);
+        write_value((long long)value);
     }
 
     void value(unsigned int value)
     {
-        value_ulonglong((unsigned long long)value);
+        write_value((unsigned long long)value);
     }
 
     void value(long value) 
     {
-        value_longlong((long long)value);
+        write_value((long long)value);
     }
 
     void value(unsigned long value)
     {
-        value_ulonglong((unsigned long long)value);
+        write_value((unsigned long long)value);
     }
 
     void value(long long value) 
     {
-        value_longlong(value);
+        write_value(value);
     }
 
     void value(unsigned long long value)
     {
-        value_ulonglong(value);
+        write_value(value);
     }
 
     void value(bool value)
     {
-        value_bool(value);
+        write_value(value);
     }
 
     virtual void null_value() = 0;
@@ -89,15 +89,15 @@ public:
 
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& value) = 0;
+    virtual void write_value(const std::basic_string<Char>& value) = 0;
 
-    virtual void value_double(double value) = 0;
+    virtual void write_value(double value) = 0;
 
-    virtual void value_longlong(long long value) = 0;
+    virtual void write_value(long long value) = 0;
 
-    virtual void value_ulonglong(unsigned long long value) = 0;
+    virtual void write_value(unsigned long long value) = 0;
 
-    virtual void value_bool(bool value) = 0;
+    virtual void write_value(bool value) = 0;
 };
 
 template <class Char>
@@ -139,23 +139,23 @@ public:
 
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& value)
+    virtual void write_value(const std::basic_string<Char>& value)
     {
     }
 
-    virtual void value_double(double value)
+    virtual void write_value(double value)
     {
     }
 
-    virtual void value_longlong(long long value)
+    virtual void write_value(long long value)
     {
     }
 
-    virtual void value_ulonglong(unsigned long long value)
+    virtual void write_value(unsigned long long value)
     {
     }
 
-    virtual void value_bool(bool value)
+    virtual void write_value(bool value)
     {
     }
 
