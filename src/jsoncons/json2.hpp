@@ -1520,44 +1520,51 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_j
     return os;
 }
 
-template <typename Json=json>
-class basic_pretty_print
+template <typename Char, typename Allocator>
+class pretty_printer
 {
 public:
-    typedef typename Json::char_type char_type;
-    typedef typename Json::allocator_type allocator_type;
-
-    basic_pretty_print(basic_json<char_type,allocator_type>& o)
-        : o_(o)
+    pretty_printer(const basic_json<Char,Allocator>& o)
+        : o_(&o)
     {
     }
 
-    basic_pretty_print(basic_json<char_type,allocator_type>& o,
-                       const basic_output_format<char_type>& format)
-        : o_(o), format_(format)
+    pretty_printer(basic_json<Char,Allocator>& o,
+                   const basic_output_format<Char>& format)
+        : o_(&o), format_(format)
     {
     ;
     }
 
-    void to_stream(std::basic_ostream<char_type>& os) const
+    void to_stream(std::basic_ostream<Char>& os) const
     {
-        o_.to_stream(os,format_,true);
+        o_->to_stream(os,format_,true);
     }
 
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const basic_pretty_print<Json>& o)
+    friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const pretty_printer<Char,Allocator>& o)
     {
         o.to_stream(os);
         return os;
     }
 
-    const basic_json<char_type,allocator_type>& o_;
-    basic_output_format<char_type> format_;
+    const basic_json<Char,Allocator>* o_;
+    basic_output_format<Char> format_;
 private:
-    basic_pretty_print();
-    basic_pretty_print(const basic_pretty_print& o);
+    pretty_printer();
 };
 
-typedef basic_pretty_print<json> pretty_print;
+template <class Char,class Allocator>
+pretty_printer<Char,Allocator> pretty_print(const basic_json<Char,Allocator>& val)
+{
+    return typename pretty_printer<Char,Allocator>(val);
+}
+
+template <class Char,class Allocator>
+pretty_printer<Char,Allocator> pretty_print(const basic_json<Char,Allocator>& val,
+                                            const basic_output_format<Char>& format)
+{
+    return typename pretty_printer<Char,Allocator>(val,format);
+}
 
 inline
 char to_hex_character(unsigned char c)
