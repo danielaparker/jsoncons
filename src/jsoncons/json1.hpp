@@ -170,6 +170,9 @@ template <typename Char, typename Allocator>
 class basic_json : public json_base
 {
 public:
+    typedef Char char_type;
+    typedef Allocator allocator_type;
+
     class null_type;
     class object;
     class array;
@@ -1290,6 +1293,9 @@ void swap(typename basic_json<Char,Allocator>::name_value_pair& a, typename basi
 {
     a.swap(b);
 }
+
+typedef basic_json<char,std::allocator<char>> json;
+typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
 
 }
 
