@@ -32,22 +32,22 @@
 
 namespace jsoncons {
 
-template <class Char>
-basic_json<Char>::basic_json()
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json()
 {
     type_ = empty_object_t;
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class InputIterator>
-basic_json<Char>::basic_json(InputIterator first, InputIterator last)
+basic_json<Char,Allocator>::basic_json(InputIterator first, InputIterator last)
 {
     type_ = array_t;
-    value_.array_ = new json_array<Char>(first,last);
+    value_.array_ = new json_array<Char,Allocator>(first,last);
 }
 
-template <class Char>
-basic_json<Char>::basic_json(const basic_json<Char>& val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(const basic_json<Char,Allocator>& val)
 {
     type_ = val.type_;
     switch (type_)
@@ -80,85 +80,85 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
     }
 }
 
-template <class Char>
-basic_json<Char>::basic_json(json_object<Char>* var)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(json_object<Char,Allocator>* var)
 {
     type_ = object_t;
     value_.object_ = var;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(json_array<Char>* var)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(json_array<Char,Allocator>* var)
 {
     type_ = array_t;
     value_.array_ = var;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(basic_custom_data<Char>* var)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(basic_custom_data<Char>* var)
 {
     type_ = custom_t;
     value_.userdata_ = var;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(double val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(double val)
 {
     type_ = double_t;
     value_.value_double_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(long long val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(long long val)
 {
     type_ = longlong_t;
     value_.value_longlong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(int val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(int val)
 {
     type_ = longlong_t;
     value_.value_longlong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(unsigned int val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(unsigned int val)
 {
     type_ = ulonglong_t;
     value_.value_longlong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(long val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(long val)
 {
     type_ = longlong_t;
     value_.value_longlong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(unsigned long val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(unsigned long val)
 {
     type_ = ulonglong_t;
     value_.value_longlong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(unsigned long long val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(unsigned long long val)
 {
     type_ = ulonglong_t;
     value_.value_ulonglong_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(bool val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(bool val)
 {
     type_ = bool_t;
     value_.bool_value_ = val;
 }
 
-template <class Char>
-basic_json<Char>::basic_json(Char c)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(Char c)
 {
     type_ = string_t;
     //value_.value_string_ = new std::basic_string<Char>();
@@ -166,8 +166,8 @@ basic_json<Char>::basic_json(Char c)
     init_string(value_.val_string_, c);
 }
 
-template <class Char>
-basic_json<Char>::basic_json(const std::basic_string<Char>& s)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
     //value_.value_string_ = new std::basic_string<Char>(s);
@@ -176,8 +176,8 @@ basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 	#pragma warning(default:4996)
 }
 
-template <class Char>
-basic_json<Char>::basic_json(const Char* s)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(const Char* s)
 {
     type_ = string_t;
     //value_.value_string_ = new std::basic_string<Char>(s);
@@ -186,8 +186,8 @@ basic_json<Char>::basic_json(const Char* s)
 	#pragma warning(default:4996)
 }
 
-template <class Char>
-basic_json<Char>::basic_json(value_type t)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(value_type t)
 {
     type_ = t;
     switch (type_)
@@ -204,10 +204,10 @@ basic_json<Char>::basic_json(value_type t)
         //value_.value_string_ = new std::basic_string<Char>();
         break;
     case array_t:
-        value_.array_ = new json_array<Char>();
+        value_.array_ = new json_array<Char,Allocator>();
         break;
     case object_t:
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
         break;
 
     case custom_t:
@@ -215,8 +215,8 @@ basic_json<Char>::basic_json(value_type t)
     }
 }
 
-template <class Char>
-basic_json<Char>::~basic_json()
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::~basic_json()
 {
     switch (type_)
     {
@@ -243,8 +243,8 @@ basic_json<Char>::~basic_json()
     }
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(const char* rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(const char* rhs)
 {
     switch (type_)
     {
@@ -258,14 +258,14 @@ basic_json<Char>& basic_json<Char>::operator=(const char* rhs)
         init_string(value_.val_string_,rhs);
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(const std::basic_string<Char>& rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(const std::basic_string<Char>& rhs)
 {
     switch (type_)
     {
@@ -279,14 +279,14 @@ basic_json<Char>& basic_json<Char>::operator=(const std::basic_string<Char>& rhs
         //value_.value_string_ = new std::basic_string<Char>(rhs);
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(Char rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(Char rhs)
 {
     switch (type_)
     {
@@ -301,14 +301,14 @@ basic_json<Char>& basic_json<Char>::operator=(Char rhs)
         //value_.value_string_->push_back(rhs);
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(int rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(int rhs)
 {
     switch (type_)
     {
@@ -321,14 +321,14 @@ basic_json<Char>& basic_json<Char>::operator=(int rhs)
         value_.value_longlong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(unsigned int rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned int rhs)
 {
     switch (type_)
     {
@@ -341,14 +341,14 @@ basic_json<Char>& basic_json<Char>::operator=(unsigned int rhs)
         value_.value_ulonglong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(long rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long rhs)
 {
     switch (type_)
     {
@@ -361,14 +361,14 @@ basic_json<Char>& basic_json<Char>::operator=(long rhs)
         value_.value_longlong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(unsigned long rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long rhs)
 {
     switch (type_)
     {
@@ -381,14 +381,14 @@ basic_json<Char>& basic_json<Char>::operator=(unsigned long rhs)
         value_.value_ulonglong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(long long rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long long rhs)
 {
     switch (type_)
     {
@@ -401,14 +401,14 @@ basic_json<Char>& basic_json<Char>::operator=(long long rhs)
         value_.value_longlong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(unsigned long long rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long long rhs)
 {
     switch (type_)
     {
@@ -421,14 +421,14 @@ basic_json<Char>& basic_json<Char>::operator=(unsigned long long rhs)
         value_.value_ulonglong_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(bool rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(bool rhs)
 {
     switch (type_)
     {
@@ -441,14 +441,14 @@ basic_json<Char>& basic_json<Char>::operator=(bool rhs)
         value_.bool_value_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(double rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(double rhs)
 {
     switch (type_)
     {
@@ -461,27 +461,27 @@ basic_json<Char>& basic_json<Char>::operator=(double rhs)
         value_.value_double_ = rhs;
         break;
     default:
-        basic_json<Char>(rhs).swap(*this);
+        basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
     return *this;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator=(basic_json<Char> rhs)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(basic_json<Char,Allocator> rhs)
 {
     rhs.swap(*this);
     return *this;
 }
 
-template <class Char>
-bool basic_json<Char>::operator!=(const basic_json<Char>& rhs) const
+template <typename Char, typename Allocator>
+bool basic_json<Char,Allocator>::operator!=(const basic_json<Char,Allocator>& rhs) const
 {
     return !(*this == rhs);
 }
 
-template <class Char>
-bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
+template <typename Char, typename Allocator>
+bool basic_json<Char,Allocator>::operator==(const basic_json<Char,Allocator>& rhs) const
 {
     if (is_number() && rhs.is_number())
     {
@@ -552,8 +552,8 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
     return false;
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::at(size_t i)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::at(size_t i)
 {
     switch (type_)
     {
@@ -568,8 +568,8 @@ basic_json<Char>& basic_json<Char>::at(size_t i)
     }
 }
 
-template <class Char>
-const basic_json<Char>& basic_json<Char>::at(size_t i) const
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator>& basic_json<Char,Allocator>::at(size_t i) const
 {
     switch (type_)
     {
@@ -584,8 +584,8 @@ const basic_json<Char>& basic_json<Char>::at(size_t i) const
     }
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::at(const std::basic_string<Char>& name)
 {
     switch (type_)
     {
@@ -600,8 +600,8 @@ basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name)
     }
 }
 
-template <class Char>
-const basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name) const
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator>& basic_json<Char,Allocator>::at(const std::basic_string<Char>& name) const
 {
     switch (type_)
     {
@@ -616,17 +616,17 @@ const basic_json<Char>& basic_json<Char>::at(const std::basic_string<Char>& name
     }
 }
 
-template <class Char>
-const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& name) const
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator>& basic_json<Char,Allocator>::get(const std::basic_string<Char>& name) const
 {
     switch (type_)
     {
     case empty_object_t:
-        return basic_json<Char>::null;
+        return basic_json<Char,Allocator>::null;
     case object_t:
         {
         const_object_iterator it = value_.object_->find(name);
-        return it != end_members() ? it->value() : basic_json<Char>::null;
+        return it != end_members() ? it->value() : basic_json<Char,Allocator>::null;
 		}
     default:
         {
@@ -635,8 +635,8 @@ const basic_json<Char>& basic_json<Char>::get(const std::basic_string<Char>& nam
     }
 }
 
-template <class Char>
-typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basic_string<Char>& name, const basic_json<Char>& default_val) const
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::const_val_proxy basic_json<Char,Allocator>::get(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& default_val) const
 {
     switch (type_)
     {
@@ -654,14 +654,14 @@ typename basic_json<Char>::const_val_proxy basic_json<Char>::get(const std::basi
     }
 }
 
-template <class Char>
-void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json<Char>& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::set(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& value)
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
         value_.object_->set(name,value);
         break;
@@ -672,16 +672,16 @@ void basic_json<Char>::set(const std::basic_string<Char>& name, const basic_json
     }
 }
 
-template <class Char>
-basic_json<Char>::basic_json(basic_json&& other)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>::basic_json(basic_json&& other)
 {
     type_ = other.type_;
     value_ = other.value_;
     other.type_ = null_t;
 }
 
-template <class Char>
-void basic_json<Char>::add(basic_json<Char>&& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::add(basic_json<Char,Allocator>&& value)
 {
     switch (type_)
     {
@@ -695,8 +695,8 @@ void basic_json<Char>::add(basic_json<Char>&& value)
     }
 }
 
-template <class Char>
-void basic_json<Char>::add(size_t index, basic_json<Char>&& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::add(size_t index, basic_json<Char,Allocator>&& value)
 {
     switch (type_)
     {
@@ -710,14 +710,14 @@ void basic_json<Char>::add(size_t index, basic_json<Char>&& value)
     }
 }
 
-template <class Char>
-void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::set(std::basic_string<Char>&& name, basic_json<Char,Allocator>&& value)
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
         value_.object_->set(name,value);
         break;
@@ -728,17 +728,17 @@ void basic_json<Char>::set(std::basic_string<Char>&& name, basic_json<Char>&& va
     }
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class T>
-void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, const T& value)
+void basic_json<Char,Allocator>::set_custom_data(const std::basic_string<Char>& name, const T& value)
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
-        value_.object_->set(name,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        value_.object_->set(name,basic_json<Char,Allocator>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -747,8 +747,8 @@ void basic_json<Char>::set_custom_data(const std::basic_string<Char>& name, cons
     }
 }
 
-template <class Char>
-void basic_json<Char>::clear()
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::clear()
 {
     switch (type_)
     {
@@ -763,8 +763,8 @@ void basic_json<Char>::clear()
     }
 }
 
-template <class Char>
-void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::remove_range(size_t from_index, size_t to_index)
 {
     switch (type_)
     {
@@ -776,8 +776,8 @@ void basic_json<Char>::remove_range(size_t from_index, size_t to_index)
     }
 }
 
-template <class Char>
-void basic_json<Char>::remove_member(const std::basic_string<Char>& name)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::remove_member(const std::basic_string<Char>& name)
 {
     switch (type_)
     {
@@ -789,8 +789,8 @@ void basic_json<Char>::remove_member(const std::basic_string<Char>& name)
     }
 }
 
-template <class Char>
-void basic_json<Char>::add(const basic_json<Char>& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::add(const basic_json<Char,Allocator>& value)
 {
     switch (type_)
     {
@@ -804,8 +804,8 @@ void basic_json<Char>::add(const basic_json<Char>& value)
     }
 }
 
-template <class Char>
-void basic_json<Char>::add(size_t index, const basic_json<Char>& value)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::add(size_t index, const basic_json<Char,Allocator>& value)
 {
     switch (type_)
     {
@@ -819,15 +819,15 @@ void basic_json<Char>::add(size_t index, const basic_json<Char>& value)
     }
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class T>
-void basic_json<Char>::add_custom_data(const T& value)
+void basic_json<Char,Allocator>::add_custom_data(const T& value)
 {
     switch (type_)
     {
     case array_t:
         {
-        add(basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        add(basic_json<Char,Allocator>(new custom_data_wrapper<Char,T>(value)));
         }
         break;
     default:
@@ -837,14 +837,14 @@ void basic_json<Char>::add_custom_data(const T& value)
     }
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class T>
-void basic_json<Char>::add_custom_data(size_t index, const T& value)
+void basic_json<Char,Allocator>::add_custom_data(size_t index, const T& value)
 {
     switch (type_)
     {
     case array_t:
-        value_.array_->add(index,basic_json<Char>(new custom_data_wrapper<Char,T>(value)));
+        value_.array_->add(index,basic_json<Char,Allocator>(new custom_data_wrapper<Char,T>(value)));
         break;
     default:
         {
@@ -853,8 +853,8 @@ void basic_json<Char>::add_custom_data(size_t index, const T& value)
     }
 }
 
-template <class Char>
-size_t basic_json<Char>::size() const
+template <typename Char, typename Allocator>
+size_t basic_json<Char,Allocator>::size() const
 {
     switch (type_)
     {
@@ -869,32 +869,32 @@ size_t basic_json<Char>::size() const
     }
 }
 
-template <class Char>
-typename basic_json<Char>::object_key_proxy basic_json<Char>::operator[](const std::basic_string<Char>& name)
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::object_key_proxy basic_json<Char,Allocator>::operator[](const std::basic_string<Char>& name)
 {
     return object_key_proxy(*this,name);
 }
 
-template <class Char>
-const basic_json<Char>& basic_json<Char>::operator[](const std::basic_string<Char>& name) const
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator[](const std::basic_string<Char>& name) const
 {
     return at(name);
 }
 
-template <class Char>
-basic_json<Char>& basic_json<Char>::operator[](size_t i)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator[](size_t i)
 {
     return value_.array_->at(i);
 }
 
-template <class Char>
-const basic_json<Char>& basic_json<Char>::operator[](size_t i) const
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator[](size_t i) const
 {
     return value_.array_->at(i);
 }
 
-template <class Char>
-std::basic_string<Char> basic_json<Char>::to_string() const
+template <typename Char, typename Allocator>
+std::basic_string<Char> basic_json<Char,Allocator>::to_string() const
 {
     std::basic_ostringstream<Char> os;
     basic_json_serializer<Char> serializer(os);
@@ -902,8 +902,8 @@ std::basic_string<Char> basic_json<Char>::to_string() const
     return os.str();
 }
 
-template <class Char>
-std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Char>& format) const
+template <typename Char, typename Allocator>
+std::basic_string<Char> basic_json<Char,Allocator>::to_string(const basic_output_format<Char>& format) const
 {
     std::basic_ostringstream<Char> os;
     basic_json_serializer<Char> serializer(os,format);
@@ -911,8 +911,8 @@ std::basic_string<Char> basic_json<Char>::to_string(const basic_output_format<Ch
     return os.str();
 }
 
-template <class Char>
-void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::to_stream(basic_json_output_handler<Char>& handler) const
 {
     switch (type_)
     {
@@ -942,7 +942,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
     case object_t:
         {
         handler.begin_object();
-        json_object<Char>* o = value_.object_;
+        json_object<Char,Allocator>* o = value_.object_;
         for (const_object_iterator it = o->begin(); it != o->end(); ++it)
         {
             handler.name(it->name());
@@ -954,7 +954,7 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
     case array_t:
         {
         handler.begin_array();
-        json_array<Char>* o = value_.array_;
+        json_array<Char,Allocator>* o = value_.array_;
         for (const_array_iterator it = o->begin(); it != o->end(); ++it)
         {
             it->to_stream(handler);
@@ -971,123 +971,123 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
     }
 }
 
-template <class Char>
-void basic_json<Char>::to_stream(std::basic_ostream<Char>& os) const
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::to_stream(std::basic_ostream<Char>& os) const
 {
     basic_json_serializer<Char> serializer(os);
     to_stream(serializer);
 }
 
-template <class Char>
-void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
 {
     basic_json_serializer<Char> serializer(os,format);
     to_stream(serializer);
 }
 
-template <class Char>
-void basic_json<Char>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
 {
     basic_json_serializer<Char> serializer(os,format,indenting);
     to_stream(serializer);
 }
 
-template <class Char>
-const basic_json<Char> basic_json<Char>::an_object(new json_object<Char>());
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator> basic_json<Char,Allocator>::an_object(new json_object<Char,Allocator>());
 
-template <class Char>
-const basic_json<Char> basic_json<Char>::an_array(new json_array<Char>());
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator> basic_json<Char,Allocator>::an_array(new json_array<Char,Allocator>());
 
-template <class Char>
-const basic_json<Char> basic_json<Char>::null = basic_json<Char>(basic_json<Char>::null_t);
+template <typename Char, typename Allocator>
+const basic_json<Char,Allocator> basic_json<Char,Allocator>::null = basic_json<Char,Allocator>(basic_json<Char,Allocator>::null_t);
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_array()
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_array()
 {
-    return basic_json<Char>(new json_array<Char>());
+    return basic_json<Char,Allocator>(new json_array<Char,Allocator>());
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_array(size_t n)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_array(size_t n)
 {
-    return basic_json<Char>(new json_array<Char>(n));
+    return basic_json<Char,Allocator>(new json_array<Char,Allocator>(n));
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_array(size_t n, const basic_json<Char>& val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_array(size_t n, const basic_json<Char,Allocator>& val)
 {
-    return basic_json<Char>(new json_array<Char>(n,val));
+    return basic_json<Char,Allocator>(new json_array<Char,Allocator>(n,val));
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    basic_json<Char,Allocator> a(basic_json<Char,Allocator>(new json_array<Char,Allocator>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>::make_array(n);
+        a[i] = basic_json<Char,Allocator>::make_array(n);
     }
     return a;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_2d_array(size_t m, size_t n, const basic_json<Char>& val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_2d_array(size_t m, size_t n, const basic_json<Char,Allocator>& val)
 {
-    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    basic_json<Char,Allocator> a(basic_json<Char,Allocator>(new json_array<Char,Allocator>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>::make_array(n,val);
+        a[i] = basic_json<Char,Allocator>::make_array(n,val);
     }
     return a;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    basic_json<Char,Allocator> a(basic_json<Char,Allocator>(new json_array<Char,Allocator>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>::make_2d_array(n,k);
+        a[i] = basic_json<Char,Allocator>::make_2d_array(n,k);
     }
     return a;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char>& val)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char,Allocator>& val)
 {
-    basic_json<Char> a(basic_json<Char>(new json_array<Char>(m)));
+    basic_json<Char,Allocator> a(basic_json<Char,Allocator>(new json_array<Char,Allocator>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char>::make_2d_array(n,k,val);
+        a[i] = basic_json<Char,Allocator>::make_2d_array(n,k,val);
     }
     return a;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::parse(std::basic_istream<Char>& is)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::parse(std::basic_istream<Char>& is)
 {
-    basic_json_deserializer<Char> handler;
+    basic_json_deserializer<Char,Allocator> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val;
+    basic_json<Char,Allocator> val;
     handler.root().swap(val);
     return val;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::parse_string(const std::basic_string<Char>& s)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
-    basic_json_deserializer<Char> handler;
+    basic_json_deserializer<Char,Allocator> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val;
+    basic_json<Char,Allocator> val;
     handler.root().swap(val);
     return val;
 }
 
-template <class Char>
-basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
+template <typename Char, typename Allocator>
+basic_json<Char,Allocator> basic_json<Char,Allocator>::parse_file(const std::string& filename)
 {
     std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
     if (!is.is_open())
@@ -1095,22 +1095,22 @@ basic_json<Char> basic_json<Char>::parse_file(const std::string& filename)
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
 
-    basic_json_deserializer<Char> handler;
+    basic_json_deserializer<Char,Allocator> handler;
     basic_json_reader<Char> parser(is,handler);
     parser.read();
-    basic_json<Char> val;
+    basic_json<Char,Allocator> val;
     handler.root().swap(val);
     return val;
 }
 
-template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::object_iterator basic_json<Char,Allocator>::begin_members()
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
         return value_.object_->begin();
     default:
@@ -1118,8 +1118,8 @@ typename basic_json<Char>::object_iterator basic_json<Char>::begin_members()
     }
 }
 
-template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members() const
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::const_object_iterator basic_json<Char,Allocator>::begin_members() const
 {
     switch (type_)
     {
@@ -1132,14 +1132,14 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::begin_members
     }
 }
 
-template <class Char>
-typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::object_iterator basic_json<Char,Allocator>::end_members()
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
         return value_.object_->end();
     default:
@@ -1147,8 +1147,8 @@ typename basic_json<Char>::object_iterator basic_json<Char>::end_members()
     }
 }
 
-template <class Char>
-typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members() const
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::const_object_iterator basic_json<Char,Allocator>::end_members() const
 {
     switch (type_)
     {
@@ -1161,8 +1161,8 @@ typename basic_json<Char>::const_object_iterator basic_json<Char>::end_members()
     }
 }
 
-template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::array_iterator basic_json<Char,Allocator>::begin_elements()
 {
     switch (type_)
     {
@@ -1173,8 +1173,8 @@ typename basic_json<Char>::array_iterator basic_json<Char>::begin_elements()
     }
 }
 
-template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements() const
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::const_array_iterator basic_json<Char,Allocator>::begin_elements() const
 {
     switch (type_)
     {
@@ -1185,8 +1185,8 @@ typename basic_json<Char>::const_array_iterator basic_json<Char>::begin_elements
     }
 }
 
-template <class Char>
-typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::array_iterator basic_json<Char,Allocator>::end_elements()
 {
     switch (type_)
     {
@@ -1197,8 +1197,8 @@ typename basic_json<Char>::array_iterator basic_json<Char>::end_elements()
     }
 }
 
-template <class Char>
-typename basic_json<Char>::const_array_iterator basic_json<Char>::end_elements() const
+template <typename Char, typename Allocator>
+typename basic_json<Char,Allocator>::const_array_iterator basic_json<Char,Allocator>::end_elements() const
 {
     switch (type_)
     {
@@ -1209,8 +1209,8 @@ typename basic_json<Char>::const_array_iterator basic_json<Char>::end_elements()
     }
 }
 
-template <class Char>
-double basic_json<Char>::as_double() const
+template <typename Char, typename Allocator>
+double basic_json<Char,Allocator>::as_double() const
 {
     switch (type_)
     {
@@ -1227,8 +1227,8 @@ double basic_json<Char>::as_double() const
     }
 }
 
-template <class Char>
-bool basic_json<Char>::is_empty() const
+template <typename Char, typename Allocator>
+bool basic_json<Char,Allocator>::is_empty() const
 {
     switch (type_)
     {
@@ -1246,8 +1246,8 @@ bool basic_json<Char>::is_empty() const
     }
 }
 
-template <class Char>
-void basic_json<Char>::reserve(size_t n)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::reserve(size_t n)
 {
     switch (type_)
     {
@@ -1256,15 +1256,15 @@ void basic_json<Char>::reserve(size_t n)
         break;
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char>();
+        value_.object_ = new json_object<Char,Allocator>();
     case object_t:
         value_.object_->reserve(n);
         break;
     }
 }
 
-template <class Char>
-void basic_json<Char>::resize_array(size_t n)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::resize_array(size_t n)
 {
     switch (type_)
     {
@@ -1274,8 +1274,8 @@ void basic_json<Char>::resize_array(size_t n)
     }
 }
 
-template <class Char>
-void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val)
+template <typename Char, typename Allocator>
+void basic_json<Char,Allocator>::resize_array(size_t n, const basic_json<Char,Allocator>& val)
 {
     switch (type_)
     {
@@ -1285,8 +1285,8 @@ void basic_json<Char>::resize_array(size_t n, const basic_json<Char>& val)
     }
 }
 
-template <class Char>
-size_t basic_json<Char>::capacity() const
+template <typename Char, typename Allocator>
+size_t basic_json<Char,Allocator>::capacity() const
 {
     switch (type_)
     {
@@ -1299,8 +1299,8 @@ size_t basic_json<Char>::capacity() const
     }
 }
 
-template <class Char>
-bool basic_json<Char>::has_member(const std::basic_string<Char>& name) const
+template <typename Char, typename Allocator>
+bool basic_json<Char,Allocator>::has_member(const std::basic_string<Char>& name) const
 {
     switch (type_)
     {
@@ -1315,8 +1315,8 @@ bool basic_json<Char>::has_member(const std::basic_string<Char>& name) const
     }
 }
 
-template <class Char>
-bool basic_json<Char>::as_bool() const
+template <typename Char, typename Allocator>
+bool basic_json<Char,Allocator>::as_bool() const
 {
     switch (type_)
     {
@@ -1327,8 +1327,8 @@ bool basic_json<Char>::as_bool() const
     }
 }
 
-template <class Char>
-int basic_json<Char>::as_int() const
+template <typename Char, typename Allocator>
+int basic_json<Char,Allocator>::as_int() const
 {
     switch (type_)
     {
@@ -1345,8 +1345,8 @@ int basic_json<Char>::as_int() const
     }
 }
 
-template <class Char>
-unsigned int basic_json<Char>::as_uint() const
+template <typename Char, typename Allocator>
+unsigned int basic_json<Char,Allocator>::as_uint() const
 {
     switch (type_)
     {
@@ -1363,8 +1363,8 @@ unsigned int basic_json<Char>::as_uint() const
     }
 }
 
-template <class Char>
-long long basic_json<Char>::as_longlong() const
+template <typename Char, typename Allocator>
+long long basic_json<Char,Allocator>::as_longlong() const
 {
     switch (type_)
     {
@@ -1381,8 +1381,8 @@ long long basic_json<Char>::as_longlong() const
     }
 }
 
-template <class Char>
-unsigned long long basic_json<Char>::as_ulonglong() const
+template <typename Char, typename Allocator>
+unsigned long long basic_json<Char,Allocator>::as_ulonglong() const
 {
     switch (type_)
     {
@@ -1399,8 +1399,8 @@ unsigned long long basic_json<Char>::as_ulonglong() const
     }
 }
 
-template <class Char>
-long basic_json<Char>::as_long() const
+template <typename Char, typename Allocator>
+long basic_json<Char,Allocator>::as_long() const
 {
     switch (type_)
     {
@@ -1417,8 +1417,8 @@ long basic_json<Char>::as_long() const
     }
 }
 
-template <class Char>
-unsigned long basic_json<Char>::as_ulong() const
+template <typename Char, typename Allocator>
+unsigned long basic_json<Char,Allocator>::as_ulong() const
 {
     switch (type_)
     {
@@ -1435,9 +1435,9 @@ unsigned long basic_json<Char>::as_ulong() const
     }
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class T>
-const T& basic_json<Char>::custom_data() const
+const T& basic_json<Char,Allocator>::custom_data() const
 {
     switch (type_)
     {
@@ -1448,9 +1448,9 @@ const T& basic_json<Char>::custom_data() const
     }
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 template <class T>
-T& basic_json<Char>::custom_data()
+T& basic_json<Char,Allocator>::custom_data()
 {
     switch (type_)
     {
@@ -1464,8 +1464,8 @@ T& basic_json<Char>::custom_data()
     }
 }
 
-template <class Char>
-std::basic_string<Char> basic_json<Char>::as_string() const
+template <typename Char, typename Allocator>
+std::basic_string<Char> basic_json<Char,Allocator>::as_string() const
 {
     switch (type_)
     {
@@ -1477,8 +1477,8 @@ std::basic_string<Char> basic_json<Char>::as_string() const
     }
 }
 
-template <class Char>
-std::basic_string<Char> basic_json<Char>::as_string(const basic_output_format<Char>& format) const
+template <typename Char, typename Allocator>
+std::basic_string<Char> basic_json<Char,Allocator>::as_string(const basic_output_format<Char>& format) const
 {
     switch (type_)
     {
@@ -1490,8 +1490,8 @@ std::basic_string<Char> basic_json<Char>::as_string(const basic_output_format<Ch
     }
 }
 
-template <class Char>
-Char basic_json<Char>::as_char() const
+template <typename Char, typename Allocator>
+Char basic_json<Char,Allocator>::as_char() const
 {
     switch (type_)
     {
@@ -1513,24 +1513,24 @@ Char basic_json<Char>::as_char() const
     }
 }
 
-template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char>& o)
+template <typename Char, typename Allocator>
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char,Allocator>& o)
 {
     o.to_stream(os);
     return os;
 }
 
-template <class Char>
+template <typename Char, typename Allocator>
 class basic_pretty_print
 {
 public:
 
-    basic_pretty_print(basic_json<Char>& o)
+    basic_pretty_print(basic_json<Char,Allocator>& o)
         : o_(o)
     {
     }
 
-    basic_pretty_print(basic_json<Char>& o,
+    basic_pretty_print(basic_json<Char,Allocator>& o,
                        const basic_output_format<Char>& format)
         : o_(o), format_(format)
     {
@@ -1542,21 +1542,21 @@ public:
         o_.to_stream(os,format_,true);
     }
 
-    const basic_json<Char>& o_;
+    const basic_json<Char,Allocator>& o_;
     basic_output_format<Char> format_;
 private:
     basic_pretty_print();
     basic_pretty_print(const basic_pretty_print& o);
 };
 
-template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_pretty_print<Char>& o)
+template <typename Char, typename Allocator>
+std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_pretty_print<Char,Allocator>& o)
 {
     o.to_stream(os);
     return os;
 }
 
-typedef basic_pretty_print<char> pretty_print;
+typedef basic_pretty_print<char,std::allocator<char>> pretty_print;
 
 inline
 char to_hex_character(unsigned char c)
@@ -1572,7 +1572,7 @@ bool is_non_ascii_character(unsigned int c)
     return c >= 0x80;
 }
 
-template <class Char>
+template <typename Char>
 void escape_string(const std::basic_string<Char>& s,
                    const basic_output_format<Char>& format,
                    std::basic_ostream<Char>& os)
@@ -1637,82 +1637,82 @@ void escape_string(const std::basic_string<Char>& s,
     }
 }
 
-template <typename Char>
-class value_adapter<Char,std::basic_string<Char>>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,std::basic_string<Char>>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_string();
     }
-    std::basic_string<Char> as(const basic_json<Char>& val) const
+    std::basic_string<Char> as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_string();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,typename basic_json<Char>::object>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::object>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_object();
     }
-    typename basic_json<Char>::object as(const basic_json<Char>& val) const
+    typename basic_json<Char,Allocator>::object as(const basic_json<Char,Allocator>& val) const
     {
         return val;
     }
 };
 
-template <typename Char>
-class value_adapter<Char,typename basic_json<Char>::array>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::array>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_array();
     }
-    typename basic_json<Char>::array as(const basic_json<Char>& val) const
+    typename basic_json<Char,Allocator>::array as(const basic_json<Char,Allocator>& val) const
     {
         return val;
     }
 };
 
-template <typename Char>
-class value_adapter<Char,typename basic_json<Char>::null_type>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::null_type>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_null();
     }
-    typename basic_json<Char>::null_type as(const basic_json<Char>& val) const
+    typename basic_json<Char,Allocator>::null_type as(const basic_json<Char,Allocator>& val) const
     {
         JSONCONS_ASSERT(val.is_null());
-        return basic_json<Char>::null_type();
+        return basic_json<Char,Allocator>::null_type();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,bool>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,bool>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_bool();
     }
-    bool as(const basic_json<Char>& val) const
+    bool as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_bool();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,int>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,int>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1727,17 +1727,17 @@ public:
             return false;
         }
     }
-    int as(const basic_json<Char>& val) const
+    int as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_int();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,unsigned int>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,unsigned int>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1752,17 +1752,17 @@ public:
             return false;
         }
     }
-    unsigned int as(const basic_json<Char>& val) const
+    unsigned int as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_uint();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,short>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,short>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1777,17 +1777,17 @@ public:
             return false;
         }
     }
-    short as(const basic_json<Char>& val) const
+    short as(const basic_json<Char,Allocator>& val) const
     {
         return (short)val.as_int();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,unsigned short>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,unsigned short>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1802,17 +1802,17 @@ public:
             return false;
         }
     }
-    unsigned short as(const basic_json<Char>& val) const
+    unsigned short as(const basic_json<Char,Allocator>& val) const
     {
         return (unsigned short)val.as_uint();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,long>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,long>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1827,17 +1827,17 @@ public:
             return false;
         }
     }
-    long as(const basic_json<Char>& val) const
+    long as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_long();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,unsigned long>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,unsigned long>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1852,46 +1852,46 @@ public:
             return false;
         }
     }
-    unsigned long as(const basic_json<Char>& val) const
+    unsigned long as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_ulong();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,Char>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,Char>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_string() && val.as_string().size() == 1;
     }
-    char as(const basic_json<Char>& val) const
+    char as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_char();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,double>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,double>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         return val.is_double();
     }
 
-    double as(const basic_json<Char>& val) const
+    double as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_double();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,long long>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,long long>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1906,17 +1906,17 @@ public:
             return false;
         }
     }
-    long long as(const basic_json<Char>& val) const
+    long long as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_longlong();
     }
 };
 
-template <typename Char>
-class value_adapter<Char,unsigned long long>
+template <typename Char, typename Allocator>
+class value_adapter<Char,Allocator,unsigned long long>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         if (val.is_longlong())
         {
@@ -1931,17 +1931,17 @@ public:
             return false;
         }
     }
-    unsigned long long as(const basic_json<Char>& val) const
+    unsigned long long as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_ulonglong();
     }
 };
 
-template <typename Char,typename T>
-class value_adapter<Char,std::vector<T>>
+template <typename Char,typename Allocator,typename T>
+class value_adapter<Char,Allocator,std::vector<T>>
 {
 public:
-    bool is(const basic_json<Char>& val) const
+    bool is(const basic_json<Char,Allocator>& val) const
     {
         bool result = val.is_array();
         for (size_t i = 0; result && i < val.size(); ++i)
@@ -1953,7 +1953,7 @@ public:
         }
         return result;
     }
-    std::vector<T> as(const basic_json<Char>& val) const
+    std::vector<T> as(const basic_json<Char,Allocator>& val) const
     {
         std::vector<T> v(val.size());
         for (size_t i = 0; i < v.size(); ++i)
@@ -1964,37 +1964,37 @@ public:
     }
 };
 
-template <typename Char>
-class basic_json<Char>::null_type : public basic_json<Char> 
+template <typename Char, typename Allocator>
+class basic_json<Char,Allocator>::null_type : public basic_json<Char,Allocator> 
 {
 private:
     null_type()
-        : basic_json<Char>(null_t)
+        : basic_json<Char,Allocator>(null_t)
     {
     }
 };
 
-template <typename Char>
-class basic_json<Char>::object : public basic_json<Char>
+template <typename Char, typename Allocator>
+class basic_json<Char,Allocator>::object : public basic_json<Char,Allocator>
 {
 public:
-    object(json_object<Char>* impl)
-        : basic_json<Char>(impl)
+    object(json_object<Char,Allocator>* impl)
+        : basic_json<Char,Allocator>(impl)
     {
     }
 };
 
-template <typename Char>
-class basic_json<Char>::array : public basic_json<Char>
+template <typename Char, typename Allocator>
+class basic_json<Char,Allocator>::array : public basic_json<Char,Allocator>
 {
 public:
-    array(json_array<Char>* impl)
-        : basic_json<Char>(impl)
+    array(json_array<Char,Allocator>* impl)
+        : basic_json<Char,Allocator>(impl)
     {
     }
 private:
     array()
-        : basic_json<Char>(array_t)
+        : basic_json<Char,Allocator>(array_t)
     {
     }
 };
