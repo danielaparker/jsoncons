@@ -120,7 +120,7 @@ void init_string(string_holder<Char>& sh, const std::basic_string<Char>& s)
     sh.length = s.length();
     if (sh.length > 0)
     {
-        memcpy(sh.buffer,&s[0],sh.length*sizeof(Char));
+        std::copy(&s[0],&s[0]+sh.length,sh.buffer);
     }
     sh.buffer[sh.length] = 0;
 }
@@ -130,7 +130,7 @@ void init_string(string_holder<Char>& sh, const Char* s)
 {
     sh.length = json_char_traits<Char>::cstring_len(s);
     sh.buffer = new Char[sh.length+1];
-    memcpy(sh.buffer,s,(sh.length+1)*sizeof(Char));
+    std::copy(s,s+(sh.length+1),sh.buffer);
 }
 
 template <typename Char>
@@ -138,7 +138,7 @@ void init_string(string_holder<Char>& s, const string_holder<Char>& val)
 {
     s.buffer = new Char[val.length+1];
     s.length = val.length;
-    memcpy(s.buffer,val.buffer,(val.length+1)*sizeof(Char));
+    std::copy(val.buffer,val.buffer+val.length,s.buffer);
 }
 
 template <typename Char>
