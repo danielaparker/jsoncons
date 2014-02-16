@@ -89,6 +89,64 @@ public:
     T as(const basic_json<Char>& val) const;
 };
 
+template <typename Char>
+struct string_holder
+{
+    size_t length;
+    Char* buffer;
+};
+
+template <typename Char>
+void init_string(string_holder<Char>& s)
+{
+    s.buffer = new Char[1];
+    s.length = 0;
+    s.buffer[0] = 0;
+}
+
+template <typename Char>
+void init_string(string_holder<Char>& s, Char c)
+{
+    s.buffer = new Char[2];
+    s.length = 1;
+    s.buffer[0] = c;
+    s.buffer[1] = 0;
+}
+
+template <typename Char>
+void init_string(string_holder<Char>& sh, const std::basic_string<Char>& s)
+{
+    sh.buffer = new Char[s.length()+1];
+    sh.length = s.length();
+    if (sh.length > 0)
+    {
+        memcpy(sh.buffer,&s[0],sh.length*sizeof(Char));
+    }
+    sh.buffer[sh.length] = 0;
+}
+
+template <typename Char>
+void init_string(string_holder<Char>& sh, const Char* s)
+{
+    sh.length = json_char_traits<Char>::cstring_len(s);
+    sh.buffer = new Char[sh.length+1];
+    memcpy(sh.buffer,s,(sh.length+1)*sizeof(Char));
+}
+
+template <typename Char>
+void init_string(string_holder<Char>& s, const string_holder<Char>& val)
+{
+    s.buffer = new Char[val.length+1];
+    s.length = val.length;
+    memcpy(s.buffer,val.buffer,(val.length+1)*sizeof(Char));
+}
+
+template <typename Char>
+void destroy_string(string_holder<Char>& val)
+{
+    delete[] val.buffer;
+}
+
 class json_base
 {
 public:
@@ -1220,7 +1278,8 @@ private:
         bool bool_value_;
         json_object<Char>* object_;
         json_array<Char>* array_;
-        std::basic_string<Char>* value_string_;
+        string_holder<Char> val_string_;
+        //std::basic_string<Char>* value_string_;
         basic_custom_data<Char>* userdata_;
     } value_;
 };

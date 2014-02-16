@@ -30,6 +30,11 @@ struct json_char_traits<wchar_t>
         return std::wcslen(s);
     }
 
+    static int cstring_cmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+    {
+        return std::wcsncmp(s1,s2,n);
+    }
+
     static const std::wstring null_literal() {return L"null";};
 
     static const std::wstring true_literal() {return L"true";};
@@ -43,6 +48,11 @@ struct json_char_traits<char>
     static size_t cstring_len(const char* s)
     {
         return std::strlen(s);
+    }
+
+    static int cstring_cmp(const char* s1, const char* s2, size_t n)
+    {
+        return std::strncmp(s1,s2,n);
     }
 
     static const std::string null_literal() {return "null";};
