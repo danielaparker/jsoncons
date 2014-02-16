@@ -175,7 +175,7 @@ public:
 
 // value(...) implementation
 
-    virtual void read_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
@@ -187,7 +187,7 @@ public:
         }
     }
 
-    virtual void read_value(double value, const basic_parsing_context<Char>& context)
+    virtual void value_double(double value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
@@ -199,7 +199,7 @@ public:
         }
     }
 
-    virtual void read_value(long long value, const basic_parsing_context<Char>& context)
+    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    virtual void read_value(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
@@ -223,7 +223,7 @@ public:
         }
     }
 
-    virtual void read_value(bool value, const basic_parsing_context<Char>& context)
+    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
     {
         if (stack_.back().is_object())
         {
