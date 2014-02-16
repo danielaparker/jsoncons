@@ -62,7 +62,8 @@ basic_json<Char>::basic_json(const basic_json<Char>& val)
         value_ = val.value_;
         break;
     case string_t:
-        value_.value_string_ = new std::basic_string<Char>(*(val.value_.value_string_));
+        init_string(value_.val_string_, val.value_.val_string_);
+        //value_.value_string_ = new std::basic_string<Char>(*(val.value_.value_string_));
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -160,22 +161,25 @@ template <class Char>
 basic_json<Char>::basic_json(Char c)
 {
     type_ = string_t;
-    value_.value_string_ = new std::basic_string<Char>();
-    value_.value_string_->push_back(c);
+    //value_.value_string_ = new std::basic_string<Char>();
+    //value_.value_string_->push_back(c);
+    init_string(value_.val_string_, c);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
-    value_.value_string_ = new std::basic_string<Char>(s);
+    //value_.value_string_ = new std::basic_string<Char>(s);
+    init_string(value_.val_string_, s);
 }
 
 template <class Char>
 basic_json<Char>::basic_json(const Char* s)
 {
     type_ = string_t;
-    value_.value_string_ = new std::basic_string<Char>(s);
+    //value_.value_string_ = new std::basic_string<Char>(s);
+    init_string(value_.val_string_,s);
 }
 
 template <class Char>
@@ -192,7 +196,8 @@ basic_json<Char>::basic_json(value_type t)
     case bool_t:
         break;
     case string_t:
-        value_.value_string_ = new std::basic_string<Char>();
+        init_string(value_.val_string_);
+        //value_.value_string_ = new std::basic_string<Char>();
         break;
     case array_t:
         value_.array_ = new json_array<Char>();
@@ -219,7 +224,8 @@ basic_json<Char>::~basic_json()
     case bool_t:
         break;
     case string_t:
-        delete value_.value_string_;
+        destroy_string(value_.val_string_);
+        //delete value_.value_string_;
         break;
     case array_t:
         delete value_.array_;
@@ -244,7 +250,8 @@ basic_json<Char>& basic_json<Char>::operator=(const char* rhs)
 	case longlong_t:
 	case double_t:
         type_ = string_t;
-        value_.value_string_ = new std::basic_string<Char>(rhs);
+        //value_.value_string_ = new std::basic_string<Char>(rhs);
+        init_string(value_.val_string_,rhs);
         break;
     default:
         basic_json<Char>(rhs).swap(*this);
@@ -264,7 +271,8 @@ basic_json<Char>& basic_json<Char>::operator=(const std::basic_string<Char>& rhs
 	case longlong_t:
 	case double_t:
         type_ = string_t;
-        value_.value_string_ = new std::basic_string<Char>(rhs);
+        init_string(value_.val_string_,rhs);
+        //value_.value_string_ = new std::basic_string<Char>(rhs);
         break;
     default:
         basic_json<Char>(rhs).swap(*this);
@@ -284,8 +292,9 @@ basic_json<Char>& basic_json<Char>::operator=(Char rhs)
 	case longlong_t:
 	case double_t:
         type_ = string_t;
-        value_.value_string_ = new std::basic_string<Char>();
-        value_.value_string_->push_back(rhs);
+        init_string(value_.val_string_,rhs);
+        //value_.value_string_ = new std::basic_string<Char>();
+        //value_.value_string_->push_back(rhs);
         break;
     default:
         basic_json<Char>(rhs).swap(*this);
@@ -522,7 +531,8 @@ bool basic_json<Char>::operator==(const basic_json<Char>& rhs) const
     case empty_object_t:
         return true;
     case string_t:
-        return *(value_.value_string_) == *(rhs.value_.value_string_);
+        return value_.val_string_.length == rhs.value_.val_string_.length ? json_char_traits<Char>::cstring_cmp(value_.val_string_.buffer,rhs.value_.val_string_.buffer,rhs.value_.val_string_.length) == 0 : false;
+        //return *(value_.value_string_) == *(rhs.value_.value_string_);
     case array_t:
         return *(value_.array_) == *(rhs.value_.array_);
         break;
@@ -903,7 +913,8 @@ void basic_json<Char>::to_stream(basic_json_output_handler<Char>& handler) const
     switch (type_)
     {
     case string_t:
-        handler.value(*(value_.value_string_));
+        handler.value(std::basic_string<Char>(value_.val_string_.buffer,value_.val_string_.length));
+        //handler.value(*(value_.value_string_));
         break;
     case double_t:
         handler.value(value_.value_double_);
@@ -1218,7 +1229,8 @@ bool basic_json<Char>::is_empty() const
     switch (type_)
     {
     case string_t:
-        return value_.value_string_->size() == 0;
+        return value_.val_string_.length == 0;
+        //return value_.value_string_->size() == 0;
     case array_t:
         return value_.array_->size() == 0;
     case empty_object_t:
@@ -1454,7 +1466,8 @@ std::basic_string<Char> basic_json<Char>::as_string() const
     switch (type_)
     {
     case string_t:
-        return *(value_.value_string_);
+        return std::basic_string<Char>(value_.val_string_.buffer,value_.val_string_.length);
+        //return *(value_.value_string_);
     default:
         return to_string();
     }
@@ -1466,7 +1479,8 @@ std::basic_string<Char> basic_json<Char>::as_string(const basic_output_format<Ch
     switch (type_)
     {
     case string_t:
-        return *(value_.value_string_);
+        return std::basic_string(value_.val_string_.buffer,value_.val_string_.length);
+        //return *(value_.value_string_);
     default:
         return to_string(format);
     }
@@ -1478,7 +1492,8 @@ Char basic_json<Char>::as_char() const
     switch (type_)
     {
     case string_t:
-        return value_.value_string_->length() > 0 ? (*value_.value_string_)[0] : '\0';
+        return value_.val_string_.buffer[0]; // returns '\0' if string is empty
+        //return value_.value_string_->length() > 0 ? (*value_.value_string_)[0] : '\0';
     case longlong_t:
         return static_cast<Char>(value_.value_longlong_);
     case ulonglong_t:
