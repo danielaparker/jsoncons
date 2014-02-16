@@ -19,8 +19,13 @@
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
 
-
 namespace jsoncons {
+
+template <typename Char>
+struct allocator
+{
+    typedef std::allocator<Char> char_allocator_type;
+};
 
 template <class Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T& val)
@@ -1294,8 +1299,8 @@ void swap(typename basic_json<Char,Allocator>::name_value_pair& a, typename basi
     a.swap(b);
 }
 
-typedef basic_json<char,std::allocator<char>> json;
-typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
+typedef basic_json<char,allocator<char>> json;
+typedef basic_json<wchar_t,allocator<wchar_t>> wjson;
 
 }
 
