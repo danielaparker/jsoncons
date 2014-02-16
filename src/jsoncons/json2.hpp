@@ -171,7 +171,9 @@ basic_json<Char>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
     //value_.value_string_ = new std::basic_string<Char>(s);
+	#pragma warning(disable:4996)
     init_string(value_.val_string_, s);
+	#pragma warning(default:4996)
 }
 
 template <class Char>
@@ -179,7 +181,9 @@ basic_json<Char>::basic_json(const Char* s)
 {
     type_ = string_t;
     //value_.value_string_ = new std::basic_string<Char>(s);
+	#pragma warning(disable:4996)
     init_string(value_.val_string_,s);
+	#pragma warning(default:4996)
 }
 
 template <class Char>
