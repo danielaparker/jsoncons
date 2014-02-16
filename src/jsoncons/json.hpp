@@ -13,8 +13,8 @@
 
 namespace jsoncons {
 
-typedef basic_json<char> json;
-typedef basic_json<wchar_t> wjson;
+typedef basic_json<char,std::allocator<char>> json;
+typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
 
 }
 
