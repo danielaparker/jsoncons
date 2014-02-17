@@ -272,7 +272,7 @@ public:
     }
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& val)
+    virtual void string_value(const std::basic_string<Char>& val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -287,7 +287,7 @@ public:
         }
     }
 
-    virtual void value_double(double val)
+    virtual void double_value(double val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -302,7 +302,7 @@ public:
         }
     }
 
-    virtual void value_longlong(long long val)
+    virtual void longlong_value(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -317,7 +317,7 @@ public:
         }
     }
 
-    virtual void value_ulonglong(unsigned long long val)
+    virtual void ulonglong_value(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -332,7 +332,7 @@ public:
         }
     }
 
-    virtual void value_bool(bool val)
+    virtual void bool_value(bool val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
