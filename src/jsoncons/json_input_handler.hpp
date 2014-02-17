@@ -25,52 +25,52 @@ public:
 
     void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
-        value_string(value, context);
+        string_value(value, context);
     }
 
     void value(float value, const basic_parsing_context<Char>& context)
     {
-        value_double((double)value, context);
+        double_value((double)value, context);
     }
 
     void value(double value, const basic_parsing_context<Char>& context)
     {
-        value_double(value, context);
+        double_value(value, context);
     }
 
     void value(long long value, const basic_parsing_context<Char>& context) 
     {
-        value_longlong(value,context);
+        longlong_value(value,context);
     }
 
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
-        value_ulonglong(value,context);
+        ulonglong_value(value,context);
     }
 
     void value(long value, const basic_parsing_context<Char>& context) 
     {
-        value_longlong((long)value,context);
+        longlong_value((long)value,context);
     }
 
     void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
-        value_ulonglong((unsigned long)value,context);
+        ulonglong_value((unsigned long)value,context);
     }
 
     void value(int value, const basic_parsing_context<Char>& context) 
     {
-        value_longlong((int)value,context);
+        longlong_value((int)value,context);
     }
 
     void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
-        value_ulonglong((unsigned int)value,context);
+        ulonglong_value((unsigned int)value,context);
     }
 
     void value(bool value, const basic_parsing_context<Char>& context) 
     {
-        value_bool(value,context);
+        bool_value(value,context);
     }
 
     virtual void end_json() = 0;
@@ -88,15 +88,15 @@ public:
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 
 // value(...) implementation
-    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
+    virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value_double(double value, const basic_parsing_context<Char>& context) = 0;
+    virtual void double_value(double value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void longlong_value(long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void value_bool(bool value, const basic_parsing_context<Char>& context) = 0;
+    virtual void bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
 template <class Char>
@@ -135,23 +135,23 @@ public:
     {
     }
 // value(...) implementation
-    virtual void value_string(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
     }
 
-    virtual void value_double(double value, const basic_parsing_context<Char>& context)
+    virtual void double_value(double value, const basic_parsing_context<Char>& context)
     {
     }
 
-    virtual void value_longlong(long long value, const basic_parsing_context<Char>& context)
+    virtual void longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
     }
 
-    virtual void value_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
     }
 
-    virtual void value_bool(bool value, const basic_parsing_context<Char>& context)
+    virtual void bool_value(bool value, const basic_parsing_context<Char>& context)
     {
     }
 };
