@@ -1501,43 +1501,52 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_j
     return os;
 }
 
-template <class Char>
-class basic_pretty_print
+
+template <typename Char>
+class pretty_printer
 {
 public:
-
-    basic_pretty_print(basic_json<Char>& o)
-        : o_(o)
+    pretty_printer(const basic_json<Char>& o)
+        : o_(&o)
     {
     }
 
-    basic_pretty_print(basic_json<Char>& o,
-                       const basic_output_format<Char>& format)
-        : o_(o), format_(format)
+    pretty_printer(basic_json<Char>& o,
+                   const basic_output_format<Char>& format)
+        : o_(&o), format_(format)
     {
     ;
     }
 
     void to_stream(std::basic_ostream<Char>& os) const
     {
-        o_.to_stream(os,format_,true);
+        o_->to_stream(os,format_,true);
     }
 
-    const basic_json<Char>& o_;
+    friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const pretty_printer<Char>& o)
+    {
+        o.to_stream(os);
+        return os;
+    }
+
+    const basic_json<Char>* o_;
     basic_output_format<Char> format_;
 private:
-    basic_pretty_print();
-    basic_pretty_print(const basic_pretty_print& o);
+    pretty_printer();
 };
 
 template <class Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_pretty_print<Char>& o)
+pretty_printer<Char> pretty_print(const basic_json<Char>& val)
 {
-    o.to_stream(os);
-    return os;
+    return typename pretty_printer<Char>(val);
 }
 
-typedef basic_pretty_print<char> pretty_print;
+template <class Char>
+pretty_printer<Char> pretty_print(const basic_json<Char>& val,
+                                            const basic_output_format<Char>& format)
+{
+    return typename pretty_printer<Char>(val,format);
+}
 
 inline
 char to_hex_character(unsigned char c)

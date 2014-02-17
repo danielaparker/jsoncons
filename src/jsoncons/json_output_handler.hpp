@@ -21,52 +21,52 @@ public:
     // Overloaded methods
     void value(const std::basic_string<Char>& value) 
     {
-        value_string(value);
+        string_value(value);
     }
 
     void value(float value)
     {
-        value_double((double)value);
+        double_value((double)value);
     }
 
     void value(double value)
     {
-        value_double(value);
+        double_value(value);
     }
 
     void value(int value) 
     {
-        value_longlong((long long)value);
+        longlong_value((long long)value);
     }
 
     void value(unsigned int value)
     {
-        value_ulonglong((unsigned long long)value);
+        ulonglong_value((unsigned long long)value);
     }
 
     void value(long value) 
     {
-        value_longlong((long long)value);
+        longlong_value((long long)value);
     }
 
     void value(unsigned long value)
     {
-        value_ulonglong((unsigned long long)value);
+        ulonglong_value((unsigned long long)value);
     }
 
     void value(long long value) 
     {
-        value_longlong(value);
+        longlong_value(value);
     }
 
     void value(unsigned long long value)
     {
-        value_ulonglong(value);
+        ulonglong_value(value);
     }
 
     void value(bool value)
     {
-        value_bool(value);
+        bool_value(value);
     }
 
     virtual void null_value() = 0;
@@ -89,15 +89,15 @@ public:
 
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& value) = 0;
+    virtual void string_value(const std::basic_string<Char>& value) = 0;
 
-    virtual void value_double(double value) = 0;
+    virtual void double_value(double value) = 0;
 
-    virtual void value_longlong(long long value) = 0;
+    virtual void longlong_value(long long value) = 0;
 
-    virtual void value_ulonglong(unsigned long long value) = 0;
+    virtual void ulonglong_value(unsigned long long value) = 0;
 
-    virtual void value_bool(bool value) = 0;
+    virtual void bool_value(bool value) = 0;
 };
 
 template <class Char>
@@ -139,23 +139,23 @@ public:
 
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& value)
+    virtual void string_value(const std::basic_string<Char>& value)
     {
     }
 
-    virtual void value_double(double value)
+    virtual void double_value(double value)
     {
     }
 
-    virtual void value_longlong(long long value)
+    virtual void longlong_value(long long value)
     {
     }
 
-    virtual void value_ulonglong(unsigned long long value)
+    virtual void ulonglong_value(unsigned long long value)
     {
     }
 
-    virtual void value_bool(bool value)
+    virtual void bool_value(bool value)
     {
     }
 
