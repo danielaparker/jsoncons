@@ -427,7 +427,7 @@ void basic_json_reader<Char>::read()
                             }
                             else
                             {
-                                handler_.value_string(string_buffer_, *this);
+                                handler_.string_value(string_buffer_, *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -492,7 +492,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.value_bool(true, *this);
+                        handler_.bool_value(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -503,7 +503,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 4;
                         column_ += 4;
-                        handler_.value_bool(false, *this);
+                        handler_.bool_value(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -665,7 +665,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_.value_double(d, *this);
+                            handler_.double_value(d, *this);
                         }
                         catch (...)
                         {
@@ -678,14 +678,14 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_.value_longlong(-d, *this);
+                            handler_.longlong_value(-d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.value_double(-d, *this);
+                                handler_.double_value(-d, *this);
                             }
                             catch (...)
                             {
@@ -699,14 +699,14 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_.value_ulonglong(d, *this);
+                            handler_.ulonglong_value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.value_double(d, *this);
+                                handler_.double_value(d, *this);
                             }
                             catch (...)
                             {

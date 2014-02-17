@@ -146,7 +146,7 @@ public:
 
 // value(...) implementation
 
-    virtual void value_string(const std::basic_string<Char>& value)
+    virtual void string_value(const std::basic_string<Char>& value)
     {
         begin_value();
 
@@ -157,7 +157,7 @@ public:
         end_value();
     }
 
-    virtual void value_double(double value)
+    virtual void double_value(double value)
     {
         begin_value();
 
@@ -190,7 +190,7 @@ public:
         end_value();
     }
 
-    virtual void value_longlong(long long value)
+    virtual void longlong_value(long long value)
     {
         begin_value();
 
@@ -199,7 +199,7 @@ public:
         end_value();
     }
 
-    virtual void value_ulonglong(unsigned long long value)
+    virtual void ulonglong_value(unsigned long long value)
     {
         begin_value();
 
@@ -208,7 +208,7 @@ public:
         end_value();
     }
 
-    virtual void value_bool(bool value)
+    virtual void bool_value(bool value)
     {
         begin_value();
 

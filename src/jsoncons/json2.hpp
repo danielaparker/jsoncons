@@ -112,42 +112,42 @@ template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(long long val)
 {
     type_ = longlong_t;
-    value_.value_longlong_ = val;
+    value_.longlong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(int val)
 {
     type_ = longlong_t;
-    value_.value_longlong_ = val;
+    value_.longlong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(unsigned int val)
 {
     type_ = ulonglong_t;
-    value_.value_longlong_ = val;
+    value_.longlong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(long val)
 {
     type_ = longlong_t;
-    value_.value_longlong_ = val;
+    value_.longlong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(unsigned long val)
 {
     type_ = ulonglong_t;
-    value_.value_longlong_ = val;
+    value_.longlong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
 basic_json<Char,Allocator>::basic_json(unsigned long long val)
 {
     type_ = ulonglong_t;
-    value_.value_ulonglong_ = val;
+    value_.ulonglong_value_ = val;
 }
 
 template <typename Char, typename Allocator>
@@ -318,7 +318,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(int rhs)
 	case longlong_t:
 	case double_t:
         type_ = longlong_t;
-        value_.value_longlong_ = rhs;
+        value_.longlong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -338,7 +338,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned int r
 	case longlong_t:
 	case double_t:
         type_ = ulonglong_t;
-        value_.value_ulonglong_ = rhs;
+        value_.ulonglong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -358,7 +358,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long rhs)
 	case longlong_t:
 	case double_t:
         type_ = longlong_t;
-        value_.value_longlong_ = rhs;
+        value_.longlong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -378,7 +378,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long 
 	case longlong_t:
 	case double_t:
         type_ = ulonglong_t;
-        value_.value_ulonglong_ = rhs;
+        value_.ulonglong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -398,7 +398,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long long rhs)
 	case longlong_t:
 	case double_t:
         type_ = longlong_t;
-        value_.value_longlong_ = rhs;
+        value_.longlong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -418,7 +418,7 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long 
 	case longlong_t:
 	case double_t:
         type_ = ulonglong_t;
-        value_.value_ulonglong_ = rhs;
+        value_.ulonglong_value_ = rhs;
         break;
     default:
         basic_json<Char,Allocator>(rhs).swap(*this);
@@ -491,31 +491,31 @@ bool basic_json<Char,Allocator>::operator==(const basic_json<Char,Allocator>& rh
             switch (rhs.type())
             {
             case longlong_t:
-                return value_.value_longlong_ == rhs.value_.value_longlong_;
+                return value_.longlong_value_ == rhs.value_.longlong_value_;
             case ulonglong_t:
-                return value_.value_longlong_ == rhs.value_.value_ulonglong_;
+                return value_.longlong_value_ == rhs.value_.ulonglong_value_;
             case double_t:
-                return value_.value_longlong_ == rhs.value_.value_double_;
+                return value_.longlong_value_ == rhs.value_.value_double_;
             }
             break;
         case ulonglong_t:
             switch (rhs.type())
             {
             case longlong_t:
-                return value_.value_ulonglong_ == rhs.value_.value_longlong_;
+                return value_.ulonglong_value_ == rhs.value_.longlong_value_;
             case ulonglong_t:
-                return value_.value_ulonglong_ == rhs.value_.value_ulonglong_;
+                return value_.ulonglong_value_ == rhs.value_.ulonglong_value_;
             case double_t:
-                return value_.value_ulonglong_ == rhs.value_.value_double_;
+                return value_.ulonglong_value_ == rhs.value_.value_double_;
             }
             break;
         case double_t:
             switch (rhs.type())
             {
             case longlong_t:
-                return value_.value_double_ == rhs.value_.value_longlong_;
+                return value_.value_double_ == rhs.value_.longlong_value_;
             case ulonglong_t:
-                return value_.value_double_ == rhs.value_.value_ulonglong_;
+                return value_.value_double_ == rhs.value_.ulonglong_value_;
             case double_t:
                 return value_.value_double_ == rhs.value_.value_double_;
             }
@@ -924,10 +924,10 @@ void basic_json<Char,Allocator>::to_stream(basic_json_output_handler<Char>& hand
         handler.value(value_.value_double_);
         break;
     case longlong_t:
-        handler.value(value_.value_longlong_);
+        handler.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        handler.value(value_.value_ulonglong_);
+        handler.value(value_.ulonglong_value_);
         break;
     case bool_t:
         handler.value(value_.bool_value_);
@@ -1217,9 +1217,9 @@ double basic_json<Char,Allocator>::as_double() const
     case double_t:
         return value_.value_double_;
     case longlong_t:
-        return static_cast<double>(value_.value_longlong_);
+        return static_cast<double>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<double>(value_.value_ulonglong_);
+        return static_cast<double>(value_.ulonglong_value_);
     case null_t:
         return std::numeric_limits<double>::quiet_NaN();;
     default:
@@ -1335,9 +1335,9 @@ int basic_json<Char,Allocator>::as_int() const
     case double_t:
         return static_cast<int>(value_.value_double_);
     case longlong_t:
-        return static_cast<int>(value_.value_longlong_);
+        return static_cast<int>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<int>(value_.value_ulonglong_);
+        return static_cast<int>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1353,9 +1353,9 @@ unsigned int basic_json<Char,Allocator>::as_uint() const
     case double_t:
         return static_cast<unsigned int>(value_.value_double_);
     case longlong_t:
-        return static_cast<unsigned int>(value_.value_longlong_);
+        return static_cast<unsigned int>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<unsigned int>(value_.value_ulonglong_);
+        return static_cast<unsigned int>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1371,9 +1371,9 @@ long long basic_json<Char,Allocator>::as_longlong() const
     case double_t:
         return static_cast<long long>(value_.value_double_);
     case longlong_t:
-        return static_cast<long long>(value_.value_longlong_);
+        return static_cast<long long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<long long>(value_.value_ulonglong_);
+        return static_cast<long long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1389,9 +1389,9 @@ unsigned long long basic_json<Char,Allocator>::as_ulonglong() const
     case double_t:
         return static_cast<unsigned long long>(value_.value_double_);
     case longlong_t:
-        return static_cast<unsigned long long>(value_.value_longlong_);
+        return static_cast<unsigned long long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<unsigned long long>(value_.value_ulonglong_);
+        return static_cast<unsigned long long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1407,9 +1407,9 @@ long basic_json<Char,Allocator>::as_long() const
     case double_t:
         return static_cast<long long>(value_.value_double_);
     case longlong_t:
-        return static_cast<long long>(value_.value_longlong_);
+        return static_cast<long long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<long long>(value_.value_ulonglong_);
+        return static_cast<long long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1425,9 +1425,9 @@ unsigned long basic_json<Char,Allocator>::as_ulong() const
     case double_t:
         return static_cast<unsigned long long>(value_.value_double_);
     case longlong_t:
-        return static_cast<unsigned long long>(value_.value_longlong_);
+        return static_cast<unsigned long long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<unsigned long long>(value_.value_ulonglong_);
+        return static_cast<unsigned long long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1499,9 +1499,9 @@ Char basic_json<Char,Allocator>::as_char() const
         return value_.val_string_.buffer[0]; // returns '\0' if string is empty
         //return value_.value_string_->length() > 0 ? (*value_.value_string_)[0] : '\0';
     case longlong_t:
-        return static_cast<Char>(value_.value_longlong_);
+        return static_cast<Char>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<Char>(value_.value_ulonglong_);
+        return static_cast<Char>(value_.ulonglong_value_);
     case double_t:
         return static_cast<Char>(value_.value_double_);
     case bool_t:
