@@ -93,6 +93,7 @@ public:
         return false;
     }
     T as(const basic_json<Char,Allocator>& val) const;
+    void assign(basic_json<Char,Allocator>& self, const T val);
 };
 
 class json_base
@@ -922,27 +923,13 @@ public:
 
     const_array_iterator end_elements() const;
 
-    basic_json& operator=(const char* rhs);
-
-    basic_json& operator=(const std::basic_string<Char>& rhs);
-
-    basic_json& operator=(Char rhs);
-
-    basic_json& operator=(bool rhs);
-
-    basic_json& operator=(int rhs);
-
-    basic_json& operator=(unsigned int rhs);
-
-    basic_json& operator=(long rhs);
-
-    basic_json& operator=(unsigned long rhs);
-
-    basic_json& operator=(long long rhs);
-
-    basic_json& operator=(unsigned long long rhs);
-
-    basic_json& operator=(double rhs);
+    template <class T>
+    basic_json& operator=(T val)
+    {
+        value_adapter<Char,Allocator,T> adapter;
+        adapter.assign(*this,val);
+        return *this;
+    }
 
     basic_json& operator=(basic_json<Char,Allocator> rhs);
 
@@ -1151,6 +1138,12 @@ public:
     {
         a.swap(b);
     }
+
+    void assign_string(const std::basic_string<Char>& rhs);
+    void assign_double(double rhs);
+    void assign_longlong(long long rhs);
+    void assign_ulonglong(unsigned long long rhs);
+    void assign_bool(bool rhs);
 
 //  Deprecated
 

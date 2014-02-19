@@ -232,9 +232,8 @@ basic_json<Char,Allocator>::~basic_json()
         break;
     }
 }
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(const char* rhs)
+template <class Char,class Allocator>
+void basic_json<Char,Allocator>::assign_string(const std::basic_string<Char>& rhs)
 {
     switch (type_)
     {
@@ -250,192 +249,9 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(const char* rh
         basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
-    return *this;
 }
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(const std::basic_string<Char>& rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = string_t;
-        value_.value_string_ = new std::basic_string<Char>(rhs);
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(Char rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = string_t;
-        value_.value_string_ = new std::basic_string<Char>();
-        value_.value_string_->push_back(rhs);
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(int rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = longlong_t;
-        value_.longlong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned int rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = ulonglong_t;
-        value_.ulonglong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = longlong_t;
-        value_.longlong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = ulonglong_t;
-        value_.ulonglong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(long long rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = longlong_t;
-        value_.longlong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(unsigned long long rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = ulonglong_t;
-        value_.ulonglong_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(bool rhs)
-{
-    switch (type_)
-    {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-	case longlong_t:
-	case double_t:
-        type_ = bool_t;
-        value_.bool_value_ = rhs;
-        break;
-    default:
-        basic_json<Char,Allocator>(rhs).swap(*this);
-        break;
-    }
-    return *this;
-}
-
-template <typename Char, typename Allocator>
-basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(double rhs)
+template <class Char,class Allocator>
+void basic_json<Char,Allocator>::assign_double(double rhs)
 {
     switch (type_)
     {
@@ -451,7 +267,61 @@ basic_json<Char,Allocator>& basic_json<Char,Allocator>::operator=(double rhs)
         basic_json<Char,Allocator>(rhs).swap(*this);
         break;
     }
-    return *this;
+}
+
+template <class Char,class Allocator>
+void basic_json<Char,Allocator>::assign_longlong(long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = longlong_t;
+        value_.longlong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char,Allocator>(rhs).swap(*this);
+        break;
+    }
+}
+template <class Char,class Allocator>
+void basic_json<Char,Allocator>::assign_ulonglong(unsigned long long rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = ulonglong_t;
+        value_.ulonglong_value_ = rhs;
+        break;
+    default:
+        basic_json<Char,Allocator>(rhs).swap(*this);
+        break;
+    }
+}
+template <class Char,class Allocator>
+void basic_json<Char,Allocator>::assign_bool(bool rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+	case double_t:
+        type_ = bool_t;
+        value_.bool_value_ = rhs;
+        break;
+    default:
+        basic_json<Char,Allocator>(rhs).swap(*this);
+        break;
+    }
 }
 
 template <typename Char, typename Allocator>
@@ -1626,7 +1496,7 @@ void escape_string(const std::basic_string<Char>& s,
     }
 }
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,std::basic_string<Char>>
 {
 public:
@@ -1638,9 +1508,50 @@ public:
     {
         return val.as_string();
     }
+    void assign(basic_json<Char,Allocator>& self, const std::basic_string<Char>& val)
+    {
+        self.assign_string(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
+class value_adapter<Char,Allocator,basic_json<Char,Allocator>>
+{
+public:
+    bool is(const basic_json<Char,Allocator>& val) const
+    {
+        return true;
+    }
+    std::basic_string<Char> as(const basic_json<Char,Allocator>& val) const
+    {
+        return val;
+    }
+    void assign(basic_json<Char,Allocator>& self, basic_json<Char,Allocator> val)
+    {
+        val.swap(self);
+    }
+};
+
+template <typename Char,typename Allocator>
+class value_adapter<Char,Allocator,const Char*>
+{
+public:
+    bool is(const basic_json<Char,Allocator>& val) const
+    {
+        return val.is_string();
+    }
+    const Char* as(const basic_json<Char,Allocator>& val) const
+    {
+        JSONCONS_ASSERT(val.is_string());
+        return val.value_.value_string_.c_str();
+    }
+    void assign(basic_json<Char,Allocator>& self, const Char* val)
+    {
+        self.assign_string(std::basic_string<Char>(val));
+    }
+};
+
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::object>
 {
 public:
@@ -1654,7 +1565,7 @@ public:
     }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::array>
 {
 public:
@@ -1668,7 +1579,7 @@ public:
     }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,typename basic_json<Char,Allocator>::null_type>
 {
 public:
@@ -1683,7 +1594,7 @@ public:
     }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,bool>
 {
 public:
@@ -1695,9 +1606,13 @@ public:
     {
         return val.as_bool();
     }
+    void assign(basic_json<Char,Allocator>& self, bool val)
+    {
+        self.assign_bool(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,int>
 {
 public:
@@ -1720,9 +1635,13 @@ public:
     {
         return val.as_int();
     }
+    void assign(basic_json<Char,Allocator>& self, int val)
+    {
+        self.assign_longlong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,unsigned int>
 {
 public:
@@ -1745,9 +1664,13 @@ public:
     {
         return val.as_uint();
     }
+    void assign(basic_json<Char,Allocator>& self, unsigned int val)
+    {
+        self.assign_ulonglong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,short>
 {
 public:
@@ -1770,9 +1693,13 @@ public:
     {
         return (short)val.as_int();
     }
+    void assign(basic_json<Char,Allocator>& self, short val)
+    {
+        self.assign_longlong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,unsigned short>
 {
 public:
@@ -1795,9 +1722,13 @@ public:
     {
         return (unsigned short)val.as_uint();
     }
+    void assign(basic_json<Char,Allocator>& self, unsigned short val)
+    {
+        self.assign_ulonglong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,long>
 {
 public:
@@ -1820,9 +1751,13 @@ public:
     {
         return val.as_long();
     }
+    void assign(basic_json<Char,Allocator>& self, long val)
+    {
+        self.assign_longlong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,unsigned long>
 {
 public:
@@ -1845,9 +1780,13 @@ public:
     {
         return val.as_ulong();
     }
+    void assign(basic_json<Char,Allocator>& self, unsigned long val)
+    {
+        self.assign_ulonglong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,Char>
 {
 public:
@@ -1859,9 +1798,15 @@ public:
     {
         return val.as_char();
     }
+    void assign(basic_json<Char,Allocator>& self, Char ch)
+    {
+        std::basic_string<Char> s = new std::basic_string<Char>();
+        s.push_back(ch);
+        self.assign_string(s);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,double>
 {
 public:
@@ -1874,9 +1819,13 @@ public:
     {
         return val.as_double();
     }
+    void assign(basic_json<Char,Allocator>& self, double val)
+    {
+        self.assign_double(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,long long>
 {
 public:
@@ -1899,9 +1848,13 @@ public:
     {
         return val.as_longlong();
     }
+    void assign(basic_json<Char,Allocator>& self, long long val)
+    {
+        self.assign_longlong(val);
+    }
 };
 
-template <typename Char, typename Allocator>
+template <typename Char,typename Allocator>
 class value_adapter<Char,Allocator,unsigned long long>
 {
 public:
@@ -1923,6 +1876,10 @@ public:
     unsigned long long as(const basic_json<Char,Allocator>& val) const
     {
         return val.as_ulonglong();
+    }
+    void assign(basic_json<Char,Allocator>& self, unsigned long long val)
+    {
+        self.assign_ulonglong(val);
     }
 };
 
