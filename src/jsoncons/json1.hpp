@@ -728,6 +728,12 @@ public:
         }
         // Remove a member from an object 
 
+        template <typename T>
+        void set(const std::basic_string<Char>& name, T value)
+        {
+            val_.at(name_).set(name,value);
+        }
+
         void set(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& value)
         {
             val_.at(name_).set(name,value);
@@ -749,12 +755,6 @@ public:
             val_.at(name_).add(index, value);
         }
 
-        template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, const T& value)
-        {
-            val_.at(name_).set_custom_data(name,value);
-        }
-
         void add(const basic_json<Char,Allocator>& value)
         {
             val_.at(name_).add(value);
@@ -763,6 +763,12 @@ public:
         void add(size_t index, const basic_json<Char,Allocator>& value)
         {
             val_.at(name_).add(index, value);
+        }
+
+        template <class T>
+        void set_custom_data(const std::basic_string<Char>& name, const T& value)
+        {
+            val_.at(name_).set_custom_data(name,value);
         }
 
         template <class T>
@@ -1084,9 +1090,33 @@ public:
     void remove_member(const std::basic_string<Char>& name);
     // Removes a member from an object value
 
-    void set(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& value);
-
     basic_json(basic_json&& val);
+
+    template <typename T>
+    void set(const std::basic_string<Char>& name, T value)
+    {
+        switch (type_)
+        {
+        case empty_object_t:
+            type_ = object_t;
+            value_.object_ = new json_object<Char,Allocator>();
+        case object_t:
+            {
+                value_adapter<Char,Allocator,T> adapter;
+                basic_json<Char,Allocator> o;
+                adapter.assign(o,value);
+                value_.object_->set(name,o);
+            }
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+            }
+        }
+
+    }
+
+    void set(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& value);
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Allocator>&& value);
 
