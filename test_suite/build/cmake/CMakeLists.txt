@@ -21,6 +21,7 @@ find_package (Boost REQUIRED COMPONENTS unit_test_framework)
 add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/double_to_string_tests.cpp
                                ../../src/json_accessor_tests.cpp
+                               ../../src/json_extensibility_tests.cpp
                                ../../src/json_array_tests.cpp
                                ../../src/json_construction_tests.cpp
                                ../../src/json_equals_tests.cpp
