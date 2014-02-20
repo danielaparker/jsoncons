@@ -1800,7 +1800,7 @@ public:
     }
     void assign(basic_json<Char,Allocator>& self, Char ch)
     {
-        std::basic_string<Char> s = new std::basic_string<Char>();
+        std::basic_string<Char> s;
         s.push_back(ch);
         self.assign_string(s);
     }

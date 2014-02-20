@@ -656,6 +656,13 @@ public:
             return val_.at(name_);
         }
 
+        template <typename T>
+        object_key_proxy& operator=(T val)
+        {
+            val_.set(name_, val);
+            return *this;
+        }
+
         object_key_proxy& operator=(const basic_json& val)
         {
             val_.set(name_, val);
