@@ -27,7 +27,7 @@ template <class Char,class Allocator>
 class key_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Allocator>::name_value_pair& a, 
+    bool operator()(const typename basic_json<Char,Allocator>::member_type& a, 
                     const std::basic_string<Char>& b) const
     {
         return a.name() < b;
@@ -38,8 +38,8 @@ template <class Char,class Allocator>
 class member_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Allocator>::name_value_pair& a, 
-                    const typename basic_json<Char,Allocator>::name_value_pair& b) const
+    bool operator()(const typename basic_json<Char,Allocator>::member_type& a, 
+                    const typename basic_json<Char,Allocator>::member_type& b) const
     {
         return a.name() < b.name();
     }
@@ -160,8 +160,8 @@ template <class Char,class Allocator>
 class json_object
 {
 public:
-    typedef typename std::vector<typename basic_json<Char,Allocator>::name_value_pair>::iterator iterator;
-    typedef typename std::vector<typename basic_json<Char,Allocator>::name_value_pair>::const_iterator const_iterator;
+    typedef typename std::vector<typename basic_json<Char,Allocator>::member_type>::iterator iterator;
+    typedef typename std::vector<typename basic_json<Char,Allocator>::member_type>::const_iterator const_iterator;
 
     json_object()
     {
@@ -172,7 +172,7 @@ public:
     {
     }
 
-    json_object(std::vector<typename basic_json<Char,Allocator>::name_value_pair> members)
+    json_object(std::vector<typename basic_json<Char,Allocator>::member_type> members)
         : members_(members)
     {
     }
@@ -206,7 +206,7 @@ public:
         }
     }
 
-    const typename basic_json<Char,Allocator>::name_value_pair& get(size_t i) const 
+    const typename basic_json<Char,Allocator>::member_type& get(size_t i) const 
     {
         return members_[i];
     }
@@ -219,7 +219,7 @@ public:
 
     void push_back(const std::basic_string<Char>& name, const basic_json<Char,Allocator>& val)
     {
-        members_.push_back(typename basic_json<Char,Allocator>::name_value_pair(name,val));
+        members_.push_back(typename basic_json<Char,Allocator>::member_type(name,val));
     }
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Allocator>&& value)
@@ -228,20 +228,20 @@ public:
         if (it != end() && it->name() == name)
         {
             //it = remove(it);
-            *it = typename basic_json<Char,Allocator>::name_value_pair(name,value);
+            *it = typename basic_json<Char,Allocator>::member_type(name,value);
         }
         else
         {
-            insert(it,typename basic_json<Char,Allocator>::name_value_pair(name,value));
+            insert(it,typename basic_json<Char,Allocator>::member_type(name,value));
         }
     }
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Allocator>&& val)
     {
-        members_.push_back(typename basic_json<Char,Allocator>::name_value_pair());
+        members_.push_back(typename basic_json<Char,Allocator>::member_type());
         members_.back().name_.swap(name);
         members_.back().value_.swap(val);
-        //members_.push_back(typename basic_json<Char,Allocator>::name_value_pair(name,val)); // much slower on VS 2010
+        //members_.push_back(typename basic_json<Char,Allocator>::member_type(name,val)); // much slower on VS 2010
     }
 
     iterator remove(iterator at); 
@@ -254,7 +254,7 @@ public:
 
     const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(iterator it, typename basic_json<Char,Allocator>::name_value_pair member);
+    void insert(iterator it, typename basic_json<Char,Allocator>::member_type member);
 
     void sort_members();
 
@@ -284,7 +284,7 @@ public:
     }
 
 private:
-    std::vector<typename basic_json<Char,Allocator>::name_value_pair> members_;
+    std::vector<typename basic_json<Char,Allocator>::member_type> members_;
     json_object(const json_object<Char,Allocator>&);
     json_object<Char,Allocator>& operator=(const json_object<Char,Allocator>&);
 };
@@ -297,7 +297,7 @@ void json_object<Char,Allocator>::sort_members()
 }
 
 template <class Char,class Allocator>
-void json_object<Char,Allocator>::insert(iterator it, typename basic_json<Char,Allocator>::name_value_pair member)
+void json_object<Char,Allocator>::insert(iterator it, typename basic_json<Char,Allocator>::member_type member)
 {
     members_.insert(it,member);
 }
@@ -315,11 +315,11 @@ void json_object<Char,Allocator>::set(const std::basic_string<Char>& name, const
     if (it != end() && it->name() == name)
     {
         //it = remove(it);
-        *it = typename basic_json<Char,Allocator>::name_value_pair(name,value);
+        *it = typename basic_json<Char,Allocator>::member_type(name,value);
     }
     else
     {
-        insert(it,typename basic_json<Char,Allocator>::name_value_pair(name,value));
+        insert(it,typename basic_json<Char,Allocator>::member_type(name,value));
     }
 }
 

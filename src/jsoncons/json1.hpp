@@ -126,27 +126,27 @@ public:
     class array;
     struct custom_type {};
 
-    class name_value_pair
+    class member_type
     {
     public:
-        name_value_pair()
+        member_type()
         {
         }
-        name_value_pair(const name_value_pair& pair)
+        member_type(const member_type& pair)
             : name_(pair.name_), value_(pair.value_)
         {
         }
-        name_value_pair(name_value_pair&& pair)
+        member_type(member_type&& pair)
             //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
         {
             name_.swap(pair.name_);
             value_.swap(pair.value_);
         }
-        name_value_pair(const std::basic_string<Char>& nam, const basic_json<Char,Allocator>& val)
+        member_type(const std::basic_string<Char>& nam, const basic_json<Char,Allocator>& val)
             : name_(nam), value_(val)
         {
         }
-        name_value_pair(std::basic_string<Char>&& nam, basic_json<Char,Allocator>&& val)
+        member_type(std::basic_string<Char>&& nam, basic_json<Char,Allocator>&& val)
             : name_(nam), value_(val)
         {
         }
@@ -166,13 +166,13 @@ public:
             return value_;
         }
 
-        name_value_pair& operator=(name_value_pair rhs)
+        member_type& operator=(member_type rhs)
         {
             swap(rhs);
             return *this;
         }
 
-        void swap(name_value_pair& pair)
+        void swap(member_type& pair)
         {
             name_.swap(pair.name_);
             value_.swap(pair.value_);
@@ -181,6 +181,8 @@ public:
         std::basic_string<Char> name_;
         basic_json<Char,Allocator> value_;
     };
+
+    typedef member_type name_value_pair;
 
     static const basic_json<Char,Allocator> an_object;
     static const basic_json<Char,Allocator> an_array;
@@ -745,6 +747,18 @@ public:
             val_.at(name_).set(name,value);
         }
 
+        template <typename T>
+        void add(T value)
+        {
+            val_.at(name_).add(value);
+        }
+
+        template <typename T>
+        void add(size_t index, T value)
+        {
+            val_.at(name_).add(index, value);
+        }
+
         void add(basic_json<Char,Allocator>&& value)
         {
             val_.at(name_).add(value);
@@ -1120,6 +1134,46 @@ public:
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Allocator>&& value);
 
+    template <typename T>
+    void add(T val)
+    {
+        switch (type_)
+        {
+        case array_t:
+            {
+                value_adapter<Char,Allocator,T> adapter;
+                basic_json<Char,Allocator> a;
+                adapter.assign(a,val);
+                value_.array_->push_back(std::move(a));
+            }
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <typename T>
+    void add(size_t index, T val)
+    {
+        switch (type_)
+        {
+        case array_t:
+            {
+                value_adapter<Char,Allocator,T> adapter;
+                basic_json<Char,Allocator> a;
+                adapter.assign(a,val);
+                value_.array_->add(index, std::move(a));
+            }
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
     void add(basic_json<Char,Allocator>&& value);
 
     void add(size_t index, basic_json<Char,Allocator>&& value);
@@ -1258,7 +1312,7 @@ private:
 };
 
 template <typename Char, typename Allocator>
-void swap(typename basic_json<Char,Allocator>::name_value_pair& a, typename basic_json<Char,Allocator>::name_value_pair& b)
+void swap(typename basic_json<Char,Allocator>::member_type& a, typename basic_json<Char,Allocator>::member_type& b)
 {
     a.swap(b);
 }
