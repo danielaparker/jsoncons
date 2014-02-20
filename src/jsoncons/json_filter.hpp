@@ -74,27 +74,27 @@ public:
 // value(...) implementation
     virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
     {
-        writer_.value(value);
+        writer_.string_value(value);
     }
 
     virtual void double_value(double value, const basic_parsing_context<Char>& context)
     {
-        writer_.value(value);
+        writer_.double_value(value);
     }
 
     virtual void longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        writer_.value(value);
+        writer_.longlong_value(value);
     }
 
     virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
-        writer_.value(value);
+        writer_.ulonglong_value(value);
     }
 
     virtual void bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        writer_.value(value);
+        writer_.bool_value(value);
     }
 private:
     basic_json_output_handler<Char>& writer_;

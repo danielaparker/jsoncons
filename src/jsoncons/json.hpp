@@ -11,11 +11,4 @@
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json2.hpp"
 
-namespace jsoncons {
-
-typedef basic_json<char> json;
-typedef basic_json<wchar_t> wjson;
-
-}
-
 #endif

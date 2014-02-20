@@ -85,7 +85,7 @@ void escape_string(const std::basic_string<Char>& s,
     }
 }
 
-template<class Char>
+template<class Char,class Allocator>
 class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item
@@ -123,7 +123,7 @@ public:
     }
 
     basic_csv_serializer(std::basic_ostream<Char>& os,
-                         const jsoncons::basic_json<Char>& params)
+                         const jsoncons::basic_json<Char,Allocator>& params)
        :
        os_(os),
        format_(),
@@ -472,7 +472,7 @@ private:
     std::map<std::basic_string<Char>,size_t> header_;
 };
 
-typedef basic_csv_serializer<char> csv_serializer;
+typedef basic_csv_serializer<char,jsoncons::allocator<char>> csv_serializer;
 
 }}
 
