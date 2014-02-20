@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     std::cout << "size json=" << sizeof(json) << std::endl;
     std::cout << "size string=" << sizeof(string) << std::endl;
     std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
-    std::cout << "size map=" << sizeof(std::vector<json::name_value_pair>) << std::endl;
+    std::cout << "size map=" << sizeof(std::vector<json::member_type>) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_userdata)

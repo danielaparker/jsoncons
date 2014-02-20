@@ -8,9 +8,9 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 ### Member types
 
-    name_value_pair
+    member_type
 
-[[name_value_pair]] stores a name and a json value
+[[member_type]] stores a name and a json value
 
     null_type
 
@@ -22,10 +22,10 @@ The `json` class is an instantiation of the `basic_json` class template that use
 Type tags that can be used with `is<T>` and `as<T>`
 
     object_iterator
-A random access iterator to `json::name_value_pair`
+A random access iterator to `json::member_type`
 
     const_object_iterator
-A random access iterator to `const json::name_value_pair`
+A random access iterator to `const json::member_type`
 
     array_iterator
 A random access iterator to `json`
