@@ -1,6 +1,6 @@
-    jsoncons::json::name_value_pair
+    jsoncons::json::member_type
 
-`name_value_pair` stores a name and a json value
+`member_type` stores a name and a json value
 
 ### Accessors
     
