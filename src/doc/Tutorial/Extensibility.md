@@ -1,6 +1,6 @@
-If you want to use the json methods `is<T>`, `as<T>`, `add`, `set` and `operator=` to access or modify with a new type, you need to show json how to interact with that type, by extending `value_adapter`.
+If you want to use the json methods `is<T>`, `as<T>`, `add`, `set` and `operator=` to access or modify with a new type, you need to show json how to interact with that type, by extending `value_adapter` in the `jsoncons` namespace.
 
-Below is an example for extending `value_adapter` to access and modify with `boost::gregorian::date` values.
+Below is an example for extending `value_adapter` to access and modify with `boost::gregorian::date` values, while internally storing the value as a string.
 
 First, you need to specialize `value_adapter` in namespace `jsoncons`
 
