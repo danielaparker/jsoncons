@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj.is_object());
     BOOST_CHECK(obj.is<json::object>());
 
-    BOOST_CHECK(obj["string"].is_string());
+    BOOST_CHECK(obj["string"].is<std::string>());
     BOOST_CHECK(obj["string"].is<std::string>());
 
     obj["double"] = 10.7;
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     // tests for json is_type methods
 
     json str = obj["string"];
-    BOOST_CHECK(str.is_string());
+    BOOST_CHECK(str.is<std::string>());
     BOOST_CHECK(str.is<std::string>());
 }
 

@@ -15,7 +15,7 @@ First, you need to specialize `value_adapter` for `boost::gregorian::date` in na
         public:
             bool is(const basic_json<char,Allocator>& val) const
             {
-                if (!val.is_string())
+                if (!val.is<std::string>())
                 {
                     return false;
                 }
