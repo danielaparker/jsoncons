@@ -59,10 +59,18 @@ namespace jsoncons
 BOOST_AUTO_TEST_CASE(test_add_extensibility)
 {
     json a(json::an_array);
-    boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-    a.add(d);
-    boost::gregorian::date val = a[0].as<boost::gregorian::date>();
-    BOOST_CHECK_EQUAL(d,val);
+    a.add(boost::gregorian::date(2013,10,14));
+    auto d = a[0].as<boost::gregorian::date>();
+    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
+
+    json o;
+    o["ObservationDates"] = std::move(a);
+    o["ObservationDates"].add(boost::gregorian::date(2013,10,21));
+    d = o["ObservationDates"][0].as<boost::gregorian::date>();
+    auto d2 = o["ObservationDates"][1].as<boost::gregorian::date>();
+
+    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
+    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,21),d2);
 }
 
 BOOST_AUTO_TEST_CASE(test_set_extensibility)
@@ -81,5 +89,36 @@ BOOST_AUTO_TEST_CASE(test_assignment_extensibility)
     o["today"] = d;
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
     BOOST_CHECK_EQUAL(d,val);
+}
+
+BOOST_AUTO_TEST_CASE(test_example)
+{
+        using jsoncons::json;
+        using boost::gregorian::date;
+
+        json deal;
+        deal["Maturity"] = date(2014,10,14);
+
+        json observation_dates(json::an_array);
+        observation_dates.add(date(2014,2,14));
+        observation_dates.add(date(2014,2,21));
+
+		deal["ObservationDates"] = std::move(observation_dates);
+
+        date maturity = deal["Maturity"].as<date>();
+        std::cout << "Maturity: " << maturity << std::endl << std::endl;
+
+        std::cout << "Observation dates: " << std::endl << std::endl;
+        json::array_iterator it = deal["ObservationDates"].begin_elements();
+        json::array_iterator end = deal["ObservationDates"].end_elements();
+
+        while (it != end)
+        {
+            std::cout << *it << std::endl;
+			++it;
+        }
+        std::cout << std::endl;
+
+        std::cout << pretty_print(deal) << std::endl;
 }
 
