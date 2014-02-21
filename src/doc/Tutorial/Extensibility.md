@@ -38,7 +38,7 @@ First, you need to specialize `value_adapter` for `boost::gregorian::date` in na
             void assign(basic_json<char,Allocator>& self, boost::gregorian::date val)
             {
                 std::string s(to_iso_extended_string(val));
-                self.assign_string(s);
+                self = s;
             }
         };
     };

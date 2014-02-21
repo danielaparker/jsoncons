@@ -101,8 +101,8 @@ This is how to read the document with `jsoncons`:
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
+            string author = book["author"].as<string>();
+            string title = book["title"].as<string>();
             double price = book["price"].as<double>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
@@ -132,9 +132,9 @@ Instead of having the exception, let's use an accessor that evaluates to a strin
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
-            string price = book.get("price","N/A").as<std::string>();
+            string author = book["author"].as<string>();
+            string title = book["title"].as<string>();
+            string price = book.get("price","N/A").as<string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
     }
@@ -162,8 +162,8 @@ By default, when formatting a floating-point value with `as_string()`, `jsoncons
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
+            string author = book["author"].as<string>();
+            string title = book["title"].as<string>();
             string price = book.get("price","N/A").as_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
