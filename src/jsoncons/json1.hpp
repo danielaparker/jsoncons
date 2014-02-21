@@ -217,6 +217,26 @@ public:
     public:
         friend class basic_json<Char,Allocator>;
 
+        const_object_iterator begin_members() const
+        {
+            return val_.begin_members();
+        }
+
+        const_object_iterator end_members() const
+        {
+            return val_.end_members();
+        }
+
+        const_array_iterator begin_elements() const
+        {
+            return val_.begin_elements();
+        }
+
+        const_array_iterator end_elements() const
+        {
+            return val_.end_elements();
+        }
+
         size_t size() const
         {
             return val_.size();
@@ -463,6 +483,46 @@ public:
     {
     public:
         friend class basic_json<Char,Allocator>;
+
+        object_iterator begin_members()
+        {
+            return val_.at(name_).begin_members();
+        }
+
+        const_object_iterator begin_members() const
+        {
+            return val_.at(name_).begin_members();
+        }
+
+        object_iterator end_members()
+        {
+            return val_.at(name_).end_members();
+        }
+
+        const_object_iterator end_members() const
+        {
+            return val_.at(name_).end_members();
+        }
+
+        array_iterator begin_elements()
+        {
+            return val_.at(name_).begin_elements();
+        }
+
+        const_array_iterator begin_elements() const
+        {
+            return val_.at(name_).begin_elements();
+        }
+
+        array_iterator end_elements()
+        {
+            return val_.at(name_).end_elements();
+        }
+
+        const_array_iterator end_elements() const
+        {
+            return val_.at(name_).end_elements();
+        }
 
         size_t size() const
         {
