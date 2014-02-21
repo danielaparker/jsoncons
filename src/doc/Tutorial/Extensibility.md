@@ -2,7 +2,7 @@ If you want to use the json methods `is<T>`, `as<T>`, `add`, `set` and `operator
 
 Below is an example for extending `value_adapter` to access and modify with `boost::gregorian::date` values, while internally storing the values as strings.
 
-First, you need to specialize `value_adapter` in namespace `jsoncons`
+First, you need to specialize `value_adapter` for `boost::gregorian::date` in namespace `jsoncons`
 
     #include "jsoncons/json.hpp"
     #include "boost/date_time/gregorian/gregorian.hpp"
