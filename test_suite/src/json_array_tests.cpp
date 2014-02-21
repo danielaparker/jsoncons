@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_array_constructor)
     arr.resize_array(10,10.0);
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 10);
-    BOOST_CHECK_CLOSE(arr[0].as_double(), 10.0, 0.0000001);
+    BOOST_CHECK_CLOSE(arr[0].as<double>(), 10.0, 0.0000001);
 
 }
 
@@ -40,9 +40,9 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 
     BOOST_CHECK(arr.size() == 3);
 
-    BOOST_CHECK(arr[0].as_string() == std::string("Montreal"));
-    BOOST_CHECK(arr[1].as_string() == std::string("Toronto"));
-    BOOST_CHECK(arr[2].as_string() == std::string("Vancouver"));
+    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
+    BOOST_CHECK(arr[1].as<std::string>() == std::string("Toronto"));
+    BOOST_CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
 
     BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
     BOOST_CHECK(arr[1].as<std::string>() == std::string("Toronto"));
@@ -119,8 +119,8 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    BOOST_CHECK_EQUAL(a[0][0].as_string(), std::string("Tenor"));
-    BOOST_CHECK_CLOSE(a[2][3].as_double(), -0.005, 0.00000001);
+    BOOST_CHECK_EQUAL(a[0][0].as<std::string>(), std::string("Tenor"));
+    BOOST_CHECK_CLOSE(a[2][3].as<double>(), -0.005, 0.00000001);
 
     BOOST_CHECK_EQUAL(a[0][0].as<std::string>(), std::string("Tenor"));
     BOOST_CHECK_CLOSE(a[2][3].as<double>(), -0.005, 0.00000001);

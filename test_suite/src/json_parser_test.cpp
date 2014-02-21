@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
     std::string expected("\n\b\f\r\t");
 
     json o = json::parse_string(input);
-    BOOST_CHECK(expected == o[0].as_string());
+    BOOST_CHECK(expected == o[0].as<std::string>());
 }
 
 

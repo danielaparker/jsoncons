@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(test_const_member_read)
 
     const json b(a);
 
-    int val1 = b["field1"].as_int();
+    int val1 = b["field1"].as<int>();
     BOOST_CHECK(val1 == 10);
     BOOST_REQUIRE_THROW(b["field2"], json_exception);
 }

@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json double_1 = root["double_1"];
 
-    BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
+    BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
     BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
     json double_1 = root["double_1"];
 
-    BOOST_CHECK_CLOSE(double_1.as_double(), 10.0, 0.000001);
+    BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
     root["myobject"] = json();
     root["myobject"]["double_2"] = json(7.0);
@@ -66,11 +66,11 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 
     json double_2 = root["myobject"]["double_2"];
 
-    BOOST_CHECK_CLOSE(double_2.as_double(), 7.0, 0.000001);
-    BOOST_CHECK(double_2.as_int() == 7);
-    BOOST_CHECK(root["myobject"]["bool_2"].as_bool());
+    BOOST_CHECK_CLOSE(double_2.as<double>(), 7.0, 0.000001);
+    BOOST_CHECK(double_2.as<int>() == 7);
+    BOOST_CHECK(root["myobject"]["bool_2"].as<bool>());
     BOOST_CHECK(root["myobject"]["int_2"].as_longlong() == 0);
-    BOOST_CHECK(root["myobject"]["string_2"].as_string() == std::string("my string"));
+    BOOST_CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
     BOOST_CHECK(root["myobject"]["bool_2"].as<bool>());
     BOOST_CHECK(root["myobject"]["int_2"].as<long long>() == 0);
@@ -156,13 +156,13 @@ BOOST_AUTO_TEST_CASE(test_to_string)
 
     BOOST_CHECK(root["null"].is_null());
     BOOST_CHECK(root["null"].is<json::null_type>());
-    BOOST_CHECK(!root["bool1"].as_bool());
-    BOOST_CHECK(root["bool2"].as_bool());
-    BOOST_CHECK(root["integer"].as_int() == 12345678);
-    BOOST_CHECK(root["integer"].as_uint() == 12345678);
-    BOOST_CHECK(root["neg-integer"].as_int() == -87654321);
-    BOOST_CHECK_CLOSE(root["double"].as_double(), 123456.01, 0.0000001);
-    BOOST_CHECK(root["escaped-string"].as_string() == std::string("\\\n"));
+    BOOST_CHECK(!root["bool1"].as<bool>());
+    BOOST_CHECK(root["bool2"].as<bool>());
+    BOOST_CHECK(root["integer"].as<int>() == 12345678);
+    BOOST_CHECK(root["integer"].as<unsigned int>() == 12345678);
+    BOOST_CHECK(root["neg-integer"].as<int>() == -87654321);
+    BOOST_CHECK_CLOSE(root["double"].as<double>(), 123456.01, 0.0000001);
+    BOOST_CHECK(root["escaped-string"].as<std::string>() == std::string("\\\n"));
 
     BOOST_CHECK(!root["bool1"].as<bool>());
     BOOST_CHECK(root["bool2"].as<bool>());
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << it->name() << "=" << it->value().as_string() << std::endl;
+        std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
 }
 
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
-        std::cout << it->as_string() << std::endl;
+        std::cout << it->as<std::string>() << std::endl;
     }
 }
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(test_u0000)
     std::cout << "Input:    " << inputStr << std::endl;
     json arr = json::parse_string(inputStr);
 
-    std::string str = arr[0].as_string();
+    std::string str = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < str.size(); ++i)
     {
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::cout << "Input:    " << inputStr << std::endl;
     json arr = json::parse_string(inputStr);
 
-    std::string s = arr[0].as_string();
+    std::string s = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)
     {
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::cout << "Output:   " << os.str() << std::endl;
 
     json arr2 = json::parse_string(outputStr);
-    std::string s2 = arr2[0].as_string();
+    std::string s2 = arr2[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)
     {
@@ -362,14 +362,14 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
 
-    double x1 = obj.has_member("field1") ? obj["field1"].as_double() : 10.0;
-    double x2 = obj.has_member("field2") ? obj["field2"].as_double() : 20.0;
+    double x1 = obj.has_member("field1") ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.has_member("field2") ? obj["field2"].as<double>() : 20.0;
 
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
 
-    std::string x3 = obj.get("field3","Montreal").as_string();
-    std::string x4 = obj.get("field4","San Francisco").as_string();
+    std::string x3 = obj.get("field3","Montreal").as<std::string>();
+    std::string x4 = obj.get("field4","San Francisco").as<std::string>();
 
     std::cout << "x3=" << x3 << std::endl;
     std::cout << "x4=" << x4 << std::endl;
