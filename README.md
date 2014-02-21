@@ -11,6 +11,25 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
+0.92 Candidate Release
+----------------------
+
+Breaking change (if you have subclassed `json_input_handler` or `json_output_handler`)
+
+- For consistency with other names, the input and output handler methods new to 0.91 - `value_string`, `value_double`, `value_longlong`, `value_ulonglong` and `value_bool` - have been renamed to `string_value`, `double_value`, `longlong_value`, `ulonglong_value` and `bool_value`.
+
+Non breaking change
+
+- `name_value_pair` has been renamed to `member_type` (typedefed to previous name.)
+
+Enhancements:
+
+- `json` now has extensibilty, you can access and modify json values with new types, see the tutorial Extensibility 
+
+Preparation for allocator support:
+
+- The basic_json and related classes now have an Allocator template parameter, this is transparent to users.
+
 0.91 Release
 ------------
 
