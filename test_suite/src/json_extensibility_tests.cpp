@@ -114,7 +114,8 @@ BOOST_AUTO_TEST_CASE(test_example)
 
         while (it != end)
         {
-            std::cout << *it << std::endl;
+            date d = it->as<date>();
+            std::cout << d << std::endl;
 			++it;
         }
         std::cout << std::endl;

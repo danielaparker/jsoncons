@@ -14,7 +14,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 0.92 Candidate Release
 ----------------------
 
-Breaking change (if you have subclassed `json_input_handler` or `json_output_handler`)
+Breaking change (only if you have subclassed `json_input_handler` or `json_output_handler`)
 
 - For consistency with other names, the input and output handler methods new to 0.91 - `value_string`, `value_double`, `value_longlong`, `value_ulonglong` and `value_bool` - have been renamed to `string_value`, `double_value`, `longlong_value`, `ulonglong_value` and `bool_value`.
 
@@ -28,7 +28,7 @@ Enhancements:
 
 Preparation for allocator support:
 
-- The basic_json and related classes now have an Allocator template parameter, this is transparent to users.
+- The basic_json and related classes now have an Allocator template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the `json` class.
 
 0.91 Release
 ------------

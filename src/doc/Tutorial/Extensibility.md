@@ -68,7 +68,8 @@ You can now access and modify json members and elements with boost dates.
 
         while (it != end)
         {
-            std::cout << *it << std::endl;
+            date d = it->as<date>();
+            std::cout << d << std::endl;
 			++it;
         }
         std::cout << std::endl;
@@ -82,8 +83,8 @@ The output is
 
     Observation dates:
 
-    "2014-02-14"
-    "2014-02-21"
+    2014-Feb-14
+    2014-Feb-21
 
     {
         "Maturity":"2014-10-14",
