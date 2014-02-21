@@ -149,7 +149,7 @@ Now the output is
     Charles Bukowski, Women: A Novel, 12.0
     Ivan Passer, Cutter's Way, N/A
 
-By default, when formatting a floating-point value with `as_string()`, `jsoncons` truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and the number of decimal places to 2.
+By default, when formatting a floating-point value with `as<string>()`, `jsoncons` truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and the number of decimal places to 2.
 
     try
     {
@@ -164,7 +164,7 @@ By default, when formatting a floating-point value with `as_string()`, `jsoncons
             json& book = books[i];
             string author = book["author"].as<string>();
             string title = book["title"].as<string>();
-            string price = book.get("price","N/A").as_string(format);
+            string price = book.get("price","N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
     }
@@ -289,7 +289,7 @@ The output is
     std::cout << "Input:    " << inputStr << std::endl;
 
     json arr = json::parse_string(inputStr);
-    std::string s = arr[0].as_string();
+    std::string s = arr[0].as<string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)
     {
@@ -308,7 +308,7 @@ The output is
     std::cout << "Output:   " << os.str() << std::endl;
 
     json arr2 = json::parse_string(outputStr);
-    std::string s2 = arr2[0].as_string();
+    std::string s2 = arr2[0].as<string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)
     {

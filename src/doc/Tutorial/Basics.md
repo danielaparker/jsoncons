@@ -2,12 +2,13 @@
 
     using jsoncons::json;
     using jsoncons::pretty_print;
+    using std::string;
 
 ## Constructing a json value
 
 ### From a string
 
-    std::string input = "{\"first_name\":\"Jane\",\"last_name\":\"Roe\",\"events_attended\":10}";
+    string input = "{\"first_name\":\"Jane\",\"last_name\":\"Roe\",\"events_attended\":10}";
 
     json val = json::parse_string(input);
 
@@ -135,8 +136,8 @@ The output is
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    std::string first_name = obj["first_name"].as_string();
-    std::string last_name = obj.at("last_name").as_string();
+    string first_name = obj["first_name"].as<string>();
+    string last_name = obj.at("last_name").as<string>();
     int events_attended = obj["events_attended"].as_int();
     bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as_bool();
 
@@ -155,14 +156,14 @@ The output is
 
     try
     {
-        std::string experience = obj["outdoor_experience"].as_string();
+        string experience = obj["outdoor_experience"].as<string>();
     }
     catch (const json_exception& e)
     {
         std::cout << e.what() << std::endl;
     }
 
-    std::string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as_string() : "";
+    string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as<string>() : "";
 
     bool first_aid_certification = obj.get("first_aid_certification",false).as_bool();
 
@@ -184,7 +185,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
+        std::cout << "name=" << it->name() << ", value=" << it->value().as<string>() << std::endl;
     }
 
 The output is
@@ -204,7 +205,7 @@ The output is
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
-        std::cout << it->as<std::string>() << std::endl;
+        std::cout << it->as<string>() << std::endl;
     }
 
 The output is

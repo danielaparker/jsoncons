@@ -242,9 +242,6 @@ If value is long long, returns value, if value is unsigned long long or double, 
     std::string as_string() const
 If value is string, returns value, otherwise returns result of `to_string`.
 
-    std::string as_string(const output_format& format) const
-If value is string, returns value, otherwise returns result of `to_string(format)`.
-
     template <class T>
     const T& custom_data() const
 If the value is custom, returns a reference to the custom value, otherwise throws  
@@ -333,6 +330,9 @@ Inserts json value into stream.
 Exchanges the values of `a` and `b`
 
 ### Deprecated methods
+
+    std::string as_string(const output_format& format) const
+Use `to_string(format)`.
 
     static json make_array()
     static json make_array(size_t n)
