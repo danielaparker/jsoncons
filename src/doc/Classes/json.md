@@ -375,11 +375,11 @@ Use `as<char>()` instead
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
 
-    double x1 = obj.has_member("field1") ? obj["field1"].as_double() : 10.0;
-    double x2 = obj.has_member("field2") ? obj["field2"].as_double() : 20.0;
+    double x1 = obj.has_member("field1") ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.has_member("field2") ? obj["field2"].as<double>() : 20.0;
 
-    std::string x3 = obj.get("field3","Montreal").as_string();
-    std::string x4 = obj.get("field4","San Francisco").as_string();
+    std::string x3 = obj.get("field3","Montreal").as<std::string>();
+    std::string x4 = obj.get("field4","San Francisco").as<std::string>();
 
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
@@ -440,7 +440,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << it->name << "=" << it->second.as_string() << std::endl;
+        std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
 
 The output is
@@ -458,7 +458,7 @@ The output is
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
-        std::cout << it->as_string() << std::endl;
+        std::cout << it->as<std::string>() << std::endl;
     }
 
 The output is
@@ -561,7 +561,7 @@ The (illegal) json output produced by Visual Studio 2010 is
     std::cout << "Input:    " << inputStr << std::endl;
 
     json arr = json::parse_string(inputStr);
-    std::string str = arr[0].as_string();
+    std::string str = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < str.size(); ++i)
     {
@@ -590,7 +590,7 @@ The output is
     std::cout << "Input:    " << inputStr << std::endl;
 
     json arr = json::parse_string(inputStr);
-    std::string s = arr[0].as_string();
+    std::string s = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)
     {
@@ -609,7 +609,7 @@ The output is
     std::cout << "Output:   " << os.str() << std::endl;
 
     json arr2 = json::parse_string(outputStr);
-    std::string s2 = arr2[0].as_string();
+    std::string s2 = arr2[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)
     {
