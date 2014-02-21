@@ -138,8 +138,8 @@ The output is
 
     string first_name = obj["first_name"].as<string>();
     string last_name = obj.at("last_name").as<string>();
-    int events_attended = obj["events_attended"].as_int();
-    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as_bool();
+    int events_attended = obj["events_attended"].as<int>();
+    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
 
     std::cout << first_name << " " << last_name << ", " << events_attended 
               << ", " << accept_waiver_of_liability << std::endl;
@@ -165,7 +165,7 @@ The output is
 
     string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as<string>() : "";
 
-    bool first_aid_certification = obj.get("first_aid_certification",false).as_bool();
+    bool first_aid_certification = obj.get("first_aid_certification",false).as<bool>();
 
     std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
 

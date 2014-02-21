@@ -95,10 +95,10 @@ BOOST_AUTO_TEST_CASE(test_accessing)
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    std::string first_name = obj["first_name"].as_string();
-    std::string last_name = obj.at("last_name").as_string();
-    int events_attended = obj["events_attended"].as_int();
-    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as_bool();
+    std::string first_name = obj["first_name"].as<std::string>();
+    std::string last_name = obj.at("last_name").as<std::string>();
+    int events_attended = obj["events_attended"].as<int>();
+    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
 
     std::cout << first_name << " " << last_name << ", " << events_attended << ", " << accept_waiver_of_liability << std::endl;
 
@@ -112,16 +112,16 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 
     try
     {
-        std::string experience = obj["outdoor_experience"].as_string();
+        std::string experience = obj["outdoor_experience"].as<std::string>();
     }
     catch (const json_exception& e)
     {
         std::cout << e.what() << std::endl;
     }
 
-    std::string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as_string() : "";
+    std::string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as<std::string>() : "";
 
-    bool first_aid_certification = obj.get("first_aid_certification",false).as_bool();
+    bool first_aid_certification = obj.get("first_aid_certification",false).as<bool>();
 
     std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
 }
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->name() << ", value=" << it->value().as_string() << std::endl;
+        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
     }
 }
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
-        std::cout << it->as_string() << std::endl;
+        std::cout << it->as<std::string>() << std::endl;
     }
 }
 
