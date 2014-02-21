@@ -22,6 +22,8 @@ Non breaking change
 
 - `name_value_pair` has been renamed to `member_type` (typedefed to previous name.)
 
+- `as_string(output_format format)` has been deprecated, use the existing `to_string(output_format format)` instead
+
 Enhancements:
 
 - `json` now has extensibilty, you can access and modify json values with new types, see the tutorial Extensibility 

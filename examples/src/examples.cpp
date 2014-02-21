@@ -73,7 +73,7 @@ void first_example_c()
             json& book = books[i];
             string author = book["author"].as<std::string>();
             string title = book["title"].as<std::string>();
-            string price = book.get("price","N/A").as_string(format);
+            string price = book.get("price","N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
     }
