@@ -25,9 +25,9 @@ void first_example_a()
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
-            double price = book["price"].as_double();
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
+            double price = book["price"].as<double>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
     }
@@ -46,9 +46,9 @@ void first_example_b()
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
-            string price = book.get("price","N/A").as_string();
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
+            string price = book.get("price","N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
     }
@@ -71,8 +71,8 @@ void first_example_c()
         for (size_t i = 0; i < books.size(); ++i)
         {
             json& book = books[i];
-            string author = book["author"].as_string();
-            string title = book["title"].as_string();
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
             string price = book.get("price","N/A").as_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }

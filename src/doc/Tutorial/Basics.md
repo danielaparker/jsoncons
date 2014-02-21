@@ -184,7 +184,7 @@ The output is
 
     for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
     {
-        std::cout << "name=" << it->name() << ", value=" << it->value().as_string() << std::endl;
+        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
     }
 
 The output is
@@ -204,7 +204,7 @@ The output is
 
     for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
     {
-        std::cout << it->as_string() << std::endl;
+        std::cout << it->as<std::string>() << std::endl;
     }
 
 The output is
