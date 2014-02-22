@@ -25,6 +25,16 @@ namespace jsoncons {
 template<class Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
+    struct buffered_stream
+    {
+        buffered_stream(std::basic_istream<Char>& is)
+            : is_(is)
+        {
+        }
+
+        std::basic_istream<Char>& is_;
+    };
+
     static default_error_handler default_err_handler;
 
     struct stack_item
@@ -55,10 +65,8 @@ public:
 
     static const size_t read_ahead_length = 12;
     static const size_t default_max_buffer_length = 16384;
-    //!  Parse an input stream of JSON text into a json object
-    /*!
-      \param is The input stream to read from
-    */
+
+    //  Parse an input stream of JSON text into a json object
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_error_handler<Char>& err_handler)
@@ -68,9 +76,7 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
-         buffer_(default_max_buffer_length + 2 * read_ahead_length),
-         input_buffer_(0),
+         bufptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -81,10 +87,6 @@ public:
          bof_(true),
          eof_(false)
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
     }
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
@@ -95,9 +97,7 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
-         buffer_(default_max_buffer_length + 2 * read_ahead_length),
-         input_buffer_(0),
+         bufptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -108,17 +108,57 @@ public:
          bof_(true),
          eof_(false)
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
+    }
+
+    basic_json_reader(basic_json_input_handler<Char>& handler,
+                      basic_error_handler<Char>& err_handler)
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         hard_buffer_length_(0),
+         estimation_buffer_length_(default_max_buffer_length),
+         handler_(handler),
+         err_handler_(err_handler),
+         bof_(true),
+         eof_(false)
+    {
+    }
+
+    basic_json_reader(basic_json_input_handler<Char>& handler)
+
+       : minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         hard_buffer_length_(0),
+         estimation_buffer_length_(default_max_buffer_length),
+         handler_(handler),
+         err_handler_(default_err_handler),
+         bof_(true),
+         eof_(false)
+    {
     }
 
     ~basic_json_reader()
     {
     }
 
-    void read();
+    void read()
+    {
+        read(bufptr_->is_);
+    }
+
+    void read(std::basic_istream<Char>& is);
 
     bool eof() const
     {
@@ -133,7 +173,6 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity + 2*read_ahead_length);
     }
 
     virtual unsigned long line_number() const
@@ -174,7 +213,7 @@ private:
     unsigned int decode_unicode_codepoint();
     unsigned int decode_unicode_escape_sequence();
 
-    void read_data_block()
+    void read_some()
     {
         if (buffer_position_ < buffer_length_)
         {
@@ -190,12 +229,12 @@ private:
         }
 
         buffer_position_ = 0;
-        if (!is_.eof())
+        if (!bufptr_->is_.eof())
         {
             if (bof_)
             {
-                is_.read(&buffer_[0], buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(is_.gcount());
+                bufptr_->is_.read(&buffer_[0], buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(bufptr_->is_.gcount());
                 bof_ = false;
                 if (buffer_length_ == 0)
                 {
@@ -220,9 +259,9 @@ private:
                 {
                     buffer_[i] = buffer_[real_buffer_length + i];
                 }
-                is_.read(&buffer_[0] + unread, buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(is_.gcount());
-                if (!is_.eof())
+                bufptr_->is_.read(&buffer_[0] + unread, buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(bufptr_->is_.gcount());
+                if (!bufptr_->is_.eof())
                 {
                     buffer_length_ -= extra;
                     hard_buffer_length_ = buffer_length_ + read_ahead_length;
@@ -252,9 +291,7 @@ private:
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
     std::vector<stack_item> stack_;
-    std::basic_istream<Char>& is_;
     std::vector<Char> buffer_;
-    Char *input_buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
@@ -264,6 +301,7 @@ private:
     basic_error_handler<Char>& err_handler_;
     bool bof_;
     bool eof_;
+    std::unique_ptr<buffered_stream> bufptr_;
 };
 
 template<class Char>
@@ -296,14 +334,25 @@ unsigned long long string_to_ulonglong(const char *s, size_t length, const unsig
 }
 
 template<class Char>
-void basic_json_reader<Char>::read()
+void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
 {
+    if (is.bad())
+    {
+        JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+    }
+    bufptr_ = std::unique_ptr<buffered_stream>(new buffered_stream(is));
+    buffer_.resize(buffer_capacity_ + 2*read_ahead_length);
+    buffer_position_ = 0;
+    buffer_length_ = 0;
+    hard_buffer_length_ = 0;
+    bof_ = true;
+    eof_ = false;
     line_ = 1;
     column_ = 0;
 
     if (buffer_position_ >= buffer_length_)
     {
-        read_data_block();
+        read_some();
     }
     while (!eof())
     {
@@ -543,7 +592,7 @@ void basic_json_reader<Char>::read()
         }
         if (buffer_position_ >= buffer_length_)
         {
-            read_data_block();
+            read_some();
         }
     }
 
@@ -605,7 +654,7 @@ void basic_json_reader<Char>::parse_separator()
         }
         if (!done)
         {
-            read_data_block();
+            read_some();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -722,7 +771,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         }
         if (!done)
         {
-            read_data_block();
+            read_some();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -839,7 +888,7 @@ void basic_json_reader<Char>::parse_string()
         }
         if (!done)
         {
-            read_data_block();
+            read_some();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -879,7 +928,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
         }
         if (!done)
         {
-            read_data_block();
+            read_some();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -928,7 +977,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
         }
         if (!done)
         {
-            read_data_block();
+            read_some();
             if (eof())
             {
                 err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);

@@ -27,7 +27,8 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
 
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(handler);
+        reader.read(is);
     }
     catch (const json_exception&)
     {
@@ -42,8 +43,8 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();
+        json_reader reader(handler);
+        reader.read(is);
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -61,8 +62,8 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -79,8 +80,8 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -97,8 +98,8 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -116,8 +117,8 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -135,8 +136,8 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -154,8 +155,8 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -173,8 +174,8 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -192,8 +193,8 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
@@ -211,8 +212,8 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
     try
     {
         json_deserializer handler;
-        json_reader reader(is,handler);
-        reader.read();  // must throw
+        json_reader reader(handler);
+        reader.read(is);  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)

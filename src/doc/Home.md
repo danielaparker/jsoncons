@@ -265,11 +265,11 @@ and here is the code to read them:
     }
 
     json_deserializer handler;
-    json_reader reader(is,handler);
+    json_reader reader(handler);
 
     while (!reader.eof())
     {
-        reader.read();
+        reader.read(is);
         if (!reader.eof())
         {
             json val = std::move(handler.root());
