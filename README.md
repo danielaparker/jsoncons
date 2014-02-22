@@ -34,7 +34,7 @@ Enhancements:
 
 Preparation for allocator support:
 
-- The basic_json and related classes now have an Allocator template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the `json` class.
+- The basic_json and related classes now have an Allocator template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the `json` and related classes.
 
 0.91 Release
 ------------
