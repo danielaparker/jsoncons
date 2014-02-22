@@ -46,36 +46,26 @@ Parses an input stream `is` of CSV text and reports JSON events to a [[json_inpu
 
     csv_reader(std::istream& is,
                json_input_handler& handler)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text and a [[json_input_handler]] handler that receives
-notification of JSON events. Uses default [[csv formatting parameters]].
+Use the constructor that does not take `is` and pass `is` to `read` instead.
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                const json& params)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events, and [[csv formatting parameters]].
+Use the constructor that does not take `is` and pass `is` to `read` instead.
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                error_handler& err_handler)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events and the specified [[error_handler]].
-Uses default [[csv formatting parameters]].
+Use the constructor that does not take `is` and pass `is` to `read` instead.
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                error_handler& err_handler,
                const json& params)
-Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
-notification of JSON events, the specified [[error_handler]],
-and [[csv formatting parameters]].
+Use the constructor that does not take `is` and pass `is` to `read` instead.
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_input_handler]] handler, such as a [[json_deserializer]].
+Use the constructor that does not take `is` and use the `read` method that does.
 
 ### Examples
 
