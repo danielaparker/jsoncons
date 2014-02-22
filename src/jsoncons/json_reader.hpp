@@ -76,7 +76,7 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         bufptr_(new buffered_stream(is)),
+         stream_ptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -97,7 +97,7 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         bufptr_(new buffered_stream(is)),
+         stream_ptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -155,7 +155,7 @@ public:
 
     void read()
     {
-        read(bufptr_->is_);
+        read(stream_ptr_->is_);
     }
 
     void read(std::basic_istream<Char>& is);
@@ -229,12 +229,12 @@ private:
         }
 
         buffer_position_ = 0;
-        if (!bufptr_->is_.eof())
+        if (!stream_ptr_->is_.eof())
         {
             if (bof_)
             {
-                bufptr_->is_.read(&buffer_[0], buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(bufptr_->is_.gcount());
+                stream_ptr_->is_.read(&buffer_[0], buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
                 bof_ = false;
                 if (buffer_length_ == 0)
                 {
@@ -259,9 +259,9 @@ private:
                 {
                     buffer_[i] = buffer_[real_buffer_length + i];
                 }
-                bufptr_->is_.read(&buffer_[0] + unread, buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(bufptr_->is_.gcount());
-                if (!bufptr_->is_.eof())
+                stream_ptr_->is_.read(&buffer_[0] + unread, buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
+                if (!stream_ptr_->is_.eof())
                 {
                     buffer_length_ -= extra;
                     hard_buffer_length_ = buffer_length_ + read_ahead_length;
@@ -301,7 +301,7 @@ private:
     basic_error_handler<Char>& err_handler_;
     bool bof_;
     bool eof_;
-    std::unique_ptr<buffered_stream> bufptr_;
+    std::unique_ptr<buffered_stream> stream_ptr_;
 };
 
 template<class Char>
@@ -340,7 +340,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
     {
         JSONCONS_THROW_EXCEPTION("Input stream is invalid");
     }
-    bufptr_ = std::unique_ptr<buffered_stream>(new buffered_stream(is));
+    stream_ptr_ = std::unique_ptr<buffered_stream>(new buffered_stream(is));
     buffer_.resize(buffer_capacity_ + 2*read_ahead_length);
     buffer_position_ = 0;
     buffer_length_ = 0;

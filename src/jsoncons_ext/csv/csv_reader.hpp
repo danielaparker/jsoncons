@@ -26,6 +26,16 @@ namespace jsoncons_ext { namespace csv {
 template<class Char,class Allocator>
 class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
+    struct buffered_stream
+    {
+        buffered_stream(std::basic_istream<Char>& is)
+            : is_(is)
+        {
+        }
+
+        std::basic_istream<Char>& is_;
+    };
+
     static jsoncons::default_error_handler default_err_handler;
 
     struct stack_item
@@ -54,9 +64,8 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
+         stream_ptr_(new buffered_stream(is)),
          buffer_(default_max_buffer_length),
-         input_buffer_(0),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -68,10 +77,6 @@ public:
          quote_escape_char_(),
          comment_symbol_()
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
         init(jsoncons::json::an_object);
     }
 
@@ -85,9 +90,8 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
+         stream_ptr_(new buffered_stream(is)),
          buffer_(default_max_buffer_length),
-         input_buffer_(0),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -99,10 +103,6 @@ public:
          quote_escape_char_(),
          comment_symbol_()
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
         init(params);
     }
 
@@ -116,9 +116,8 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
+         stream_ptr_(new buffered_stream(is)),
          buffer_(),
-         input_buffer_(0),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -132,10 +131,6 @@ public:
 
 
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
         init(jsoncons::json::an_object);
     }
 
@@ -149,9 +144,8 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         is_(is),
+         stream_ptr_(new buffered_stream(is)),
          buffer_(),
-         input_buffer_(0),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -163,17 +157,108 @@ public:
          quote_escape_char_(),
          comment_symbol_()
     {
-        if (!is.good())
-        {
-            JSONCONS_THROW_EXCEPTION("Input stream is invalid");
-        }
+        init(params);
+    }
+
+    basic_csv_reader(jsoncons::basic_json_input_handler<Char>& handler)
+
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_(default_max_buffer_length),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         handler_(handler),
+         err_handler_(default_err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
+    {
+        init(jsoncons::json::an_object);
+    }
+
+    basic_csv_reader(jsoncons::basic_json_input_handler<Char>& handler,
+                     const jsoncons::basic_json<Char,Allocator>& params)
+
+       :
+         minimum_structure_capacity_(0),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_(default_max_buffer_length),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         handler_(handler),
+         err_handler_(default_err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
+    {
+        init(params);
+    }
+
+    basic_csv_reader(jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler)
+       :
+
+         minimum_structure_capacity_(),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_(),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         handler_(handler),
+         err_handler_(err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
+
+
+    {
+        init(jsoncons::json::an_object);
+    }
+
+    basic_csv_reader(jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler,
+                     const jsoncons::basic_json<Char,Allocator>& params)
+       :
+         minimum_structure_capacity_(),
+         column_(),
+         line_(),
+         string_buffer_(),
+         stack_(),
+         buffer_(),
+         buffer_capacity_(default_max_buffer_length),
+         buffer_position_(0),
+         buffer_length_(0),
+         handler_(handler),
+         err_handler_(err_handler),
+         assume_header_(),
+         field_delimiter_(),
+         quote_char_(),
+         quote_escape_char_(),
+         comment_symbol_()
+    {
         init(params);
     }
 
     void init(const jsoncons::basic_json<Char,Allocator>& params)
     {
-        input_buffer_ = &buffer_[0];
-
         field_delimiter_ = params.get("field_delimiter",",").as_char();
 
         assume_header_ = params.get("has_header",false).as_bool();
@@ -189,11 +274,16 @@ public:
     {
     }
 
-    void read();
+    void read()
+    {
+        read(stream_ptr_->is_);
+    }
+
+    void read(std::basic_istream<Char>& is);
 
     bool eof() const
     {
-        return buffer_position_ > buffer_length_ && is_.eof();
+        return buffer_position_ > buffer_length_ && stream_ptr_->is_.eof();
     }
 
     size_t buffer_capacity() const
@@ -204,8 +294,6 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-        buffer_.resize(buffer_capacity);
-        input_buffer_ = &buffer_[0];
     }
 
     virtual unsigned long line_number() const
@@ -239,13 +327,13 @@ private:
     void parse_quoted_string();
     void ignore_single_line_comment();
 
-    void read_data_block()
+    void read_some()
     {
         buffer_position_ = 0;
-        if (!is_.eof())
+        if (!stream_ptr_->is_.eof())
         {
-            is_.read(input_buffer_, buffer_capacity_);
-            buffer_length_ = static_cast<size_t>(is_.gcount());
+            stream_ptr_->is_.read(&buffer_[0], buffer_capacity_);
+            buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
         }
         else
         {
@@ -257,14 +345,14 @@ private:
     {
         if (buffer_position_ >= buffer_length_)
         {
-            read_data_block();
+            read_some();
         }
         Char c = 0;
 
         //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
         {
-            c = input_buffer_[buffer_position_++];
+            c = buffer_[buffer_position_++];
         }
         else
         {
@@ -279,12 +367,12 @@ private:
     {
         if (buffer_position_ >= buffer_length_)
         {
-            read_data_block();
+            read_some();
         }
         Char c = 0;
         if (buffer_position_ < buffer_length_)
         {
-            c = input_buffer_[buffer_position_];
+            c = buffer_[buffer_position_];
         }
 
         return c;
@@ -309,9 +397,8 @@ private:
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
     std::vector<stack_item> stack_;
-    std::basic_istream<Char>& is_;
+    std::unique_ptr<buffered_stream> stream_ptr_;
     std::vector<Char> buffer_;
-    Char *input_buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
@@ -328,8 +415,17 @@ template<class Char,class Allocator>
 jsoncons::default_error_handler basic_csv_reader<Char,Allocator>::default_err_handler;
 
 template<class Char,class Allocator>
-void basic_csv_reader<Char,Allocator>::read()
+void basic_csv_reader<Char,Allocator>::read(std::basic_istream<Char>& is)
 {
+    if (is.bad())
+    {
+        JSONCONS_THROW_EXCEPTION("Input stream is invalid");
+    }
+    stream_ptr_ = std::unique_ptr<buffered_stream>(new buffered_stream(is));
+    buffer_.resize(buffer_capacity_);
+    buffer_position_ = 0;
+    buffer_length_ = 0;
+
     line_ = 1;
     column_ = 0;
 
