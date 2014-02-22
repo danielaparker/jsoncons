@@ -14,11 +14,11 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 0.92 Candidate Release
 ----------------------
 
-Breaking change (only if you have subclassed `json_input_handler` or `json_output_handler`)
+Breaking change (but only if you have subclassed `json_input_handler` or `json_output_handler`)
 
 - For consistency with other names, the input and output handler methods new to 0.91 - `value_string`, `value_double`, `value_longlong`, `value_ulonglong` and `value_bool` - have been renamed to `string_value`, `double_value`, `longlong_value`, `ulonglong_value` and `bool_value`.
 
-Non breaking change
+Non breaking changes (previous features are deprecated but still work)
 
 - `name_value_pair` has been renamed to `member_type` (typedefed to previous name.)
 
