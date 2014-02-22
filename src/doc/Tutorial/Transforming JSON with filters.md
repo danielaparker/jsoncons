@@ -86,8 +86,8 @@ In your code you will pass `my_json_filter` to the constructor of [[json_reader]
 
     json_serializer serializer(os, true);
     my_json_filter filter(serializer);
-    json_reader reader(is,filter);
-	reader.read();
+    json_reader reader(filter);
+	reader.read(is);
 
 The output is a warning message written to the console
 

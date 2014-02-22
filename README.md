@@ -22,6 +22,8 @@ Non breaking change
 
 - `name_value_pair` has been renamed to `member_type` (typedefed to previous name.)
 
+- In previous versions, the `json_reader` constructor took an input stream as a parameter and the `read` method took no parameters. As of this release, the input stream parameter has been moved from the constructor to the `read` method. The previous approach will still work, but is deprecated.
+
 - `as_string(output_format format)` has been deprecated, use the existing `to_string(output_format format)` instead
 
 Enhancements:
