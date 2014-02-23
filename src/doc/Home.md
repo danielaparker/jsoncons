@@ -21,6 +21,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 * Supports `Nan`, `Inf` and `-Inf` replacement
 * Supports reading multiple json objects from a stream
 * Supports optional escaping of non-ascii UTF-8 octets
+* Allows extensions to the types accepted by the `json` class accessors and modifiers
 * Supports storing custom data types in a json object, with specialized serialization
 * Supports reading JSON values from CSV files
 
