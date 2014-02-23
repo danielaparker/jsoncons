@@ -11,8 +11,8 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-0.92 Candidate Release
-----------------------
+0.92 Release
+------------
 
 Breaking change (but only if you have subclassed `json_input_handler` or `json_output_handler`)
 
