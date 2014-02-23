@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 
     json_deserializer handler;
 
-    csv_reader reader(handler);
-    reader.read(is);
+    csv_reader reader(is,handler);
+    reader.read();
     json countries = std::move(handler.root());
 
     std::cout << pretty_print(countries) << std::endl;
@@ -39,8 +39,8 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json_reader reader(handler);
-    reader.read(is);
+    json_reader reader(is,handler);
+    reader.read();
     json countries = std::move(handler.root());
 
     csv_serializer serializer(std::cout);
@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     params["field_delimiter"] = "\t";
     params["has_header"] = true;
 
-    csv_reader reader(handler,params);
-    reader.read(is);
+    csv_reader reader(is,handler,params);
+    reader.read();
     json employees = std::move(handler.root());
 
     std::cout << pretty_print(employees) << std::endl;
@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     json params;
     params["field_delimiter"] = "\t";
 
-    json_reader reader(handler);
-    reader.read(is);
+    json_reader reader(is,handler);
+    reader.read();
     json employees = std::move(handler.root());
 
     csv_serializer serializer(std::cout,params);
