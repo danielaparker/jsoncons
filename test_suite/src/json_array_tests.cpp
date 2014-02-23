@@ -142,3 +142,20 @@ BOOST_AUTO_TEST_CASE(test_three_dim_array)
     BOOST_CHECK(a[3][2][1].as<long long>() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_assign_vector)
+{
+    std::vector<std::string> vec;
+    vec.push_back("Toronto");
+    vec.push_back("Vancouver");
+    vec.push_back("Montreal");
+
+    json val;
+    val = vec;
+
+    BOOST_CHECK(val.size() == 3);
+    BOOST_CHECK_EQUAL(val[0], std::string("Toronto"));
+    BOOST_CHECK_EQUAL(val[1], std::string("Vancouver"));
+    BOOST_CHECK_EQUAL(val[2], std::string("Montreal"));
+
+}
+
