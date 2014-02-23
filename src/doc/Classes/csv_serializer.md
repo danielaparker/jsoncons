@@ -83,8 +83,8 @@ Note
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json_reader reader(handler);
-    reader.read(is);
+    json_reader reader(is,handler);
+    reader.read();
     json countries = std::move(handler.root());
 
     csv_serializer serializer(std::cout);
@@ -148,8 +148,8 @@ Note
     json params;
     params["field_delimiter"] = "\t";
 
-    json_reader reader(handler);
-    reader.read(is);
+    json_reader reader(is,handler);
+    reader.read();
     json employees = std::move(handler.root());
 
     csv_serializer serializer(std::cout,params);
