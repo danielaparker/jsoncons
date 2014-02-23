@@ -1908,6 +1908,10 @@ public:
         }
         return v;
     }
+    void assign(basic_json<Char,Allocator>& self, const std::vector<T>& val)
+    {
+        self = basic_json<Char,Allocator>(val.begin(),val.end());
+    }
 };
 
 template <typename Char, typename Allocator>
