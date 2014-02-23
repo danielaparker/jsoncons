@@ -12,16 +12,16 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Constructors
 
-    basic_json_serializer(std::ostream& os)
+    json_serializer(std::ostream& os)
 Constructs a new serializer that writes to the specified output stream.
 
-    basic_json_serializer(std::ostream& os, bool indenting)
+    json_serializer(std::ostream& os, bool indenting)
 Constructs a new serializer that writes to the specified output stream.
 
-    basic_json_serializer(std::ostream& os, const output_format& format)
+    json_serializer(std::ostream& os, const output_format& format)
 Constructs a new serializer that writes to the specified output stream using the specified [[output_format]].
 
-    basic_json_serializer(std::ostream& os, const output_format& format, bool indenting)
+    json_serializer(std::ostream& os, const output_format& format, bool indenting)
 Constructs a new serializer that writes to the specified output stream using the specified [[output_format]].
 
 ### Destructor
