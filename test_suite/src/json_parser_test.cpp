@@ -68,9 +68,9 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     json_deserializer handler;
     my_error_handler err_handler("","JPE106");
 
-    json_reader reader(handler,err_handler);
+    json_reader reader(is,handler,err_handler);
 
-    BOOST_REQUIRE_THROW(reader.read(is), json_parse_exception);
+    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_invalid_value)
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
     json_deserializer handler;
     my_error_handler err_handler("","JPE105");
 
-    json_reader reader(handler,err_handler);
+    json_reader reader(is,handler,err_handler);
 
-    BOOST_REQUIRE_THROW(reader.read(is), json_parse_exception);
+    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
@@ -92,9 +92,9 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
     json_deserializer handler;
     my_error_handler err_handler("","JPE101");
 
-    json_reader reader(handler,err_handler);
+    json_reader reader(is,handler,err_handler);
 
-    BOOST_REQUIRE_THROW(reader.read(is), json_parse_exception);
+    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_value_not_found)
@@ -104,9 +104,9 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     json_deserializer handler;
     my_error_handler err_handler("","JPE107");
 
-    json_reader reader(handler,err_handler);
+    json_reader reader(is,handler,err_handler);
 
-    BOOST_REQUIRE_THROW(reader.read(is), json_parse_exception);
+    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_escaped_characters)

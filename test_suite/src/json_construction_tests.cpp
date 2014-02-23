@@ -268,11 +268,11 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     std::istringstream is(in);
 
     jsoncons::json_deserializer handler;
-    json_reader reader(handler);
+    json_reader reader(is,handler);
 
     while (!reader.eof())
     {
-        reader.read(is);
+        reader.read();
         if (!reader.eof())
         {
             json val = std::move(handler.root());

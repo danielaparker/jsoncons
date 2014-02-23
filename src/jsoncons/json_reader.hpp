@@ -110,45 +110,6 @@ public:
     {
     }
 
-    basic_json_reader(basic_json_input_handler<Char>& handler,
-                      basic_error_handler<Char>& err_handler)
-       :
-         minimum_structure_capacity_(0),
-         column_(),
-         line_(),
-         string_buffer_(),
-         stack_(),
-         buffer_capacity_(default_max_buffer_length),
-         buffer_position_(0),
-         buffer_length_(0),
-         hard_buffer_length_(0),
-         estimation_buffer_length_(default_max_buffer_length),
-         handler_(handler),
-         err_handler_(err_handler),
-         bof_(true),
-         eof_(false)
-    {
-    }
-
-    basic_json_reader(basic_json_input_handler<Char>& handler)
-
-       : minimum_structure_capacity_(0),
-         column_(),
-         line_(),
-         string_buffer_(),
-         stack_(),
-         buffer_capacity_(default_max_buffer_length),
-         buffer_position_(0),
-         buffer_length_(0),
-         hard_buffer_length_(0),
-         estimation_buffer_length_(default_max_buffer_length),
-         handler_(handler),
-         err_handler_(default_err_handler),
-         bof_(true),
-         eof_(false)
-    {
-    }
-
     ~basic_json_reader()
     {
     }
