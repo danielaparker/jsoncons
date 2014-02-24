@@ -1407,14 +1407,14 @@ private:
 template <class Char,class Allocator>
 pretty_printer<Char,Allocator> pretty_print(const basic_json<Char,Allocator>& val)
 {
-    return typename pretty_printer<Char,Allocator>(val);
+    return pretty_printer<Char,Allocator>(val);
 }
 
 template <class Char,class Allocator>
 pretty_printer<Char,Allocator> pretty_print(const basic_json<Char,Allocator>& val,
                                             const basic_output_format<Char>& format)
 {
-    return typename pretty_printer<Char,Allocator>(val,format);
+    return pretty_printer<Char,Allocator>(val,format);
 }
 
 inline

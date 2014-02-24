@@ -8,6 +8,7 @@
 #ifndef JSONCONS_JSON_READER_HPP
 #define JSONCONS_JSON_READER_HPP
 
+#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -76,7 +77,6 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         stream_ptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -85,7 +85,8 @@ public:
          handler_(handler),
          err_handler_(err_handler),
          bof_(true),
-         eof_(false)
+         eof_(false),
+         stream_ptr_(new buffered_stream(is))
     {
     }
     basic_json_reader(std::basic_istream<Char>& is,
@@ -97,7 +98,6 @@ public:
          line_(),
          string_buffer_(),
          stack_(),
-         stream_ptr_(new buffered_stream(is)),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
          buffer_length_(0),
@@ -106,7 +106,8 @@ public:
          handler_(handler),
          err_handler_(default_err_handler),
          bof_(true),
-         eof_(false)
+         eof_(false), 
+         stream_ptr_(new buffered_stream(is))
     {
     }
 
