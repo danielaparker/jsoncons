@@ -32,7 +32,7 @@ add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/jsoncons_test.cpp
                                ../../src/string_to_double_tests.cpp)
 
-target_compile_definitions (jsoncons_tests PUBLIC BOOST_DYN_LINK BOOST_TEST_DYN_LINK)
+target_compile_definitions (jsoncons_tests PUBLIC BOOST_ALL_DYN_LINK)
 
 target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
                                            PUBLIC ../../../src
