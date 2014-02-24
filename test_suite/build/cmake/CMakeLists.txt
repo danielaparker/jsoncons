@@ -16,7 +16,7 @@ include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 
 set (Boost_NO_BOOST_CMAKE ON)
-find_package (Boost REQUIRED COMPONENTS unit_test_framework)
+find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework)
 
 add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/double_to_string_tests.cpp

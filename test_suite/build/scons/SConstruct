@@ -57,6 +57,7 @@ cpppath = [
     Dir('../../../src')
 ]
 libs = [
+    'boost_date_time',
     'boost_unit_test_framework'
 ]
 libpath = []

@@ -32,7 +32,7 @@ namespace jsoncons
             {
                 return false;
             }
-            std::string s = val.as<std::string>();
+            std::string s = val.template as<std::string>();
             try
             {
                 boost::gregorian::date_from_iso_string(s);
@@ -45,7 +45,7 @@ namespace jsoncons
         }
         boost::gregorian::date as(const basic_json<char,Allocator>& val) const
         {
-            std::string s = val.as<std::string>();
+            std::string s = val.template as<std::string>();
             return boost::gregorian::from_simple_string(s);
         }
         void assign(basic_json<char,Allocator>& self, boost::gregorian::date val)
