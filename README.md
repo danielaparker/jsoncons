@@ -14,7 +14,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 0.92a Release
 -------------
 
-Includes updates for validate compilation and execution in gcc and clang environments
+Includes contributed updates for validate compilation and execution in gcc and clang environments
 
 0.92 Release
 ------------
