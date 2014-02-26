@@ -43,6 +43,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [[Transforming JSON with filters]]
 
+[[Wide character support]]
+
 ### Classes
 
 [[json]]
