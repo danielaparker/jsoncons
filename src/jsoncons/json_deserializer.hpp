@@ -21,7 +21,7 @@
 
 namespace jsoncons {
 
-template <class Char,class Allocator>
+template <class Char,class Storage>
 class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     struct stack_item
@@ -32,12 +32,12 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             minimum_structure_capacity_ = minimum_structure_capacity;
             if (is_object_)
             {
-                object_ = new json_object<Char,Allocator>();
+                object_ = new json_object<Char,Storage>();
                 object_->reserve(minimum_structure_capacity);
             }
             else
             {
-                array_ = new json_array<Char,Allocator>();
+                array_ = new json_array<Char,Storage>();
                 array_->reserve(minimum_structure_capacity);
             }
         }
@@ -70,14 +70,14 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             return !is_object_;
         }
 
-        json_object<Char,Allocator>* release_object() {json_object<Char,Allocator>* p(0); std::swap(p,object_); return p;}
+        json_object<Char,Storage>* release_object() {json_object<Char,Storage>* p(0); std::swap(p,object_); return p;}
 
-        json_array<Char,Allocator>* release_array() {json_array<Char,Allocator>* p(0); std::swap(p,array_); return p;}
+        json_array<Char,Storage>* release_array() {json_array<Char,Storage>* p(0); std::swap(p,array_); return p;}
 
         std::basic_string<Char> name_;
         bool is_object_;
-        json_object<Char,Allocator>* object_;
-        json_array<Char,Allocator>* array_;
+        json_object<Char,Storage>* object_;
+        json_array<Char,Storage>* array_;
         size_t minimum_structure_capacity_;
     };
 
@@ -106,7 +106,7 @@ public:
     virtual void end_object(const basic_parsing_context<Char>& context)
     {
         stack_.back().object_->sort_members();
-        basic_json<Char,Allocator> val(stack_.back().release_object());	    
+        basic_json<Char,Storage> val(stack_.back().release_object());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -132,7 +132,7 @@ public:
 
     virtual void end_array(const basic_parsing_context<Char>& context)
     {
-        basic_json<Char,Allocator> val(stack_.back().release_array());	    
+        basic_json<Char,Storage> val(stack_.back().release_array());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -160,15 +160,15 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(basic_json<Char,Allocator>::null));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(basic_json<Char,Storage>::null));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Allocator>::null);
+            stack_.back().array_->push_back(basic_json<Char,Storage>::null);
         }
     }
 
-    basic_json<Char,Allocator>& root()
+    basic_json<Char,Storage>& root()
     {
         return root_;
     }
@@ -179,11 +179,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(value));
         } 
         else 
         {
-            stack_.back().array_->push_back(std::move(basic_json<Char,Allocator>(value)));
+            stack_.back().array_->push_back(std::move(basic_json<Char,Storage>(value)));
         }
     }
 
@@ -191,11 +191,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Allocator>(value));
+            stack_.back().array_->push_back(basic_json<Char,Storage>(value));
         }
     }
 
@@ -203,11 +203,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Allocator>(value));
+            stack_.back().array_->push_back(basic_json<Char,Storage>(value));
         }
     }
 
@@ -215,11 +215,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Allocator>(value));
+            stack_.back().array_->push_back(basic_json<Char,Storage>(value));
         }
     }
 
@@ -227,16 +227,16 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Allocator>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Storage>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Allocator>(value));
+            stack_.back().array_->push_back(basic_json<Char,Storage>(value));
         }
     }
 
 private:
-	basic_json<Char,Allocator> root_;
+	basic_json<Char,Storage> root_;
     std::vector<stack_item> stack_;
 };
 
