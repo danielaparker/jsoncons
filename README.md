@@ -11,6 +11,11 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
+0.93 Release Candidate
+----------------------
+
+- Supports wide character strings and streams with wjson and wjson_reader. Assumes UTF16 encoding if sizeof(wchar_t)=2 and UTF32 encoding if sizeof(wchar_t)=4.
+
 0.92a Release
 -------------
 
