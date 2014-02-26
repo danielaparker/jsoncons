@@ -1188,7 +1188,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     {
         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
     }
-    if (cp >= 0xD800 && cp <= 0xDBFF)
+    if (cp >= min_lead_surrogate && cp <= max_lead_surrogate)
     {
         // surrogate pairs
         if (buffer_[buffer_position_++] == '\\' && buffer_[buffer_position_++] == 'u')
@@ -1199,7 +1199,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
         }
         else
         {
-            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a cp surrogate pair.", *this);
+            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a codepoint surrogate pair.", *this);
         }
     }
     return cp;
