@@ -22,11 +22,11 @@ using boost::numeric::ublas::matrix;
 
 namespace jsoncons
 {
-    template <typename Allocator>
-    class value_adapter<char,Allocator,boost::gregorian::date>
+    template <typename Storage>
+    class value_adapter<char,Storage,boost::gregorian::date>
     {
     public:
-        bool is(const basic_json<char,Allocator>& val) const
+        bool is(const basic_json<char,Storage>& val) const
         {
             if (!val.is_string())
             {
@@ -43,12 +43,12 @@ namespace jsoncons
                 return false;
             }
         }
-        boost::gregorian::date as(const basic_json<char,Allocator>& val) const
+        boost::gregorian::date as(const basic_json<char,Storage>& val) const
         {
             std::string s = val.template as<std::string>();
             return boost::gregorian::from_simple_string(s);
         }
-        void assign(basic_json<char,Allocator>& self, boost::gregorian::date val)
+        void assign(basic_json<char,Storage>& self, boost::gregorian::date val)
         {
             std::string s(to_iso_extended_string(val));
             self = s;
