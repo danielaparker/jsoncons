@@ -14,8 +14,14 @@
 #include <istream>
 #include <cstdlib>
 #include <cwchar>
+#include <cstdint> 
 
 namespace jsoncons {
+
+const uint16_t min_lead_surrogate = 0xD800;
+const uint16_t max_lead_surrogate = 0xDBFF;
+const uint16_t min_trail_surrogate = 0xDC00;
+const uint16_t max_trail_surrogate = 0xDFFF;
 
 template <class Char>
 struct json_char_traits
@@ -40,6 +46,30 @@ struct json_char_traits<wchar_t>
     static const std::wstring true_literal() {return L"true";};
 
     static const std::wstring false_literal() {return L"false";};
+
+    static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
+    {
+        if (cp <= 0xFFFF)
+        {
+            s.push_back(static_cast<wchar_t>(cp));
+        }
+        else if (cp <= 0x10FFFF)
+        {
+            s.push_back(static_cast<wchar_t>((cp >> 10) + min_lead_surrogate - (0x10000 >> 10)));
+            s.push_back(static_cast<wchar_t>((cp & 0x3ff) + min_trail_surrogate));
+        }
+    }
+
+    static uint32_t char_sequence_to_codepoint(std::wstring::const_iterator it, std::wstring::const_iterator end)
+    {
+        uint32_t cp = 0xffff & *it;
+        if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate)) // surrogate pair
+        {
+            uint32_t trail_surrogate = 0xffff & *it++;
+            cp = (cp << 10) + trail_surrogate + 0x10000u - (min_lead_surrogate << 10) - min_trail_surrogate;
+        }
+        return cp;
+    }
 };
 
 template <>
@@ -61,11 +91,11 @@ struct json_char_traits<char>
 
     static const std::string false_literal() {return "false";};
 
-    static unsigned int char_sequence_to_codepoint(std::string::const_iterator it, std::string::const_iterator end)
+    static uint32_t char_sequence_to_codepoint(std::string::const_iterator it, std::string::const_iterator end)
     {
         char c = *it;
-        unsigned int u(c >= 0 ? c : 256 + c );
-        unsigned int cp = u;
+        uint32_t u(c >= 0 ? c : 256 + c );
+        uint32_t cp = u;
         if (u < 0x80)
         {
         }
@@ -79,7 +109,7 @@ struct json_char_traits<char>
         {
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 12) & 0xffff) + ((static_cast<unsigned int>(0xff & u) << 6) & 0xfff);
+            cp = ((cp << 12) & 0xffff) + ((static_cast<uint32_t>(0xff & u) << 6) & 0xfff);
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
             cp += (u) & 0x3f;
@@ -88,10 +118,10 @@ struct json_char_traits<char>
         {
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 18) & 0x1fffff) + ((static_cast<unsigned int>(0xff & u) << 12) & 0x3ffff);
+            cp = ((cp << 18) & 0x1fffff) + ((static_cast<uint32_t>(0xff & u) << 12) & 0x3ffff);
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
-            cp += (static_cast<unsigned int>(0xff & u) << 6) & 0xfff;
+            cp += (static_cast<uint32_t>(0xff & u) << 6) & 0xfff;
             c = *(++it);
             u = (c >= 0 ? c : 256 + c );
             cp += (u) & 0x3f;
@@ -102,7 +132,7 @@ struct json_char_traits<char>
         return cp;
     }
 
-    static void append_codepoint_to_string(unsigned int cp, std::string& s)
+    static void append_codepoint_to_string(uint32_t cp, std::string& s)
     {
         if (cp <= 0x7f)
         {
@@ -131,7 +161,7 @@ struct json_char_traits<char>
 };
 
 inline
-bool is_control_character(unsigned int c)
+bool is_control_character(uint32_t c)
 {
     return c <= 0x1F;
 }

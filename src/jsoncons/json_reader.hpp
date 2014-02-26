@@ -36,7 +36,7 @@ class basic_json_reader : private basic_parsing_context<Char>
         std::basic_istream<Char>& is_;
     };
 
-    static default_error_handler default_err_handler;
+    static basic_default_error_handler<Char> default_err_handler;
 
     struct stack_item
     {
@@ -267,15 +267,15 @@ private:
 };
 
 template<class Char>
-default_error_handler basic_json_reader<Char>::default_err_handler;
+basic_default_error_handler<Char> basic_json_reader<Char>::default_err_handler;
 
-inline
-unsigned long long string_to_ulonglong(const char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
+template <typename Char>
+unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
 {
     unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        char c = s[i];
+        Char c = s[i];
         if ((c >= '0') & (c <= '9'))
         {
             if (n > max_value / 10)

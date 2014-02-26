@@ -36,7 +36,7 @@ class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
         std::basic_istream<Char>& is_;
     };
 
-    static jsoncons::default_error_handler default_err_handler;
+    static jsoncons::basic_default_error_handler<Char> default_err_handler;
 
     struct stack_item
     {
@@ -315,7 +315,7 @@ private:
 };
 
 template<class Char,class Storage>
-jsoncons::default_error_handler basic_csv_reader<Char,Storage>::default_err_handler;
+jsoncons::basic_default_error_handler<Char> basic_csv_reader<Char,Storage>::default_err_handler;
 
 template<class Char,class Storage>
 void basic_csv_reader<Char,Storage>::read(std::basic_istream<Char>& is)
