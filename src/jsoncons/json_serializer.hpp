@@ -139,7 +139,7 @@ public:
     {
         begin_value();
 
-        os_ << json_char_traits<Char>::null_literal();
+        os_ << json_char_traits<Char,sizeof(Char)>::null_literal();
 
         end_value();
     }
@@ -212,7 +212,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? json_char_traits<Char>::true_literal() :  json_char_traits<Char>::false_literal());
+        os_ << (value ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
 
         end_value();
     }

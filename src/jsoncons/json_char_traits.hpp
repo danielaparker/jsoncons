@@ -23,13 +23,51 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
-template <class Char>
+template <class Char,size_t Size>
 struct json_char_traits
 {
 };
 
 template <>
-struct json_char_traits<wchar_t>
+struct json_char_traits<wchar_t,2> // assume utf16
+{
+    static size_t cstring_len(const wchar_t* s)
+    {
+        return std::wcslen(s);
+    }
+
+    static int cstring_cmp(const wchar_t* s1, const wchar_t* s2, size_t n)
+    {
+        return std::wcsncmp(s1,s2,n);
+    }
+
+    static const std::wstring null_literal() {return L"null";};
+
+    static const std::wstring true_literal() {return L"true";};
+
+    static const std::wstring false_literal() {return L"false";};
+
+    static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
+    {
+        if (cp <= 0xFFFF)
+        {
+            s.push_back(static_cast<wchar_t>(cp));
+        }
+        else if (cp <= 0x10FFFF)
+        {
+            s.push_back(static_cast<wchar_t>(cp));
+        }
+    }
+
+    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator it, std::wstring::const_iterator end)
+    {
+        uint32_t cp = static_cast<uint32_t>(*it);
+        return cp;
+    }
+};
+
+template <>
+struct json_char_traits<wchar_t,4> // assume utf32
 {
     static size_t cstring_len(const wchar_t* s)
     {
@@ -60,7 +98,7 @@ struct json_char_traits<wchar_t>
         }
     }
 
-    static uint32_t char_sequence_to_codepoint(std::wstring::const_iterator it, std::wstring::const_iterator end)
+    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator it, std::wstring::const_iterator end)
     {
         uint32_t cp = 0xffff & *it;
         if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate)) // surrogate pair
@@ -73,7 +111,7 @@ struct json_char_traits<wchar_t>
 };
 
 template <>
-struct json_char_traits<char>
+struct json_char_traits<char,1>
 {
     static size_t cstring_len(const char* s)
     {
@@ -91,7 +129,7 @@ struct json_char_traits<char>
 
     static const std::string false_literal() {return "false";};
 
-    static uint32_t char_sequence_to_codepoint(std::string::const_iterator it, std::string::const_iterator end)
+    static uint32_t convert_char_to_codepoint(std::string::const_iterator it, std::string::const_iterator end)
     {
         char c = *it;
         uint32_t u(c >= 0 ? c : 256 + c );

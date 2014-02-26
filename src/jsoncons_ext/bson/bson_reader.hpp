@@ -787,7 +787,7 @@ void basic_bson_reader<Char>::parse_string()
                             err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
                         }
                         unsigned int cp = decode_unicode_codepoint();
-                        json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
+                        json_char_traits<Char,sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
                     }
                     break;
                 default:

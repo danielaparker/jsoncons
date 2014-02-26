@@ -1473,7 +1473,7 @@ void escape_string(const std::basic_string<Char>& s,
             if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
             {
                 // convert utf8 to codepoint
-                unsigned int cp = json_char_traits<Char>::char_sequence_to_codepoint(it,end);
+                unsigned int cp = json_char_traits<Char,sizeof(Char)>::convert_char_to_codepoint(it,end);
 
                 os << '\\';
                 os << 'u';

@@ -172,8 +172,8 @@ private:
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
-    unsigned int decode_unicode_codepoint();
-    unsigned int decode_unicode_escape_sequence();
+    uint32_t decode_unicode_codepoint();
+    uint32_t decode_unicode_escape_sequence();
 
     void read_some()
     {
@@ -831,8 +831,8 @@ void basic_json_reader<Char>::parse_string()
                     case 'u':
                         {
                             ++buffer_position_;
-                            unsigned int cp = decode_unicode_codepoint();
-                            json_char_traits<Char>::append_codepoint_to_string(cp, string_buffer_);
+                            uint32_t cp = decode_unicode_codepoint();
+                            json_char_traits<Char,sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
                         }
                         break;
                     default:
@@ -1181,9 +1181,9 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
 }
 
 template<class Char>
-unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
+uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
 {
-    unsigned int cp = decode_unicode_escape_sequence();
+    uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
     {
         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
@@ -1194,7 +1194,7 @@ unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
         if (buffer_[buffer_position_++] == '\\' && buffer_[buffer_position_++] == 'u')
         {
             column_ += 2;
-            unsigned int surrogate_pair = decode_unicode_escape_sequence();
+            uint32_t surrogate_pair = decode_unicode_escape_sequence();
             cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
         }
         else
@@ -1206,19 +1206,19 @@ unsigned int basic_json_reader<Char>::decode_unicode_codepoint()
 }
 
 template<class Char>
-unsigned int basic_json_reader<Char>::decode_unicode_escape_sequence()
+uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
         err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
     }
-    unsigned int cp = 0;
+    uint32_t cp = 0;
     size_t index = 0;
     while (index < 4)
     {
         Char c = buffer_[buffer_position_++];
         ++column_;
-        const unsigned int u(c >= 0 ? c : 256 + c);
+        const uint32_t u(c >= 0 ? c : 256 + c);
         cp *= 16;
         if (u >= '0'  &&  u <= '9')
         {
