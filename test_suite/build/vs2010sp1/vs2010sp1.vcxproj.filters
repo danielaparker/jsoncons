@@ -54,6 +54,9 @@
     <ClCompile Include="..\..\src\json_extensibility_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\wjson_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\my_custom_data.hpp">

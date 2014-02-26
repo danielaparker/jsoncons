@@ -30,7 +30,8 @@ add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/json_reader_exception_tests.cpp
                                ../../src/json_serializer_tests.cpp
                                ../../src/jsoncons_test.cpp
-                               ../../src/string_to_double_tests.cpp)
+                               ../../src/string_to_double_tests.cpp
+                               ../../src/wjson_test.cpp)
 
 target_compile_definitions (jsoncons_tests PUBLIC BOOST_ALL_DYN_LINK)
 
