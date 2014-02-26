@@ -424,7 +424,7 @@ private:
     {
         begin_value(os);
 
-        os << (val ? jsoncons::json_char_traits<Char>::true_literal() :  jsoncons::json_char_traits<Char>::false_literal());
+        os << (val ? jsoncons::json_char_traits<Char,sizeof(Char)>::true_literal() :  jsoncons::json_char_traits<Char,sizeof(Char)>::false_literal());
 
         end_value();
     }
@@ -433,7 +433,7 @@ private:
     {
         begin_value(os);
 
-        os << jsoncons::json_char_traits<Char>::null_literal();
+        os << jsoncons::json_char_traits<Char,sizeof(Char)>::null_literal();
 
         end_value();
 

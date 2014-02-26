@@ -34,9 +34,9 @@ public:
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
-        nan_replacement_(json_char_traits<Char>::null_literal()),
-        pos_inf_replacement_(json_char_traits<Char>::null_literal()),
-        neg_inf_replacement_(json_char_traits<Char>::null_literal()),
+        nan_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
+        pos_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
+        neg_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
         escape_all_non_ascii_(false),
         escape_solidus_(false)
     {
