@@ -20,13 +20,30 @@ using jsoncons::parsing_context;
 using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::json;
-using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
 using jsoncons::json_output_handler;
 using std::string;
 using jsoncons::json_filter;
 using jsoncons::pretty_print;
+
+BOOST_AUTO_TEST_CASE( test_surrogate_pair )
+{
+    string input = "{\"name\":\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"}";
+    json value = json::parse_string(input);
+    //cout << json_spirit::write(value) << endl;
+    //cout << value.get_obj()["name"].get_str() << endl;
+    string str = value["name"].as<string>();
+    for(size_t i = 0; i < str.size(); ++i)
+    {
+        std::cout << "idx\t" << i << "\t" << (int)str[i] << std::endl;
+    }
+    std::cout << input << std::endl;
+    output_format format;
+    format.escape_all_non_ascii(true);
+    string output = value.to_string(format);
+    std::cout << output << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE( test1 )
 {
