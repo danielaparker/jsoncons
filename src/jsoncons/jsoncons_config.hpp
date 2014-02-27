@@ -247,6 +247,10 @@ double string_to_double(const std::basic_string<Char>& s)
 }
 #endif
 
+class null_type
+{
+};
+
 }
 
 #endif
