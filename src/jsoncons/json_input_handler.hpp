@@ -28,6 +28,11 @@ public:
         string_value(value, context);
     }
 
+    void value(null_type, const basic_parsing_context<Char>& context)
+    {
+        null_value(context);
+    }
+
     void value(float value, const basic_parsing_context<Char>& context)
     {
         double_value((double)value, context);

@@ -120,7 +120,7 @@ public:
     typedef Char char_type;
     typedef Storage allocator_type;
 
-    class null_type;
+    typedef jsoncons::null_type null_type;
     class object;
     class array;
     struct custom_type {};
@@ -192,12 +192,6 @@ public:
 
     typedef typename json_array<Char,Storage>::iterator array_iterator;
     typedef typename json_array<Char,Storage>::const_iterator const_array_iterator;
-
-    operator null_type() const
-    {
-        JSONCONS_ASSERT(type_ == null_t);
-        return null_type();
-    }
 
     operator array() const
     {
@@ -959,6 +953,8 @@ public:
     explicit basic_json();
 
     basic_json(const basic_json& val);
+
+    basic_json(jsoncons::null_type);
 
     basic_json(Char c);
 

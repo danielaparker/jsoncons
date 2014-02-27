@@ -39,6 +39,12 @@ basic_json<Char,Storage>::basic_json()
 }
 
 template <typename Char, typename Storage>
+basic_json<Char,Storage>::basic_json(jsoncons::null_type)
+{
+    type_ = null_t;
+}
+
+template <typename Char, typename Storage>
 template <class InputIterator>
 basic_json<Char,Storage>::basic_json(InputIterator first, InputIterator last)
 {
@@ -859,7 +865,7 @@ template <typename Char, typename Storage>
 const basic_json<Char,Storage> basic_json<Char,Storage>::an_array(new json_array<Char,Storage>());
 
 template <typename Char, typename Storage>
-const basic_json<Char,Storage> basic_json<Char,Storage>::null = basic_json<Char,Storage>(basic_json<Char,Storage>::null_t);
+const basic_json<Char,Storage> basic_json<Char,Storage>::null = basic_json<Char,Storage>(jsoncons::null_type());
 
 template <typename Char, typename Storage>
 basic_json<Char,Storage> basic_json<Char,Storage>::make_array()
@@ -1616,17 +1622,17 @@ public:
 };
 
 template <typename Char,typename Storage>
-class value_adapter<Char,Storage,typename basic_json<Char,Storage>::null_type>
+class value_adapter<Char,Storage,jsoncons::null_type>
 {
 public:
     bool is(const basic_json<Char,Storage>& val) const
     {
         return val.is_null();
     }
-    typename basic_json<Char,Storage>::null_type as(const basic_json<Char,Storage>& val) const
+    typename jsoncons::null_type as(const basic_json<Char,Storage>& val) const
     {
         JSONCONS_ASSERT(val.is_null());
-        return basic_json<Char,Storage>::null_type();
+        return jsoncons::null_type();
     }
 };
 
@@ -1947,16 +1953,6 @@ public:
     void assign(basic_json<Char,Storage>& self, const std::vector<T>& val)
     {
         self = basic_json<Char,Storage>(val.begin(),val.end());
-    }
-};
-
-template <typename Char, typename Storage>
-class basic_json<Char,Storage>::null_type : public basic_json<Char,Storage> 
-{
-private:
-    null_type()
-        : basic_json<Char,Storage>(null_t)
-    {
     }
 };
 

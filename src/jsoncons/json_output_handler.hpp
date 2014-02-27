@@ -24,6 +24,11 @@ public:
         string_value(value);
     }
 
+    void value(null_type)
+    {
+        null_value();
+    }
+
     void value(float value)
     {
         double_value((double)value);
