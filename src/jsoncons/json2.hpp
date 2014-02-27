@@ -1431,7 +1431,7 @@ char to_hex_character(unsigned char c)
 }
 
 inline
-bool is_non_ascii_character(unsigned int c)
+bool is_non_ascii_character(uint32_t c)
 {
     return c >= 0x80;
 }
@@ -1474,18 +1474,49 @@ void escape_string(const std::basic_string<Char>& s,
             os << 't';
             break;
         default:
-            unsigned int u(c >= 0 ? c : 256 + c );
-            if (is_control_character(u) || (format.escape_all_non_ascii() && is_non_ascii_character(u)))
+            uint32_t u(c >= 0 ? c : 256 + c );
+            if (format.escape_solidus() && c == '/')
+            {
+                os << '\\';
+                os << '/';
+            }
+            else if (is_control_character(u) || format.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                unsigned int cp = json_char_traits<Char,sizeof(Char)>::convert_char_to_codepoint(it,end);
+                uint32_t cp = json_char_traits<Char,sizeof(Char)>::convert_char_to_codepoint(it,end);
+                if (is_non_ascii_character(cp) || is_control_character(u))
+                {
+                    if ( cp > 0xFFFF ) {
+                        cp -= 0x10000;
+                        uint32_t first = (cp >> 10) + 0xD800;
+                        uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                os << '\\';
-                os << 'u';
-                os << to_hex_character(cp >>12 & 0x000F );
-                os << to_hex_character(cp >>8  & 0x000F );
-                os << to_hex_character(cp >>4  & 0x000F );
-                os << to_hex_character(cp     & 0x000F );
+                        os << '\\';
+                        os << 'u';
+                        os << to_hex_character(first >>12 & 0x000F );
+                        os << to_hex_character(first >>8  & 0x000F );
+                        os << to_hex_character(first >>4  & 0x000F );
+                        os << to_hex_character(first     & 0x000F );
+                        os << '\\';
+                        os << 'u';
+                        os << to_hex_character(second >>12 & 0x000F );
+                        os << to_hex_character(second >>8  & 0x000F );
+                        os << to_hex_character(second >>4  & 0x000F );
+                        os << to_hex_character(second     & 0x000F );
+                    }
+                    else {
+                        os << '\\';
+                        os << 'u';
+                        os << to_hex_character(cp >>12 & 0x000F );
+                        os << to_hex_character(cp >>8  & 0x000F );
+                        os << to_hex_character(cp >>4  & 0x000F );
+                        os << to_hex_character(cp     & 0x000F );
+                    }
+                }
+                else
+                {
+                    os << c;
+                }
             }
             else if (format.escape_solidus() && c == '/')
             {

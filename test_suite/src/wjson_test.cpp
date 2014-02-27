@@ -36,9 +36,8 @@ BOOST_AUTO_TEST_CASE(test_wjson )
     root[L"field2"] = 3.9;
     root[L"field3"] = true;
     std::wcout << root << L"\n";
-    //wjson root = wjson::parse(L"{}");
 }
-/*
+
 BOOST_AUTO_TEST_CASE(test_wjson_escape_u)
 {
     wstring input = L"[\"\\uABCD\"]";
@@ -49,8 +48,9 @@ BOOST_AUTO_TEST_CASE(test_wjson_escape_u)
     wstring s = root[0].as<wstring>();
     BOOST_CHECK_EQUAL( s.length(), 1 );
     BOOST_CHECK_EQUAL( s[0], 0xABCD );
-}*/
+}
 
+#ifdef _MSC_VER
 BOOST_AUTO_TEST_CASE(test_wjson_escape_u2)
 {
     wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
@@ -70,10 +70,31 @@ BOOST_AUTO_TEST_CASE(test_wjson_escape_u2)
     }
     std::cout << "]" << std::endl;
 
-#ifdef _MSC_VER
     std::wofstream os("output/xxx.txt");
     os.imbue(std::locale(os.getloc(), new std::codecvt_utf16<wchar_t>));
     os << s << L"\n";
-#endif
 }
+#endif
+
+#ifdef _MSC_VER
+BOOST_AUTO_TEST_CASE(test_wjson_surrogate_pair)
+{
+    wstring input = L"[\"\\uD950\\uDF21\"]";
+    std::wistringstream is(input);
+
+    wjson root = wjson::parse(is);
+
+    wstring s = root[0].as<wstring>();
+    std::cout << "length=" << s.length() << std::endl;
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < s.size(); ++i)
+    {
+        if (i != 0)
+            std::cout << " ";
+        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
+        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+    }
+    std::cout << "]" << std::endl;
+}
+#endif
 
