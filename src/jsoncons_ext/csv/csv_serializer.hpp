@@ -472,7 +472,7 @@ private:
     std::map<std::basic_string<Char>,size_t> header_;
 };
 
-typedef basic_csv_serializer<char,jsoncons::allocator<char>> csv_serializer;
+typedef basic_csv_serializer<char,jsoncons::storage<char>> csv_serializer;
 
 }}
 
