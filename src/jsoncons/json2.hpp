@@ -241,6 +241,7 @@ void basic_json<Char,Storage>::assign_string(const std::basic_string<Char>& rhs)
     case bool_t:
     case empty_object_t:
 	case longlong_t:
+    case ulonglong_t:
 	case double_t:
         type_ = string_t;
         value_.value_string_ = new std::basic_string<Char>(rhs);
@@ -259,6 +260,7 @@ void basic_json<Char,Storage>::assign_double(double rhs)
     case bool_t:
     case empty_object_t:
 	case longlong_t:
+    case ulonglong_t:
 	case double_t:
         type_ = double_t;
         value_.value_double_ = rhs;
@@ -278,6 +280,7 @@ void basic_json<Char,Storage>::assign_longlong(long long rhs)
     case bool_t:
     case empty_object_t:
 	case longlong_t:
+    case ulonglong_t:
 	case double_t:
         type_ = longlong_t;
         value_.longlong_value_ = rhs;
@@ -296,6 +299,7 @@ void basic_json<Char,Storage>::assign_ulonglong(unsigned long long rhs)
     case bool_t:
     case empty_object_t:
 	case longlong_t:
+    case ulonglong_t:
 	case double_t:
         type_ = ulonglong_t;
         value_.ulonglong_value_ = rhs;
@@ -314,6 +318,7 @@ void basic_json<Char,Storage>::assign_bool(bool rhs)
     case bool_t:
     case empty_object_t:
 	case longlong_t:
+    case ulonglong_t:
 	case double_t:
         type_ = bool_t;
         value_.bool_value_ = rhs;
