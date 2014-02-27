@@ -240,7 +240,7 @@ private:
     std::vector<stack_item> stack_;
 };
 
-typedef basic_json_deserializer<char,allocator<char>> json_deserializer;
+typedef basic_json_deserializer<char,storage<char>> json_deserializer;
 
 }
 

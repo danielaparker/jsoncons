@@ -666,7 +666,7 @@ void basic_csv_reader<Char,Storage>::ignore_single_line_comment()
 
 }
 
-typedef basic_csv_reader<char,jsoncons::allocator<char>> csv_reader;
+typedef basic_csv_reader<char,jsoncons::storage<char>> csv_reader;
 
 }}
 

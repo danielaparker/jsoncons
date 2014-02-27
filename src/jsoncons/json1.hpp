@@ -22,9 +22,8 @@
 namespace jsoncons {
 
 template <typename Char>
-struct allocator
+struct storage
 {
-    typedef std::allocator<Char> char_allocator_type;
 };
 
 template <class Char,class T> inline
@@ -1384,8 +1383,8 @@ void swap(typename basic_json<Char,Storage>::member_type& a, typename basic_json
     a.swap(b);
 }
 
-typedef basic_json<char,allocator<char>> json;
-typedef basic_json<wchar_t,allocator<wchar_t>> wjson;
+typedef basic_json<char,storage<char>> json;
+typedef basic_json<wchar_t,storage<wchar_t>> wjson;
 
 }
 
