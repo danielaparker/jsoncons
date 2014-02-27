@@ -15,6 +15,7 @@ using std::string;
 
 void array_examples();
 void custom_data_examples();
+void unicode_examples();
 
 void first_example_a()
 {
@@ -193,7 +194,7 @@ void introspection_example()
 
 int main()
 {
-    first_example_a();
+    /*first_example_a();
     first_example_b();
     first_example_c();
 
@@ -208,7 +209,9 @@ int main()
     more_examples();
     mulitple_json_objects();
 
-	introspection_example();
+	introspection_example();*/
+
+    unicode_examples();
 
     return 0;
 }
