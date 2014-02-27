@@ -1190,11 +1190,12 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     }
     if (cp >= min_lead_surrogate && cp <= max_lead_surrogate)
     {
-        // surrogate pairs
+        // surrogate pair
         if (buffer_[buffer_position_++] == '\\' && buffer_[buffer_position_++] == 'u')
         {
             column_ += 2;
             uint32_t surrogate_pair = decode_unicode_escape_sequence();
+
             cp = 0x10000 + ((cp & 0x3FF) << 10) + (surrogate_pair & 0x3FF);
         }
         else
