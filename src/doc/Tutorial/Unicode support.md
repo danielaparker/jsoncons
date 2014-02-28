@@ -1,5 +1,36 @@
 ## Narrow character support for UTF8 encoding
 
+### Unicode escaping
+
+    string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
+    std::cout << "Input:    " << inputStr << std::endl;
+
+    json arr = json::parse_string(inputStr);
+    std::string str = arr[0].as<std::string>();
+    std::cout << "Hex dump: [";
+    for (size_t i = 0; i < str.size(); ++i)
+    {
+        unsigned int val = static_cast<unsigned int>(str[i]);
+        if (i != 0)
+        {
+            std::cout << " ";
+        }
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << val;
+    }
+    std::cout << "]" << std::endl;
+
+    std::ostringstream os;
+    os << arr;
+    std::cout << "Output:   " << os.str() << std::endl;
+
+The output is
+
+    Input:    ["\u0040\u0040\u0000\u0011"]
+    Hex dump: [0x40 0x40 0x00 0x11]
+    Output:   ["@@\u0000\u0011"]
+
+Note that just the two control characters are escaped on output.
+
 ### Reading escaped unicode into utf8 encodings and writing back escaped unicode
 
     string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
