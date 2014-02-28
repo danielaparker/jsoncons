@@ -1,6 +1,6 @@
     jsoncons::json
 
-The `json` class is an instantiation of the `basic_json` class template that uses char as the character type.
+The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type.
 
 ### Header
 
@@ -324,7 +324,7 @@ Reports JSON related events for JSON objects, arrays, object members and array e
 
 ### Non-member overloads
 
-    ostream& operator<< (ostream& os, const json& val)
+    std::wostream& operator<< (std::wostream& os, const json& val)
 Inserts json value into stream.
 
     void swap(json& a, json& b)
