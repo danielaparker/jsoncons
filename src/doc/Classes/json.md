@@ -12,8 +12,6 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 [[member_type]] stores a name and a json value
 
-    null_type
-
     object
 
     array
@@ -67,44 +65,47 @@ Makes a multidimensional array with the number of dimensions specified as a temp
     explicit json()
 Constructs an empty json object. 
 
-    json(const json& val);
+    json(const json& val)
 Constructs a copy of val
 
-    json(json&& val);
+    json(json&& val)
 Acquires the contents of val, leaving val a `null` value
 
-    json(double val);
+    json(double val)
 Constructs a `double` value
 
-    json(int val);
+    json(int val)
 Constructs a `integer` value
 
-    json(unsigned int val);
+    json(unsigned int val)
 Constructs a `unsigned integer` value
 
-    json(long val);
+    json(long val)
 Constructs a `integer` value
 
-    json(unsigned long val);
+    json(unsigned long val)
 Constructs a `unsigned integer` value
 
-    json(long long val);
+    json(long long val)
 Constructs a `integer` value
 
-    json(unsigned long long val);
+    json(unsigned long long val)
 Constructs a `unsigned integer` value
 
-    json(const std::string& val);
+    json(const std::string& val)
 Constructs a `string` value
 
-    json(char val);
+    json(char val)
 Constructs a `string` value that has one character
 
-    json(bool val);
+    json(bool val)
 Constructs a `true` or `false` value
 
+    json(jsoncons::null_type)
+Constructs a `null` value
+
     template <class InputIterator>
-    json(InputIterator first, InputIterator last);
+    json(InputIterator first, InputIterator last)
 
 Constructs a json array with the elements in the range [first,last).
 
@@ -116,9 +117,9 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
 ### Assignment operator
 
     template <class T>
-    json& operator=(T rhs);
+    json& operator=(T rhs)
 
-    json& operator=(json rhs);
+    json& operator=(json rhs)
 Supports copy and move assignment
 
 ### Iterators
@@ -318,7 +319,7 @@ Inserts json value into stream with default output format.
     std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
 Inserts json value into stream using specified [output_format](output_format).
 
-    void to_stream(json_output_handler& handler) const;
+    void to_stream(json_output_handler& handler) const
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
 ### Non-member overloads
@@ -328,6 +329,11 @@ Inserts json value into stream.
 
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
+
+### Deprecated member types
+
+    null_type
+typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
 
 ### Deprecated methods
 

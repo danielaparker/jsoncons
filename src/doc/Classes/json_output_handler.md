@@ -11,6 +11,9 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
     void value(const std::string& value)
 Send notification of a `string` value
 
+    void value(jsoncons::null_type)
+Send notification of a `null` value
+
     void value(float value)
 Send notification of a float number
 

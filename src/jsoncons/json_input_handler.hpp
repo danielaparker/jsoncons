@@ -90,9 +90,10 @@ public:
 
     virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context) = 0;
 
+// value(...) implementation
+
     virtual void null_value(const basic_parsing_context<Char>& context) = 0;
 
-// value(...) implementation
     virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void double_value(double value, const basic_parsing_context<Char>& context) = 0;

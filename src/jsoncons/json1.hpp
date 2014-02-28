@@ -461,7 +461,7 @@ public:
         }
 
     private:
-        const_val_proxy(); // nopop
+        const_val_proxy(); // no op
         const_val_proxy& operator = (const const_val_proxy& other); // noop
 
         const_val_proxy(const basic_json<Char,Storage>& val)
