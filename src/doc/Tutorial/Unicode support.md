@@ -1,6 +1,16 @@
-## Narrow character support for UTF8 encoding
+### Narrow character support for UTF8 encoding
 
-### Unicode escaping
+In the Linux and web worlds, `UTF-8` is the dominant character encoding.
+
+Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard 
+
+    std::fstream fs(const char* filename).
+
+Instead you need to use the non standard Microsoft extension
+
+    std::fstream fs(const wchar_t* filename)
+
+#### Unicode escaping
 
     string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     std::cout << "Input:    " << inputStr << std::endl;
@@ -31,7 +41,7 @@ The output is
 
 Note that just the two control characters are escaped on output.
 
-### Reading escaped unicode into utf8 encodings and writing back escaped unicode
+#### Reading escaped unicode into utf8 encodings and writing back escaped unicode
 
     string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
     std::cout << "Input:    " << inputStr << std::endl;
@@ -76,7 +86,7 @@ The output is
 
 Since the escaped unicode consists of a control character (0x7f) and non-ascii, we get back the same text as what we started with.
 
-### Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)
+#### Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)
 
     string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     json value = json::parse_string(input);
@@ -98,9 +108,23 @@ Since all of the escaped unicode is non-ascii, we get back the same text as what
     Output:
     ["\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00"]
 
-## Wide character support for UTF16 and UTF32 encodings
+### Wide character support for UTF16 and UTF32 encodings
 
-jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It assumes `UTF16` encoding if `wchar_t` has size 2 and `UTF32` encoding if `wchar_t` has size 4.
+jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It assumes `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4.
+
+It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API. 
+
+Even if you choose to use wide character streams and strings to interact with the Windows API, you can still read and write to files in the more widely supported, endiness independent, UTF-8 format. To handle that you need to imbue your streams with the facet `std::codecvt_utf8_utf16`, which encapsulates the conversion between `UTF-8` and `UTF-16`.
+
+Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard 
+
+    std::wfstream fs(const char* filename)
+
+Instead you need to use the non standard Microsoft extension
+
+    std::wfstream fs(const wchar_t* filename)
+
+#### Constructing a 'wjson' value
 
     using jsoncons::wjson;
 
@@ -114,7 +138,7 @@ The output is
 
     {"field1":"test","field2":3.9,"field3":true}
 
-### Escaped unicode
+#### Escaped unicode
 
     wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
     std::wistringstream is(input);

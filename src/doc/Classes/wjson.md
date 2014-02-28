@@ -10,7 +10,7 @@ The `wjson` class is an instantiation of the `basic_json` class template that us
 
     member_type
 
-[[member_type]] stores a name and a wjson value
+[member_type](wjson_member_type) stores a name and a wjson value
 
     object
 
