@@ -201,7 +201,7 @@ struct json_char_traits<wchar_t,4> // assume utf32
 inline
 bool is_control_character(uint32_t c)
 {
-    return c <= 0x1F;
+    return c <= 0x1F || c == 0x7f;
 }
 
 }

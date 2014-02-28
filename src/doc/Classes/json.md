@@ -176,7 +176,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 `is<float>` and `is<double>` returns true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
 `is<std::string>` returns `true` if the json value is of string type, `false` otherwise.  
 `is<bool>` returns `true` if the json value is of boolean type, `false` otherwise.  
-`is<json::null_type>` returns `true` if the json value is null, `false` otherwise.  
+`is<jsoncons::null_type>` returns `true` if the json value is null, `false` otherwise.  
 `is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
 `is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
 `is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.

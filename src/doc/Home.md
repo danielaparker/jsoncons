@@ -43,7 +43,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [[Transforming JSON with filters]]
 
-[[Wide character support]]
+[[Unicode support]]
 
 ### Classes
 
@@ -286,45 +286,3 @@ The output is
     {"a":4,"b":5,"c":6}
     {"a":7,"b":8,"c":9}
 
-### Optional escaping of non-ASCII UTF8 octets 
-
-    string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
-    std::cout << "Input:    " << inputStr << std::endl;
-
-    json arr = json::parse_string(inputStr);
-    std::string s = arr[0].as<string>();
-    std::cout << "Hex dump: [";
-    for (size_t i = 0; i < s.size(); ++i)
-    {
-        if (i != 0)
-            std::cout << " ";
-        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
-        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
-    }
-    std::cout << "]" << std::endl;
-    
-    std::ostringstream os;
-    output_format format;
-    format.escape_all_non_ascii(true);
-    arr.to_stream(os,format);
-    std::string outputStr = os.str();
-    std::cout << "Output:   " << os.str() << std::endl;
-
-    json arr2 = json::parse_string(outputStr);
-    std::string s2 = arr2[0].as<string>();
-    std::cout << "Hex dump: [";
-    for (size_t i = 0; i < s2.size(); ++i)
-    {
-        if (i != 0)
-            std::cout << " ";
-        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
-        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
-    }
-    std::cout << "]" << std::endl;
-
-The output is
-
-    Input:    ["\u007F\u07FF\u0800"]
-    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
-    Output:   ["?\u07FF\u0800"]
-    Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]

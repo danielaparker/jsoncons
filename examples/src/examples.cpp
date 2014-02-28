@@ -15,7 +15,7 @@ using std::string;
 
 void array_examples();
 void custom_data_examples();
-void unicode_examples();
+void wjson_examples();
 
 void first_example_a()
 {
@@ -192,9 +192,24 @@ void introspection_example()
     }
 }
 
+void read_and_write_escaped_unicode()
+{
+    string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
+    json value = json::parse_string(input);
+    output_format format;
+    format.escape_all_non_ascii(true);
+    string output = value.to_string(format);
+
+    std::cout << "Input:" << std::endl;
+    std::cout << input << std::endl;
+    std::cout << std::endl;
+    std::cout << "Output:" << std::endl;
+    std::cout << output << std::endl;
+}
+
 int main()
 {
-    /*first_example_a();
+    first_example_a();
     first_example_b();
     first_example_c();
 
@@ -209,9 +224,11 @@ int main()
     more_examples();
     mulitple_json_objects();
 
-	introspection_example();*/
+	introspection_example();
 
-    unicode_examples();
+    wjson_examples();
+
+    read_and_write_escaped_unicode();
 
     return 0;
 }

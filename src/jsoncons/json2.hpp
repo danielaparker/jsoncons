@@ -1391,7 +1391,7 @@ public:
     {
     }
 
-    pretty_printer(basic_json<Char,Storage>& o,
+    pretty_printer(const basic_json<Char,Storage>& o,
                    const basic_output_format<Char>& format)
         : o_(&o), format_(format)
     {
@@ -1423,7 +1423,7 @@ pretty_printer<Char,Storage> pretty_print(const basic_json<Char,Storage>& val)
 
 template <class Char,class Storage>
 pretty_printer<Char,Storage> pretty_print(const basic_json<Char,Storage>& val,
-                                            const basic_output_format<Char>& format)
+                                          const basic_output_format<Char>& format)
 {
     return pretty_printer<Char,Storage>(val,format);
 }

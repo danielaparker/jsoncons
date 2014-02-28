@@ -15,6 +15,7 @@
 #include <ostream>
 #include <cstdlib>
 #include <limits>
+#include <cwchar>
 
 namespace jsoncons {
 
@@ -168,6 +169,7 @@ private:
 };
 
 typedef basic_output_format<char> output_format;
+typedef basic_output_format<wchar_t> woutput_format;
 
 }
 #endif
