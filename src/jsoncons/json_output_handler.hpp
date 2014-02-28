@@ -74,8 +74,6 @@ public:
         bool_value(value);
     }
 
-    virtual void null_value() = 0;
-
 //  Implementation start here
 
     virtual void begin_json() = 0;
@@ -93,6 +91,8 @@ public:
     virtual void end_array() = 0;
 
 // value(...) implementation
+
+    virtual void null_value() = 0;
 
     virtual void string_value(const std::basic_string<Char>& value) = 0;
 
