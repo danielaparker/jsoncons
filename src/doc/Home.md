@@ -12,9 +12,10 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 ### Features
 
-* Implements parsing and serializing JSON text in UTF-8
-* Supports event based JSON parsing and serializing with user defined input and output handlers
 * Uses the standard C++ input/output streams library
+* Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
+* Supports UTF16 (UTF32) encodings with size 2 (size 4) wide character strings and streams
+* Supports event based JSON parsing and serializing with user defined input and output handlers
 * Guarantees basic exception safety (no leaks)
 * Accepts and ignores single line comments that start with `//`, and multi line comments that start with `/*` and end with `*/`
 * Supports optional escaping of the solidus (`/`) character
@@ -33,6 +34,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [[Basics]]
 
+[[Unicode support]]
+
 [[Arrays]]
 
 [[Introspection]]
@@ -42,8 +45,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 [[Custom data]]
 
 [[Transforming JSON with filters]]
-
-[[Unicode support]]
 
 ### Classes
 
