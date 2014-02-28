@@ -3,7 +3,9 @@
 
 #include <string>
 #include <cwchar>
+#ifdef _MSC_VER
 #include <codecvt>
+#endif
 #include "jsoncons/json.hpp"
 
 using jsoncons::json;
