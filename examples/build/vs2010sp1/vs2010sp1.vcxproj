@@ -81,7 +81,7 @@
     <ClCompile Include="..\..\src\csv_examples.cpp" />
     <ClCompile Include="..\..\src\custom_data_examples.cpp" />
     <ClCompile Include="..\..\src\examples.cpp" />
-    <ClCompile Include="..\..\src\unicode_examples.cpp" />
+    <ClCompile Include="..\..\src\wjson_examples.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

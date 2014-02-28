@@ -24,6 +24,10 @@
 
 namespace jsoncons {
 
+class null_type
+{
+};
+
 // Follow boost
 
 #if defined (__clang__)
@@ -246,10 +250,6 @@ double string_to_double(const std::basic_string<Char>& s)
     return val;
 }
 #endif
-
-class null_type
-{
-};
 
 }
 

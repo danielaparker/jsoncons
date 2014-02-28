@@ -14,7 +14,15 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 0.93 Release Candidate
 ----------------------
 
-- Supports wide character strings and streams with wjson and wjson_reader. Assumes UTF16 encoding if sizeof(wchar_t)=2 and UTF32 encoding if sizeof(wchar_t)=4.
+New features
+
+- Supports wide character strings and streams with `wjson`, `wjson_reader` etc. Assumes UTF16 encoding if sizeof(wchar_t)=2 and UTF32 encoding if sizeof(wchar_t)=4.
+- The empty class `null_type`  is added to the `jsoncons` namespace, it replaces the member type json::null_type (json::null_type is typedefed to jsoncons::null_type for backward compatibility.)
+
+Defect fixes:
+
+- The ascii character 0x7f (del) was not being considered a control character to be escaped, this is fixed.
+- Fixed two issues with serialization when the output format property `escape_all_non_ascii` is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being checked for when decoding.
 
 0.92a Release
 -------------
