@@ -14,7 +14,6 @@
 #include <utility>
 #include <ctime>
 #include "my_custom_data.hpp"
-#include <codecvt>
 
 using jsoncons::parsing_context;
 using jsoncons::json_serializer;
