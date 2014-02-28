@@ -22,7 +22,7 @@ New features
 Defect fixes:
 
 - The ascii character 0x7f (del) was not being considered a control character to be escaped, this is fixed.
-- Fixed two issues with serialization when the output format property `escape_all_non_ascii` is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being checked for when decoding.
+- Fixed two issues with serialization when the output format property `escape_all_non_ascii` is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being handled when decoding.
 
 0.92a Release
 -------------
