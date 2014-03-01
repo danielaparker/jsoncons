@@ -1,6 +1,8 @@
     jsoncons::wjson_reader
 
-The `wjson_reader` class is an instantiation of the `basic_json_reader` class template that uses wchar_t as the character type.
+    typedef basic_json_reader<wchar_t> wjson_reader
+
+The `wjson_reader` class is an instantiation of the `basic_json_reader` class template that uses `wchar_t` as the character type.
 
 ### Header
 
@@ -8,5 +10,5 @@ The `wjson_reader` class is an instantiation of the `basic_json_reader` class te
 
 ### Interface
 
-The interface is the same as [[json_reader]], substituting wide character instantiations of classes - std::wstring, std::wistream, etc. - for narrow character ones.
+The interface is the same as [json_reader](json_reader), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
 

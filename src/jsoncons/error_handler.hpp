@@ -8,7 +8,7 @@
 #ifndef JSONCONS_ERROR_HANDLER_HPP
 #define JSONCONS_ERROR_HANDLER_HPP
 
-#include "jsoncons/json_exception.hpp"
+#include "jsoncons/jsoncons.hpp"
 
 // Error codes
 //

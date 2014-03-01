@@ -1,6 +1,6 @@
     jsoncons::json_serializer
 
-The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [[json_output_handler]] and supports pretty print serialization.
+The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [json_output_handler](json_output_handler) and supports pretty print serialization.
 
 ### Header
 
@@ -8,7 +8,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Implemented interfaces
 
-[[json_output_handler]]
+[json_output_handler](json_output_handler)
 
 ### Constructors
 
@@ -19,10 +19,10 @@ Constructs a new serializer that writes to the specified output stream.
 Constructs a new serializer that writes to the specified output stream.
 
     json_serializer(std::ostream& os, const output_format& format)
-Constructs a new serializer that writes to the specified output stream using the specified [[output_format]].
+Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
 
     json_serializer(std::ostream& os, const output_format& format, bool indenting)
-Constructs a new serializer that writes to the specified output stream using the specified [[output_format]].
+Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
 
 ### Destructor
 

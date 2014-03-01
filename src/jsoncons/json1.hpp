@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ostream>
-#include "jsoncons/json_exception.hpp"
+#include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
 

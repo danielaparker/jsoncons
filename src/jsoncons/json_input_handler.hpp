@@ -9,7 +9,7 @@
 #define JSONCONS_JSON_INPUT_HANDLER_HPP
 
 #include <string>
-#include "jsoncons/jsoncons_config.hpp"
+#include "jsoncons/jsoncons.hpp"
 
 namespace jsoncons {
 

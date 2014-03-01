@@ -1,6 +1,6 @@
     jsoncons_ext::csv::csv_serializer
 
-The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses char as the character type.  It implements [[json_output_handler]] and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
+The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses char as the character type.  It implements [json_output_handler](json_output_handler) and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
 
 ### Header
 
@@ -10,12 +10,12 @@ The `csv_serializer` class is an instantiation of the `basic_csv_serializer` cla
 
     csv_serializer(std::ostream& os)
 Constructs a `csv_serializer` that is associated with an output stream
-`os`. Uses default [[csv formatting parameters]].
+`os`. Uses default [csv formatting parameters](csv formatting parameters).
 
     csv_serializer(std::ostream& os,
                    const json& params)
 Constructs a `csv_serializer` that is associated with an output stream
-`os` and [[csv formatting parameters]].
+`os` and [csv formatting parameters](csv formatting parameters).
 
 ### Member functions
 
