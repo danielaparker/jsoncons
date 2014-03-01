@@ -10,7 +10,7 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
     member_type
 
-[[member_type]] stores a name and a json value
+[member_type](json_member_type) stores a name and a json value
 
     object
 
@@ -101,7 +101,7 @@ Constructs a `string` value that has one character
     json(bool val)
 Constructs a `true` or `false` value
 
-    json(jsoncons::null_type)
+    json(null_type)
 Constructs a `null` value
 
     template <class InputIterator>
@@ -176,7 +176,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 `is<float>` and `is<double>` returns true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
 `is<std::string>` returns `true` if the json value is of string type, `false` otherwise.  
 `is<bool>` returns `true` if the json value is of boolean type, `false` otherwise.  
-`is<jsoncons::null_type>` returns `true` if the json value is null, `false` otherwise.  
+`is<null_type>` returns `true` if the json value is null, `false` otherwise.  
 `is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
 `is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
 `is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.

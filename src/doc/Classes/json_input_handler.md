@@ -12,7 +12,7 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 Send notification of a string value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(jsoncons::null_type, const parsing_context& context)
+    void value(null_type, const parsing_context& context)
 Send notification of a null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
