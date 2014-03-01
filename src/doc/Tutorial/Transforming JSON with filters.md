@@ -17,7 +17,7 @@ Suppose you have a JSON address book that looks like this
 
 Now suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separator. Pretend that the file `address-book.json` is too large to hold in memory.
 
-You can achieve the desired result by subclassing the [json_filter](json_filter) class, overriding the default methods for name and string value event notifications, and delegating modified event notifications to the parent [json_input_handler](json_input_handler) (which in this example will forward them to a [json_serializer](json_serializer).) 
+You can achieve the desired result by subclassing the [json_filter](basic_json_filter) class, overriding the default methods for name and string value event notifications, and delegating modified event notifications to the parent [json_input_handler](json_input_handler) (which in this example will forward them to a [json_serializer](json_serializer).) 
 
     #include "jsoncons/json_serializer.hpp"
     #include "jsoncons/json_filter.hpp"

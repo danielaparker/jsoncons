@@ -193,6 +193,7 @@ private:
 };
 
 typedef basic_json_filter<char> json_filter;
+typedef basic_json_filter<wchar_t> wjson_filter;
 
 }
 
