@@ -107,7 +107,7 @@ public:
 };
 
 template <typename Char>
-class basic_default_error_handler : public basic_error_handler<Char>
+class default_basic_error_handler : public basic_error_handler<Char>
 {
 public:
     virtual void warning(const std::string& error_code,
@@ -131,8 +131,13 @@ public:
 };
 
 typedef basic_error_handler<char> error_handler;
-typedef basic_default_error_handler<char> default_error_handler;
+typedef basic_error_handler<wchar_t> werror_handler;
+
+typedef default_basic_error_handler<char> default_error_handler;
+typedef default_basic_error_handler<wchar_t> wdefault_error_handler;
+
 typedef basic_parsing_context<char> parsing_context;
+typedef basic_parsing_context<wchar_t> wparsing_context;
 
 }
 #endif

@@ -241,6 +241,7 @@ private:
 };
 
 typedef basic_json_deserializer<char,storage<char>> json_deserializer;
+typedef basic_json_deserializer<wchar_t,storage<wchar_t>> wjson_deserializer;
 
 }
 

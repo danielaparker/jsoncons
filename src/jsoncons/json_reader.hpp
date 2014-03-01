@@ -36,7 +36,7 @@ class basic_json_reader : private basic_parsing_context<Char>
         std::basic_istream<Char>& is_;
     };
 
-    static basic_default_error_handler<Char> default_err_handler;
+    static default_basic_error_handler<Char> default_err_handler;
 
     struct stack_item
     {
@@ -267,7 +267,7 @@ private:
 };
 
 template<typename Char>
-basic_default_error_handler<Char> basic_json_reader<Char>::default_err_handler;
+default_basic_error_handler<Char> basic_json_reader<Char>::default_err_handler;
 
 template <typename Char>
 unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
@@ -1249,6 +1249,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 }
 
 typedef basic_json_reader<char> json_reader;
+typedef basic_json_reader<wchar_t> wjson_reader;
 
 }
 
