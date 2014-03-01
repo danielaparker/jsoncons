@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-template <class Char>
+template <typename Char>
 class basic_json_output_handler
 {
 public:
@@ -105,8 +105,8 @@ public:
     virtual void bool_value(bool value) = 0;
 };
 
-template <class Char>
-class basic_null_json_output_handler : public basic_json_output_handler<Char>
+template <typename Char>
+class null_basic_json_output_handler : public basic_json_output_handler<Char>
 {
 public:
 
@@ -166,9 +166,11 @@ public:
 
 };
 
-typedef basic_null_json_output_handler<char> null_json_output_handler;
+typedef null_basic_json_output_handler<char> null_json_output_handler;
+typedef null_basic_json_output_handler<wchar_t> wnull_json_output_handler;
 
 typedef basic_json_output_handler<char> json_output_handler;
+typedef basic_json_output_handler<wchar_t> wjson_output_handler;
 
 }
 #endif

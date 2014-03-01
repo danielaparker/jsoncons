@@ -26,13 +26,13 @@ struct storage
 {
 };
 
-template <class Char,class T> inline
+template <typename Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T& val)
 {
     os.null_value();
 }
 
-template <class Char>
+template <typename Char>
 class basic_custom_data
 {
 public:
@@ -45,7 +45,7 @@ public:
     virtual basic_custom_data<Char>* clone() const = 0;
 };
 
-template <class Char, class T>
+template <typename Char, class T>
 class custom_data_wrapper : public basic_custom_data<Char>
 {
 public:
@@ -68,19 +68,19 @@ public:
     T data1_;
 };
 
-template <class Char, class Storage>
+template <typename Char, class Storage>
 class basic_json;
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class json_object;
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class json_array;
 
-template <class Char>
+template <typename Char>
 class basic_output_format;
 
-template <class Char>
+template <typename Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
 template <typename Char, typename Storage, typename T>

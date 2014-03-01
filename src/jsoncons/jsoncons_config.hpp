@@ -98,7 +98,7 @@ inline bool is_neg_inf(double x) {return  std::isinf(x) && x > 0;}
 #endif
 
 #ifdef _MSC_VER
-template <class Char>
+template <typename Char>
 std::basic_string<Char> double_to_string(double val, size_t precision)
 {
     std::basic_string<Char> s;
@@ -175,7 +175,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
     return s;
 }
 #else
-template <class Char>
+template <typename Char>
 std::basic_string<Char> double_to_string(double val, size_t precision)
 {
     std::basic_ostringstream<Char> os;
@@ -236,7 +236,7 @@ double string_to_double(const std::wstring& s)
     return val;
 }
 #else
-template <class Char> inline
+template <typename Char> inline
 double string_to_double(const std::basic_string<Char>& s)
 {
     std::basic_stringstream<Char> ss(s);

@@ -71,7 +71,7 @@ private:
     unsigned long column_number_;
 };
 
-template<class Char>
+template<typename Char>
 class basic_parsing_context
 {
 public:
@@ -83,8 +83,9 @@ public:
 };
 
 typedef basic_parsing_context<char> parsing_context;
+typedef basic_parsing_context<wchar_t> wparsing_context;
 
-template <class Char>
+template <typename Char>
 class basic_error_handler
 {
 public:
@@ -105,7 +106,7 @@ public:
                              const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 };
 
-template <class Char>
+template <typename Char>
 class basic_default_error_handler : public basic_error_handler<Char>
 {
 public:

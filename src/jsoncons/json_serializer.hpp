@@ -23,7 +23,7 @@
 
 namespace jsoncons {
 
-template<class Char>
+template<typename Char>
 class basic_json_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
@@ -294,6 +294,7 @@ public:
 };
 
 typedef basic_json_serializer<char> json_serializer;
+typedef basic_json_serializer<wchar_t> wjson_serializer;
 
 }
 #endif

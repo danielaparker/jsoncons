@@ -19,11 +19,11 @@ void wjson_examples();
 
 void first_example_a()
 {
-    try
-    {
-        json books = json::parse_file("input/books.json");
+    json books = json::parse_file("input/books.json");
 
-        for (size_t i = 0; i < books.size(); ++i)
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        try
         {
             json& book = books[i];
             string author = book["author"].as<std::string>();
@@ -31,57 +31,58 @@ void first_example_a()
             double price = book["price"].as<double>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
 }
 
 void first_example_b()
 {
-    try
-    {
-        json books = json::parse_file("input/books.json");
+    json books = json::parse_file("input/books.json");
 
-        for (size_t i = 0; i < books.size(); ++i)
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        try
         {
             json& book = books[i];
             string author = book["author"].as<std::string>();
             string title = book["title"].as<std::string>();
-            string price = book.get("price","N/A").as<std::string>();
+            string price = book.get("price", "N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
 }
 
 void first_example_c()
 {
-    try
+    json books = json::parse_file("input/books.json");
+
+    output_format format;
+    format.floatfield(std::ios::fixed);
+    format.precision(2);
+
+    for (size_t i = 0; i < books.size(); ++i)
     {
-        json books = json::parse_file("input/books.json");
-
-        output_format format;
-        format.floatfield(std::ios::fixed);
-        format.precision(2);
-
-        for (size_t i = 0; i < books.size(); ++i)
+        try
         {
             json& book = books[i];
             string author = book["author"].as<std::string>();
             string title = book["title"].as<std::string>();
-            string price = book.get("price","N/A").to_string(format);
+            string price = book.get("price", "N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+
 }
 
 void second_example_a()
@@ -130,7 +131,7 @@ void mulitple_json_objects()
     }
 
     json_deserializer handler;
-    json_reader reader(is,handler);
+    json_reader reader(is, handler);
 
     while (!reader.eof())
     {
@@ -164,7 +165,7 @@ void more_examples()
     std::cout << pretty_print(file_export) << std::endl;
 
     size_t n = 10, m = 3;
-    std::vector<size_t> x(n,m);
+    std::vector<size_t> x(n, m);
     x[5] = 3;
 }
 
@@ -182,8 +183,7 @@ void introspection_example()
             std::cout << "Is element " << i << " an object? " << elem.is<json::object>() << std::endl;
             if (elem.is<json::object>())
             {
-                for (auto it = elem.begin_members(); it != elem.end_members(); ++it)
-                {
+                for (auto it = elem.begin_members(); it != elem.end_members(); ++it){
                     std::cout << "Is member " << it->name() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << std::endl;
 
                 }
@@ -224,7 +224,7 @@ int main()
     more_examples();
     mulitple_json_objects();
 
-	introspection_example();
+    introspection_example();
 
     wjson_examples();
 

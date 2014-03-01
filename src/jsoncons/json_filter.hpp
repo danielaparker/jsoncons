@@ -15,11 +15,11 @@
 
 namespace jsoncons {
 
-template <class Char>
+template <typename Char>
 class basic_json_input_output_adapter : public basic_json_input_handler<Char>
 {
 public:
-    static basic_null_json_output_handler<Char> null_writer;
+    static null_basic_json_output_handler<Char> null_writer;
 
     basic_json_input_output_adapter()
         : writer_(null_writer)
@@ -100,10 +100,10 @@ private:
     basic_json_output_handler<Char>& writer_;
 };
 
-template <class Char>
-basic_null_json_output_handler<Char> basic_json_input_output_adapter<Char>::null_writer;
+template <typename Char>
+null_basic_json_output_handler<Char> basic_json_input_output_adapter<Char>::null_writer;
 
-template <class Char>
+template <typename Char>
 class basic_json_filter : public basic_json_input_handler<Char>
 {
 public:

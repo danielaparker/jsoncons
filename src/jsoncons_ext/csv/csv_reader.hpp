@@ -23,7 +23,7 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
     struct buffered_stream
@@ -314,10 +314,10 @@ private:
     Char comment_symbol_;
 };
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 jsoncons::basic_default_error_handler<Char> basic_csv_reader<Char,Storage>::default_err_handler;
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::read(std::basic_istream<Char>& is)
 {
     if (is.bad())
@@ -349,7 +349,7 @@ void basic_csv_reader<Char,Storage>::read(std::basic_istream<Char>& is)
     handler_.end_json();
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::read_array_of_arrays()
 {
     size_t row_capacity = 0;
@@ -444,7 +444,7 @@ void basic_csv_reader<Char,Storage>::read_array_of_arrays()
     }
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::read_array_of_objects()
 {
     std::vector<std::string> header;
@@ -542,7 +542,7 @@ void basic_csv_reader<Char,Storage>::read_array_of_objects()
     }
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::parse_string()
 {
     string_buffer_.clear();
@@ -578,7 +578,7 @@ void basic_csv_reader<Char,Storage>::parse_string()
     }
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::parse_quoted_string()
 {
     string_buffer_.clear();
@@ -635,7 +635,7 @@ void basic_csv_reader<Char,Storage>::parse_quoted_string()
     }
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 void basic_csv_reader<Char,Storage>::ignore_single_line_comment()
 {
     bool done = false;

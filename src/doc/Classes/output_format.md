@@ -1,6 +1,6 @@
     jsoncons::output_format
 
-The output_format class is an instantiation of the basic_output_format class template that uses char as the character type.
+The `output_format class` is an instantiation of the `basic_output_format` class template that uses char as the character type.
 
 The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `16`. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, there will be less space saving from removing trailing zeros, e.g. 1.1 becomes 1.1000000000000001. 
 
@@ -38,13 +38,13 @@ The default is false
 The default is false
 
     bool replace_nan() const
-The defult is `true`
+The default is `true`
 
     bool replace_pos_inf() const
-The defult is `true`
+The default is `true`
 
     bool replace_neg_inf() const
-The defult is `true`
+The default is `true`
 
     std::string nan_replacement() const 
 The default is "null"

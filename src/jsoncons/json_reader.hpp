@@ -23,7 +23,7 @@
 
 namespace jsoncons {
 
-template<class Char>
+template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
     struct buffered_stream
@@ -266,7 +266,7 @@ private:
     std::unique_ptr<buffered_stream> stream_ptr_;
 };
 
-template<class Char>
+template<typename Char>
 basic_default_error_handler<Char> basic_json_reader<Char>::default_err_handler;
 
 template <typename Char>
@@ -295,7 +295,7 @@ unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsig
     return n;
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
 {
     if (is.bad())
@@ -564,7 +564,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::parse_separator()
 {
     bool done = false;
@@ -625,7 +625,7 @@ void basic_json_reader<Char>::parse_separator()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::parse_number(Char c)
 {
     string_buffer_.clear();
@@ -742,7 +742,7 @@ void basic_json_reader<Char>::parse_number(Char c)
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::parse_string()
 {
     string_buffer_.clear();
@@ -859,7 +859,7 @@ void basic_json_reader<Char>::parse_string()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::ignore_single_line_comment()
 {
     bool done = false;
@@ -899,7 +899,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_json_reader<Char>::ignore_multi_line_comment()
 {
     bool done = false;
@@ -948,7 +948,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
 {
     size_t size = 0;
@@ -1009,7 +1009,7 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     return size;
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
 {
     size_t size = 0;
@@ -1054,7 +1054,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     return size;
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
 {
     bool done = false;
@@ -1084,7 +1084,7 @@ size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
     return pos;
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
 {
     bool done = false;
@@ -1116,7 +1116,7 @@ size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
     return pos;
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
 {
     bool done = false;
@@ -1150,7 +1150,7 @@ size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
     return pos;
 }
 
-template<class Char>
+template<typename Char>
 size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
 {
     bool done = false;
@@ -1180,7 +1180,7 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
     return pos;
 }
 
-template<class Char>
+template<typename Char>
 uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
 {
     uint32_t cp = decode_unicode_escape_sequence();
@@ -1206,7 +1206,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     return cp;
 }
 
-template<class Char>
+template<typename Char>
 uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)

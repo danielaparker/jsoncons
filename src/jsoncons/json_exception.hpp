@@ -49,7 +49,7 @@ private:
     std::string message_;
 };
 
-template <class Char>
+template <typename Char>
 class json_exception_1 : public json_exception
 {
 public:

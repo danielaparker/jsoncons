@@ -23,7 +23,7 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
-template <class Char,size_t Size>
+template <typename Char,size_t Size>
 struct json_char_traits
 {
 };

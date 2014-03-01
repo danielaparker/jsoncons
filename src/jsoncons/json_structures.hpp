@@ -23,7 +23,7 @@
 
 namespace jsoncons {
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class key_compare
 {
 public:
@@ -34,7 +34,7 @@ public:
     }
 };
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class member_compare
 {
 public:
@@ -45,7 +45,7 @@ public:
     }
 };
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class json_array 
 {
 public:
@@ -156,7 +156,7 @@ private:
     json_array& operator=(const json_array<Char,Storage>&);
 };
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class json_object
 {
 public:
@@ -290,25 +290,25 @@ private:
 };
 
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void json_object<Char,Storage>::sort_members()
 {
     std::sort(members_.begin(),members_.end(),member_compare<Char,Storage>());
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void json_object<Char,Storage>::insert(iterator it, typename basic_json<Char,Storage>::member_type member)
 {
     members_.insert(it,member);
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 typename json_object<Char,Storage>::iterator json_object<Char,Storage>::remove(iterator at)
 {
     return members_.erase(at);
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void json_object<Char,Storage>::set(const std::basic_string<Char>& name, const basic_json<Char,Storage>& value)
 {
     iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Storage>());
@@ -323,7 +323,7 @@ void json_object<Char,Storage>::set(const std::basic_string<Char>& name, const b
     }
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string<Char>& name) 
 {
     iterator it = find(name);
@@ -334,7 +334,7 @@ basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string
     return it->value();
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 const basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string<Char>& name) const
 {
     const_iterator it = find(name);
@@ -345,7 +345,7 @@ const basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_
     return it->value_;
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 typename json_object<Char,Storage>::iterator json_object<Char,Storage>::find(const std::basic_string<Char>& name)
 {
     key_compare<Char,Storage> comp;
@@ -353,7 +353,7 @@ typename json_object<Char,Storage>::iterator json_object<Char,Storage>::find(con
     return (it != end() && it->name() == name) ? it : end();
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 typename json_object<Char,Storage>::const_iterator json_object<Char,Storage>::find(const std::basic_string<Char>& name) const
 {
     key_compare<Char,Storage> comp;

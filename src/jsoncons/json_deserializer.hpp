@@ -21,7 +21,7 @@
 
 namespace jsoncons {
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     struct stack_item

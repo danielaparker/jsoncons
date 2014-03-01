@@ -23,7 +23,7 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template <class Char>
+template <typename Char>
 struct csv_char_traits
 {
 };
@@ -64,7 +64,7 @@ struct csv_char_traits<wchar_t>
     static const std::wstring nonnumeric_literal() {return L"nonumeric";};
 };
 
-template <class Char>
+template <typename Char>
 void escape_string(const std::basic_string<Char>& s,
                    Char quote_char, Char quote_escape_char,
                    std::basic_ostream<Char>& os)
@@ -85,7 +85,7 @@ void escape_string(const std::basic_string<Char>& s,
     }
 }
 
-template<class Char,class Storage>
+template<typename Char,class Storage>
 class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item

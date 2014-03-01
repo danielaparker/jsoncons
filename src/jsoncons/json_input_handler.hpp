@@ -13,10 +13,10 @@
 
 namespace jsoncons {
 
-template <class Char>
+template <typename Char>
 class basic_parsing_context;
 
-template <class Char>
+template <typename Char>
 class basic_json_input_handler
 {
 public:
@@ -105,7 +105,7 @@ public:
     virtual void bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
-template <class Char>
+template <typename Char>
 class basic_null_json_input_handler : public basic_json_input_handler<Char>
 {
 public:
