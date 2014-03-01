@@ -22,7 +22,7 @@
 
 namespace jsoncons_ext { namespace bson {
 
-template <class Char>
+template <typename Char>
 class basic_bson_serializer : public jsoncons::basic_json_output_handler<Char>
 {
     struct stack_item

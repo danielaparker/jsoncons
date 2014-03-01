@@ -320,7 +320,7 @@ Inserts wjson value into stream with default output format.
 Inserts wjson value into stream using specified [woutput_format](woutput_format).
 
     void to_stream(json_output_handler& handler) const
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [wjson_output_handler](basic_json_output_handler), such as a [wjson_serializer](json_serializer).
 
 ### Non-member overloads
 

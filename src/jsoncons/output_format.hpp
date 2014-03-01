@@ -19,7 +19,7 @@
 
 namespace jsoncons {
 
-template <class Char>
+template <typename Char>
 class basic_output_format
 {
 public:

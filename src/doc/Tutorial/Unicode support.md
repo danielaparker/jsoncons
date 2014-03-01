@@ -124,7 +124,7 @@ Instead you need to use the non standard Microsoft extension
 
     std::wfstream fs(const wchar_t* filename)
 
-#### Constructing a 'wjson' value
+#### Constructing a wjson value
 
     using jsoncons::wjson;
 

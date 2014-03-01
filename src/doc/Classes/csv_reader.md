@@ -11,21 +11,21 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
     csv_reader(std::istream& is,
                json_input_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text and a [[json_input_handler]] handler that receives
+`is` of CSV text and a [json_input_handler](basic_json_input_handler) handler that receives
 notification of JSON events. Uses default [[csv formatting parameters]].
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                const json& params)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
+`is` of CSV text, a [json_input_handler](basic_json_input_handler) handler that receives
 notification of JSON events, and [[csv formatting parameters]].
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
+`is` of CSV text, a [json_input_handler](basic_json_input_handler) handler that receives
 notification of JSON events and the specified [[error_handler]].
 Uses default [[csv formatting parameters]].
 
@@ -34,7 +34,7 @@ Uses default [[csv formatting parameters]].
                error_handler& err_handler,
                const json& params)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [[json_input_handler]] handler that receives
+`is` of CSV text, a [json_input_handler](basic_json_input_handler) handler that receives
 notification of JSON events, the specified [[error_handler]],
 and [[csv formatting parameters]].
 
@@ -44,7 +44,7 @@ and [[csv formatting parameters]].
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [[json_input_handler]] handler, such as a [[json_deserializer]].
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](basic_json_input_handler) handler, such as a [[json_deserializer]].
 
     size_t buffer_capacity() const
 

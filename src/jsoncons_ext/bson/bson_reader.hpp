@@ -22,7 +22,7 @@
 
 namespace jsoncons_ext { namespace bson {
 
-template<class Char>
+template<typename Char>
 class basic_bson_reader : private jsoncons::basic_parsing_context<Char>
 {
     static jsoncons::default_error_handler default_err_handler;
@@ -239,10 +239,10 @@ private:
     jsoncons::basic_error_handler<Char>& err_handler_;
 };
 
-template<class Char>
+template<typename Char>
 jsoncons::default_error_handler basic_bson_reader<Char>::default_err_handler;
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::read()
 {
     line_ = 1;
@@ -457,7 +457,7 @@ void basic_bson_reader<Char>::read()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::skip_separator()
 {
     while (!eof())
@@ -504,7 +504,7 @@ void basic_bson_reader<Char>::skip_separator()
     err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
 }
 
-template<class Char>
+template<typename Char>
 bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, char char3)
 {
     if (!eof())
@@ -539,7 +539,7 @@ bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
+template<typename Char>
 bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, char char3, char char4)
 {
     if (!eof())
@@ -582,7 +582,7 @@ bool basic_bson_reader<Char>::read_until_match_fails(char char1, char char2, cha
     return false;
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::parse_number(Char c)
 {
     string_buffer_.clear();
@@ -690,7 +690,7 @@ void basic_bson_reader<Char>::parse_number(Char c)
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::parse_string()
 {
     string_buffer_.clear();
@@ -805,7 +805,7 @@ void basic_bson_reader<Char>::parse_string()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::ignore_single_line_comment()
 {
     bool done = false;
@@ -824,7 +824,7 @@ void basic_bson_reader<Char>::ignore_single_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::fast_ignore_single_line_comment()
 {
     while (buffer_position_ < buffer_length_)
@@ -838,7 +838,7 @@ void basic_bson_reader<Char>::fast_ignore_single_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::fast_ignore_multi_line_comment()
 {
     while (buffer_position_ < buffer_length_)
@@ -857,7 +857,7 @@ void basic_bson_reader<Char>::fast_ignore_multi_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::ignore_multi_line_comment()
 {
     bool done = false;
@@ -884,7 +884,7 @@ void basic_bson_reader<Char>::ignore_multi_line_comment()
     }
 }
 
-template<class Char>
+template<typename Char>
 void basic_bson_reader<Char>::fast_skip_white_space()
 {
     bool done = false;
@@ -910,7 +910,7 @@ void basic_bson_reader<Char>::fast_skip_white_space()
     }
 }
 
-template<class Char>
+template<typename Char>
 unsigned int basic_bson_reader<Char>::decode_unicode_codepoint()
 {
 
@@ -935,7 +935,7 @@ unsigned int basic_bson_reader<Char>::decode_unicode_codepoint()
     return cp;
 }
 
-template<class Char>
+template<typename Char>
 unsigned int basic_bson_reader<Char>::decode_unicode_escape_sequence()
 {
     unsigned int cp = 0;

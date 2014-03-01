@@ -238,7 +238,7 @@ basic_json<Char,Storage>::~basic_json()
         break;
     }
 }
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void basic_json<Char,Storage>::assign_string(const std::basic_string<Char>& rhs)
 {
     switch (type_)
@@ -257,7 +257,7 @@ void basic_json<Char,Storage>::assign_string(const std::basic_string<Char>& rhs)
         break;
     }
 }
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void basic_json<Char,Storage>::assign_double(double rhs)
 {
     switch (type_)
@@ -277,7 +277,7 @@ void basic_json<Char,Storage>::assign_double(double rhs)
     }
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void basic_json<Char,Storage>::assign_longlong(long long rhs)
 {
     switch (type_)
@@ -296,7 +296,7 @@ void basic_json<Char,Storage>::assign_longlong(long long rhs)
         break;
     }
 }
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void basic_json<Char,Storage>::assign_ulonglong(unsigned long long rhs)
 {
     switch (type_)
@@ -315,7 +315,7 @@ void basic_json<Char,Storage>::assign_ulonglong(unsigned long long rhs)
         break;
     }
 }
-template <class Char,class Storage>
+template <typename Char,class Storage>
 void basic_json<Char,Storage>::assign_bool(bool rhs)
 {
     switch (type_)
@@ -1415,13 +1415,13 @@ private:
     pretty_printer();
 };
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 pretty_printer<Char,Storage> pretty_print(const basic_json<Char,Storage>& val)
 {
     return pretty_printer<Char,Storage>(val);
 }
 
-template <class Char,class Storage>
+template <typename Char,class Storage>
 pretty_printer<Char,Storage> pretty_print(const basic_json<Char,Storage>& val,
                                           const basic_output_format<Char>& format)
 {

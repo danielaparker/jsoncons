@@ -28,44 +28,48 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 ### Roadmap
 
-[[Roadmap]]
+[Roadmap](Roadmap)
 
 ### Tutorial
 
-[[Basics]]
+[Basics](Basics)
 
-[[Unicode support]]
+[Unicode support](Unicode support)
 
-[[Arrays]]
+[Arrays](Arrays)
 
-[[Introspection]]
+[Introspection](Introspection)
 
-[[Extensibility]]
+[Extensibility](Extensibility)
 
-[[Custom data]]
+[Custom data](Custom data)
 
-[[Transforming JSON with filters]]
+[Transforming JSON with filters](Transforming JSON with filters)
 
 ### Classes
 
 [json](json)  
 [wjson](wjson)  
 
-[[json_serializer]]
+[json_serializer](json_serializer)  
+[wjson_serializer](wjson_serializer)
 
-[[output_format]]
+[output_format](output_format)  
+[woutput_format](woutput_format)
 
-[[json_reader]]
+[json_reader](json_reader)  
+[wjson_reader](wjson_reader)
 
-[[json_deserializer]]
+[json_deserializer](json_deserializer)  
+[wjson_deserializer](wjson_deserializer)
 
 ### Extensions
 
 #### csv
 
-[[csv_reader]]
+[csv_reader](csv_reader)
 
-[[csv_serializer]]
+[csv_serializer](csv_serializer)
 
 ## Examples
 
@@ -99,22 +103,22 @@ This is how to read the document with `jsoncons`:
     using jsoncons::output_format;
     using std::string;
 
-    try
-    {
-        json books = json::parse_file("input/books.json");
+    json books = json::parse_file("input/books.json");
 
-        for (size_t i = 0; i < books.size(); ++i)
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        try
         {
             json& book = books[i];
-            string author = book["author"].as<string>();
-            string title = book["title"].as<string>();
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
             double price = book["price"].as<double>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
 The output is
@@ -125,27 +129,27 @@ The output is
 
 Note the following:
 
-- The assignment `json& book = books[i]` is to a reference, the reference identifies a [[json]] object owned by `books`. 
-- The book "Cutter's Way" has no price, so `book["price"]` throws a [[json_exception]] ("Member price not found")
+- The assignment `json& book = books[i]` is to a reference, the reference identifies a [json](json) object owned by `books`. 
+- The book "Cutter's Way" has no price, so `book["price"]` throws a [json_exception](json_exception) ("Member price not found")
 
-Instead of having the exception, let's use an accessor that evaluates to a string and substitutes "N/A" for the missing price: 
+Instead of handling the missing price in a catch clause, let's use an accessor that evaluates to a string and substitutes "N/A" for the missing price: 
 
-    try
+    json books = json::parse_file("input/books.json");
+
+    for (size_t i = 0; i < books.size(); ++i)
     {
-        json books = json::parse_file("input/books.json");
-
-        for (size_t i = 0; i < books.size(); ++i)
+        try
         {
             json& book = books[i];
-            string author = book["author"].as<string>();
-            string title = book["title"].as<string>();
-            string price = book.get("price","N/A").as<string>();
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
+            string price = book.get("price", "N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
 Now the output is
@@ -156,26 +160,26 @@ Now the output is
 
 By default, when formatting a floating-point value with `as<string>()`, `jsoncons` truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and the number of decimal places to 2.
 
-    try
+    json books = json::parse_file("input/books.json");
+
+    output_format format;
+    format.floatfield(std::ios::fixed);
+    format.precision(2);
+
+    for (size_t i = 0; i < books.size(); ++i)
     {
-        json books = json::parse_file("input/books.json");
-
-        output_format format;
-        format.floatfield(std::ios::fixed);
-        format.precision(2);
-
-        for (size_t i = 0; i < books.size(); ++i)
+        try
         {
             json& book = books[i];
-            string author = book["author"].as<string>();
-            string title = book["title"].as<string>();
-            string price = book.get("price","N/A").to_string(format);
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
+            string price = book.get("price", "N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
 This time the output is
