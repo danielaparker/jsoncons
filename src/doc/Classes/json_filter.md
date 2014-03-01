@@ -8,7 +8,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 ### Base classes
 
-[[json_input_handler]]
+[json_input_handler](json_input_handler)
 
 ### Constructors
 

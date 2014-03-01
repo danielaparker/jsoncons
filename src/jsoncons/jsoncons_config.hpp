@@ -24,10 +24,6 @@
 
 namespace jsoncons {
 
-class null_type
-{
-};
-
 // Follow boost
 
 #if defined (__clang__)

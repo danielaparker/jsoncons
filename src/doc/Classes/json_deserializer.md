@@ -8,7 +8,7 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
 ### Base classes
 
-[[json_input_handler]]
+[json_input_handler](json_input_handler)
 
 ### Constructors
 

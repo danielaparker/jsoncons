@@ -1,6 +1,8 @@
     jsoncons::wjson_deserializer
 
-The `wjson_deserializer` class is an instantiation of the `basic_json_deserializer` class template that uses wchar_t as the character type.
+    typedef basic_json_deserializer<wchar_t,storage<wchar_t>> wjson_deserializer
+
+The `wjson_deserializer` class is an instantiation of the `basic_json_deserializer` class template that uses `wchar_t` as the character type.
 
 ### Header
 
@@ -8,6 +10,6 @@ The `wjson_deserializer` class is an instantiation of the `basic_json_deserializ
 
 ### Interface
 
-The interface is the same as [[json_deserializer]], substituting wide character instantiations of classes - std::wstring, etc. - for narrow character ones.
+The interface is the same as [json_deserializer](json_deserializer), substituting wide character instantiations of classes - `std::wstring`, etc. - for narrow character ones.
 
 

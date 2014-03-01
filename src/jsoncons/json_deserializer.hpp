@@ -14,7 +14,7 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include "jsoncons/json_char_traits.hpp"
+#include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/json_structures.hpp"

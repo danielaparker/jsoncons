@@ -289,3 +289,10 @@ The output is
     {"a":4,"b":5,"c":6}
     {"a":7,"b":8,"c":9}
 
+### Acknowledgements
+
+Thanks to Marc Chevrier for contributing implementations for the json `is<T>` and `as<T>` methods, and the `make_multi_array<N>` template implementation.
+
+I'm grateful to Marc Chevrier and Pedro Larroy for keeping a watchful eye that all continues to go well in GCC and clang environments, and contributing bug fixes. 
+
+

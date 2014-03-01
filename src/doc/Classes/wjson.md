@@ -1,5 +1,7 @@
     jsoncons::wjson
 
+    typedef basic_json<wchar_t,storage<wchar_t>> wjson
+
 The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type.
 
 ### Header
@@ -8,4 +10,4 @@ The `wjson` class is an instantiation of the `basic_json` class template that us
 
 ### Interface
 
-The interface is the same as [[json]], substituting wide character instantiations of classes - std::wstring, std::wistream, etc. - for narrow character ones.
+The interface is the same as [json](json), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.

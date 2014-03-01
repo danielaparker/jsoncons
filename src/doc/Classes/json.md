@@ -1,5 +1,7 @@
     jsoncons::json
 
+    typedef basic_json<char,storage<char>> json
+
 The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type.
 
 ### Header
@@ -47,11 +49,11 @@ Constant json null value
     static json parse(std::istream& is)
 Parses an input stream of JSON text and returns a json object or array value
 
+    static json parse_file(const std::string& filename)
+Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
+
     static json parse_string(const std::string& s)
 Parses a string of JSON text and returns a json object or array value
-
-    static json parse_file(const std::string& filename)
-Parses JSON text from a file opened as a binary stream, and returns a json object or array value.
 
     template <typename N>
     static json make_multi_array(size1 ... sizeN)
