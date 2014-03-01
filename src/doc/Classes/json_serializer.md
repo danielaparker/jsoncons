@@ -8,7 +8,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Implemented interfaces
 
-[json_output_handler](basic_json_output_handler)
+[[json_output_handler]]
 
 ### Constructors
 

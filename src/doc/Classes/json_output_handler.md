@@ -1,10 +1,6 @@
-    jsoncons::basic_json_output_handler
+    jsoncons::json_output_handler
 
-    template <typename Char>
-    class basic_json_output_handler
-
-    typedef basic_json_output_handler<char> json_output_handler;
-    typedef basic_json_output_handler<wchar_t> wjson_output_handler;
+The `json_output_handler` class is an instantiation of the `basic_json_output_handler` class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON writer.
 
 ### Header
 
@@ -12,7 +8,7 @@
 
 ### Overloaded methods
 
-    void value(const std::basic_string<Char>& value)
+    void value(const std::string& value)
 Send notification of a `string` value
 
     void value(jsoncons::null_type)
@@ -45,7 +41,7 @@ Send notification of an unsigned long long number
     void value(bool value)
 Send notification of a boolean value
 
-### Virtual methods
+### Implementing methods
 
     virtual void begin_json()
 Receive notification of the start of a JSON document
@@ -65,13 +61,13 @@ Receive notification of the start of a JSON array
     virtual void end_array()
 Receive notification of the end of a JSON object
 
-    virtual void name(const std::basic_string<Char>& name)
+    virtual void name(const std::string& name)
 Receive notification of the `name` of a name value pair
 
     virtual void null_value()
 Receive notification of `null`
 
-    virtual void string_value(const std::basic_string<Char>& value)
+    virtual void string_value(const std::string& value)
 Receive notification of a `string` value
 
     virtual void double_value(double value)
