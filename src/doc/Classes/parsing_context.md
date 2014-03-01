@@ -1,5 +1,7 @@
     jsoncons::parsing_context
 
+    typedef basic_parsing_context<char> parsing_context
+
 Provides contextual information for the element being parsed. This information may be used for error reporting.
 
 ### Header

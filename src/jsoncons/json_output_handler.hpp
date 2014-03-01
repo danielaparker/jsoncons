@@ -166,11 +166,11 @@ public:
 
 };
 
-typedef null_basic_json_output_handler<char> null_json_output_handler;
-typedef null_basic_json_output_handler<wchar_t> wnull_json_output_handler;
-
 typedef basic_json_output_handler<char> json_output_handler;
 typedef basic_json_output_handler<wchar_t> wjson_output_handler;
+
+typedef null_basic_json_output_handler<char> null_json_output_handler;
+typedef null_basic_json_output_handler<wchar_t> wnull_json_output_handler;
 
 }
 #endif

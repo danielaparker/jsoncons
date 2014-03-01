@@ -1,5 +1,7 @@
     jsoncons::json_reader
 
+    typedef basic_json_reader<char> json_reader
+
 ### Header
 
     #include "jsoncons/json_reader.hpp"
