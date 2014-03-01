@@ -49,18 +49,15 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 ### Classes
 
 [json](json)  
-[wjson](wjson)  
-
 [json_serializer](json_serializer)  
-[wjson_serializer](wjson_serializer)
-
 [output_format](output_format)  
-[woutput_format](woutput_format)
-
 [json_reader](json_reader)  
-[wjson_reader](wjson_reader)
-
 [json_deserializer](json_deserializer)  
+
+[woutput_format](woutput_format)
+[wjson](wjson)  
+[wjson_serializer](wjson_serializer)
+[wjson_reader](wjson_reader)
 [wjson_deserializer](wjson_deserializer)
 
 ### Extensions
