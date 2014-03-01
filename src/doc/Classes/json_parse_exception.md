@@ -6,7 +6,7 @@
 
 ### Base class
 
-    [[json_exception]]
+    [json_exception](json_exception)
 
 ### Constructors
 
