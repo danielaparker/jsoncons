@@ -519,3 +519,6 @@ The (illegal) wjson output produced by Visual Studio 2010 is
 
     {"field1":-1.#IND,"field2":1.#INF,"field3":-1.#INF}
 
+### Interface
+
+The interface is the same as [[json]], substituting wide character instantiations of classes - std::wstring, std::wistream, etc. - for narrow character ones.
