@@ -1,10 +1,10 @@
-    jsoncons::json_deserializer
+    jsoncons::json_filter
 
-The `json_deserializer` class is an instantiation of the `basic_json_deserializer` class template that uses char as the character type.
+The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses char as the character type.
 
 ### Header
 
-    #include "jsoncons/json_deserializer.hpp"
+    #include "jsoncons/json_filter.hpp"
 
 ### Base classes
 
@@ -12,7 +12,9 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
 ### Constructors
 
-    json_deserializer()
+    json_filter(json_input_handler& parent)
+
+    json_filter(json_output_handler& output_handler)
 
 ### Implementing methods
 
@@ -72,5 +74,5 @@ line and column information is provided in the [parsing_context](parsing_context
 
 ### Accessors
 
-    json& root()
-Returns a reference to the root of the json value read from the stream
+    json_input_handler& parent()
+Returns a reference to the parent input handler. 

@@ -1,18 +1,56 @@
-    jsoncons::json_deserializer
+    jsoncons::json_input_handler
 
-The `json_deserializer` class is an instantiation of the `basic_json_deserializer` class template that uses char as the character type.
+The `json_input_handler` class is an instantiation of the `basic_json_input_handler` class template that uses char as the character type. It defines an interface for a listener to JSON events.
 
 ### Header
 
-    #include "jsoncons/json_deserializer.hpp"
+    #include "jsoncons/json_input_handler.hpp"
 
-### Base classes
+### Overloaded methods
 
-[[json_input_handler]]
+    void value(const std::string& value, const parsing_context& context)
+Send notification of a string value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-### Constructors
+    void value(jsoncons::null_type, const parsing_context& context)
+Send notification of a null value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    json_deserializer()
+    void value(float value, const parsing_context& context)
+Send notification of a float number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(double value, const parsing_context& context)
+Send notification of a double number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(int value, const parsing_context& context)
+Send notification of an int number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned int value, const parsing_context& context)
+Send notification of an unsigned int number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(long value, const parsing_context& context)
+Send notification of a long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned long value, const parsing_context& context)
+Send notification of an unsigned long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(long long value, const parsing_context& context)
+Send notification of a long long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(unsigned long long value, const parsing_context& context)
+Send notification of an unsigned long long number. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(bool value, const parsing_context& context)
+Send notification of a boolean value. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
 ### Implementing methods
 
@@ -70,7 +108,3 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive notification of a boolean value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-### Accessors
-
-    json& root()
-Returns a reference to the root of the json value read from the stream
