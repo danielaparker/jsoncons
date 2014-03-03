@@ -4,7 +4,7 @@ In the Linux and web worlds, `UTF-8` is the dominant character encoding.
 
 Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard 
 
-    std::fstream fs(const char* filename).
+    std::fstream fs(const char* filename)
 
 Instead you need to use the non standard Microsoft extension
 

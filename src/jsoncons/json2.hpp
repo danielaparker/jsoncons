@@ -334,6 +334,24 @@ void basic_json<Char,Storage>::assign_bool(bool rhs)
         break;
     }
 }
+template <typename Char,class Storage>
+void basic_json<Char,Storage>::assign_null()
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+	case longlong_t:
+    case ulonglong_t:
+	case double_t:
+        type_ = null_t;
+        break;
+    default:
+        basic_json<Char,Storage>(null_type()).swap(*this);
+        break;
+    }
+}
 
 template <typename Char, typename Storage>
 basic_json<Char,Storage>& basic_json<Char,Storage>::operator=(basic_json<Char,Storage> rhs)
@@ -1633,6 +1651,10 @@ public:
     {
         JSONCONS_ASSERT(val.is_null());
         return jsoncons::null_type();
+    }
+    void assign(basic_json<Char,Storage>& self, null_type)
+    {
+        self.assign_null();
     }
 };
 
