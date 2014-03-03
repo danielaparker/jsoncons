@@ -7,6 +7,7 @@
 #include "csv_examples.h"
 
 using jsoncons::json;
+using jsoncons::json_exception;
 using jsoncons::json_deserializer;
 using jsoncons::json_reader;
 using jsoncons::pretty_print;
@@ -52,7 +53,7 @@ void first_example_b()
             string price = book.get("price", "N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-        catch (const std::exception& e)
+        catch (const json_exception& e)
         {
             std::cerr << e.what() << std::endl;
         }
@@ -76,6 +77,39 @@ void first_example_c()
             string title = book["title"].as<std::string>();
             string price = book.get("price", "N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+
+}
+
+void first_example_d()
+{
+    json books = json::parse_file("input/books.json");
+
+    output_format format;
+    format.floatfield(std::ios::fixed);
+    format.precision(2);
+
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        try
+        {
+            json& book = books[i];
+            string author = book["author"].as<std::string>();
+            string title = book["title"].as<std::string>();
+            if (book.has_member("price") && book["price"].is_numeric())
+            {
+                double price = book["price"].as<double>();
+                std::cout << author << ", " << title << ", " << price << std::endl;
+            }
+            else
+            {
+                std::cout << author << ", " << title << ", " << "n/a" << std::endl;
+            }
         }
         catch (const std::exception& e)
         {
@@ -147,10 +181,11 @@ void mulitple_json_objects()
 void more_examples()
 {
     json image_sizing;
-    image_sizing["resolution"] = 144;
-    image_sizing["long_edge"] = 9.84;
-    image_sizing["size_units"] =  "cm";
-    image_sizing["resize_to_fit"] = true;
+	image_sizing["resize_to_fit"] = true;  // a boolean 
+	image_sizing["resize_unit"] =  "pixels";  // a string
+	image_sizing["resize_what"] =  "long_edge";  // a string
+	image_sizing["dimension1"] = 9.84;  // a double
+	image_sizing["dimension2"] = jsoncons::null_type();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats(json::an_array);
@@ -212,6 +247,7 @@ int main()
     first_example_a();
     first_example_b();
     first_example_c();
+    first_example_d();
 
     second_example_a();
 

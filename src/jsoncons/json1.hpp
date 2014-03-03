@@ -1290,6 +1290,7 @@ public:
     void assign_longlong(long long rhs);
     void assign_ulonglong(unsigned long long rhs);
     void assign_bool(bool rhs);
+    void assign_null();
 
 //  Deprecated
 
