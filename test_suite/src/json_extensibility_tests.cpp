@@ -71,6 +71,15 @@ BOOST_AUTO_TEST_CASE(test_add_extensibility)
 
     BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
     BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,21),d2);
+
+    json deal;
+    deal["maturity"] = boost::gregorian::date(2015,1,1);
+	json observation_dates(json::an_array);
+    observation_dates.add(boost::gregorian::date(2013,10,21));
+    observation_dates.add(boost::gregorian::date(2013,10,28));
+	deal["observation_dates"] = std::move(observation_dates);
+    std::cout << pretty_print(deal) << std::endl;
+
 }
 
 BOOST_AUTO_TEST_CASE(test_set_extensibility)
