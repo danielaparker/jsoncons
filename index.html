@@ -125,7 +125,7 @@ Ivan Passer, Cutter's Way, n/a
         cout &lt;&lt; "n/a";
     }
 </pre></code></div>
-<h2>Building json values in C++</h2>
+<h3>Building json values in C++</h3>
 <p>To construct an empty <code>json</code> object, use the default constructor:</p>
 <div><code><pre>
      json image_sizing;
@@ -196,6 +196,45 @@ Ivan Passer, Cutter's Way, n/a
         }
     }
 </pre></code></div>
+<h3>Iterators</h3>
+<p><code>jsoncons::json</code> supports iterators for accessing the members of json objects and the elements of json arrays.</p>  
+<p>An example of iterating over the name-value pairs of a <code>json</code> object:</p>
+<div><code><pre>
+    json person;
+    person["first_name"] = "Jane";
+    person["last_name"] = "Roe";
+    person["events_attended"] = 10;
+    person["accept_waiver_of_liability"] = true;
+
+    for (auto it = person.begin_members(); it != person.end_members(); ++it)
+    {
+        cout << "name=" << it->name() << ", value=" << it->value().as&lt;string>() << endl;
+    }
+</pre></code></div>
+<p>An example of iterating over the elements of a <code>json</code> array:</p>
+<div><code><pre>
+    json cities(json::an_array);
+    cities.add("Montreal");
+    cities.add("Toronto");
+    cities.add("Ottawa");
+    cities.add("Vancouver");
+
+    for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
+    {
+        cout << it->as&lt;string>() << endl;
+    }
+</pre></code></div>
+
+<h3>About jsoncons::json</h3>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type,</p>
+<div><code><pre>
+    typedef basic_json&lt;char,storage&lt;char>> json
+</pre></code></div>
+The library includes an instantiation for wide characters as well,
+<div><code><pre>
+    typedef basic_json&lt;wchar_t,storage&lt;wchar_t>> json
+</pre></code></div>
+<p>Note that the template parameter <code>storage</code> is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.</p>
 <h2>Extensibility</h2>
 <p>In the <code>json</code> class, accessors and modifiers are templated, for example,</p>
 <div><code><pre>
