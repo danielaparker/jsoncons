@@ -1,4 +1,4 @@
-`jsoncons` is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a tree structured `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. 
+`jsoncons` is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a tree structured `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in [jsoncons: a C++ library for json construction](http://jsoncons.sourceforge.net/).
 
 The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
 
@@ -8,7 +8,7 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-All core jsoncons classes and functions are in namespace `jsoncons`. Extensions are in namespace `jsoncons_ext`.
+All core jsoncons classes and functions are in namespace `jsoncons`. Extensions are in namespace `jsoncons_ext`. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
 ### Features
 
