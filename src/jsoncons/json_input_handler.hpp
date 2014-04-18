@@ -117,47 +117,47 @@ public:
     {
     }
 
-    virtual void begin_object(const basic_parsing_context<Char>& context)
+    virtual void begin_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_object(const basic_parsing_context<Char>& context)
+    virtual void end_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void begin_array(const basic_parsing_context<Char>& context)
+    virtual void begin_array(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_array(const basic_parsing_context<Char>& context)
+    virtual void end_array(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    virtual void name(const std::basic_string<Char>&, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void null_value(const basic_parsing_context<Char>& context)
+    virtual void null_value(const basic_parsing_context<Char>&)
     {
     }
 // value(...) implementation
-    virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void string_value(const std::basic_string<Char>&, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void double_value(double, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void longlong_value(long long value, const basic_parsing_context<Char>& context)
+    virtual void longlong_value(long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void bool_value(bool value, const basic_parsing_context<Char>& context)
+    virtual void bool_value(bool, const basic_parsing_context<Char>&)
     {
     }
 };

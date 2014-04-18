@@ -103,7 +103,7 @@ public:
         stack_.push_back(stack_item(true,context.minimum_structure_capacity()));
     }
 
-    virtual void end_object(const basic_parsing_context<Char>& context)
+    virtual void end_object(const basic_parsing_context<Char>&)
     {
         stack_.back().object_->sort_members();
         basic_json<Char,Storage> val(stack_.back().release_object());	    
@@ -130,7 +130,7 @@ public:
         stack_.push_back(stack_item(false,context.minimum_structure_capacity()));
     }
 
-    virtual void end_array(const basic_parsing_context<Char>& context)
+    virtual void end_array(const basic_parsing_context<Char>&)
     {
         basic_json<Char,Storage> val(stack_.back().release_array());	    
         stack_.pop_back();
@@ -151,12 +151,12 @@ public:
         }
     }
 
-    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    virtual void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>&)
     {
         stack_.back().name_ = name;
     }
 
-    virtual void null_value(const basic_parsing_context<Char>& context)
+    virtual void null_value(const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -175,7 +175,7 @@ public:
 
 // value(...) implementation
 
-    virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context)
+    virtual void string_value(const std::basic_string<Char>& value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -187,7 +187,7 @@ public:
         }
     }
 
-    virtual void double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void double_value(double value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -199,7 +199,7 @@ public:
         }
     }
 
-    virtual void longlong_value(long long value, const basic_parsing_context<Char>& context)
+    virtual void longlong_value(long long value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -223,7 +223,7 @@ public:
         }
     }
 
-    virtual void bool_value(bool value, const basic_parsing_context<Char>& context)
+    virtual void bool_value(bool value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
