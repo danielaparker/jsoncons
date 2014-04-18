@@ -1578,7 +1578,7 @@ template <typename Char,typename Storage>
 class value_adapter<Char,Storage,basic_json<Char,Storage>>
 {
 public:
-    bool is(const basic_json<Char,Storage>& val) const
+    bool is(const basic_json<Char,Storage>&) const
     {
         return true;
     }

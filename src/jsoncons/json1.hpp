@@ -27,7 +27,7 @@ struct storage
 };
 
 template <typename Char,class T> inline
-void serialize(basic_json_output_handler<Char>& os, const T& val)
+void serialize(basic_json_output_handler<Char>& os, const T&)
 {
     os.null_value();
 }
@@ -87,7 +87,7 @@ template <typename Char, typename Storage, typename T>
 class value_adapter
 {
 public:
-    bool is(const basic_json<Char,Storage>& val) const
+    bool is(const basic_json<Char,Storage>&) const
     {
         return false;
     }
