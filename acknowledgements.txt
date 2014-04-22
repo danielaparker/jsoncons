@@ -3,3 +3,5 @@ Andrew Hutko for early code review
 Marc Chevrier for contributing clang port, build files, json is<T> and as<T> methods, and make_multi_array template implementation.
 
 Pedro Larroy and the developers of the clearskies_core project for contributing build system for posix systems, adding GCC to list of supported compilers, bug fixes, Android fix
+
+Cory Fields for code cleanup
