@@ -111,7 +111,7 @@ struct json_char_traits<char,1>
 
     static const std::string true_literal() {return "true";};
 
-    static uint32_t convert_char_to_codepoint(std::string::const_iterator& it, std::string::const_iterator end)
+    static uint32_t convert_char_to_codepoint(std::string::const_iterator& it, std::string::const_iterator)
     {
         char c = *it;
         uint32_t u(c >= 0 ? c : 256 + c );
@@ -214,7 +214,7 @@ struct json_char_traits<wchar_t,2> // assume utf16
         }
     }
 
-    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator& it, std::wstring::const_iterator end)
+    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator& it, std::wstring::const_iterator)
     {
         uint32_t cp = (0xffff & *it);
         if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate)) // surrogate pair
@@ -257,7 +257,7 @@ struct json_char_traits<wchar_t,4> // assume utf32
         }
     }
 
-    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator& it, std::wstring::const_iterator end)
+    static uint32_t convert_char_to_codepoint(std::wstring::const_iterator& it, std::wstring::const_iterator)
     {
         uint32_t cp = static_cast<uint32_t>(*it);
         return cp;
