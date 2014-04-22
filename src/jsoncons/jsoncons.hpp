@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cwchar>
 #include <cstdint> 
+#include <iostream>
 #include "jsoncons/jsoncons_config.hpp"
 
 namespace jsoncons {
