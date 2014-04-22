@@ -110,19 +110,19 @@ template <typename Char>
 class default_basic_error_handler : public basic_error_handler<Char>
 {
 public:
-    virtual void warning(const std::string& error_code,
-                         const std::string& message,
-                         const basic_parsing_context<Char>& context) throw (json_parse_exception)
+    virtual void warning(const std::string&,
+                         const std::string&,
+                         const basic_parsing_context<Char>&) throw (json_parse_exception)
     {
         // Do nothing
     }
-    virtual void error(const std::string& error_code,
+    virtual void error(const std::string&,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
-    virtual void fatal_error(const std::string& error_code,
+    virtual void fatal_error(const std::string&,
                              const std::string& message,
                              const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
