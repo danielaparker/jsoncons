@@ -1473,7 +1473,7 @@ void escape_string(const std::basic_string<Char>& s,
         switch (c)
         {
         case '\\':
-            os << '\\';
+            os << '\\' <<'\\';
             break;
         case '"':
             os << '\\' << '\"';
