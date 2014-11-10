@@ -769,13 +769,13 @@ const basic_json<Char,Storage>& basic_json<Char,Storage>::operator[](const std::
 template <typename Char, typename Storage>
 basic_json<Char,Storage>& basic_json<Char,Storage>::operator[](size_t i)
 {
-    return value_.array_->at(i);
+    return at(i);
 }
 
 template <typename Char, typename Storage>
 const basic_json<Char,Storage>& basic_json<Char,Storage>::operator[](size_t i) const
 {
-    return value_.array_->at(i);
+    return at(i);
 }
 
 template <typename Char, typename Storage>
@@ -898,9 +898,12 @@ basic_json<Char,Storage> basic_json<Char,Storage>::make_array(size_t n)
 }
 
 template <typename Char, typename Storage>
-basic_json<Char,Storage> basic_json<Char,Storage>::make_array(size_t n, const basic_json<Char,Storage>& val)
+template <typename T>
+basic_json<Char,Storage> basic_json<Char,Storage>::make_array(size_t n, T val)
 {
-    return basic_json<Char,Storage>(new json_array<Char,Storage>(n,val));
+    basic_json<Char,Storage> v;
+    v = val;
+    return basic_json<Char,Storage>(new json_array<Char,Storage>(n,v));
 }
 
 template <typename Char, typename Storage>
@@ -915,12 +918,15 @@ basic_json<Char,Storage> basic_json<Char,Storage>::make_2d_array(size_t m, size_
 }
 
 template <typename Char, typename Storage>
-basic_json<Char,Storage> basic_json<Char,Storage>::make_2d_array(size_t m, size_t n, const basic_json<Char,Storage>& val)
+template <typename T>
+basic_json<Char,Storage> basic_json<Char,Storage>::make_2d_array(size_t m, size_t n, T val)
 {
+    basic_json<Char,Storage> v;
+    v = val;
     basic_json<Char,Storage> a(basic_json<Char,Storage>(new json_array<Char,Storage>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char,Storage>::make_array(n,val);
+        a[i] = basic_json<Char,Storage>::make_array(n,v);
     }
     return a;
 }
@@ -937,12 +943,15 @@ basic_json<Char,Storage> basic_json<Char,Storage>::make_3d_array(size_t m, size_
 }
 
 template <typename Char, typename Storage>
-basic_json<Char,Storage> basic_json<Char,Storage>::make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char,Storage>& val)
+template <typename T>
+basic_json<Char,Storage> basic_json<Char,Storage>::make_3d_array(size_t m, size_t n, size_t k, T val)
 {
+    basic_json<Char,Storage> v;
+    v = val;
     basic_json<Char,Storage> a(basic_json<Char,Storage>(new json_array<Char,Storage>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char,Storage>::make_2d_array(n,k,val);
+        a[i] = basic_json<Char,Storage>::make_2d_array(n,k,v);
     }
     return a;
 }
@@ -1158,12 +1167,15 @@ void basic_json<Char,Storage>::resize_array(size_t n)
 }
 
 template <typename Char, typename Storage>
-void basic_json<Char,Storage>::resize_array(size_t n, const basic_json<Char,Storage>& val)
+template <typename T>
+void basic_json<Char,Storage>::resize_array(size_t n, T val)
 {
+    basic_json<Char,Storage> j;
+    j = val;
     switch (type_)
     {
     case array_t:
-        value_.array_->resize(n,val);
+        value_.array_->resize(n,j);
         break;
     }
 }

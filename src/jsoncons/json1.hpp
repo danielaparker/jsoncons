@@ -557,7 +557,8 @@ public:
             val_.at(name_).resize_array(n);
         }
 
-        void resize_array(size_t n, const basic_json<Char,Storage>& val)
+        template <typename T>
+        void resize_array(size_t n, T val)
         {
             val_.at(name_).resize_array(n,val);
         }
@@ -924,8 +925,8 @@ public:
     {
         return build_array<Char,Storage,size>()(n);
     }
-    template<size_t size>
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, const basic_json<Char,Storage>& val)
+    template<size_t size,typename T>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
     {
         return build_array<Char,Storage,size>()(n, val);
     }
@@ -934,8 +935,8 @@ public:
     {
         return build_array<Char,Storage,size>()(m, n);
     }
-    template<size_t size>
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, const basic_json<Char,Storage>& val)
+    template<size_t size,typename T>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
     {
         return build_array<Char,Storage,size>()(m, n, val);
     }
@@ -944,8 +945,8 @@ public:
     {
         return build_array<Char,Storage,size>()(m, n, k);
     }
-    template<size_t size>
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, const basic_json<Char,Storage>& val)
+    template<size_t size,typename T>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
     {
         return build_array<Char,Storage,size>()(m, n, k, val);
     }
@@ -1106,7 +1107,8 @@ public:
 
     void resize_array(size_t n);
 
-    void resize_array(size_t n, const basic_json<Char,Storage>& val);
+    template <typename T>
+    void resize_array(size_t n, T val);
 
     template<typename T>
     T as() const
@@ -1296,15 +1298,18 @@ public:
 
     static basic_json make_array();
     static basic_json make_array(size_t n);
-    static basic_json make_array(size_t n, const basic_json<Char,Storage>& val);
+    template <typename T>
+    static basic_json make_array(size_t n, T val);
 
     static basic_json make_2d_array(size_t m, size_t n);
 
-    static basic_json make_2d_array(size_t m, size_t n, const basic_json<Char,Storage>& val);
+    template <typename T>
+    static basic_json make_2d_array(size_t m, size_t n, T val);
 
     static basic_json make_3d_array(size_t m, size_t n, size_t k);
 
-    static basic_json make_3d_array(size_t m, size_t n, size_t k, const basic_json<Char,Storage>& val);
+    template <typename T>
+    static basic_json make_3d_array(size_t m, size_t n, size_t k, T val);
 
     bool is_number() const
     {
@@ -1328,7 +1333,8 @@ private:
         {
             return basic_json<Char2,Allocator2>::make_array(n);
         }
-        basic_json<Char2,Allocator2> operator() (size_t n, const basic_json<Char2,Allocator2>& val)
+        template <typename T>
+        basic_json<Char2,Allocator2> operator() (size_t n, T val)
         {
             return basic_json<Char2,Allocator2>::make_array(n, val);
         }
@@ -1341,7 +1347,8 @@ private:
         {
             return basic_json<Char2,Allocator2>::make_2d_array(m, n);
         }
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, const basic_json<Char2,Allocator2>& val)
+        template <typename T>
+        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, T val)
         {
             return basic_json<Char2,Allocator2>::make_2d_array(m, n, val);
         }
@@ -1354,7 +1361,8 @@ private:
         {
             return basic_json<Char2,Allocator2>::make_3d_array (m, n, k);
         }
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, size_t k, const basic_json<Char2,Allocator2>& val)
+        template <typename T>
+        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, size_t k, T val)
         {
             return basic_json<Char2,Allocator2>::make_3d_array (m, n, k, val);
         }
