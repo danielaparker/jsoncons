@@ -33,17 +33,17 @@ void construct_json_from_vector()
 
     std::vector<json> addresses;
     json address1;
-    address1["city"] = json("San Francisco");
-    address1["state"] = json("CA");
-    address1["zip"] = json("94107");
-    address1["country"] = json("USA");
+    address1["city"] = "San Francisco";
+    address1["state"] = "CA";
+    address1["zip"] = "94107";
+    address1["country"] = "USA";
     addresses.push_back(address1);
 
     json address2;
-    address2["city"] = json("Sunnyvale");
-    address2["state"] = json("CA");
-    address2["zip"] = json("94085");
-    address2["country"] = json("USA");
+    address2["city"] = "Sunnyvale";
+    address2["state"] = "CA";
+    address2["zip"] = "94085";
+    address2["country"] = "USA";
     addresses.push_back(address2);
 
     root["addresses"] = json(addresses.begin(),addresses.end());

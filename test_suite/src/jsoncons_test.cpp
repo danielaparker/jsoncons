@@ -27,6 +27,16 @@ using std::string;
 using jsoncons::json_filter;
 using jsoncons::pretty_print;
 
+BOOST_AUTO_TEST_CASE(test_for_each_value)
+{
+    string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
+    json val = json::parse_string(input);
+
+    BOOST_CHECK(val[0].type() == json::string_t);
+    BOOST_CHECK(val[1].type() == json::string_t);
+    BOOST_CHECK(val[2].type() == json::ulonglong_t);
+}
+
 BOOST_AUTO_TEST_CASE(test_assignment)
 {
     json root;
@@ -84,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     address2["country"] = json("USA");
     addresses.push_back(address2);
 
-    root["addresses"] = json(addresses.begin(),addresses.end());
+    root["addresses"] = json(addresses.begin(), addresses.end());
 
     BOOST_CHECK(root["addresses"].size() == 2);
 
@@ -116,16 +126,16 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     std::ostringstream os;
     os << "{"
        << "\"string\":\"value\""
-        << ",\"null\":null"
-        << ",\"bool1\":false"
-        << ",\"bool2\":true"
-        << ",\"integer\":12345678"
-        << ",\"neg-integer\":-87654321"
-        << ",\"double\":123456.01"
-        << ",\"neg-double\":-654321.01"
-        << ",\"exp\":2.00600e+03"
-        << ",\"minus-exp\":1.00600e-010"
-        << ",\"escaped-string\":\"\\\\\\n\""
+       << ",\"null\":null"
+       << ",\"bool1\":false"
+       << ",\"bool2\":true"
+       << ",\"integer\":12345678"
+       << ",\"neg-integer\":-87654321"
+       << ",\"double\":123456.01"
+       << ",\"neg-double\":-654321.01"
+       << ",\"exp\":2.00600e+03"
+       << ",\"minus-exp\":1.00600e-010"
+       << ",\"escaped-string\":\"\\\\\\n\""
        << "}";
     std::cout << "test_to_string" << std::endl;
     std::cout << os.str() << std::endl;
@@ -161,7 +171,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 
     std::ostringstream os;
 
-    json_serializer serializer(os,true);
+    json_serializer serializer(os, true);
     o.to_stream(serializer);
     std::cout << os.str() << std::endl;
 }
@@ -173,7 +183,7 @@ BOOST_AUTO_TEST_CASE(test_array2)
     v.push_back(200);
     v.push_back(300);
 
-    json a(v.begin(),v.end());
+    json a(v.begin(), v.end());
     a.add(400);
 
     std::cout << a << std::endl;
@@ -184,8 +194,8 @@ BOOST_AUTO_TEST_CASE(test_nan_replacement)
 {
     json obj;
     obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308*1000;
-    obj["field3"] = -1.79e308*1000;
+    obj["field2"] = 1.79e308 * 1000;
+    obj["field3"] = -1.79e308 * 1000;
     std::cout << obj << std::endl;
 }
 
@@ -193,15 +203,15 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
 {
     json obj;
     obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308*1000;
-    obj["field3"] = -1.79e308*1000;
+    obj["field2"] = 1.79e308 * 1000;
+    obj["field3"] = -1.79e308 * 1000;
 
     output_format format;
     format.nan_replacement("null");
     format.pos_inf_replacement("1e9999");
     format.neg_inf_replacement("-1e9999");
 
-    obj.to_stream(std::cout,format);
+    obj.to_stream(std::cout, format);
     std::cout << std::endl;
 }
 
@@ -209,14 +219,14 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
 {
     json obj;
     obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308*1000;
-    obj["field3"] = -1.79e308*1000;
+    obj["field2"] = 1.79e308 * 1000;
+    obj["field3"] = -1.79e308 * 1000;
 
     output_format format;
     format.replace_nan(false);
     format.replace_inf(false);
 
-    obj.to_stream(std::cout,format);
+    obj.to_stream(std::cout, format);
     std::cout << std::endl;
 }
 
@@ -227,8 +237,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
-    {
+    for (auto it = obj.begin_members(); it != obj.end_members(); ++it){
         std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
 }
@@ -240,8 +249,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
     arr.add("Vancouver");
     arr.add("Montreal");
 
-    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
-    {
+    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it){
         std::cout << it->as<std::string>() << std::endl;
     }
 }
@@ -289,15 +297,15 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     {
         if (i != 0)
             std::cout << " ";
-        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i] );
-        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+        unsigned int u(s[i] >= 0 ? s[i] : 256 + s[i]);
+        std::cout << "0x"  << std::hex << std::setfill('0') << std::setw(2) << u;
     }
     std::cout << "]" << std::endl;
 
     std::ostringstream os;
     output_format format;
     format.escape_all_non_ascii(true);
-    arr.to_stream(os,format);
+    arr.to_stream(os, format);
     std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 
@@ -308,8 +316,8 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     {
         if (i != 0)
             std::cout << " ";
-        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i] );
-        std::cout << "0x"  << std::hex<< std::setfill('0') << std::setw(2) << u;
+        unsigned int u(s2[i] >= 0 ? s2[i] : 256 + s2[i]);
+        std::cout << "0x"  << std::hex << std::setfill('0') << std::setw(2) << u;
     }
     std::cout << "]" << std::endl;
 
@@ -348,8 +356,8 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
 
-    std::string x3 = obj.get("field3","Montreal").as<std::string>();
-    std::string x4 = obj.get("field4","San Francisco").as<std::string>();
+    std::string x3 = obj.get("field3", "Montreal").as<std::string>();
+    std::string x4 = obj.get("field4", "San Francisco").as<std::string>();
 
     std::cout << "x3=" << x3 << std::endl;
     std::cout << "x4=" << x4 << std::endl;
@@ -361,7 +369,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
     {
         std::string input("{\"field1\":\n\"value}");
         std::cout << input << std::endl;
-    json obj = json::parse_string(input);
+        json obj = json::parse_string(input);
     }
     catch (const std::exception& e)
     {
@@ -371,7 +379,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
 
 BOOST_AUTO_TEST_CASE(test_big_file)
 {
-    std::ofstream os("output/test.json",std::ofstream::binary);
+    std::ofstream os("output/test.json", std::ofstream::binary);
 
     std::string person("person");
     std::string first_name("first_name");
@@ -439,14 +447,14 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     handler.end_array();
     os.flush();
     std::clock_t s = std::clock() - t;
-    std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds to write.\n";
+    std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";
 
-    std::ifstream is("output/test.json",std::ofstream::binary);
+    std::ifstream is("output/test.json", std::ofstream::binary);
     t = std::clock();
 
     json root = json::parse(is);
     s = std::clock() - t;
-    std::cout << "It took " << (((double)s)/CLOCKS_PER_SEC) << " seconds.\n";
+    std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds.\n";
 
 }
 
@@ -454,7 +462,7 @@ class my_json_filter : public json_filter
 {
 public:
     my_json_filter(json_output_handler& parent)
-        : json_filter(parent)
+       : json_filter(parent)
     {
     }
 
@@ -463,7 +471,7 @@ public:
         name_ = name;
         if (name != "name")
         {
-            parent().name(name,context);
+            parent().name(name, context);
         }
     }
 
@@ -473,26 +481,26 @@ public:
         if (name_ == "name")
         {
             size_t end_first = value.find_first_of(" \t");
-            size_t start_last = value.find_first_not_of(" \t",end_first);
-            parent().name("first-name",context);
-            std::string first = value.substr(0,end_first);
-            parent().value(first,context);
+            size_t start_last = value.find_first_not_of(" \t", end_first);
+            parent().name("first-name", context);
+            std::string first = value.substr(0, end_first);
+            parent().value(first, context);
             if (start_last != std::string::npos)
             {
-                parent().name("last-name",context);
+                parent().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().value(last,context);
+                parent().value(last, context);
             }
             else
             {
                 std::cerr << "Incomplete name \"" << value
-                          << "\" at line " << context.line_number()
-                          << " and column " << context.column_number() << std::endl;
+                   << "\" at line " << context.line_number()
+                   << " and column " << context.column_number() << std::endl;
             }
         }
         else
         {
-            parent().value(value,context);
+            parent().value(value, context);
         }
     }
 private:
@@ -503,12 +511,12 @@ BOOST_AUTO_TEST_CASE(test_filter)
 {
     std::string in_file = "input/address-book.json";
     std::string out_file = "output/address-book-new.json";
-    std::ifstream is(in_file,std::ofstream::binary);
+    std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
     json_serializer serializer(os, true);
     my_json_filter filter(serializer);
-    json_reader reader(is,filter);
+    json_reader reader(is, filter);
     reader.read();
 }
 
@@ -517,6 +525,6 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     json obj = json::parse_file("input/json-multiline-comment.json");
     BOOST_CHECK(obj.is_array());
     BOOST_CHECK(obj.is<json::array>());
-    BOOST_CHECK_EQUAL(obj.size(),0);
+    BOOST_CHECK_EQUAL(obj.size(), 0);
 }
 
