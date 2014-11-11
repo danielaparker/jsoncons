@@ -10,7 +10,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include "boost/date_time/gregorian/gregorian.hpp"
+#include "jsoncons_ext/boost/type_extensions.hpp"
 
 using jsoncons::json_serializer;
 using jsoncons::output_format;
@@ -19,42 +19,6 @@ using jsoncons::wjson;
 using jsoncons::basic_json_reader;
 using std::string;
 using boost::numeric::ublas::matrix;
-
-namespace jsoncons
-{
-    template <typename Storage>
-    class value_adapter<char,Storage,boost::gregorian::date>
-    {
-    public:
-        bool is(const basic_json<char,Storage>& val) const
-        {
-            if (!val.is_string())
-            {
-                return false;
-            }
-            std::string s = val.template as<std::string>();
-            try
-            {
-                boost::gregorian::date_from_iso_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        }
-        boost::gregorian::date as(const basic_json<char,Storage>& val) const
-        {
-            std::string s = val.template as<std::string>();
-            return boost::gregorian::from_simple_string(s);
-        }
-        void assign(basic_json<char,Storage>& self, boost::gregorian::date val)
-        {
-            std::string s(to_iso_extended_string(val));
-            self = s;
-        }
-    };
-};
 
 BOOST_AUTO_TEST_CASE(test_add_extensibility)
 {
