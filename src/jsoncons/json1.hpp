@@ -925,37 +925,37 @@ public:
     static basic_json parse_file(const std::string& s);
 
     template<int size>
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
+    static typename std::enable_if<size==1,basic_json>::type make_array()
     {
         return build_array<Char,Storage,size>()();
     }
     template<size_t size>
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
+    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
     {
         return build_array<Char,Storage,size>()(n);
     }
     template<size_t size,typename T>
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
+    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n, T val)
     {
         return build_array<Char,Storage,size>()(n, val);
     }
     template<size_t size>
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
+    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n)
     {
         return build_array<Char,Storage,size>()(m, n);
     }
     template<size_t size,typename T>
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
+    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n, T val)
     {
         return build_array<Char,Storage,size>()(m, n, val);
     }
     template<size_t size>
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
+    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k)
     {
         return build_array<Char,Storage,size>()(m, n, k);
     }
     template<size_t size,typename T>
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
+    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k, T val)
     {
         return build_array<Char,Storage,size>()(m, n, k, val);
     }
@@ -964,7 +964,7 @@ public:
 
     basic_json(const basic_json& val);
 
-    basic_json(jsoncons::null_type);
+    explicit basic_json(jsoncons::null_type);
 
     explicit basic_json(Char c);
 
@@ -1320,6 +1320,42 @@ public:
 
     template <typename T>
     static basic_json make_3d_array(size_t m, size_t n, size_t k, T val);
+
+    template<int size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
+    {
+        return build_array<Char,Storage,size>()();
+    }
+    template<size_t size>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
+    {
+        return build_array<Char,Storage,size>()(n);
+    }
+    template<size_t size,typename T>
+    static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
+    {
+        return build_array<Char,Storage,size>()(n, val);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
+    {
+        return build_array<Char,Storage,size>()(m, n);
+    }
+    template<size_t size,typename T>
+    static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
+    {
+        return build_array<Char,Storage,size>()(m, n, val);
+    }
+    template<size_t size>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
+    {
+        return build_array<Char,Storage,size>()(m, n, k);
+    }
+    template<size_t size,typename T>
+    static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
+    {
+        return build_array<Char,Storage,size>()(m, n, k, val);
+    }
 
     bool is_number() const
     {

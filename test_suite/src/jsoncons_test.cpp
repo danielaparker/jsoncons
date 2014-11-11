@@ -41,17 +41,17 @@ BOOST_AUTO_TEST_CASE(test_assignment)
 {
     json root;
 
-    root["double_1"] = json(10.0);
+    root["double_1"] = 10.0;
 
     json double_1 = root["double_1"];
 
     BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
     root["myobject"] = json();
-    root["myobject"]["double_2"] = json(7.0);
-    root["myobject"]["bool_2"] = json(true);
-    root["myobject"]["int_2"] = json(0LL);
-    root["myobject"]["string_2"] = json("my string");
+    root["myobject"]["double_2"] = 7.0;
+    root["myobject"]["bool_2"] = true;
+    root["myobject"]["int_2"] = 0LL;
+    root["myobject"]["string_2"] = "my string";
     root["myarray"] = json::an_array;
 
     json double_2 = root["myobject"]["double_2"];
@@ -81,17 +81,17 @@ BOOST_AUTO_TEST_CASE(test_array)
 
     std::vector<json> addresses;
     json address1;
-    address1["city"] = json("San Francisco");
-    address1["state"] = json("CA");
-    address1["zip"] = json("94107");
-    address1["country"] = json("USA");
+    address1["city"] = "San Francisco";
+    address1["state"] = "CA";
+    address1["zip"] = "94107";
+    address1["country"] = "USA";
     addresses.push_back(address1);
 
     json address2;
-    address2["city"] = json("Sunnyvale");
-    address2["state"] = json("CA");
-    address2["zip"] = json("94085");
-    address2["country"] = json("USA");
+    address2["city"] = "Sunnyvale";
+    address2["state"] = "CA";
+    address2["zip"] = "94085";
+    address2["country"] = "USA";
     addresses.push_back(address2);
 
     root["addresses"] = json(addresses.begin(), addresses.end());
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(example)
 
 BOOST_AUTO_TEST_CASE(test_null)
 {
-    json nullval = jsoncons::null_type();
+    json nullval = json::null;
     BOOST_CHECK(nullval.is_null());
     BOOST_CHECK(nullval.is<json::null_type>());
 
