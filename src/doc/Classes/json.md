@@ -55,6 +55,12 @@ Opens a binary input stream to a JSON unicode file, parsing the file assuming UT
     static json parse_string(const std::string& s)
 Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception).
 
+    static json make_array()
+    static json make_array(size_t n)
+    template<typename T> 
+    static json make_array(size_t n, T val)
+Makes an empty array, an n-dimensional array of empty `json` objects, or an n-dimensional array of 'json' objects initialized to `val`.
+
     template <size_t N>
     static json make_array(size1 ... sizeN)
 
@@ -350,13 +356,6 @@ Use `to_string(format)`.
     template <size_t N,typename T>
     static json make_multi_array(size1 ... sizeN, T val)
     Use `json make_array<N>(size1 ... sizeN, T val)` instead
-
-    static json make_array()
-    static json make_array(size_t n)
-    template<typename T> 
-    static json make_array(size_t n, T val)
-Makes an empty array, an array of n elements, each element an empty json object, or an array of n elements, each element a copy of `val`.
-Use `json val(json::an_array)` or `json::make_array<1>(...)` instead (but `make_array` will continue to work)
 
     static json make_2d_array(size_t m, size_t n)
 Use `make_array<2>(m,n)` instead

@@ -11,11 +11,23 @@ The code repository is on [github](https://github.com/danielaparker/jsoncons), r
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-Current
-------------
+0.94 RC
+-------
 
-- Incorporates contributions from Cory Fields for silencing compiler warnings
+Bug fixes
 
+- Incorporates contributions from Cory Fields for silencing some compiler warnings
+- Fixes bug reported by Vitaliy Gusev in json object operator[size_t]
+
+Changes
+
+- json constructors that take string, double etc. are now declared explicit.
+- `make_multi_array` renamed to `make_array` (old name is still supported)
+
+Enhancements 
+
+- json get method with default value now accepts extended types as defaults
+- json make_array method with default value now accepts extended types as defaults
 
 0.93 Release
 ------------
