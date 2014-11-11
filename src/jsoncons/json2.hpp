@@ -1592,8 +1592,8 @@ public:
     }
 };
 
-                    template<typename Char, typename Storage>
-                    class value_adapter<Char, Storage, basic_json<Char, Storage>>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, basic_json<Char, Storage>>
 {
 public:
     bool is(const basic_json<Char, Storage>&) const
@@ -1610,8 +1610,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, const Char *>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, const Char *>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1629,8 +1629,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, typename basic_json<Char, Storage>::object>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, typename basic_json<Char, Storage>::object>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1643,8 +1643,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, typename basic_json<Char, Storage>::array>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, typename basic_json<Char, Storage>::array>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1657,8 +1657,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, jsoncons::null_type>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, jsoncons::null_type>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1676,8 +1676,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, bool>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, bool>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1694,8 +1694,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, int>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, int>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1723,8 +1723,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, unsigned int>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, unsigned int>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1752,8 +1752,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, short>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, short>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1781,8 +1781,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, unsigned short>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, unsigned short>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1810,8 +1810,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, long>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, long>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1839,8 +1839,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, unsigned long>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, unsigned long>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1868,8 +1868,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, Char>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, Char>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1888,8 +1888,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, double>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, double>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1907,8 +1907,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, long long>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, long long>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1936,8 +1936,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage>
-                                        class value_adapter<Char, Storage, unsigned long long>
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, unsigned long long>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1965,8 +1965,8 @@ public:
     }
 };
 
-                                        template<typename Char, typename Storage, typename T>
-                                        class value_adapter<Char, Storage, std::vector<T>>
+template<typename Char, typename Storage, typename T>
+class value_adapter<Char, Storage, std::vector<T>>
 {
 public:
     bool is(const basic_json<Char, Storage>& val) const
@@ -1996,8 +1996,8 @@ public:
     }
 };
 
-                                                            template<typename Char, typename Storage>
-                                                            class basic_json<Char, Storage>::object : public basic_json<Char, Storage>
+template<typename Char, typename Storage>
+class basic_json<Char, Storage>::object : public basic_json<Char, Storage>
 {
 public:
     object(json_object<Char, Storage> *impl)
@@ -2006,8 +2006,8 @@ public:
     }
 };
 
-                                                            template<typename Char, typename Storage>
-                                                            class basic_json<Char, Storage>::array : public basic_json<Char, Storage>
+template<typename Char, typename Storage>
+class basic_json<Char, Storage>::array : public basic_json<Char, Storage>
 {
 public:
     array(json_array<Char, Storage> *impl)
