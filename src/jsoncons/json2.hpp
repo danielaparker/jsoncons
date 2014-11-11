@@ -39,12 +39,6 @@ basic_json<Char, Storage>::basic_json()
 }
 
 template<typename Char, typename Storage>
-basic_json<Char, Storage>::basic_json(jsoncons::null_type)
-{
-    type_ = null_t;
-}
-
-template<typename Char, typename Storage>
 template<class InputIterator>
 basic_json<Char, Storage>::basic_json(InputIterator first, InputIterator last)
 {
@@ -104,6 +98,12 @@ basic_json<Char, Storage>::basic_json(basic_custom_data<Char> *var)
 {
     type_ = custom_t;
     value_.userdata_ = var;
+}
+
+template<typename Char, typename Storage>
+basic_json<Char, Storage>::basic_json(jsoncons::null_type)
+{
+    type_ = null_t;
 }
 
 template<typename Char, typename Storage>

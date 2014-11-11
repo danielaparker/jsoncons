@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( test1 )
     BOOST_CHECK(root.is_object());
     BOOST_CHECK(root.is<json::object>());
 
-    root["double_1"] = json(10.0);
+    root["double_1"] = 10.0;
 
     json double_1 = root["double_1"];
 
@@ -67,6 +67,6 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     BOOST_CHECK_CLOSE(double_1.as<double>(), 10.0, 0.000001);
 
-    json copy = root;
+    json copy(root);
 }
 

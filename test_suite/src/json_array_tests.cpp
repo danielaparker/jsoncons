@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_array_remove_range)
     arr.remove_range(1,3);
 
     BOOST_CHECK(arr.size() == 1);
-    BOOST_CHECK(arr[0] == json(std::string("Montreal")));
+    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
 }
 
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 
 BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
-    json a = json::make_multi_array<1>(10,0);
+    json a = json::make_array<1>(10,0);
     BOOST_CHECK(a.size() == 10);
     BOOST_CHECK(a[0].as_longlong() == 0);
     a[1] = 1;
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
 
 BOOST_AUTO_TEST_CASE(test_two_dim_array)
 {
-    json a = json::make_multi_array<2>(3,4,0);
+    json a = json::make_array<2>(3,4,0);
     BOOST_CHECK(a.size() == 3);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
 
 BOOST_AUTO_TEST_CASE(test_three_dim_array)
 {
-    json a = json::make_multi_array<3>(4,3,2,0);
+    json a = json::make_array<3>(4,3,2,0);
     BOOST_CHECK(a.size() == 4);
     a[0][2][0] = 2;
     a[0][2][1] = 3;
@@ -153,9 +153,9 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     val = vec;
 
     BOOST_CHECK(val.size() == 3);
-    BOOST_CHECK_EQUAL(val[0], json(std::string("Toronto")));
-    BOOST_CHECK_EQUAL(val[1], json(std::string("Vancouver")));
-    BOOST_CHECK_EQUAL(val[2], json(std::string("Montreal")));
+    BOOST_CHECK_EQUAL(val[0].as<std::string>(), std::string("Toronto"));
+    BOOST_CHECK_EQUAL(val[1].as<std::string>(), std::string("Vancouver"));
+    BOOST_CHECK_EQUAL(val[2].as<std::string>(), std::string("Montreal"));
 
 }
 

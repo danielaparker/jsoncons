@@ -55,11 +55,11 @@ Opens a binary input stream to a JSON unicode file, parsing the file assuming UT
     static json parse_string(const std::string& s)
 Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception).
 
-    template <typename N>
-    static json make_multi_array(size1 ... sizeN)
+    template <size_t N>
+    static json make_array(size1 ... sizeN)
 
-    template <typename N>
-    static json make_multi_array(size1 ... sizeN, const json& val)
+    template <size_t N,typename T>
+    static json make_array(size1 ... sizeN, const T val)
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors
@@ -73,43 +73,43 @@ Constructs a copy of val
     json(json&& val)
 Acquires the contents of val, leaving val a `null` value
 
-    json(double val)
-Constructs a `double` value
-
-    json(int val)
-Constructs a `integer` value
-
-    json(unsigned int val)
-Constructs a `unsigned integer` value
-
-    json(long val)
-Constructs a `integer` value
-
-    json(unsigned long val)
-Constructs a `unsigned integer` value
-
-    json(long long val)
-Constructs a `integer` value
-
-    json(unsigned long long val)
-Constructs a `unsigned integer` value
-
-    json(const std::string& val)
-Constructs a `string` value
-
-    json(char val)
-Constructs a `string` value that has one character
-
-    json(bool val)
-Constructs a `true` or `false` value
-
-    json(null_type)
-Constructs a `null` value
-
     template <class InputIterator>
     json(InputIterator first, InputIterator last)
 
 Constructs a json array with the elements in the range [first,last).
+
+    explicit json(null_type)
+Constructs a `null` value
+
+    explicit json(double val)
+Constructs a `double` value
+
+    explicit json(int val)
+Constructs a `integer` value
+
+    explicit json(unsigned int val)
+Constructs a `unsigned integer` value
+
+    explicit json(long val)
+Constructs a `integer` value
+
+    explicit json(unsigned long val)
+Constructs a `unsigned integer` value
+
+    explicit json(long long val)
+Constructs a `integer` value
+
+    explicit json(unsigned long long val)
+Constructs a `unsigned integer` value
+
+    explicit json(const std::string& val)
+Constructs a `string` value
+
+    explicit json(char val)
+Constructs a `string` value that has one character
+
+    explicit json(bool val)
+Constructs a `true` or `false` value
 
 ### Destructor
 
@@ -225,7 +225,8 @@ Returns a reference to the element at position `i` in a json array.  These have 
     const json& get(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to `json::null`.
 
-    const json get(const std::string& name, const json& default_val) const
+    template <typename T>
+    const json get(const std::string& name, T default_val) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
 
     template <typename T>
@@ -342,23 +343,34 @@ typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::n
     std::string as_string(const output_format& format) const
 Use `to_string(format)`.
 
+    template <size_t N>
+    static json make_multi_array(size1 ... sizeN)
+    Use `json make_array<N>(size1 ... sizeN)` instead
+
+    template <size_t N,typename T>
+    static json make_multi_array(size1 ... sizeN, T val)
+    Use `json make_array<N>(size1 ... sizeN, T val)` instead
+
     static json make_array()
     static json make_array(size_t n)
-    static json make_array(size_t n, const json& val)
+    template<typename T> 
+    static json make_array(size_t n, T val)
 Makes an empty array, an array of n elements, each element an empty json object, or an array of n elements, each element a copy of `val`.
-Use `json val(json::an_array)` or `json::make_multi_array<1>(...)` instead (but `make_array` will continue to work)
+Use `json val(json::an_array)` or `json::make_array<1>(...)` instead (but `make_array` will continue to work)
 
     static json make_2d_array(size_t m, size_t n)
-Use `make_multi_array<2>(m,n)` instead
+Use `make_array<2>(m,n)` instead
 
-    static json make_2d_array(size_t m, size_t n, const json& val)
-Use `make_multi_array<2>(m,n,val)` instead
+    template<typename T> 
+    static json make_2d_array(size_t m, size_t n, T val)
+Use `make_array<2>(m,n,val)` instead
 
     static json make_3d_array(size_t m, size_t n, size_t k)
-Use `make_multi_array<3>(m,n,k)` instead
+Use `make_array<3>(m,n,k)` instead
 
-    static json make_3d_array(size_t m, size_t n, size_t k, const json& val)
-Use `make_multi_array<3>(m,n,k,val)` instead
+    template <typename T>
+    static json make_3d_array(size_t m, size_t n, size_t k, T val)
+Use `make_array<3>(m,n,k,val)` instead
 
     template <class T>
     std::vector<T> as_vector() const

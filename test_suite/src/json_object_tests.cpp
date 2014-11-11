@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_empty_object_assignment)
     BOOST_CHECK(a.is_object());
     BOOST_CHECK(a.is<json::object>());
 
-    json b = json::make_multi_array<1>(10);
+    json b = json::make_array<1>(10);
     BOOST_CHECK(b.size() == 10);
     BOOST_CHECK(b.is_array());
     BOOST_CHECK(b.is<json::array>());
