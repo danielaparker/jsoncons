@@ -14,7 +14,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 0.94 RC
 -------
 
-Bug fixes
+Bug fixes 
 
 - Incorporates contributions from Cory Fields for silencing some compiler warnings
 - Fixes bug reported by Vitaliy Gusev in json object operator[size_t]
