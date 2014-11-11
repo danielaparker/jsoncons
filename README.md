@@ -21,7 +21,7 @@ Bug fixes
 
 Changes
 
-- json constructors that take string, double etc. are now declared explicit.
+- json constructors that take string, double etc. are now declared explicit (assignments and defaults to `get` and `make_array` methods have their own implementation and do not depend on implicit constructors.)
 - `make_multi_array` renamed to `make_array` (old name is still supported)
 
 Enhancements 
