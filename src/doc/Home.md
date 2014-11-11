@@ -12,20 +12,20 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 ### Features
 
-* Uses the standard C++ input/output streams library
-* Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
-* Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
-* Correctly handles surrogate pairs in \uXXXX escape sequences
-* Supports event based JSON parsing and serializing with user defined input and output handlers
-* Guarantees basic exception safety (no leaks)
-* Accepts and ignores single line comments that start with <code>//</code>, and multi line comments that start with <code>/*</code> and end with <code>*/</code>
-* Supports optional escaping of the solidus (<code>/</code>) character
-* Supports <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement
-* Supports reading multiple json objects from a stream
-* Supports optional escaping of non-ascii UTF-8 octets
-* Allows extensions to the types accepted by the <code>json</code> class accessors and modifiers
-* Supports storing custom data types in a json object, with specialized serialization
-* Supports reading (writing) JSON values from (to) CSV files
+- Uses the standard C++ input/output streams library
+- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
+- Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
+- Correctly handles surrogate pairs in \uXXXX escape sequences
+- Supports event based JSON parsing and serializing with user defined input and output handlers
+- Guarantees basic exception safety (no leaks)
+- Accepts and ignores single line comments that start with <code>//</code>, and multi line comments that start with <code>/*</code> and end with <code>*/</code>
+- Supports optional escaping of the solidus (<code>/</code>) character
+- Supports <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement
+- Supports reading multiple json objects from a stream
+- Supports optional escaping of non-ascii UTF-8 octets
+- Allows extensions to the types accepted by the <code>json</code> class accessors and modifiers
+- Supports storing custom data types in a json object, with specialized serialization
+- Supports reading (writing) JSON values from (to) CSV files
 
 ### Roadmap
 
