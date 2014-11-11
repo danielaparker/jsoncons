@@ -137,6 +137,8 @@ BOOST_AUTO_TEST_CASE(test_get)
 
     BOOST_CHECK(s1 == std::string("value1"));
     BOOST_CHECK(s1a == std::string("value1"));
+
+    std::cout << "s2=" << s2 << std::endl;
     BOOST_CHECK_EQUAL(s2, std::string("null"));
 }
 

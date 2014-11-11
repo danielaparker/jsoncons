@@ -424,7 +424,8 @@ public:
             return val_.get(name);
         }
 
-        const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char,Storage>& default_val) const
+        template <typename T>
+        const_val_proxy get(const std::basic_string<Char>& name, T default_val) const
         {
             return val_.get(name,default_val);
         }
@@ -469,6 +470,13 @@ public:
         {
         }
 
+        template <typename T>
+        const_val_proxy(T val)
+            : val2_(val), val_(val2_)
+        {
+        }
+
+        basic_json<Char,Storage> val2_;
         const basic_json<Char,Storage>& val_;
     };
 
@@ -768,7 +776,8 @@ public:
             return val_.at(name_).get(name);
         }
 
-        const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char,Storage>& default_val) const
+        template <typename T>
+        const_val_proxy get(const std::basic_string<Char>& name, T default_val) const
         {
             return val_.at(name_).get(name,default_val);
         }
@@ -957,27 +966,27 @@ public:
 
     basic_json(jsoncons::null_type);
 
-    basic_json(Char c);
+    explicit basic_json(Char c);
 
-    basic_json(double val);
+    explicit basic_json(double val);
 
-    basic_json(int val);
+    explicit basic_json(int val);
 
-    basic_json(unsigned int val);
+    explicit basic_json(unsigned int val);
 
-    basic_json(long val);
+    explicit basic_json(long val);
 
-    basic_json(unsigned long val);
+    explicit basic_json(unsigned long val);
 
-    basic_json(long long val);
+    explicit basic_json(long long val);
 
-    basic_json(unsigned long long val);
+    explicit basic_json(unsigned long long val);
 
-    basic_json(const Char* val);
+    explicit basic_json(const Char* val);
 
-    basic_json(const std::basic_string<Char>& val);
+    explicit basic_json(const std::basic_string<Char>& val);
 
-    basic_json(bool val);
+    explicit basic_json(bool val);
 
     template <class InputIterator>
     basic_json(InputIterator name, InputIterator last);
@@ -1155,7 +1164,8 @@ public:
 
     const basic_json<Char,Storage>& get(const std::basic_string<Char>& name) const;
 
-    const_val_proxy get(const std::basic_string<Char>& name, const basic_json<Char,Storage>& default_val) const;
+    template <typename T>
+    const_val_proxy get(const std::basic_string<Char>& name, T default_val) const;
 
     // Modifiers
 

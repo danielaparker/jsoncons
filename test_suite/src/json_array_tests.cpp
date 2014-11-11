@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_array_remove_range)
     arr.remove_range(1,3);
 
     BOOST_CHECK(arr.size() == 1);
-    BOOST_CHECK(arr[0] == std::string("Montreal"));
+    BOOST_CHECK(arr[0] == json(std::string("Montreal")));
 }
 
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
@@ -153,9 +153,9 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     val = vec;
 
     BOOST_CHECK(val.size() == 3);
-    BOOST_CHECK_EQUAL(val[0], std::string("Toronto"));
-    BOOST_CHECK_EQUAL(val[1], std::string("Vancouver"));
-    BOOST_CHECK_EQUAL(val[2], std::string("Montreal"));
+    BOOST_CHECK_EQUAL(val[0], json(std::string("Toronto")));
+    BOOST_CHECK_EQUAL(val[1], json(std::string("Vancouver")));
+    BOOST_CHECK_EQUAL(val[2], json(std::string("Montreal")));
 
 }
 
