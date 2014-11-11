@@ -924,11 +924,30 @@ public:
 
     static basic_json parse_file(const std::string& s);
 
+    static basic_json make_array()
+    {
+        return basic_json<Char, Storage>(new json_array<Char, Storage>());
+    }
+
+    static basic_json make_array(size_t n)
+    {
+        return basic_json<Char, Storage>(new json_array<Char, Storage>(n));
+    }
+
+    template <typename T>
+    static basic_json make_array(size_t n, T val)
+    {
+        basic_json<Char, Storage> v;
+        v = val;
+        return basic_json<Char, Storage>(new json_array<Char, Storage>(n, v));
+    }
+
     template<int size>
     static typename std::enable_if<size==1,basic_json>::type make_array()
     {
         return build_array<Char,Storage,size>()();
     }
+
     template<size_t size>
     static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
     {
@@ -1305,11 +1324,6 @@ public:
     void assign_null();
 
 //  Deprecated
-
-    static basic_json make_array();
-    static basic_json make_array(size_t n);
-    template <typename T>
-    static basic_json make_array(size_t n, T val);
 
     static basic_json make_2d_array(size_t m, size_t n);
 

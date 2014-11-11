@@ -29,6 +29,17 @@ BOOST_AUTO_TEST_CASE(test_array_constructor)
 
 }
 
+BOOST_AUTO_TEST_CASE(test_make_array)
+{
+    json arr = json::make_array();
+    BOOST_CHECK(arr.size() == 0);
+    arr.resize_array(10,10.0);
+    BOOST_CHECK(arr.is_array());
+    BOOST_CHECK(arr.size() == 10);
+    BOOST_CHECK_CLOSE(arr[0].as<double>(), 10.0, 0.0000001);
+
+}
+
 BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 {
     json arr(json::an_array);

@@ -888,7 +888,8 @@ const basic_json<Char, Storage> basic_json<Char, Storage>::an_array(new json_arr
 template<typename Char, typename Storage>
 const basic_json<Char, Storage> basic_json<Char, Storage>::null = basic_json<Char, Storage>(jsoncons::null_type());
 
-template<typename Char, typename Storage>
+
+/*template<typename Char, typename Storage>
 basic_json<Char, Storage> basic_json<Char, Storage>::make_array()
 {
     return basic_json<Char, Storage>(new json_array<Char, Storage>());
@@ -907,7 +908,7 @@ basic_json<Char, Storage> basic_json<Char, Storage>::make_array(size_t n, T val)
     basic_json<Char, Storage> v;
     v = val;
     return basic_json<Char, Storage>(new json_array<Char, Storage>(n, v));
-}
+}*/
 
 template<typename Char, typename Storage>
 basic_json<Char, Storage> basic_json<Char, Storage>::make_2d_array(size_t m, size_t n)
