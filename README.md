@@ -30,11 +30,10 @@ Enhancements
 - json make_array method with default value now accepts extended types as defaults
 
 New extensions
---------------
 
-- Added jsoncons_ext/boost/type_extensions.hpp to collect 
+- Added `jsoncons_ext/boost/type_extensions.hpp` to collect 
   extensions traits for boost types, in particular, for
-  boost::gregorian::date.
+  `boost::gregorian` dates.
 
 0.93 Release
 ------------
