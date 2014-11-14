@@ -10,8 +10,8 @@ using jsoncons::basic_json;
 using jsoncons::pretty_print;
 using std::string;
 
-using jsoncons::basic_custom_data;
-using jsoncons::custom_data_wrapper;
+using jsoncons::json_any_impl;
+using jsoncons::typed_json_any;
 
 void put_custom_data_in_object()
 {

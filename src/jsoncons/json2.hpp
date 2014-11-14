@@ -18,11 +18,11 @@
 #include <fstream>
 #include <limits>
 #include "jsoncons/json1.hpp"
+#include "jsoncons/json_type_traits.hpp"
 #include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json_deserializer.hpp"
 #include "jsoncons/json_serializer.hpp"
-
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -70,7 +70,7 @@ basic_json<Char, Storage>::basic_json(const basic_json<Char, Storage>& val)
     case object_t:
         value_.object_ = val.value_.object_->clone();
         break;
-    case custom_t:
+    case json_any_t:
         value_.userdata_ = val.value_.userdata_->clone();
         break;
     default:
@@ -94,9 +94,9 @@ basic_json<Char, Storage>::basic_json(json_array<Char, Storage> *var)
 }
 
 template<typename Char, typename Storage>
-basic_json<Char, Storage>::basic_json(basic_custom_data<Char> *var)
+basic_json<Char, Storage>::basic_json(json_any_impl<Char> *var)
 {
-    type_ = custom_t;
+    type_ = json_any_t;
     value_.userdata_ = var;
 }
 
@@ -207,7 +207,7 @@ basic_json<Char, Storage>::basic_json(value_type t)
         value_.object_ = new json_object<Char, Storage>();
         break;
 
-    case custom_t:
+    case json_any_t:
         JSONCONS_ASSERT(false);
     }
 }
@@ -233,7 +233,7 @@ basic_json<Char, Storage>::~basic_json()
     case object_t:
         delete value_.object_;
         break;
-    case custom_t:
+    case json_any_t:
         delete value_.userdata_;
         break;
     }
@@ -428,7 +428,7 @@ bool basic_json<Char, Storage>::operator==(const basic_json<Char, Storage>& rhs)
     case object_t:
         return *(value_.object_) == *(rhs.value_.object_);
         break;
-    case custom_t:
+    case json_any_t:
         break;
     default:
         // throw
@@ -626,7 +626,7 @@ void basic_json<Char, Storage>::set_custom_data(const std::basic_string<Char>& n
         type_ = object_t;
         value_.object_ = new json_object<Char, Storage>();
     case object_t:
-        value_.object_->set(name, basic_json<Char, Storage>(new custom_data_wrapper<Char, T>(value)));
+        value_.object_->set(name, basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
         break;
     default:
         {
@@ -715,7 +715,7 @@ void basic_json<Char, Storage>::add_custom_data(const T& value)
     {
     case array_t:
         {
-            add(basic_json<Char, Storage>(new custom_data_wrapper<Char, T>(value)));
+            add(basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
         }
         break;
     default:
@@ -732,7 +732,7 @@ void basic_json<Char, Storage>::add_custom_data(size_t index, const T& value)
     switch (type_)
     {
     case array_t:
-        value_.array_->add(index, basic_json<Char, Storage>(new custom_data_wrapper<Char, T>(value)));
+        value_.array_->add(index, basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
         break;
     default:
         {
@@ -849,7 +849,7 @@ void basic_json<Char, Storage>::to_stream(basic_json_output_handler<Char>& handl
             handler.end_array();
         }
         break;
-    case custom_t:
+    case json_any_t:
         value_.userdata_->to_stream(handler);
         break;
     default:
@@ -1340,8 +1340,8 @@ const T& basic_json<Char, Storage>::custom_data() const
 {
     switch (type_)
     {
-    case custom_t:
-        return static_cast<const custom_data_wrapper<Char, T> *>(value_.userdata_)->data1_;
+    case json_any_t:
+        return static_cast<const typed_json_any<Char, T> *>(value_.userdata_)->data1_;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1353,9 +1353,9 @@ T& basic_json<Char, Storage>::custom_data()
 {
     switch (type_)
     {
-    case custom_t:
+    case json_any_t:
         {
-            custom_data_wrapper<Char, T> *p = static_cast<custom_data_wrapper<Char, T> *>(value_.userdata_);
+            typed_json_any<Char, T> *p = static_cast<typed_json_any<Char, T> *>(value_.userdata_);
             return p->data1_;
         }
     default:
@@ -1573,428 +1573,6 @@ void escape_string(const std::basic_string<Char>& s,
         }
     }
 }
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, std::basic_string<Char>>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_string();
-    }
-    std::basic_string<Char> as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_string();
-    }
-    void assign(basic_json<Char, Storage>& self, const std::basic_string<Char>& val)
-    {
-        self.assign_string(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, basic_json<Char, Storage>>
-{
-public:
-    bool is(const basic_json<Char, Storage>&) const
-    {
-        return true;
-    }
-    std::basic_string<Char> as(const basic_json<Char, Storage>& val) const
-    {
-        return val;
-    }
-    void assign(basic_json<Char, Storage>& self, basic_json<Char, Storage> val)
-    {
-        val.swap(self);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, const Char *>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_string();
-    }
-    const Char* as(const basic_json<Char, Storage>& val) const
-    {
-        JSONCONS_ASSERT(val.is_string());
-        return val.value_.value_string_.c_str();
-    }
-    void assign(basic_json<Char, Storage>& self, const Char *val)
-    {
-        self.assign_string(std::basic_string<Char>(val));
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, typename basic_json<Char, Storage>::object>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_object();
-    }
-    typename basic_json<Char, Storage>::object as(const basic_json<Char, Storage>& val) const
-    {
-        return val;
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, typename basic_json<Char, Storage>::array>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_array();
-    }
-    typename basic_json<Char, Storage>::array as(const basic_json<Char, Storage>& val) const
-    {
-        return val;
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, jsoncons::null_type>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_null();
-    }
-    typename jsoncons::null_type as(const basic_json<Char, Storage>& val) const
-    {
-        JSONCONS_ASSERT(val.is_null());
-        return jsoncons::null_type();
-    }
-    void assign(basic_json<Char, Storage>& self, null_type)
-    {
-        self.assign_null();
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, bool>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_bool();
-    }
-    bool as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_bool();
-    }
-    void assign(basic_json<Char, Storage>& self, bool val)
-    {
-        self.assign_bool(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, int>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    int as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_int();
-    }
-    void assign(basic_json<Char, Storage>& self, int val)
-    {
-        self.assign_longlong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, unsigned int>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned int as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_uint();
-    }
-    void assign(basic_json<Char, Storage>& self, unsigned int val)
-    {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, short>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    short as(const basic_json<Char, Storage>& val) const
-    {
-        return (short)val.as_int();
-    }
-    void assign(basic_json<Char, Storage>& self, short val)
-    {
-        self.assign_longlong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, unsigned short>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned short as(const basic_json<Char, Storage>& val) const
-    {
-        return (unsigned short)val.as_uint();
-    }
-    void assign(basic_json<Char, Storage>& self, unsigned short val)
-    {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, long>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    long as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_long();
-    }
-    void assign(basic_json<Char, Storage>& self, long val)
-    {
-        self.assign_longlong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, unsigned long>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= 0 && val.as_longlong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned long as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_ulong();
-    }
-    void assign(basic_json<Char, Storage>& self, unsigned long val)
-    {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, Char>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_string() && val.as_string().size() == 1;
-    }
-    char as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_char();
-    }
-    void assign(basic_json<Char, Storage>& self, Char ch)
-    {
-        std::basic_string<Char> s;
-        s.push_back(ch);
-        self.assign_string(s);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, double>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        return val.is_double();
-    }
-
-    double as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_double();
-    }
-    void assign(basic_json<Char, Storage>& self, double val)
-    {
-        self.assign_double(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, long long>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return true;
-        }
-        else if (val.is_ulonglong())
-        {
-            return val.as_ulonglong() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    long long as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_longlong();
-    }
-    void assign(basic_json<Char, Storage>& self, long long val)
-    {
-        self.assign_longlong(val);
-    }
-};
-
-template<typename Char, typename Storage>
-class value_adapter<Char, Storage, unsigned long long>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        if (val.is_longlong())
-        {
-            return val.as_longlong() >= 0;
-        }
-        else if (val.is_ulonglong())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned long long as(const basic_json<Char, Storage>& val) const
-    {
-        return val.as_ulonglong();
-    }
-    void assign(basic_json<Char, Storage>& self, unsigned long long val)
-    {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Storage, typename T>
-class value_adapter<Char, Storage, std::vector<T>>
-{
-public:
-    bool is(const basic_json<Char, Storage>& val) const
-    {
-        bool result = val.is_array();
-        for (size_t i = 0; result && i < val.size(); ++i)
-        {
-            if (!val[i].template is<T>())
-            {
-                result = false;
-            }
-        }
-        return result;
-    }
-    std::vector<T> as(const basic_json<Char, Storage>& val) const
-    {
-        std::vector<T> v(val.size());
-        for (size_t i = 0; i < v.size(); ++i)
-        {
-            v[i] = val[i].template as<T>();
-        }
-        return v;
-    }
-    void assign(basic_json<Char, Storage>& self, const std::vector<T>& val)
-    {
-        self = basic_json<Char, Storage>(val.begin(), val.end());
-    }
-};
 
 template<typename Char, typename Storage>
 class basic_json<Char, Storage>::object : public basic_json<Char, Storage>
