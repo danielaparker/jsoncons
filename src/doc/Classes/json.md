@@ -18,7 +18,7 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
     array
 
-    custom_type
+    json_any_type
 Type tags that can be used with `is<T>` and `as<T>`
 
     object_iterator
@@ -181,7 +181,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 `is<null_type>` returns `true` if the json value is null, `false` otherwise.  
 `is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
 `is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
-`is<json::custom_type>` returns `true` if the json value is a custom type, `false` otherwise.
+`is<json::json_any_type>` returns `true` if the json value is a custom type, `false` otherwise.
 `is<json::std::vector<T>>` returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
 
     bool is_null() const

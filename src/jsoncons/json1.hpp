@@ -33,31 +33,31 @@ void serialize(basic_json_output_handler<Char>& os, const T&)
 }
 
 template <typename Char>
-class basic_custom_data
+class json_any_impl
 {
 public:
-    virtual ~basic_custom_data()
+    virtual ~json_any_impl()
     {
     }
 
     virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
 
-    virtual basic_custom_data<Char>* clone() const = 0;
+    virtual json_any_impl<Char>* clone() const = 0;
 };
 
 template <typename Char, class T>
-class custom_data_wrapper : public basic_custom_data<Char>
+class typed_json_any : public json_any_impl<Char>
 {
 public:
-    typedef custom_data_wrapper<Char,T>* Ptr;
+    typedef typed_json_any<Char,T>* Ptr;
 
-    custom_data_wrapper(const T& value)
+    typed_json_any(const T& value)
         : data1_(value)
     {
     }
-    virtual basic_custom_data<Char>* clone() const
+    virtual json_any_impl<Char>* clone() const
     {
-        return new custom_data_wrapper<Char,T>(data1_);
+        return new typed_json_any<Char,T>(data1_);
     }
 
     virtual void to_stream(basic_json_output_handler<Char>& os) const
@@ -66,6 +66,24 @@ public:
     }
 
     T data1_;
+};
+
+template <typename Char>
+class basic_json_any
+{
+public:
+	template <typename T>
+	basic_json_any(const T& val)
+		: value_(nullptr)
+	{
+		holder_ = new typed_json_any<Char,T>(val);
+	}
+	~basic_json_any()
+	{
+		delete holder_;
+	}
+private:
+	json_any_impl<Char>* holder_;
 };
 
 template <typename Char, class Storage>
@@ -109,7 +127,7 @@ public:
         ulonglong_t,
         bool_t,
         null_t,
-        custom_t
+        json_any_t
     };
 };
 
@@ -123,7 +141,7 @@ public:
     typedef jsoncons::null_type null_type;
     class object;
     class array;
-    struct custom_type {};
+    struct json_any_type {};
 
     class member_type
     {
@@ -1014,7 +1032,7 @@ public:
 
     explicit basic_json(json_array<Char,Storage>* var);
 
-    explicit basic_json(basic_custom_data<Char>* var);
+    explicit basic_json(json_any_impl<Char>* var);
 
     ~basic_json();
 
@@ -1124,7 +1142,7 @@ public:
 
     bool is_custom() const
     {
-        return type_ == custom_t;
+        return type_ == json_any_t;
     }
 
     bool is_empty() const;
@@ -1438,7 +1456,7 @@ private:
         json_object<Char,Storage>* object_;
         json_array<Char,Storage>* array_;
         std::basic_string<Char>* value_string_;
-        basic_custom_data<Char>* userdata_;
+        json_any_impl<Char>* userdata_;
     } value_;
 };
 
