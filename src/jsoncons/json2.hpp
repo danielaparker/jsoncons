@@ -171,6 +171,13 @@ basic_json<Char, Storage>::basic_json(Char c)
 }
 
 template<typename Char, typename Storage>
+basic_json<Char, Storage>::basic_json(const typename basic_json<Char,Storage>::any& val)
+{
+    type_ = json_any_t;
+    value_.userdata_ = val.holder_->clone();
+}
+
+template<typename Char, typename Storage>
 basic_json<Char, Storage>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
@@ -238,6 +245,27 @@ basic_json<Char, Storage>::~basic_json()
         break;
     }
 }
+
+template<typename Char, class Storage>
+void basic_json<Char, Storage>::assign_any(const typename basic_json<Char,Storage>::any& rhs)
+{
+    switch (type_)
+    {
+    case null_t:
+    case bool_t:
+    case empty_object_t:
+    case longlong_t:
+    case ulonglong_t:
+    case double_t:
+        type_ = json_any_t;
+        value_.userdata_ = rhs.holder_->clone();
+        break;
+    default:
+        basic_json<Char, Storage>(rhs).swap(*this);
+        break;
+    }
+}
+
 template<typename Char, class Storage>
 void basic_json<Char, Storage>::assign_string(const std::basic_string<Char>& rhs)
 {
@@ -257,6 +285,7 @@ void basic_json<Char, Storage>::assign_string(const std::basic_string<Char>& rhs
         break;
     }
 }
+
 template<typename Char, class Storage>
 void basic_json<Char, Storage>::assign_double(double rhs)
 {
@@ -1341,7 +1370,8 @@ const T& basic_json<Char, Storage>::custom_data() const
     switch (type_)
     {
     case json_any_t:
-        return static_cast<const typed_json_any<Char, T> *>(value_.userdata_)->data1_;
+			const T* p = (const T*)value_.userdata_->data();
+			return *p;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1355,8 +1385,8 @@ T& basic_json<Char, Storage>::custom_data()
     {
     case json_any_t:
         {
-            typed_json_any<Char, T> *p = static_cast<typed_json_any<Char, T> *>(value_.userdata_);
-            return p->data1_;
+			T* p = (T*)value_.userdata_->data();
+			return *p;
         }
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
