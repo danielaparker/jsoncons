@@ -53,13 +53,31 @@ public:
     {
         return true;
     }
-    std::basic_string<Char> as(const basic_json<Char, Storage>& val) const
+    basic_json<Char, Storage> as(const basic_json<Char, Storage>& val) const
     {
         return val;
     }
     void assign(basic_json<Char, Storage>& self, basic_json<Char, Storage> val)
     {
         val.swap(self);
+    }
+};
+
+template<typename Char, typename Storage>
+class value_adapter<Char, Storage, typename basic_json<Char, Storage>::any>
+{
+public:
+    bool is(const basic_json<Char, Storage>&) const
+    {
+        return true;
+    }
+    typename basic_json<Char, Storage>::any as(const basic_json<Char, Storage>& val) const
+    {
+        return val;
+    }
+    void assign(basic_json<Char, Storage>& self, typename basic_json<Char, Storage>::any val)
+    {
+        self.assign_any(val);
     }
 };
 

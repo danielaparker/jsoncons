@@ -40,6 +40,10 @@ public:
     {
     }
 
+    virtual void* data() = 0;
+
+    virtual const void* data() const = 0;
+
     virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
 
     virtual json_any_impl<Char>* clone() const = 0;
@@ -51,10 +55,21 @@ class typed_json_any : public json_any_impl<Char>
 public:
     typedef typed_json_any<Char,T>* Ptr;
 
-    typed_json_any(const T& value)
+    typed_json_any(T value)
         : data1_(value)
     {
     }
+
+    virtual void* data() 
+    {
+        return &data1_;
+    }
+
+    virtual const void* data() const  
+    {
+        return &data1_;
+    }
+
     virtual json_any_impl<Char>* clone() const
     {
         return new typed_json_any<Char,T>(data1_);
@@ -66,24 +81,6 @@ public:
     }
 
     T data1_;
-};
-
-template <typename Char>
-class basic_json_any
-{
-public:
-	template <typename T>
-	basic_json_any(const T& val)
-		: value_(nullptr)
-	{
-		holder_ = new typed_json_any<Char,T>(val);
-	}
-	~basic_json_any()
-	{
-		delete holder_;
-	}
-private:
-	json_any_impl<Char>* holder_;
 };
 
 template <typename Char, class Storage>
@@ -142,6 +139,49 @@ public:
     class object;
     class array;
     struct json_any_type {};
+
+    class any
+    {
+    public:
+        any()
+            : holder_(nullptr)
+        {
+            std::cout << "Check 10a" << std::endl;
+        }
+        any(const any& val)
+            : holder_(nullptr)
+        {
+            std::cout << "Check 10c" << std::endl;
+			holder_ = val.holder_->clone();
+        }
+        any(any&& val)
+            : holder_(val.holder_)
+        {
+            std::cout << "Check 10d" << std::endl;
+            val.holder_ = nullptr;
+        }
+
+        template<typename T>
+        any(T&& val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
+        {
+            std::cout << "Check 10" << std::endl;
+    		holder_ = new typed_json_any<Char,T>(val);
+            std::cout << "Check 20" << std::endl;
+        }
+    	~any()
+    	{
+            std::cout << "Check 30" << std::endl;
+    		delete holder_;
+            std::cout << "Check 40" << std::endl;
+    	}
+        template <typename T>
+        const T& cast() const
+        {
+            return static_cast<const typed_json_any<Char, T>*>(holder_)->data1_;
+        }
+    
+    	json_any_impl<Char>* holder_;
+    };
 
     class member_type
     {
@@ -1001,6 +1041,8 @@ public:
 
     basic_json(const basic_json& val);
 
+    explicit basic_json(const any& val);
+
     explicit basic_json(jsoncons::null_type);
 
     explicit basic_json(Char c);
@@ -1334,6 +1376,7 @@ public:
         a.swap(b);
     }
 
+    void assign_any(const any& rhs);
     void assign_string(const std::basic_string<Char>& rhs);
     void assign_double(double rhs);
     void assign_longlong(long long rhs);
