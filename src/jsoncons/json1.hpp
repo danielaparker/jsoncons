@@ -56,33 +56,31 @@ public:
     typedef typed_json_any<Char,T>* Ptr;
 
     typed_json_any(T value)
-        : data1_(value)
+        : data_(value)
     {
     }
 
     virtual void* data() 
     {
-        return (void*)(&data1_);
-        //return reinterpret_cast<void*>(&data1_);
-        //return const_cast<const void*>(&data1_);
+        return &data_;
     }
 
     virtual const void* data() const  
     {
-        return &data1_;
+        return &data_;
     }
 
     virtual json_any_impl<Char>* clone() const
     {
-        return new typed_json_any<Char,T>(data1_);
+        return new typed_json_any<Char,T>(data_);
     }
 
     virtual void to_stream(basic_json_output_handler<Char>& os) const
     {
-        serialize(os,data1_);
+        serialize(os,data_);
     }
 
-    T data1_;
+    T data_;
 };
 
 template <typename Char, class Storage>
@@ -148,33 +146,26 @@ public:
         any()
             : content_(nullptr)
         {
-            std::cout << "Check 10a" << std::endl;
         }
         any(const any& val)
             : content_(nullptr)
         {
-            std::cout << "Check 10c" << std::endl;
 			content_ = val.content_->clone();
         }
         any(any&& val)
             : content_(val.content_)
         {
-            std::cout << "Check 10d" << std::endl;
             val.content_ = nullptr;
         }
 
         template<typename T>
-        explicit any(T&& val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
+        explicit any(T val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
         {
-            std::cout << "Check 10" << std::endl;
     		content_ = new typed_json_any<Char,T>(val);
-            std::cout << "Check 20" << std::endl;
         }
     	~any()
     	{
-            std::cout << "Check 30" << std::endl;
     		delete content_;
-            std::cout << "Check 40" << std::endl;
     	}
         template <typename T>
         const T& cast() const
@@ -922,19 +913,19 @@ public:
         }
 
         template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, const T& value)
+        void set_custom_data(const std::basic_string<Char>& name, T value)
         {
             val_.at(name_).set_custom_data(name,value);
         }
 
         template <class T>
-        void add_custom_data(const T& value)
+        void add_custom_data(T value)
         {
             val_.at(name_).add_custom_data(value);
         }
 
         template <class T>
-        void add_custom_data(size_t index, const T& value)
+        void add_custom_data(size_t index, T value)
         {
             val_.at(name_).add_custom_data(index, value);
         }
@@ -1344,17 +1335,17 @@ public:
     void add(size_t index, basic_json<Char,Storage>&& value);
 
     template <class T>
-    void set_custom_data(const std::basic_string<Char>& name, const T& value);
+    void set_custom_data(const std::basic_string<Char>& name, T value);
 
     void add(const basic_json<Char,Storage>& value);
 
     void add(size_t index, const basic_json<Char,Storage>& value);
 
     template <class T>
-    void add_custom_data(const T &value);
+    void add_custom_data(T value);
 
     template <class T>
-    void add_custom_data(size_t index, const T& value);
+    void add_custom_data(size_t index, T value);
 
     value_type type() const
     {

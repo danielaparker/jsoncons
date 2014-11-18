@@ -640,7 +640,7 @@ void basic_json<Char, Storage>::set(std::basic_string<Char>&& name, basic_json<C
 
 template<typename Char, typename Storage>
 template<class T>
-void basic_json<Char, Storage>::set_custom_data(const std::basic_string<Char>& name, const T& value)
+void basic_json<Char, Storage>::set_custom_data(const std::basic_string<Char>& name, T value)
 {
     switch (type_)
     {
@@ -731,7 +731,7 @@ void basic_json<Char, Storage>::add(size_t index, const basic_json<Char, Storage
 
 template<typename Char, typename Storage>
 template<class T>
-void basic_json<Char, Storage>::add_custom_data(const T& value)
+void basic_json<Char, Storage>::add_custom_data(T value)
 {
     switch (type_)
     {
@@ -749,7 +749,7 @@ void basic_json<Char, Storage>::add_custom_data(const T& value)
 
 template<typename Char, typename Storage>
 template<class T>
-void basic_json<Char, Storage>::add_custom_data(size_t index, const T& value)
+void basic_json<Char, Storage>::add_custom_data(size_t index, T value)
 {
     switch (type_)
     {
