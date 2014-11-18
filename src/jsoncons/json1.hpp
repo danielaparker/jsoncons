@@ -164,7 +164,7 @@ public:
         }
 
         template<typename T>
-        any(T&& val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
+        explicit any(T&& val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
         {
             std::cout << "Check 10" << std::endl;
     		content_ = new typed_json_any<Char,T>(val);
