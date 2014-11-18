@@ -71,7 +71,7 @@ basic_json<Char, Storage>::basic_json(const basic_json<Char, Storage>& val)
         value_.object_ = val.value_.object_->clone();
         break;
     case json_any_t:
-        value_.userdata_ = val.value_.userdata_->clone();
+        value_.any_value_ = new any(*(val.value_.any_value_));
         break;
     default:
         // throw
@@ -94,10 +94,10 @@ basic_json<Char, Storage>::basic_json(json_array<Char, Storage> *var)
 }
 
 template<typename Char, typename Storage>
-basic_json<Char, Storage>::basic_json(json_any_impl<Char> *var)
+basic_json<Char, Storage>::basic_json(typename basic_json<Char, Storage>::any var)
 {
     type_ = json_any_t;
-    value_.userdata_ = var;
+    value_.any_value_ = new any(var);
 }
 
 template<typename Char, typename Storage>
@@ -171,13 +171,6 @@ basic_json<Char, Storage>::basic_json(Char c)
 }
 
 template<typename Char, typename Storage>
-basic_json<Char, Storage>::basic_json(const typename basic_json<Char,Storage>::any& val)
-{
-    type_ = json_any_t;
-    value_.userdata_ = val.holder_->clone();
-}
-
-template<typename Char, typename Storage>
 basic_json<Char, Storage>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
@@ -241,7 +234,7 @@ basic_json<Char, Storage>::~basic_json()
         delete value_.object_;
         break;
     case json_any_t:
-        delete value_.userdata_;
+        delete value_.any_value_;
         break;
     }
 }
@@ -258,7 +251,7 @@ void basic_json<Char, Storage>::assign_any(const typename basic_json<Char,Storag
     case ulonglong_t:
     case double_t:
         type_ = json_any_t;
-        value_.userdata_ = rhs.holder_->clone();
+        value_.any_value_ = new any(rhs);
         break;
     default:
         basic_json<Char, Storage>(rhs).swap(*this);
@@ -655,7 +648,7 @@ void basic_json<Char, Storage>::set_custom_data(const std::basic_string<Char>& n
         type_ = object_t;
         value_.object_ = new json_object<Char, Storage>();
     case object_t:
-        value_.object_->set(name, basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
+        value_.object_->set(name, basic_json<Char, Storage>(any(value)));
         break;
     default:
         {
@@ -744,7 +737,7 @@ void basic_json<Char, Storage>::add_custom_data(const T& value)
     {
     case array_t:
         {
-            add(basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
+            add(basic_json<Char, Storage>(any(value)));
         }
         break;
     default:
@@ -761,7 +754,7 @@ void basic_json<Char, Storage>::add_custom_data(size_t index, const T& value)
     switch (type_)
     {
     case array_t:
-        value_.array_->add(index, basic_json<Char, Storage>(new typed_json_any<Char, T>(value)));
+        value_.array_->add(index, basic_json<Char, Storage>(any(value)));
         break;
     default:
         {
@@ -879,7 +872,7 @@ void basic_json<Char, Storage>::to_stream(basic_json_output_handler<Char>& handl
         }
         break;
     case json_any_t:
-        value_.userdata_->to_stream(handler);
+        value_.any_value_->to_stream(handler);
         break;
     default:
         // throw
@@ -1370,8 +1363,8 @@ const T& basic_json<Char, Storage>::custom_data() const
     switch (type_)
     {
     case json_any_t:
-			const T* p = (const T*)value_.userdata_->data();
-			return *p;
+			const T& p = value_.any_value_->cast<T>();
+			return p;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
@@ -1385,8 +1378,8 @@ T& basic_json<Char, Storage>::custom_data()
     {
     case json_any_t:
         {
-			T* p = (T*)value_.userdata_->data();
-			return *p;
+			T& p = value_.any_value_->cast<T>();
+			return p;
         }
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");

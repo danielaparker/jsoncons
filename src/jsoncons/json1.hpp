@@ -62,7 +62,9 @@ public:
 
     virtual void* data() 
     {
-        return &data1_;
+        return (void*)(&data1_);
+        //return reinterpret_cast<void*>(&data1_);
+        //return const_cast<const void*>(&data1_);
     }
 
     virtual const void* data() const  
@@ -144,43 +146,55 @@ public:
     {
     public:
         any()
-            : holder_(nullptr)
+            : content_(nullptr)
         {
             std::cout << "Check 10a" << std::endl;
         }
         any(const any& val)
-            : holder_(nullptr)
+            : content_(nullptr)
         {
             std::cout << "Check 10c" << std::endl;
-			holder_ = val.holder_->clone();
+			content_ = val.content_->clone();
         }
         any(any&& val)
-            : holder_(val.holder_)
+            : content_(val.content_)
         {
             std::cout << "Check 10d" << std::endl;
-            val.holder_ = nullptr;
+            val.content_ = nullptr;
         }
 
         template<typename T>
         any(T&& val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
         {
             std::cout << "Check 10" << std::endl;
-    		holder_ = new typed_json_any<Char,T>(val);
+    		content_ = new typed_json_any<Char,T>(val);
             std::cout << "Check 20" << std::endl;
         }
     	~any()
     	{
             std::cout << "Check 30" << std::endl;
-    		delete holder_;
+    		delete content_;
             std::cout << "Check 40" << std::endl;
     	}
         template <typename T>
         const T& cast() const
         {
-            return static_cast<const typed_json_any<Char, T>*>(holder_)->data1_;
+            const T* p = (const T*)content_->data();
+            return *p;
         }
-    
-    	json_any_impl<Char>* holder_;
+        template <typename T>
+        T& cast() 
+        {
+            T* p = (T*)content_->data();
+            return *p;
+        }
+
+        void to_stream(basic_json_output_handler<Char>& os) const 
+        {
+            content_->to_stream(os);
+        }
+
+    	json_any_impl<Char>* content_;
     };
 
     class member_type
@@ -1041,7 +1055,7 @@ public:
 
     basic_json(const basic_json& val);
 
-    explicit basic_json(const any& val);
+    explicit basic_json(any val);
 
     explicit basic_json(jsoncons::null_type);
 
@@ -1073,8 +1087,6 @@ public:
     explicit basic_json(json_object<Char,Storage>* var);
 
     explicit basic_json(json_array<Char,Storage>* var);
-
-    explicit basic_json(json_any_impl<Char>* var);
 
     ~basic_json();
 
@@ -1339,7 +1351,7 @@ public:
     void add(size_t index, const basic_json<Char,Storage>& value);
 
     template <class T>
-    void add_custom_data(const T& value);
+    void add_custom_data(const T &value);
 
     template <class T>
     void add_custom_data(size_t index, const T& value);
@@ -1499,7 +1511,7 @@ private:
         json_object<Char,Storage>* object_;
         json_array<Char,Storage>* array_;
         std::basic_string<Char>* value_string_;
-        json_any_impl<Char>* userdata_;
+        any* any_value_;
     } value_;
 };
 
