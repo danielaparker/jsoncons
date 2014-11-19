@@ -181,7 +181,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 `is<null_type>` returns `true` if the json value is null, `false` otherwise.  
 `is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
 `is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
-`is<json::json_any_type>` returns `true` if the json value is a custom type, `false` otherwise.
+`is<json::json_any_type>` returns `true` if the json value is type any, `false` otherwise.
 `is<json::std::vector<T>>` returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
 
     bool is_null() const
@@ -202,7 +202,7 @@ Returns `true` if json value is of type `T`, `false` otherwise.
 
     bool is_array() const
 
-    bool is_custom() const
+    bool is_any() const
 
     json& operator[](size_t i)
     const json& operator[](size_t i) const
@@ -246,13 +246,9 @@ If value is long long, returns value, if value is unsigned long long or double, 
     std::string as_string() const
 If value is string, returns value, otherwise returns result of `to_string`.
 
-    template <class T>
-    const T& custom_data() const
-If the value is custom, returns a reference to the custom value, otherwise throws  
-
-    template <class T>
-    T& custom_data() 
-If the value is custom, returns a reference to the custom value, otherwise throws  
+    const any& any_value() const
+    any& any_value() 
+If the value has type `any`, returns a reference to the value, otherwise throws  
 
 ### Modifiers
 
@@ -334,6 +330,16 @@ Inserts json value into stream.
 Exchanges the values of `a` and `b`
 
 ### Deprecated member types
+
+    bool is_custom() const
+
+    template <class T>
+    const T& custom_data() const
+If the value is custom, returns a reference to the custom value, otherwise throws  
+
+    template <class T>
+    T& custom_data() 
+If the value is custom, returns a reference to the custom value, otherwise throws  
 
     null_type
 typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
