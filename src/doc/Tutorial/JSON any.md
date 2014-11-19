@@ -27,7 +27,7 @@ a json::any value, like this:
 
     matrix<double> B = obj["mydata"].as<json::any>.cast<matrix<double>>();
 
-### Serializing the custom data
+### Serializing a json `any` value
  
 By default, if you write the json object containing your boost matrix to a stream
 
@@ -91,7 +91,7 @@ the output becomes
 
 ### Adding a boost matrix to a json array
 
-You may also want to add a custom data type to a `json` array. You can do this with 
+You may also want to add a json `any` value to a `json` array. You can do this with 
 the `add_custom_data' method.
 
     json arr(json::an_array);
