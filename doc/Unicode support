@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Unicode support</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+</head>
+<body>
+<h3>Narrow character support for UTF8 encoding</h3>
+<p>In the Linux and web worlds, <code>UTF-8</code> is the dominant character encoding.</p>
+<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
+<pre><code>std::fstream fs(const char* filename)
+</code></pre>
+
+<p>Instead you need to use the non standard Microsoft extension</p>
+<pre><code>std::fstream fs(const wchar_t* filename)
+</code></pre>
+
+<h4>Unicode escaping</h4>
+<pre><code>string inputStr(&quot;[\&quot;\\u0040\\u0040\\u0000\\u0011\&quot;]&quot;);
+std::cout &lt;&lt; &quot;Input:    &quot; &lt;&lt; inputStr &lt;&lt; std::endl;
+
+json arr = json::parse_string(inputStr);
+std::string str = arr[0].as&lt;std::string&gt;();
+std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+for (size_t i = 0; i &lt; str.size(); ++i)
+{
+    unsigned int val = static_cast&lt;unsigned int&gt;(str[i]);
+    if (i != 0)
+    {
+        std::cout &lt;&lt; &quot; &quot;;
+    }
+    std::cout &lt;&lt; &quot;0x&quot; &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; std::hex &lt;&lt; val;
+}
+std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+
+std::ostringstream os;
+os &lt;&lt; arr;
+std::cout &lt;&lt; &quot;Output:   &quot; &lt;&lt; os.str() &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>Input:    [&quot;\u0040\u0040\u0000\u0011&quot;]
+Hex dump: [0x40 0x40 0x00 0x11]
+Output:   [&quot;@@\u0000\u0011&quot;]
+</code></pre>
+
+<p>Note that just the two control characters are escaped on output.</p>
+<h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode</h4>
+<pre><code>string inputStr(&quot;[\&quot;\\u007F\\u07FF\\u0800\&quot;]&quot;);
+std::cout &lt;&lt; &quot;Input:    &quot; &lt;&lt; inputStr &lt;&lt; std::endl;
+
+json arr = json::parse_string(inputStr);
+std::string s = arr[0].as&lt;string&gt;();
+std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+for (size_t i = 0; i &lt; s.size(); ++i)
+{
+    if (i != 0)
+        std::cout &lt;&lt; &quot; &quot;;
+    unsigned int u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
+    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+}
+std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+
+std::ostringstream os;
+output_format format;
+format.escape_all_non_ascii(true);
+arr.to_stream(os,format);
+std::string outputStr = os.str();
+std::cout &lt;&lt; &quot;Output:   &quot; &lt;&lt; os.str() &lt;&lt; std::endl;
+
+json arr2 = json::parse_string(outputStr);
+std::string s2 = arr2[0].as&lt;string&gt;();
+std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+for (size_t i = 0; i &lt; s2.size(); ++i)
+{
+    if (i != 0)
+        std::cout &lt;&lt; &quot; &quot;;
+    unsigned int u(s2[i] &gt;= 0 ? s2[i] : 256 + s2[i] );
+    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+}
+std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>Input:    [&quot;\u007F\u07FF\u0800&quot;]
+Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
+Output:   [&quot;\u007F\u07FF\u0800&quot;]
+Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
+</code></pre>
+
+<p>Since the escaped unicode consists of a control character (0x7f) and non-ascii, we get back the same text as what we started with.</p>
+<h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)</h4>
+<pre><code>string input = &quot;[\&quot;\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\&quot;]&quot;;
+json value = json::parse_string(input);
+output_format format;
+format.escape_all_non_ascii(true);
+string output = value.to_string(format);
+
+std::cout &lt;&lt; &quot;Input:&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; input &lt;&lt; std::endl;
+std::cout &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;Output:&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; output &lt;&lt; std::endl;
+</code></pre>
+
+<p>Since all of the escaped unicode is non-ascii, we get back the same text as what we started with.</p>
+<pre><code>Input:
+[&quot;\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00&quot;]
+
+Output:
+[&quot;\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00&quot;]
+</code></pre>
+
+<h3>Wide character support for UTF16 and UTF32 encodings</h3>
+<p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It assumes <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4.</p>
+<p>It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API. </p>
+<p>Even if you choose to use wide character streams and strings to interact with the Windows API, you can still read and write to files in the more widely supported, endiness independent, UTF-8 format. To handle that you need to imbue your streams with the facet <code>std::codecvt_utf8_utf16</code>, which encapsulates the conversion between <code>UTF-8</code> and <code>UTF-16</code>.</p>
+<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
+<pre><code>std::wfstream fs(const char* filename)
+</code></pre>
+
+<p>Instead you need to use the non standard Microsoft extension</p>
+<pre><code>std::wfstream fs(const wchar_t* filename)
+</code></pre>
+
+<h4>Constructing a wjson value</h4>
+<pre><code>using jsoncons::wjson;
+
+wjson root;
+root[L&quot;field1&quot;] = L&quot;test&quot;;
+root[L&quot;field2&quot;] = 3.9;
+root[L&quot;field3&quot;] = true;
+std::wcout &lt;&lt; root &lt;&lt; L&quot;\n&quot;;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{&quot;field1&quot;:&quot;test&quot;,&quot;field2&quot;:3.9,&quot;field3&quot;:true}
+</code></pre>
+
+<h4>Escaped unicode</h4>
+<pre><code>wstring input = L&quot;[\&quot;\\u007F\\u07FF\\u0800\&quot;]&quot;;
+std::wistringstream is(input);
+
+wjson val = wjson::parse(is);
+
+wstring s = val[0].as&lt;wstring&gt;();
+std::cout &lt;&lt; &quot;length=&quot; &lt;&lt; s.length() &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+for (size_t i = 0; i &lt; s.size(); ++i)
+{
+    if (i != 0)
+        std::cout &lt;&lt; &quot; &quot;;
+    uint32_t u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
+    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+}
+std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+
+std::wofstream os(&quot;output/xxx.txt&quot;);
+os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16&lt;wchar_t&gt;));
+
+woutput_format format;
+format.escape_all_non_ascii(true);
+
+os &lt;&lt; pretty_print(val,format) &lt;&lt; L&quot;\n&quot;;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>length=3
+Hex dump: [0x7f 0x7ff 0x800]
+</code></pre>
+
+<p>and the file <code>xxx.txt</code> contains</p>
+<pre><code>[&quot;\u007F\u07FF\u0800&quot;]    
+</code></pre>
+
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
