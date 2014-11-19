@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Home</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+</head>
+<body>
+<p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in <a href="http://jsoncons.sourceforge.net/">jsoncons: a C++ library for json construction</a>.</p>
+<p>The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
+<p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013 and clang 3.3 and GCC 4.8. </p>
+<p>The code repository is on <a href="https://github.com/danielaparker/jsoncons">github</a>, releases are on <a href="https://sourceforge.net/projects/jsoncons/?source=navbar">sourceforge</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
+<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>. Extensions are in namespace <code>jsoncons_ext</code>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a>.</p>
+<h3>Features</h3>
+<ul>
+<li>Uses the standard C++ input/output streams library</li>
+<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
+<li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
+<li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
+<li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
+<li>Guarantees basic exception safety (no leaks)</li>
+<li>Accepts and ignores single line comments that start with <code>//</code>, and multi line comments that start with <code>/<em></code> and end with <code></em>/</code></li>
+<li>Supports optional escaping of the solidus (<code>/</code>) character</li>
+<li>Supports <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</li>
+<li>Supports reading multiple json objects from a stream</li>
+<li>Supports optional escaping of non-ascii UTF-8 octets</li>
+<li>Allows extensions to the types accepted by the <code>json</code> class accessors and modifiers</li>
+<li>Supports storing custom data types in a json object, with specialized serialization</li>
+<li>Supports reading (writing) JSON values from (to) CSV files</li>
+</ul>
+<h3>Roadmap</h3>
+<p><a href="Roadmap">Roadmap</a></p>
+<h3>Tutorial</h3>
+<p><a href="Basics">Basics</a></p>
+<p><a href="Unicode%20support">Unicode support</a></p>
+<p><a href="Arrays">Arrays</a></p>
+<p><a href="Introspection">Introspection</a></p>
+<p><a href="Type%20Extensibility">Type Extensibility</a></p>
+<p><a href="JSON%20Any">JSON Any</a></p>
+<p><a href="Transforming%20JSON%20with%20filters">Transforming JSON with filters</a></p>
+<h3>Classes</h3>
+<p><a href="json">json</a><br />
+<a href="json_serializer">json_serializer</a><br />
+<a href="output_format">output_format</a><br />
+<a href="json_reader">json_reader</a><br />
+<a href="json_deserializer">json_deserializer</a>  </p>
+<p><a href="wjson">wjson</a><br />
+<a href="wjson_serializer">wjson_serializer</a><br />
+<a href="woutput_format">woutput_format</a><br />
+<a href="wjson_reader">wjson_reader</a><br />
+<a href="wjson_deserializer">wjson_deserializer</a>  </p>
+<h3>Extensions</h3>
+<h4>csv</h4>
+<p><a href="csv_reader">csv_reader</a></p>
+<p><a href="csv_serializer">csv_serializer</a></p>
+<h2>Examples</h2>
+<h3>First example</h3>
+<p>Here is a sample json file (<code>books.json</code>):</p>
+<pre><code>[
+    {
+        &quot;title&quot; : &quot;Kafka on the Shore&quot;,
+        &quot;author&quot; : &quot;Haruki Murakami&quot;,
+        &quot;price&quot; : 25.17
+    },
+    {
+        &quot;title&quot; : &quot;Women: A Novel&quot;,
+        &quot;author&quot; : &quot;Charles Bukowski&quot;,
+        &quot;price&quot; : 12.00
+    },
+    {
+        &quot;title&quot; : &quot;Cutter's Way&quot;,
+        &quot;author&quot; : &quot;Ivan Passer&quot;
+    }
+]
+</code></pre>
+
+<p>This is how to read the document with <code>jsoncons</code>: </p>
+<pre><code>#include &lt;string&gt;
+#include &quot;jsoncons/json.hpp&quot;
+
+using jsoncons::json;
+using jsoncons::output_format;
+using std::string;
+
+json books = json::parse_file(&quot;input/books.json&quot;);
+
+for (size_t i = 0; i &lt; books.size(); ++i)
+{
+    try
+    {
+        json&amp; book = books[i];
+        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
+        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
+        double price = book[&quot;price&quot;].as&lt;double&gt;();
+        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+    }
+    catch (const std::exception&amp; e)
+    {
+        std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>The output is</p>
+<pre><code>Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12
+Member price not found.
+</code></pre>
+
+<p>Note the following:</p>
+<ul>
+<li>The assignment <code>json&amp; book = books[i]</code> is to a reference, the reference identifies a <a href="json">json</a> object owned by <code>books</code>. </li>
+<li>The book &quot;Cutter's Way&quot; has no price, so <code>book[&quot;price&quot;]</code> throws a <a href="json_exception">json_exception</a> (&quot;Member price not found&quot;)</li>
+</ul>
+<p>Instead of handling the missing price in a catch clause, let's use an accessor that evaluates to a string and substitutes &quot;N/A&quot; for the missing price: </p>
+<pre><code>json books = json::parse_file(&quot;input/books.json&quot;);
+
+for (size_t i = 0; i &lt; books.size(); ++i)
+{
+    try
+    {
+        json&amp; book = books[i];
+        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
+        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
+        string price = book.get(&quot;price&quot;, &quot;N/A&quot;).as&lt;std::string&gt;();
+        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+    }
+    catch (const std::exception&amp; e)
+    {
+        std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>Now the output is</p>
+<pre><code>Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12.0
+Ivan Passer, Cutter's Way, N/A
+</code></pre>
+
+<p>By default, when formatting a floating-point value with <code>as&lt;string&gt;()</code>, <code>jsoncons</code> truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and the number of decimal places to 2.</p>
+<pre><code>json books = json::parse_file(&quot;input/books.json&quot;);
+
+output_format format;
+format.floatfield(std::ios::fixed);
+format.precision(2);
+
+for (size_t i = 0; i &lt; books.size(); ++i)
+{
+    try
+    {
+        json&amp; book = books[i];
+        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
+        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
+        string price = book.get(&quot;price&quot;, &quot;N/A&quot;).to_string(format);
+        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+    }
+    catch (const std::exception&amp; e)
+    {
+        std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>This time the output is</p>
+<pre><code>Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12.00
+Ivan Passer, Cutter's Way, N/A
+</code></pre>
+
+<h3>Second example</h3>
+<p>This example shows how to create the <code>books.json</code> file in code.</p>
+<pre><code>json books(json::an_array);
+
+{
+    json book;
+    book[&quot;title&quot;] = &quot;Kafka on the Shore&quot;;
+    book[&quot;author&quot;] = &quot;Haruki Murakami&quot;;
+    book[&quot;price&quot;] = 25.17;
+    books.add(std::move(book));
+}
+
+{
+    json book;
+    book[&quot;title&quot;] = &quot;Women: A Novel&quot;;
+    book[&quot;author&quot;] = &quot;Charles Bukowski&quot;;
+    book[&quot;price&quot;] = 12.00;
+    books.add(std::move(book));
+}
+
+{
+    json book;
+    book[&quot;title&quot;] = &quot;Cutter's Way&quot;;
+    book[&quot;author&quot;] = &quot;Ivan Passer&quot;;
+    books.add(std::move(book));
+}
+
+std::cout &lt;&lt; pretty_print(books) &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>[
+    {
+        &quot;author&quot;:&quot;Haruki Murakami&quot;,
+        &quot;price&quot;:25.17,
+        &quot;title&quot;:&quot;Kafka on the Shore&quot;
+    },
+    {
+        &quot;author&quot;:&quot;Charles Bukowski&quot;,
+        &quot;price&quot;:12.0,
+        &quot;title&quot;:&quot;Women: A Novel&quot;
+    },
+    {
+        &quot;author&quot;:&quot;Ivan Passer&quot;,
+        &quot;title&quot;:&quot;Cutter's Way&quot;
+    }
+]
+</code></pre>
+
+<h3>User specified <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</h3>
+<pre><code>json obj;
+obj[&quot;field1&quot;] = std::sqrt(-1.0);
+obj[&quot;field2&quot;] = 1.79e308*1000;
+obj[&quot;field3&quot;] = -1.79e308*1000;
+
+output_format format;
+format.nan_replacement(&quot;null&quot;);        // default is &quot;null&quot;
+format.pos_inf_replacement(&quot;1e9999&quot;);  // default is &quot;null&quot;
+format.neg_inf_replacement(&quot;-1e9999&quot;); // default is &quot;null&quot;
+
+obj.to_stream(std::cout,format);
+std::cout &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{&quot;field1&quot;:null,&quot;field2&quot;:1e9999,&quot;field3&quot;:-1e9999}
+</code></pre>
+
+<h3>Reading multiple JSON objects from a stream</h3>
+<p>Here is a sample json file containing multiple json objects (<code>multiple-json-objects.json</code>):</p>
+<pre><code>{&quot;a&quot;:1,&quot;b&quot;:2,&quot;c&quot;:3}
+{&quot;a&quot;:4,&quot;b&quot;:5,&quot;c&quot;:6}
+{&quot;a&quot;:7,&quot;b&quot;:8,&quot;c&quot;:9}
+</code></pre>
+
+<p>and here is the code to read them: </p>
+<pre><code>std::ifstream is(&quot;input/multiple-json-objects.json&quot;);
+if (!is.is_open())
+{
+    throw std::exception(&quot;Cannot open file&quot;);
+}
+
+json_deserializer handler;
+json_reader reader(is,handler);
+
+while (!reader.eof())
+{
+    reader.read();
+    if (!reader.eof())
+    {
+        json val = std::move(handler.root());
+        std::cout &lt;&lt; val &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{&quot;a&quot;:1,&quot;b&quot;:2,&quot;c&quot;:3}
+{&quot;a&quot;:4,&quot;b&quot;:5,&quot;c&quot;:6}
+{&quot;a&quot;:7,&quot;b&quot;:8,&quot;c&quot;:9}
+</code></pre>
+
+<h3>Acknowledgements</h3>
+<p>Thanks to Marc Chevrier for contributing implementations for the json <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code> methods, and the <code>make_array&lt;N&gt;</code> template implementation.</p>
+<p>I'm grateful to Marc Chevrier and Pedro Larroy for keeping a watchful eye that all continues to go well in GCC and clang environments, and contributing bug fixes. </p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

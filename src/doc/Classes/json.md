@@ -55,11 +55,18 @@ Opens a binary input stream to a JSON unicode file, parsing the file assuming UT
     static json parse_string(const std::string& s)
 Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception).
 
+    static json make_array()
+
+    static json make_array(size_t n)
+
+    template <typename T>
+    static json make_array(size_ n, T val)
+
     template <size_t N>
-    static json make_array(size1 ... sizeN)
+    static json make_array(size_t size1 ... size_t sizeN)
 
     template <size_t N,typename T>
-    static json make_array(size1 ... sizeN, const T val)
+    static json make_array(size_t size1 ... size_t sizeN, T val)
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors
@@ -268,10 +275,6 @@ Remove a member from a `json` object
     void set(std::string&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
 
-    template <class T>
-    void set_custom_data(const std::string& name, const T& value)
-Inserts custom data of type `T` into a json object.
-
     template <typename T>
     void add(T val)
 
@@ -283,15 +286,6 @@ Adds a new element at the end of a json array. The content of `val` is copied (o
     void add(size_t index, json&& val)
 Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.
 The content of `val` is copied (or moved) to the new element.
-
-    template <class T>
-    void add_custom_data(const T& val)
-Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied to the new element.
-
-    template <class T>
-    void add_custom_data(size_t index, const T& val)
-Adds a new custom data element of type `T` at the specified index of a json array, shifting all elements currently at or above that index to the right.
-The content of `val` is copied to the new element.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
@@ -331,6 +325,11 @@ Exchanges the values of `a` and `b`
 
 ### Deprecated member types
 
+    null_type
+typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
+
+### Deprecated methods
+
     bool is_custom() const
 
     template <class T>
@@ -341,19 +340,21 @@ If the value is custom, returns a reference to the custom value, otherwise throw
     T& custom_data() 
 If the value is custom, returns a reference to the custom value, otherwise throws  
 
-    null_type
-typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
+    template <class T>
+    void set_custom_data(const std::string& name, const T& value)
+Inserts custom data of type `T` into a json object.
 
-### Deprecated methods
+    template <class T>
+    void add_custom_data(const T& val)
+Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied to the new element.
+
+    template <class T>
+    void add_custom_data(size_t index, const T& val)
+Adds a new custom data element of type `T` at the specified index of a json array, shifting all elements currently at or above that index to the right.
+The content of `val` is copied to the new element.
 
     std::string as_string(const output_format& format) const
 Use `to_string(format)`.
-
-    static json make_array()
-    static json make_array(size_t n)
-    static json make_array(size_t n, const json& val)
-Makes an empty array, an array of n elements, each element an empty json object, or an array of n elements, each element a copy of `val`.
-Use `json val(json::an_array)` or `json::make_array<1>(...)` instead (but `make_array` will continue to work)
 
     template <size_t N>
     static json make_multi_array(size1 ... sizeN)
