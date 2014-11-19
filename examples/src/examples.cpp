@@ -15,7 +15,7 @@ using jsoncons::output_format;
 using std::string;
 
 void array_examples();
-void custom_data_examples();
+void json_any_examples();
 void wjson_examples();
 
 void first_example_a()
@@ -252,7 +252,7 @@ int main()
     second_example_a();
 
     array_examples();
-    custom_data_examples();
+    json_any_examples();
 
     read_csv_file();
     write_csv_file();

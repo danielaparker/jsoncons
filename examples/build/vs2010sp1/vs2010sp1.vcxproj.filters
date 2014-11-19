@@ -24,10 +24,10 @@
     <ClCompile Include="..\..\src\csv_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\custom_data_examples.cpp">
+    <ClCompile Include="..\..\src\wjson_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\wjson_examples.cpp">
+    <ClCompile Include="..\..\src\json_any_examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
