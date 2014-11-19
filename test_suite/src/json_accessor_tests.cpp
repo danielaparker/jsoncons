@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["array"].is<json::array>());
 
     matrix<double> A;
-    obj.set_custom_data("custom",A);
-    BOOST_CHECK(obj["custom"].is_custom());
+    obj.set_custom_data("my-any",A);
+    BOOST_CHECK(obj["my-any"].is<json::any>());
 
     // tests for json is_type methods
 
