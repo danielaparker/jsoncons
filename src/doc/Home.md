@@ -35,17 +35,17 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [Basics](Basics)
 
-[Unicode support](Unicode support)
+[Unicode support](Unicode%20support)
 
 [Arrays](Arrays)
 
 [Introspection](Introspection)
 
-[Extensibility](Extensibility)
+[Type Extensibility](Type%20Extensibility)
 
-[Custom data](Custom data)
+[JSON Any](JSON%20Any)
 
-[Transforming JSON with filters](Transforming JSON with filters)
+[Transforming JSON with filters](Transforming%20JSON%20with%20filters)
 
 ### Classes
 
