@@ -374,6 +374,12 @@ public:
             return val_.is_array();
         }
 
+        bool is_any() const
+        {
+            return val_.is_any();
+        }
+
+        // Deprecated
         bool is_custom() const
         {
             return val_.is_custom();
@@ -398,6 +404,11 @@ public:
         Char as_char() const
         {
             return val_.as_char();
+        }
+
+        any any_value() const
+        {
+            return val_.any_value();
         }
 
         bool as_bool() const
@@ -685,6 +696,12 @@ public:
             return val_.at(name_).is_array();
         }
  
+        bool is_any() const
+        {
+            return val_.at(name_).is_any();
+        }
+
+        // Deprecated
         bool is_custom() const
         {
             return val_.at(name_).is_custom();
@@ -709,6 +726,11 @@ public:
         Char as_char() const
         {
             return val_.at(name_).as_char();
+        }
+
+        any any_value() const
+        {
+            return val_.at(name_).any_value();
         }
 
         bool as_bool() const
@@ -1098,12 +1120,7 @@ public:
     const_array_iterator end_elements() const;
 
     template <class T>
-    basic_json& operator=(T val)
-    {
-        value_adapter<Char,Storage,T> adapter;
-        adapter.assign(*this,val);
-        return *this;
-    }
+    basic_json& operator=(T val);
 
     basic_json& operator=(basic_json<Char,Storage> rhs);
 
@@ -1185,6 +1202,12 @@ public:
         return type_ == array_t;
     }
 
+    bool is_any() const
+    {
+        return type_ == json_any_t;
+    }
+
+    // Deprecated
     bool is_custom() const
     {
         return type_ == json_any_t;
@@ -1237,6 +1260,8 @@ public:
     std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
 
     Char as_char() const;
+
+    any any_value() const;
 
     basic_json<Char,Storage>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Storage>& at(const std::basic_string<Char>& name) const;
@@ -1495,13 +1520,13 @@ private:
 	value_type type_;
     union
     {
-        double value_double_;
+        double double_value_;
         long long longlong_value_;
         unsigned long long ulonglong_value_;
         bool bool_value_;
         json_object<Char,Storage>* object_;
         json_array<Char,Storage>* array_;
-        std::basic_string<Char>* value_string_;
+        std::basic_string<Char>* string_value_;
         any* any_value_;
     } value_;
 };

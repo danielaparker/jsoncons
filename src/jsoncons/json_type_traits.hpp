@@ -67,13 +67,13 @@ template<typename Char, typename Storage>
 class value_adapter<Char, Storage, typename basic_json<Char, Storage>::any>
 {
 public:
-    bool is(const basic_json<Char, Storage>&) const
+    bool is(const basic_json<Char, Storage>& self) const
     {
-        return true;
+        return self.is_any();
     }
     typename basic_json<Char, Storage>::any as(const basic_json<Char, Storage>& val) const
     {
-        return val;
+        return val.any_value();
     }
     void assign(basic_json<Char, Storage>& self, typename basic_json<Char, Storage>::any val)
     {
@@ -92,7 +92,7 @@ public:
     const Char* as(const basic_json<Char, Storage>& val) const
     {
         JSONCONS_ASSERT(val.is_string());
-        return val.value_.value_string_.c_str();
+        return val.value_.string_value_.c_str();
     }
     void assign(basic_json<Char, Storage>& self, const Char *val)
     {
