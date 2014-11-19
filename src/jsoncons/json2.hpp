@@ -1401,7 +1401,21 @@ T& basic_json<Char, Storage>::custom_data()
 }
 
 template<typename Char, typename Storage>
-typename basic_json<Char, Storage>::any basic_json<Char, Storage>::any_value() const
+typename basic_json<Char, Storage>::any& basic_json<Char, Storage>::any_value()
+{
+    switch (type_)
+    {
+    case json_any_t:
+        {
+			return *value_.any_value_;
+        }
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an any value");
+    }
+}
+
+template<typename Char, typename Storage>
+const typename basic_json<Char, Storage>::any& basic_json<Char, Storage>::any_value() const
 {
     switch (type_)
     {

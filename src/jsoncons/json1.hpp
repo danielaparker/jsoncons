@@ -180,6 +180,11 @@ public:
             return *p;
         }
 
+        any& operator=(any rhs)
+        {
+            std::swap(content_,rhs.content_);
+        }
+
         void to_stream(basic_json_output_handler<Char>& os) const 
         {
             content_->to_stream(os);
@@ -406,7 +411,12 @@ public:
             return val_.as_char();
         }
 
-        any any_value() const
+        any& any_value()
+        {
+            return val_.any_value();
+        }
+
+        const any& any_value() const
         {
             return val_.any_value();
         }
@@ -729,7 +739,12 @@ public:
             return val_.at(name_).as_char();
         }
 
-        any any_value() const
+        any& any_value()
+        {
+            return val_.at(name_).any_value();
+        }
+
+        const any& any_value() const
         {
             return val_.at(name_).any_value();
         }
@@ -1269,7 +1284,9 @@ public:
 
     Char as_char() const;
 
-    any any_value() const;
+    any& any_value();
+
+    const any& any_value() const;
 
     basic_json<Char,Storage>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Storage>& at(const std::basic_string<Char>& name) const;
