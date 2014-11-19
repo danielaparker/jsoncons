@@ -457,6 +457,7 @@ public:
             return val_.as_vector<T>();
         }
 
+        // Deprecated
         template <class T>
         const T& custom_data() const
         {
@@ -779,6 +780,7 @@ public:
             return val_.at(name_).template as_vector<T>();
         }
 
+        // Deprecated
         template <class T>
         const T& custom_data() const
         {
@@ -786,6 +788,7 @@ public:
         }
         // Returns a const reference to the custom data associated with name
 
+        // Deprecated
         template <class T>
         T& custom_data() 
         {
@@ -934,18 +937,21 @@ public:
             val_.at(name_).add(index, value);
         }
 
+        // Deprecated
         template <class T>
         void set_custom_data(const std::basic_string<Char>& name, T value)
         {
             val_.at(name_).set_custom_data(name,value);
         }
 
+        // Deprecated
         template <class T>
         void add_custom_data(T value)
         {
             val_.at(name_).add_custom_data(value);
         }
 
+        // Deprecated
         template <class T>
         void add_custom_data(size_t index, T value)
         {
@@ -1247,10 +1253,12 @@ public:
 
     unsigned long long as_ulonglong() const;
 
+    // Deprecated
     template <class T>
     const T& custom_data() const;
     // Returns a const reference to the custom data associated with name
 
+    // Deprecated
     template <class T>
     T& custom_data();
     // Returns a reference to the custom data associated with name
@@ -1359,18 +1367,9 @@ public:
 
     void add(size_t index, basic_json<Char,Storage>&& value);
 
-    template <class T>
-    void set_custom_data(const std::basic_string<Char>& name, T value);
-
     void add(const basic_json<Char,Storage>& value);
 
     void add(size_t index, const basic_json<Char,Storage>& value);
-
-    template <class T>
-    void add_custom_data(T value);
-
-    template <class T>
-    void add_custom_data(size_t index, T value);
 
     value_type type() const
     {
@@ -1413,6 +1412,15 @@ public:
     void assign_null();
 
 //  Deprecated
+
+    template <class T>
+    void set_custom_data(const std::basic_string<Char>& name, T value);
+
+    template <class T>
+    void add_custom_data(T value);
+
+    template <class T>
+    void add_custom_data(size_t index, T value);
 
     static basic_json make_2d_array(size_t m, size_t n);
 

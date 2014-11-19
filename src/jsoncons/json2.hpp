@@ -638,6 +638,7 @@ void basic_json<Char, Storage>::set(std::basic_string<Char>&& name, basic_json<C
     }
 }
 
+// Deprecated
 template<typename Char, typename Storage>
 template<class T>
 void basic_json<Char, Storage>::set_custom_data(const std::basic_string<Char>& name, T value)
@@ -729,6 +730,7 @@ void basic_json<Char, Storage>::add(size_t index, const basic_json<Char, Storage
     }
 }
 
+// Deprecated
 template<typename Char, typename Storage>
 template<class T>
 void basic_json<Char, Storage>::add_custom_data(T value)
@@ -747,6 +749,7 @@ void basic_json<Char, Storage>::add_custom_data(T value)
     }
 }
 
+// Deprecated
 template<typename Char, typename Storage>
 template<class T>
 void basic_json<Char, Storage>::add_custom_data(size_t index, T value)
@@ -1365,6 +1368,7 @@ unsigned long basic_json<Char, Storage>::as_ulong() const
     }
 }
 
+// Deprecated
 template<typename Char, typename Storage>
 template<class T>
 const T& basic_json<Char, Storage>::custom_data() const
@@ -1379,6 +1383,7 @@ const T& basic_json<Char, Storage>::custom_data() const
     }
 }
 
+// Deprecated
 template<typename Char, typename Storage>
 template<class T>
 T& basic_json<Char, Storage>::custom_data()
