@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>json</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+</head>
+<body>
+<pre><code>jsoncons::json
+
+typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
+</code></pre>
+
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type.</p>
+<h3>Header</h3>
+<pre><code>#include &quot;jsoncons/json.hpp&quot;
+</code></pre>
+
+<h3>Member types</h3>
+<pre><code>member_type
+</code></pre>
+
+<p><a href="json_member_type">member_type</a> stores a name and a json value</p>
+<pre><code>object
+
+array
+
+json_any_type
+</code></pre>
+
+<p>Type tags that can be used with <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code></p>
+<pre><code>object_iterator
+</code></pre>
+
+<p>A random access iterator to <code>json::member_type</code></p>
+<pre><code>const_object_iterator
+</code></pre>
+
+<p>A random access iterator to <code>const json::member_type</code></p>
+<pre><code>array_iterator
+</code></pre>
+
+<p>A random access iterator to <code>json</code></p>
+<pre><code>const_array_iterator
+</code></pre>
+
+<p>A random access iterator to <code>const json</code></p>
+<h3>Member constants</h3>
+<pre><code>an_object
+</code></pre>
+
+<p>Empty constant json object value</p>
+<pre><code>an_array
+</code></pre>
+
+<p>Empty constant json array value</p>
+<pre><code>null
+</code></pre>
+
+<p>Constant json null value</p>
+<h3>Static member functions</h3>
+<pre><code>static json parse(std::istream&amp; is)
+</code></pre>
+
+<p>Parses an input stream of JSON text and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json<em>parse</em>exception</a>.</p>
+<pre><code>static json parse_file(const std::string&amp; filename)
+</code></pre>
+
+<p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json<em>parse</em>exception</a>. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.</p>
+<pre><code>static json parse_string(const std::string&amp; s)
+</code></pre>
+
+<p>Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json<em>parse</em>exception</a>.</p>
+<pre><code>static json make_array()
+
+static json make_array(size_t n)
+
+template &lt;typename T&gt;
+static json make_array(size_ n, T val)
+
+template &lt;size_t N&gt;
+static json make_array(size_t size1 ... size_t sizeN)
+
+template &lt;size_t N,typename T&gt;
+static json make_array(size_t size1 ... size_t sizeN, T val)
+</code></pre>
+
+<p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
+<h3>Constructors</h3>
+<pre><code>explicit json()
+</code></pre>
+
+<p>Constructs an empty json object. </p>
+<pre><code>json(const json&amp; val)
+</code></pre>
+
+<p>Constructs a copy of val</p>
+<pre><code>json(json&amp;&amp; val)
+</code></pre>
+
+<p>Acquires the contents of val, leaving val a <code>null</code> value</p>
+<pre><code>template &lt;class InputIterator&gt;
+json(InputIterator first, InputIterator last)
+</code></pre>
+
+<p>Constructs a json array with the elements in the range [first,last).</p>
+<pre><code>explicit json(null_type)
+</code></pre>
+
+<p>Constructs a <code>null</code> value</p>
+<pre><code>explicit json(double val)
+</code></pre>
+
+<p>Constructs a <code>double</code> value</p>
+<pre><code>explicit json(int val)
+</code></pre>
+
+<p>Constructs a <code>integer</code> value</p>
+<pre><code>explicit json(unsigned int val)
+</code></pre>
+
+<p>Constructs a <code>unsigned integer</code> value</p>
+<pre><code>explicit json(long val)
+</code></pre>
+
+<p>Constructs a <code>integer</code> value</p>
+<pre><code>explicit json(unsigned long val)
+</code></pre>
+
+<p>Constructs a <code>unsigned integer</code> value</p>
+<pre><code>explicit json(long long val)
+</code></pre>
+
+<p>Constructs a <code>integer</code> value</p>
+<pre><code>explicit json(unsigned long long val)
+</code></pre>
+
+<p>Constructs a <code>unsigned integer</code> value</p>
+<pre><code>explicit json(const std::string&amp; val)
+</code></pre>
+
+<p>Constructs a <code>string</code> value</p>
+<pre><code>explicit json(char val)
+</code></pre>
+
+<p>Constructs a <code>string</code> value that has one character</p>
+<pre><code>explicit json(bool val)
+</code></pre>
+
+<p>Constructs a <code>true</code> or <code>false</code> value</p>
+<h3>Destructor</h3>
+<pre><code>~json()
+</code></pre>
+
+<p>Destroys all values and deletes all memory allocated for strings, arrays, and objects.</p>
+<h3>Assignment operator</h3>
+<pre><code>template &lt;class T&gt;
+json&amp; operator=(T rhs)
+
+json&amp; operator=(json rhs)
+</code></pre>
+
+<p>Supports copy and move assignment</p>
+<h3>Iterators</h3>
+<pre><code>object_iterator begin_members()
+const_object_iterator begin_members() const
+</code></pre>
+
+<p>Returns an iterator to the first member of the json object,
+provided this value is a json object, otherwise throws a <code>json_exception</code></p>
+<pre><code>object_iterator end_members()
+const_object_iterator end_members() const
+</code></pre>
+
+<p>Returns an iterator to one-past the last member of the json object
+provided this value is a json object, otherwise throws a <code>json_exception</code></p>
+<pre><code>array_iterator begin_elements()
+const_array_iterator begin_elements() const
+</code></pre>
+
+<p>Returns an iterator to the first element of the json array
+provided this value is a json array, otherwise throws a <code>json_exception</code></p>
+<pre><code>array_iterator end_elements()
+const_array_iterator end_elements() const
+</code></pre>
+
+<p>Returns an iterator to one-past the last element of the json array
+provided this value is a json array, otherwise throws a <code>json_exception</code></p>
+<h3>Capacity</h3>
+<pre><code>size_t size() const
+</code></pre>
+
+<p>Returns the number of elements in a json array, or the number of members in a json object, or <code>zero</code></p>
+<pre><code>bool is_empty() const
+</code></pre>
+
+<p>Returns <code>true</code> if a json string, object or array has no elements, otherwise <code>false</code>.</p>
+<pre><code>size_t capacity() const
+</code></pre>
+
+<p>Returns the size of the storage space currently allocated for a json object or array.</p>
+<pre><code>void reserve(size_t n)
+</code></pre>
+
+<p>Increases the capacity of a json object or array to allow at least <code>n</code> members or elements. </p>
+<pre><code>void resize_array(size_t n)
+</code></pre>
+
+<p>Resizes a json array so that it contains <code>n</code> elements. </p>
+<pre><code>void resize_array(size_t n, const json&amp; val)
+</code></pre>
+
+<p>Resizes a json array so that it contains <code>n</code> elements that are initialized to <code>val</code>. </p>
+<h3>Accessors</h3>
+<pre><code>bool has_member(const std::string&amp; name) const
+</code></pre>
+
+<p>Returns <code>true</code> if a json object has a member named <code>name</code>, otherwise <code>false</code>.    </p>
+<pre><code>template &lt;typename T&gt;
+bool is() const
+</code></pre>
+
+<p>Returns <code>true</code> if json value is of type <code>T</code>, <code>false</code> otherwise.<br />
+<code>is&lt;short&gt;</code>, <code>is&lt;unsigned short&gt;</code>, <code>is&lt;int&gt;</code>, <code>is&lt;unsigned int&gt;</code>, <code>is&lt;long&gt;</code>, <code>is&lt;unsigned long&gt;</code>, <code>is&lt;long long&gt;</code>, <code>is&lt;unsigned long long&gt;</code> all return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.<br />
+<code>is&lt;float&gt;</code> and <code>is&lt;double&gt;</code> returns true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.<br />
+<code>is&lt;std::string&gt;</code> returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.<br />
+<code>is&lt;bool&gt;</code> returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.<br />
+<code>is&lt;null_type&gt;</code> returns <code>true</code> if the json value is null, <code>false</code> otherwise.<br />
+<code>is&lt;json::object&gt;</code> returns <code>true</code> if the json value is an object, <code>false</code> otherwise.<br />
+<code>is&lt;json::array&gt;</code> returns <code>true</code> if the json value is an array, <code>false</code> otherwise.<br />
+<code>is&lt;json::json_any_type&gt;</code> returns <code>true</code> if the json value is type any, <code>false</code> otherwise.
+<code>is&lt;json::std::vector&lt;T&gt;&gt;</code> returns <code>true</code> if the json value is an array and each element is of type <code>T</code>, <code>false</code> otherwise.</p>
+<pre><code>bool is_null() const
+
+bool is_string() const
+
+bool is_numeric() const
+
+bool is_longlong() const
+
+bool is_ulonglong() const
+
+bool is_double() const
+
+bool is_bool() const
+
+bool is_object() const
+
+bool is_array() const
+
+bool is_any() const
+
+json&amp; operator[](size_t i)
+const json&amp; operator[](size_t i) const
+</code></pre>
+
+<p>Returns a reference to the value at position i in a json object or array.</p>
+<pre><code>json&amp; operator[](const std::string&amp; name)
+</code></pre>
+
+<p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. </p>
+<pre><code>const json&amp; operator[](const std::string&amp; name) const
+</code></pre>
+
+<p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.</p>
+<pre><code>json&amp; at(const std::string&amp; name)
+const json&amp; at(const std::string&amp; name) const
+</code></pre>
+
+<p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.  These have the same behavior as the corresponding <code>operator[]</code> functions, but the non-const <code>at</code> is more efficient (doesn't have to return a proxy.)</p>
+<pre><code>json&amp; at(size_t i)
+const json&amp; at(size_t i) const
+</code></pre>
+
+<p>Returns a reference to the element at position <code>i</code> in a json array.  These have the same behavior as the corresponding <code>operator[]</code> functions.</p>
+<pre><code>const json&amp; get(const std::string&amp; name) const
+</code></pre>
+
+<p>If <code>name</code> matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to <code>json::null</code>.</p>
+<pre><code>template &lt;typename T&gt;
+const json get(const std::string&amp; name, T default_val) const
+</code></pre>
+
+<p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.</p>
+<pre><code>template &lt;typename T&gt;
+T as() const
+</code></pre>
+
+<p>Attempts to coerce the json value to the template type</p>
+<pre><code>bool as_bool() const
+
+double as_double() const
+</code></pre>
+
+<p>If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is <code>null</code>, returns <code>NaN</code>, otherwise throws.</p>
+<pre><code>long long as_longlong() const
+</code></pre>
+
+<p>If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.</p>
+<pre><code>unsigned long long as_ulonglong() const
+
+std::string as_string() const
+</code></pre>
+
+<p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
+<pre><code>const any&amp; any_value() const
+any&amp; any_value() 
+</code></pre>
+
+<p>If the value has type <code>any</code>, returns a reference to the value, otherwise throws  </p>
+<h3>Modifiers</h3>
+<pre><code>void clear()
+</code></pre>
+
+<p>Remove all elements from an array or object value, otherwise do nothing</p>
+<pre><code>void remove_range(size_t from_index, size_t to_index)
+</code></pre>
+
+<p>Removes all elements from an array value whose index is between <code>from_index</code>, the first element to be removed, and <code>to_index</code>, one after the last element to be removed.</p>
+<pre><code>void remove_member(const std::string&amp; name)
+</code></pre>
+
+<p>Remove a member from a <code>json</code> object</p>
+<pre><code>template &lt;typename T&gt;
+void set(const std::string&amp; name, T val)
+
+void set(const std::string&amp; name, const json&amp; val)
+void set(std::string&amp;&amp; name, json&amp;&amp; val)
+</code></pre>
+
+<p>Inserts a new member or replaces an existing member in a json object.</p>
+<pre><code>template &lt;typename T&gt;
+void add(T val)
+
+void add(const json&amp; val)
+void add(json&amp;&amp; val)
+</code></pre>
+
+<p>Adds a new element at the end of a json array. The content of <code>val</code> is copied (or moved) to the new element.</p>
+<pre><code>void add(size_t index, const json&amp; val)
+void add(size_t index, json&amp;&amp; val)
+</code></pre>
+
+<p>Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.
+The content of <code>val</code> is copied (or moved) to the new element.</p>
+<pre><code>void swap(json&amp; val)
+</code></pre>
+
+<p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
+<h3>Relational operators</h3>
+<pre><code>bool operator==(const json&amp; rhs) const
+</code></pre>
+
+<p>Returns <code>true</code> if two json objects compare equal, <code>false</code> otherwise.</p>
+<pre><code>bool operator!=(const json&amp; rhs) const
+</code></pre>
+
+<p>Returns <code>true</code> if two json objects do not compare equal, <code>false</code> otherwise.</p>
+<h3>Serialization</h3>
+<pre><code>std::string to_string() const
+</code></pre>
+
+<p>Inserts json value into string.</p>
+<pre><code>std::string to_string(const output_format&amp; format) const
+</code></pre>
+
+<p>Inserts json value into string using specified <a href="output_format">output_format</a>.</p>
+<pre><code>std::ostream&amp; to_stream(std::ostream&amp; os) const
+</code></pre>
+
+<p>Inserts json value into stream with default output format.</p>
+<pre><code>std::ostream&amp; to_stream(std::ostream&lt;Char&gt; os, const output_format&amp; format) const
+</code></pre>
+
+<p>Inserts json value into stream using specified <a href="output_format">output_format</a>.</p>
+<pre><code>void to_stream(json_output_handler&amp; handler) const
+</code></pre>
+
+<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json<em>output</em>handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>
+<h3>Non-member overloads</h3>
+<pre><code>std::wostream&amp; operator&lt;&lt; (std::wostream&amp; os, const json&amp; val)
+</code></pre>
+
+<p>Inserts json value into stream.</p>
+<pre><code>void swap(json&amp; a, json&amp; b)
+</code></pre>
+
+<p>Exchanges the values of <code>a</code> and <code>b</code></p>
+<h3>Deprecated member types</h3>
+<pre><code>null_type
+</code></pre>
+
+<p>typedefed to <code>jsoncons::null_type</code> for backwards compatability, use <code>jsoncons::null_type</code> instead</p>
+<h3>Deprecated methods</h3>
+<pre><code>bool is_custom() const
+
+template &lt;class T&gt;
+const T&amp; custom_data() const
+</code></pre>
+
+<p>If the value is custom, returns a reference to the custom value, otherwise throws  </p>
+<pre><code>template &lt;class T&gt;
+T&amp; custom_data() 
+</code></pre>
+
+<p>If the value is custom, returns a reference to the custom value, otherwise throws  </p>
+<pre><code>template &lt;class T&gt;
+void set_custom_data(const std::string&amp; name, const T&amp; value)
+</code></pre>
+
+<p>Inserts custom data of type <code>T</code> into a json object.</p>
+<pre><code>template &lt;class T&gt;
+void add_custom_data(const T&amp; val)
+</code></pre>
+
+<p>Adds a new custom data element of type <code>T at the end of a json array. The content of</code>val` is copied to the new element.</p>
+<pre><code>template &lt;class T&gt;
+void add_custom_data(size_t index, const T&amp; val)
+</code></pre>
+
+<p>Adds a new custom data element of type <code>T</code> at the specified index of a json array, shifting all elements currently at or above that index to the right.
+The content of <code>val</code> is copied to the new element.</p>
+<pre><code>std::string as_string(const output_format&amp; format) const
+</code></pre>
+
+<p>Use <code>to_string(format)</code>.</p>
+<pre><code>template &lt;size_t N&gt;
+static json make_multi_array(size1 ... sizeN)
+Use `json make_array&lt;N&gt;(size1 ... sizeN)` instead
+
+template &lt;size_t N,typename T&gt;
+static json make_multi_array(size1 ... sizeN, T val)
+Use `json make_array&lt;N&gt;(size1 ... sizeN, T val)` instead
+
+static json make_2d_array(size_t m, size_t n)
+</code></pre>
+
+<p>Use <code>make_array&lt;2&gt;(m,n)</code> instead</p>
+<pre><code>template&lt;typename T&gt; 
+static json make_2d_array(size_t m, size_t n, T val)
+</code></pre>
+
+<p>Use <code>make_array&lt;2&gt;(m,n,val)</code> instead</p>
+<pre><code>static json make_3d_array(size_t m, size_t n, size_t k)
+</code></pre>
+
+<p>Use <code>make_array&lt;3&gt;(m,n,k)</code> instead</p>
+<pre><code>template &lt;typename T&gt;
+static json make_3d_array(size_t m, size_t n, size_t k, T val)
+</code></pre>
+
+<p>Use <code>make_array&lt;3&gt;(m,n,k,val)</code> instead</p>
+<pre><code>template &lt;class T&gt;
+std::vector&lt;T&gt; as_vector() const
+</code></pre>
+
+<p>If value is array and conversion is possible to the template type, returns a <code>std::vector</code> of that type, otherwise throws an <code>std::exception</code>. Specializations are provided for <code>std::string</code>, <code>bool</code>, <code>char</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, and <code>double</code>.
+Use <code>as&lt;std::vector&lt;T&gt;&gt;</code> instead.</p>
+<pre><code>int as_int() const
+</code></pre>
+
+<p>Use <code>as&lt;int&gt;()</code> instead</p>
+<pre><code>unsigned int as_uint() const
+</code></pre>
+
+<p>Use <code>as&lt;int&gt;()</code> instead</p>
+<pre><code>char as_char() const
+</code></pre>
+
+<p>Use <code>as&lt;char&gt;()</code> instead</p>
+<h3>Examples</h3>
+<h3>Accessors and defaults</h3>
+<pre><code>json obj;
+
+obj[&quot;field1&quot;] = 1;
+obj[&quot;field3&quot;] = &quot;Toronto&quot;;
+
+double x1 = obj.has_member(&quot;field1&quot;) ? obj[&quot;field1&quot;].as&lt;double&gt;() : 10.0;
+double x2 = obj.has_member(&quot;field2&quot;) ? obj[&quot;field2&quot;].as&lt;double&gt;() : 20.0;
+
+std::string x3 = obj.get(&quot;field3&quot;,&quot;Montreal&quot;).as&lt;std::string&gt;();
+std::string x4 = obj.get(&quot;field4&quot;,&quot;San Francisco&quot;).as&lt;std::string&gt;();
+
+std::cout &lt;&lt; &quot;x1=&quot; &lt;&lt; x1 &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;x2=&quot; &lt;&lt; x2 &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;x3=&quot; &lt;&lt; x3 &lt;&lt; std::endl;
+std::cout &lt;&lt; &quot;x4=&quot; &lt;&lt; x4 &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>x1=1
+x2=20
+x3=Toronto
+x4=San Francisco
+</code></pre>
+
+<h3>Nulls</h3>
+<pre><code>json obj;
+obj[&quot;field1&quot;] = json::null;
+std::cout &lt;&lt; obj &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is </p>
+<pre><code>{&quot;field1&quot;:null}
+</code></pre>
+
+<h3>Array</h3>
+<pre><code>json arr(json::an_array);
+arr.add(10);
+arr.add(20);
+arr.add(30);
+
+std::cout &lt;&lt; arr &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is </p>
+<pre><code>[10,20,30]
+</code></pre>
+
+<h3>Array from std::vector</h3>
+<pre><code>std::vector&lt;int&gt; v;
+v.push_back(10);
+v.push_back(20);
+v.push_back(30);
+
+json arr(v.begin(),v.end());
+
+std::cout &lt;&lt; arr &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is </p>
+<pre><code>[10,20,30]
+</code></pre>
+
+<h3>Object iterator</h3>
+<pre><code>json obj;
+obj[&quot;city&quot;] = &quot;Toronto&quot;;
+obj[&quot;province&quot;] = &quot;Ontario&quot;;
+obj[&quot;country&quot;] = &quot;Canada&quot;;
+
+for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+{
+    std::cout &lt;&lt; it-&gt;name() &lt;&lt; &quot;=&quot; &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
+}
+</code></pre>
+
+<p>The output is</p>
+<pre><code>city=Toronto
+country=Canada
+province=Ontario
+</code></pre>
+
+<h3>Array iterator</h3>
+<pre><code>json arr(json::an_array);
+arr.add(&quot;Toronto&quot;);
+arr.add(&quot;Vancouver&quot;);
+arr.add(&quot;Montreal&quot;);
+
+for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+{
+    std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
+}
+</code></pre>
+
+<p>The output is</p>
+<pre><code>Toronto
+Vancouver 
+Montreal
+</code></pre>
+
+<h3>Constructing json structures</h3>
+<pre><code>json root;
+
+root[&quot;persons&quot;] = json::an_array;
+
+json person;
+person[&quot;first_name&quot;] = &quot;John&quot;;
+person[&quot;last_name&quot;] = &quot;Smith&quot;;
+person[&quot;birth_date&quot;] = &quot;1972-01-30&quot;;
+
+json address;
+address[&quot;city&quot;] = &quot;Toronto&quot;;
+address[&quot;country&quot;] = &quot;Canada&quot;;
+
+person[&quot;address&quot;] = std::move(address);
+
+root[&quot;persons&quot;].add(std::move(person));
+
+std::cout &lt;&lt; pretty_print(root) &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{
+    &quot;persons&quot;:
+    [
+        {
+            &quot;address&quot;:
+            {
+                &quot;city&quot;:&quot;Toronto&quot;,
+                &quot;country&quot;:&quot;Canada&quot;
+            },
+            &quot;birth_date&quot;:&quot;1972-01-30&quot;,
+            &quot;first_name&quot;:&quot;John&quot;,
+            &quot;last_name&quot;:&quot;Smith&quot;
+        }
+    ]
+}
+</code></pre>
+
+<h3>Default NaN, inf and -inf replacement</h3>
+<pre><code>json obj;
+obj[&quot;field1&quot;] = std::sqrt(-1.0);
+obj[&quot;field2&quot;] = 1.79e308*1000;
+obj[&quot;field3&quot;] = -1.79e308*1000;
+std::cout &lt;&lt; obj &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{&quot;field1&quot;:null,&quot;field2&quot;:null,&quot;field3&quot;:null}
+</code></pre>
+
+<h3>Custom NaN, inf and -inf replacement</h3>
+<pre><code>json obj;
+obj[&quot;field1&quot;] = std::sqrt(-1.0);
+obj[&quot;field2&quot;] = 1.79e308*1000;
+obj[&quot;field3&quot;] = -1.79e308*1000;
+
+output_format format;
+format.nan_replacement(&quot;null&quot;);
+format.pos_inf_replacement(&quot;1e9999&quot;);
+format.neg_inf_replacement(&quot;-1e9999&quot;);
+
+obj.to_stream(std::cout,format);
+std::cout &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is</p>
+<pre><code>{&quot;field1&quot;:null,&quot;field2&quot;:1e9999,&quot;field3&quot;:-1e9999}
+</code></pre>
+
+<h3>Suppressing NaN, inf and -inf replacement</h3>
+<pre><code>json obj;
+obj[&quot;field1&quot;] = std::sqrt(-1.0);
+obj[&quot;field2&quot;] = 1.79e308*1000;
+obj[&quot;field3&quot;] = -1.79e308*1000;
+
+output_format format;
+format.replace_nan(false);
+format.replace_inf(false);
+
+obj.to_stream(std::cout,format);
+std::cout &lt;&lt; std::endl;
+</code></pre>
+
+<p>The (illegal) json output produced by Visual Studio 2010 is</p>
+<pre><code>{&quot;field1&quot;:-1.#IND,&quot;field2&quot;:1.#INF,&quot;field3&quot;:-1.#INF}
+</code></pre>
+
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
