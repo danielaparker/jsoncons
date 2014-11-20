@@ -138,7 +138,6 @@ public:
     typedef jsoncons::null_type null_type;
     class object;
     class array;
-    struct json_any_type {};
 
     class any
     {
@@ -192,6 +191,9 @@ public:
 
     	json_any_impl<Char>* content_;
     };
+
+    // Deprecated
+    typedef any json_any_type;
 
     class member_type
     {
