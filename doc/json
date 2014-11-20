@@ -306,11 +306,13 @@ typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
 </code></pre>
 
 <p><a href="json_member_type">member_type</a> stores a name and a json value</p>
+<pre><code>any
+</code></pre>
+
+<p><a href="json_any">any</a> can contain any value that supports copy construction and assignment.</p>
 <pre><code>object
 
 array
-
-json_any_type
 </code></pre>
 
 <p>Type tags that can be used with <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code></p>
@@ -505,34 +507,60 @@ provided this value is a json array, otherwise throws a <code>json_exception</co
 bool is() const
 </code></pre>
 
-<p>Returns <code>true</code> if json value is of type <code>T</code>, <code>false</code> otherwise.<br />
-<code>is&lt;short&gt;</code>, <code>is&lt;unsigned short&gt;</code>, <code>is&lt;int&gt;</code>, <code>is&lt;unsigned int&gt;</code>, <code>is&lt;long&gt;</code>, <code>is&lt;unsigned long&gt;</code>, <code>is&lt;long long&gt;</code>, <code>is&lt;unsigned long long&gt;</code> all return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.<br />
-<code>is&lt;float&gt;</code> and <code>is&lt;double&gt;</code> returns true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.<br />
-<code>is&lt;std::string&gt;</code> returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.<br />
-<code>is&lt;bool&gt;</code> returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.<br />
-<code>is&lt;null_type&gt;</code> returns <code>true</code> if the json value is null, <code>false</code> otherwise.<br />
-<code>is&lt;json::object&gt;</code> returns <code>true</code> if the json value is an object, <code>false</code> otherwise.<br />
-<code>is&lt;json::array&gt;</code> returns <code>true</code> if the json value is an array, <code>false</code> otherwise.<br />
-<code>is&lt;json::json_any_type&gt;</code> returns <code>true</code> if the json value is type any, <code>false</code> otherwise.
-<code>is&lt;json::std::vector&lt;T&gt;&gt;</code> returns <code>true</code> if the json value is an array and each element is of type <code>T</code>, <code>false</code> otherwise.</p>
+<p>Returns <code>true</code> if json value is of type <code>T</code>, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;short&gt; 
+is&lt;unsigned short&gt; 
+is&lt;int&gt; 
+is&lt;unsigned int&gt; 
+is&lt;long&gt; 
+is&lt;unsigned long&gt; 
+is&lt;long long&gt; 
+is&lt;unsigned long long&gt; 
+</code></pre>
+
+<p>Return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;float&gt; 
+is&lt;double&gt; 
+</code></pre>
+
+<p>Return true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;std::string&gt; 
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;bool&gt;
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;null_type&gt;
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is null, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;json::any&gt;
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is type any, <code>false</code> otherwise.</p>
+<pre><code>is&lt;json::object&gt; 
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is an object, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;json::array&gt; 
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is an array, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;json::std::vector&lt;T&gt;&gt;
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is an array and each element is of type <code>T</code>, <code>false</code> otherwise.</p>
 <pre><code>bool is_null() const
-
 bool is_string() const
-
 bool is_numeric() const
-
 bool is_longlong() const
-
 bool is_ulonglong() const
-
 bool is_double() const
-
 bool is_bool() const
-
 bool is_object() const
-
 bool is_array() const
-
 bool is_any() const
 
 json&amp; operator[](size_t i)

@@ -183,34 +183,51 @@ Returns `true` if a json object has a member named `name`, otherwise `false`.
     template <typename T>
     bool is() const
 Returns `true` if json value is of type `T`, `false` otherwise.  
-`is<short>`, `is<unsigned short>`, `is<int>`, `is<unsigned int>`, `is<long>`, `is<unsigned long>`, `is<long long>`, `is<unsigned long long>` all return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
-`is<float>` and `is<double>` returns true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
-`is<std::string>` returns `true` if the json value is of string type, `false` otherwise.  
-`is<bool>` returns `true` if the json value is of boolean type, `false` otherwise.  
-`is<null_type>` returns `true` if the json value is null, `false` otherwise.  
-`is<json::object>` returns `true` if the json value is an object, `false` otherwise.  
-`is<json::array>` returns `true` if the json value is an array, `false` otherwise.  
-`is<json::json_any_type>` returns `true` if the json value is type any, `false` otherwise.
-`is<json::std::vector<T>>` returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
+
+    is<short> 
+    is<unsigned short> 
+    is<int> 
+    is<unsigned int> 
+    is<long> 
+    is<unsigned long> 
+    is<long long> 
+    is<unsigned long long> 
+Return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
+
+    is<float> 
+    is<double> 
+Return true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
+
+    is<std::string> 
+Returns `true` if the json value is of string type, `false` otherwise.  
+
+    is<bool>
+Returns `true` if the json value is of boolean type, `false` otherwise.  
+
+    is<null_type>
+Returns `true` if the json value is null, `false` otherwise.  
+
+    is<json::any>
+Returns `true` if the json value is type any, `false` otherwise.
+
+    is<json::object> 
+Returns `true` if the json value is an object, `false` otherwise.  
+
+    is<json::array> 
+Returns `true` if the json value is an array, `false` otherwise.  
+
+    is<json::std::vector<T>>
+Returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
 
     bool is_null() const
-
     bool is_string() const
-
     bool is_numeric() const
-
     bool is_longlong() const
-
     bool is_ulonglong() const
-
     bool is_double() const
-
     bool is_bool() const
-
     bool is_object() const
-
     bool is_array() const
-
     bool is_any() const
 
     json& operator[](size_t i)
