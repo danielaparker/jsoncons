@@ -25,7 +25,7 @@ a json::any value, like this:
 
     obj.set("mydata",json::any(A));
 
-    matrix<double> B = obj["mydata"].as<json::any>.cast<matrix<double>>();
+    matrix<double> B = obj["mydata"].as<json::any>().cast<matrix<double>>();
 
 ### Serializing a json `any` value
  
