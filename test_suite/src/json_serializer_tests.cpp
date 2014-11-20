@@ -5,7 +5,7 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
-#include "jsoncons_ext/boost/type_extensions.hpp"
+#include "my_any_specializations.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
