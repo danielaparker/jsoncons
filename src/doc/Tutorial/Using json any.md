@@ -11,8 +11,8 @@ assignment.
 
 ### Inserting a boost matrix into a json object
 
-You may want to insert say a boost matrix into a `json` object, 
-and later access it by name. You can do so by wrapping it in
+This allows you, for example, to insert a boost matrix into a `json` object, 
+and to retrieve it back cast to the appropriate type. You do so by wrapping it in
 a json::any value, like this:
 
     json obj;
@@ -91,8 +91,7 @@ the output becomes
 
 ### Adding a boost matrix to a json array
 
-You may also want to add a json `any` value to a `json` array. You can do this with 
-the `add_custom_data' method.
+You can also add a json `any` value to a `json` array, like this. 
 
     json arr(json::an_array);
     matrix<double> A(2,2);
