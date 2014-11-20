@@ -1,13 +1,13 @@
 jsoncons
 ========
 
-`jsoncons` is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a tree structured `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in [jsoncons: a C++ library for json construction](http://jsoncons.sourceforge.net/).
+`jsoncons` is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a tree structured `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in [jsoncons: a C++ library for json construction](http://jsoncons.sourceforge.net/). Documentation may be found in https://github.com/danielaparker/jsoncons/wiki.
 
 The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
 
 jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013, clang 3.3 and GCC 4.8. 
 
-The code repository is on [github](https://github.com/danielaparker/jsoncons), releases are on [sourceforge](https://sourceforge.net/projects/jsoncons/?source=navbar). It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
+The code repository is on [github](https://github.com/danielaparker/jsoncons). It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
