@@ -4,7 +4,6 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
-#include "my_custom_data.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>

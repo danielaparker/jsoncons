@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef MY_CUSTOM_DATA_HPP
-#define MY_CUSTOM_DATA_HPP
+#ifndef MY_ANY_SPECIALIZATIONS_HPP
+#define MY_ANY_SPECIALIZATIONS_HPP
 
 #include "jsoncons/json.hpp"
 #include <boost/numeric/ublas/matrix.hpp>

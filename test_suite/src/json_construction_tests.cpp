@@ -9,7 +9,6 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include "my_custom_data.hpp"
 
 using jsoncons::json_serializer;
 using jsoncons::output_format;
