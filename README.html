@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+</head>
+<body>
+<h1>jsoncons</h1>
+<p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in <a href="http://jsoncons.sourceforge.net/">jsoncons: a C++ library for json construction</a>.</p>
+<p>The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
+<p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013, clang 3.3 and GCC 4.8. </p>
+<p>The code repository is on <a href="https://github.com/danielaparker/jsoncons">github</a>, releases are on <a href="https://sourceforge.net/projects/jsoncons/?source=navbar">sourceforge</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
+<h2>0.94 RC</h2>
+<p>Bug fixes </p>
+<ul>
+<li>Incorporates contributions from Cory Fields for silencing some compiler warnings</li>
+<li>Fixes bug reported by Vitaliy Gusev in json object operator[size_t]</li>
+</ul>
+<p>Changes</p>
+<ul>
+<li>json constructors that take string, double etc. are now declared explicit (assignments and defaults to <code>get</code> and <code>make_array</code> methods have their own implementation and do not depend on implicit constructors.)</li>
+<li><code>make_multi_array</code> renamed to <code>make_array</code> (old name is still supported)</li>
+<li>Previous versions supported <code>any</code> type values through special methods <code>set_custom_data</code>, <code>add_custom_data</code>, and <code>custom_data</code>. This version introduces a new type <code>json::any</code> that wraps <code>any</code> values and works with the usual accessors 'set', 'add' and 'as', so the specialized methods are no longer required.</li>
+</ul>
+<p>Enhancements </p>
+<ul>
+<li>json get method with default value now accepts extended types as defaults</li>
+<li>json make_array method with default value now accepts extended types as defaults</li>
+</ul>
+<p>New extensions</p>
+<ul>
+<li>Added <code>jsoncons_ext/boost/type_extensions.hpp</code> to collect 
+  extensions traits for boost types, in particular, for
+  <code>boost::gregorian</code> dates.</li>
+</ul>
+<h2>0.93 Release</h2>
+<p>New features</p>
+<ul>
+<li>Supports wide character strings and streams with <code>wjson</code>, <code>wjson_reader</code> etc. Assumes UTF16 encoding if sizeof(wchar<em>t)=2 and UTF32 encoding if sizeof(wchar</em>t)=4.</li>
+<li>The empty class <code>null_type</code>  is added to the <code>jsoncons</code> namespace, it replaces the member type json::null<em>type (json::null</em>type is typedefed to jsoncons::null_type for backward compatibility.)</li>
+</ul>
+<p>Defect fixes:</p>
+<ul>
+<li>The ascii character 0x7f (del) was not being considered a control character to be escaped, this is fixed.</li>
+<li>Fixed two issues with serialization when the output format property <code>escape_all_non_ascii</code> is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being handled when decoding.</li>
+</ul>
+<h2>0.92a Release</h2>
+<p>Includes contributed updates for valid compilation and execution in gcc and clang environments</p>
+<h2>0.92 Release</h2>
+<p>Breaking change (but only if you have subclassed <code>json_input_handler</code> or <code>json_output_handler</code>)</p>
+<ul>
+<li>For consistency with other names, the input and output handler methods new to 0.91 - <code>value_string</code>, <code>value_double</code>, <code>value_longlong</code>, <code>value_ulonglong</code> and <code>value_bool</code> - have been renamed to <code>string_value</code>, <code>double_value</code>, <code>longlong_value</code>, <code>ulonglong_value</code> and <code>bool_value</code>.</li>
+</ul>
+<p>Non breaking changes (previous features are deprecated but still work)</p>
+<ul>
+<li>
+<p><code>name_value_pair</code> has been renamed to <code>member_type</code> (typedefed to previous name.)</p>
+</li>
+<li>
+<p><code>as_string(output_format format)</code> has been deprecated, use the existing <code>to_string(output_format format)</code> instead</p>
+</li>
+</ul>
+<p>Enhancements:</p>
+<ul>
+<li><code>json</code> now has extensibilty, you can access and modify json values with new types, see the tutorial Extensibility </li>
+</ul>
+<p>Preparation for allocator support:</p>
+<ul>
+<li>The basic_json and related classes now have an Storage template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the <code>json</code> and related classes.</li>
+</ul>
+<h2>0.91 Release</h2>
+<p>This release should be largely backwards compatible with 0.90 and 0.83 with two exceptions: </p>
+<ol>
+<li>
+<p>If you have used object iterators, you will need to replace uses of <code>std::pair</code> with <code>name_value_pair</code>, in particular, <code>first</code> becomes <code>name()</code> and <code>second</code> becomes <code>value()</code>. </p>
+</li>
+<li>
+<p>If you have subclassed <code>json_input_handler</code>, <code>json_output_handler</code>, or <code>json_filter</code>, and have implemented <code>value(const std::string&amp; ...</code>,  <code>value(double ...</code>, etc., you will need to modify the names to  <code>value_string(const std::string&amp; ...</code>,  <code>value_double(double ...</code> (no changes if you are feeding existing implementations.)</p>
+</li>
+</ol>
+<p>The changes are</p>
+<ul>
+<li>
+<p>Replaced <code>std::pair&lt;std::string,json&gt;</code> with <code>name_value_pair</code> that has accessors <code>name()</code> and <code>value()</code></p>
+</li>
+<li>
+<p>In <code>json_input_handler</code> and <code>json_output_handler</code>, allowed for overrides of the <code>value</code> methods by making them non-virtual and adding virtual methods <code>value_string</code>, <code>value_double</code>, <code>value_longlong</code>, <code>value_ulonglong</code>, and <code>value_bool</code></p>
+</li>
+</ul>
+<p>Other new features:</p>
+<ul>
+<li>
+<p>Changed implementation of <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code>, the current implementation should be user extensible</p>
+</li>
+<li>
+<p><code>make_multi_array&lt;N&gt;</code> makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces <code>make_2d_array</code> and <code>make_3d_array</code>, which are now deprecated.</p>
+</li>
+<li>
+<p>Added support for <code>is&lt;std::vector&lt;T&gt;&gt;</code> and <code>as&lt;std::vector&lt;T&gt;&gt;</code></p>
+</li>
+<li>
+<p>Removed JSONCONS<em>NO</em>CXX11<em>RVALUE</em>REFERENCES, compiler must support move semantics</p>
+</li>
+</ul>
+<p>Incorporates a number of contributions from Pedro Larroy and the developers of the clearskies_core project:</p>
+<ul>
+<li>build system for posix systems</li>
+<li>GCC to list of supported compilers</li>
+<li>Android fix</li>
+<li>fixed virtual destructors missing in <code>json_input_handler</code>, <code>json_output_handler</code> and <code>parsing_context</code></li>
+<li>fixed const<em>iterator should be iterator in json</em>object implementation </li>
+</ul>
+<p>To clean up the interface and avoid too much duplicated functionality, we've deprecated some json methods (but they still work)</p>
+<pre><code>make_array
+</code></pre>
+
+<p>Use <code>json val(json::an_array)</code> or <code>json::make_multi_array&lt;1&gt;(...)</code> instead (but <code>make_array</code> will continue to work)</p>
+<pre><code>make_2d_array
+make_3d_array
+</code></pre>
+
+<p>Use <code>make_multi_array&lt;2&gt;</code> and <code>make_multi_array&lt;3&gt;</code> instead</p>
+<pre><code>as_vector
+</code></pre>
+
+<p>Use <code>as&lt;std::vector&lt;int&gt;&gt;</code> etc. instead</p>
+<pre><code>as_int
+as_uint
+as_char
+</code></pre>
+
+<p>Use <code>as&lt;int&gt;</code>, <code>as&lt;unsigned int&gt;</code>, and <code>as&lt;char&gt;</code> instead</p>
+<h2>Release 0.90a</h2>
+<p>Fixed issue affecting clang compile</p>
+<h2>Release 0.90</h2>
+<p>This release should be fully backwards compatible with 0.83. </p>
+<p>Includes performance enhancements to json<em>reader and json</em>deserializer</p>
+<p>Fixes issues with column numbers reported with exceptions</p>
+<p>Incorporates a number of patches contributed by Marc Chevrier:</p>
+<ul>
+<li>Fixed issue with set member on json object when a member with that name already exists</li>
+<li>clang port</li>
+<li>cmake build files for examples and test suite</li>
+<li>json template method is<T> for examining the types of json values</li>
+<li>json template method as<T> for accessing json values</li>
+</ul>
+<h2>Release 0.83</h2>
+<p>Optimizations (very unlikely to break earlier code)</p>
+<ul>
+<li>
+<p><code>get(const std::name&amp; name) const</code> now returns <code>const json&amp;</code> if keyed value exists, otherwise a const reference to json::null</p>
+</li>
+<li>
+<p><code>get(const std::string&amp; name, const json&amp; default_val) const</code> now returns <code>const json</code> (actually a const proxy that evaluates to <code>json</code> if read)</p>
+</li>
+</ul>
+<p>Bug fixes</p>
+<ul>
+<li>Line number not incremented within multiline comment - fixed</li>
+</ul>
+<p>Deprecated features removed</p>
+<ul>
+<li>Removed deprecated output_format properties (too much bagage to carry around)</li>
+</ul>
+<h2>Release 0.82a</h2>
+<ul>
+<li>
+<p>The const version of the json <code>operator[](const std::string&amp; name)</code> didn't need to return a proxy, the return value has been changed to <code>const json&amp;</code> (this change is transparent to the user.) </p>
+</li>
+<li>
+<p><code>get(const std::name&amp; name)</code> has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw.) This way both <code>get</code> methods return default values if no keyed value exists.</p>
+</li>
+<li>
+<p>non-const and const methods <code>json&amp; at(const std::name&amp; name)</code> have been added to replace the old single argument get method. These have the same behavior as the corresponding <code>operator[]</code> functions, but the non-const <code>at</code> is more efficient.</p>
+</li>
+</ul>
+<h2>Release 0.81</h2>
+<ul>
+<li>
+<p>Added accessor and modifier methods <code>floatfield</code> to <code>output_format</code> to provide a supported way to set the floatfield format flag to <code>fixed</code> or <code>scientific</code> with a specified number of decimal places (this can be done in older versions, but only with deprecated methods.)</p>
+</li>
+<li>
+<p>The default constructor now constructs an empty object (rather than a null object.) While this is a change, it's unlikely to break exisitng code (all test cases passed without modification.)</p>
+</li>
+</ul>
+<p>This means that instead of</p>
+<pre><code>json obj(json::an_object);
+obj[&quot;field&quot;] = &quot;field&quot;;
+</code></pre>
+
+<p>you can simply write</p>
+<pre><code>json obj;
+obj[&quot;field&quot;] = &quot;field&quot;;
+</code></pre>
+
+<p>The former notation is still supported, though.</p>
+<ul>
+<li>
+<p>Added a version of 'resize_array' to <code>json</code> that resizes the array to <code>n</code> elements and initializes them to a specified value.</p>
+</li>
+<li>
+<p>Added a version of the static method <code>json::make_array</code> that takes no arguments and makes an empty <code>json</code> array</p>
+</li>
+</ul>
+<p>Note that</p>
+<pre><code>json arr(json::an_array);
+</code></pre>
+
+<p>is equivalent to</p>
+<pre><code>json arr = json::make_array();
+</code></pre>
+
+<p>and</p>
+<pre><code>json arr(json::an_array);
+arr.resize_array(10,0.0);
+</code></pre>
+
+<p>is equivalent to</p>
+<pre><code>json arr = json::make_array(10,0.0);
+</code></pre>
+
+<p>For consistency the <code>json::make_array</code> notation is now favored in the documentation. </p>
+<h2>Release 0.71</h2>
+<ul>
+<li>
+<p>Added <code>resize_array</code> method to <code>json</code> for resizing json <code>arrays</code> </p>
+</li>
+<li>
+<p>Fixed issue with <code>remove_range</code> method (templated code failed to compile if calling this method.)</p>
+</li>
+<li>
+<p>Added <code>remove_member</code> method to remove a member from a <code>json</code> object</p>
+</li>
+<li>
+<p>Fixed issue with multiline line comments, added test case</p>
+</li>
+<li>
+<p>Fixed issue with adding custom data to a json array using <code>add_custom_data</code>, added examples.</p>
+</li>
+</ul>
+<h2>Release 0.70</h2>
+<ul>
+<li>
+<p>Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid <code>json</code> output when running on a locale like German or Spanish. The period character (‘.’) is now always used as the decimal point, non English locales are ignored.</p>
+</li>
+<li>
+<p>The <code>output_format</code> methods that support alternative floating point formatting, e.g. <code>fixed</code>, have been deprecated.</p>
+</li>
+<li>
+<p>Added a template method as_vector<T> to the <code>json</code> class. If a <code>json</code> value is an array and conversion is possible to the template type, returns a <code>std::vector</code> of that type, otherwise throws an <code>std::exception</code>. Specializations are provided for <code>std::string</code>, <code>bool</code>, <code>char</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, and <code>double</code>. For example</p>
+<p>std::string s(&quot;[0,1,2,3]&quot;);</p>
+<p>json val = json::parse_string(s);</p>
+<p>std::vector<int> v = val.as_vector<int>(); </p>
+</li>
+<li>
+<p>Undeprecated the <code>json</code> member function <code>precision</code></p>
+</li>
+</ul>
+<h2>Release 0.60b</h2>
+<p>This release (0.60b) is fully backwards compatible with 0.50.</p>
+<p>A change introduced with 0.60 has been reversed. 0.60 introduced an alternative method of constructing a json arrray or object with an initial default constructor, a bug with this was fixed in 0.60a, but this feature and related documentation has been removed because it added complexity but no real value.</p>
+<h3>Enhancements</h3>
+<ul>
+<li>
+<p>Added <code>swap</code> member function to <code>json</code></p>
+</li>
+<li>
+<p>Added <code>add</code> and <code>add_custom_data</code> overrides to <code>json</code> that take an index value, for adding a new element at the specified index and shifting all elements currently at or above that index to the right.</p>
+</li>
+<li>
+<p>Added <code>capacity</code> member functions to <code>json</code></p>
+</li>
+</ul>
+<h3>0.60  extensions</h3>
+<ul>
+<li><code>csv_serializer</code> has been added to the <code>csv</code> extension</li>
+</ul>
+<h2>Release 0.50</h2>
+<p>This release is fully backwards compatible with 0.4*, and mostly backwards compatible to 0.32 apart from the two name changes in 0.41</p>
+<p>Bug fixes</p>
+<ul>
+<li>When reading the escaped characters &quot;\b&quot;, &quot;\f&quot;, &quot;\r&quot; and &quot;\t&quot; appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.</li>
+</ul>
+<p>Deprecated </p>
+<ul>
+<li>Deprecated modifiers <code>precision</code> and <code>fixed_decimal_places</code> from output_format. Use <code>set_floating_point_format</code> instead.</li>
+<li>Deprecated constructor that takes <code>indenting</code> parameter from <code>output_format</code>. For pretty printing with indenting, use the <code>pretty_print</code> function or pass the <code>indenting</code> parameter in <code>json_serializer</code>.</li>
+</ul>
+<p>Changes</p>
+<ul>
+<li>When serializing floating point values to a stream, previous versions defaulted to default floating point precision with a precision of 16. This has been changed to truncate trailing zeros  but keep one if immediately after a decimal point.</li>
+</ul>
+<p>New features</p>
+<ul>
+<li>For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone (\r alone is new.)</li>
+<li>Added <code>set_floating_point_format</code> methods to <code>output_format</code> to give more control over floating point notation.</li>
+</ul>
+<p>Non functional enhancements</p>
+<ul>
+<li>json<em>reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin</em>array and begin_object events. This greatly reduces reallocations.</li>
+</ul>
+<h2>Release 0.42</h2>
+<ul>
+<li>Fixed another bug with multi line /**/ comments </li>
+<li>Minor fixes to reporting line and column number of errors</li>
+<li>Added fixed<em>decimal</em>places setter to output_format</li>
+<li>Added version of <code>as_string</code> to <code>json</code> that takes <code>output_format</code> as a parameter</li>
+<li>Reorganization of test cases and examples in source tree</li>
+</ul>
+<h2>Release 0.41</h2>
+<ul>
+<li>Added non-member overload swap(json&amp; a, json&amp; b)</li>
+<li>Fixed bug with multi line /**/ comments </li>
+<li>Added begin<em>json and end</em>json methods to json<em>output</em>handler</li>
+<li>json_deserializer should now satisfy basic exception safety (no leak guarantee)</li>
+<li>Moved csv<em>reader.hpp to jsoncons</em>ext/csv directory</li>
+<li>Changed csv<em>reader namespace to jsoncons</em>ext::csv</li>
+<li>json::parse<em>file no longer reads the entire file into memory before parsing
+  (it now uses json</em>reader default buffering)</li>
+</ul>
+<h2>Release 0.40</h2>
+<ul>
+<li>json<em>listener renamed to json</em>input_handler</li>
+<li>
+<p>json<em>writer renamed to json</em>output_handler</p>
+</li>
+<li>
+<p>Added json_filter class</p>
+</li>
+<li>
+<p>json get method that takes default argument now returns a value rather than a reference</p>
+</li>
+<li>Issue in csv_reader related to get method issue fixed</li>
+<li>Issue with const json operator[] fixed</li>
+<li>Added as_char method to json</li>
+<li>Improved exception safety, some opportunites for memory leaks in the presence of exceptions removed</li>
+</ul>
+<h2>Release 0.33</h2>
+<p>Added reserve method to json</p>
+<p>Added static make<em>3d</em>array method to json</p>
+<p>json_reader now configured for buffered reading</p>
+<p>Added csv_reader class for reading CSV files and producing JSON events</p>
+<p>Fixed bug with explicitly passing output<em>format in pretty</em>print.</p>
+<h2>Release 0.32</h2>
+<p>Added remove_range method, operator== and  operator!= to proxy and json objects</p>
+<p>Added static methods make<em>array and make</em>2d_array to json</p>
+<h2>Release 0.31</h2>
+<p>error<em>handler method content</em>error renamed to error</p>
+<p>Added error<em>code to warning, error and fatal</em>error methods of error_handler</p>
+<h2>Release 0.30</h2>
+<p>json<em>in</em>stream renamed to json_listener</p>
+<p>json<em>out</em>stream renamed to json_writer</p>
+<p>Added buffer accessor method to parsing_context</p>
+<h2>Release 0.20</h2>
+<p>Added parsing_context class for providing information about the
+element being parsed.</p>
+<p>error<em>handler methods take message and parsing</em>context parameters</p>
+<p>json<em>in</em>stream handlers take parsing_context parameter</p>
+<h2>Release 0.19</h2>
+<p>Added error<em>handler class for json</em>reader</p>
+<p>Made json_exception a base class for all json exceptions</p>
+<p>Added root() method to json_deserializer to get a reference to the json value</p>
+<p>Removed swap<em>root() method from json</em>deserializer</p>
+<h2>Release 0.18</h2>
+<p>Renamed serialize() class method to to_stream() in json  </p>
+<p>Custom data serialization supported through template function specialization of serialize
+(reverses change in 0.17)</p>
+<h2>Release 0.17</h2>
+<p>Added is_custom() method to json and proxy</p>
+<p>get<em>custom() method renamed to custom</em>data() in json and proxy</p>
+<p>Added clear() method to json and proxy</p>
+<p>set_member() method renamed to set()</p>
+<p>set<em>custom() method renamed to set</em>custom_data()</p>
+<p>push_back() method renamed to add() in json and proxy</p>
+<p>Added add<em>custom</em>data method() in json and proxy</p>
+<p>Custom data serialization supported through template class specialization of custom_serialization
+(replaces template function specialization of serialize)</p>
+<h2>Release 0.16</h2>
+<p>Change to json<em>out</em>stream and json_serializer:</p>
+<pre><code>void value(const custom_data&amp; value)
+</code></pre>
+
+<p>removed.</p>
+<p>Free function <code>serialize</code> replaces free function <code>to_stream</code> for
+serializing custom data.</p>
+<p>pretty print tidied up for nested arrays</p>
+<h2>Release 0.15</h2>
+<p>Made eof() method on json_reader public, to support reading
+multiple JSON objects from a stream.</p>
+<h2>Release 0.14</h2>
+<p>Added <code>pretty_print</code> class</p>
+<p>Renamed <code>json_stream_writer</code> to <code>json_serializer</code>, 
+implements pure virtual class <code>json_out_stream</code></p>
+<p>Renamed <code>json_stream_listener</code> to <code>json_deserializer</code>
+implements pure virtual class <code>json_in_stream</code></p>
+<p>Renamed <code>json_parser</code> to <code>json_reader</code>, <code>parse</code> to <code>read</code>.</p>
+<p>Changed indenting so object and array members start on new line.</p>
+<p>Added support for storing user data in <code>json</code> object, and
+serializing to JSON.</p>
+<h2>Release 0.13</h2>
+<p>Replaced <code>simple_string</code> union member with json_string that 
+wraps <code>std::basic_string&lt;Char&gt;</code></p>
+<p>name() and value() event handler methods on 
+basic<em>json</em>stream_writer take <code>const std::basic_string&lt;Char&gt;&amp;</code>
+rather than <code>const Char*</code> and <code>length</code>.</p>
+<h2>Release 0.12</h2>
+<p>Implemented operator&lt;&lt; for json::proxy</p>
+<p>Added to_stream methods to json::proxy</p>
+<h2>Release 0.11</h2>
+<p>Added members to json_parser to access and modify the buffer capacity</p>
+<p>Added checks when parsing integer values to determine overflow for 
+long long and unsigned long long, and if overflow, parse them as
+doubles.</p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
