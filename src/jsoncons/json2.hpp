@@ -1376,7 +1376,7 @@ const T& basic_json<Char, Storage>::custom_data() const
     switch (type_)
     {
     case json_any_t:
-			const T& p = value_.any_value_->cast<T>();
+			const T& p = value_.any_value_->template cast<T>();
 			return p;
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
@@ -1392,7 +1392,7 @@ T& basic_json<Char, Storage>::custom_data()
     {
     case json_any_t:
         {
-			T& p = value_.any_value_->cast<T>();
+			T& p = value_.any_value_->template cast<T>();
 			return p;
         }
     default:
