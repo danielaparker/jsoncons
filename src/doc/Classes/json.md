@@ -15,7 +15,7 @@ The `json` class is an instantiation of the `basic_json` class template that use
 [member_type](json_member_type) stores a name and a json value
 
     any
-[any](json_any) can contain any value that supports copy construction and assignment.
+[any](json%20any) can contain any value that supports copy construction and assignment.
 
     object
 
