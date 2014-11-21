@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_as)
     short_val = parent["child"]["field2"].as<short>();
     BOOST_CHECK_EQUAL(short_val,1);
 
-    json x = parent["child"].as<json::object>();
+    json::object x = parent["child"].as<json::object>();
 }
 
 BOOST_AUTO_TEST_CASE(test_is)

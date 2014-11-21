@@ -150,9 +150,13 @@ public:
         }
         return true;
     }
+
+    json_array(const json_array<Char,Storage>& val)
+        : members_(val.elements_)
+    {
+    }
 private:
     std::vector<basic_json<Char,Storage>> elements_;
-    json_array(const json_array<Char,Storage>&);
     json_array& operator=(const json_array<Char,Storage>&);
 };
 
@@ -283,9 +287,13 @@ public:
         return true;
     }
 
+    json_object(const json_object<Char,Storage>& val)
+        : members_(val.members_)
+    {
+    }
+
 private:
     std::vector<typename basic_json<Char,Storage>::member_type> members_;
-    json_object(const json_object<Char,Storage>&);
     json_object<Char,Storage>& operator=(const json_object<Char,Storage>&);
 };
 
