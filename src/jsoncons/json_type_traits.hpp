@@ -110,7 +110,8 @@ public:
     }
     typename basic_json<Char, Storage>::object as(const basic_json<Char, Storage>& val) const
     {
-        return val.object_value();
+        JSONCONS_ASSERT(val.is_object());
+        return val.is_empty() ? typename basic_json<Char, Storage>::object() : val.object_value();
     }
 };
 

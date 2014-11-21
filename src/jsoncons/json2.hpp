@@ -1168,7 +1168,7 @@ bool basic_json<Char, Storage>::is_empty() const
     case array_t:
         return value_.array_->size() == 0;
     case empty_object_t:
-        return 0;
+        return true;
     case object_t:
         return value_.object_->size() == 0;
     default:
