@@ -152,7 +152,7 @@ public:
     }
 
     json_array(const json_array<Char,Storage>& val)
-        : members_(val.elements_)
+        : elements_(val.elements_)
     {
     }
 private:
