@@ -18,12 +18,13 @@ Bug fixes
 
 - Incorporates contributions from Cory Fields for silencing some compiler warnings
 - Fixes bug reported by Vitaliy Gusev in json object operator[size_t]
+- Fixes bug in json `is_empty` method for empty objects
 
 Changes
 
 - json constructors that take string, double etc. are now declared explicit (assignments and defaults to `get` and `make_array` methods have their own implementation and do not depend on implicit constructors.)
 - `make_multi_array` renamed to `make_array` (old name is still supported)
-- Previous versions supported `any` type values through special methods `set_custom_data`, `add_custom_data`, and `custom_data`. This version introduces a new type `json::any` that wraps `any` values and works with the usual accessors 'set', 'add' and 'as', so the specialized methods are no longer required.
+- Previous versions supported `any` type values through special methods `set_custom_data`, `add_custom_data`, and `custom_data`. This version introduces a new type `json::any` that wraps `any` values and works with the usual accessors `set`, `add` and `as`, so the specialized methods are no longer required.
 
 Enhancements 
 
