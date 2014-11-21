@@ -229,6 +229,7 @@ Returns `true` if the json value is an array and each element is of type `T`, `f
     bool is_object() const
     bool is_array() const
     bool is_any() const
+Non-generic 'is' methods
 
     json& operator[](size_t i)
     const json& operator[](size_t i) const
