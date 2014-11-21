@@ -136,8 +136,8 @@ public:
     typedef Storage allocator_type;
 
     typedef jsoncons::null_type null_type;
-    class object;
-    class array;
+    typedef json_object<Char,Storage> object;
+    typedef json_array<Char,Storage> array;
 
     class any
     {
@@ -262,18 +262,6 @@ public:
 
     typedef typename json_array<Char,Storage>::iterator array_iterator;
     typedef typename json_array<Char,Storage>::const_iterator const_array_iterator;
-
-    operator array() const
-    {
-        JSONCONS_ASSERT(type_ == array_t);
-        return array(value_.array_->clone());
-    }
-
-    operator object() const
-    {
-        JSONCONS_ASSERT(type_ == object_t);
-        return object(value_.object_->clone());
-    }
 
     class const_val_proxy 
     {
@@ -1289,6 +1277,14 @@ public:
     any& any_value();
 
     const any& any_value() const;
+
+    object& object_value();
+
+    const object& object_value() const;
+
+    array& array_value();
+
+    const array& array_value() const;
 
     basic_json<Char,Storage>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Storage>& at(const std::basic_string<Char>& name) const;

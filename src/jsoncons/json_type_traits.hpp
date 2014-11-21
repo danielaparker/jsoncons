@@ -110,7 +110,7 @@ public:
     }
     typename basic_json<Char, Storage>::object as(const basic_json<Char, Storage>& val) const
     {
-        return val;
+        return val.object_value();
     }
 };
 
@@ -124,7 +124,7 @@ public:
     }
     typename basic_json<Char, Storage>::array as(const basic_json<Char, Storage>& val) const
     {
-        return val;
+        return val.array_value();
     }
 };
 

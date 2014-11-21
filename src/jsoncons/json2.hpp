@@ -1429,6 +1429,62 @@ const typename basic_json<Char, Storage>::any& basic_json<Char, Storage>::any_va
 }
 
 template<typename Char, typename Storage>
+typename basic_json<Char, Storage>::object& basic_json<Char, Storage>::object_value()
+{
+    switch (type_)
+    {
+    case json_object_t:
+        {
+			return *value_.object_;
+        }
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object value");
+    }
+}
+
+template<typename Char, typename Storage>
+const typename basic_json<Char, Storage>::object& basic_json<Char, Storage>::object_value() const
+{
+    switch (type_)
+    {
+    case object_t:
+        {
+			return *value_.object_;
+        }
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an object value");
+    }
+}
+
+template<typename Char, typename Storage>
+typename basic_json<Char, Storage>::array& basic_json<Char, Storage>::array_value()
+{
+    switch (type_)
+    {
+    case array_t:
+        {
+			return *value_.array_;
+        }
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array value");
+    }
+}
+
+template<typename Char, typename Storage>
+const typename basic_json<Char, Storage>::array& basic_json<Char, Storage>::array_value() const
+{
+    switch (type_)
+    {
+    case array_t:
+        {
+			return *value_.array_;
+        }
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an array value");
+    }
+}
+
+template<typename Char, typename Storage>
 std::basic_string<Char> basic_json<Char, Storage>::as_string() const
 {
     switch (type_)
@@ -1638,31 +1694,6 @@ void escape_string(const std::basic_string<Char>& s,
         }
     }
 }
-
-template<typename Char, typename Storage>
-class basic_json<Char, Storage>::object : public basic_json<Char, Storage>
-{
-public:
-    object(json_object<Char, Storage> *impl)
-       : basic_json<Char, Storage>(impl)
-    {
-    }
-};
-
-template<typename Char, typename Storage>
-class basic_json<Char, Storage>::array : public basic_json<Char, Storage>
-{
-public:
-    array(json_array<Char, Storage> *impl)
-       : basic_json<Char, Storage>(impl)
-    {
-    }
-private:
-    array()
-       : basic_json<Char, Storage>(array_t)
-    {
-    }
-};
 
 }
 
