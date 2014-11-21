@@ -51,6 +51,11 @@ BOOST_AUTO_TEST_CASE(test_as)
     BOOST_CHECK_EQUAL(short_val,1);
 
     json::object x = parent["child"].as<json::object>();
+
+    json empty;
+    BOOST_CHECK(empty.is_object());
+    BOOST_CHECK(empty.is_empty());
+    json::object y = empty.as<json::object>();
 }
 
 BOOST_AUTO_TEST_CASE(test_is)
