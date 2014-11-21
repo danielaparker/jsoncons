@@ -323,6 +323,29 @@ template &lt;typename T&gt;
 T&amp; cast() 
 </code></pre>
 
+<h3>Example</h3>
+<p>The json::any class can contain a value of any type as long as 
+that type supports copy construction and assignment. This allows you, for example, to insert a boost matrix into a <code>json</code> object, 
+and to retrieve it back cast to the appropriate type. </p>
+<pre><code>#include &quot;jsoncons/json.hpp&quot;
+#include &lt;boost/numeric/ublas/matrix.hpp&gt;
+
+using jsoncons::json;
+using boost::numeric::ublas::matrix;
+
+json obj;
+
+matrix&lt;double&gt; A(2,2);
+A(0,0) = 1;
+A(0,1) = 2;
+A(1,0) = 3;
+A(1,1) = 4;
+
+obj.set(&quot;mydata&quot;,json::any(A));
+
+matrix&lt;double&gt; B = obj[&quot;mydata&quot;].as&lt;json::any&gt;().cast&lt;matrix&lt;double&gt;&gt;();
+</code></pre>
+
 
 </body>
 </html>
