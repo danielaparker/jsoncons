@@ -1433,7 +1433,7 @@ typename basic_json<Char, Storage>::object& basic_json<Char, Storage>::object_va
 {
     switch (type_)
     {
-    case json_object_t:
+    case object_t:
         {
 			return *value_.object_;
         }
