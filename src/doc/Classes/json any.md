@@ -32,7 +32,7 @@ Supports copy and move assignment
 
 ### Example
 
-The json::any class can contain a value of any type as long as 
+A `json::any` object can contain a value of any type as long as 
 that type supports copy construction and assignment. This allows you, for example, to insert a boost matrix into a `json` object, 
 and to retrieve it back cast to the appropriate type. 
 

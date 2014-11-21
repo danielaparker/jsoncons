@@ -324,7 +324,7 @@ T&amp; cast()
 </code></pre>
 
 <h3>Example</h3>
-<p>The json::any class can contain a value of any type as long as 
+<p>A <code>json::any</code> object can contain a value of any type as long as 
 that type supports copy construction and assignment. This allows you, for example, to insert a boost matrix into a <code>json</code> object, 
 and to retrieve it back cast to the appropriate type. </p>
 <pre><code>#include &quot;jsoncons/json.hpp&quot;
