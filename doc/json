@@ -309,7 +309,7 @@ typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
 <pre><code>any
 </code></pre>
 
-<p><a href="json_any">any</a> can contain any value that supports copy construction and assignment.</p>
+<p><a href="json%20any">any</a> can contain any value that supports copy construction and assignment.</p>
 <pre><code>object
 
 array
@@ -562,8 +562,10 @@ bool is_bool() const
 bool is_object() const
 bool is_array() const
 bool is_any() const
+</code></pre>
 
-json&amp; operator[](size_t i)
+<p>Non-generic 'is' methods</p>
+<pre><code>json&amp; operator[](size_t i)
 const json&amp; operator[](size_t i) const
 </code></pre>
 
