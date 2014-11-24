@@ -507,8 +507,8 @@ provided this value is a json array, otherwise throws a <code>json_exception</co
 bool is() const
 </code></pre>
 
-<p>Returns <code>true</code> if json value is of type <code>T</code>, <code>false</code> otherwise.  </p>
-<pre><code>is&lt;short&gt; 
+<p>Returns <code>true</code> if json value has type <code>T</code>, <code>false</code> otherwise.  </p>
+<pre><code>is&lt;short&gt;
 is&lt;unsigned short&gt; 
 is&lt;int&gt; 
 is&lt;unsigned int&gt; 
@@ -519,8 +519,7 @@ is&lt;unsigned long long&gt;
 </code></pre>
 
 <p>Return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.  </p>
-<pre><code>is&lt;float&gt; 
-is&lt;double&gt; 
+<pre><code>is&lt;double&gt; 
 </code></pre>
 
 <p>Return true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.  </p>
@@ -551,7 +550,7 @@ is&lt;double&gt;
 <pre><code>is&lt;json::std::vector&lt;T&gt;&gt;
 </code></pre>
 
-<p>Returns <code>true</code> if the json value is an array and each element is of type <code>T</code>, <code>false</code> otherwise.</p>
+<p>Returns <code>true</code> if the json value is an array and each element has type <code>T</code>, <code>false</code> otherwise.</p>
 <pre><code>bool is_null() const
 bool is_string() const
 bool is_numeric() const
@@ -564,7 +563,7 @@ bool is_array() const
 bool is_any() const
 </code></pre>
 
-<p>Non-generic 'is' methods</p>
+<p>Non-generic versions of <code>is_</code> methods</p>
 <pre><code>json&amp; operator[](size_t i)
 const json&amp; operator[](size_t i) const
 </code></pre>
@@ -602,22 +601,37 @@ T as() const
 </code></pre>
 
 <p>Attempts to coerce the json value to the template type</p>
-<pre><code>bool as_bool() const
+<pre><code>as_bool&lt;bool&gt;
+</code></pre>
 
-double as_double() const
+<p>Returns <code>true</code> or <code>false</code> if value has a boolean type, otherwise throws.</p>
+<pre><code>as&lt;double&gt;
 </code></pre>
 
 <p>If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is <code>null</code>, returns <code>NaN</code>, otherwise throws.</p>
-<pre><code>long long as_longlong() const
+<pre><code>as&lt;short&gt;
+as&lt;unsigned short&gt; 
+as&lt;int&gt; 
+as&lt;unsigned int&gt; 
+as&lt;long&gt; 
+as&lt;unsigned long&gt; 
+as&lt;long long&gt; 
+as&lt;unsigned long long&gt; 
 </code></pre>
 
-<p>If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.</p>
-<pre><code>unsigned long long as_ulonglong() const
-
-std::string as_string() const
+<p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
+<pre><code>as&lt;string&gt;
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
+<pre><code>bool as_bool() const
+double as_double() const
+long long as_longlong() const
+unsigned long long as_ulonglong() const
+std::string as_string() const
+</code></pre>
+
+<p>Non-generic versions of <code>as</code> methods</p>
 <pre><code>const any&amp; any_value() const
 any&amp; any_value() 
 </code></pre>
