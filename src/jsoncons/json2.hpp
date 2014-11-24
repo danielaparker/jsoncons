@@ -1256,7 +1256,7 @@ bool basic_json<Char, Storage>::as_bool() const
     case bool_t:
         return value_.bool_value_;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a int");
+        JSONCONS_THROW_EXCEPTION("Not a bool");
     }
 }
 

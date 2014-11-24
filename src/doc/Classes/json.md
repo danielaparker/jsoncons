@@ -182,9 +182,9 @@ Returns `true` if a json object has a member named `name`, otherwise `false`.
 
     template <typename T>
     bool is() const
-Returns `true` if json value is of type `T`, `false` otherwise.  
+Returns `true` if json value has type `T`, `false` otherwise.  
 
-    is<short> 
+    is<short>
     is<unsigned short> 
     is<int> 
     is<unsigned int> 
@@ -194,7 +194,6 @@ Returns `true` if json value is of type `T`, `false` otherwise.
     is<unsigned long long> 
 Return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
 
-    is<float> 
     is<double> 
 Return true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
 
@@ -217,7 +216,7 @@ Returns `true` if the json value is an object, `false` otherwise.
 Returns `true` if the json value is an array, `false` otherwise.  
 
     is<json::std::vector<T>>
-Returns `true` if the json value is an array and each element is of type `T`, `false` otherwise.
+Returns `true` if the json value is an array and each element has type `T`, `false` otherwise.
 
     bool is_null() const
     bool is_string() const
@@ -229,7 +228,7 @@ Returns `true` if the json value is an array and each element is of type `T`, `f
     bool is_object() const
     bool is_array() const
     bool is_any() const
-Non-generic 'is' methods
+Non-generic versions of `is_` methods
 
     json& operator[](size_t i)
     const json& operator[](size_t i) const
@@ -260,18 +259,31 @@ If `name` matches the name of a member in the json object, returns a copy of the
     T as() const
 Attempts to coerce the json value to the template type
 
-    bool as_bool() const
+    as_bool<bool>
+Returns `true` or `false` if value has a boolean type, otherwise throws.
 
-    double as_double() const
+    as<double>
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
 
-    long long as_longlong() const
-If value is long long, returns value, if value is unsigned long long or double, casts to long long, if value is bool, returns 1 if true and 0 if false, otherwise throws.
+    as<short>
+    as<unsigned short> 
+    as<int> 
+    as<unsigned int> 
+    as<long> 
+    as<unsigned long> 
+    as<long long> 
+    as<unsigned long long> 
+Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
-    unsigned long long as_ulonglong() const
-
-    std::string as_string() const
+    as<string>
 If value is string, returns value, otherwise returns result of `to_string`.
+
+    bool as_bool() const
+    double as_double() const
+    long long as_longlong() const
+    unsigned long long as_ulonglong() const
+    std::string as_string() const
+Non-generic versions of `as` methods
 
     const any& any_value() const
     any& any_value() 
