@@ -293,10 +293,8 @@ img {
 <body>
 <h1>jsoncons: a C++ library for json construction</h1>
 <p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. Documentation may be found in https://github.com/danielaparker/jsoncons/wiki.</p>
-<p>The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
 <p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013, clang 3.3 and GCC 4.8. </p>
 <p>The code repository is on <a href="https://github.com/danielaparker/jsoncons">github</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
-<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
 <p>The library has a number of features, which are listed below:</p>
 <ul>
 <li>Uses the standard C++ input/output streams library</li>
@@ -316,7 +314,7 @@ img {
 </ul>
 <h2>Using the code</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
-<p>To install the jsoncons library, download the zip file, unpack the release, find the jsoncons directory under src, and copy it to your include directory.</p>
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
 <p>The jsoncons classes and functions are in namespace jsoncons. The following using declarations are for the examples that appear below.</p>
 <pre><code>#include &quot;jsoncons/json.hpp&quot;
 
