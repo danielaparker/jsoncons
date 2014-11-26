@@ -291,29 +291,12 @@ img {
 </style>
 </head>
 <body>
-<p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. A brief introduction may be found in <a href="http://jsoncons.sourceforge.net/">jsoncons: a C++ library for json construction</a>.</p>
+<p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. </p>
 <p>The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
 <p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013 and clang 3.3 and GCC 4.8. </p>
-<p>The code repository is on <a href="https://github.com/danielaparker/jsoncons">github</a>, releases are on <a href="https://sourceforge.net/projects/jsoncons/?source=navbar">sourceforge</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
+<p>The code repository and releases are on <a href="https://github.com/danielaparker/jsoncons">github</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
 <p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>. Extensions are in namespace <code>jsoncons_ext</code>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a>.</p>
-<h3>Features</h3>
-<ul>
-<li>Uses the standard C++ input/output streams library</li>
-<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
-<li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
-<li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
-<li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
-<li>Guarantees basic exception safety (no leaks)</li>
-<li>Accepts and ignores single line comments that start with <code>//</code>, and multi line comments that start with <code>/<em></code> and end with <code></em>/</code></li>
-<li>Supports optional escaping of the solidus (<code>/</code>) character</li>
-<li>Supports <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</li>
-<li>Supports reading multiple json objects from a stream</li>
-<li>Supports optional escaping of non-ascii UTF-8 octets</li>
-<li>Allows extensions to the types accepted by the <code>json</code> class accessors and modifiers</li>
-<li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li>
-<li>Supports reading (writing) JSON values from (to) CSV files</li>
-</ul>
 <h3>Roadmap</h3>
 <p><a href="Roadmap">Roadmap</a></p>
 <h3>Tutorial</h3>
