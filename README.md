@@ -39,7 +39,7 @@ The jsoncons classes and functions are in namespace jsoncons. The following usin
     using jsoncons::null_type;
     using jsoncons::json;
 
-Reading json values from a file
+### Reading json values from a file
 
 Here is a sample file (books.json):
 
@@ -117,7 +117,7 @@ Or you can check if book has a member "price" with the method `has_member`, and 
         cout << "n/a";
     }
 
-Building json values in C++
+### Constructing json values in C++
 
 To construct an empty json object, use the default constructor:
 
@@ -187,7 +187,8 @@ produces
             "resize_what":"long_edge"
         }
     }
-## Iterators
+
+### Iterators
 
 jsoncons::json supports iterators for accessing the members of json objects and the elements of json arrays.
 
