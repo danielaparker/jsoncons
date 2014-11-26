@@ -325,7 +325,7 @@ using jsoncons::null_type;
 using jsoncons::json;
 </code></pre>
 
-<p>Reading json values from a file</p>
+<h3>Reading json values from a file</h3>
 <p>Here is a sample file (books.json):</p>
 <pre><code>[
     {
@@ -402,7 +402,7 @@ else
 }
 </code></pre>
 
-<p>Building json values in C++</p>
+<h3>Constructing json values in C++</h3>
 <p>To construct an empty json object, use the default constructor:</p>
 <pre><code> json image_sizing;
 </code></pre>
@@ -473,7 +473,7 @@ file_export[&quot;image_sizing&quot;] = std::move(image_sizing);
 }
 </code></pre>
 
-<h2>Iterators</h2>
+<h3>Iterators</h3>
 <p>jsoncons::json supports iterators for accessing the members of json objects and the elements of json arrays.</p>
 <p>An example of iterating over the name-value pairs of a json object:</p>
 <pre><code>json person;
