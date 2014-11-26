@@ -292,8 +292,6 @@ assignment.
     using jsoncons::pretty_print;
     using boost::numeric::ublas::matrix;
 
-### Inserting a boost matrix into a json object
-
 This allows you, for example, to insert a boost matrix into a `json` object, 
 and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
 a `json::any value`, like this:
