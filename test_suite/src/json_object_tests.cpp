@@ -189,3 +189,19 @@ BOOST_AUTO_TEST_CASE(test_proxy_const_member_read)
     BOOST_CHECK(s1 == std::string("value1"));
 }
 
+BOOST_AUTO_TEST_CASE(test_object_equals)
+{
+    json a;
+    a["field1"] = "value1";
+
+    json b;
+    b["field1"] = "value1";
+
+    BOOST_CHECK(a == b);
+
+    json c;
+    c["field1"] = 10;
+
+    BOOST_CHECK(a != c);
+}
+
