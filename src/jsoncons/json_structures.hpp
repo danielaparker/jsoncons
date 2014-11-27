@@ -278,8 +278,10 @@ public:
         }
         for (const_iterator it = members_.begin(); it != members_.end(); ++it)
         {
-            bool exists = std::binary_search(rhs.members_.begin(),rhs.members_.end(),*it,member_compare<Char,Storage>());
-            if (!exists)
+
+            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Storage>());
+            // member_compare actually only compares keys, so we need to check the value separately
+            if (rhs_it == rhs.end() || rhs_it->value() != it->value())
             {
                 return false;
             }
