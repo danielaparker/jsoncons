@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_any)
     obj.set("mydata",json::any(A));
     std::cout << "After set" << std::endl;
 
-    obj.to_stream(json_serializer(std::cout));
+    obj.to_stream(std::cout);
     std::cout << "After to_stream" << std::endl;
     std::cout << obj << std::endl;
 
