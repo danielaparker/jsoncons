@@ -339,21 +339,21 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
             case '\f':
             case ' ':
                 {
-                    size_t count = 0;
                     if (buffer_[buffer_position_] == ' ')
                     {
-                        ++count;
+                        ++buffer_position_;
+                        ++column_;
+                        if (buffer_[buffer_position_] == ' ')
+                        {
+                            ++buffer_position_;
+                            ++column_;
+                            if (buffer_[buffer_position_] == ' ')
+                            {
+                                ++buffer_position_;
+                                ++column_;
+                            }
+                        }
                     }
-                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' '))
-                    {
-                        ++count;
-                    }
-                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' ') & (buffer_[buffer_position_+2] == ' '))
-                    {
-                        ++count;
-                    }
-                    buffer_position_ += count;
-                    column_ += count;
                 }
                 break;
             case '/':
@@ -364,7 +364,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         ++buffer_position_;
                         ignore_single_line_comment();
                     }
-                    if (next == '*')
+                    else if (next == '*')
                     {
                         ++buffer_position_;
                         ignore_multi_line_comment();
@@ -421,7 +421,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                                 {
                                     ++count1;
                                 }
-                                if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ':'))
+                                else if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ':'))
                                 {
                                     count1 += 2;
                                 }
