@@ -21,20 +21,20 @@
 
 namespace jsoncons {
 
-template<typename Char>
-class basic_json_reader : private basic_parsing_context<Char>
+template<typename CharT>
+class basic_json_reader : private basic_parsing_context<CharT>
 {
     struct buffered_stream
     {
-        buffered_stream(std::basic_istream<Char>& is)
+        buffered_stream(std::basic_istream<CharT>& is)
             : is_(is)
         {
         }
 
-        std::basic_istream<Char>& is_;
+        std::basic_istream<CharT>& is_;
     };
 
-    static default_basic_error_handler<Char> default_err_handler;
+    static default_basic_error_handler<CharT> default_err_handler;
 
     struct stack_item
     {
@@ -66,9 +66,9 @@ public:
     static const size_t default_max_buffer_length = 16384;
 
     //  Parse an input stream of JSON text into a json object
-    basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_input_handler<Char>& handler,
-                      basic_error_handler<Char>& err_handler)
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler,
+                      basic_error_handler<CharT>& err_handler)
        :
          minimum_structure_capacity_(0),
          column_(),
@@ -87,8 +87,8 @@ public:
          stream_ptr_(new buffered_stream(is))
     {
     }
-    basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_input_handler<Char>& handler)
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler)
 
        :
          minimum_structure_capacity_(0),
@@ -118,7 +118,7 @@ public:
         read(stream_ptr_->is_);
     }
 
-    void read(std::basic_istream<Char>& is);
+    void read(std::basic_istream<CharT>& is);
 
     bool eof() const
     {
@@ -150,7 +150,7 @@ public:
         return minimum_structure_capacity_;
     }
 
-    virtual const std::basic_string<Char>& buffer() const
+    virtual const std::basic_string<CharT>& buffer() const
     {
         return string_buffer_;
     }
@@ -166,7 +166,7 @@ private:
     size_t skip_string(size_t pos, const size_t end) const;
     size_t skip_number(size_t pos, const size_t end) const;
     void parse_separator();
-    void parse_number(Char c);
+    void parse_number(CharT c);
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
@@ -249,31 +249,31 @@ private:
     size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
-    std::basic_string<Char> string_buffer_;
+    std::basic_string<CharT> string_buffer_;
     std::vector<stack_item> stack_;
-    std::vector<Char> buffer_;
+    std::vector<CharT> buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
     size_t hard_buffer_length_;
     size_t estimation_buffer_length_;
-    basic_json_input_handler<Char>& handler_;
-    basic_error_handler<Char>& err_handler_;
+    basic_json_input_handler<CharT>& handler_;
+    basic_error_handler<CharT>& err_handler_;
     bool bof_;
     bool eof_;
     std::unique_ptr<buffered_stream> stream_ptr_;
 };
 
-template<typename Char>
-default_basic_error_handler<Char> basic_json_reader<Char>::default_err_handler;
+template<typename CharT>
+default_basic_error_handler<CharT> basic_json_reader<CharT>::default_err_handler;
 
-template <typename Char>
-unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
+template <typename CharT>
+unsigned long long string_to_ulonglong(const CharT *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
 {
     unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        Char c = s[i];
+        CharT c = s[i];
         if ((c >= '0') & (c <= '9'))
         {
             if (n > max_value / 10)
@@ -293,8 +293,8 @@ unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsig
     return n;
 }
 
-template<typename Char>
-void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
+template<typename CharT>
+void basic_json_reader<CharT>::read(std::basic_istream<CharT>& is)
 {
     if (is.bad())
     {
@@ -318,7 +318,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
     {
         while (buffer_position_ < buffer_length_)
         {
-            Char c = buffer_[buffer_position_++];
+            CharT c = buffer_[buffer_position_++];
             ++column_;
             switch (c)
             {
@@ -358,7 +358,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                 break;
             case '/':
                 {
-                    Char next = buffer_[buffer_position_];
+                    CharT next = buffer_[buffer_position_];
                     if (next == '/')
                     {
                         ++buffer_position_;
@@ -436,7 +436,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                             }
                             else
                             {
-                                handler_.string_value(string_buffer_, *this);
+                                handler_.string_value(&string_buffer_[0], string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -562,8 +562,8 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
     }
 }
 
-template<typename Char>
-void basic_json_reader<Char>::parse_separator()
+template<typename CharT>
+void basic_json_reader<CharT>::parse_separator()
 {
     bool done = false;
     while (!done)
@@ -571,7 +571,7 @@ void basic_json_reader<Char>::parse_separator()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            CharT c = buffer_[buffer_position_++];
             ++column_;
             switch (c)
             {
@@ -594,7 +594,7 @@ void basic_json_reader<Char>::parse_separator()
                 break;
             case '/':
                 {
-                    Char next = buffer_[buffer_position_];
+                    CharT next = buffer_[buffer_position_];
                     if (next == '/')
                     {
                         ignore_single_line_comment();
@@ -623,8 +623,8 @@ void basic_json_reader<Char>::parse_separator()
     }
 }
 
-template<typename Char>
-void basic_json_reader<Char>::parse_number(Char c)
+template<typename CharT>
+void basic_json_reader<CharT>::parse_number(CharT c)
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -640,7 +640,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++]; // shouldn't be lf
+            CharT c = buffer_[buffer_position_++]; // shouldn't be lf
             ++column_;
             switch (c)
             {
@@ -740,8 +740,8 @@ void basic_json_reader<Char>::parse_number(Char c)
     }
 }
 
-template<typename Char>
-void basic_json_reader<Char>::parse_string()
+template<typename CharT>
+void basic_json_reader<CharT>::parse_string()
 {
     string_buffer_.clear();
 
@@ -751,7 +751,7 @@ void basic_json_reader<Char>::parse_string()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            CharT c = buffer_[buffer_position_++];
             ++column_;
             switch (c)
             {
@@ -791,7 +791,7 @@ void basic_json_reader<Char>::parse_string()
                 break;
             case '\\':
                 {
-                    Char next = buffer_[buffer_position_];
+                    CharT next = buffer_[buffer_position_];
                     switch (next)
                     {
                     case '\"':
@@ -830,7 +830,7 @@ void basic_json_reader<Char>::parse_string()
                         {
                             ++buffer_position_;
                             uint32_t cp = decode_unicode_codepoint();
-                            json_char_traits<Char,sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
+                            json_char_traits<CharT,sizeof(CharT)>::append_codepoint_to_string(cp, string_buffer_);
                         }
                         break;
                     default:
@@ -857,8 +857,8 @@ void basic_json_reader<Char>::parse_string()
     }
 }
 
-template<typename Char>
-void basic_json_reader<Char>::ignore_single_line_comment()
+template<typename CharT>
+void basic_json_reader<CharT>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
@@ -866,7 +866,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            CharT c = buffer_[buffer_position_++];
             ++column_;
             switch (c)
             {
@@ -897,8 +897,8 @@ void basic_json_reader<Char>::ignore_single_line_comment()
     }
 }
 
-template<typename Char>
-void basic_json_reader<Char>::ignore_multi_line_comment()
+template<typename CharT>
+void basic_json_reader<CharT>::ignore_multi_line_comment()
 {
     bool done = false;
     while (!done)
@@ -906,7 +906,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            CharT c = buffer_[buffer_position_++];
             ++column_;
             switch (c)
             {
@@ -924,7 +924,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
                 break;
             case '*':
                 {
-                    Char next = buffer_[buffer_position_];
+                    CharT next = buffer_[buffer_position_];
                     if (next == '/')
                     {
                         done = true;
@@ -946,8 +946,8 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
     }
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
+template<typename CharT>
+size_t basic_json_reader<CharT>::estimate_minimum_array_capacity() const
 {
     size_t size = 0;
     size_t pos = buffer_position_;
@@ -1007,8 +1007,8 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     return size;
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
+template<typename CharT>
+size_t basic_json_reader<CharT>::estimate_minimum_object_capacity() const
 {
     size_t size = 0;
     size_t pos = buffer_position_;
@@ -1052,8 +1052,8 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     return size;
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
+template<typename CharT>
+size_t basic_json_reader<CharT>::skip_array(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1082,8 +1082,8 @@ size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
     return pos;
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
+template<typename CharT>
+size_t basic_json_reader<CharT>::skip_string(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1114,8 +1114,8 @@ size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
     return pos;
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
+template<typename CharT>
+size_t basic_json_reader<CharT>::skip_number(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1148,8 +1148,8 @@ size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
     return pos;
 }
 
-template<typename Char>
-size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
+template<typename CharT>
+size_t basic_json_reader<CharT>::skip_object(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1178,8 +1178,8 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
     return pos;
 }
 
-template<typename Char>
-uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
+template<typename CharT>
+uint32_t basic_json_reader<CharT>::decode_unicode_codepoint()
 {
     uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
@@ -1204,8 +1204,8 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     return cp;
 }
 
-template<typename Char>
-uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
+template<typename CharT>
+uint32_t basic_json_reader<CharT>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
@@ -1215,7 +1215,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
     size_t index = 0;
     while (index < 4)
     {
-        Char c = buffer_[buffer_position_++];
+        CharT c = buffer_[buffer_position_++];
         ++column_;
         const uint32_t u(c >= 0 ? c : 256 + c);
         cp *= 16;

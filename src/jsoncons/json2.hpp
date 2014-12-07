@@ -32,22 +32,22 @@
 
 namespace jsoncons {
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json()
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json()
 {
     type_ = empty_object_t;
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class InputIterator>
-basic_json<Char, Alloc>::basic_json(InputIterator first, InputIterator last)
+basic_json<CharT, Alloc>::basic_json(InputIterator first, InputIterator last)
 {
     type_ = array_t;
-    value_.array_ = new json_array<Char, Alloc>(first, last);
+    value_.array_ = new json_array<CharT, Alloc>(first, last);
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(const basic_json<CharT, Alloc>& val)
 {
     type_ = val.type_;
     switch (type_)
@@ -62,7 +62,7 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
         value_ = val.value_;
         break;
     case string_t:
-        value_.string_value_ = new std::basic_string<Char>(*(val.value_.string_value_));
+        value_.string_value_ = new internal_string_type(*(val.value_.string_value_));
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -79,113 +79,113 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
     }
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(json_object<Char, Alloc> *var)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(json_object<CharT, Alloc> *var)
 {
     type_ = object_t;
     value_.object_ = var;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(json_array<Char, Alloc> *var)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(json_array<CharT, Alloc> *var)
 {
     type_ = array_t;
     value_.array_ = var;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(typename basic_json<Char, Alloc>::any var)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(typename basic_json<CharT, Alloc>::any var)
 {
     type_ = json_any_t;
     value_.any_value_ = new any(var);
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(jsoncons::null_type)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(jsoncons::null_type)
 {
     type_ = null_t;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(double val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(double val)
 {
     type_ = double_t;
     value_.double_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(long long val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(long long val)
 {
     type_ = longlong_t;
     value_.longlong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(int val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(int val)
 {
     type_ = longlong_t;
     value_.longlong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned int val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(unsigned int val)
 {
     type_ = ulonglong_t;
     value_.longlong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(long val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(long val)
 {
     type_ = longlong_t;
     value_.longlong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned long val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(unsigned long val)
 {
     type_ = ulonglong_t;
     value_.longlong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned long long val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(unsigned long long val)
 {
     type_ = ulonglong_t;
     value_.ulonglong_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(bool val)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(bool val)
 {
     type_ = bool_t;
     value_.bool_value_ = val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(Char c)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(CharT c)
 {
     type_ = string_t;
-    value_.string_value_ = new std::basic_string<Char>();
+    value_.string_value_ = new std::basic_string<CharT>();
     value_.string_value_->push_back(c);
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(const std::basic_string<CharT>& s)
 {
     type_ = string_t;
-    value_.string_value_ = new std::basic_string<Char>(s);
+    value_.string_value_ = new internal_string_type(s.begin(),s.end());
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const Char *s)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(const CharT *s)
 {
     type_ = string_t;
-    value_.string_value_ = new std::basic_string<Char>(s);
+    value_.string_value_ = new std::basic_string<CharT>(s);
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(value_type t)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(value_type t)
 {
     type_ = t;
     switch (type_)
@@ -198,13 +198,13 @@ basic_json<Char, Alloc>::basic_json(value_type t)
     case bool_t:
         break;
     case string_t:
-        value_.string_value_ = new std::basic_string<Char>();
+        value_.string_value_ = new std::basic_string<CharT>();
         break;
     case array_t:
-        value_.array_ = new json_array<Char, Alloc>();
+        value_.array_ = new json_array<CharT, Alloc>();
         break;
     case object_t:
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
         break;
 
     case json_any_t:
@@ -212,8 +212,8 @@ basic_json<Char, Alloc>::basic_json(value_type t)
     }
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::~basic_json()
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::~basic_json()
 {
     switch (type_)
     {
@@ -239,8 +239,8 @@ basic_json<Char, Alloc>::~basic_json()
     }
 }
 
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_any(const typename basic_json<Char,Alloc>::any& rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_any(const typename basic_json<CharT,Alloc>::any& rhs)
 {
     switch (type_)
     {
@@ -254,13 +254,13 @@ void basic_json<Char, Alloc>::assign_any(const typename basic_json<Char,Alloc>::
         value_.any_value_ = new any(rhs);
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
 
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_string(const std::basic_string<CharT>& rhs)
 {
     switch (type_)
     {
@@ -271,16 +271,16 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
     case ulonglong_t:
     case double_t:
         type_ = string_t;
-        value_.string_value_ = new std::basic_string<Char>(rhs);
+        value_.string_value_ = new internal_string_type(rhs.begin(),rhs.end());
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
 
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_double(double rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_double(double rhs)
 {
     switch (type_)
     {
@@ -294,13 +294,13 @@ void basic_json<Char, Alloc>::assign_double(double rhs)
         value_.double_value_ = rhs;
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
 
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_longlong(long long rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_longlong(long long rhs)
 {
     switch (type_)
     {
@@ -314,12 +314,12 @@ void basic_json<Char, Alloc>::assign_longlong(long long rhs)
         value_.longlong_value_ = rhs;
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_ulonglong(unsigned long long rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_ulonglong(unsigned long long rhs)
 {
     switch (type_)
     {
@@ -333,12 +333,12 @@ void basic_json<Char, Alloc>::assign_ulonglong(unsigned long long rhs)
         value_.ulonglong_value_ = rhs;
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_bool(bool rhs)
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_bool(bool rhs)
 {
     switch (type_)
     {
@@ -352,12 +352,12 @@ void basic_json<Char, Alloc>::assign_bool(bool rhs)
         value_.bool_value_ = rhs;
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<CharT, Alloc>(rhs).swap(*this);
         break;
     }
 }
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_null()
+template<typename CharT, class Alloc>
+void basic_json<CharT, Alloc>::assign_null()
 {
     switch (type_)
     {
@@ -370,26 +370,26 @@ void basic_json<Char, Alloc>::assign_null()
         type_ = null_t;
         break;
     default:
-        basic_json<Char, Alloc>(null_type()).swap(*this);
+        basic_json<CharT, Alloc>(null_type()).swap(*this);
         break;
     }
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator = (basic_json<Char, Alloc> rhs)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::operator = (basic_json<CharT, Alloc> rhs)
 {
     rhs.swap(*this);
     return *this;
 }
 
-template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::operator!=(const basic_json<Char, Alloc>& rhs) const
+template<typename CharT, typename Alloc>
+bool basic_json<CharT, Alloc>::operator!=(const basic_json<CharT, Alloc>& rhs) const
 {
     return !(*this == rhs);
 }
 
-template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) const
+template<typename CharT, typename Alloc>
+bool basic_json<CharT, Alloc>::operator==(const basic_json<CharT, Alloc>& rhs) const
 {
     if (is_number() && rhs.is_number())
     {
@@ -459,8 +459,8 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
     return false;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::at(size_t i)
 {
     switch (type_)
     {
@@ -475,8 +475,8 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
     }
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::at(size_t i) const
 {
     switch (type_)
     {
@@ -491,8 +491,8 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
     }
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Char>& name)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::at(const std::basic_string<CharT>& name)
 {
     switch (type_)
     {
@@ -507,8 +507,8 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Cha
     }
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Char>& name) const
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::at(const std::basic_string<CharT>& name) const
 {
     switch (type_)
     {
@@ -523,17 +523,17 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_stri
     }
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_string<Char>& name) const
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::get(const std::basic_string<CharT>& name) const
 {
     switch (type_)
     {
     case empty_object_t:
-        return basic_json<Char, Alloc>::null;
+        return basic_json<CharT, Alloc>::null;
     case object_t:
         {
             const_object_iterator it = value_.object_->find(name);
-            return it != end_members() ? it->value() : basic_json<Char, Alloc>::null;
+            return it != end_members() ? it->value() : basic_json<CharT, Alloc>::null;
         }
     default:
         {
@@ -542,9 +542,9 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_str
     }
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<typename T>
-typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(const std::basic_string<Char>& name, T default_val) const
+typename basic_json<CharT, Alloc>::const_val_proxy basic_json<CharT, Alloc>::get(const std::basic_string<CharT>& name, T default_val) const
 {
     switch (type_)
     {
@@ -571,14 +571,14 @@ typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(c
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::set(const std::basic_string<CharT>& name, const basic_json<CharT, Alloc>& value)
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
     case object_t:
         value_.object_->set(name, value);
         break;
@@ -589,15 +589,15 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
     }
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(basic_json&& other){
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(basic_json&& other){
     type_ = other.type_;
     value_ = other.value_;
     other.type_ = null_t;
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::add(basic_json<CharT, Alloc>&& value){
     switch (type_){
     case array_t:
         value_.array_->push_back(value);
@@ -609,8 +609,8 @@ void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value){
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::add(size_t index, basic_json<CharT, Alloc>&& value){
     switch (type_){
     case array_t:
         value_.array_->add(index, value);
@@ -622,12 +622,12 @@ void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value)
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::set(std::basic_string<CharT>&& name, basic_json<CharT, Alloc>&& value){
     switch (type_){
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char,Alloc>();
+        value_.object_ = new json_object<CharT,Alloc>();
     case object_t:
         value_.object_->set(name,value);
         break;
@@ -639,17 +639,17 @@ void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Cha
 }
 
 // Deprecated
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class T>
-void basic_json<Char, Alloc>::set_custom_data(const std::basic_string<Char>& name, T value)
+void basic_json<CharT, Alloc>::set_custom_data(const std::basic_string<CharT>& name, T value)
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
     case object_t:
-        value_.object_->set(name, basic_json<Char, Alloc>(any(value)));
+        value_.object_->set(name, basic_json<CharT, Alloc>(any(value)));
         break;
     default:
         {
@@ -658,8 +658,8 @@ void basic_json<Char, Alloc>::set_custom_data(const std::basic_string<Char>& nam
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::clear()
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::clear()
 {
     switch (type_)
     {
@@ -674,8 +674,8 @@ void basic_json<Char, Alloc>::clear()
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove_range(size_t from_index, size_t to_index)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::remove_range(size_t from_index, size_t to_index)
 {
     switch (type_)
     {
@@ -687,8 +687,8 @@ void basic_json<Char, Alloc>::remove_range(size_t from_index, size_t to_index)
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::remove_member(const std::basic_string<CharT>& name)
 {
     switch (type_)
     {
@@ -700,8 +700,8 @@ void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(const basic_json<Char, Alloc>& value)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::add(const basic_json<CharT, Alloc>& value)
 {
     switch (type_)
     {
@@ -715,8 +715,8 @@ void basic_json<Char, Alloc>::add(const basic_json<Char, Alloc>& value)
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(size_t index, const basic_json<Char, Alloc>& value)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::add(size_t index, const basic_json<CharT, Alloc>& value)
 {
     switch (type_)
     {
@@ -731,15 +731,15 @@ void basic_json<Char, Alloc>::add(size_t index, const basic_json<Char, Alloc>& v
 }
 
 // Deprecated
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class T>
-void basic_json<Char, Alloc>::add_custom_data(T value)
+void basic_json<CharT, Alloc>::add_custom_data(T value)
 {
     switch (type_)
     {
     case array_t:
         {
-            add(basic_json<Char, Alloc>(any(value)));
+            add(basic_json<CharT, Alloc>(any(value)));
         }
         break;
     default:
@@ -750,14 +750,14 @@ void basic_json<Char, Alloc>::add_custom_data(T value)
 }
 
 // Deprecated
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class T>
-void basic_json<Char, Alloc>::add_custom_data(size_t index, T value)
+void basic_json<CharT, Alloc>::add_custom_data(size_t index, T value)
 {
     switch (type_)
     {
     case array_t:
-        value_.array_->add(index, basic_json<Char, Alloc>(any(value)));
+        value_.array_->add(index, basic_json<CharT, Alloc>(any(value)));
         break;
     default:
         {
@@ -766,8 +766,8 @@ void basic_json<Char, Alloc>::add_custom_data(size_t index, T value)
     }
 }
 
-template<typename Char, typename Alloc>
-size_t basic_json<Char, Alloc>::size() const
+template<typename CharT, typename Alloc>
+size_t basic_json<CharT, Alloc>::size() const
 {
     switch (type_)
     {
@@ -782,55 +782,56 @@ size_t basic_json<Char, Alloc>::size() const
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object_key_proxy basic_json<Char, Alloc>::operator[](const std::basic_string<Char>& name)
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::object_key_proxy basic_json<CharT, Alloc>::operator[](const std::basic_string<CharT>& name)
 {
     return object_key_proxy(*this, name);
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](const std::basic_string<Char>& name) const
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::operator[](const std::basic_string<CharT>& name) const
 {
     return at(name);
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](size_t i)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::operator[](size_t i)
 {
     return at(i);
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](size_t i) const
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::operator[](size_t i) const
 {
     return at(i);
 }
 
-template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::to_string() const
+template<typename CharT, typename Alloc>
+std::basic_string<CharT> basic_json<CharT, Alloc>::to_string() const
 {
-    std::basic_ostringstream<Char> os;
-    basic_json_serializer<Char> serializer(os);
+    std::basic_ostringstream<CharT> os;
+    basic_json_serializer<CharT> serializer(os);
     to_stream(serializer);
     return os.str();
 }
 
-template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::to_string(const basic_output_format<Char>& format) const
+template<typename CharT, typename Alloc>
+std::basic_string<CharT> basic_json<CharT, Alloc>::to_string(const basic_output_format<CharT>& format) const
 {
-    std::basic_ostringstream<Char> os;
-    basic_json_serializer<Char> serializer(os, format);
+    std::basic_ostringstream<CharT> os;
+    basic_json_serializer<CharT> serializer(os, format);
     to_stream(serializer);
     return os.str();
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler) const
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handler) const
 {
     switch (type_)
     {
     case string_t:
-        handler.value(*(value_.string_value_));
+        handler.value(&(*(value_.string_value_))[0],
+			         (value_.string_value_)->length());
         break;
     case double_t:
         handler.value(value_.double_value_);
@@ -854,7 +855,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     case object_t:
         {
             handler.begin_object();
-            json_object<Char, Alloc> *o = value_.object_;
+            json_object<CharT, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
                 handler.name(it->name());
@@ -866,7 +867,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     case array_t:
         {
             handler.begin_array();
-            json_array<Char, Alloc> *o = value_.array_;
+            json_array<CharT, Alloc> *o = value_.array_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);
@@ -883,156 +884,156 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::to_stream(std::basic_ostream<Char>& os) const
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os) const
 {
-    basic_json_serializer<Char> serializer(os);
+    basic_json_serializer<CharT> serializer(os);
     to_stream(serializer);
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format) const
 {
-    basic_json_serializer<Char> serializer(os, format);
+    basic_json_serializer<CharT> serializer(os, format);
     to_stream(serializer);
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting) const
 {
-    basic_json_serializer<Char> serializer(os, format, indenting);
+    basic_json_serializer<CharT> serializer(os, format, indenting);
     to_stream(serializer);
 }
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_object(new json_object<Char, Alloc>());
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_object(new json_object<CharT, Alloc>());
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_array(new json_array<Char, Alloc>());
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_array(new json_array<CharT, Alloc>());
 
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc> basic_json<Char, Alloc>::null = basic_json<Char, Alloc>(jsoncons::null_type());
+template<typename CharT, typename Alloc>
+const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::null = basic_json<CharT, Alloc>(jsoncons::null_type());
 
 
-/*template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_array()
+/*template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_array()
 {
-    return basic_json<Char, Alloc>(new json_array<Char, Alloc>());
+    return basic_json<CharT, Alloc>(new json_array<CharT, Alloc>());
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_array(size_t n)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_array(size_t n)
 {
-    return basic_json<Char, Alloc>(new json_array<Char, Alloc>(n));
+    return basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(n));
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<typename T>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_array(size_t n, T val)
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_array(size_t n, T val)
 {
-    basic_json<Char, Alloc> v;
+    basic_json<CharT, Alloc> v;
     v = val;
-    return basic_json<Char, Alloc>(new json_array<Char, Alloc>(n, v));
+    return basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(n, v));
 }*/
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t n)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array<Char, Alloc>(m)));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char, Alloc>::make_array(n);
+        a[i] = basic_json<CharT, Alloc>::make_array(n);
     }
     return a;
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<typename T>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t n, T val)
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n, T val)
 {
-    basic_json<Char, Alloc> v;
+    basic_json<CharT, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array<Char, Alloc>(m)));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char, Alloc>::make_array(n, v);
+        a[i] = basic_json<CharT, Alloc>::make_array(n, v);
     }
     return a;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array<Char, Alloc>(m)));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char, Alloc>::make_2d_array(n, k);
+        a[i] = basic_json<CharT, Alloc>::make_2d_array(n, k);
     }
     return a;
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<typename T>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t n, size_t k, T val)
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k, T val)
 {
-    basic_json<Char, Alloc> v;
+    basic_json<CharT, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array<Char, Alloc>(m)));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(new json_array<CharT, Alloc>(m)));
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<Char, Alloc>::make_2d_array(n, k, v);
+        a[i] = basic_json<CharT, Alloc>::make_2d_array(n, k, v);
     }
     return a;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(std::basic_istream<CharT>& is)
 {
-    basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> parser(is, handler);
+    basic_json_deserializer<CharT, Alloc> handler;
+    basic_json_reader<CharT> parser(is, handler);
     parser.read();
-    basic_json<Char, Alloc> val;
+    basic_json<CharT, Alloc> val;
     handler.root().swap(val);
     return val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic_string<CharT>& s)
 {
-    std::basic_istringstream<Char> is(s);
-    basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> parser(is, handler);
+    std::basic_istringstream<CharT> is(s);
+    basic_json_deserializer<CharT, Alloc> handler;
+    basic_json_reader<CharT> parser(is, handler);
     parser.read();
-    basic_json<Char, Alloc> val;
+    basic_json<CharT, Alloc> val;
     handler.root().swap(val);
     return val;
 }
 
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename)
+template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string& filename)
 {
-    std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
+    std::basic_ifstream<CharT> is(filename.c_str(), std::basic_ifstream<CharT>::in | std::basic_ifstream<CharT>::binary);
     if (!is.is_open())
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
 
-    basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> parser(is, handler);
+    basic_json_deserializer<CharT, Alloc> handler;
+    basic_json_reader<CharT> parser(is, handler);
     parser.read();
-    basic_json<Char, Alloc> val;
+    basic_json<CharT, Alloc> val;
     handler.root().swap(val);
     return val;
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin_members()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::begin_members()
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
     case object_t:
         return value_.object_->begin();
     default:
@@ -1040,8 +1041,8 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>::begin_members() const
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc>::begin_members() const
 {
     switch (type_)
     {
@@ -1054,14 +1055,14 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_members()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::end_members()
 {
     switch (type_)
     {
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
     case object_t:
         return value_.object_->end();
     default:
@@ -1069,8 +1070,8 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_m
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>::end_members() const
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc>::end_members() const
 {
     switch (type_)
     {
@@ -1083,8 +1084,8 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::begin_elements()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::begin_elements()
 {
     switch (type_)
     {
@@ -1095,8 +1096,8 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::begin_
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::begin_elements() const
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>::begin_elements() const
 {
     switch (type_)
     {
@@ -1107,8 +1108,8 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::end_elements()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::end_elements()
 {
     switch (type_)
     {
@@ -1119,17 +1120,17 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::end_el
     }
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template <class T>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator=(T val)
+basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::operator=(T val)
 {
-    value_adapter<Char,Alloc,T> adapter;
+    value_adapter<CharT,Alloc,T> adapter;
     adapter.assign(*this,val);
     return *this;
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::end_elements() const
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>::end_elements() const
 {
     switch (type_)
     {
@@ -1140,8 +1141,8 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
     }
 }
 
-template<typename Char, typename Alloc>
-double basic_json<Char, Alloc>::as_double() const
+template<typename CharT, typename Alloc>
+double basic_json<CharT, Alloc>::as_double() const
 {
     switch (type_)
     {
@@ -1158,8 +1159,8 @@ double basic_json<Char, Alloc>::as_double() const
     }
 }
 
-template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::is_empty() const
+template<typename CharT, typename Alloc>
+bool basic_json<CharT, Alloc>::is_empty() const
 {
     switch (type_)
     {
@@ -1176,8 +1177,8 @@ bool basic_json<Char, Alloc>::is_empty() const
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::reserve(size_t n)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::reserve(size_t n)
 {
     switch (type_)
     {
@@ -1186,15 +1187,15 @@ void basic_json<Char, Alloc>::reserve(size_t n)
         break;
     case empty_object_t:
         type_ = object_t;
-        value_.object_ = new json_object<Char, Alloc>();
+        value_.object_ = new json_object<CharT, Alloc>();
     case object_t:
         value_.object_->reserve(n);
         break;
     }
 }
 
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::resize_array(size_t n)
+template<typename CharT, typename Alloc>
+void basic_json<CharT, Alloc>::resize_array(size_t n)
 {
     switch (type_)
     {
@@ -1204,11 +1205,11 @@ void basic_json<Char, Alloc>::resize_array(size_t n)
     }
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<typename T>
-void basic_json<Char, Alloc>::resize_array(size_t n, T val)
+void basic_json<CharT, Alloc>::resize_array(size_t n, T val)
 {
-    basic_json<Char, Alloc> j;
+    basic_json<CharT, Alloc> j;
     j = val;
     switch (type_)
     {
@@ -1218,8 +1219,8 @@ void basic_json<Char, Alloc>::resize_array(size_t n, T val)
     }
 }
 
-template<typename Char, typename Alloc>
-size_t basic_json<Char, Alloc>::capacity() const
+template<typename CharT, typename Alloc>
+size_t basic_json<CharT, Alloc>::capacity() const
 {
     switch (type_)
     {
@@ -1232,8 +1233,8 @@ size_t basic_json<Char, Alloc>::capacity() const
     }
 }
 
-template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) const
+template<typename CharT, typename Alloc>
+bool basic_json<CharT, Alloc>::has_member(const std::basic_string<CharT>& name) const
 {
     switch (type_)
     {
@@ -1248,8 +1249,8 @@ bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) co
     }
 }
 
-template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::as_bool() const
+template<typename CharT, typename Alloc>
+bool basic_json<CharT, Alloc>::as_bool() const
 {
     switch (type_)
     {
@@ -1260,8 +1261,8 @@ bool basic_json<Char, Alloc>::as_bool() const
     }
 }
 
-template<typename Char, typename Alloc>
-int basic_json<Char, Alloc>::as_int() const
+template<typename CharT, typename Alloc>
+int basic_json<CharT, Alloc>::as_int() const
 {
     switch (type_)
     {
@@ -1278,8 +1279,8 @@ int basic_json<Char, Alloc>::as_int() const
     }
 }
 
-template<typename Char, typename Alloc>
-unsigned int basic_json<Char, Alloc>::as_uint() const
+template<typename CharT, typename Alloc>
+unsigned int basic_json<CharT, Alloc>::as_uint() const
 {
     switch (type_)
     {
@@ -1296,8 +1297,8 @@ unsigned int basic_json<Char, Alloc>::as_uint() const
     }
 }
 
-template<typename Char, typename Alloc>
-long long basic_json<Char, Alloc>::as_longlong() const
+template<typename CharT, typename Alloc>
+long long basic_json<CharT, Alloc>::as_longlong() const
 {
     switch (type_)
     {
@@ -1314,8 +1315,8 @@ long long basic_json<Char, Alloc>::as_longlong() const
     }
 }
 
-template<typename Char, typename Alloc>
-unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
+template<typename CharT, typename Alloc>
+unsigned long long basic_json<CharT, Alloc>::as_ulonglong() const
 {
     switch (type_)
     {
@@ -1332,8 +1333,8 @@ unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
     }
 }
 
-template<typename Char, typename Alloc>
-long basic_json<Char, Alloc>::as_long() const
+template<typename CharT, typename Alloc>
+long basic_json<CharT, Alloc>::as_long() const
 {
     switch (type_)
     {
@@ -1350,8 +1351,8 @@ long basic_json<Char, Alloc>::as_long() const
     }
 }
 
-template<typename Char, typename Alloc>
-unsigned long basic_json<Char, Alloc>::as_ulong() const
+template<typename CharT, typename Alloc>
+unsigned long basic_json<CharT, Alloc>::as_ulong() const
 {
     switch (type_)
     {
@@ -1369,9 +1370,9 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
 }
 
 // Deprecated
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class T>
-const T& basic_json<Char, Alloc>::custom_data() const
+const T& basic_json<CharT, Alloc>::custom_data() const
 {
     switch (type_)
     {
@@ -1384,9 +1385,9 @@ const T& basic_json<Char, Alloc>::custom_data() const
 }
 
 // Deprecated
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 template<class T>
-T& basic_json<Char, Alloc>::custom_data()
+T& basic_json<CharT, Alloc>::custom_data()
 {
     switch (type_)
     {
@@ -1400,8 +1401,8 @@ T& basic_json<Char, Alloc>::custom_data()
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value()
 {
     switch (type_)
     {
@@ -1414,8 +1415,8 @@ typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value()
     }
 }
 
-template<typename Char, typename Alloc>
-const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value() const
+template<typename CharT, typename Alloc>
+const typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value() const
 {
     switch (type_)
     {
@@ -1428,8 +1429,8 @@ const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value(
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::object& basic_json<CharT, Alloc>::object_value()
 {
     switch (type_)
     {
@@ -1442,8 +1443,8 @@ typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value(
     }
 }
 
-template<typename Char, typename Alloc>
-const typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value() const
+template<typename CharT, typename Alloc>
+const typename basic_json<CharT, Alloc>::object& basic_json<CharT, Alloc>::object_value() const
 {
     switch (type_)
     {
@@ -1456,8 +1457,8 @@ const typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_
     }
 }
 
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value()
+template<typename CharT, typename Alloc>
+typename basic_json<CharT, Alloc>::array& basic_json<CharT, Alloc>::array_value()
 {
     switch (type_)
     {
@@ -1470,8 +1471,8 @@ typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value()
     }
 }
 
-template<typename Char, typename Alloc>
-const typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value() const
+template<typename CharT, typename Alloc>
+const typename basic_json<CharT, Alloc>::array& basic_json<CharT, Alloc>::array_value() const
 {
     switch (type_)
     {
@@ -1484,8 +1485,8 @@ const typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_va
     }
 }
 
-template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
+template<typename CharT, typename Alloc>
+std::basic_string<CharT> basic_json<CharT, Alloc>::as_string() const
 {
     switch (type_)
     {
@@ -1496,8 +1497,8 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     }
 }
 
-template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_format<Char>& format) const
+template<typename CharT, typename Alloc>
+std::basic_string<CharT> basic_json<CharT, Alloc>::as_string(const basic_output_format<CharT>& format) const
 {
     switch (type_)
     {
@@ -1508,19 +1509,19 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     }
 }
 
-template<typename Char, typename Alloc>
-Char basic_json<Char, Alloc>::as_char() const
+template<typename CharT, typename Alloc>
+CharT basic_json<CharT, Alloc>::as_char() const
 {
     switch (type_)
     {
     case string_t:
         return value_.string_value_->length() > 0 ? (*value_.string_value_)[0] : '\0';
     case longlong_t:
-        return static_cast<Char>(value_.longlong_value_);
+        return static_cast<CharT>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<Char>(value_.ulonglong_value_);
+        return static_cast<CharT>(value_.ulonglong_value_);
     case double_t:
-        return static_cast<Char>(value_.double_value_);
+        return static_cast<CharT>(value_.double_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     case null_t:
@@ -1530,57 +1531,57 @@ Char basic_json<Char, Alloc>::as_char() const
     }
 }
 
-template<typename Char, typename Alloc>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char, Alloc>& o)
+template<typename CharT, typename Alloc>
+std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_json<CharT, Alloc>& o)
 {
     o.to_stream(os);
     return os;
 }
 
-template<typename Char, typename Alloc>
+template<typename CharT, typename Alloc>
 class pretty_printer
 {
 public:
-    pretty_printer(const basic_json<Char, Alloc>& o)
+    pretty_printer(const basic_json<CharT, Alloc>& o)
        : o_(&o)
     {
     }
 
-    pretty_printer(const basic_json<Char, Alloc>& o,
-                   const basic_output_format<Char>& format)
+    pretty_printer(const basic_json<CharT, Alloc>& o,
+                   const basic_output_format<CharT>& format)
        : o_(&o), format_(format)
     {
         ;
     }
 
-    void to_stream(std::basic_ostream<Char>& os) const
+    void to_stream(std::basic_ostream<CharT>& os) const
     {
         o_->to_stream(os, format_, true);
     }
 
-    friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const pretty_printer<Char, Alloc>& o)
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const pretty_printer<CharT, Alloc>& o)
     {
         o.to_stream(os);
         return os;
     }
 
-    const basic_json<Char, Alloc> *o_;
-    basic_output_format<Char> format_;
+    const basic_json<CharT, Alloc> *o_;
+    basic_output_format<CharT> format_;
 private:
     pretty_printer();
 };
 
-template<typename Char, class Alloc>
-pretty_printer<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val)
+template<typename CharT, class Alloc>
+pretty_printer<CharT, Alloc> pretty_print(const basic_json<CharT, Alloc>& val)
 {
-    return pretty_printer<Char, Alloc>(val);
+    return pretty_printer<CharT, Alloc>(val);
 }
 
-template<typename Char, class Alloc>
-pretty_printer<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val,
-                                           const basic_output_format<Char>& format)
+template<typename CharT, class Alloc>
+pretty_printer<CharT, Alloc> pretty_print(const basic_json<CharT, Alloc>& val,
+                                           const basic_output_format<CharT>& format)
 {
-    return pretty_printer<Char, Alloc>(val, format);
+    return pretty_printer<CharT, Alloc>(val, format);
 }
 
 inline
@@ -1597,16 +1598,17 @@ bool is_non_ascii_character(uint32_t c)
     return c >= 0x80;
 }
 
-template<typename Char>
-void escape_string(const std::basic_string<Char>& s,
-                   const basic_output_format<Char>& format,
-                   std::basic_ostream<Char>& os)
+template<typename CharT>
+void escape_string(const CharT* s,
+                   size_t length,
+                   const basic_output_format<CharT>& format,
+                   std::basic_ostream<CharT>& os)
 {
-    typename std::basic_string<Char>::const_iterator begin = s.begin();
-    typename std::basic_string<Char>::const_iterator end = s.end();
-    for (typename std::basic_string<Char>::const_iterator it = begin; it != end; ++it)
+    const CharT* begin = s;
+    const CharT* end = s + length;
+    for (const CharT* it = begin; it != end; ++it)
     {
-        Char c = *it;
+        CharT c = *it;
         switch (c)
         {
         case '\\':
@@ -1644,7 +1646,7 @@ void escape_string(const std::basic_string<Char>& s,
             else if (is_control_character(u) || format.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                uint32_t cp = json_char_traits<Char, sizeof(Char)>::convert_char_to_codepoint(it, end);
+                uint32_t cp = json_char_traits<CharT, sizeof(CharT)>::convert_char_to_codepoint(it, end);
                 if (is_non_ascii_character(cp) || is_control_character(u))
                 {
                     if (cp > 0xFFFF)

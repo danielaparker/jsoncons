@@ -12,16 +12,21 @@
 
 namespace jsoncons {
 
-template <typename Char>
+template <typename CharT>
 class basic_json_output_handler
 {
 public:
     virtual ~basic_json_output_handler() {}
 
     // Overloaded methods
-    void value(const std::basic_string<Char>& value) 
+    void value(const std::basic_string<CharT>& value) 
     {
-        string_value(value);
+        string_value(&value[0], value.length());
+    }
+
+    void value(const CharT* value, size_t length) 
+    {
+        string_value(value, length);
     }
 
     void value(null_type)
@@ -80,7 +85,7 @@ public:
 
     virtual void end_json() = 0;
 
-    virtual void name(const std::basic_string<Char>& name) = 0;
+    virtual void name(const std::basic_string<CharT>& name) = 0;
 
     virtual void begin_object() = 0;
 
@@ -94,7 +99,7 @@ public:
 
     virtual void null_value() = 0;
 
-    virtual void string_value(const std::basic_string<Char>& value) = 0;
+    virtual void string_value(const CharT* value, size_t length) = 0;
 
     virtual void double_value(double value) = 0;
 
@@ -105,8 +110,8 @@ public:
     virtual void bool_value(bool value) = 0;
 };
 
-template <typename Char>
-class null_basic_json_output_handler : public basic_json_output_handler<Char>
+template <typename CharT>
+class null_basic_json_output_handler : public basic_json_output_handler<CharT>
 {
 public:
 
@@ -118,7 +123,7 @@ public:
     {
     }
 
-    virtual void name(const std::basic_string<Char>&)
+    virtual void name(const std::basic_string<CharT>&)
     {
     }
 
@@ -144,7 +149,7 @@ public:
 
 // value(...) implementation
 
-    virtual void string_value(const std::basic_string<Char>&)
+    virtual void string_value(const CharT*, size_t length)
     {
     }
 
