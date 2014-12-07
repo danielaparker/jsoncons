@@ -475,20 +475,21 @@ public:
     }
 
 // value(...) implementation
-    virtual void string_value(const std::string& value, const parsing_context& context)
+    virtual void string_value(const char* val, int length, const parsing_context& context)
     {
+		string value(val,length);
         if (name_ == "name")
         {
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             parent().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            parent().value(first, context);
+            parent().value(&first[0], first.length(), context);
             if (start_last != std::string::npos)
             {
                 parent().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().value(last, context);
+                parent().value(&last[0], last.length(), context);
             }
             else
             {
@@ -499,7 +500,7 @@ public:
         }
         else
         {
-            parent().value(value, context);
+            parent().value(val, length, context);
         }
     }
 private:
