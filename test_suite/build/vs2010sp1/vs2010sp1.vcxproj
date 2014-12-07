@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\allocator_tests.cpp" />
     <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
     <ClCompile Include="..\..\src\jsoncons_test.cpp" />
