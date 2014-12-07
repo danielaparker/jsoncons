@@ -22,7 +22,7 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template<typename Char,class Storage>
+template<typename Char,class Alloc>
 class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
     struct buffered_stream
@@ -81,7 +81,7 @@ public:
 
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
-                     const jsoncons::basic_json<Char,Storage>& params)
+                     const jsoncons::basic_json<Char,Alloc>& params)
 
        :
          minimum_structure_capacity_(0),
@@ -136,7 +136,7 @@ public:
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
                      jsoncons::basic_error_handler<Char>& err_handler,
-                     const jsoncons::basic_json<Char,Storage>& params)
+                     const jsoncons::basic_json<Char,Alloc>& params)
        :
          minimum_structure_capacity_(),
          column_(),
@@ -159,7 +159,7 @@ public:
         init(params);
     }
 
-    void init(const jsoncons::basic_json<Char,Storage>& params)
+    void init(const jsoncons::basic_json<Char,Alloc>& params)
     {
         field_delimiter_ = params.get("field_delimiter",",").as_char();
 
@@ -313,11 +313,11 @@ private:
     Char comment_symbol_;
 };
 
-template<typename Char,class Storage>
-jsoncons::default_basic_error_handler<Char> basic_csv_reader<Char,Storage>::default_err_handler;
+template<typename Char,class Alloc>
+jsoncons::default_basic_error_handler<Char> basic_csv_reader<Char,Alloc>::default_err_handler;
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::read(std::basic_istream<Char>& is)
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read(std::basic_istream<Char>& is)
 {
     if (is.bad())
     {
@@ -348,8 +348,8 @@ void basic_csv_reader<Char,Storage>::read(std::basic_istream<Char>& is)
     handler_.end_json();
 }
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::read_array_of_arrays()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
 {
     size_t row_capacity = 0;
     stack_.push_back(stack_item());
@@ -443,8 +443,8 @@ void basic_csv_reader<Char,Storage>::read_array_of_arrays()
     }
 }
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::read_array_of_objects()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read_array_of_objects()
 {
     std::vector<std::string> header;
     size_t row_index = 0;
@@ -541,8 +541,8 @@ void basic_csv_reader<Char,Storage>::read_array_of_objects()
     }
 }
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::parse_string()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::parse_string()
 {
     string_buffer_.clear();
 
@@ -577,8 +577,8 @@ void basic_csv_reader<Char,Storage>::parse_string()
     }
 }
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::parse_quoted_string()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::parse_quoted_string()
 {
     string_buffer_.clear();
 
@@ -634,8 +634,8 @@ void basic_csv_reader<Char,Storage>::parse_quoted_string()
     }
 }
 
-template<typename Char,class Storage>
-void basic_csv_reader<Char,Storage>::ignore_single_line_comment()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
@@ -665,7 +665,7 @@ void basic_csv_reader<Char,Storage>::ignore_single_line_comment()
 
 }
 
-typedef basic_csv_reader<char,jsoncons::storage<char>> csv_reader;
+typedef basic_csv_reader<char,std::allocator<char>> csv_reader;
 
 }}
 
