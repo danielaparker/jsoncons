@@ -1498,7 +1498,7 @@ std::basic_string<CharT> basic_json<CharT, Alloc>::as_string() const
     switch (type_)
     {
     case string_t:
-        return *(value_.string_value_);
+        return external_string_type(&(*(value_.string_value_))[0],(*(value_.string_value_)).length());
     default:
         return to_string();
     }
@@ -1510,7 +1510,7 @@ std::basic_string<CharT> basic_json<CharT, Alloc>::as_string(const basic_output_
     switch (type_)
     {
     case string_t:
-        return *(value_.string_value_);
+        return external_string_type(&(*(value_.string_value_))[0],(*(value_.string_value_)).length());
     default:
         return to_string(format);
     }
