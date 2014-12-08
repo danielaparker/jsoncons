@@ -25,7 +25,7 @@ namespace jsoncons {
 template <typename CharT,class T> inline
 void serialize(basic_json_output_handler<CharT>& os, const T&)
 {
-    os.null_value();
+    os.write_null();
 }
 
 template <typename CharT>

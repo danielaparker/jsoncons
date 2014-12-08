@@ -853,7 +853,7 @@ void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handl
         handler.value(value_.bool_value_);
         break;
     case null_t:
-        handler.null_value();
+        handler.write_null();
         break;
     case empty_object_t:
         handler.begin_object();
@@ -865,7 +865,7 @@ void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handl
             json_object<CharT, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.name(it->name());
+                handler.write_name(it->name());
                 it->value().to_stream(handler);
             }
             handler.end_object();

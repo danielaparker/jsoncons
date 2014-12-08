@@ -125,7 +125,7 @@ public:
         end_value();
     }
 
-    virtual void name(const std::basic_string<CharT>& name)
+    virtual void write_name(const std::basic_string<CharT>& name)
     {
         begin_element();
         os_.put('\"');
@@ -134,7 +134,7 @@ public:
         os_.put(':');
     }
 
-    virtual void null_value()
+    virtual void write_null()
     {
         begin_value();
 
@@ -145,7 +145,7 @@ public:
 
 // value(...) implementation
 
-    virtual void string_value(const CharT* value, size_t length)
+    virtual void write_string(const CharT* value, size_t length)
     {
         begin_value();
 
@@ -189,7 +189,7 @@ public:
         end_value();
     }
 
-    virtual void longlong_value(long long value)
+    virtual void write_longlong(long long value)
     {
         begin_value();
 
@@ -198,7 +198,7 @@ public:
         end_value();
     }
 
-    virtual void ulonglong_value(unsigned long long value)
+    virtual void write_ulonglong(unsigned long long value)
     {
         begin_value();
 
@@ -207,7 +207,7 @@ public:
         end_value();
     }
 
-    virtual void bool_value(bool value)
+    virtual void write_bool(bool value)
     {
         begin_value();
 

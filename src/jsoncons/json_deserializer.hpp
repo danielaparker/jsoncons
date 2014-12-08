@@ -151,12 +151,12 @@ public:
         }
     }
 
-    virtual void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>&)
+    virtual void write_name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>&)
     {
         stack_.back().name_ = name;
     }
 
-    virtual void null_value(const basic_parsing_context<CharT>&)
+    virtual void write_null(const basic_parsing_context<CharT>&)
     {
         if (stack_.back().is_object())
         {
@@ -175,7 +175,7 @@ public:
 
 // value(...) implementation
 
-    virtual void string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>&)
+    virtual void write_string(const CharT* value, size_t length, const basic_parsing_context<CharT>&)
     {
         if (stack_.back().is_object())
         {
@@ -199,7 +199,7 @@ public:
         }
     }
 
-    virtual void longlong_value(long long value, const basic_parsing_context<CharT>&)
+    virtual void write_longlong(long long value, const basic_parsing_context<CharT>&)
     {
         if (stack_.back().is_object())
         {
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<CharT>&)
+    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<CharT>&)
     {
         if (stack_.back().is_object())
         {
@@ -223,7 +223,7 @@ public:
         }
     }
 
-    virtual void bool_value(bool value, const basic_parsing_context<CharT>&)
+    virtual void write_bool(bool value, const basic_parsing_context<CharT>&)
     {
         if (stack_.back().is_object())
         {

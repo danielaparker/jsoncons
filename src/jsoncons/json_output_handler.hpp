@@ -21,17 +21,17 @@ public:
     // Overloaded methods
     void value(const std::basic_string<CharT>& value) 
     {
-        string_value(&value[0], value.length());
+        write_string(&value[0], value.length());
     }
 
     void value(const CharT* value, size_t length) 
     {
-        string_value(value, length);
+        write_string(value, length);
     }
 
     void value(null_type)
     {
-        null_value();
+        write_null();
     }
 
     void value(float value)
@@ -46,37 +46,42 @@ public:
 
     void value(int value) 
     {
-        longlong_value((long long)value);
+        write_longlong((long long)value);
     }
 
     void value(unsigned int value)
     {
-        ulonglong_value((unsigned long long)value);
+        write_ulonglong((unsigned long long)value);
     }
 
     void value(long value) 
     {
-        longlong_value((long long)value);
+        write_longlong((long long)value);
     }
 
     void value(unsigned long value)
     {
-        ulonglong_value((unsigned long long)value);
+        write_ulonglong((unsigned long long)value);
     }
 
     void value(long long value) 
     {
-        longlong_value(value);
+        write_longlong(value);
     }
 
     void value(unsigned long long value)
     {
-        ulonglong_value(value);
+        write_ulonglong(value);
     }
 
     void value(bool value)
     {
-        bool_value(value);
+        write_bool(value);
+    }
+
+    void name(const std::basic_string<CharT>& name)
+    {
+        write_name(name);
     }
 
 //  Implementation start here
@@ -85,7 +90,7 @@ public:
 
     virtual void end_json() = 0;
 
-    virtual void name(const std::basic_string<CharT>& name) = 0;
+    virtual void write_name(const std::basic_string<CharT>& name) = 0;
 
     virtual void begin_object() = 0;
 
@@ -97,17 +102,17 @@ public:
 
 // value(...) implementation
 
-    virtual void null_value() = 0;
+    virtual void write_null() = 0;
 
-    virtual void string_value(const CharT* value, size_t length) = 0;
+    virtual void write_string(const CharT* value, size_t length) = 0;
 
     virtual void double_value(double value) = 0;
 
-    virtual void longlong_value(long long value) = 0;
+    virtual void write_longlong(long long value) = 0;
 
-    virtual void ulonglong_value(unsigned long long value) = 0;
+    virtual void write_ulonglong(unsigned long long value) = 0;
 
-    virtual void bool_value(bool value) = 0;
+    virtual void write_bool(bool value) = 0;
 };
 
 template <typename CharT>
@@ -123,7 +128,7 @@ public:
     {
     }
 
-    virtual void name(const std::basic_string<CharT>&)
+    virtual void write_name(const std::basic_string<CharT>&)
     {
     }
 
@@ -143,13 +148,13 @@ public:
     {
     }
 
-    virtual void null_value()
+    virtual void write_null()
     {
     }
 
 // value(...) implementation
 
-    virtual void string_value(const CharT*, size_t length)
+    virtual void write_string(const CharT*, size_t length)
     {
     }
 
@@ -157,15 +162,15 @@ public:
     {
     }
 
-    virtual void longlong_value(long long)
+    virtual void write_longlong(long long)
     {
     }
 
-    virtual void ulonglong_value(unsigned long long)
+    virtual void write_ulonglong(unsigned long long)
     {
     }
 
-    virtual void bool_value(bool)
+    virtual void write_bool(bool)
     {
     }
 

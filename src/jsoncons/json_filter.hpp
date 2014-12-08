@@ -61,20 +61,20 @@ public:
         writer_.end_array();
     }
 
-    virtual void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
+    virtual void write_name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
     {
-        writer_.name(name);
+        writer_.write_name(name);
     }
 
-    virtual void null_value(const basic_parsing_context<CharT>& context)
+    virtual void write_null(const basic_parsing_context<CharT>& context)
     {
-        writer_.null_value();
+        writer_.write_null();
     }
 
 // value(...) implementation
-    virtual void string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context)
+    virtual void write_string(const CharT* value, size_t length, const basic_parsing_context<CharT>& context)
     {
-        writer_.string_value(value, length);
+        writer_.write_string(value, length);
     }
 
     virtual void double_value(double value, const basic_parsing_context<CharT>& context)
@@ -82,19 +82,19 @@ public:
         writer_.double_value(value);
     }
 
-    virtual void longlong_value(long long value, const basic_parsing_context<CharT>& context)
+    virtual void write_longlong(long long value, const basic_parsing_context<CharT>& context)
     {
-        writer_.longlong_value(value);
+        writer_.write_longlong(value);
     }
 
-    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<CharT>& context)
+    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<CharT>& context)
     {
-        writer_.ulonglong_value(value);
+        writer_.write_ulonglong(value);
     }
 
-    virtual void bool_value(bool value, const basic_parsing_context<CharT>& context)
+    virtual void write_bool(bool value, const basic_parsing_context<CharT>& context)
     {
-        writer_.bool_value(value);
+        writer_.write_bool(value);
     }
 private:
     basic_json_output_handler<CharT>& writer_;
@@ -147,14 +147,14 @@ public:
         parent_.end_array(context);
     }
 
-    virtual void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
+    virtual void write_name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
     {
-        parent_.name(name,context);
+        parent_.write_name(name,context);
     }
 
-    virtual void null_value(const basic_parsing_context<CharT>& context)
+    virtual void write_null(const basic_parsing_context<CharT>& context)
     {
-        parent_.null_value(context);
+        parent_.write_null(context);
     }
 
     basic_json_input_handler<CharT>& parent()
@@ -163,7 +163,7 @@ public:
     }
 
 // value(...) implementation
-    virtual void string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context)
+    virtual void write_string(const CharT* value, size_t length, const basic_parsing_context<CharT>& context)
     {
         parent_.value(value,length,context);
     }
@@ -173,17 +173,17 @@ public:
         parent_.value(value,context);
     }
 
-    virtual void longlong_value(long long value, const basic_parsing_context<CharT>& context)
+    virtual void write_longlong(long long value, const basic_parsing_context<CharT>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void ulonglong_value(unsigned long long value, const basic_parsing_context<CharT>& context)
+    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<CharT>& context)
     {
         parent_.value(value,context);
     }
 
-    virtual void bool_value(bool value, const basic_parsing_context<CharT>& context)
+    virtual void write_bool(bool value, const basic_parsing_context<CharT>& context)
     {
         parent_.value(value,context);
     }
