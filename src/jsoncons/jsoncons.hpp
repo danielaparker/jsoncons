@@ -57,11 +57,11 @@ private:
     std::string message_;
 };
 
-template <typename CharT>
+template <typename Char>
 class json_exception_1 : public json_exception
 {
 public:
-    json_exception_1(const std::string& format, const std::basic_string<CharT>& arg1) JSONCONS_NOEXCEPT
+    json_exception_1(const std::string& format, const std::basic_string<Char>& arg1) JSONCONS_NOEXCEPT
         : format_(format), arg1_(arg1)
     {
     }
@@ -75,12 +75,12 @@ public:
     }
 private:
     std::string format_;
-    std::basic_string<CharT> arg1_;
+    std::basic_string<Char> arg1_;
     char message_[255];
 };
 
 #define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0((x))
-#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<CharT>((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<Char>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) {std::cerr << #x; abort();}
 
 // json_char_traits
@@ -90,7 +90,7 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
-template <typename CharT,size_t Size>
+template <typename Char,size_t Size>
 struct json_char_traits
 {
 };

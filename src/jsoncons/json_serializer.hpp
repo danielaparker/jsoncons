@@ -22,8 +22,8 @@
 
 namespace jsoncons {
 
-template<typename CharT>
-class basic_json_serializer : public basic_json_output_handler<CharT>
+template<typename Char>
+class basic_json_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
     {
@@ -41,22 +41,22 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
         bool content_indented_;
     };
 public:
-    basic_json_serializer(std::basic_ostream<CharT>& os)
+    basic_json_serializer(std::basic_ostream<Char>& os)
        : os_(os), indent_(0), indenting_(false)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<CharT>& os, bool indenting)
+    basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
        : os_(os), indent_(0), indenting_(indenting)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format)
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
        : os_(os), format_(format), indent_(0),
          indenting_(false) // Deprecated behavior
     {
     }
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting)
+    basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
        : os_(os), format_(format), indent_(0), indenting_(indenting)
     {
     }
@@ -125,11 +125,11 @@ public:
         end_value();
     }
 
-    virtual void write_name(const std::basic_string<CharT>& name)
+    virtual void write_name(const std::basic_string<Char>& name)
     {
         begin_element();
         os_.put('\"');
-        escape_string<CharT>(&name[0], name.length(), format_, os_);
+        escape_string<Char>(&name[0], name.length(), format_, os_);
         os_.put('\"');
         os_.put(':');
     }
@@ -138,19 +138,19 @@ public:
     {
         begin_value();
 
-        os_ << json_char_traits<CharT,sizeof(CharT)>::null_literal();
+        os_ << json_char_traits<Char,sizeof(Char)>::null_literal();
 
         end_value();
     }
 
 // value(...) implementation
 
-    virtual void write_string(const CharT* value, size_t length)
+    virtual void write_string(const Char* value, size_t length)
     {
         begin_value();
 
         os_.put('\"');
-        escape_string<CharT>(value, length, format_, os_);
+        escape_string<Char>(value, length, format_, os_);
         os_.put('\"');
 
         end_value();
@@ -174,7 +174,7 @@ public:
         }
         else if (format_.floatfield() != 0)
         {
-            std::basic_ostringstream<CharT> os;
+            std::basic_ostringstream<Char> os;
             os.imbue(std::locale::classic());
             os.setf(format_.floatfield(), std::ios::floatfield);
             os << std::showpoint << std::setprecision(format_.precision()) << value;
@@ -182,7 +182,7 @@ public:
         }
         else
         {
-            std::basic_string<CharT> buf = double_to_string<CharT>(value,format_.precision());
+            std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
             os_ << buf;
         }
 
@@ -211,7 +211,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? json_char_traits<CharT,sizeof(CharT)>::true_literal() :  json_char_traits<CharT,sizeof(CharT)>::false_literal());
+        os_ << (value ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
 
         end_value();
     }
@@ -282,8 +282,8 @@ public:
         }
     }
 
-    std::basic_ostream<CharT>& os_;
-    basic_output_format<CharT> format_;
+    std::basic_ostream<Char>& os_;
+    basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
     std::streamsize original_precision_;
