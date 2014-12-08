@@ -53,22 +53,22 @@ Receive notification of the end of a JSON object
     virtual void name(const std::string& name)
 Receive notification of the `name` of a name value pair
 
-    virtual void null_value()
+    virtual void write_null()
 Receive notification of `null`
 
-    virtual void string_value(const std::string& value)
+    virtual void write_string(const std::string& value)
 Receive notification of a `string` value
 
     virtual void double_value(double value)
 Receive notification of a floating point number
 
-    virtual void longlong_value(long long value)
+    virtual void write_longlong(long long value)
 Receive notification of a signed integer
 
-    virtual void ulonglong_value(unsigned long long value)
+    virtual void write_ulonglong(unsigned long long value)
 Receive notification of a non-negative integer
 
-    virtual void bool_value(bool value)
+    virtual void write_bool(bool value)
 Receive notification of a boolean value
 
 ### Examples

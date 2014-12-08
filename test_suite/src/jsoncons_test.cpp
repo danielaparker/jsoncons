@@ -475,7 +475,7 @@ public:
     }
 
 // value(...) implementation
-    virtual void string_value(const char* val, int length, const parsing_context& context)
+    virtual void write_string(const char* val, int length, const parsing_context& context)
     {
 		string value(val,length);
         if (name_ == "name")

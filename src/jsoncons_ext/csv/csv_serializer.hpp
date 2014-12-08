@@ -210,7 +210,7 @@ public:
         end_value();
     }
 
-    virtual void name(const std::basic_string<CharT>& name)
+    virtual void write_name(const std::basic_string<CharT>& name)
     {
         if (stack_.size() == 2)
         {
@@ -256,23 +256,23 @@ public:
         }
     }
 
-    virtual void null_value()
+    virtual void write_null()
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0)
             {
-                null_value(header_os_);
+                write_null(header_os_);
             }
             else
             {
-                null_value(os_);
+                write_null(os_);
             }
         }
     }
 // value(...) implementation
 
-    virtual void string_value(const CharT* val, size_t length)
+    virtual void write_string(const CharT* val, size_t length)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -302,7 +302,7 @@ public:
         }
     }
 
-    virtual void longlong_value(long long val)
+    virtual void write_longlong(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -317,7 +317,7 @@ public:
         }
     }
 
-    virtual void ulonglong_value(unsigned long long val)
+    virtual void write_ulonglong(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -332,7 +332,7 @@ public:
         }
     }
 
-    virtual void bool_value(bool val)
+    virtual void write_bool(bool val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -429,7 +429,7 @@ private:
         end_value();
     }
 
-    virtual void null_value(std::basic_ostream<CharT>& os)
+    virtual void write_null(std::basic_ostream<CharT>& os)
     {
         begin_value(os);
 

@@ -498,7 +498,7 @@ void basic_csv_reader<CharT,Alloc>::read_array_of_objects()
             }
             if (column_index < header.size())
             {
-                handler_.name(header[column_index],*this);
+                handler_.write_name(header[column_index],*this);
                 handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
             }
             ++column_index;
@@ -522,7 +522,7 @@ void basic_csv_reader<CharT,Alloc>::read_array_of_objects()
                 }
                 if (column_index < header.size())
                 {
-                    handler_.name(header[column_index],*this);
+                    handler_.write_name(header[column_index],*this);
                     handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
                 }
             }

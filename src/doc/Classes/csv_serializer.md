@@ -56,7 +56,7 @@ Receive notification of a non-negative integer
     virtual void value(bool val)
 Receive notification of a boolean value
 
-    virtual void null_value()
+    virtual void write_null()
 Receive notification of `null`
 
 ### Examples

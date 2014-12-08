@@ -46,7 +46,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
         }
 
-        virtual void string_value(const std::string& value, const parsing_context& context)
+        virtual void write_string(const std::string& value, const parsing_context& context)
         {
             if (name_ == "name")
             {
