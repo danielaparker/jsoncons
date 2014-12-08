@@ -179,11 +179,11 @@ public:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value,length));
         } 
         else 
         {
-            stack_.back().array_->push_back(std::move(basic_json<CharT,Alloc>(value)));
+            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value,length));
         }
     }
 

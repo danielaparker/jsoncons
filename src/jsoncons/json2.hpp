@@ -185,6 +185,13 @@ basic_json<CharT, Alloc>::basic_json(const CharT *s)
 }
 
 template<typename CharT, typename Alloc>
+basic_json<CharT, Alloc>::basic_json(const CharT *s, size_t length)
+{
+    type_ = string_t;
+    value_.string_value_ = new std::basic_string<CharT>(s,length);
+}
+
+template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc>::basic_json(value_type t)
 {
     type_ = t;

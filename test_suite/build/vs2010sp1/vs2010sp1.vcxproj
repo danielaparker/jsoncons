@@ -166,6 +166,7 @@
     <ClCompile Include="..\..\src\wjson_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\my_any_specializations.hpp" />
     <ClInclude Include="..\..\src\my_custom_data.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

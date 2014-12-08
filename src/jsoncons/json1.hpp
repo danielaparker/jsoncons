@@ -1104,6 +1104,8 @@ public:
 
     explicit basic_json(const CharT* val);
 
+    explicit basic_json(const CharT* val, size_t length);
+
     explicit basic_json(const std::basic_string<CharT>& val);
 
     explicit basic_json(bool val);

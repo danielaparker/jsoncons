@@ -141,7 +141,7 @@ public:
     {
     }
 // value(...) implementation
-    virtual void string_value(const std::basic_string<CharT>&, const basic_parsing_context<CharT>&)
+    virtual void string_value(const CharT*, size_t length, const basic_parsing_context<CharT>&)
     {
     }
 
