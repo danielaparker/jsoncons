@@ -165,7 +165,7 @@ public:
 // value(...) implementation
     virtual void string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context)
     {
-        parent_.value(value,context);
+        parent_.value(value,length,context);
     }
 
     virtual void double_value(double value, const basic_parsing_context<CharT>& context)
