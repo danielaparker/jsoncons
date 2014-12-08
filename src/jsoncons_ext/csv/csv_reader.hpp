@@ -22,20 +22,20 @@
 
 namespace jsoncons_ext { namespace csv {
 
-template<typename CharT,class Alloc>
-class basic_csv_reader : private jsoncons::basic_parsing_context<CharT>
+template<typename Char,class Alloc>
+class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
     struct buffered_stream
     {
-        buffered_stream(std::basic_istream<CharT>& is)
+        buffered_stream(std::basic_istream<Char>& is)
             : is_(is)
         {
         }
 
-        std::basic_istream<CharT>& is_;
+        std::basic_istream<Char>& is_;
     };
 
-    static jsoncons::default_basic_error_handler<CharT> default_err_handler;
+    static jsoncons::default_basic_error_handler<Char> default_err_handler;
 
     struct stack_item
     {
@@ -54,8 +54,8 @@ public:
       \param is The input stream to read from
     */
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
-                     jsoncons::basic_json_input_handler<CharT>& handler)
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     jsoncons::basic_json_input_handler<Char>& handler)
 
        :
          minimum_structure_capacity_(0),
@@ -79,9 +79,9 @@ public:
         init(jsoncons::json::an_object);
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
-                     jsoncons::basic_json_input_handler<CharT>& handler,
-                     const jsoncons::basic_json<CharT,Alloc>& params)
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     const jsoncons::basic_json<Char,Alloc>& params)
 
        :
          minimum_structure_capacity_(0),
@@ -105,9 +105,9 @@ public:
         init(params);
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
-                     jsoncons::basic_json_input_handler<CharT>& handler,
-                     jsoncons::basic_error_handler<CharT>& err_handler)
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler)
        :
 
          minimum_structure_capacity_(),
@@ -133,10 +133,10 @@ public:
         init(jsoncons::json::an_object);
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
-                     jsoncons::basic_json_input_handler<CharT>& handler,
-                     jsoncons::basic_error_handler<CharT>& err_handler,
-                     const jsoncons::basic_json<CharT,Alloc>& params)
+    basic_csv_reader(std::basic_istream<Char>& is,
+                     jsoncons::basic_json_input_handler<Char>& handler,
+                     jsoncons::basic_error_handler<Char>& err_handler,
+                     const jsoncons::basic_json<Char,Alloc>& params)
        :
          minimum_structure_capacity_(),
          column_(),
@@ -159,7 +159,7 @@ public:
         init(params);
     }
 
-    void init(const jsoncons::basic_json<CharT,Alloc>& params)
+    void init(const jsoncons::basic_json<Char,Alloc>& params)
     {
         field_delimiter_ = params.get("field_delimiter",",").as_char();
 
@@ -181,7 +181,7 @@ public:
         read(stream_ptr_->is_);
     }
 
-    void read(std::basic_istream<CharT>& is);
+    void read(std::basic_istream<Char>& is);
 
     bool eof() const
     {
@@ -213,7 +213,7 @@ public:
         return minimum_structure_capacity_;
     }
 
-    virtual const std::basic_string<CharT>& buffer() const
+    virtual const std::basic_string<Char>& buffer() const
     {
         return string_buffer_;
     }
@@ -243,13 +243,13 @@ private:
         }
     }
 
-    CharT read_ch()
+    Char read_ch()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_some();
         }
-        CharT c = 0;
+        Char c = 0;
 
         //std::cout << "buffer_position = " << buffer_position_ << ", buffer_length=" << buffer_length_ << std::endl;
         if (buffer_position_ < buffer_length_)
@@ -265,13 +265,13 @@ private:
         return c;
     }
 
-    CharT peek()
+    Char peek()
     {
         if (buffer_position_ >= buffer_length_)
         {
             read_some();
         }
-        CharT c = 0;
+        Char c = 0;
         if (buffer_position_ < buffer_length_)
         {
             c = buffer_[buffer_position_];
@@ -297,27 +297,27 @@ private:
     size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
-    std::basic_string<CharT> string_buffer_;
+    std::basic_string<Char> string_buffer_;
     std::vector<stack_item> stack_;
     std::unique_ptr<buffered_stream> stream_ptr_;
-    std::vector<CharT> buffer_;
+    std::vector<Char> buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
-    jsoncons::basic_json_input_handler<CharT>& handler_;
-    jsoncons::basic_error_handler<CharT>& err_handler_;
+    jsoncons::basic_json_input_handler<Char>& handler_;
+    jsoncons::basic_error_handler<Char>& err_handler_;
     bool assume_header_;
-    CharT field_delimiter_;
-    CharT quote_char_;
-    CharT quote_escape_char_;
-    CharT comment_symbol_;
+    Char field_delimiter_;
+    Char quote_char_;
+    Char quote_escape_char_;
+    Char comment_symbol_;
 };
 
-template<typename CharT,class Alloc>
-jsoncons::default_basic_error_handler<CharT> basic_csv_reader<CharT,Alloc>::default_err_handler;
+template<typename Char,class Alloc>
+jsoncons::default_basic_error_handler<Char> basic_csv_reader<Char,Alloc>::default_err_handler;
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::read(std::basic_istream<CharT>& is)
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read(std::basic_istream<Char>& is)
 {
     if (is.bad())
     {
@@ -348,14 +348,14 @@ void basic_csv_reader<CharT,Alloc>::read(std::basic_istream<CharT>& is)
     handler_.end_json();
 }
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::read_array_of_arrays()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
 {
     size_t row_capacity = 0;
     stack_.push_back(stack_item());
     while (!eof())
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             continue;
@@ -443,8 +443,8 @@ void basic_csv_reader<CharT,Alloc>::read_array_of_arrays()
     }
 }
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::read_array_of_objects()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::read_array_of_objects()
 {
     std::vector<std::string> header;
     size_t row_index = 0;
@@ -453,7 +453,7 @@ void basic_csv_reader<CharT,Alloc>::read_array_of_objects()
     stack_.push_back(stack_item());
     while (!eof())
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             continue;
@@ -541,15 +541,15 @@ void basic_csv_reader<CharT,Alloc>::read_array_of_objects()
     }
 }
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::parse_string()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::parse_string()
 {
     string_buffer_.clear();
 
     bool done = false;
     while (!done)
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             done = true;
@@ -577,8 +577,8 @@ void basic_csv_reader<CharT,Alloc>::parse_string()
     }
 }
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::parse_quoted_string()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::parse_quoted_string()
 {
     string_buffer_.clear();
 
@@ -586,7 +586,7 @@ void basic_csv_reader<CharT,Alloc>::parse_quoted_string()
     //std::cout << "start quoted string" << std::endl;
     while (!done_string)
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             err_handler_.fatal_error("JPE101", "EOF, expected quote character", *this);
@@ -610,7 +610,7 @@ void basic_csv_reader<CharT,Alloc>::parse_quoted_string()
     bool done = false;
     while (!done)
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             done = true;
@@ -634,13 +634,13 @@ void basic_csv_reader<CharT,Alloc>::parse_quoted_string()
     }
 }
 
-template<typename CharT,class Alloc>
-void basic_csv_reader<CharT,Alloc>::ignore_single_line_comment()
+template<typename Char,class Alloc>
+void basic_csv_reader<Char,Alloc>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
     {
-        CharT c = read_ch();
+        Char c = read_ch();
         if (eof())
         {
             done = true;

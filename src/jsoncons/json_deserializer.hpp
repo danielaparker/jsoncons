@@ -21,8 +21,8 @@
 
 namespace jsoncons {
 
-template <typename CharT,class Alloc>
-class basic_json_deserializer : public basic_json_input_handler<CharT>
+template <typename Char,class Alloc>
+class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     struct stack_item
     {
@@ -32,12 +32,12 @@ class basic_json_deserializer : public basic_json_input_handler<CharT>
             minimum_structure_capacity_ = minimum_structure_capacity;
             if (is_object_)
             {
-                object_ = new json_object<CharT,Alloc>();
+                object_ = new json_object<Char,Alloc>();
                 object_->reserve(minimum_structure_capacity);
             }
             else
             {
-                array_ = new json_array<CharT,Alloc>();
+                array_ = new json_array<Char,Alloc>();
                 array_->reserve(minimum_structure_capacity);
             }
         }
@@ -70,14 +70,14 @@ class basic_json_deserializer : public basic_json_input_handler<CharT>
             return !is_object_;
         }
 
-        json_object<CharT,Alloc>* release_object() {json_object<CharT,Alloc>* p(0); std::swap(p,object_); return p;}
+        json_object<Char,Alloc>* release_object() {json_object<Char,Alloc>* p(0); std::swap(p,object_); return p;}
 
-        json_array<CharT,Alloc>* release_array() {json_array<CharT,Alloc>* p(0); std::swap(p,array_); return p;}
+        json_array<Char,Alloc>* release_array() {json_array<Char,Alloc>* p(0); std::swap(p,array_); return p;}
 
-        std::basic_string<CharT> name_;
+        std::basic_string<Char> name_;
         bool is_object_;
-        json_object<CharT,Alloc>* object_;
-        json_array<CharT,Alloc>* array_;
+        json_object<Char,Alloc>* object_;
+        json_array<Char,Alloc>* array_;
         size_t minimum_structure_capacity_;
     };
 
@@ -98,15 +98,15 @@ public:
     {
     }
 
-    virtual void begin_object(const basic_parsing_context<CharT>& context)
+    virtual void begin_object(const basic_parsing_context<Char>& context)
     {
         stack_.push_back(stack_item(true,context.minimum_structure_capacity()));
     }
 
-    virtual void end_object(const basic_parsing_context<CharT>&)
+    virtual void end_object(const basic_parsing_context<Char>&)
     {
         stack_.back().object_->sort_members();
-        basic_json<CharT,Alloc> val(stack_.back().release_object());	    
+        basic_json<Char,Alloc> val(stack_.back().release_object());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -125,14 +125,14 @@ public:
         }
     }
 
-    virtual void begin_array(const basic_parsing_context<CharT>& context)
+    virtual void begin_array(const basic_parsing_context<Char>& context)
     {
         stack_.push_back(stack_item(false,context.minimum_structure_capacity()));
     }
 
-    virtual void end_array(const basic_parsing_context<CharT>&)
+    virtual void end_array(const basic_parsing_context<Char>&)
     {
-        basic_json<CharT,Alloc> val(stack_.back().release_array());	    
+        basic_json<Char,Alloc> val(stack_.back().release_array());	    
         stack_.pop_back();
         if (stack_.size() > 0)
         {
@@ -151,92 +151,92 @@ public:
         }
     }
 
-    virtual void write_name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>&)
+    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>&)
     {
         stack_.back().name_ = name;
     }
 
-    virtual void write_null(const basic_parsing_context<CharT>&)
+    virtual void write_null(const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(basic_json<CharT,Alloc>::null));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(basic_json<Char,Alloc>::null));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>::null);
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::null);
         }
     }
 
-    basic_json<CharT,Alloc>& root()
+    basic_json<Char,Alloc>& root()
     {
         return root_;
     }
 
 // value(...) implementation
 
-    virtual void write_string(const CharT* value, size_t length, const basic_parsing_context<CharT>&)
+    virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value,length));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value,length));
         } 
         else 
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value,length));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value,length));
         }
     }
 
-    virtual void double_value(double value, const basic_parsing_context<CharT>&)
+    virtual void double_value(double value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
         }
     }
 
-    virtual void write_longlong(long long value, const basic_parsing_context<CharT>&)
+    virtual void write_longlong(long long value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
         }
     }
 
-    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<CharT>&)
+    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
         }
     }
 
-    virtual void write_bool(bool value, const basic_parsing_context<CharT>&)
+    virtual void write_bool(bool value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<CharT,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<CharT,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
         }
     }
 
 private:
-	basic_json<CharT,Alloc> root_;
+	basic_json<Char,Alloc> root_;
     std::vector<stack_item> stack_;
 };
 

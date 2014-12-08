@@ -23,34 +23,34 @@
 
 namespace jsoncons {
 
-template <typename CharT,class Alloc>
+template <typename Char,class Alloc>
 class key_compare
 {
 public:
-    bool operator()(const typename basic_json<CharT,Alloc>::member_type& a, 
-                    const std::basic_string<CharT>& b) const
+    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
+                    const std::basic_string<Char>& b) const
     {
         return a.name() < b;
     }
 };
 
-template <typename CharT,class Alloc>
+template <typename Char,class Alloc>
 class member_compare
 {
 public:
-    bool operator()(const typename basic_json<CharT,Alloc>::member_type& a, 
-                    const typename basic_json<CharT,Alloc>::member_type& b) const
+    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
+                    const typename basic_json<Char,Alloc>::member_type& b) const
     {
         return a.name() < b.name();
     }
 };
 
-template <typename CharT,class Alloc>
+template <typename Char,class Alloc>
 class json_array 
 {
 public:
-    typedef typename std::vector<basic_json<CharT,Alloc>>::iterator iterator;
-    typedef typename std::vector<basic_json<CharT,Alloc>>::const_iterator const_iterator;
+    typedef typename std::vector<basic_json<Char,Alloc>>::iterator iterator;
+    typedef typename std::vector<basic_json<Char,Alloc>>::const_iterator const_iterator;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
@@ -65,12 +65,12 @@ public:
     {
     }
 
-    json_array(size_t n, const basic_json<CharT,Alloc>& val)
+    json_array(size_t n, const basic_json<Char,Alloc>& val)
         : elements_(n,val)
     {
     }
 
-    json_array(std::vector<basic_json<CharT,Alloc>> elements)
+    json_array(std::vector<basic_json<Char,Alloc>> elements)
         : elements_(elements)
     {
     }
@@ -81,7 +81,7 @@ public:
     {
     }
 
-    json_array<CharT,Alloc>* clone() 
+    json_array<Char,Alloc>* clone() 
     {
         return new json_array(elements_);
     }
@@ -96,7 +96,7 @@ public:
 
     void resize(size_t n) {elements_.resize(n);}
 
-    void resize(size_t n, const basic_json<CharT,Alloc>& val) {elements_.resize(n,val);}
+    void resize(size_t n, const basic_json<Char,Alloc>& val) {elements_.resize(n,val);}
 
     void remove_range(size_t from_index, size_t to_index) 
     {
@@ -105,29 +105,29 @@ public:
         elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
-    basic_json<CharT,Alloc>& at(size_t i) {return elements_[i];}
+    basic_json<Char,Alloc>& at(size_t i) {return elements_[i];}
 
-    const basic_json<CharT,Alloc>& at(size_t i) const {return elements_[i];}
+    const basic_json<Char,Alloc>& at(size_t i) const {return elements_[i];}
 
-    void push_back(const basic_json<CharT,Alloc>& value)
+    void push_back(const basic_json<Char,Alloc>& value)
     {
         elements_.push_back(value);
     }
 
-    void add(size_t index, const basic_json<CharT,Alloc>& value)
+    void add(size_t index, const basic_json<Char,Alloc>& value)
     {
-        json_array<CharT,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
-    void push_back(basic_json<CharT,Alloc>&& value)
+    void push_back(basic_json<Char,Alloc>&& value)
     {
         elements_.push_back(value);
     }
 
-    void add(size_t index, basic_json<CharT,Alloc>&& value)
+    void add(size_t index, basic_json<Char,Alloc>&& value)
     {
-        json_array<CharT,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
@@ -139,7 +139,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<CharT,Alloc>& rhs) const
+    bool operator==(const json_array<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -155,21 +155,21 @@ public:
         return true;
     }
 
-    json_array(const json_array<CharT,Alloc>& val)
+    json_array(const json_array<Char,Alloc>& val)
         : elements_(val.elements_)
     {
     }
 private:
-    std::vector<basic_json<CharT,Alloc>> elements_;
-    json_array& operator=(const json_array<CharT,Alloc>&);
+    std::vector<basic_json<Char,Alloc>> elements_;
+    json_array& operator=(const json_array<Char,Alloc>&);
 };
 
-template <typename CharT,class Alloc>
+template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef typename std::vector<typename basic_json<CharT,Alloc>::member_type>::iterator iterator;
-    typedef typename std::vector<typename basic_json<CharT,Alloc>::member_type>::const_iterator const_iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_iterator;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
@@ -184,12 +184,12 @@ public:
     {
     }
 
-    json_object(std::vector<typename basic_json<CharT,Alloc>::member_type> members)
+    json_object(std::vector<typename basic_json<Char,Alloc>::member_type> members)
         : members_(members)
     {
     }
 
-    json_object<CharT,Alloc>* clone() 
+    json_object<Char,Alloc>* clone() 
     {
         return new json_object(members_);
     }
@@ -209,7 +209,7 @@ public:
         members_.erase(members_.begin()+from_index,members_.begin()+to_index);
     }
 
-    void remove(const std::basic_string<CharT>& name) 
+    void remove(const std::basic_string<Char>& name) 
     {
         iterator it = find(name);
         if (it != members_.end())
@@ -218,55 +218,55 @@ public:
         }
     }
 
-    const typename basic_json<CharT,Alloc>::member_type& get(size_t i) const 
+    const typename basic_json<Char,Alloc>::member_type& get(size_t i) const 
     {
         return members_[i];
     }
 
-    basic_json<CharT,Alloc>& at(size_t i) {return members_[i].value();}
+    basic_json<Char,Alloc>& at(size_t i) {return members_[i].value();}
 
-    const basic_json<CharT,Alloc>& at(size_t i) const {return members_[i].value;}
+    const basic_json<Char,Alloc>& at(size_t i) const {return members_[i].value;}
 
-    void set(const std::basic_string<CharT>& name, const basic_json<CharT,Alloc>& value);
+    void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
 
-    void push_back(const std::basic_string<CharT>& name, const basic_json<CharT,Alloc>& val)
+    void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
     {
-        members_.push_back(typename basic_json<CharT,Alloc>::member_type(name,val));
+        members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val));
     }
 
-    void set(std::basic_string<CharT>&& name, basic_json<CharT,Alloc>&& value)
+    void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
-        iterator it = std::lower_bound(begin(),end(),name ,key_compare<CharT,Alloc>());
+        iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
         if (it != end() && it->name() == name)
         {
             //it = remove(it);
-            *it = typename basic_json<CharT,Alloc>::member_type(name,value);
+            *it = typename basic_json<Char,Alloc>::member_type(name,value);
         }
         else
         {
-            insert(it,typename basic_json<CharT,Alloc>::member_type(name,value));
+            insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
         }
     }
 
-    void push_back(std::basic_string<CharT>&& name, basic_json<CharT,Alloc>&& val)
+    void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
-        members_.push_back(typename basic_json<CharT,Alloc>::member_type());
+        members_.push_back(typename basic_json<Char,Alloc>::member_type());
         members_.back().name_.swap(name);
         members_.back().value_.swap(val);
-        //members_.push_back(typename basic_json<CharT,Alloc>::member_type(name,val)); // much slower on VS 2010
+        //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
     }
 
     iterator remove(iterator at); 
 
-    basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name);
+    basic_json<Char,Alloc>& get(const std::basic_string<Char>& name);
 
-    const basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name) const;
+    const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
 
-    iterator find(const std::basic_string<CharT>& name);
+    iterator find(const std::basic_string<Char>& name);
 
-    const_iterator find(const std::basic_string<CharT>& name) const;
+    const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(iterator it, typename basic_json<CharT,Alloc>::member_type member);
+    void insert(iterator it, typename basic_json<Char,Alloc>::member_type member);
 
     void sort_members();
 
@@ -278,7 +278,7 @@ public:
 
     const_iterator end() const {return members_.end();}
 
-    bool operator==(const json_object<CharT,Alloc>& rhs) const
+    bool operator==(const json_object<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -287,7 +287,7 @@ public:
         for (const_iterator it = members_.begin(); it != members_.end(); ++it)
         {
 
-            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<CharT, Alloc>());
+            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
             if (rhs_it == rhs.end() || rhs_it->value() != it->value())
             {
@@ -297,52 +297,52 @@ public:
         return true;
     }
 
-    json_object(const json_object<CharT,Alloc>& val)
+    json_object(const json_object<Char,Alloc>& val)
         : members_(val.members_)
     {
     }
 
 private:
-    std::vector<typename basic_json<CharT,Alloc>::member_type> members_;
-    json_object<CharT,Alloc>& operator=(const json_object<CharT,Alloc>&);
+    std::vector<typename basic_json<Char,Alloc>::member_type> members_;
+    json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 
 
-template <typename CharT,class Alloc>
-void json_object<CharT,Alloc>::sort_members()
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::sort_members()
 {
-    std::sort(members_.begin(),members_.end(),member_compare<CharT,Alloc>());
+    std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
 }
 
-template <typename CharT,class Alloc>
-void json_object<CharT,Alloc>::insert(iterator it, typename basic_json<CharT,Alloc>::member_type member)
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::insert(iterator it, typename basic_json<Char,Alloc>::member_type member)
 {
     members_.insert(it,member);
 }
 
-template <typename CharT,class Alloc>
-typename json_object<CharT,Alloc>::iterator json_object<CharT,Alloc>::remove(iterator at)
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::remove(iterator at)
 {
     return members_.erase(at);
 }
 
-template <typename CharT,class Alloc>
-void json_object<CharT,Alloc>::set(const std::basic_string<CharT>& name, const basic_json<CharT,Alloc>& value)
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
 {
-    iterator it = std::lower_bound(begin(),end(),name ,key_compare<CharT,Alloc>());
+    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
     if (it != end() && it->name() == name)
     {
         //it = remove(it);
-        *it = typename basic_json<CharT,Alloc>::member_type(name,value);
+        *it = typename basic_json<Char,Alloc>::member_type(name,value);
     }
     else
     {
-        insert(it,typename basic_json<CharT,Alloc>::member_type(name,value));
+        insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
     }
 }
 
-template <typename CharT,class Alloc>
-basic_json<CharT,Alloc>& json_object<CharT,Alloc>::get(const std::basic_string<CharT>& name) 
+template <typename Char,class Alloc>
+basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) 
 {
     iterator it = find(name);
     if (it == end())
@@ -352,8 +352,8 @@ basic_json<CharT,Alloc>& json_object<CharT,Alloc>::get(const std::basic_string<C
     return it->value();
 }
 
-template <typename CharT,class Alloc>
-const basic_json<CharT,Alloc>& json_object<CharT,Alloc>::get(const std::basic_string<CharT>& name) const
+template <typename Char,class Alloc>
+const basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) const
 {
     const_iterator it = find(name);
     if (it == end())
@@ -363,18 +363,18 @@ const basic_json<CharT,Alloc>& json_object<CharT,Alloc>::get(const std::basic_st
     return it->value_;
 }
 
-template <typename CharT,class Alloc>
-typename json_object<CharT,Alloc>::iterator json_object<CharT,Alloc>::find(const std::basic_string<CharT>& name)
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name)
 {
-    key_compare<CharT,Alloc> comp;
+    key_compare<Char,Alloc> comp;
     iterator it = std::lower_bound(begin(),end(), name, comp);
     return (it != end() && it->name() == name) ? it : end();
 }
 
-template <typename CharT,class Alloc>
-typename json_object<CharT,Alloc>::const_iterator json_object<CharT,Alloc>::find(const std::basic_string<CharT>& name) const
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::const_iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name) const
 {
-    key_compare<CharT,Alloc> comp;
+    key_compare<Char,Alloc> comp;
     const_iterator it = std::lower_bound(begin(),end(),name, comp);
     return (it != end() && it->name_ == name) ? it : end();
 }

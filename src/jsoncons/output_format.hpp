@@ -19,7 +19,7 @@
 
 namespace jsoncons {
 
-template <typename CharT>
+template <typename Char>
 class basic_output_format
 {
 public:
@@ -35,9 +35,9 @@ public:
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
-        nan_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
-        pos_inf_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
-        neg_inf_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
+        nan_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
+        pos_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
+        neg_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
         escape_all_non_ascii_(false),
         escape_solidus_(false)
     {
@@ -71,17 +71,17 @@ public:
 
     bool replace_neg_inf() const {return replace_neg_inf_;}
 
-    std::basic_string<CharT> nan_replacement() const
+    std::basic_string<Char> nan_replacement() const
     {
         return nan_replacement_;
     }
 
-    std::basic_string<CharT> pos_inf_replacement() const
+    std::basic_string<Char> pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
-    std::basic_string<CharT> neg_inf_replacement() const
+    std::basic_string<Char> neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }
@@ -124,17 +124,17 @@ public:
         replace_neg_inf_ = replace;
     }
 
-    void nan_replacement(const std::basic_string<CharT>& replacement)
+    void nan_replacement(const std::basic_string<Char>& replacement)
     {
         nan_replacement_ = replacement;
     }
 
-    void pos_inf_replacement(const std::basic_string<CharT>& replacement)
+    void pos_inf_replacement(const std::basic_string<Char>& replacement)
     {
         pos_inf_replacement_ = replacement;
     }
 
-    void neg_inf_replacement(const std::basic_string<CharT>& replacement)
+    void neg_inf_replacement(const std::basic_string<Char>& replacement)
     {
         neg_inf_replacement_ = replacement;
     }
@@ -161,9 +161,9 @@ private:
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
-    std::basic_string<CharT> nan_replacement_;
-    std::basic_string<CharT> pos_inf_replacement_;
-    std::basic_string<CharT> neg_inf_replacement_;
+    std::basic_string<Char> nan_replacement_;
+    std::basic_string<Char> pos_inf_replacement_;
+    std::basic_string<Char> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
 };

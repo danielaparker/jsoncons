@@ -27,150 +27,150 @@
 
 namespace jsoncons {
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, std::basic_string<CharT>>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, std::basic_string<Char>>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_string();
     }
-    std::basic_string<CharT> as(const basic_json<CharT, Alloc>& val) const
+    std::basic_string<Char> as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_string();
     }
-    void assign(basic_json<CharT, Alloc>& self, const std::basic_string<CharT>& val)
+    void assign(basic_json<Char, Alloc>& self, const std::basic_string<Char>& val)
     {
         self.assign_string(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, basic_json<CharT, Alloc>>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, basic_json<Char, Alloc>>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>&) const
+    bool is(const basic_json<Char, Alloc>&) const
     {
         return true;
     }
-    basic_json<CharT, Alloc> as(const basic_json<CharT, Alloc>& val) const
+    basic_json<Char, Alloc> as(const basic_json<Char, Alloc>& val) const
     {
         return val;
     }
-    void assign(basic_json<CharT, Alloc>& self, basic_json<CharT, Alloc> val)
+    void assign(basic_json<Char, Alloc>& self, basic_json<Char, Alloc> val)
     {
         val.swap(self);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, typename basic_json<CharT, Alloc>::any>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::any>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& self) const
+    bool is(const basic_json<Char, Alloc>& self) const
     {
         return self.is_any();
     }
-    typename basic_json<CharT, Alloc>::any as(const basic_json<CharT, Alloc>& val) const
+    typename basic_json<Char, Alloc>::any as(const basic_json<Char, Alloc>& val) const
     {
         return val.any_value();
     }
-    void assign(basic_json<CharT, Alloc>& self, typename basic_json<CharT, Alloc>::any val)
+    void assign(basic_json<Char, Alloc>& self, typename basic_json<Char, Alloc>::any val)
     {
         self.assign_any(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, const CharT *>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, const Char *>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_string();
     }
-    const CharT* as(const basic_json<CharT, Alloc>& val) const
+    const Char* as(const basic_json<Char, Alloc>& val) const
     {
         JSONCONS_ASSERT(val.is_string());
         return val.value_.string_value_.c_str();
     }
-    void assign(basic_json<CharT, Alloc>& self, const CharT *val)
+    void assign(basic_json<Char, Alloc>& self, const Char *val)
     {
-        self.assign_string(std::basic_string<CharT>(val));
+        self.assign_string(std::basic_string<Char>(val));
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, typename basic_json<CharT, Alloc>::object>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::object>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_object();
     }
-    typename basic_json<CharT, Alloc>::object as(const basic_json<CharT, Alloc>& val) const
+    typename basic_json<Char, Alloc>::object as(const basic_json<Char, Alloc>& val) const
     {
         JSONCONS_ASSERT(val.is_object());
-        return val.is_empty() ? typename basic_json<CharT, Alloc>::object() : val.object_value();
+        return val.is_empty() ? typename basic_json<Char, Alloc>::object() : val.object_value();
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, typename basic_json<CharT, Alloc>::array>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::array>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_array();
     }
-    typename basic_json<CharT, Alloc>::array as(const basic_json<CharT, Alloc>& val) const
+    typename basic_json<Char, Alloc>::array as(const basic_json<Char, Alloc>& val) const
     {
         return val.array_value();
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, jsoncons::null_type>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, jsoncons::null_type>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_null();
     }
-    typename jsoncons::null_type as(const basic_json<CharT, Alloc>& val) const
+    typename jsoncons::null_type as(const basic_json<Char, Alloc>& val) const
     {
         JSONCONS_ASSERT(val.is_null());
         return jsoncons::null_type();
     }
-    void assign(basic_json<CharT, Alloc>& self, null_type)
+    void assign(basic_json<Char, Alloc>& self, null_type)
     {
         self.assign_null();
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, bool>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, bool>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_bool();
     }
-    bool as(const basic_json<CharT, Alloc>& val) const
+    bool as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_bool();
     }
-    void assign(basic_json<CharT, Alloc>& self, bool val)
+    void assign(basic_json<Char, Alloc>& self, bool val)
     {
         self.assign_bool(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, int>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, int>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -185,21 +185,21 @@ public:
             return false;
         }
     }
-    int as(const basic_json<CharT, Alloc>& val) const
+    int as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_int();
     }
-    void assign(basic_json<CharT, Alloc>& self, int val)
+    void assign(basic_json<Char, Alloc>& self, int val)
     {
         self.assign_longlong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, unsigned int>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, unsigned int>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -214,21 +214,21 @@ public:
             return false;
         }
     }
-    unsigned int as(const basic_json<CharT, Alloc>& val) const
+    unsigned int as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_uint();
     }
-    void assign(basic_json<CharT, Alloc>& self, unsigned int val)
+    void assign(basic_json<Char, Alloc>& self, unsigned int val)
     {
         self.assign_ulonglong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, short>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, short>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -243,21 +243,21 @@ public:
             return false;
         }
     }
-    short as(const basic_json<CharT, Alloc>& val) const
+    short as(const basic_json<Char, Alloc>& val) const
     {
         return (short)val.as_int();
     }
-    void assign(basic_json<CharT, Alloc>& self, short val)
+    void assign(basic_json<Char, Alloc>& self, short val)
     {
         self.assign_longlong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, unsigned short>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, unsigned short>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -272,21 +272,21 @@ public:
             return false;
         }
     }
-    unsigned short as(const basic_json<CharT, Alloc>& val) const
+    unsigned short as(const basic_json<Char, Alloc>& val) const
     {
         return (unsigned short)val.as_uint();
     }
-    void assign(basic_json<CharT, Alloc>& self, unsigned short val)
+    void assign(basic_json<Char, Alloc>& self, unsigned short val)
     {
         self.assign_ulonglong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, long>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, long>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -301,21 +301,21 @@ public:
             return false;
         }
     }
-    long as(const basic_json<CharT, Alloc>& val) const
+    long as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_long();
     }
-    void assign(basic_json<CharT, Alloc>& self, long val)
+    void assign(basic_json<Char, Alloc>& self, long val)
     {
         self.assign_longlong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, unsigned long>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, unsigned long>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -330,60 +330,60 @@ public:
             return false;
         }
     }
-    unsigned long as(const basic_json<CharT, Alloc>& val) const
+    unsigned long as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_ulong();
     }
-    void assign(basic_json<CharT, Alloc>& self, unsigned long val)
+    void assign(basic_json<Char, Alloc>& self, unsigned long val)
     {
         self.assign_ulonglong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, CharT>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, Char>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_string() && val.as_string().size() == 1;
     }
-    char as(const basic_json<CharT, Alloc>& val) const
+    char as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_char();
     }
-    void assign(basic_json<CharT, Alloc>& self, CharT ch)
+    void assign(basic_json<Char, Alloc>& self, Char ch)
     {
-        std::basic_string<CharT> s;
+        std::basic_string<Char> s;
         s.push_back(ch);
         self.assign_string(s);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, double>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, double>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         return val.is_double();
     }
 
-    double as(const basic_json<CharT, Alloc>& val) const
+    double as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_double();
     }
-    void assign(basic_json<CharT, Alloc>& self, double val)
+    void assign(basic_json<Char, Alloc>& self, double val)
     {
         self.assign_double(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, long long>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, long long>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -398,21 +398,21 @@ public:
             return false;
         }
     }
-    long long as(const basic_json<CharT, Alloc>& val) const
+    long long as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_longlong();
     }
-    void assign(basic_json<CharT, Alloc>& self, long long val)
+    void assign(basic_json<Char, Alloc>& self, long long val)
     {
         self.assign_longlong(val);
     }
 };
 
-template<typename CharT, typename Alloc>
-class value_adapter<CharT, Alloc, unsigned long long>
+template<typename Char, typename Alloc>
+class value_adapter<Char, Alloc, unsigned long long>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         if (val.is_longlong())
         {
@@ -427,21 +427,21 @@ public:
             return false;
         }
     }
-    unsigned long long as(const basic_json<CharT, Alloc>& val) const
+    unsigned long long as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_ulonglong();
     }
-    void assign(basic_json<CharT, Alloc>& self, unsigned long long val)
+    void assign(basic_json<Char, Alloc>& self, unsigned long long val)
     {
         self.assign_ulonglong(val);
     }
 };
 
-template<typename CharT, typename Alloc, typename T>
-class value_adapter<CharT, Alloc, std::vector<T>>
+template<typename Char, typename Alloc, typename T>
+class value_adapter<Char, Alloc, std::vector<T>>
 {
 public:
-    bool is(const basic_json<CharT, Alloc>& val) const
+    bool is(const basic_json<Char, Alloc>& val) const
     {
         bool result = val.is_array();
         for (size_t i = 0; result && i < val.size(); ++i)
@@ -453,7 +453,7 @@ public:
         }
         return result;
     }
-    std::vector<T> as(const basic_json<CharT, Alloc>& val) const
+    std::vector<T> as(const basic_json<Char, Alloc>& val) const
     {
         std::vector<T> v(val.size());
         for (size_t i = 0; i < v.size(); ++i)
@@ -462,9 +462,9 @@ public:
         }
         return v;
     }
-    void assign(basic_json<CharT, Alloc>& self, const std::vector<T>& val)
+    void assign(basic_json<Char, Alloc>& self, const std::vector<T>& val)
     {
-        self = basic_json<CharT, Alloc>(val.begin(), val.end());
+        self = basic_json<Char, Alloc>(val.begin(), val.end());
     }
 };
 

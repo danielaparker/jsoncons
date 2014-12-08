@@ -13,105 +13,105 @@
 
 namespace jsoncons {
 
-template <typename CharT>
+template <typename Char>
 class basic_parsing_context;
 
-template <typename CharT>
+template <typename Char>
 class basic_json_input_handler
 {
 public:
     virtual ~basic_json_input_handler() {}
     virtual void begin_json() = 0;
 
-    void value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context) 
+    void value(const Char* value, size_t length, const basic_parsing_context<Char>& context) 
     {
         write_string(value, length, context);
     }
 
-    void value(null_type, const basic_parsing_context<CharT>& context)
+    void value(null_type, const basic_parsing_context<Char>& context)
     {
         write_null(context);
     }
 
-    void value(float value, const basic_parsing_context<CharT>& context)
+    void value(float value, const basic_parsing_context<Char>& context)
     {
         double_value((double)value, context);
     }
 
-    void value(double value, const basic_parsing_context<CharT>& context)
+    void value(double value, const basic_parsing_context<Char>& context)
     {
         double_value(value, context);
     }
 
-    void value(long long value, const basic_parsing_context<CharT>& context) 
+    void value(long long value, const basic_parsing_context<Char>& context) 
     {
         write_longlong(value,context);
     }
 
-    void value(unsigned long long value, const basic_parsing_context<CharT>& context) 
+    void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
         write_ulonglong(value,context);
     }
 
-    void value(long value, const basic_parsing_context<CharT>& context) 
+    void value(long value, const basic_parsing_context<Char>& context) 
     {
         write_longlong((long)value,context);
     }
 
-    void value(unsigned long value, const basic_parsing_context<CharT>& context) 
+    void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
         write_ulonglong((unsigned long)value,context);
     }
 
-    void value(int value, const basic_parsing_context<CharT>& context) 
+    void value(int value, const basic_parsing_context<Char>& context) 
     {
         write_longlong((int)value,context);
     }
 
-    void value(unsigned int value, const basic_parsing_context<CharT>& context) 
+    void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
         write_ulonglong((unsigned int)value,context);
     }
 
-    void value(bool value, const basic_parsing_context<CharT>& context) 
+    void value(bool value, const basic_parsing_context<Char>& context) 
     {
         write_bool(value,context);
     }
 
-    void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
+    void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
         write_name(name,context);
     }
 
     virtual void end_json() = 0;
 
-    virtual void begin_object(const basic_parsing_context<CharT>& context) = 0;
+    virtual void begin_object(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void end_object(const basic_parsing_context<CharT>& context) = 0;
+    virtual void end_object(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void begin_array(const basic_parsing_context<CharT>& context) = 0;
+    virtual void begin_array(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void end_array(const basic_parsing_context<CharT>& context) = 0;
+    virtual void end_array(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context) = 0;
 
 // value(...) implementation
 
-    virtual void write_null(const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_null(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_string(const CharT* value, size_t length, const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void double_value(double value, const basic_parsing_context<CharT>& context) = 0;
+    virtual void double_value(double value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_longlong(long long value, const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_longlong(long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_bool(bool value, const basic_parsing_context<CharT>& context) = 0;
+    virtual void write_bool(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
-template <typename CharT>
-class null_basic_json_input_handler : public basic_json_input_handler<CharT>
+template <typename Char>
+class null_basic_json_input_handler : public basic_json_input_handler<Char>
 {
 public:
     virtual void begin_json()
@@ -122,47 +122,47 @@ public:
     {
     }
 
-    virtual void begin_object(const basic_parsing_context<CharT>&)
+    virtual void begin_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_object(const basic_parsing_context<CharT>&)
+    virtual void end_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void begin_array(const basic_parsing_context<CharT>&)
+    virtual void begin_array(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_array(const basic_parsing_context<CharT>&)
+    virtual void end_array(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void name(const std::basic_string<CharT>&, const basic_parsing_context<CharT>&)
+    virtual void name(const std::basic_string<Char>&, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_null(const basic_parsing_context<CharT>&)
+    virtual void write_null(const basic_parsing_context<Char>&)
     {
     }
 // value(...) implementation
-    virtual void write_string(const CharT*, size_t length, const basic_parsing_context<CharT>&)
+    virtual void write_string(const Char*, size_t length, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void double_value(double, const basic_parsing_context<CharT>&)
+    virtual void double_value(double, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_longlong(long long, const basic_parsing_context<CharT>&)
+    virtual void write_longlong(long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_ulonglong(unsigned long long, const basic_parsing_context<CharT>&)
+    virtual void write_ulonglong(unsigned long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_bool(bool, const basic_parsing_context<CharT>&)
+    virtual void write_bool(bool, const basic_parsing_context<Char>&)
     {
     }
 };
