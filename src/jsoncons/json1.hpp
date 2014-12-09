@@ -1545,6 +1545,16 @@ private:
         }
     };
 
+    internal_string_type& internal_string() 
+    {
+        return *(value_.string_value_);
+    }
+
+    const internal_string_type& internal_string() const
+    {
+        return *(value_.string_value_);
+    }
+
 	value_type type_;
     union
     {
