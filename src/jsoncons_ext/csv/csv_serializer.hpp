@@ -460,7 +460,7 @@ private:
     std::map<std::basic_string<Char>,size_t> header_;
 };
 
-typedef basic_csv_serializer<char,std::allocator<char>> csv_serializer;
+typedef basic_csv_serializer<char,std::allocator<void>> csv_serializer;
 
 }}
 

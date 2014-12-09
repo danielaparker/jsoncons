@@ -240,8 +240,8 @@ private:
     std::vector<stack_item> stack_;
 };
 
-typedef basic_json_deserializer<char,std::allocator<char>> json_deserializer;
-typedef basic_json_deserializer<wchar_t,std::allocator<wchar_t>> wjson_deserializer;
+typedef basic_json_deserializer<char,std::allocator<void>> json_deserializer;
+typedef basic_json_deserializer<wchar_t,std::allocator<void>> wjson_deserializer;
 
 }
 
