@@ -1,5 +1,6 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
+#define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -32,7 +33,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 
     std::cout << pretty_print(countries) << std::endl;
 }
-
+#if 0
 BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 {
     std::string in_file = "input/countries.json";
@@ -82,4 +83,4 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     employees.to_stream(serializer);
 }
-
+#endif

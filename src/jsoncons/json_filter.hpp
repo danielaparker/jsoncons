@@ -61,9 +61,9 @@ public:
         writer_.end_array();
     }
 
-    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
     {
-        writer_.write_name(name);
+        writer_.write_name(name, length);
     }
 
     virtual void write_null(const basic_parsing_context<Char>& context)
@@ -147,9 +147,9 @@ public:
         parent_.end_array(context);
     }
 
-    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_.write_name(name,context);
+        parent_.write_name(name, length, context);
     }
 
     virtual void write_null(const basic_parsing_context<Char>& context)

@@ -30,12 +30,6 @@ struct csv_char_traits
 template <>
 struct csv_char_traits<char>
 {
-    static bool contains_char(const std::string& s, char c)
-    {
-        size_t pos = s.find_first_of(c);
-        return pos == std::string::npos ? false : true;
-    }
-
     static const std::string all_literal() {return "all";};
 
     static const std::string minimal_literal() {return "minimal";};
@@ -48,12 +42,6 @@ struct csv_char_traits<char>
 template <>
 struct csv_char_traits<wchar_t>
 {
-    static bool contains_char(const std::wstring& s, wchar_t c)
-    {
-        size_t pos = s.find_first_of(c);
-        return pos == std::string::npos ? false : true;
-    }
-
     static const std::wstring all_literal() {return L"all";};
 
     static const std::wstring minimal_literal() {return L"minimal";};
@@ -210,7 +198,7 @@ public:
         end_value();
     }
 
-    virtual void write_name(const std::basic_string<Char>& name)
+    virtual void write_name(const Char* name, size_t length)
     {
         if (stack_.size() == 2)
         {
@@ -222,12 +210,12 @@ public:
                 }
                 bool quote = false;
                 if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-                    (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(name,field_delimiter_)))
+                    (quote_style_ == quote_minimal && std::char_traits<Char>::find(name,length,field_delimiter_) != nullptr))
                 {
                     quote = true;
                     os_.put(quote_char_);
                 }
-                jsoncons_ext::csv::escape_string<Char>(&name[0], name.length(), quote_char_, quote_escape_char_, os_);
+                jsoncons_ext::csv::escape_string<Char>(name, length, quote_char_, quote_escape_char_, os_);
                 if (quote)
                 {
                     os_.put(quote_char_);
@@ -236,7 +224,7 @@ public:
             }
             else
             {
-                typename std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(name);
+                typename std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(std::basic_string<Char>(name,length));
                 if (it == header_.end())
                 {
                     stack_.back().skip_ = true;
@@ -354,7 +342,7 @@ private:
 
         bool quote = false;
         if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
-            (quote_style_ == quote_minimal && csv_char_traits<Char>::contains_char(val,field_delimiter_)))
+            (quote_style_ == quote_minimal && std::char_traits<Char>::find(val,length,field_delimiter_) != nullptr))
         {
             quote = true;
             os.put(quote_char_);

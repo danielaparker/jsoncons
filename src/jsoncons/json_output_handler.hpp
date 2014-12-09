@@ -81,7 +81,7 @@ public:
 
     void name(const std::basic_string<Char>& name)
     {
-        write_name(name);
+        write_name(&name[0], name.length());
     }
 
 //  Implementation start here
@@ -90,7 +90,7 @@ public:
 
     virtual void end_json() = 0;
 
-    virtual void write_name(const std::basic_string<Char>& name) = 0;
+    virtual void write_name(const Char* name, size_t length) = 0;
 
     virtual void begin_object() = 0;
 
@@ -128,7 +128,7 @@ public:
     {
     }
 
-    virtual void write_name(const std::basic_string<Char>&)
+    virtual void write_name(const Char* name, size_t length)
     {
     }
 

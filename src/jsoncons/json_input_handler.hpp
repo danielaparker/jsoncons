@@ -80,7 +80,7 @@ public:
 
     void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
-        write_name(name,context);
+        write_name(&name[0], name.length(), context);
     }
 
     virtual void end_json() = 0;
@@ -93,7 +93,7 @@ public:
 
     virtual void end_array(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context) = 0;
+    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>& context) = 0;
 
 // value(...) implementation
 

@@ -125,11 +125,11 @@ public:
         end_value();
     }
 
-    virtual void write_name(const std::basic_string<Char>& name)
+    virtual void write_name(const Char* name, size_t length)
     {
         begin_element();
         os_.put('\"');
-        escape_string<Char>(&name[0], name.length(), format_, os_);
+        escape_string<Char>(name, length, format_, os_);
         os_.put('\"');
         os_.put(':');
     }
