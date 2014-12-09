@@ -415,7 +415,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                             size_t count1 = 0;
                             if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
-                                handler_.write_name(string_buffer_, *this);
+                                handler_.write_name(&string_buffer_[0], string_buffer_.length(), *this);
                                 count1 = 0;
                                 if (buffer_[buffer_position_] == ':')
                                 {

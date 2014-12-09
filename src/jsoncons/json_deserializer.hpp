@@ -151,9 +151,9 @@ public:
         }
     }
 
-    virtual void write_name(const std::basic_string<Char>& name, const basic_parsing_context<Char>&)
+    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>&)
     {
-        stack_.back().name_ = name;
+        stack_.back().name_ = std::basic_string<Char>(name,length);
     }
 
     virtual void write_null(const basic_parsing_context<Char>&)

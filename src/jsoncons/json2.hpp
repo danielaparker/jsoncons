@@ -865,7 +865,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
             json_object<Char, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.write_name(it->name());
+                handler.write_name(&(it->name())[0],it->name().length());
                 it->value().to_stream(handler);
             }
             handler.end_object();
