@@ -74,7 +74,9 @@ public:
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
-         comment_symbol_()
+         comment_symbol_(),
+         bof_(true),
+         eof_(false)
     {
         init(jsoncons::json::an_object);
     }
@@ -100,7 +102,9 @@ public:
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
-         comment_symbol_()
+         comment_symbol_(),
+         bof_(true),
+         eof_(false)
     {
         init(params);
     }
@@ -126,7 +130,9 @@ public:
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
-         comment_symbol_()
+         comment_symbol_(),
+         bof_(true),
+         eof_(false)
 
 
     {
@@ -154,7 +160,9 @@ public:
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
-         comment_symbol_()
+         comment_symbol_(),
+         bof_(true),
+         eof_(false)
     {
         init(params);
     }
@@ -185,7 +193,7 @@ public:
 
     bool eof() const
     {
-        return buffer_position_ > buffer_length_ && stream_ptr_->is_.eof();
+        return eof_;
     }
 
     size_t buffer_capacity() const
@@ -231,15 +239,28 @@ private:
 
     void read_some()
     {
+        if (buffer_position_ < buffer_length_)
+        {
+            return; // exhaust buffer first
+        }
         buffer_position_ = 0;
         if (!stream_ptr_->is_.eof())
         {
             stream_ptr_->is_.read(&buffer_[0], buffer_capacity_);
             buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
+            if (bof_)
+            {
+                bof_ = false;
+                if (buffer_length_ == 0)
+                {
+                    eof_ = true;
+                }
+            }
         }
         else
         {
             buffer_length_ = 0;
+            eof_ = true;
         }
     }
 
@@ -311,6 +332,8 @@ private:
     Char quote_char_;
     Char quote_escape_char_;
     Char comment_symbol_;
+    bool bof_;
+    bool eof_;
 };
 
 template<typename Char,class Alloc>
@@ -376,7 +399,8 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
 
         if (c == field_delimiter_)
         {
-            skip_ch();
+            //skip_ch();
+			continue;
         }
         if (column_ == 0) // Just got newline
         {
@@ -414,7 +438,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_.write_string(&string_buffer_[0],string_buffer_.length(),*this);
                 }
                 else
                 {
@@ -427,7 +451,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_.write_string(&string_buffer_[0],string_buffer_.length(),*this);
                 }
             }
         }
@@ -499,7 +523,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
             if (column_index < header.size())
             {
                 handler_.name(header[column_index],*this);
-                handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
+                handler_.write_string(&string_buffer_[0],string_buffer_.length(),*this);
             }
             ++column_index;
         }
@@ -523,7 +547,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
                 if (column_index < header.size())
                 {
                     handler_.name(header[column_index],*this);
-                    handler_.value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_.write_string(&string_buffer_[0],string_buffer_.length(),*this);
                 }
             }
             ++column_index;
