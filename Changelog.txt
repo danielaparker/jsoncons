@@ -1,3 +1,9 @@
+0.94.1
+
+Bug fixes:
+
+- Incorporates fix from Alex Merry for comparison of json objects
+
 0.94
 ----
 

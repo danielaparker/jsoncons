@@ -62,7 +62,7 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
         value_ = val.value_;
         break;
     case string_t:
-        value_.string_value_ = new internal_string_type(val.internal_string());
+        value_.string_wrapper_ = new string_wrapper(val.internal_string());
         break;
     case array_t:
         value_.array_ = val.value_.array_->clone();
@@ -166,29 +166,28 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(Char c)
 {
     type_ = string_t;
-    value_.string_value_ = new internal_string_type();
-    value_.string_value_->push_back(c);
+    value_.string_wrapper_ = new string_wrapper(c);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = string_t;
-    value_.string_value_ = new internal_string_type(s.begin(),s.end());
+    value_.string_wrapper_ = new string_wrapper(s);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s)
 {
     type_ = string_t;
-    value_.string_value_ = new internal_string_type(s);
+    value_.string_wrapper_ = new string_wrapper(s);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
 {
     type_ = string_t;
-    value_.string_value_ = new internal_string_type(s,length);
+    value_.string_wrapper_ = new string_wrapper(s,length);
 }
 
 template<typename Char, typename Alloc>
@@ -205,7 +204,7 @@ basic_json<Char, Alloc>::basic_json(value_type t)
     case bool_t:
         break;
     case string_t:
-        value_.string_value_ = new internal_string_type();
+        value_.string_wrapper_ = new string_wrapper();
         break;
     case array_t:
         value_.array_ = new json_array<Char, Alloc>();
@@ -232,7 +231,7 @@ basic_json<Char, Alloc>::~basic_json()
     case bool_t:
         break;
     case string_t:
-        delete value_.string_value_;
+        delete value_.string_wrapper_;
         break;
     case array_t:
         delete value_.array_;
@@ -278,7 +277,7 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
     case ulonglong_t:
     case double_t:
         type_ = string_t;
-        value_.string_value_ = new internal_string_type(rhs.begin(),rhs.end());
+        value_.string_wrapper_ = new string_wrapper(rhs);
         break;
     default:
         basic_json<Char, Alloc>(rhs).swap(*this);
@@ -1497,7 +1496,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     switch (type_)
     {
     case string_t:
-        return external_string_type(&internal_string()[0],internal_string().length());
+        return std::basic_string<Char>(&internal_string()[0],internal_string().length());
     default:
         return to_string();
     }
@@ -1509,7 +1508,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     switch (type_)
     {
     case string_t:
-        return external_string_type(&internal_string()[0],internal_string().length());
+        return std::basic_string<Char>(&internal_string()[0],internal_string().length());
     default:
         return to_string(format);
     }

@@ -689,7 +689,7 @@ void basic_csv_reader<Char,Alloc>::ignore_single_line_comment()
 
 }
 
-typedef basic_csv_reader<char,std::allocator<char>> csv_reader;
+typedef basic_csv_reader<char,std::allocator<void>> csv_reader;
 
 }}
 

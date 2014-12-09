@@ -124,7 +124,7 @@ public:
     };
 };
 
-template <typename Char, typename Alloc = std::allocator<Char>>
+template <typename Char, typename Alloc = std::allocator<void>>
 class basic_json : public json_base
 {
 public:
@@ -139,8 +139,7 @@ public:
     static void* operator new(std::size_t) { std::cout << "json" << std::endl; return typename Alloc::template rebind<basic_json>::other().allocate(1); }
     static void operator delete(void* ptr) { return typename Alloc::template rebind<basic_json>::other().deallocate(static_cast<basic_json*>(ptr), 1); }
 
-    typedef typename std::basic_string<Char, std::char_traits<Char>, Alloc> internal_string_type;
-    typedef typename std::basic_string<Char> external_string_type;
+    typedef typename std::basic_string<Char> internal_string_type;
 
     class any
     {
@@ -1547,15 +1546,64 @@ private:
 
     internal_string_type& internal_string() 
     {
-        return *(value_.string_value_);
+        return value_.string_wrapper_->s_;
     }
 
     const internal_string_type& internal_string() const
     {
-        return *(value_.string_value_);
+        return value_.string_wrapper_->s_;
     }
 
-	value_type type_;
+    class string_wrapper
+    {
+    public:
+
+        // Allocation
+        static void* operator new(std::size_t) { return typename Alloc::template rebind<string_wrapper>::other().allocate(1); }
+        static void operator delete(void* ptr) { return typename Alloc::template rebind<string_wrapper>::other().deallocate(static_cast<string_wrapper*>(ptr), 1); }
+
+        string_wrapper()
+        {
+        }
+
+        string_wrapper(const string_wrapper& wrapper)
+            : s_(wrapper.s_)
+        {
+        }
+
+        string_wrapper(string_wrapper&& wrapper)
+            : s_(wrapper.s_)
+        {
+        }
+
+        string_wrapper(const std::basic_string<Char>& s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(Char c)
+        {
+            s_->push_back(c);
+        }
+
+        string_wrapper(std::basic_string<Char>&& s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(const Char* s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(const Char* s, size_t length)
+            : s_(s,length)
+        {
+        }
+        std::basic_string<Char> s_;
+    };
+
+    value_type type_;
     union
     {
         double double_value_;
@@ -1564,7 +1612,7 @@ private:
         bool bool_value_;
         json_object<Char,Alloc>* object_;
         json_array<Char,Alloc>* array_;
-        internal_string_type* string_value_;
+        string_wrapper* string_wrapper_;
         any* any_value_;
     } value_;
 };
@@ -1575,8 +1623,8 @@ void swap(typename basic_json<Char,Alloc>::member_type& a, typename basic_json<C
     a.swap(b);
 }
 
-typedef basic_json<char,std::allocator<char>> json;
-typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
+typedef basic_json<char,std::allocator<void>> json;
+typedef basic_json<wchar_t,std::allocator<void>> wjson;
 
 }
 
