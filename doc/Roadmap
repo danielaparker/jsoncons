@@ -293,13 +293,22 @@ img {
 <body>
 <ul>
 <li>
-<p>Complete support for <code>json</code> storage and allocators</p>
+<p>Examine other data storage than vectors that could   benefit from custom allocators.</p>
+</li>
+<li>
+<p>Implement a path search.</p>
 </li>
 <li>
 <p>Review hooks for error handling and recovery</p>
 </li>
 <li>
 <p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p>
+</li>
+<li>
+<p>Improve csv_reader </p>
+</li>
+<li>
+<p>Support some type of schema validation</p>
 </li>
 </ul>
 
