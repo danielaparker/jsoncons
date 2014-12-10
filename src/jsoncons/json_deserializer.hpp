@@ -187,7 +187,7 @@ public:
         }
     }
 
-    virtual void double_value(double value, const basic_parsing_context<Char>&)
+    virtual void write_double(double value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {

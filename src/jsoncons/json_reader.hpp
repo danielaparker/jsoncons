@@ -674,7 +674,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_.double_value(d, *this);
+                            handler_.write_double(d, *this);
                         }
                         catch (...)
                         {
@@ -694,7 +694,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.double_value(-d, *this);
+                                handler_.write_double(-d, *this);
                             }
                             catch (...)
                             {
@@ -715,7 +715,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.double_value(d, *this);
+                                handler_.write_double(d, *this);
                             }
                             catch (...)
                             {

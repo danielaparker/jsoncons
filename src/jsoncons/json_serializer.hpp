@@ -156,7 +156,7 @@ public:
         end_value();
     }
 
-    virtual void double_value(double value)
+    virtual void write_double(double value)
     {
         begin_value();
 
