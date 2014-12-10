@@ -293,7 +293,7 @@ img {
 <body>
 <pre><code>jsoncons::wjson
 
-typedef basic_json&lt;wchar_t,storage&lt;wchar_t&gt;&gt; wjson
+typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
 </code></pre>
 
 <p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type.</p>

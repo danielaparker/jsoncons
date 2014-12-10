@@ -293,7 +293,7 @@ img {
 <body>
 <pre><code>jsoncons::wjson_deserializer
 
-typedef basic_json_deserializer&lt;wchar_t,storage&lt;wchar_t&gt;&gt; wjson_deserializer
+typedef basic_json_deserializer&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson_deserializer
 </code></pre>
 
 <p>The <code>wjson_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses <code>wchar_t</code> as the character type.</p>

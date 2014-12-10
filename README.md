@@ -226,7 +226,7 @@ The json class is an instantiation of the basic_json class template that uses ch
 
 The library includes an instantiation for wide characters as well,
 
-    typedef basic_json<wchar_t,storage<wchar_t>> wjson
+    typedef basic_json<wchar_t,std::allocator<void>> wjson
 
 Note that the template parameter storage is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.
 
