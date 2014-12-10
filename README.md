@@ -219,7 +219,8 @@ An example of iterating over the elements of a json array:
 
 ## About jsoncons::json
 
-The json class is an instantiation of the basic_json class template that uses char as the character type,
+The json class is an instantiation of the basic_json class template that uses char as the character type
+and `std::allocator<void>` as the allocator type,
 
     typedef basic_json<char,std::allocator<void>> json
 
@@ -227,7 +228,22 @@ The library includes an instantiation for wide characters as well,
 
     typedef basic_json<wchar_t,std::allocator<void>> wjson
 
-Note that the template parameter storage is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.
+Note that the allocator type allows you to supply a custom allocator for dynamically allocated, 
+fixed size small objects in the json container, the container rebinds it as necessay. For example, 
+if you wish, you can use the boost pool allocator:
+
+    #include <boost/pool/pool_alloc.hpp>
+    #include "jsoncons/json.hpp"
+
+    basic_json<char, boost::pool_allocator<void>> o;
+
+    o.set("FirstName","Joe");
+    o.set("LastName","Smith");
+
+This results in a json object class and a string wrapper being allocated
+from the boost memory pool. The allocator type is not used for structures 
+including vectors and strings that use large or variable amounts of memory, 
+these always use default allocators.
 
 ## Type Extensibility
 

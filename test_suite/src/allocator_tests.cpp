@@ -17,7 +17,7 @@ using std::string;
 
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
-    basic_json<char, boost::pool_allocator<char>> o;
+    basic_json<char, boost::pool_allocator<void>> o;
 
     o.set("field1",10.0);
     o.set("field2",20.0);
