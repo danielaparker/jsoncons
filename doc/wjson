@@ -296,7 +296,11 @@ img {
 typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
 </code></pre>
 
-<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type.</p>
+<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type
+and <code>std::allocator&lt;void&gt;</code> as the allocator type. The allocator type is used to supply an allocator for dynamically allocated, 
+fixed size small objects in the <code>wjson</code> container, the <code>wjson</code> container will rebind it as necessary. The allocator type
+is not used for structures including vectors and strings that use large or variable amounts of memory, 
+these always use default allocators.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons/json.hpp&quot;
 </code></pre>
