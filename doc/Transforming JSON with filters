@@ -340,9 +340,9 @@ virtual void write_name(const char* p, int length, const parsing_context&amp; co
 
 virtual void write_string(const char* p, int length, const parsing_context&amp; context)
 {
-    string value(p,length);
     if (name_ == &quot;name&quot;)
     {
+        string value(p,length);
         size_t end_first = value.find_first_of(&quot; \t&quot;);
         size_t start_last = value.find_first_not_of(&quot; \t&quot;, end_first);
         parent().name(&quot;first-name&quot;, context);
