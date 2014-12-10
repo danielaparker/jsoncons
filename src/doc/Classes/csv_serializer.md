@@ -38,7 +38,7 @@ Receive notification of the start of a JSON array
     virtual void end_array()
 Receive notification of the end of a JSON object
 
-    virtual void name(const std::string& name)
+    virtual void write_name(const char* p, size_t length)
 Receive notification of the `name` of a name value pair
 
     virtual void value(const std::string& val)
@@ -56,7 +56,7 @@ Receive notification of a non-negative integer
     virtual void value(bool val)
 Receive notification of a boolean value
 
-    virtual void null_value()
+    virtual void write_null()
 Receive notification of `null`
 
 ### Examples

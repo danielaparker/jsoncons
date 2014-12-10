@@ -312,6 +312,26 @@ img {
 <li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
+<h2>What's new since Release 0.94.1</h2>
+<ul>
+<li>
+<p>A template method <code>any_cast</code> has been added to the <code>json</code> class.</p>
+</li>
+<li>
+<p>The allocator type parameter in basic_json is now supported, it allows you to supply a 
+  custom allocator for dynamically allocated, fixed size small objects in the json container.
+  The allocator type is not used for structures including vectors and strings that use large 
+  or variable amounts of memory, these always use the default allocators.</p>
+</li>
+<li>
+<p>If you have implemented your own input and output handlers that derive from 
+  <code>json_input_handler</code> or <code>json_output_handler</code>, you will need to make some
+  changes to method signatures, refer to the Changelog for details.</p>
+</li>
+<li>
+<p>A bug has been fixed in <code>csv_reader</code></p>
+</li>
+</ul>
 <h2>Using the code</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
@@ -321,7 +341,6 @@ img {
 using std::string;
 using std::cout;
 using std::endl;
-using jsoncons::null_type;
 using jsoncons::json;
 </code></pre>
 
@@ -420,7 +439,7 @@ else
 image_sizing[&quot;resize_unit&quot;] =  &quot;pixels&quot;;  // a string
 image_sizing[&quot;resize_what&quot;] =  &quot;long_edge&quot;;  // a string
 image_sizing[&quot;dimension1&quot;] = 9.84;  // a double
-image_sizing[&quot;dimension2&quot;] = null_type();  // a null
+image_sizing[&quot;dimension2&quot;] = json::null;  // a null
 </code></pre>
 
 <p>Serializing it, this time with pretty print,</p>
@@ -502,15 +521,31 @@ for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 </code></pre>
 
 <h2>About jsoncons::json</h2>
-<p>The json class is an instantiation of the basic_json class template that uses char as the character type,</p>
-<pre><code>typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
+<p>The json class is an instantiation of the basic_json class template that uses char as the character type
+and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
+<pre><code>typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
 </code></pre>
 
 <p>The library includes an instantiation for wide characters as well,</p>
-<pre><code>typedef basic_json&lt;wchar_t,storage&lt;wchar_t&gt;&gt; wjson
+<pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
 </code></pre>
 
-<p>Note that the template parameter storage is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.</p>
+<p>Note that the allocator type allows you to supply a custom allocator for dynamically allocated, 
+fixed size small objects in the json container, the container rebinds it as necessay. For example, 
+if you wish, you can use the boost pool allocator:</p>
+<pre><code>#include &lt;boost/pool/pool_alloc.hpp&gt;
+#include &quot;jsoncons/json.hpp&quot;
+
+basic_json&lt;char, boost::pool_allocator&lt;void&gt;&gt; o;
+
+o.set(&quot;FirstName&quot;,&quot;Joe&quot;);
+o.set(&quot;LastName&quot;,&quot;Smith&quot;);
+</code></pre>
+
+<p>This results in a json object class and a string wrapper being allocated
+from the boost memory pool. The allocator type is not used for structures 
+including vectors and strings that use large or variable amounts of memory, 
+these always use the default allocators.</p>
 <h2>Type Extensibility</h2>
 <p>In the json class, accessors and modifiers are templated, for example,</p>
 <pre><code>template&lt;typename T&gt;
@@ -524,7 +559,7 @@ basic_json&amp; operator=(T val)
 </code></pre>
 
 <p>The implementations of these functions and operators make use of the class template value_adapter</p>
-<pre><code>template &lt;typename Char, typename Storage, typename T&gt;
+<pre><code>template &lt;typename Char, typename Alloc, typename T&gt;
 class value_adapter
 {
 public:
@@ -581,7 +616,7 @@ A(1,1) = 4;
 
 obj.set(&quot;mydata&quot;,json::any(A));
 
-matrix&lt;double&gt; B = obj[&quot;mydata&quot;].as&lt;json::any&gt;().cast&lt;matrix&lt;double&gt;&gt;();
+matrix&lt;double&gt;&amp; B = obj[&quot;mydata&quot;].any_cast&lt;matrix&lt;double&gt;&gt;();
 </code></pre>
 
 

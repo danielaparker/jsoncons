@@ -82,4 +82,3 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     employees.to_stream(serializer);
 }
-

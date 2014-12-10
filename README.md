@@ -23,6 +23,21 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
+## What's new since Release 0.94.1
+
+- A template method `any_cast` has been added to the `json` class.
+
+- The allocator type parameter in basic_json is now supported, it allows you to supply a 
+  custom allocator for dynamically allocated, fixed size small objects in the json container.
+  The allocator type is not used for structures including vectors and strings that use large 
+  or variable amounts of memory, these always use the default allocators.
+
+- If you have implemented your own input and output handlers that derive from 
+  `json_input_handler` or `json_output_handler`, you will need to make some
+  changes to method signatures, refer to the Changelog for details.
+
+- A bug has been fixed in `csv_reader`
+
 ## Using the code
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
@@ -36,7 +51,6 @@ The jsoncons classes and functions are in namespace jsoncons. The following usin
     using std::string;
     using std::cout;
     using std::endl;
-    using jsoncons::null_type;
     using jsoncons::json;
 
 ### Reading json values from a file
@@ -137,7 +151,7 @@ Adding some members,
     image_sizing["resize_unit"] =  "pixels";  // a string
     image_sizing["resize_what"] =  "long_edge";  // a string
     image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = null_type();  // a null
+    image_sizing["dimension2"] = json::null;  // a null
 
 Serializing it, this time with pretty print,
 
@@ -220,15 +234,31 @@ An example of iterating over the elements of a json array:
 
 ## About jsoncons::json
 
-The json class is an instantiation of the basic_json class template that uses char as the character type,
+The json class is an instantiation of the basic_json class template that uses char as the character type
+and `std::allocator<void>` as the allocator type,
 
-    typedef basic_json<char,storage<char>> json
+    typedef basic_json<char,std::allocator<void>> json
 
 The library includes an instantiation for wide characters as well,
 
-    typedef basic_json<wchar_t,storage<wchar_t>> wjson
+    typedef basic_json<wchar_t,std::allocator<void>> wjson
 
-Note that the template parameter storage is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.
+Note that the allocator type allows you to supply a custom allocator for dynamically allocated, 
+fixed size small objects in the json container, the container rebinds it as necessay. For example, 
+if you wish, you can use the boost pool allocator:
+
+    #include <boost/pool/pool_alloc.hpp>
+    #include "jsoncons/json.hpp"
+
+    basic_json<char, boost::pool_allocator<void>> o;
+
+    o.set("FirstName","Joe");
+    o.set("LastName","Smith");
+
+This results in a json object class and a string wrapper being allocated
+from the boost memory pool. The allocator type is not used for structures 
+including vectors and strings that use large or variable amounts of memory, 
+these always use the default allocators.
 
 ## Type Extensibility
 
@@ -245,7 +275,7 @@ In the json class, accessors and modifiers are templated, for example,
 
 The implementations of these functions and operators make use of the class template value_adapter
 
-    template <typename Char, typename Storage, typename T>
+    template <typename Char, typename Alloc, typename T>
     class value_adapter
     {
     public:
@@ -303,5 +333,5 @@ a `json::any value`, like this:
 
     obj.set("mydata",json::any(A));
 
-    matrix<double> B = obj["mydata"].as<json::any>().cast<matrix<double>>();
+    matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
 

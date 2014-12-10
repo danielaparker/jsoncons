@@ -23,34 +23,38 @@
 
 namespace jsoncons {
 
-template <typename Char,class Storage>
+template <typename Char,class Alloc>
 class key_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Storage>::member_type& a, 
+    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
                     const std::basic_string<Char>& b) const
     {
         return a.name() < b;
     }
 };
 
-template <typename Char,class Storage>
+template <typename Char,class Alloc>
 class member_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Storage>::member_type& a, 
-                    const typename basic_json<Char,Storage>::member_type& b) const
+    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
+                    const typename basic_json<Char,Alloc>::member_type& b) const
     {
         return a.name() < b.name();
     }
 };
 
-template <typename Char,class Storage>
+template <typename Char,class Alloc>
 class json_array 
 {
 public:
-    typedef typename std::vector<basic_json<Char,Storage>>::iterator iterator;
-    typedef typename std::vector<basic_json<Char,Storage>>::const_iterator const_iterator;
+    typedef typename std::vector<basic_json<Char,Alloc>>::iterator iterator;
+    typedef typename std::vector<basic_json<Char,Alloc>>::const_iterator const_iterator;
+
+    // Allocation
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
 
     json_array()
     {
@@ -61,12 +65,12 @@ public:
     {
     }
 
-    json_array(size_t n, const basic_json<Char,Storage>& val)
+    json_array(size_t n, const basic_json<Char,Alloc>& val)
         : elements_(n,val)
     {
     }
 
-    json_array(std::vector<basic_json<Char,Storage>> elements)
+    json_array(std::vector<basic_json<Char,Alloc>> elements)
         : elements_(elements)
     {
     }
@@ -77,7 +81,7 @@ public:
     {
     }
 
-    json_array<Char,Storage>* clone() 
+    json_array<Char,Alloc>* clone() 
     {
         return new json_array(elements_);
     }
@@ -92,7 +96,7 @@ public:
 
     void resize(size_t n) {elements_.resize(n);}
 
-    void resize(size_t n, const basic_json<Char,Storage>& val) {elements_.resize(n,val);}
+    void resize(size_t n, const basic_json<Char,Alloc>& val) {elements_.resize(n,val);}
 
     void remove_range(size_t from_index, size_t to_index) 
     {
@@ -101,29 +105,29 @@ public:
         elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
-    basic_json<Char,Storage>& at(size_t i) {return elements_[i];}
+    basic_json<Char,Alloc>& at(size_t i) {return elements_[i];}
 
-    const basic_json<Char,Storage>& at(size_t i) const {return elements_[i];}
+    const basic_json<Char,Alloc>& at(size_t i) const {return elements_[i];}
 
-    void push_back(const basic_json<Char,Storage>& value)
+    void push_back(const basic_json<Char,Alloc>& value)
     {
         elements_.push_back(value);
     }
 
-    void add(size_t index, const basic_json<Char,Storage>& value)
+    void add(size_t index, const basic_json<Char,Alloc>& value)
     {
-        json_array<Char,Storage>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
-    void push_back(basic_json<Char,Storage>&& value)
+    void push_back(basic_json<Char,Alloc>&& value)
     {
         elements_.push_back(value);
     }
 
-    void add(size_t index, basic_json<Char,Storage>&& value)
+    void add(size_t index, basic_json<Char,Alloc>&& value)
     {
-        json_array<Char,Storage>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
@@ -135,7 +139,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<Char,Storage>& rhs) const
+    bool operator==(const json_array<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -151,21 +155,25 @@ public:
         return true;
     }
 
-    json_array(const json_array<Char,Storage>& val)
+    json_array(const json_array<Char,Alloc>& val)
         : elements_(val.elements_)
     {
     }
 private:
-    std::vector<basic_json<Char,Storage>> elements_;
-    json_array& operator=(const json_array<Char,Storage>&);
+    std::vector<basic_json<Char,Alloc>> elements_;
+    json_array& operator=(const json_array<Char,Alloc>&);
 };
 
-template <typename Char,class Storage>
+template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef typename std::vector<typename basic_json<Char,Storage>::member_type>::iterator iterator;
-    typedef typename std::vector<typename basic_json<Char,Storage>::member_type>::const_iterator const_iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_iterator;
+
+    // Allocation
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
 
     json_object()
     {
@@ -176,12 +184,12 @@ public:
     {
     }
 
-    json_object(std::vector<typename basic_json<Char,Storage>::member_type> members)
+    json_object(std::vector<typename basic_json<Char,Alloc>::member_type> members)
         : members_(members)
     {
     }
 
-    json_object<Char,Storage>* clone() 
+    json_object<Char,Alloc>* clone() 
     {
         return new json_object(members_);
     }
@@ -210,55 +218,55 @@ public:
         }
     }
 
-    const typename basic_json<Char,Storage>::member_type& get(size_t i) const 
+    const typename basic_json<Char,Alloc>::member_type& get(size_t i) const 
     {
         return members_[i];
     }
 
-    basic_json<Char,Storage>& at(size_t i) {return members_[i].value();}
+    basic_json<Char,Alloc>& at(size_t i) {return members_[i].value();}
 
-    const basic_json<Char,Storage>& at(size_t i) const {return members_[i].value;}
+    const basic_json<Char,Alloc>& at(size_t i) const {return members_[i].value;}
 
-    void set(const std::basic_string<Char>& name, const basic_json<Char,Storage>& value);
+    void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
 
-    void push_back(const std::basic_string<Char>& name, const basic_json<Char,Storage>& val)
+    void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
     {
-        members_.push_back(typename basic_json<Char,Storage>::member_type(name,val));
+        members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val));
     }
 
-    void set(std::basic_string<Char>&& name, basic_json<Char,Storage>&& value)
+    void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
-        iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Storage>());
+        iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
         if (it != end() && it->name() == name)
         {
             //it = remove(it);
-            *it = typename basic_json<Char,Storage>::member_type(name,value);
+            *it = typename basic_json<Char,Alloc>::member_type(name,value);
         }
         else
         {
-            insert(it,typename basic_json<Char,Storage>::member_type(name,value));
+            insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
         }
     }
 
-    void push_back(std::basic_string<Char>&& name, basic_json<Char,Storage>&& val)
+    void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
-        members_.push_back(typename basic_json<Char,Storage>::member_type());
+        members_.push_back(typename basic_json<Char,Alloc>::member_type());
         members_.back().name_.swap(name);
         members_.back().value_.swap(val);
-        //members_.push_back(typename basic_json<Char,Storage>::member_type(name,val)); // much slower on VS 2010
+        //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
     }
 
     iterator remove(iterator at); 
 
-    basic_json<Char,Storage>& get(const std::basic_string<Char>& name);
+    basic_json<Char,Alloc>& get(const std::basic_string<Char>& name);
 
-    const basic_json<Char,Storage>& get(const std::basic_string<Char>& name) const;
+    const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
 
     iterator find(const std::basic_string<Char>& name);
 
     const_iterator find(const std::basic_string<Char>& name) const;
 
-    void insert(iterator it, typename basic_json<Char,Storage>::member_type member);
+    void insert(iterator it, typename basic_json<Char,Alloc>::member_type member);
 
     void sort_members();
 
@@ -270,7 +278,7 @@ public:
 
     const_iterator end() const {return members_.end();}
 
-    bool operator==(const json_object<Char,Storage>& rhs) const
+    bool operator==(const json_object<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -279,7 +287,7 @@ public:
         for (const_iterator it = members_.begin(); it != members_.end(); ++it)
         {
 
-            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Storage>());
+            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
             if (rhs_it == rhs.end() || rhs_it->value() != it->value())
             {
@@ -289,52 +297,52 @@ public:
         return true;
     }
 
-    json_object(const json_object<Char,Storage>& val)
+    json_object(const json_object<Char,Alloc>& val)
         : members_(val.members_)
     {
     }
 
 private:
-    std::vector<typename basic_json<Char,Storage>::member_type> members_;
-    json_object<Char,Storage>& operator=(const json_object<Char,Storage>&);
+    std::vector<typename basic_json<Char,Alloc>::member_type> members_;
+    json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 
 
-template <typename Char,class Storage>
-void json_object<Char,Storage>::sort_members()
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::sort_members()
 {
-    std::sort(members_.begin(),members_.end(),member_compare<Char,Storage>());
+    std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
 }
 
-template <typename Char,class Storage>
-void json_object<Char,Storage>::insert(iterator it, typename basic_json<Char,Storage>::member_type member)
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::insert(iterator it, typename basic_json<Char,Alloc>::member_type member)
 {
     members_.insert(it,member);
 }
 
-template <typename Char,class Storage>
-typename json_object<Char,Storage>::iterator json_object<Char,Storage>::remove(iterator at)
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::remove(iterator at)
 {
     return members_.erase(at);
 }
 
-template <typename Char,class Storage>
-void json_object<Char,Storage>::set(const std::basic_string<Char>& name, const basic_json<Char,Storage>& value)
+template <typename Char,class Alloc>
+void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
 {
-    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Storage>());
+    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
     if (it != end() && it->name() == name)
     {
         //it = remove(it);
-        *it = typename basic_json<Char,Storage>::member_type(name,value);
+        *it = typename basic_json<Char,Alloc>::member_type(name,value);
     }
     else
     {
-        insert(it,typename basic_json<Char,Storage>::member_type(name,value));
+        insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
     }
 }
 
-template <typename Char,class Storage>
-basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string<Char>& name) 
+template <typename Char,class Alloc>
+basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) 
 {
     iterator it = find(name);
     if (it == end())
@@ -344,8 +352,8 @@ basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string
     return it->value();
 }
 
-template <typename Char,class Storage>
-const basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_string<Char>& name) const
+template <typename Char,class Alloc>
+const basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) const
 {
     const_iterator it = find(name);
     if (it == end())
@@ -355,18 +363,18 @@ const basic_json<Char,Storage>& json_object<Char,Storage>::get(const std::basic_
     return it->value_;
 }
 
-template <typename Char,class Storage>
-typename json_object<Char,Storage>::iterator json_object<Char,Storage>::find(const std::basic_string<Char>& name)
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name)
 {
-    key_compare<Char,Storage> comp;
+    key_compare<Char,Alloc> comp;
     iterator it = std::lower_bound(begin(),end(), name, comp);
     return (it != end() && it->name() == name) ? it : end();
 }
 
-template <typename Char,class Storage>
-typename json_object<Char,Storage>::const_iterator json_object<Char,Storage>::find(const std::basic_string<Char>& name) const
+template <typename Char,class Alloc>
+typename json_object<Char,Alloc>::const_iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name) const
 {
-    key_compare<Char,Storage> comp;
+    key_compare<Char,Alloc> comp;
     const_iterator it = std::lower_bound(begin(),end(),name, comp);
     return (it != end() && it->name_ == name) ? it : end();
 }
