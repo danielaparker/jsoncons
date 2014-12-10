@@ -465,31 +465,32 @@ public:
     {
     }
 
-    virtual void name(const std::string& name, const parsing_context& context)
+    virtual void write_name(const char* p, int length, const parsing_context& context)
     {
+        string name(p,length);
         name_ = name;
         if (name != "name")
         {
-            parent().name(name, context);
+            parent().write_name(p, length, context);
         }
     }
 
 // value(...) implementation
-    virtual void write_string(const char* val, int length, const parsing_context& context)
+    virtual void write_string(const char* p, int length, const parsing_context& context)
     {
-		string value(val,length);
+		string value(p,length);
         if (name_ == "name")
         {
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             parent().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            parent().value(&first[0], first.length(), context);
+            parent().value(first, context); // uses non-virtual overload
             if (start_last != std::string::npos)
             {
                 parent().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().value(&last[0], last.length(), context);
+                parent().value(last, context); // uses non-virtual overload
             }
             else
             {
@@ -500,7 +501,7 @@ public:
         }
         else
         {
-            parent().value(val, length, context);
+            parent().write_string(p, length, context);
         }
     }
 private:

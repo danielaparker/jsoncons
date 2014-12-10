@@ -36,12 +36,12 @@ public:
 
     void value(float value)
     {
-        double_value((double)value);
+        write_double((double)value);
     }
 
     void value(double value)
     {
-        double_value(value);
+        write_double(value);
     }
 
     void value(int value) 
@@ -106,7 +106,7 @@ public:
 
     virtual void write_string(const Char* value, size_t length) = 0;
 
-    virtual void double_value(double value) = 0;
+    virtual void write_double(double value) = 0;
 
     virtual void write_longlong(long long value) = 0;
 
@@ -158,7 +158,7 @@ public:
     {
     }
 
-    virtual void double_value(double)
+    virtual void write_double(double)
     {
     }
 

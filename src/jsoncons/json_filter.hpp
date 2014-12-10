@@ -71,15 +71,14 @@ public:
         writer_.write_null();
     }
 
-// value(...) implementation
     virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>& context)
     {
         writer_.write_string(value, length);
     }
 
-    virtual void double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void write_double(double value, const basic_parsing_context<Char>& context)
     {
-        writer_.double_value(value);
+        writer_.write_double(value);
     }
 
     virtual void write_longlong(long long value, const basic_parsing_context<Char>& context)
@@ -168,7 +167,7 @@ public:
         parent_.value(value,length,context);
     }
 
-    virtual void double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void write_double(double value, const basic_parsing_context<Char>& context)
     {
         parent_.value(value,context);
     }

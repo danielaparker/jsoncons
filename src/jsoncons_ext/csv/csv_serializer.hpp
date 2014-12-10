@@ -275,7 +275,7 @@ public:
         }
     }
 
-    virtual void double_value(double val)
+    virtual void write_double(double val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {

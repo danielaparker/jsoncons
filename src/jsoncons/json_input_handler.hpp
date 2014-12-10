@@ -23,6 +23,11 @@ public:
     virtual ~basic_json_input_handler() {}
     virtual void begin_json() = 0;
 
+    void value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    {
+        write_string(&value[0], value.length(), context);
+    }
+
     void value(const Char* value, size_t length, const basic_parsing_context<Char>& context) 
     {
         write_string(value, length, context);
@@ -35,12 +40,12 @@ public:
 
     void value(float value, const basic_parsing_context<Char>& context)
     {
-        double_value((double)value, context);
+        write_double((double)value, context);
     }
 
     void value(double value, const basic_parsing_context<Char>& context)
     {
-        double_value(value, context);
+        write_double(value, context);
     }
 
     void value(long long value, const basic_parsing_context<Char>& context) 
@@ -101,7 +106,7 @@ public:
 
     virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void double_value(double value, const basic_parsing_context<Char>& context) = 0;
+    virtual void write_double(double value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void write_longlong(long long value, const basic_parsing_context<Char>& context) = 0;
 
@@ -150,7 +155,7 @@ public:
     {
     }
 
-    virtual void double_value(double, const basic_parsing_context<Char>&)
+    virtual void write_double(double, const basic_parsing_context<Char>&)
     {
     }
 

@@ -37,17 +37,19 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         {
         }
 
-        virtual void name(const std::string& name, const parsing_context& context)
+        virtual void write_name(const char* p, size_t length, const parsing_context& context)
         {
+            std::string name(p, length);
             name_ = name;
             if (name != "name")
             {
-                parent().name(name,context);
+                parent().write_name(p, length, context);
             }
         }
 
         virtual void write_string(const char* p, size_t length, const parsing_context& context)
         {
+            std::string value(p, length);
             if (name_ == "name")
             {
                 size_t end_first = value.find_first_of(" \t");
@@ -70,7 +72,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
             else
             {
-                parent().value(value,context);
+                parent().write_string(p, length, context);
             }
         }
     private:
