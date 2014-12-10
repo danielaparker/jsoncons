@@ -49,9 +49,9 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
 
     virtual void write_string(const char* p, int length, const parsing_context& context)
     {
-		string value(p,length);
         if (name_ == "name")
         {
+    		string value(p,length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             parent().name("first-name", context);
