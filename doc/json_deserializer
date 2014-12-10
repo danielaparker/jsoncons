@@ -293,7 +293,7 @@ img {
 <body>
 <pre><code>jsoncons::json_deserializer
 
-typedef basic_json_deserializer&lt;char,storage&lt;char&gt;&gt; json_deserializer
+typedef basic_json_deserializer&lt;char,std::allocator&lt;void&gt;&gt; json_deserializer
 </code></pre>
 
 <p>The <code>json_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses char as the character type.</p>

@@ -1,6 +1,6 @@
     jsoncons::json_deserializer
 
-    typedef basic_json_deserializer<char,storage<char>> json_deserializer
+    typedef basic_json_deserializer<char,std::allocator<void>> json_deserializer
 
 The `json_deserializer` class is an instantiation of the `basic_json_deserializer` class template that uses char as the character type.
 

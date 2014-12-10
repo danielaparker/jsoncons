@@ -503,7 +503,7 @@ for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 
 <h2>About jsoncons::json</h2>
 <p>The json class is an instantiation of the basic_json class template that uses char as the character type,</p>
-<pre><code>typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
+<pre><code>typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
 </code></pre>
 
 <p>The library includes an instantiation for wide characters as well,</p>
@@ -524,7 +524,7 @@ basic_json&amp; operator=(T val)
 </code></pre>
 
 <p>The implementations of these functions and operators make use of the class template value_adapter</p>
-<pre><code>template &lt;typename Char, typename Storage, typename T&gt;
+<pre><code>template &lt;typename Char, typename Alloc, typename T&gt;
 class value_adapter
 {
 public:
