@@ -10,6 +10,9 @@ The `json_output_handler` class is an instantiation of the `basic_json_output_ha
 
 ### Overloaded methods
 
+    virtual void name(const std::string& name)
+Send notification of the `name` of a name value pair
+
     void value(const std::string& value)
 Send notification of a `string` value
 
@@ -63,16 +66,16 @@ Receive notification of the start of a JSON array
     virtual void end_array()
 Receive notification of the end of a JSON object
 
-    virtual void name(const std::string& name)
+    virtual void write_name(const char* p, size_t length)
 Receive notification of the `name` of a name value pair
 
     virtual void write_null()
 Receive notification of `null`
 
-    virtual void write_string(const std::string& value)
+    virtual void write_string(const char* p, size_t length)
 Receive notification of a `string` value
 
-    virtual void double_value(double value)
+    virtual void write_double(double value)
 Receive notification of a floating point number
 
     virtual void write_longlong(long long value)

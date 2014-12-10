@@ -42,7 +42,7 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive notification of the end of a JSON array. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void name(const std::string& name, const parsing_context& context)
+    virtual void write_name(const char* p, size_t length, const parsing_context& context)
 Receive notification of the `name` part of a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
@@ -54,11 +54,11 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive notification of a null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_string(const std::string& value, const parsing_context& context)
+    virtual void write_string(const char* p, size_t length, const parsing_context& context)
 Receive notification of a string value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void double_value(double value, const parsing_context& context)
+    virtual void write_double(double value, const parsing_context& context)
 Receive notification of a floating point number. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
