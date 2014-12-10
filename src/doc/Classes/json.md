@@ -1,6 +1,6 @@
     jsoncons::json
 
-    typedef basic_json<char,storage<char>> json
+    typedef basic_json<char,std::allocator<void>> json
 
 The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type.
 

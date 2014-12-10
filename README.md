@@ -222,7 +222,7 @@ An example of iterating over the elements of a json array:
 
 The json class is an instantiation of the basic_json class template that uses char as the character type,
 
-    typedef basic_json<char,storage<char>> json
+    typedef basic_json<char,std::allocator<void>> json
 
 The library includes an instantiation for wide characters as well,
 
@@ -245,7 +245,7 @@ In the json class, accessors and modifiers are templated, for example,
 
 The implementations of these functions and operators make use of the class template value_adapter
 
-    template <typename Char, typename Storage, typename T>
+    template <typename Char, typename Alloc, typename T>
     class value_adapter
     {
     public:

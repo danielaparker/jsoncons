@@ -293,7 +293,7 @@ img {
 <body>
 <pre><code>jsoncons::json
 
-typedef basic_json&lt;char,storage&lt;char&gt;&gt; json
+typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
 </code></pre>
 
 <p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type.</p>
