@@ -321,7 +321,6 @@ img {
 using std::string;
 using std::cout;
 using std::endl;
-using jsoncons::null_type;
 using jsoncons::json;
 </code></pre>
 
@@ -420,7 +419,7 @@ else
 image_sizing[&quot;resize_unit&quot;] =  &quot;pixels&quot;;  // a string
 image_sizing[&quot;resize_what&quot;] =  &quot;long_edge&quot;;  // a string
 image_sizing[&quot;dimension1&quot;] = 9.84;  // a double
-image_sizing[&quot;dimension2&quot;] = null_type();  // a null
+image_sizing[&quot;dimension2&quot;] = json::null;  // a null
 </code></pre>
 
 <p>Serializing it, this time with pretty print,</p>
@@ -581,7 +580,7 @@ A(1,1) = 4;
 
 obj.set(&quot;mydata&quot;,json::any(A));
 
-matrix&lt;double&gt; B = obj[&quot;mydata&quot;].as&lt;json::any&gt;().cast&lt;matrix&lt;double&gt;&gt;();
+matrix&lt;double&gt;&amp; B = obj[&quot;mydata&quot;].any_cast&lt;matrix&lt;double&gt;&gt;();
 </code></pre>
 
 

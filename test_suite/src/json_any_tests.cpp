@@ -85,6 +85,7 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     json::any a0 = arr[0].as<json::any>();
     BOOST_CHECK(arr[0].is<json::any>());
     matrix<double> C = a0.cast<matrix<double>>();
+
     BOOST_CHECK_EQUAL(C.size1(),A.size1());
     BOOST_CHECK_EQUAL(C.size2(),A.size2());
     BOOST_CHECK_CLOSE(C(0,0),A(0,0),0.0000001);
@@ -92,15 +93,24 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     BOOST_CHECK_CLOSE(C(1,0),A(1,0),0.0000001);
     BOOST_CHECK_CLOSE(C(1,1),A(1,1),0.0000001);
 
+    matrix<double>& D = arr[0].any_cast<matrix<double>>();
+    BOOST_CHECK_EQUAL(D.size1(),A.size1());
+    BOOST_CHECK_EQUAL(D.size2(),A.size2());
+    BOOST_CHECK_CLOSE(D(0,0),A(0,0),0.0000001);
+    BOOST_CHECK_CLOSE(D(0,1),A(0,1),0.0000001);
+    BOOST_CHECK_CLOSE(D(1,0),A(1,0),0.0000001);
+    BOOST_CHECK_CLOSE(D(1,1),A(1,1),0.0000001);
+
     json::any a1 = arr[1].as<json::any>();
     BOOST_CHECK(arr[1].is<json::any>());
-    matrix<double>& D = a1.cast<matrix<double>>();
-    BOOST_CHECK_EQUAL(D.size1(),B.size1());
-    BOOST_CHECK_EQUAL(D.size2(),B.size2());
-    BOOST_CHECK_CLOSE(D(0,0),B(0,0),0.0000001);
-    BOOST_CHECK_CLOSE(D(0,1),B(0,1),0.0000001);
-    BOOST_CHECK_CLOSE(D(1,0),B(1,0),0.0000001);
-    BOOST_CHECK_CLOSE(D(1,1),B(1,1),0.0000001);
+
+    matrix<double>& E = a1.cast<matrix<double>>();
+    BOOST_CHECK_EQUAL(E.size1(),B.size1());
+    BOOST_CHECK_EQUAL(E.size2(),B.size2());
+    BOOST_CHECK_CLOSE(E(0,0),B(0,0),0.0000001);
+    BOOST_CHECK_CLOSE(E(0,1),B(0,1),0.0000001);
+    BOOST_CHECK_CLOSE(E(1,0),B(1,0),0.0000001);
+    BOOST_CHECK_CLOSE(E(1,1),B(1,1),0.0000001);
 
     std::cout << pretty_print(arr) << std::endl;
 }

@@ -1430,6 +1430,20 @@ public:
     void assign_bool(bool rhs);
     void assign_null();
 
+    template <typename T>
+    const T& any_cast() const
+    {
+        const T* p = (const T*)value_.any_value_->content_->data();
+        return *p;
+    }
+    template <typename T>
+    T& any_cast() 
+    {
+        T* p = (T*)value_.any_value_->content_->data();
+        return *p;
+    }
+
+
 //  Deprecated
 
     template <class T>
