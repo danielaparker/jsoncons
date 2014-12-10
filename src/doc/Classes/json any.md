@@ -52,6 +52,6 @@ and to retrieve it back cast to the appropriate type.
 
     obj.set("mydata",json::any(A));
 
-    matrix<double> B = obj["mydata"].as<json::any>().cast<matrix<double>>();
+    matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
 
 

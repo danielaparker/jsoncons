@@ -636,11 +636,14 @@ std::string as_string() const
 </code></pre>
 
 <p>Non-generic versions of <code>as</code> methods</p>
-<pre><code>const any&amp; any_value() const
-any&amp; any_value() 
+<pre><code>template &lt;typename T&gt;
+const T&amp; any_cast() const
+
+template &lt;typename T&gt;
+T&amp; any_cast() 
 </code></pre>
 
-<p>If the value has type <code>any</code>, returns a reference to the value, otherwise throws  </p>
+<p>If the value does not have type <code>any</code>, throws, otherwise casts the value back to the original type.</p>
 <h3>Modifiers</h3>
 <pre><code>void clear()
 </code></pre>
