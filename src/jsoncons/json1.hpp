@@ -1433,12 +1433,14 @@ public:
     template <typename T>
     const T& any_cast() const
     {
+        JSONCONS_ASSERT(type_ == json_any_t);
         const T* p = (const T*)value_.any_value_->content_->data();
         return *p;
     }
     template <typename T>
     T& any_cast() 
     {
+        JSONCONS_ASSERT(type_ == json_any_t);
         T* p = (T*)value_.any_value_->content_->data();
         return *p;
     }

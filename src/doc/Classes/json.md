@@ -289,9 +289,12 @@ If value is string, returns value, otherwise returns result of `to_string`.
     std::string as_string() const
 Non-generic versions of `as` methods
 
-    const any& any_value() const
-    any& any_value() 
-If the value has type `any`, returns a reference to the value, otherwise throws  
+    template <typename T>
+    const T& any_cast() const
+
+    template <typename T>
+    T& any_cast() 
+If the value does not have type `any`, throws, otherwise casts the value back to the original type.
 
 ### Modifiers
 
