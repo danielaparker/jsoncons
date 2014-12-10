@@ -339,21 +339,21 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
             case '\f':
             case ' ':
                 {
-                    size_t count = 0;
                     if (buffer_[buffer_position_] == ' ')
                     {
-                        ++count;
+                        ++buffer_position_;
+                        ++column_;
+                        if (buffer_[buffer_position_] == ' ')
+                        {
+                            ++buffer_position_;
+                            ++column_;
+                            if (buffer_[buffer_position_] == ' ')
+                            {
+                                ++buffer_position_;
+                                ++column_;
+                            }
+                        }
                     }
-                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' '))
-                    {
-                        ++count;
-                    }
-                    if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ' ') & (buffer_[buffer_position_+2] == ' '))
-                    {
-                        ++count;
-                    }
-                    buffer_position_ += count;
-                    column_ += count;
                 }
                 break;
             case '/':
@@ -364,7 +364,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         ++buffer_position_;
                         ignore_single_line_comment();
                     }
-                    if (next == '*')
+                    else if (next == '*')
                     {
                         ++buffer_position_;
                         ignore_multi_line_comment();
@@ -415,13 +415,13 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                             size_t count1 = 0;
                             if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
-                                handler_.name(string_buffer_, *this);
+                                handler_.write_name(&string_buffer_[0], string_buffer_.length(), *this);
                                 count1 = 0;
                                 if (buffer_[buffer_position_] == ':')
                                 {
                                     ++count1;
                                 }
-                                if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ':'))
+                                else if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_+1] == ':'))
                                 {
                                     count1 += 2;
                                 }
@@ -436,7 +436,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                             }
                             else
                             {
-                                handler_.string_value(string_buffer_, *this);
+                                handler_.write_string(&string_buffer_[0], string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -501,7 +501,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.bool_value(true, *this);
+                        handler_.write_bool(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -512,7 +512,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         }
                         buffer_position_ += 4;
                         column_ += 4;
-                        handler_.bool_value(false, *this);
+                        handler_.write_bool(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -523,7 +523,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.null_value(*this);
+                        handler_.write_null(*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -679,7 +679,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         catch (...)
                         {
                             err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                            handler_.null_value(*this);
+                            handler_.write_null(*this);
                         }
                     }
                     else if (has_neg)
@@ -687,7 +687,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_.longlong_value(-d, *this);
+                            handler_.write_longlong(-d, *this);
                         }
                         catch (const std::exception&)
                         {
@@ -699,7 +699,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             catch (...)
                             {
                                 err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.null_value(*this);
+                                handler_.write_null(*this);
                             }
                         }
                     }
@@ -708,7 +708,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_.ulonglong_value(d, *this);
+                            handler_.write_ulonglong(d, *this);
                         }
                         catch (const std::exception&)
                         {
@@ -720,7 +720,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             catch (...)
                             {
                                 err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.null_value(*this);
+                                handler_.write_null(*this);
                             }
                         }
                     }

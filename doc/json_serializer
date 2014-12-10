@@ -349,31 +349,31 @@ typedef basic_json_serializer&lt;char&gt; json_serializer
 </code></pre>
 
 <p>Receive notification of the end of a JSON object</p>
-<pre><code>virtual void name(const std::string&amp; name)
+<pre><code>virtual void write_name(const char* p, size_t length)
 </code></pre>
 
 <p>Receive notification of the <code>name</code> of a name value pair</p>
-<pre><code>virtual void null_value()
+<pre><code>virtual void write_null()
 </code></pre>
 
 <p>Receive notification of <code>null</code></p>
-<pre><code>virtual void string_value(const std::string&amp; value)
+<pre><code>virtual void write_string(const char* p, size_t length)
 </code></pre>
 
 <p>Receive notification of a <code>string</code> value</p>
-<pre><code>virtual void double_value(double value)
+<pre><code>virtual void write_double(double value)
 </code></pre>
 
 <p>Receive notification of a floating point number</p>
-<pre><code>virtual void longlong_value(long long value)
+<pre><code>virtual void write_longlong(long long value)
 </code></pre>
 
 <p>Receive notification of a signed integer</p>
-<pre><code>virtual void ulonglong_value(unsigned long long value)
+<pre><code>virtual void write_ulonglong(unsigned long long value)
 </code></pre>
 
 <p>Receive notification of a non-negative integer</p>
-<pre><code>virtual void bool_value(bool value)
+<pre><code>virtual void write_bool(bool value)
 </code></pre>
 
 <p>Receive notification of a boolean value</p>

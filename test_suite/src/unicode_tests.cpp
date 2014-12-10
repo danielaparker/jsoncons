@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 
     BOOST_CHECK_EQUAL(input,output);
 }
-
+#if 0
 BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
 {
     wstring input = L"[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
@@ -68,4 +68,5 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json copy(root);
 }
+#endif
 
