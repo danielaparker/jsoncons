@@ -36,7 +36,6 @@ The jsoncons classes and functions are in namespace jsoncons. The following usin
     using std::string;
     using std::cout;
     using std::endl;
-    using jsoncons::null_type;
     using jsoncons::json;
 
 ### Reading json values from a file
@@ -137,7 +136,7 @@ Adding some members,
     image_sizing["resize_unit"] =  "pixels";  // a string
     image_sizing["resize_what"] =  "long_edge";  // a string
     image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = null_type();  // a null
+    image_sizing["dimension2"] = json::null;  // a null
 
 Serializing it, this time with pretty print,
 
@@ -303,5 +302,5 @@ a `json::any value`, like this:
 
     obj.set("mydata",json::any(A));
 
-    matrix<double> B = obj["mydata"].as<json::any>().cast<matrix<double>>();
+    matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
 

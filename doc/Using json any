@@ -316,7 +316,7 @@ A(1,1) = 4;
 
 obj.set(&quot;mydata&quot;,json::any(A));
 
-matrix&lt;double&gt; B = obj[&quot;mydata&quot;].as&lt;json::any&gt;().cast&lt;matrix&lt;double&gt;&gt;();
+matrix&lt;double&gt;&amp; B = obj[&quot;mydata&quot;].any_cast&lt;matrix&lt;double&gt;&gt;();
 </code></pre>
 
 <h3>Serializing a json <code>any</code> value</h3>
