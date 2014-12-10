@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-0.94.1
-=======
 0.95
 ----
 
@@ -48,7 +45,6 @@ Bug fixes:
 
 0.94.1
 ------
->>>>>>> dd113e34b049a111db225b62f2c61a2ad27fb473
 
 Bug fixes:
 
@@ -518,6 +514,6 @@ Added members to json_parser to access and modify the buffer capacity
 
 Added checks when parsing integer values to determine overflow for 
 long long and unsigned long long, and if overflow, parse them as
-doubles.
+doubles. 
 
 
