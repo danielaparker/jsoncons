@@ -19,6 +19,7 @@ set (Boost_NO_BOOST_CMAKE ON)
 find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework)
 
 add_executable (jsoncons_tests ../../src/csv_tests.cpp
+                               ../../src/allocator_tests.cpp
                                ../../src/double_to_string_tests.cpp
                                ../../src/json_accessor_tests.cpp
                                ../../src/json_extensibility_tests.cpp

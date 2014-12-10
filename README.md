@@ -23,6 +23,21 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
+## What's new since Release 0.94.1
+
+- A template method `any_cast` has been added to the `json` class.
+
+- The allocator type parameter in basic_json is now supported, it allows you to supply a 
+  custom allocator for dynamically allocated, fixed size small objects in the json container.
+  The allocator type is not used for structures including vectors and strings that use large 
+  or variable amounts of memory, these always use the default allocators.
+
+- If you have implemented your own input and output handlers that derive from 
+  `json_input_handler` or `json_output_handler`, you will need to make some
+  changes to method signatures, refer to the Changelog for details.
+
+- A bug has been fixed in `csv_reader`
+
 ## Using the code
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
@@ -243,7 +258,7 @@ if you wish, you can use the boost pool allocator:
 This results in a json object class and a string wrapper being allocated
 from the boost memory pool. The allocator type is not used for structures 
 including vectors and strings that use large or variable amounts of memory, 
-these always use default allocators.
+these always use the default allocators.
 
 ## Type Extensibility
 

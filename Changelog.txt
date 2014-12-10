@@ -5,10 +5,12 @@ Enhancements:
 
 - Added template method `any_cast` to `json` class.
 
-- The second template parameter Alloc in basic_json is now supported.
+- The allocator type parameter in basic_json is now supported, it allows you to supply a 
+  custom allocator for dynamically allocated, fixed size small objects in the json container.
+  The allocator type is not used for structures including vectors and strings that use large 
+  or variable amounts of memory, these always use the default allocators.
 
-Breaking changes (but only if you've implemented your own implementations
-of input and output handlers):
+Breaking changes (but only if you've implemented your own input and output handlers):
 
 - The input handler virtual method 
   `name(const std::string& name, const parsing_context& context)` 
