@@ -1,4 +1,48 @@
+0.95
+----
+
+Enhancements:
+
+- Added template method `any_cast` to `json` class.
+
+- The second template parameter Alloc in basic_json is now supported.
+
+Breaking changes (but only if you've implemented your own implementations
+of input and output handlers):
+
+- The input handler virtual method 
+  `name(const std::string& name, const parsing_context& context)` 
+  has been changed to
+  `write_name(const char* p, size_t length, const parsing_context& context)` 
+
+- The output handler virtual method 
+  `name(const std::string& name)` 
+  has been changed to
+  `write_name(const char* p, size_t length)` 
+
+- The input handler virtual method 
+  `string_value(const std::string& value, const parsing_context& context)` 
+  has been changed to
+  `write_string(const char* p, size_t length, const parsing_context& context)` 
+
+- The output handler virtual method 
+  `string_value(const std::string& value)` 
+  has been changed to
+  `write_string(const char* p, size_t length)` 
+
+The rationale for these changes is to allow different internal
+representations of strings but preserve efficieny. 
+
+- The input and output handler virtual methods double_value, 
+  longlong_value, ulonglong_value and bool_value have been renamed to 
+  write_string, write_double, write_longlong, write_ulonglong, and write_bool.
+
+Bug fixes:
+
+- Fixed bug in csv_reader
+
 0.94.1
+------
 
 Bug fixes:
 
