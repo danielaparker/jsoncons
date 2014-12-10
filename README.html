@@ -507,7 +507,7 @@ for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 </code></pre>
 
 <p>The library includes an instantiation for wide characters as well,</p>
-<pre><code>typedef basic_json&lt;wchar_t,storage&lt;wchar_t&gt;&gt; wjson
+<pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
 </code></pre>
 
 <p>Note that the template parameter storage is a place holder for what in a future release will allow the user to have control over internal storage and memory allocation.</p>

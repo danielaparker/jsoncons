@@ -1,6 +1,6 @@
     jsoncons::wjson
 
-    typedef basic_json<wchar_t,storage<wchar_t>> wjson
+    typedef basic_json<wchar_t,std::allocator<void>> wjson
 
 The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type.
 
