@@ -328,42 +328,44 @@ public:
     {
     }
 
-    virtual void name(const std::string&amp; name, const parsing_context&amp; context)
+virtual void write_name(const char* p, int length, const parsing_context&amp; context)
+{
+    string name(p,length);
+    name_ = name;
+    if (name != &quot;name&quot;)
     {
-        name_ = name;
-        if (name != &quot;name&quot;)
-        {
-            parent().name(name,context);
-        }
+        parent().write_name(p, length, context);
     }
+}
 
-    virtual void string_value(const std::string&amp; value, const parsing_context&amp; context)
+virtual void write_string(const char* p, int length, const parsing_context&amp; context)
+{
+    string value(p,length);
+    if (name_ == &quot;name&quot;)
     {
-        if (name_ == &quot;name&quot;)
+        size_t end_first = value.find_first_of(&quot; \t&quot;);
+        size_t start_last = value.find_first_not_of(&quot; \t&quot;, end_first);
+        parent().name(&quot;first-name&quot;, context);
+        std::string first = value.substr(0, end_first);
+        parent().value(first, context); // use convenience overload
+        if (start_last != std::string::npos)
         {
-            size_t end_first = value.find_first_of(&quot; \t&quot;);
-            size_t start_last = value.find_first_not_of(&quot; \t&quot;,end_first);
-            parent().name(&quot;first-name&quot;,context);
-            std::string first = value.substr(0,end_first);
-            parent().value(first,context);
-            if (start_last != std::string::npos)
-            {
-                parent().name(&quot;last-name&quot;,context);
-                std::string last = value.substr(start_last);
-                parent().value(last,context);
-            }
-            else
-            {
-                std::cerr &lt;&lt; &quot;Incomplete name \&quot;&quot; &lt;&lt; value
-                          &lt;&lt; &quot;\&quot; at line &quot; &lt;&lt; context.line_number()
-                          &lt;&lt; &quot; and column &quot; &lt;&lt; context.column_number() &lt;&lt; std::endl;
-            }
+            parent().name(&quot;last-name&quot;, context);
+            std::string last = value.substr(start_last);
+            parent().value(last, context); // use convenience overload
         }
         else
         {
-            parent().value(value,context);
+            std::cerr &lt;&lt; &quot;Incomplete name \&quot;&quot; &lt;&lt; value
+               &lt;&lt; &quot;\&quot; at line &quot; &lt;&lt; context.line_number()
+               &lt;&lt; &quot; and column &quot; &lt;&lt; context.column_number() &lt;&lt; std::endl;
         }
     }
+    else
+    {
+        parent().write_string(p, length, context);
+    }
+}
 private:
     std::string name_;
 };

@@ -475,7 +475,6 @@ public:
         }
     }
 
-// value(...) implementation
     virtual void write_string(const char* p, int length, const parsing_context& context)
     {
 		string value(p,length);
@@ -485,12 +484,12 @@ public:
             size_t start_last = value.find_first_not_of(" \t", end_first);
             parent().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            parent().value(first, context); // uses non-virtual overload
+            parent().value(first, context); // use convenience overload
             if (start_last != std::string::npos)
             {
                 parent().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().value(last, context); // uses non-virtual overload
+                parent().value(last, context); // use convenience overload
             }
             else
             {

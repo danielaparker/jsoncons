@@ -37,44 +37,44 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         {
         }
 
-        virtual void write_name(const char* p, size_t length, const parsing_context& context)
+    virtual void write_name(const char* p, int length, const parsing_context& context)
+    {
+        string name(p,length);
+        name_ = name;
+        if (name != "name")
         {
-            std::string name(p, length);
-            name_ = name;
-            if (name != "name")
-            {
-                parent().write_name(p, length, context);
-            }
+            parent().write_name(p, length, context);
         }
+    }
 
-        virtual void write_string(const char* p, size_t length, const parsing_context& context)
+    virtual void write_string(const char* p, int length, const parsing_context& context)
+    {
+		string value(p,length);
+        if (name_ == "name")
         {
-            std::string value(p, length);
-            if (name_ == "name")
+            size_t end_first = value.find_first_of(" \t");
+            size_t start_last = value.find_first_not_of(" \t", end_first);
+            parent().name("first-name", context);
+            std::string first = value.substr(0, end_first);
+            parent().value(first, context); // use convenience overload
+            if (start_last != std::string::npos)
             {
-                size_t end_first = value.find_first_of(" \t");
-                size_t start_last = value.find_first_not_of(" \t",end_first);
-                parent().name("first-name",context);
-                std::string first = value.substr(0,end_first);
-                parent().value(first,context);
-                if (start_last != std::string::npos)
-                {
-                    parent().name("last-name",context);
-                    std::string last = value.substr(start_last);
-                    parent().value(last,context);
-                }
-                else
-                {
-                    std::cerr << "Incomplete name \"" << value
-                              << "\" at line " << context.line_number()
-                              << " and column " << context.column_number() << std::endl;
-                }
+                parent().name("last-name", context);
+                std::string last = value.substr(start_last);
+                parent().value(last, context); // use convenience overload
             }
             else
             {
-                parent().write_string(p, length, context);
+                std::cerr << "Incomplete name \"" << value
+                   << "\" at line " << context.line_number()
+                   << " and column " << context.column_number() << std::endl;
             }
         }
+        else
+        {
+            parent().write_string(p, length, context);
+        }
+    }
     private:
         std::string name_;
     };
