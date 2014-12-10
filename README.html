@@ -312,6 +312,26 @@ img {
 <li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
+<h2>What's new since Release 0.94.1</h2>
+<ul>
+<li>
+<p>A template method <code>any_cast</code> has been added to the <code>json</code> class.</p>
+</li>
+<li>
+<p>The allocator type parameter in basic_json is now supported, it allows you to supply a 
+  custom allocator for dynamically allocated, fixed size small objects in the json container.
+  The allocator type is not used for structures including vectors and strings that use large 
+  or variable amounts of memory, these always use the default allocators.</p>
+</li>
+<li>
+<p>If you have implemented your own input and output handlers that derive from 
+  <code>json_input_handler</code> or <code>json_output_handler</code>, you will need to make some
+  changes to method signatures, refer to the Changelog for details.</p>
+</li>
+<li>
+<p>A bug has been fixed in <code>csv_reader</code></p>
+</li>
+</ul>
 <h2>Using the code</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
@@ -525,7 +545,7 @@ o.set(&quot;LastName&quot;,&quot;Smith&quot;);
 <p>This results in a json object class and a string wrapper being allocated
 from the boost memory pool. The allocator type is not used for structures 
 including vectors and strings that use large or variable amounts of memory, 
-these always use default allocators.</p>
+these always use the default allocators.</p>
 <h2>Type Extensibility</h2>
 <p>In the json class, accessors and modifiers are templated, for example,</p>
 <pre><code>template&lt;typename T&gt;

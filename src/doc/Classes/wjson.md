@@ -6,7 +6,7 @@ The `wjson` class is an instantiation of the `basic_json` class template that us
 and `std::allocator<void>` as the allocator type. The allocator type is used to supply an allocator for dynamically allocated, 
 fixed size small objects in the `wjson` container, the `wjson` container will rebind it as necessary. The allocator type
 is not used for structures including vectors and strings that use large or variable amounts of memory, 
-these always use default allocators.
+these always use the default allocators.
 
 ### Header
 
