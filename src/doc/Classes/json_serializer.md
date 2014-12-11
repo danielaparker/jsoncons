@@ -2,7 +2,7 @@
 
     typedef basic_json_serializer<char> json_serializer
 
-The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses char as the character type. It implements [json_output_handler](json_output_handler) and supports pretty print serialization.
+The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses `char` as the character type. It implements [json_output_handler](json_output_handler) and supports pretty print serialization.
 
 ### Header
 

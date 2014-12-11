@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Transforming JSON with filters</title>
+<title>csv_serializer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -291,120 +291,179 @@ img {
 </style>
 </head>
 <body>
-<p>Suppose you have a JSON address book that looks like this</p>
-<pre><code>{
-    &quot;address-book&quot; : 
-    [
-        {
-            &quot;name&quot;:&quot;Jane Roe&quot;,
-            &quot;email&quot;:&quot;jane.roe@example.com&quot;
-        },
-        {
-             &quot;name&quot;:&quot;John&quot;,
-             &quot;email&quot; : &quot;john.doe@example.com&quot;
-         }
-    ]
-}
+<pre><code>jsoncons_ext::csv::csv_serializer
 </code></pre>
 
-<p><code>address-book.json</code></p>
-<p>Now suppose you want to break the name into a first name and last name, and report a warning when <code>name</code> does not contain a space or tab separator. Pretend that the file <code>address-book.json</code> is too large to hold in memory.</p>
-<p>You can achieve the desired result by subclassing the <a href="json_filter">json_filter</a> class, overriding the default methods for name and string value event notifications, and delegating modified event notifications to the parent <a href="json_input_handler">json<em>input</em>handler</a> (which in this example will forward them to a <a href="json_serializer">json_serializer</a>.) </p>
-<pre><code>#include &quot;jsoncons/json_serializer.hpp&quot;
-#include &quot;jsoncons/json_filter.hpp&quot;
-#include &quot;jsoncons/json_reader.hpp&quot;
-
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::json_output_handler;
-
-class my_json_filter : public json_filter
-{
-public:
-    my_json_filter(json_output_handler&amp; parent)
-        : json_filter(parent)
-    {
-    }
-
-    virtual void write_name(const char* p, size_t length, const parsing_context&amp; context)
-    {
-        std::string name(p, length);
-        name_ = name;
-        if (name != &quot;name&quot;)
-        {
-            parent().write_name(p, length, context);
-        }
-    }
-
-    virtual void write_string(const char* p, size_t length, const parsing_context&amp; context)
-    {
-        std::string value(p, length);
-        if (name_ == &quot;name&quot;)
-        {
-            size_t end_first = value.find_first_of(&quot; \t&quot;);
-            size_t start_last = value.find_first_not_of(&quot; \t&quot;,end_first);
-            parent().name(&quot;first-name&quot;,context);
-            std::string first = value.substr(0,end_first);
-            parent().value(first,context);
-            if (start_last != std::string::npos)
-            {
-                parent().name(&quot;last-name&quot;,context);
-                std::string last = value.substr(start_last);
-                parent().value(last,context);
-            }
-            else
-            {
-                std::cerr &lt;&lt; &quot;Incomplete name \&quot;&quot; &lt;&lt; value
-                          &lt;&lt; &quot;\&quot; at line &quot; &lt;&lt; context.line_number()
-                          &lt;&lt; &quot; and column &quot; &lt;&lt; context.column_number() &lt;&lt; std::endl;
-            }
-        }
-        else
-        {
-            parent().write_string(p, length, context);
-        }
-    }
-private:
-    std::string name_;
-};
+<p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json<em>output</em>handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
+<h3>Header</h3>
+<pre><code>#include &quot;jsoncons_ext/csv/csv_serializer.hpp&quot;
 </code></pre>
 
-<p>In your code you will pass <code>my_json_filter</code> to the constructor of <a href="json_reader">json_reader</a>, and call read</p>
-<pre><code>std::string in_file = &quot;address-book.json&quot;;
-std::string out_file = &quot;address-book-new.json&quot;;
-std::ifstream is(in_file,std::ofstream::binary);
-std::ofstream os(out_file);
+<h3>Constructors</h3>
+<pre><code>csv_serializer(std::ostream&amp; os)
+</code></pre>
 
-json_serializer serializer(os, true);
-my_json_filter filter(serializer);
-json_reader reader(is,filter);
+<p>Constructs a <code>csv_serializer</code> that is associated with an output stream
+<code>os</code>. Uses default [csv formatting parameters](csv formatting parameters).</p>
+<pre><code>csv_serializer(std::ostream&amp; os,
+               const json&amp; params)
+</code></pre>
+
+<p>Constructs a <code>csv_serializer</code> that is associated with an output stream
+<code>os</code> and [csv formatting parameters](csv formatting parameters).</p>
+<h3>Member functions</h3>
+<h3>Destructor</h3>
+<pre><code>virtual ~json_serializer()
+</code></pre>
+
+<h3>Event handler methods</h3>
+<pre><code>virtual void begin_object()
+</code></pre>
+
+<p>Receive notification of the start of a JSON object</p>
+<pre><code>virtual void end_object()
+</code></pre>
+
+<p>Receive notification of the end of a JSON object</p>
+<pre><code>virtual void begin_array()
+</code></pre>
+
+<p>Receive notification of the start of a JSON array</p>
+<pre><code>virtual void end_array()
+</code></pre>
+
+<p>Receive notification of the end of a JSON object</p>
+<pre><code>virtual void write_name(const char* p, size_t length)
+</code></pre>
+
+<p>Receive notification of the <code>name</code> of a name value pair</p>
+<pre><code>virtual void value(const std::string&amp; val)
+</code></pre>
+
+<p>Receive notification of a <code>string</code> value</p>
+<pre><code>virtual void value(double val)
+</code></pre>
+
+<p>Receive notification of a floating point number</p>
+<pre><code>virtual void value(long long val)
+</code></pre>
+
+<p>Receive notification of a signed integer</p>
+<pre><code>virtual void value(unsigned long long val)
+</code></pre>
+
+<p>Receive notification of a non-negative integer</p>
+<pre><code>virtual void value(bool val)
+</code></pre>
+
+<p>Receive notification of a boolean value</p>
+<pre><code>virtual void write_null()
+</code></pre>
+
+<p>Receive notification of <code>null</code></p>
+<h3>Examples</h3>
+<h3>Serializing an array of json values to a comma delimted file</h3>
+<h4>JSON input file</h4>
+<pre><code>[
+    [&quot;country_code&quot;,&quot;name&quot;],
+    [&quot;ABW&quot;,&quot;ARUBA&quot;],
+    [&quot;ATF&quot;,&quot;FRENCH SOUTHERN TERRITORIES, D.R. OF&quot;],
+    [&quot;VUT&quot;,&quot;VANUATU&quot;],
+    [&quot;WLF&quot;,&quot;WALLIS &amp; FUTUNA ISLANDS&quot;]
+]
+</code></pre>
+
+<p>Note </p>
+<ul>
+<li>The third array element has a value that contains a comma, in the CSV file this value will be quoted.</li>
+</ul>
+<h4>Serializing the comma delimited file with csv_serializer</h4>
+<pre><code>std::string in_file = &quot;input/countries.json&quot;;
+std::ifstream is(in_file);
+
+json_deserializer handler;
+json_reader reader(is,handler);
 reader.read();
+json countries = std::move(handler.root());
+
+csv_serializer serializer(std::cout);
+
+countries.to_stream(serializer);
 </code></pre>
 
-<p>The output is a warning message written to the console</p>
-<pre><code>Incomplete name &quot;John&quot; at line 9 and column 27
+<h4>Output</h4>
+<pre><code>country_code,name
+ABW,ARUBA
+ATF,&quot;FRENCH SOUTHERN TERRITORIES, D.R. OF&quot;
+VUT,VANUATU
+WLF,WALLIS &amp; FUTUNA ISLANDS
 </code></pre>
 
-<p>and an address book file with the required change</p>
-<pre><code>{
-    &quot;address-book&quot;:
-    [
-        {
-            &quot;first-name&quot;:&quot;Jane&quot;,
-            &quot;last-name&quot;:&quot;Roe&quot;,
-            &quot;email&quot;:&quot;jane.roe@example.com&quot;
-        },
-        {
-            &quot;first-name&quot;:&quot;John&quot;,
-            &quot;email&quot;:&quot;john.doe@example.com&quot;
-        }
-    ]
-}
+<h3>Serializing an array of json objects to a tab delimted file</h3>
+<h4>JSON input file</h4>
+<pre><code>[
+    {
+        &quot;dept&quot;:&quot;sales&quot;,
+        &quot;employee-name&quot;:&quot;Smith, Matthew&quot;,
+        &quot;employee-no&quot;:&quot;00000001&quot;,
+        &quot;note&quot;:&quot;&quot;,
+        &quot;salary&quot;:&quot;150,000.00&quot;
+    },
+    {
+        &quot;dept&quot;:&quot;sales&quot;,
+        &quot;employee-name&quot;:&quot;Brown, Sarah&quot;,
+        &quot;employee-no&quot;:&quot;00000002&quot;,
+        &quot;note&quot;:&quot;&quot;,
+        &quot;salary&quot;:&quot;89,000.00&quot;
+    },
+    {
+        &quot;dept&quot;:&quot;finance&quot;,
+        &quot;employee-name&quot;:&quot;Oberc, Scott&quot;,
+        &quot;employee-no&quot;:&quot;00000003&quot;,
+        &quot;salary&quot;:&quot;110,000.00&quot;
+    },
+    {
+        &quot;dept&quot;:&quot;sales&quot;,
+        &quot;employee-name&quot;:&quot;Scott, Colette&quot;,
+        &quot;employee-no&quot;:&quot;00000004&quot;,
+        &quot;note&quot;:&quot;\&quot;Exemplary\&quot; employee\nDependable, trustworthy&quot;,
+        &quot;comment&quot;:&quot;Team player&quot;,
+        &quot;salary&quot;:&quot;75,000.00&quot;
+    }
+]
 </code></pre>
 
-<p><code>address-book-new.json</code></p>
+<p>Note </p>
+<ul>
+<li>The names in the first object in the array will be used for the header row of the CSV file</li>
+<li>The fourth object has a <code>note</code> member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.</li>
+</ul>
+<h4>Reading the tab delimited file with csv_serializer</h4>
+<pre><code>std::string in_file = &quot;input/employees.json&quot;;
+std::ifstream is(in_file);
+
+json_deserializer handler;
+json params;
+params[&quot;field_delimiter&quot;] = &quot;\t&quot;;
+
+json_reader reader(is,handler);
+reader.read();
+json employees = std::move(handler.root());
+
+csv_serializer serializer(std::cout,params);
+
+employees.to_stream(serializer);
+</code></pre>
+
+<h4>Tab delimited output file</h4>
+<pre><code>dept    employee-name   employee-no     note    salary
+sales   Smith, Matthew  00000001                150,000.00
+sales   Brown, Sarah    00000002                89,000.00
+finance Oberc, Scott    00000003                110,000.00
+sales   Scott, Colette  00000004        &quot;&quot;Exemplary&quot;&quot; employee
+Dependable, trustworthy 75,000.00
+</code></pre>
+
 
 </body>
 </html>

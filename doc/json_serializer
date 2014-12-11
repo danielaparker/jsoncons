@@ -296,7 +296,7 @@ img {
 typedef basic_json_serializer&lt;char&gt; json_serializer
 </code></pre>
 
-<p>The <code>json_serializer</code> class is an instantiation of the <code>basic_json_serializer</code> class template that uses char as the character type. It implements <a href="json_output_handler">json<em>output</em>handler</a> and supports pretty print serialization.</p>
+<p>The <code>json_serializer</code> class is an instantiation of the <code>basic_json_serializer</code> class template that uses <code>char</code> as the character type. It implements <a href="json_output_handler">json<em>output</em>handler</a> and supports pretty print serialization.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons/json_serializer.hpp&quot;
 </code></pre>

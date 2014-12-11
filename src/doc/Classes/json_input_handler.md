@@ -2,7 +2,7 @@
 
     typedef basic_json_input_handler<char> json_input_handler
 
-The `json_input_handler` class is an instantiation of the `basic_json_input_handler` class template that uses char as the character type. It defines an interface for a listener to JSON events.
+The `json_input_handler` class is an instantiation of the `basic_json_input_handler` class template that uses `char` as the character type. It defines an interface for a listener to JSON events.
 
 ### Header
 

@@ -296,7 +296,7 @@ img {
 typedef basic_json_deserializer&lt;char,std::allocator&lt;void&gt;&gt; json_deserializer
 </code></pre>
 
-<p>The <code>json_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses char as the character type.</p>
+<p>The <code>json_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses <code>char</code> as the character type.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons/json_deserializer.hpp&quot;
 </code></pre>

@@ -296,7 +296,7 @@ img {
 typedef basic_json_input_handler&lt;char&gt; json_input_handler
 </code></pre>
 
-<p>The <code>json_input_handler</code> class is an instantiation of the <code>basic_json_input_handler</code> class template that uses char as the character type. It defines an interface for a listener to JSON events.</p>
+<p>The <code>json_input_handler</code> class is an instantiation of the <code>basic_json_input_handler</code> class template that uses <code>char</code> as the character type. It defines an interface for a listener to JSON events.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons/json_input_handler.hpp&quot;
 </code></pre>
