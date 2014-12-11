@@ -390,9 +390,9 @@ using jsoncons::json;
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 Member price not found.
-Note that the third book is missing a price, which causes an exception to be thrown.
 </code></pre>
 
+<p>Note that the third book is missing a price, which causes an exception to be thrown.</p>
 <p>You have a choice of accessors:</p>
 <pre><code>book[&quot;price&quot;] will throw if there is no price
 book.get(&quot;price&quot;) will return json::null if there is no price
@@ -594,19 +594,17 @@ cout &lt;&lt; deal &lt;&lt; endl;
 <h2>json any</h2>
 <p>jsoncons provides a class <code>json::any</code> that can contain a value of 
 any type as long as that type supports copy construction and 
-assignment.</p>
+assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, 
+and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
+a <code>json::any value</code>, like this:</p>
 <pre><code>#include &quot;jsoncons/json.hpp&quot;
 #include &lt;boost/numeric/ublas/matrix.hpp&gt;
 
 using jsoncons::json;
 using jsoncons::pretty_print;
 using boost::numeric::ublas::matrix;
-</code></pre>
 
-<p>This allows you, for example, to insert a boost matrix into a <code>json</code> object, 
-and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
-a <code>json::any value</code>, like this:</p>
-<pre><code>json obj;
+json obj;
 
 matrix&lt;double&gt; A(2,2);
 A(0,0) = 1;

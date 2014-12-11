@@ -101,7 +101,8 @@ The output is
     Haruki Murakami, Kafka on the Shore, 25.17
     Charles Bukowski, Women: A Novel, 12
     Member price not found.
-    Note that the third book is missing a price, which causes an exception to be thrown.
+
+Note that the third book is missing a price, which causes an exception to be thrown.
 
 You have a choice of accessors:
 
@@ -310,7 +311,9 @@ producing
 
 jsoncons provides a class `json::any` that can contain a value of 
 any type as long as that type supports copy construction and 
-assignment.
+assignment. This allows you to, for example, insert a boost matrix into a `json` object, 
+and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
+a `json::any value`, like this:
 
     #include "jsoncons/json.hpp"
     #include <boost/numeric/ublas/matrix.hpp>
@@ -318,10 +321,6 @@ assignment.
     using jsoncons::json;
     using jsoncons::pretty_print;
     using boost::numeric::ublas::matrix;
-
-This allows you, for example, to insert a boost matrix into a `json` object, 
-and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
-a `json::any value`, like this:
 
     json obj;
 
