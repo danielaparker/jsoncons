@@ -2,7 +2,7 @@
 
     typedef basic_json_filter<char> json_filter
 
-The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses char as the character type.
+The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses `char` as the character type.
 
 ### Header
 

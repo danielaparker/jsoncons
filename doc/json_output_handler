@@ -296,7 +296,7 @@ img {
 typedef basic_json_output_handler&lt;char&gt; json_output_handler
 </code></pre>
 
-<p>The <code>json_output_handler</code> class is an instantiation of the <code>basic_json_output_handler</code> class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON writer.</p>
+<p>The <code>json_output_handler</code> class is an instantiation of the <code>basic_json_output_handler</code> class template that uses <code>char</code> as the character type. It is a pure virtual class that defines an interface for a JSON writer.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons/json_output_handler.hpp&quot;
 </code></pre>

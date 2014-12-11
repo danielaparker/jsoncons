@@ -2,7 +2,7 @@
 
     typedef basic_json_output_handler<char> json_output_handler
 
-The `json_output_handler` class is an instantiation of the `basic_json_output_handler` class template that uses char as the character type. It is a pure virtual class that defines an interface for a JSON writer.
+The `json_output_handler` class is an instantiation of the `basic_json_output_handler` class template that uses `char` as the character type. It is a pure virtual class that defines an interface for a JSON writer.
 
 ### Header
 
