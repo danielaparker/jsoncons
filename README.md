@@ -52,6 +52,7 @@ The jsoncons classes and functions are in namespace jsoncons. The following usin
     using std::cout;
     using std::endl;
     using jsoncons::json;
+    using jsoncons::pretty_print;
 
 ### Reading json values from a file
 
@@ -319,7 +320,6 @@ a `json::any value`, like this:
     #include <boost/numeric/ublas/matrix.hpp>
 
     using jsoncons::json;
-    using jsoncons::pretty_print;
     using boost::numeric::ublas::matrix;
 
     json obj;
