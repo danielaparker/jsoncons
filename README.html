@@ -335,7 +335,7 @@ img {
 <h2>Using the code</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
-<p>The jsoncons classes and functions are in namespace jsoncons. The following using declarations are for the examples that appear below.</p>
+<p>The jsoncons classes and functions are in namespace <code>jsoncons</code>. The following using declarations are for the examples that appear below.</p>
 <pre><code>#include &quot;jsoncons/json.hpp&quot;
 
 using std::string;
@@ -494,7 +494,7 @@ file_export[&quot;image_sizing&quot;] = std::move(image_sizing);
 </code></pre>
 
 <h3>Iterators</h3>
-<p>jsoncons::json supports iterators for accessing the members of json objects and the elements of json arrays.</p>
+<p><code>jsoncons::json</code> supports iterators for accessing the members of json objects and the elements of json arrays.</p>
 <p>An example of iterating over the name-value pairs of a json object:</p>
 <pre><code>json person;
 person[&quot;first_name&quot;] = &quot;Jane&quot;;
