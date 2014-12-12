@@ -80,8 +80,8 @@ public:
          buffer_length_(0),
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
-         handler_(handler),
-         err_handler_(err_handler),
+         handler_(std::addressof(handler)),
+         err_handler_(std::addressof(err_handler)),
          bof_(true),
          eof_(false),
          stream_ptr_(new buffered_stream(is))
@@ -101,8 +101,8 @@ public:
          buffer_length_(0),
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
-         handler_(handler),
-         err_handler_(default_err_handler),
+         handler_(std::addressof(handler)),
+         err_handler_(std::addressof(default_err_handler)),
          bof_(true),
          eof_(false), 
          stream_ptr_(new buffered_stream(is))
@@ -257,8 +257,8 @@ private:
     size_t buffer_length_;
     size_t hard_buffer_length_;
     size_t estimation_buffer_length_;
-    basic_json_input_handler<Char>& handler_;
-    basic_error_handler<Char>& err_handler_;
+    basic_json_input_handler<Char>* handler_;
+    basic_error_handler<Char>* err_handler_;
     bool bof_;
     bool eof_;
     std::unique_ptr<buffered_stream> stream_ptr_;
@@ -374,22 +374,22 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
             case begin_object:
                 if (stack_.size() == 0)
                 {
-                    handler_.begin_json();
+                    handler_->begin_json();
                 }
                 stack_.push_back(stack_item(true));
                 minimum_structure_capacity_ = estimate_minimum_object_capacity();
-                handler_.begin_object(*this);
+                handler_->begin_object(*this);
                 minimum_structure_capacity_ = 0;
                 break;
             case begin_array:
                 if (stack_.size() == 0)
                 {
-                    handler_.begin_json();
+                    handler_->begin_json();
                 }
                 {
                     stack_.push_back(stack_item(false));
                     minimum_structure_capacity_ = estimate_minimum_array_capacity();
-                    handler_.begin_array(*this);
+                    handler_->begin_array(*this);
                     minimum_structure_capacity_ = 0;
                 }
                 break;
@@ -401,21 +401,21 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                     case value_separator:
                         if (stack_.back().value_count_ == 0)
                         {
-                            err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                            err_handler_->fatal_error("JPE102", "Unexpected comma", *this);
                         }
                         stack_.back().comma_ = true;
                         break;
                     case '\"':
                         if ((stack_.back().value_count_ > 0) & !stack_.back().comma_)
                         {
-                            err_handler_.fatal_error("JPE102", "Expected comma", *this);
+                            err_handler_->fatal_error("JPE102", "Expected comma", *this);
                         }
                         {
                             parse_string();
                             size_t count1 = 0;
                             if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
-                                handler_.write_name(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->write_name(&string_buffer_[0], string_buffer_.length(), *this);
                                 count1 = 0;
                                 if (buffer_[buffer_position_] == ':')
                                 {
@@ -436,7 +436,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                             }
                             else
                             {
-                                handler_.write_string(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->write_string(&string_buffer_[0], string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -446,17 +446,17 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         {
                             if (!stack_.back().is_object_)
                             {
-                                err_handler_.fatal_error("JPE103", "Unexpected }", *this);
+                                err_handler_->fatal_error("JPE103", "Unexpected }", *this);
                             }
                             if (stack_.back().comma_)
                             {
-                                err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                                err_handler_->fatal_error("JPE102", "Unexpected comma", *this);
                             }
                             if (stack_.back().name_count_ != stack_.back().value_count_)
                             {
-                                err_handler_.fatal_error("JPE107", "Value not found", *this);
+                                err_handler_->fatal_error("JPE107", "Value not found", *this);
                             }
-                            handler_.end_object(*this);
+                            handler_->end_object(*this);
                             stack_.pop_back();
                         }
                         if (stack_.size() > 0)
@@ -466,7 +466,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         }
                         else
                         {
-                            handler_.end_json();
+                            handler_->end_json();
                             return;
                         }
                         break;
@@ -474,13 +474,13 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         {
                             if (stack_.back().is_object_)
                             {
-                                err_handler_.fatal_error("JPE104", "Unexpected ]", *this);
+                                err_handler_->fatal_error("JPE104", "Unexpected ]", *this);
                             }
                             if (stack_.back().comma_)
                             {
-                                err_handler_.fatal_error("JPE102", "Unexpected comma", *this);
+                                err_handler_->fatal_error("JPE102", "Unexpected comma", *this);
                             }
-                            handler_.end_array(*this);
+                            handler_->end_array(*this);
                             stack_.pop_back();
                         }
                         if (stack_.size() > 0)
@@ -490,40 +490,40 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         }
                         else
                         {
-                            handler_.end_json();
+                            handler_->end_json();
                             return;
                         }
                         break;
                     case 't':
                         if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                         {
-                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                            err_handler_->fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.write_bool(true, *this);
+                        handler_->write_bool(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
                     case 'f':
                         if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                         {
-                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                            err_handler_->fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 4;
                         column_ += 4;
-                        handler_.write_bool(false, *this);
+                        handler_->write_bool(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
                     case 'n':
                         if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                         {
-                            err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                            err_handler_->fatal_error("JPE105", "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_.write_null(*this);
+                        handler_->write_null(*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -543,7 +543,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
                         ++stack_.back().value_count_;
                         break;
                     default:
-                        err_handler_.fatal_error("JPE105", "Unrecognized value", *this);
+                        err_handler_->fatal_error("JPE105", "Unrecognized value", *this);
                         break;
                     }
                     break;
@@ -558,7 +558,7 @@ void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
 
     if (stack_.size() > 0)
     {
-        err_handler_.fatal_error("JPE101", "End of file", *this);
+        err_handler_->fatal_error("JPE101", "End of file", *this);
     }
 }
 
@@ -609,7 +609,7 @@ void basic_json_reader<Char>::parse_separator()
                 done = true;
                 break;
             default:
-                err_handler_.fatal_error("JPE106", "Expected :", *this);
+                err_handler_->fatal_error("JPE106", "Expected :", *this);
             }
         }
         if (!done)
@@ -617,7 +617,7 @@ void basic_json_reader<Char>::parse_separator()
             read_some();
             if (eof())
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
             }
         }
     }
@@ -674,12 +674,12 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_.write_double(d, *this);
+                            handler_->write_double(d, *this);
                         }
                         catch (...)
                         {
-                            err_handler_.fatal_error("JPE203", "Invalid double value", *this);
-                            handler_.write_null(*this);
+                            err_handler_->fatal_error("JPE203", "Invalid double value", *this);
+                            handler_->write_null(*this);
                         }
                     }
                     else if (has_neg)
@@ -687,19 +687,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_.write_longlong(-d, *this);
+                            handler_->write_longlong(-d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.write_double(-d, *this);
+                                handler_->write_double(-d, *this);
                             }
                             catch (...)
                             {
-                                err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.write_null(*this);
+                                err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
+                                handler_->write_null(*this);
                             }
                         }
                     }
@@ -708,19 +708,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_.write_ulonglong(d, *this);
+                            handler_->write_ulonglong(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_.write_double(d, *this);
+                                handler_->write_double(d, *this);
                             }
                             catch (...)
                             {
-                                err_handler_.fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_.write_null(*this);
+                                err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
+                                handler_->write_null(*this);
                             }
                         }
                     }
@@ -734,7 +734,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             read_some();
             if (eof())
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
             }
         }
     }
@@ -787,7 +787,7 @@ void basic_json_reader<Char>::parse_string()
             case 0x1d:
             case 0x1e:
             case 0x1f:
-                err_handler_.error("JPE201", "Illegal control character in string", *this);
+                err_handler_->error("JPE201", "Illegal control character in string", *this);
                 break;
             case '\\':
                 {
@@ -834,7 +834,7 @@ void basic_json_reader<Char>::parse_string()
                         }
                         break;
                     default:
-                        err_handler_.fatal_error("JPE201", "Invalid character following \\", *this);
+                        err_handler_->fatal_error("JPE201", "Invalid character following \\", *this);
                     }
                 }
                 break;
@@ -851,7 +851,7 @@ void basic_json_reader<Char>::parse_string()
             read_some();
             if (eof())
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
             }
         }
     }
@@ -891,7 +891,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
             }
         }
     }
@@ -940,7 +940,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+                err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
             }
         }
     }
@@ -1184,7 +1184,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
     {
-        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+        err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
     }
     if (cp >= min_lead_surrogate && cp <= max_lead_surrogate)
     {
@@ -1198,7 +1198,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
         }
         else
         {
-            err_handler_.fatal_error("JPE202", "expecting another \\u token to begin the second half of a codepoint surrogate pair.", *this);
+            err_handler_->fatal_error("JPE202", "expecting another \\u token to begin the second half of a codepoint surrogate pair.", *this);
         }
     }
     return cp;
@@ -1209,7 +1209,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
-        err_handler_.fatal_error("JPE101", "Unexpected EOF", *this);
+        err_handler_->fatal_error("JPE101", "Unexpected EOF", *this);
     }
     uint32_t cp = 0;
     size_t index = 0;
@@ -1235,13 +1235,13 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
         {
             std::ostringstream os;
             os << "Expected hexadecimal digit, found " << u << ".";
-            err_handler_.fatal_error("JPE202", os.str(), *this);
+            err_handler_->fatal_error("JPE202", os.str(), *this);
         }
         ++index;
     }
     if (index != 4)
     {
-        err_handler_.fatal_error("JPE202", "Bad codepoint escape sequence in string: four digits expected.", *this);
+        err_handler_->fatal_error("JPE202", "Bad codepoint escape sequence in string: four digits expected.", *this);
     }
     return cp;
 }
