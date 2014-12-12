@@ -24,16 +24,6 @@ namespace jsoncons {
 template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
-    struct buffered_stream
-    {
-        buffered_stream(std::basic_istream<Char>& is)
-            : is_(is)
-        {
-        }
-
-        std::basic_istream<Char>& is_;
-    };
-
     static default_basic_error_handler<Char> default_err_handler;
 
     struct stack_item
@@ -71,9 +61,8 @@ public:
                       basic_error_handler<Char>& err_handler)
        :
          minimum_structure_capacity_(0),
-         column_(),
-         line_(),
-         string_buffer_(),
+         column_(0),
+         line_(0),
          stack_(),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -84,7 +73,7 @@ public:
          err_handler_(std::addressof(err_handler)),
          bof_(true),
          eof_(false),
-         stream_ptr_(new buffered_stream(is))
+         is_(std::addressof(is))
     {
     }
     basic_json_reader(std::basic_istream<Char>& is,
@@ -92,9 +81,8 @@ public:
 
        :
          minimum_structure_capacity_(0),
-         column_(),
-         line_(),
-         string_buffer_(),
+         column_(0),
+         line_(0),
          stack_(),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -105,7 +93,7 @@ public:
          err_handler_(std::addressof(default_err_handler)),
          bof_(true),
          eof_(false), 
-         stream_ptr_(new buffered_stream(is))
+         is_(std::addressof(is))
     {
     }
 
@@ -113,12 +101,7 @@ public:
     {
     }
 
-    void read()
-    {
-        read(stream_ptr_->is_);
-    }
-
-    void read(std::basic_istream<Char>& is);
+    void read();
 
     bool eof() const
     {
@@ -189,12 +172,12 @@ private:
         }
 
         buffer_position_ = 0;
-        if (!stream_ptr_->is_.eof())
+        if (!is_->eof())
         {
             if (bof_)
             {
-                stream_ptr_->is_.read(&buffer_[0], buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
+                is_->read(&buffer_[0], buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(is_->gcount());
                 bof_ = false;
                 if (buffer_length_ == 0)
                 {
@@ -219,9 +202,9 @@ private:
                 {
                     buffer_[i] = buffer_[real_buffer_length + i];
                 }
-                stream_ptr_->is_.read(&buffer_[0] + unread, buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(stream_ptr_->is_.gcount());
-                if (!stream_ptr_->is_.eof())
+                is_->read(&buffer_[0] + unread, buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(is_->gcount());
+                if (!is_->eof())
                 {
                     buffer_length_ -= extra;
                     hard_buffer_length_ = buffer_length_ + read_ahead_length;
@@ -261,7 +244,7 @@ private:
     basic_error_handler<Char>* err_handler_;
     bool bof_;
     bool eof_;
-    std::unique_ptr<buffered_stream> stream_ptr_;
+    std::basic_istream<Char>* is_;
 };
 
 template<typename Char>
@@ -294,13 +277,12 @@ unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsig
 }
 
 template<typename Char>
-void basic_json_reader<Char>::read(std::basic_istream<Char>& is)
+void basic_json_reader<Char>::read()
 {
-    if (is.bad())
+    if (is_->bad())
     {
         JSONCONS_THROW_EXCEPTION("Input stream is invalid");
     }
-    stream_ptr_ = std::unique_ptr<buffered_stream>(new buffered_stream(is));
     buffer_.resize(buffer_capacity_ + 2*read_ahead_length);
     buffer_position_ = 0;
     buffer_length_ = 0;
