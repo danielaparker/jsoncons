@@ -95,7 +95,7 @@ class basic_csv_serializer : public jsoncons::basic_json_output_handler<Char>
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
        :
-       os_(os),
+       os_(std::addressof(os)),
        format_(),
        stack_(),
        original_precision_(),
@@ -113,7 +113,7 @@ public:
     basic_csv_serializer(std::basic_ostream<Char>& os,
                          const jsoncons::basic_json<Char,Alloc>& params)
        :
-       os_(os),
+       os_(std::addressof(os)),
        format_(),
        stack_(),
        original_precision_(),
@@ -171,10 +171,10 @@ public:
     {
         if (stack_.size() == 2)
         {
-            os_ << line_delimiter_;
+            *os_ << line_delimiter_;
             if (stack_[0].count_ == 0)
             {
-                os_ << header_os_.str() << line_delimiter_;
+                *os_ << header_os_.str() << line_delimiter_;
             }
         }
         stack_.pop_back();
@@ -191,7 +191,7 @@ public:
     {
         if (stack_.size() == 2)
         {
-            os_ << line_delimiter_;
+            *os_ << line_delimiter_;
         }
         stack_.pop_back();
 
@@ -206,19 +206,19 @@ public:
             {
                 if (stack_.back().count_ > 0)
                 {
-                    os_.put(field_delimiter_);
+                    os_->put(field_delimiter_);
                 }
                 bool quote = false;
                 if (quote_style_ == quote_all || quote_style_ == quote_nonnumeric ||
                     (quote_style_ == quote_minimal && std::char_traits<Char>::find(name,length,field_delimiter_) != nullptr))
                 {
                     quote = true;
-                    os_.put(quote_char_);
+                    os_->put(quote_char_);
                 }
-                jsoncons_ext::csv::escape_string<Char>(name, length, quote_char_, quote_escape_char_, os_);
+                jsoncons_ext::csv::escape_string<Char>(name, length, quote_char_, quote_escape_char_, *os_);
                 if (quote)
                 {
-                    os_.put(quote_char_);
+                    os_->put(quote_char_);
                 }
                 header_[name] = stack_.back().count_;
             }
@@ -235,7 +235,7 @@ public:
                     stack_.back().skip_ = false;
                     while (stack_.back().count_ < it->second)
                     {
-                        os_.put(field_delimiter_);
+                        os_->put(field_delimiter_);
                         ++stack_.back().count_;
                     }
                 //    std::cout << " (" << it->value() << " " << stack_.back().count_ << ") ";
@@ -254,7 +254,7 @@ public:
             }
             else
             {
-                write_null(os_);
+                write_null(*os_);
             }
         }
     }
@@ -270,7 +270,7 @@ public:
             }
             else
             {
-                value(val,length,os_);
+                value(val,length,*os_);
             }
         }
     }
@@ -285,7 +285,7 @@ public:
             }
             else
             {
-                value(val,os_);
+                value(val,*os_);
             }
         }
     }
@@ -300,7 +300,7 @@ public:
             }
             else
             {
-                value(val,os_);
+                value(val,*os_);
             }
         }
     }
@@ -315,7 +315,7 @@ public:
             }
             else
             {
-                value(val,os_);
+                value(val,*os_);
             }
         }
     }
@@ -330,7 +330,7 @@ public:
             }
             else
             {
-                value(val,os_);
+                value(val,*os_);
             }
         }
     }
@@ -446,7 +446,7 @@ private:
         }
     }
 
-    std::basic_ostream<Char>& os_;
+    std::basic_ostream<Char>* os_;
     jsoncons::basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
