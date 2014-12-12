@@ -42,22 +42,22 @@ class basic_json_serializer : public basic_json_output_handler<Char>
     };
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-       : os_(os), indent_(0), indenting_(false)
+       : os_(std::addressof(os)), indent_(0), indenting_(false)
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
-       : os_(os), indent_(0), indenting_(indenting)
+       : os_(std::addressof(os)), indent_(0), indenting_(indenting)
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-       : os_(os), format_(format), indent_(0),
+       : os_(std::addressof(os)), format_(format), indent_(0),
          indenting_(false) // Deprecated behavior
     {
     }
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
-       : os_(os), format_(format), indent_(0), indenting_(indenting)
+       : os_(std::addressof(os)), format_(format), indent_(0), indenting_(indenting)
     {
     }
 
@@ -82,7 +82,7 @@ public:
             write_indent();
         }
         stack_.push_back(stack_item(true));
-        os_.put('{');
+        os_->put('{');
         indent();
     }
 
@@ -94,7 +94,7 @@ public:
             write_indent();
         }
         stack_.pop_back();
-        os_.put('}');
+        os_->put('}');
 
         end_value();
     }
@@ -108,7 +108,7 @@ public:
             write_indent();
         }
         stack_.push_back(stack_item(false));
-        os_.put('[');
+        os_->put('[');
         indent();
     }
 
@@ -120,7 +120,7 @@ public:
             write_indent();
         }
         stack_.pop_back();
-        os_.put(']');
+        os_->put(']');
 
         end_value();
     }
@@ -128,17 +128,17 @@ public:
     virtual void write_name(const Char* name, size_t length)
     {
         begin_element();
-        os_.put('\"');
-        escape_string<Char>(name, length, format_, os_);
-        os_.put('\"');
-        os_.put(':');
+        os_->put('\"');
+        escape_string<Char>(name, length, format_, *os_);
+        os_->put('\"');
+        os_->put(':');
     }
 
     virtual void write_null()
     {
         begin_value();
 
-        os_ << json_char_traits<Char,sizeof(Char)>::null_literal();
+        *os_ << json_char_traits<Char,sizeof(Char)>::null_literal();
 
         end_value();
     }
@@ -149,9 +149,9 @@ public:
     {
         begin_value();
 
-        os_.put('\"');
-        escape_string<Char>(value, length, format_, os_);
-        os_.put('\"');
+        os_->put('\"');
+        escape_string<Char>(value, length, format_, *os_);
+        os_->put('\"');
 
         end_value();
     }
@@ -162,15 +162,15 @@ public:
 
         if (is_nan(value) && format_.replace_nan())
         {
-            os_  << format_.nan_replacement();
+            *os_ << format_.nan_replacement();
         }
         else if (is_pos_inf(value) && format_.replace_pos_inf())
         {
-            os_  << format_.pos_inf_replacement();
+            *os_ << format_.pos_inf_replacement();
         }
         else if (is_neg_inf(value) && format_.replace_neg_inf())
         {
-            os_  << format_.neg_inf_replacement();
+            *os_ << format_.neg_inf_replacement();
         }
         else if (format_.floatfield() != 0)
         {
@@ -178,12 +178,12 @@ public:
             os.imbue(std::locale::classic());
             os.setf(format_.floatfield(), std::ios::floatfield);
             os << std::showpoint << std::setprecision(format_.precision()) << value;
-            os_ << os.str();
+            *os_ << os.str();
         }
         else
         {
             std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
-            os_ << buf;
+            *os_ << buf;
         }
 
         end_value();
@@ -193,7 +193,7 @@ public:
     {
         begin_value();
 
-        os_  << value;
+        *os_ << value;
 
         end_value();
     }
@@ -202,7 +202,7 @@ public:
     {
         begin_value();
 
-        os_  << value;
+        *os_ << value;
 
         end_value();
     }
@@ -211,7 +211,7 @@ public:
     {
         begin_value();
 
-        os_ << (value ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
+        *os_ << (value ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
 
         end_value();
     }
@@ -222,7 +222,7 @@ public:
         {
             if (stack_.back().count_ > 0)
             {
-                os_.put(',');
+                os_->put(',');
             }
             if (indenting_)
             {
@@ -238,7 +238,7 @@ public:
             //begin_element();
             if (stack_.back().count_ > 0)
             {
-                os_.put(',');
+                os_->put(',');
             }
         }
     }
@@ -275,14 +275,14 @@ public:
         {
             stack_.back().content_indented_ = true;
         }
-        os_.put('\n');
+        os_->put('\n');
         for (int i = 0; i < indent_; ++i)
         {
-            os_.put(' ');
+            os_->put(' ');
         }
     }
 
-    std::basic_ostream<Char>& os_;
+    std::basic_ostream<Char>* os_;
     basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
