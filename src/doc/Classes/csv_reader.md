@@ -12,21 +12,21 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
                json_input_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text and a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events. Uses default [csv formatting parameters](csv formatting parameters).
+JSON events. Uses default [csv formatting parameters](csv formatting parameters).
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                const json& params)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events, and [csv formatting parameters](csv formatting parameters).
+JSON events, and [csv formatting parameters](csv formatting parameters).
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events and the specified [error_handler](error_handler).
+JSON events and the specified [error_handler](error_handler).
 Uses default [csv formatting parameters](csv formatting parameters).
 
     csv_reader(std::istream& is,
@@ -35,7 +35,7 @@ Uses default [csv formatting parameters](csv formatting parameters).
                const json& params)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events, the specified [error_handler](error_handler),
+JSON events, the specified [error_handler](error_handler),
 and [csv formatting parameters](csv formatting parameters).
 
 ### Member functions

@@ -19,57 +19,60 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 ### Implementing methods
 
     virtual void begin_json()
-Receive notification of the start of JSON text
+Receive begin JSON document event
 
     virtual void end_json()
-Receive notification of the end of JSON text
+Receive end JSON document event
 
     virtual void begin_object(const parsing_context& context)
-Receive notification of the start of a JSON object. Contextual information including
+Receive begin JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void end_object(const parsing_context& context)
-Receive notification of the end of a JSON object. Contextual information including
+Receive end JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void begin_array(const parsing_context& context)
-Receive notification of the start of a JSON array. Contextual information including
+Receive begin JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void end_array(const parsing_context& context)
-Receive notification of the end of a JSON array. Contextual information including
+Receive end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_name(const char* p, size_t length, const parsing_context& context)
-Receive notification of the `name` part of a name-value pair. Contextual information including
+    virtual void write_name(const char* p, size_t length, 
+                            const parsing_context& context)
+Receive name event for name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
     virtual void write_null(const parsing_context& context)
-Receive notification of a null value. Contextual information including
+Receive null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_null(const parsing_context& context)
-Receive notification of a null value. Contextual information including
+Receive null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_string(const char* p, size_t length, const parsing_context& context)
-Receive notification of a string value. Contextual information including
+    virtual void write_string(const char* p, size_t length, 
+                              const parsing_context& context)
+Receive character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_double(double value, const parsing_context& context)
-Receive notification of a floating point number. Contextual information including
+Receive floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_longlong(long long value, const parsing_context& context)
-Receive notification of a signed integer. Contextual information including
+Receive signed integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_ulonglong(unsigned long long value, const parsing_context& context)
-Receive notification of a non-negative integer. Contextual information including
+    virtual void write_ulonglong(unsigned long long value, 
+                                 const parsing_context& context)
+Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_bool(bool value, const parsing_context& context)
-Receive notification of a boolean value. Contextual information including
+Receive boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
 ### Accessors

@@ -33,43 +33,43 @@ Constructs a new serializer that writes to the specified output stream using the
 ### Implementing methods
 
     virtual void begin_json()
-Receive notification of the start of a JSON document
+Receive begin JSON document event
 
     virtual void end_json()
-Receive notification of the end of a JSON document
+Receive end JSON document event
 
     virtual void begin_object()
-Receive notification of the start of a JSON object
+Receive begin JSON object event
 
     virtual void end_object()
-Receive notification of the end of a JSON object
+Receive end JSON object event
 
     virtual void begin_array()
-Receive notification of the start of a JSON array
+Receive begin JSON array event
 
     virtual void end_array()
-Receive notification of the end of a JSON object
+Receive end JSON object event
 
     virtual void write_name(const char* p, size_t length)
-Receive notification of the `name` of a name value pair
+Receive name event for name-value pair
 
     virtual void write_null()
-Receive notification of `null`
+Receive a `null` value event
 
     virtual void write_string(const char* p, size_t length)
-Receive notification of a `string` value
+Receive character data event
 
     virtual void write_double(double value)
-Receive notification of a floating point number
+Receive floating point value event
 
     virtual void write_longlong(long long value)
-Receive notification of a signed integer
+Receive signed integer value event
 
     virtual void write_ulonglong(unsigned long long value)
-Receive notification of a non-negative integer
+Receive non-negative integer value event
 
     virtual void write_bool(bool value)
-Receive notification of a boolean value
+Receive a boolean value event
 
 ### Examples
 

@@ -308,14 +308,14 @@ typedef basic_json_reader&lt;char&gt; json_reader
 
 <p>Constructs a <code>json_reader</code> that is associated with an input stream
 <code>is</code> of JSON text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events, and the specified <a href="error_handler">error_handler</a>.</p>
+JSON events, and the specified <a href="error_handler">error_handler</a>.</p>
 <pre><code>json_reader(std::istream&amp; is,
             json_input_handler&amp; handler)
 </code></pre>
 
 <p>Constructs a <code>json_reader</code> that is associated with an input stream
 <code>is</code> of JSON text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events, and a <a href="default_error_handler">default<em>error</em>handler</a></p>
+JSON events, and a <a href="default_error_handler">default<em>error</em>handler</a></p>
 <h3>Member functions</h3>
 <pre><code>bool eof() const
 </code></pre>
