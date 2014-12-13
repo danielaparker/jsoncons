@@ -13,13 +13,13 @@
                 error_handler& err_handler)
 Constructs a `json_reader` that is associated with an input stream
 `is` of JSON text, a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events, and the specified [error_handler](error_handler).
+JSON events, and the specified [error_handler](error_handler).
 
     json_reader(std::istream& is,
                 json_input_handler& handler)
 Constructs a `json_reader` that is associated with an input stream
 `is` of JSON text, a [json_input_handler](json_input_handler) handler that receives
-notification of JSON events, and a [default_error_handler](default_error_handler)
+JSON events, and a [default_error_handler](default_error_handler)
 
 ### Member functions
 

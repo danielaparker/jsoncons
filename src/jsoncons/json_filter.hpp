@@ -61,7 +61,8 @@ public:
         writer_->end_array();
     }
 
-    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
+    virtual void write_name(const Char* name, size_t length, 
+                            const basic_parsing_context<Char>& context)
     {
         writer_->write_name(name, length);
     }
@@ -71,7 +72,8 @@ public:
         writer_->write_null();
     }
 
-    virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>& context)
+    virtual void write_string(const Char* value, size_t length, 
+                              const basic_parsing_context<Char>& context)
     {
         writer_->write_string(value, length);
     }
@@ -86,7 +88,8 @@ public:
         writer_->write_longlong(value);
     }
 
-    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void write_ulonglong(unsigned long long value, 
+                                 const basic_parsing_context<Char>& context)
     {
         writer_->write_ulonglong(value);
     }

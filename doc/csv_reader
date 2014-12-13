@@ -294,7 +294,7 @@ img {
 <pre><code>jsoncons_ext::csv::csv_reader
 </code></pre>
 
-<p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses char as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
+<p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
 <h3>Header</h3>
 <pre><code>#include &quot;jsoncons_ext/csv/csv_reader.hpp&quot;
 </code></pre>
@@ -306,7 +306,7 @@ img {
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text and a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events. Uses default [csv formatting parameters](csv formatting parameters).</p>
+JSON events. Uses default [csv formatting parameters](csv formatting parameters).</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            const json&amp; params)
@@ -314,7 +314,7 @@ notification of JSON events. Uses default [csv formatting parameters](csv format
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events, and [csv formatting parameters](csv formatting parameters).</p>
+JSON events, and [csv formatting parameters](csv formatting parameters).</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            error_handler&amp; err_handler)
@@ -322,7 +322,7 @@ notification of JSON events, and [csv formatting parameters](csv formatting para
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events and the specified <a href="error_handler">error_handler</a>.
+JSON events and the specified <a href="error_handler">error_handler</a>.
 Uses default [csv formatting parameters](csv formatting parameters).</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
@@ -332,7 +332,7 @@ Uses default [csv formatting parameters](csv formatting parameters).</p>
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-notification of JSON events, the specified <a href="error_handler">error_handler</a>,
+JSON events, the specified <a href="error_handler">error_handler</a>,
 and [csv formatting parameters](csv formatting parameters).</p>
 <h3>Member functions</h3>
 <pre><code>bool eof() const

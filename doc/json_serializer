@@ -328,55 +328,55 @@ typedef basic_json_serializer&lt;char&gt; json_serializer
 <pre><code>virtual void begin_json()
 </code></pre>
 
-<p>Receive notification of the start of a JSON document</p>
+<p>Receive begin JSON document event</p>
 <pre><code>virtual void end_json()
 </code></pre>
 
-<p>Receive notification of the end of a JSON document</p>
+<p>Receive end JSON document event</p>
 <pre><code>virtual void begin_object()
 </code></pre>
 
-<p>Receive notification of the start of a JSON object</p>
+<p>Receive begin JSON object event</p>
 <pre><code>virtual void end_object()
 </code></pre>
 
-<p>Receive notification of the end of a JSON object</p>
+<p>Receive end JSON object event</p>
 <pre><code>virtual void begin_array()
 </code></pre>
 
-<p>Receive notification of the start of a JSON array</p>
+<p>Receive begin JSON array event</p>
 <pre><code>virtual void end_array()
 </code></pre>
 
-<p>Receive notification of the end of a JSON object</p>
+<p>Receive end JSON object event</p>
 <pre><code>virtual void write_name(const char* p, size_t length)
 </code></pre>
 
-<p>Receive notification of the <code>name</code> of a name value pair</p>
+<p>Receive name event for name-value pair</p>
 <pre><code>virtual void write_null()
 </code></pre>
 
-<p>Receive notification of <code>null</code></p>
+<p>Receive a <code>null</code> value event</p>
 <pre><code>virtual void write_string(const char* p, size_t length)
 </code></pre>
 
-<p>Receive notification of a <code>string</code> value</p>
+<p>Receive character data event</p>
 <pre><code>virtual void write_double(double value)
 </code></pre>
 
-<p>Receive notification of a floating point number</p>
+<p>Receive floating point value event</p>
 <pre><code>virtual void write_longlong(long long value)
 </code></pre>
 
-<p>Receive notification of a signed integer</p>
+<p>Receive signed integer value event</p>
 <pre><code>virtual void write_ulonglong(unsigned long long value)
 </code></pre>
 
-<p>Receive notification of a non-negative integer</p>
+<p>Receive non-negative integer value event</p>
 <pre><code>virtual void write_bool(bool value)
 </code></pre>
 
-<p>Receive notification of a boolean value</p>
+<p>Receive a boolean value event</p>
 <h3>Examples</h3>
 <h3>Feeding json events directly to a <code>json_serializer</code></h3>
 <pre><code>#include &lt;iostream&gt;

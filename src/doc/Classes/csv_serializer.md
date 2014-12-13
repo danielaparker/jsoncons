@@ -27,37 +27,37 @@ Constructs a `csv_serializer` that is associated with an output stream
 ### Event handler methods
 
     virtual void begin_object()
-Receive notification of the start of a JSON object
+Receive begin JSON object event
 
     virtual void end_object()
-Receive notification of the end of a JSON object
+Receive end JSON object event
 
     virtual void begin_array()
-Receive notification of the start of a JSON array
+Receive begin JSON array event
 
     virtual void end_array()
-Receive notification of the end of a JSON object
+Receive end JSON object event
 
     virtual void write_name(const char* p, size_t length)
-Receive notification of the `name` of a name value pair
+Receive name event for name-value pair
 
     virtual void value(const std::string& val)
-Receive notification of a `string` value
+Receive character data event
 
     virtual void value(double val)
-Receive notification of a floating point number
+Receive floating point value event
 
     virtual void value(long long val)
-Receive notification of a signed integer
+Receive signed integer value event
 
     virtual void value(unsigned long long val)
-Receive notification of a non-negative integer
+Receive non-negative integer value event
 
     virtual void value(bool val)
-Receive notification of a boolean value
+Receive a boolean value event
 
     virtual void write_null()
-Receive notification of `null`
+Receive a `null` value event
 
 ### Examples
 

@@ -11,106 +11,90 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 ### Overloaded methods
 
     void name(const std::string& value, const parsing_context& context)
-Send notification of the `name` part of a name-value pair. Contextual information including
+Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
     void value(const std::string& value, const parsing_context& context)
-Send notification of a string value. Contextual information including
+Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     void value(null_type, const parsing_context& context)
-Send notification of a null value. Contextual information including
+Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     void value(float value, const parsing_context& context)
-Send notification of a float number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
     void value(double value, const parsing_context& context)
-Send notification of a double number. Contextual information including
+Send floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     void value(int value, const parsing_context& context)
-Send notification of an int number. Contextual information including
+    void value(long value, const parsing_context& context)
+    void value(long long value, const parsing_context& context)
+Send signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     void value(unsigned int value, const parsing_context& context)
-Send notification of an unsigned int number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    void value(long value, const parsing_context& context)
-Send notification of a long number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
     void value(unsigned long value, const parsing_context& context)
-Send notification of an unsigned long number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    void value(long long value, const parsing_context& context)
-Send notification of a long long number. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
     void value(unsigned long long value, const parsing_context& context)
-Send notification of an unsigned long long number. Contextual information including
+Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     void value(bool value, const parsing_context& context)
-Send notification of a boolean value. Contextual information including
+Send boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
 ### Implementing methods
 
     virtual void begin_json()
-Receive notification of the start of JSON text
+Receive begin JSON document event
 
     virtual void end_json()
-Receive notification of the end of JSON text
+Receive end JSON document event
 
     virtual void begin_object(const parsing_context& context)
-Receive notification of the start of a JSON object. Contextual information including
+Receive begin JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void end_object(const parsing_context& context)
-Receive notification of the end of a JSON object. Contextual information including
+Receive end JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void begin_array(const parsing_context& context)
-Receive notification of the start of a JSON array. Contextual information including
+Receive begin JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void end_array(const parsing_context& context)
-Receive notification of the end of a JSON array. Contextual information including
+Receive end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_name(const char* p, size_t length, const parsing_context& context)
-Receive notification of the `name` part of a name-value pair. Contextual information including
+    virtual void write_name(const char* p, size_t length, 
+                            const parsing_context& context)
+Receive name event for name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
     virtual void write_null(const parsing_context& context)
-Receive notification of a null value. Contextual information including
+Receive null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_null(const parsing_context& context)
-Receive notification of a null value. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void write_string(const char* p, size_t length, const parsing_context& context)
-Receive notification of a string value. Contextual information including
+    virtual void write_string(const char* p, size_t length, 
+                              const parsing_context& context)
+Receive character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_double(double value, const parsing_context& context)
-Receive notification of a floating point number. Contextual information including
+Receive floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_longlong(long long value, const parsing_context& context)
-Receive notification of a signed integer. Contextual information including
+Receive signed integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void write_ulonglong(unsigned long long value, const parsing_context& context)
-Receive notification of a non-negative integer. Contextual information including
+    virtual void write_ulonglong(unsigned long long value, 
+                                 const parsing_context& context)
+Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_bool(bool value, const parsing_context& context)
-Receive notification of a boolean value. Contextual information including
+Receive boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
