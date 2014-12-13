@@ -337,23 +337,23 @@ img {
 </code></pre>
 
 <p>Receive name event for name-value pair</p>
-<pre><code>virtual void value(const std::string&amp; val)
+<pre><code>virtual void write_string(const std::string&amp; val)
 </code></pre>
 
 <p>Receive character data event</p>
-<pre><code>virtual void value(double val)
-</code></pre>
-
-<p>Receive floating point value event</p>
-<pre><code>virtual void value(long long val)
+<pre><code>virtual void write_longlong(long long val)
 </code></pre>
 
 <p>Receive signed integer value event</p>
-<pre><code>virtual void value(unsigned long long val)
+<pre><code>virtual void write_ulonglong(unsigned long long val)
 </code></pre>
 
 <p>Receive non-negative integer value event</p>
-<pre><code>virtual void value(bool val)
+<pre><code>virtual void write_double(double val)
+</code></pre>
+
+<p>Receive floating point value event</p>
+<pre><code>virtual void write_bool(bool val)
 </code></pre>
 
 <p>Receive a boolean value event</p>

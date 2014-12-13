@@ -353,18 +353,10 @@ typedef basic_json_serializer&lt;char&gt; json_serializer
 </code></pre>
 
 <p>Receive name event for name-value pair</p>
-<pre><code>virtual void write_null()
-</code></pre>
-
-<p>Receive a <code>null</code> value event</p>
 <pre><code>virtual void write_string(const char* p, size_t length)
 </code></pre>
 
 <p>Receive character data event</p>
-<pre><code>virtual void write_double(double value)
-</code></pre>
-
-<p>Receive floating point value event</p>
 <pre><code>virtual void write_longlong(long long value)
 </code></pre>
 
@@ -373,10 +365,18 @@ typedef basic_json_serializer&lt;char&gt; json_serializer
 </code></pre>
 
 <p>Receive non-negative integer value event</p>
+<pre><code>virtual void write_double(double value)
+</code></pre>
+
+<p>Receive floating point value event</p>
 <pre><code>virtual void write_bool(bool value)
 </code></pre>
 
 <p>Receive a boolean value event</p>
+<pre><code>virtual void write_null()
+</code></pre>
+
+<p>Receive a <code>null</code> value event</p>
 <h3>Examples</h3>
 <h3>Feeding json events directly to a <code>json_serializer</code></h3>
 <pre><code>#include &lt;iostream&gt;

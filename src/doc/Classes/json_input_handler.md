@@ -18,10 +18,6 @@ line and column information is provided in the [parsing_context](parsing_context
 Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(null_type, const parsing_context& context)
-Send null value event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
     void value(float value, const parsing_context& context)
     void value(double value, const parsing_context& context)
 Send floating point value event. Contextual information including
@@ -41,6 +37,10 @@ line and column information is provided in the [parsing_context](parsing_context
 
     void value(bool value, const parsing_context& context)
 Send boolean value event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void value(null_type, const parsing_context& context)
+Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
 ### Implementing methods
@@ -72,17 +72,9 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive name event for name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
-    virtual void write_null(const parsing_context& context)
-Receive null value event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
     virtual void write_string(const char* p, size_t length, 
                               const parsing_context& context)
 Receive character data event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. 
-
-    virtual void write_double(double value, const parsing_context& context)
-Receive floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
     virtual void write_longlong(long long value, const parsing_context& context)
@@ -94,7 +86,15 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
+    virtual void write_double(double value, const parsing_context& context)
+Receive floating point value event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
     virtual void write_bool(bool value, const parsing_context& context)
 Receive boolean value event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    virtual void write_null(const parsing_context& context)
+Receive null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 

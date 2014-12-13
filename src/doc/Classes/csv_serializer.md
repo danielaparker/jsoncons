@@ -41,19 +41,19 @@ Receive end JSON object event
     virtual void write_name(const char* p, size_t length)
 Receive name event for name-value pair
 
-    virtual void value(const std::string& val)
+    virtual void write_string(const std::string& val)
 Receive character data event
 
-    virtual void value(double val)
-Receive floating point value event
-
-    virtual void value(long long val)
+    virtual void write_longlong(long long val)
 Receive signed integer value event
 
-    virtual void value(unsigned long long val)
+    virtual void write_ulonglong(unsigned long long val)
 Receive non-negative integer value event
 
-    virtual void value(bool val)
+    virtual void write_double(double val)
+Receive floating point value event
+
+    virtual void write_bool(bool val)
 Receive a boolean value event
 
     virtual void write_null()
