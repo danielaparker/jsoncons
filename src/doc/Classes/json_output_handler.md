@@ -56,14 +56,8 @@ Receive end JSON array event
     virtual void write_name(const char* p, size_t length)
 Receive name event for name-value pair
 
-    virtual void write_null()
-Receive a `null` value event
-
     virtual void write_string(const char* p, size_t length)
 Receive character data event
-
-    virtual void write_double(double value)
-Receive floating point value event
 
     virtual void write_longlong(long long value)
 Receive signed integer value event
@@ -71,6 +65,12 @@ Receive signed integer value event
     virtual void write_ulonglong(unsigned long long value)
 Receive non-negative integer value event
 
+    virtual void write_double(double value)
+Receive floating point value event
+
     virtual void write_bool(bool value)
 Receive a boolean value event
+
+    virtual void write_null()
+Receive a `null` value event
 

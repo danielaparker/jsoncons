@@ -360,18 +360,10 @@ void value(double value)
 </code></pre>
 
 <p>Receive name event for name-value pair</p>
-<pre><code>virtual void write_null()
-</code></pre>
-
-<p>Receive a <code>null</code> value event</p>
 <pre><code>virtual void write_string(const char* p, size_t length)
 </code></pre>
 
 <p>Receive character data event</p>
-<pre><code>virtual void write_double(double value)
-</code></pre>
-
-<p>Receive floating point value event</p>
 <pre><code>virtual void write_longlong(long long value)
 </code></pre>
 
@@ -380,10 +372,18 @@ void value(double value)
 </code></pre>
 
 <p>Receive non-negative integer value event</p>
+<pre><code>virtual void write_double(double value)
+</code></pre>
+
+<p>Receive floating point value event</p>
 <pre><code>virtual void write_bool(bool value)
 </code></pre>
 
 <p>Receive a boolean value event</p>
+<pre><code>virtual void write_null()
+</code></pre>
+
+<p>Receive a <code>null</code> value event</p>
 
 </body>
 </html>

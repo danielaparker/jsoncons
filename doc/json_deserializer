@@ -342,26 +342,11 @@ line and column information is provided in the <a href="parsing_context">parsing
 
 <p>Receive name event for name-value pair. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.  </p>
-<pre><code>virtual void write_null(const parsing_context&amp; context)
-</code></pre>
-
-<p>Receive null value event. Contextual information including
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-<pre><code>virtual void write_null(const parsing_context&amp; context)
-</code></pre>
-
-<p>Receive null value event. Contextual information including
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 <pre><code>virtual void write_string(const char* p, size_t length, 
                           const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive character data event. Contextual information including
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-<pre><code>virtual void write_double(double value, const parsing_context&amp; context)
-</code></pre>
-
-<p>Receive floating point value event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 <pre><code>virtual void write_longlong(long long value, const parsing_context&amp; context)
 </code></pre>
@@ -374,10 +359,20 @@ line and column information is provided in the <a href="parsing_context">parsing
 
 <p>Receive non-negative integer value event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
+<pre><code>virtual void write_double(double value, const parsing_context&amp; context)
+</code></pre>
+
+<p>Receive floating point value event. Contextual information including
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 <pre><code>virtual void write_bool(bool value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive boolean value event. Contextual information including
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
+<pre><code>virtual void write_null(const parsing_context&amp; context)
+</code></pre>
+
+<p>Receive null value event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 <h3>Accessors</h3>
 <pre><code>json&amp; root()
