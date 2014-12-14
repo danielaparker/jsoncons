@@ -62,37 +62,62 @@ public:
         do_name(p, length, context);
     }
 
-    void string_value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    void value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
         do_string_value(&value[0], value.length(), context);
     }
 
-    void string_value(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
+    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
     {
         do_string_value(p, length, context);
     }
 
-    void longlong_value(long long value, const basic_parsing_context<Char>& context) 
+    void value(int value, const basic_parsing_context<Char>& context) 
     {
         do_longlong_value(value,context);
     }
 
-    void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    void value(long value, const basic_parsing_context<Char>& context) 
+    {
+        do_longlong_value(value,context);
+    }
+
+    void value(long long value, const basic_parsing_context<Char>& context) 
+    {
+        do_longlong_value(value,context);
+    }
+
+    void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
         do_ulonglong_value(value,context);
     }
 
-    void double_value(double value, const basic_parsing_context<Char>& context)
+    void value(unsigned long value, const basic_parsing_context<Char>& context) 
+    {
+        do_ulonglong_value(value,context);
+    }
+
+    void value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    {
+        do_ulonglong_value(value,context);
+    }
+
+    void value(float value, const basic_parsing_context<Char>& context)
     {
         do_double_value(value, context);
     }
 
-    void bool_value(bool value, const basic_parsing_context<Char>& context) 
+    void value(double value, const basic_parsing_context<Char>& context)
+    {
+        do_double_value(value, context);
+    }
+
+    void value(bool value, const basic_parsing_context<Char>& context) 
     {
         do_bool_value(value,context);
     }
 
-    void null_value(const basic_parsing_context<Char>& context)
+    void value(null_type, const basic_parsing_context<Char>& context)
     {
         do_null_value(context);
     }

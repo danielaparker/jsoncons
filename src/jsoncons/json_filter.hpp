@@ -72,33 +72,33 @@ private:
     virtual void do_string_value(const Char* value, size_t length, 
                               const basic_parsing_context<Char>& context)
     {
-        writer_->string_value(value, length);
+        writer_->value(value, length);
     }
 
     virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        writer_->longlong_value(value);
+        writer_->value(value);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, 
                                  const basic_parsing_context<Char>& context)
     {
-        writer_->ulonglong_value(value);
+        writer_->value(value);
     }
 
     virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
     {
-        writer_->double_value(value);
+        writer_->value(value);
     }
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        writer_->bool_value(value);
+        writer_->value(value);
     }
 
     virtual void do_null_value(const basic_parsing_context<Char>& context)
     {
-        writer_->null_value();
+        writer_->value(null_type());
     }
 
     basic_json_output_handler<Char>* writer_;
@@ -164,32 +164,32 @@ private:
 
     virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_->string_value(value,length,context);
+        parent_->value(value,length,context);
     }
 
     virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
     {
-        parent_->double_value(value,context);
+        parent_->value(value,context);
     }
 
     virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->longlong_value(value,context);
+        parent_->value(value,context);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->ulonglong_value(value,context);
+        parent_->value(value,context);
     }
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        parent_->bool_value(value,context);
+        parent_->value(value,context);
     }
 
     virtual void do_null_value(const basic_parsing_context<Char>& context)
     {
-        parent_->null_value(context);
+        parent_->value(null_type(),context);
     }
 
     basic_json_input_output_adapter<Char> input_output_adapter_;

@@ -57,12 +57,12 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
                 size_t start_last = value.find_first_not_of(" \t", end_first);
                 parent().name("first-name", context);
                 std::string first = value.substr(0, end_first);
-                parent().string_value(first, context); 
+                parent().value(first, context); 
                 if (start_last != std::string::npos)
                 {
                     parent().name("last-name", context);
                     std::string last = value.substr(start_last);
-                    parent().string_value(last, context); 
+                    parent().value(last, context); 
                 }
                 else
                 {
@@ -73,7 +73,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
             else
             {
-                parent().string_value(p, length, context);
+                parent().value(p, length, context);
             }
         }
 

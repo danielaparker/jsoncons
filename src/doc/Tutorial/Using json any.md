@@ -40,8 +40,8 @@ the output is
 You can, however, implement a function template specialization of `serialize` in 
 the `jsoncons` namespace, in a header file, like this:
 
-    #ifndef MY_CUSTOM_DATA_HPP
-    #define MY_CUSTOM_DATA_HPP
+    #ifndef MY_ANY_SPECIALIZATIONS_HPP
+    #define MY_ANY_SPECIALIZATIONS_HPP
 
     #include "jsoncons/json.hpp"
     #include <boost/numeric/ublas/matrix.hpp>
@@ -57,7 +57,7 @@ the `jsoncons` namespace, in a header file, like this:
             os.begin_array();
             for (size_t j = 0; j < A.size2(); ++j)
             {
-                os.double_value(A(i, j));
+                os.value(A(i, j));
             }
             os.end_array();
         }

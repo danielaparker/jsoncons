@@ -415,29 +415,29 @@ BOOST_AUTO_TEST_CASE(test_big_file)
         handler.name(person);
         handler.begin_object();
         handler.name(first_name);
-        handler.string_value(john_first_name);
+        handler.value(john_first_name);
         handler.name(last_name);
-        handler.string_value(john_last_name);
+        handler.value(john_last_name);
         handler.name(birthdate);
-        handler.string_value(john_birthdate);
+        handler.value(john_birthdate);
         handler.name(sex);
-        handler.string_value(john_sex);
+        handler.value(john_sex);
         handler.name(salary);
-        handler.longlong_value(70000);
+        handler.value(70000);
         handler.name(interests);
         handler.begin_array();
-        handler.string_value(reading);
-        handler.string_value(mountain_biking);
-        handler.string_value(hacking);
+        handler.value(reading);
+        handler.value(mountain_biking);
+        handler.value(hacking);
         handler.end_array();
         handler.name(favorites);
         handler.begin_object();
         handler.name(color);
-        handler.string_value(john_color);
+        handler.value(john_color);
         handler.name(sport);
-        handler.string_value(john_sport);
+        handler.value(john_sport);
         handler.name(food);
-        handler.string_value(john_food);
+        handler.value(john_food);
         handler.end_object();
 
         handler.end_object();
@@ -485,12 +485,12 @@ private:
             size_t start_last = value.find_first_not_of(" \t", end_first);
             parent().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            parent().string_value(first, context); 
+            parent().value(first, context); 
             if (start_last != std::string::npos)
             {
                 parent().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().string_value(last, context); 
+                parent().value(last, context); 
             }
             else
             {
@@ -501,7 +501,7 @@ private:
         }
         else
         {
-            parent().string_value(p, length, context);
+            parent().value(p, length, context);
         }
     }
 

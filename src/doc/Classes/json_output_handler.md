@@ -34,25 +34,25 @@ Output name event for a name-value pair. Uses `do_name`.
     void name(const Char* p, size_t length, const basic_parsing_context<Char>& context)
 Output name event for a name-value pair. Uses `do_name`.
 
-    void string_value(const std::string& value)
+    void value(const std::string& value)
 Output character data event. Uses `do_string_value`.
 
-    void string_value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
 Output character data event. Uses `do_string_value`.
 
-    void longlong_value(long long value)
+    void value(long long value)
 Output signed integer event. Uses `do_longlong_value`.
 
-    void ulonglong_value(unsigned long long value)
+    void value(unsigned long long value)
 Output non-negative integer event. Uses `do_ulonglong_value`.
 
-    void double_value(double value)
+    void value(double value)
 Output floating point value event. Uses `do_double_value`.
 
-    void bool_value(bool value)
+    void value(bool value)
 Output boolean value event. Uses `do_bool_value`.
 
-    void null_value()
+    void value(null_type)
 Output null value event. Uses `do_null_value`.
 
 ### Private implementation methods

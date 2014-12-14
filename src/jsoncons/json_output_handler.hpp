@@ -60,37 +60,57 @@ public:
         do_name(p, length);
     }
 
-    void string_value(std::basic_string<Char>& value) 
+    void value(std::basic_string<Char>& value) 
     {
         do_string_value(&value[0], value.length());
     }
 
-    void string_value(const Char* p, size_t length) 
+    void value(const Char* p, size_t length) 
     {
         do_string_value(p, length);
     }
 
-    void longlong_value(long long value) 
+    void value(int value) 
     {
         do_longlong_value(value);
     }
 
-    void ulonglong_value(unsigned long long value) 
+    void value(long value) 
+    {
+        do_longlong_value(value);
+    }
+
+    void value(long long value) 
+    {
+        do_longlong_value(value);
+    }
+
+    void value(unsigned int value) 
     {
         do_ulonglong_value(value);
     }
 
-    void double_value(double value)
+    void value(unsigned long value) 
+    {
+        do_ulonglong_value(value);
+    }
+
+    void value(unsigned long long value) 
+    {
+        do_ulonglong_value(value);
+    }
+
+    void value(double value)
     {
         do_double_value(value);
     }
 
-    void bool_value(bool value) 
+    void value(bool value) 
     {
         do_bool_value(value);
     }
 
-    void null_value()
+    void value(null_type)
     {
         do_null_value();
     }
