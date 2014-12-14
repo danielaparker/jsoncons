@@ -10,6 +10,28 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 
 ### Overloaded methods
 
+    void begin_json()
+Receive begin JSON document event
+
+    void end_json()
+Receive end JSON document event
+
+    void begin_object(const parsing_context& context)
+Receive begin JSON object event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void end_object(const parsing_context& context)
+Receive end JSON object event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void begin_array(const parsing_context& context)
+Receive begin JSON array event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void end_array(const parsing_context& context)
+Receive end JSON array event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
     void name(const std::string& value, const parsing_context& context)
 Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  

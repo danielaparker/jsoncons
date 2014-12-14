@@ -21,7 +21,36 @@ class basic_json_input_handler
 {
 public:
     virtual ~basic_json_input_handler() {}
-    virtual void do_begin_json() = 0;
+
+    void begin_json()
+    {
+        do_begin_json();
+    }
+
+    void end_json()
+    {
+        do_end_json();
+    }
+
+    void begin_object(const basic_parsing_context<Char>& context)
+    {
+        do_begin_object(context);
+    }
+
+    void end_object(const basic_parsing_context<Char>& context)
+    {
+        do_end_object(context);
+    }
+
+    void begin_array(const basic_parsing_context<Char>& context)
+    {
+        do_begin_array(context);
+    }
+
+    void end_array(const basic_parsing_context<Char>& context)
+    {
+        do_end_array(context);
+    }
 
     void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
@@ -67,6 +96,8 @@ public:
     {
         do_null_value(context);
     }
+
+    virtual void do_begin_json() = 0;
 
     virtual void do_end_json() = 0;
 
