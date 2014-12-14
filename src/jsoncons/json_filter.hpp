@@ -31,74 +31,76 @@ public:
     {
     }
 
+private:
+
     virtual void do_begin_json()
     {
-        writer_->do_begin_json();
+        writer_->begin_json();
     }
 
     virtual void do_end_json()
     {
-        writer_->do_end_json();
+        writer_->end_json();
     }
 
     virtual void do_begin_object(const basic_parsing_context<Char>& context)
     {
-        writer_->do_begin_object();
+        writer_->begin_object();
     }
 
     virtual void do_end_object(const basic_parsing_context<Char>& context)
     {
-        writer_->do_end_object();
+        writer_->end_object();
     }
 
     virtual void do_begin_array(const basic_parsing_context<Char>& context)
     {
-        writer_->do_begin_array();
+        writer_->begin_array();
     }
 
     virtual void do_end_array(const basic_parsing_context<Char>& context)
     {
-        writer_->do_end_array();
+        writer_->end_array();
     }
 
     virtual void do_name(const Char* name, size_t length, 
                             const basic_parsing_context<Char>& context)
     {
-        writer_->do_name(name, length);
-    }
-
-    virtual void do_null_value(const basic_parsing_context<Char>& context)
-    {
-        writer_->do_null_value();
+        writer_->name(name, length);
     }
 
     virtual void do_string_value(const Char* value, size_t length, 
                               const basic_parsing_context<Char>& context)
     {
-        writer_->do_string_value(value, length);
-    }
-
-    virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
-    {
-        writer_->do_double_value(value);
+        writer_->string_value(value, length);
     }
 
     virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        writer_->do_longlong_value(value);
+        writer_->longlong_value(value);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, 
                                  const basic_parsing_context<Char>& context)
     {
-        writer_->do_ulonglong_value(value);
+        writer_->ulonglong_value(value);
+    }
+
+    virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
+    {
+        writer_->double_value(value);
     }
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        writer_->do_bool_value(value);
+        writer_->bool_value(value);
     }
-private:
+
+    virtual void do_null_value(const basic_parsing_context<Char>& context)
+    {
+        writer_->null_value();
+    }
+
     basic_json_output_handler<Char>* writer_;
 };
 

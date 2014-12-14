@@ -90,6 +90,13 @@ public:
         }
     }
 
+    basic_json<Char,Alloc>& root()
+    {
+        return root_;
+    }
+
+private:
+
     virtual void do_begin_json()
     {
     }
@@ -151,51 +158,20 @@ public:
         }
     }
 
-    virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>&)
+    virtual void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&)
     {
-        stack_.back().name_ = std::basic_string<Char>(name,length);
+        stack_.back().name_ = std::basic_string<Char>(p,length);
     }
 
-    virtual void do_null_value(const basic_parsing_context<Char>&)
+    virtual void do_string_value(const Char* p, size_t length, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(basic_json<Char,Alloc>::null));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>::null);
-        }
-    }
-
-    basic_json<Char,Alloc>& root()
-    {
-        return root_;
-    }
-
-// value(...) implementation
-
-    virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>&)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value,length));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(p,length));
         } 
         else 
         {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>(value,length));
-        }
-    }
-
-    virtual void do_double_value(double value, const basic_parsing_context<Char>&)
-    {
-        if (stack_.back().is_object())
-        {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
-        } 
-        else
-        {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(p,length));
         }
     }
 
@@ -223,6 +199,18 @@ public:
         }
     }
 
+    virtual void do_double_value(double value, const basic_parsing_context<Char>&)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+        }
+    }
+
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
@@ -232,6 +220,18 @@ public:
         else
         {
             stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+        }
+    }
+
+    virtual void do_null_value(const basic_parsing_context<Char>&)
+    {
+        if (stack_.back().is_object())
+        {
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(basic_json<Char,Alloc>::null));
+        } 
+        else
+        {
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::null);
         }
     }
 
