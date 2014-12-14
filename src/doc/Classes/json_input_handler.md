@@ -68,7 +68,7 @@ line and column information is provided in the [parsing_context](parsing_context
 Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-### Implementing methods
+### Private virtual implementing methods
 
     virtual void do_begin_json()
 Receive begin JSON document event

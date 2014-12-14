@@ -37,13 +37,14 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         {
         }
 
+    private:
         virtual void do_name(const char* p, int length, const parsing_context& context)
         {
             string name(p,length);
             name_ = name;
             if (name != "name")
             {
-                parent().do_name(p, length, context);
+                parent().name(p, length, context);
             }
         }
 
@@ -72,10 +73,10 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
             else
             {
-                parent().do_string_value(p, length, context);
+                parent().string_value(p, length, context);
             }
         }
-    private:
+
         std::string name_;
     };
 

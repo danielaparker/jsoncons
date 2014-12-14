@@ -119,34 +119,40 @@ public:
     {
     }
 
+    basic_json_input_handler<Char>& parent()
+    {
+        return *parent_;
+    }
+
+private:
     virtual void do_begin_json()
     {
-        parent_->do_begin_json();
+        parent_->begin_json();
     }
 
     virtual void do_end_json()
     {
-        parent_->do_end_json();
+        parent_->end_json();
     }
 
     virtual void do_begin_object(const basic_parsing_context<Char>& context)
     {
-        parent_->do_begin_object(context);
+        parent_->begin_object(context);
     }
 
     virtual void do_end_object(const basic_parsing_context<Char>& context)
     {
-        parent_->do_end_object(context);
+        parent_->end_object(context);
     }
 
     virtual void do_begin_array(const basic_parsing_context<Char>& context)
     {
-        parent_->do_begin_array(context);
+        parent_->begin_array(context);
     }
 
     virtual void do_end_array(const basic_parsing_context<Char>& context)
     {
-        parent_->do_end_array(context);
+        parent_->end_array(context);
     }
 
     virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
@@ -154,12 +160,6 @@ public:
         parent_->name(name, length, context);
     }
 
-    basic_json_input_handler<Char>& parent()
-    {
-        return *parent_;
-    }
-
-// value(...) implementation
     virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context)
     {
         parent_->string_value(value,length,context);
@@ -189,7 +189,7 @@ public:
     {
         parent_->null_value(context);
     }
-private:
+
     basic_json_input_output_adapter<Char> input_output_adapter_;
     basic_json_input_handler<Char>* parent_;
 };
