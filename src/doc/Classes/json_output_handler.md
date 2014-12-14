@@ -58,38 +58,38 @@ Output null value event. Uses `do_null_value`.
 ### Private implementation methods
 
     virtual void do_begin_json()
-Handle begin JSON document event
+Receive begin JSON document event
 
     virtual void do_end_json()
-Handle end JSON document event
+Receive end JSON document event
 
     virtual void do_end_object()
-Handle end JSON object event
+Receive end JSON object event
 
     virtual void do_begin_array()
-Handle begin JSON array event
+Receive begin JSON array event
 
     virtual void do_end_array()
-Handle end JSON array event
+Receive end JSON array event
 
     virtual void do_name(const char* p, size_t length)
-Handle name event for name-value pair
+Receive name event for name-value pair
 
     virtual void do_string_value(const char* p, size_t length)
-Handle character data event
+Receive character data event
 
     virtual void do_longlong_value(long long value)
-Handle signed integer value event
+Receive signed integer value event
 
     virtual void do_ulonglong_value(unsigned long long value)
-Handle non-negative integer value event
+Receive non-negative integer value event
 
     virtual void do_double_value(double value)
-Handle floating point value event
+Receive floating point value event
 
     virtual void do_bool_value(bool value)
-Handle a boolean value event
+Receive a boolean value event
 
     virtual void do_null_value()
-Handle a `null` value event
+Receive a `null` value event
 
