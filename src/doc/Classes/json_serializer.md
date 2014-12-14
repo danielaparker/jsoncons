@@ -30,47 +30,6 @@ Constructs a new serializer that writes to the specified output stream using the
 
     virtual ~json_serializer()
 
-### Implementing methods
-
-    virtual void do_begin_json()
-Receive begin JSON document event
-
-    virtual void do_end_json()
-Receive end JSON document event
-
-    virtual void do_begin_object()
-Receive begin JSON object event
-
-    virtual void do_end_object()
-Receive end JSON object event
-
-    virtual void do_begin_array()
-Receive begin JSON array event
-
-    virtual void do_end_array()
-Receive end JSON object event
-
-    virtual void do_name(const char* p, size_t length)
-Receive name event for name-value pair
-
-    virtual void do_string_value(const char* p, size_t length)
-Receive character data event
-
-    virtual void do_longlong_value(long long value)
-Receive signed integer value event
-
-    virtual void do_ulonglong_value(unsigned long long value)
-Receive non-negative integer value event
-
-    virtual void do_double_value(double value)
-Receive floating point value event
-
-    virtual void do_bool_value(bool value)
-Receive a boolean value event
-
-    virtual void do_null_value()
-Receive a `null` value event
-
 ### Examples
 
 ### Feeding json events directly to a `json_serializer`
@@ -85,20 +44,21 @@ Receive a `null` value event
 
     int main()
     {
-        matrix<double> A(2,2);
-        A(0,0) = 1;
-        A(0,1) = 2;
-        A(1,0) = 3;
-        A(1,1) = 4;
+        matrix<double> A(2, 2);
+        A(0, 0) = 1;
+        A(0, 1) = 2;
+        A(1, 0) = 3;
+        A(1, 1) = 4;
 
-        json_serializer os(std::cout, true);  // pretty printing
+        output_format format;
+        json_serializer os(std::cout, format, true); // pretty printing
         os.begin_array();
         for (size_t i = 0; i < A.size1(); ++i)
         {
             os.begin_array();
             for (size_t j = 0; j < A.size2(); ++j)
             {
-                os.value(A(i, j));
+                os.double_value(A(i, j));
             }
             os.end_array();
         }

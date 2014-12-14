@@ -65,6 +65,8 @@ public:
     {
     }
 
+private:
+    // Implementing methods
     virtual void do_begin_json()
     {
     }
@@ -142,8 +144,6 @@ public:
 
         end_value();
     }
-
-// value(...) implementation
 
     virtual void do_string_value(const Char* value, size_t length)
     {

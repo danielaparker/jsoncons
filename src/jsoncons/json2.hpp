@@ -836,48 +836,48 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     switch (type_)
     {
     case string_t:
-        handler.value(&internal_string()[0],internal_string().length());
+        handler.string_value(&internal_string()[0],internal_string().length());
         break;
     case double_t:
-        handler.value(value_.double_value_);
+        handler.double_value(value_.double_value_);
         break;
     case longlong_t:
-        handler.value(value_.longlong_value_);
+        handler.longlong_value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        handler.value(value_.ulonglong_value_);
+        handler.ulonglong_value(value_.ulonglong_value_);
         break;
     case bool_t:
-        handler.value(value_.bool_value_);
+        handler.bool_value(value_.bool_value_);
         break;
     case null_t:
-        handler.do_null_value();
+        handler.null_value();
         break;
     case empty_object_t:
-        handler.do_begin_object();
-        handler.do_end_object();
+        handler.begin_object();
+        handler.end_object();
         break;
     case object_t:
         {
-            handler.do_begin_object();
+            handler.begin_object();
             json_object<Char, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.do_name(&(it->name())[0],it->name().length());
+                handler.name(&(it->name())[0],it->name().length());
                 it->value().to_stream(handler);
             }
-            handler.do_end_object();
+            handler.end_object();
         }
         break;
     case array_t:
         {
-            handler.do_begin_array();
+            handler.begin_array();
             json_array<Char, Alloc> *o = value_.array_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);
             }
-            handler.do_end_array();
+            handler.end_array();
         }
         break;
     case json_any_t:

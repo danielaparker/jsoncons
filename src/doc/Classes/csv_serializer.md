@@ -24,41 +24,6 @@ Constructs a `csv_serializer` that is associated with an output stream
 
     virtual ~json_serializer()
 
-### Event handler methods
-
-    virtual void do_begin_object()
-Receive begin JSON object event
-
-    virtual void do_end_object()
-Receive end JSON object event
-
-    virtual void do_begin_array()
-Receive begin JSON array event
-
-    virtual void do_end_array()
-Receive end JSON object event
-
-    virtual void do_name(const char* p, size_t length)
-Receive name event for name-value pair
-
-    virtual void do_string_value(const std::string& val)
-Receive character data event
-
-    virtual void do_longlong_value(long long val)
-Receive signed integer value event
-
-    virtual void do_ulonglong_value(unsigned long long val)
-Receive non-negative integer value event
-
-    virtual void do_double_value(double val)
-Receive floating point value event
-
-    virtual void do_bool_value(bool val)
-Receive a boolean value event
-
-    virtual void do_null_value()
-Receive a `null` value event
-
 ### Examples
 
 ### Serializing an array of json values to a comma delimted file

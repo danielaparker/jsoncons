@@ -19,69 +19,80 @@ public:
     virtual ~basic_json_output_handler() {}
 
     // Overloaded methods
-    void value(const std::basic_string<Char>& value) 
+
+    void begin_json()
     {
-        do_string_value(&value[0], value.length());
+        do_begin_json();
     }
 
-    void value(const Char* value, size_t length) 
+    void end_json()
     {
-        do_string_value(value, length);
+        do_end_json();
     }
 
-    void value(null_type)
+    void begin_object()
     {
-        do_null_value();
+        do_begin_object();
     }
 
-    void value(float value)
+    void end_object()
     {
-        do_double_value((double)value);
+        do_end_object();
     }
 
-    void value(double value)
+    void begin_array()
     {
-        do_double_value(value);
+        do_begin_array();
     }
 
-    void value(int value) 
+    void end_array()
     {
-        do_longlong_value((long long)value);
-    }
-
-    void value(unsigned int value)
-    {
-        do_ulonglong_value((unsigned long long)value);
-    }
-
-    void value(long value) 
-    {
-        do_longlong_value((long long)value);
-    }
-
-    void value(unsigned long value)
-    {
-        do_ulonglong_value((unsigned long long)value);
-    }
-
-    void value(long long value) 
-    {
-        do_longlong_value(value);
-    }
-
-    void value(unsigned long long value)
-    {
-        do_ulonglong_value(value);
-    }
-
-    void value(bool value)
-    {
-        do_bool_value(value);
+        do_end_array();
     }
 
     void name(const std::basic_string<Char>& name)
     {
         do_name(&name[0], name.length());
+    }
+
+    void name(const Char* p, size_t length) 
+    {
+        do_name(p, length);
+    }
+
+    void string_value(std::basic_string<Char>& value) 
+    {
+        do_string_value(&value[0], value.length());
+    }
+
+    void string_value(const Char* p, size_t length) 
+    {
+        do_string_value(p, length);
+    }
+
+    void longlong_value(long long value) 
+    {
+        do_longlong_value(value);
+    }
+
+    void ulonglong_value(unsigned long long value) 
+    {
+        do_ulonglong_value(value);
+    }
+
+    void double_value(double value)
+    {
+        do_double_value(value);
+    }
+
+    void bool_value(bool value) 
+    {
+        do_bool_value(value);
+    }
+
+    void null_value()
+    {
+        do_null_value();
     }
 
 //  Implementation start here
