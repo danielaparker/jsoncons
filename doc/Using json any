@@ -330,8 +330,8 @@ matrix&lt;double&gt;&amp; B = obj[&quot;mydata&quot;].any_cast&lt;matrix&lt;doub
 
 <p>You can, however, implement a function template specialization of <code>serialize</code> in 
 the <code>jsoncons</code> namespace, in a header file, like this:</p>
-<pre><code>#ifndef MY_CUSTOM_DATA_HPP
-#define MY_CUSTOM_DATA_HPP
+<pre><code>#ifndef MY_ANY_SPECIALIZATIONS_HPP
+#define MY_ANY_SPECIALIZATIONS_HPP
 
 #include &quot;jsoncons/json.hpp&quot;
 #include &lt;boost/numeric/ublas/matrix.hpp&gt;
@@ -347,7 +347,7 @@ void serialize(json_output_handler&amp; os, const boost::numeric::ublas::matrix&
         os.begin_array();
         for (size_t j = 0; j &lt; A.size2(); ++j)
         {
-            os.double_value(A(i, j));
+            os.value(A(i, j));
         }
         os.end_array();
     }
