@@ -45,10 +45,8 @@ representations of strings but preserve efficiency.
   made private. 
   
 - Public non-virtual interface methods begin_json, end_json,
-  begin_object, end_object, begin_array, end_array, name, string_value,
-  longlong_value, ulonglong_value, double_value, bool_value and null_value 
+  begin_object, end_object, begin_array, end_array, name
   have been added to json_input_handler and json_output_handler. 
-  The overloaded `value` methods have been removed.
 
 The rationale for these changes is to follow best C++ practices by making the
 json_input_handler and json_output_handler interfaces public non-virtual and 
