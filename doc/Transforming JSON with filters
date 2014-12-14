@@ -309,7 +309,7 @@ img {
 
 <p><code>address-book.json</code></p>
 <p>Now suppose you want to break the name into a first name and last name, and report a warning when <code>name</code> does not contain a space or tab separator. Pretend that the file <code>address-book.json</code> is too large to hold in memory.</p>
-<p>You can achieve the desired result by subclassing the <a href="json_filter">json_filter</a> class, overriding the default methods for name and value events, and redirecting modified events to the parent <a href="json_input_handler">json<em>input</em>handler</a> (which in this example will forward them to a <a href="json_serializer">json_serializer</a>.) </p>
+<p>You can achieve the desired result by subclassing the <a href="json_filter">json_filter</a> class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent <a href="json_input_handler">json<em>input</em>handler</a> (which in this example will forward them to a <a href="json_serializer">json_serializer</a>.) </p>
 <pre><code>#include &quot;jsoncons/json_serializer.hpp&quot;
 #include &quot;jsoncons/json_filter.hpp&quot;
 #include &quot;jsoncons/json_reader.hpp&quot;
