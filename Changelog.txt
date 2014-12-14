@@ -10,34 +10,49 @@ Enhancements:
   The allocator type is not used for structures including vectors and strings that use large 
   or variable amounts of memory, these always use the default allocators.
 
-Breaking changes (but only if you've implemented your own input and output handlers):
+Breaking changes (if you've implemented your own input and output handlers, or if you've
+passed json events to input and output handlers directly):
 
 - The input handler virtual method 
   `name(const std::string& name, const parsing_context& context)` 
   has been changed to
-  `write_name(const char* p, size_t length, const parsing_context& context)` 
+  `do_name(const char* p, size_t length, const parsing_context& context)` 
 
 - The output handler virtual method 
   `name(const std::string& name)` 
   has been changed to
-  `write_name(const char* p, size_t length)` 
+  `do_name(const char* p, size_t length)` 
 
 - The input handler virtual method 
   `string_value(const std::string& value, const parsing_context& context)` 
   has been changed to
-  `write_string(const char* p, size_t length, const parsing_context& context)` 
+  `do_string_value(const char* p, size_t length, const parsing_context& context)` 
 
 - The output handler virtual method 
   `string_value(const std::string& value)` 
   has been changed to
-  `write_string(const char* p, size_t length)` 
+  `do_string_value(const char* p, size_t length)` 
 
-The rationale for these changes is to allow different internal
-representations of strings but preserve efficieny. 
+The rationale for the method parameter changes is to allow different internal
+representations of strings but preserve efficiency. 
 
-- The input and output handler virtual methods double_value, 
-  longlong_value, ulonglong_value and bool_value have been renamed to 
-  write_string, write_double, write_longlong, write_ulonglong, and write_bool.
+- The input and output handler virtual implementation methods begin_json, end_json,
+  begin_object, end_object, begin_array, end_array, name, string_value, 
+  longlong_value, ulonglong_value, double_value, bool_value and null_value 
+  have been renamed to do_begin_json, do_end_json, do_begin_object, do_end_object, 
+  do_begin_array, do_end_array, do_name, do_string_value, do_longlong_value, 
+  do_ulonglong_value, do_double_value, do_bool_value and do_null_value and have been 
+  made private. 
+  
+- Public non-virtual interface methods begin_json, end_json,
+  begin_object, end_object, begin_array, end_array, name, string_value,
+  longlong_value, ulonglong_value, double_value, bool_value and null_value 
+  have been added to json_input_handler and json_output_handler. 
+  The overloaded `value` methods have been removed.
+
+The rationale for these changes is to follow best C++ practices by making the
+json_input_handler and json_output_handler interfaces public non-virtual and 
+the implementations private virtual. Refer to the documentation and tutorials for details.   
 
 Bug fixes:
 

@@ -23,7 +23,7 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
-## What's new since Release 0.94.1
+## What's new on master since Release 0.94.1
 
 - A template method `any_cast` has been added to the `json` class.
 
@@ -32,9 +32,11 @@ The library has a number of features, which are listed below:
   The allocator type is not used for structures including vectors and strings that use large 
   or variable amounts of memory, these always use the default allocators.
 
-- If you have implemented your own input and output handlers that derive from 
-  `json_input_handler` or `json_output_handler`, you will need to make some
-  changes to method signatures, refer to the Changelog for details.
+- `json_input_handler` and `json_output_handler` have been changed to make the interfaces public 
+  non-virtual and the implementations private virtual. If you have implemented your own input 
+  and output handlers, or have passed json events to serializers or deserializers directly,
+  you will need to make changes to your code, refer to the Changelog, and to the revised
+  documentation and tutorials for details.
 
 - A bug has been fixed in `csv_reader`
 
