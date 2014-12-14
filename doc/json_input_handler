@@ -340,37 +340,37 @@ line and column information is provided in the <a href="parsing_context">parsing
 
 <p>Pass name event for a name-value pair. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.  Uses <code>do_name</code>.</p>
-<pre><code>void string_value(const std::string&amp; value, const parsing_context&amp; context)
+<pre><code>void value(const std::string&amp; value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass character data event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
-<pre><code>void string_value(const Char* p, size_t length, const basic_parsing_context&lt;Char&gt;&amp; context)
+<pre><code>void value(const Char* p, size_t length, const basic_parsing_context&lt;Char&gt;&amp; context)
 </code></pre>
 
 <p>Pass character data event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
-<pre><code>void longlong_value(long long value, const parsing_context&amp; context)
+<pre><code>void value(long long value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass signed integer event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_longlong_value</code>.</p>
-<pre><code>void ulonglong_value(unsigned long long value, const parsing_context&amp; context)
+<pre><code>void value(unsigned long long value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass non-negative integer event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_ulonglong_value</code>.</p>
-<pre><code>void double_value(double value, const parsing_context&amp; context)
+<pre><code>void value(double value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass floating point value event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_double_value</code>.</p>
-<pre><code>void bool_value(bool value, const parsing_context&amp; context)
+<pre><code>void value(bool value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass boolean value event. Contextual information including
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_bool_value</code>.</p>
-<pre><code>void null_value(const parsing_context&amp; context)
+<pre><code>void value(const parsing_context&amp; context)
 </code></pre>
 
 <p>Pass null value event. Contextual information including
