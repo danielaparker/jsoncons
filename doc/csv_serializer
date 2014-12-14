@@ -316,51 +316,6 @@ img {
 <pre><code>virtual ~json_serializer()
 </code></pre>
 
-<h3>Event handler methods</h3>
-<pre><code>virtual void begin_object()
-</code></pre>
-
-<p>Receive begin JSON object event</p>
-<pre><code>virtual void end_object()
-</code></pre>
-
-<p>Receive end JSON object event</p>
-<pre><code>virtual void begin_array()
-</code></pre>
-
-<p>Receive begin JSON array event</p>
-<pre><code>virtual void end_array()
-</code></pre>
-
-<p>Receive end JSON object event</p>
-<pre><code>virtual void write_name(const char* p, size_t length)
-</code></pre>
-
-<p>Receive name event for name-value pair</p>
-<pre><code>virtual void write_string(const std::string&amp; val)
-</code></pre>
-
-<p>Receive character data event</p>
-<pre><code>virtual void write_longlong(long long val)
-</code></pre>
-
-<p>Receive signed integer value event</p>
-<pre><code>virtual void write_ulonglong(unsigned long long val)
-</code></pre>
-
-<p>Receive non-negative integer value event</p>
-<pre><code>virtual void write_double(double val)
-</code></pre>
-
-<p>Receive floating point value event</p>
-<pre><code>virtual void write_bool(bool val)
-</code></pre>
-
-<p>Receive a boolean value event</p>
-<pre><code>virtual void write_null()
-</code></pre>
-
-<p>Receive a <code>null</code> value event</p>
 <h3>Examples</h3>
 <h3>Serializing an array of json values to a comma delimted file</h3>
 <h4>JSON input file</h4>

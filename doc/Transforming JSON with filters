@@ -324,51 +324,50 @@ class my_json_filter : public json_filter
 {
 public:
     my_json_filter(json_output_handler&amp; parent)
-        : json_filter(parent)
+       : json_filter(parent)
     {
     }
 
-virtual void write_name(const char* p, int length, 
-                        const parsing_context&amp; context)
-{
-    string name(p,length);
-    name_ = name;
-    if (name != &quot;name&quot;)
+private:
+    virtual void do_name(const char* p, int length, const parsing_context&amp; context)
     {
-        parent().write_name(p, length, context);
-    }
-}
-
-virtual void write_string(const char* p, int length, 
-                          const parsing_context&amp; context)
-{
-    if (name_ == &quot;name&quot;)
-    {
-        string value(p,length);
-        size_t end_first = value.find_first_of(&quot; \t&quot;);
-        size_t start_last = value.find_first_not_of(&quot; \t&quot;, end_first);
-        parent().name(&quot;first-name&quot;, context);
-        std::string first = value.substr(0, end_first);
-        parent().value(first, context); // use convenience overload
-        if (start_last != std::string::npos)
+        string name(p,length);
+        name_ = name;
+        if (name != &quot;name&quot;)
         {
-            parent().name(&quot;last-name&quot;, context);
-            std::string last = value.substr(start_last);
-            parent().value(last, context); // use convenience overload
+            parent().name(p, length, context);
+        }
+    }
+
+    virtual void do_string_value(const char* p, int length, const parsing_context&amp; context)
+    {
+        if (name_ == &quot;name&quot;)
+        {
+            string value(p,length);
+            size_t end_first = value.find_first_of(&quot; \t&quot;);
+            size_t start_last = value.find_first_not_of(&quot; \t&quot;, end_first);
+            parent().name(&quot;first-name&quot;, context);
+            std::string first = value.substr(0, end_first);
+            parent().string_value(first, context); 
+            if (start_last != std::string::npos)
+            {
+                parent().name(&quot;last-name&quot;, context);
+                std::string last = value.substr(start_last);
+                parent().string_value(last, context); 
+            }
+            else
+            {
+                std::cerr &lt;&lt; &quot;Incomplete name \&quot;&quot; &lt;&lt; value
+                   &lt;&lt; &quot;\&quot; at line &quot; &lt;&lt; context.line_number()
+                   &lt;&lt; &quot; and column &quot; &lt;&lt; context.column_number() &lt;&lt; std::endl;
+            }
         }
         else
         {
-            std::cerr &lt;&lt; &quot;Incomplete name \&quot;&quot; &lt;&lt; value
-               &lt;&lt; &quot;\&quot; at line &quot; &lt;&lt; context.line_number()
-               &lt;&lt; &quot; and column &quot; &lt;&lt; context.column_number() &lt;&lt; std::endl;
+            parent().string_value(p, length, context);
         }
     }
-    else
-    {
-        parent().write_string(p, length, context);
-    }
-}
-private:
+
     std::string name_;
 };
 </code></pre>
