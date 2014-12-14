@@ -851,33 +851,33 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
         handler.value(value_.bool_value_);
         break;
     case null_t:
-        handler.write_null();
+        handler.do_null_value();
         break;
     case empty_object_t:
-        handler.begin_object();
-        handler.end_object();
+        handler.do_begin_object();
+        handler.do_end_object();
         break;
     case object_t:
         {
-            handler.begin_object();
+            handler.do_begin_object();
             json_object<Char, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.write_name(&(it->name())[0],it->name().length());
+                handler.do_name(&(it->name())[0],it->name().length());
                 it->value().to_stream(handler);
             }
-            handler.end_object();
+            handler.do_end_object();
         }
         break;
     case array_t:
         {
-            handler.begin_array();
+            handler.do_begin_array();
             json_array<Char, Alloc> *o = value_.array_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);
             }
-            handler.end_array();
+            handler.do_end_array();
         }
         break;
     case json_any_t:

@@ -408,12 +408,12 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 
     std::clock_t t = std::clock();
 
-    handler.begin_array();
+    handler.do_begin_array();
     for (size_t i = 0; i < 100; ++i)
     {
-        handler.begin_object();
+        handler.do_begin_object();
         handler.name(person);
-        handler.begin_object();
+        handler.do_begin_object();
         handler.name(first_name);
         handler.value(john_first_name);
         handler.name(last_name);
@@ -425,25 +425,25 @@ BOOST_AUTO_TEST_CASE(test_big_file)
         handler.name(salary);
         handler.value((long long)70000);
         handler.name(interests);
-        handler.begin_array();
+        handler.do_begin_array();
         handler.value(reading);
         handler.value(mountain_biking);
         handler.value(hacking);
-        handler.end_array();
+        handler.do_end_array();
         handler.name(favorites);
-        handler.begin_object();
+        handler.do_begin_object();
         handler.name(color);
         handler.value(john_color);
         handler.name(sport);
         handler.value(john_sport);
         handler.name(food);
         handler.value(john_food);
-        handler.end_object();
+        handler.do_end_object();
 
-        handler.end_object();
-        handler.end_object();
+        handler.do_end_object();
+        handler.do_end_object();
     }
-    handler.end_array();
+    handler.do_end_array();
     os.flush();
     std::clock_t s = std::clock() - t;
     std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";
@@ -465,17 +465,17 @@ public:
     {
     }
 
-    virtual void write_name(const char* p, int length, const parsing_context& context)
+    virtual void do_name(const char* p, int length, const parsing_context& context)
     {
         string name(p,length);
         name_ = name;
         if (name != "name")
         {
-            parent().write_name(p, length, context);
+            parent().do_name(p, length, context);
         }
     }
 
-    virtual void write_string(const char* p, int length, const parsing_context& context)
+    virtual void do_string_value(const char* p, int length, const parsing_context& context)
     {
         if (name_ == "name")
         {
@@ -500,7 +500,7 @@ public:
         }
         else
         {
-            parent().write_string(p, length, context);
+            parent().do_string_value(p, length, context);
         }
     }
 private:

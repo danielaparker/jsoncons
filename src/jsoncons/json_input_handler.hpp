@@ -21,125 +21,125 @@ class basic_json_input_handler
 {
 public:
     virtual ~basic_json_input_handler() {}
-    virtual void begin_json() = 0;
+    virtual void do_begin_json() = 0;
 
     void value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
-        write_string(&value[0], value.length(), context);
+        do_string_value(&value[0], value.length(), context);
     }
 
     void value(const Char* value, size_t length, const basic_parsing_context<Char>& context) 
     {
-        write_string(value, length, context);
+        do_string_value(value, length, context);
     }
 
     void value(null_type, const basic_parsing_context<Char>& context)
     {
-        write_null(context);
+        do_null_value(context);
     }
 
     void value(float value, const basic_parsing_context<Char>& context)
     {
-        write_double((double)value, context);
+        do_double_value((double)value, context);
     }
 
     void value(double value, const basic_parsing_context<Char>& context)
     {
-        write_double(value, context);
+        do_double_value(value, context);
     }
 
     void value(long long value, const basic_parsing_context<Char>& context) 
     {
-        write_longlong(value,context);
+        do_longlong_value(value,context);
     }
 
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
-        write_ulonglong(value,context);
+        do_ulonglong_value(value,context);
     }
 
     void value(long value, const basic_parsing_context<Char>& context) 
     {
-        write_longlong((long)value,context);
+        do_longlong_value((long)value,context);
     }
 
     void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
-        write_ulonglong((unsigned long)value,context);
+        do_ulonglong_value((unsigned long)value,context);
     }
 
     void value(int value, const basic_parsing_context<Char>& context) 
     {
-        write_longlong((int)value,context);
+        do_longlong_value((int)value,context);
     }
 
     void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
-        write_ulonglong((unsigned int)value,context);
+        do_ulonglong_value((unsigned int)value,context);
     }
 
     void value(bool value, const basic_parsing_context<Char>& context) 
     {
-        write_bool(value,context);
+        do_bool_value(value,context);
     }
 
     void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
-        write_name(&name[0], name.length(), context);
+        do_name(&name[0], name.length(), context);
     }
 
-    virtual void end_json() = 0;
+    virtual void do_end_json() = 0;
 
-    virtual void begin_object(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_begin_object(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void end_object(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_end_object(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void begin_array(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_begin_array(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void end_array(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_end_array(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_name(const Char* name, size_t length, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context) = 0;
 
 // value(...) implementation
 
-    virtual void write_null(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_null_value(const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_string(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_double(double value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_double_value(double value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_longlong(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_ulonglong(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void write_bool(bool value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
 template <typename Char>
 class null_basic_json_input_handler : public basic_json_input_handler<Char>
 {
 public:
-    virtual void begin_json()
+    virtual void do_begin_json()
     {
     }
 
-    virtual void end_json()
+    virtual void do_end_json()
     {
     }
 
-    virtual void begin_object(const basic_parsing_context<Char>&)
+    virtual void do_begin_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_object(const basic_parsing_context<Char>&)
+    virtual void do_end_object(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void begin_array(const basic_parsing_context<Char>&)
+    virtual void do_begin_array(const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void end_array(const basic_parsing_context<Char>&)
+    virtual void do_end_array(const basic_parsing_context<Char>&)
     {
     }
 
@@ -147,27 +147,27 @@ public:
     {
     }
 
-    virtual void write_null(const basic_parsing_context<Char>&)
+    virtual void do_null_value(const basic_parsing_context<Char>&)
     {
     }
 // value(...) implementation
-    virtual void write_string(const Char*, size_t length, const basic_parsing_context<Char>&)
+    virtual void do_string_value(const Char*, size_t length, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_double(double, const basic_parsing_context<Char>&)
+    virtual void do_double_value(double, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_longlong(long long, const basic_parsing_context<Char>&)
+    virtual void do_longlong_value(long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_ulonglong(unsigned long long, const basic_parsing_context<Char>&)
+    virtual void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void write_bool(bool, const basic_parsing_context<Char>&)
+    virtual void do_bool_value(bool, const basic_parsing_context<Char>&)
     {
     }
 };

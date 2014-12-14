@@ -45,10 +45,10 @@ class basic_json_reader : private basic_parsing_context<Char>
     };
 public:
     // Structural characters
-    static const char begin_array = '[';
-    static const char begin_object = '{';
-    static const char end_array = ']';
-    static const char end_object = '}';
+    static const char do_begin_array = '[';
+    static const char do_begin_object = '{';
+    static const char do_end_array = ']';
+    static const char do_end_object = '}';
     static const char name_separator = ':';
     static const char value_separator = ',';
 
@@ -353,25 +353,25 @@ void basic_json_reader<Char>::read()
                     }
                 }
                 continue;
-            case begin_object:
+            case do_begin_object:
                 if (stack_.size() == 0)
                 {
-                    handler_->begin_json();
+                    handler_->do_begin_json();
                 }
                 stack_.push_back(stack_item(true));
                 minimum_structure_capacity_ = estimate_minimum_object_capacity();
-                handler_->begin_object(*this);
+                handler_->do_begin_object(*this);
                 minimum_structure_capacity_ = 0;
                 break;
-            case begin_array:
+            case do_begin_array:
                 if (stack_.size() == 0)
                 {
-                    handler_->begin_json();
+                    handler_->do_begin_json();
                 }
                 {
                     stack_.push_back(stack_item(false));
                     minimum_structure_capacity_ = estimate_minimum_array_capacity();
-                    handler_->begin_array(*this);
+                    handler_->do_begin_array(*this);
                     minimum_structure_capacity_ = 0;
                 }
                 break;
@@ -397,7 +397,7 @@ void basic_json_reader<Char>::read()
                             size_t count1 = 0;
                             if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
-                                handler_->write_name(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->do_name(&string_buffer_[0], string_buffer_.length(), *this);
                                 count1 = 0;
                                 if (buffer_[buffer_position_] == ':')
                                 {
@@ -418,13 +418,13 @@ void basic_json_reader<Char>::read()
                             }
                             else
                             {
-                                handler_->write_string(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->do_string_value(&string_buffer_[0], string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
                         }
                         break;
-                    case end_object:
+                    case do_end_object:
                         {
                             if (!stack_.back().is_object_)
                             {
@@ -438,7 +438,7 @@ void basic_json_reader<Char>::read()
                             {
                                 err_handler_->fatal_error("JPE107", "Value not found", *this);
                             }
-                            handler_->end_object(*this);
+                            handler_->do_end_object(*this);
                             stack_.pop_back();
                         }
                         if (stack_.size() > 0)
@@ -448,11 +448,11 @@ void basic_json_reader<Char>::read()
                         }
                         else
                         {
-                            handler_->end_json();
+                            handler_->do_end_json();
                             return;
                         }
                         break;
-                    case end_array:
+                    case do_end_array:
                         {
                             if (stack_.back().is_object_)
                             {
@@ -462,7 +462,7 @@ void basic_json_reader<Char>::read()
                             {
                                 err_handler_->fatal_error("JPE102", "Unexpected comma", *this);
                             }
-                            handler_->end_array(*this);
+                            handler_->do_end_array(*this);
                             stack_.pop_back();
                         }
                         if (stack_.size() > 0)
@@ -472,7 +472,7 @@ void basic_json_reader<Char>::read()
                         }
                         else
                         {
-                            handler_->end_json();
+                            handler_->do_end_json();
                             return;
                         }
                         break;
@@ -483,7 +483,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_->write_bool(true, *this);
+                        handler_->do_bool_value(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -494,7 +494,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 4;
                         column_ += 4;
-                        handler_->write_bool(false, *this);
+                        handler_->do_bool_value(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -505,7 +505,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_->write_null(*this);
+                        handler_->do_null_value(*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -656,12 +656,12 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_->write_double(d, *this);
+                            handler_->do_double_value(d, *this);
                         }
                         catch (...)
                         {
                             err_handler_->fatal_error("JPE203", "Invalid double value", *this);
-                            handler_->write_null(*this);
+                            handler_->do_null_value(*this);
                         }
                     }
                     else if (has_neg)
@@ -669,19 +669,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_->write_longlong(-d, *this);
+                            handler_->do_longlong_value(-d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->write_double(-d, *this);
+                                handler_->do_double_value(-d, *this);
                             }
                             catch (...)
                             {
                                 err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_->write_null(*this);
+                                handler_->do_null_value(*this);
                             }
                         }
                     }
@@ -690,19 +690,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_->write_ulonglong(d, *this);
+                            handler_->do_ulonglong_value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->write_double(d, *this);
+                                handler_->do_double_value(d, *this);
                             }
                             catch (...)
                             {
                                 err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_->write_null(*this);
+                                handler_->do_null_value(*this);
                             }
                         }
                     }
@@ -939,14 +939,14 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     {
         switch (buffer_[pos])
         {
-        case end_array:
+        case do_end_array:
             done = true;
             break;
-        case begin_array:
+        case do_begin_array:
             pos = skip_array(pos + 1,end);
             ++size;
             break;
-        case begin_object:
+        case do_begin_object:
             pos = skip_object(pos + 1,end);
             ++size;
             break;
@@ -1000,7 +1000,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     {
         switch (buffer_[pos])
         {
-        case end_object:
+        case do_end_object:
             done = true;
             break;
         case '\"':
@@ -1010,10 +1010,10 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
             ++size;
             ++pos;
             break;
-        case begin_array:
+        case do_begin_array:
             pos = skip_array(pos + 1,end);
             break;
-        case begin_object:
+        case do_begin_object:
             pos = skip_object(pos + 1,end);
             break;
         case 't':
@@ -1042,16 +1042,16 @@ size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
     {
         switch (buffer_[pos])
         {
-        case begin_array:
+        case do_begin_array:
             pos = skip_array(pos + 1, end);
             break;
-        case begin_object:
+        case do_begin_object:
             pos = skip_object(pos + 1, end);
             break;
         case '\"':
             pos = skip_string(pos + 1, end);
             break;
-        case end_array:
+        case do_end_array:
             done = true;
             ++pos;
             break;
@@ -1138,16 +1138,16 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
     {
         switch (buffer_[pos])
         {
-        case begin_object:
+        case do_begin_object:
             pos = skip_object(pos + 1, end);
             break;
-        case begin_array:
+        case do_begin_array:
             pos = skip_array(pos + 1, end);
             break;
         case '\"':
             pos = skip_string(pos + 1, end);
             break;
-        case end_object:
+        case do_end_object:
             done = true;
             ++pos;
             break;

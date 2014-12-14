@@ -29,17 +29,17 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
 
     output_format format;
     json_serializer os(std::cout, format, true); // pretty printing
-    os.begin_array();
+    os.do_begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {
-        os.begin_array();
+        os.do_begin_array();
         for (size_t j = 0; j < A.size2(); ++j)
         {
             os.value(A(i, j));
         }
-        os.end_array();
+        os.do_end_array();
     }
-    os.end_array();
+    os.do_end_array();
 }
 
 
