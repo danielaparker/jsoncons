@@ -339,7 +339,8 @@ private:
         }
     }
 
-    virtual void do_string_value(const char* p, int length, const parsing_context&amp; context)
+    virtual void do_string_value(const char* p, int length, 
+                                 const parsing_context&amp; context)
     {
         if (name_ == &quot;name&quot;)
         {
