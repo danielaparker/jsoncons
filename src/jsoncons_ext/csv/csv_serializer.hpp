@@ -154,20 +154,20 @@ public:
     {
     }
 
-    virtual void begin_json()
+    virtual void do_begin_json()
     {
     }
 
-    virtual void end_json()
+    virtual void do_end_json()
     {
     }
 
-    virtual void begin_object()
+    virtual void do_begin_object()
     {
         stack_.push_back(stack_item(true));
     }
 
-    virtual void end_object()
+    virtual void do_end_object()
     {
         if (stack_.size() == 2)
         {
@@ -182,12 +182,12 @@ public:
         end_value();
     }
 
-    virtual void begin_array()
+    virtual void do_begin_array()
     {
         stack_.push_back(stack_item(false));
     }
 
-    virtual void end_array()
+    virtual void do_end_array()
     {
         if (stack_.size() == 2)
         {
@@ -198,7 +198,7 @@ public:
         end_value();
     }
 
-    virtual void write_name(const Char* name, size_t length)
+    virtual void do_name(const Char* name, size_t length)
     {
         if (stack_.size() == 2)
         {
@@ -244,23 +244,23 @@ public:
         }
     }
 
-    virtual void write_null()
+    virtual void do_null_value()
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0)
             {
-                write_null(header_os_);
+                do_null_value(header_os_);
             }
             else
             {
-                write_null(*os_);
+                do_null_value(*os_);
             }
         }
     }
 // value(...) implementation
 
-    virtual void write_string(const Char* val, size_t length)
+    virtual void do_string_value(const Char* val, size_t length)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -275,7 +275,7 @@ public:
         }
     }
 
-    virtual void write_double(double val)
+    virtual void do_double_value(double val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -290,7 +290,7 @@ public:
         }
     }
 
-    virtual void write_longlong(long long val)
+    virtual void do_longlong_value(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -305,7 +305,7 @@ public:
         }
     }
 
-    virtual void write_ulonglong(unsigned long long val)
+    virtual void do_ulonglong_value(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -320,7 +320,7 @@ public:
         }
     }
 
-    virtual void write_bool(bool val)
+    virtual void do_bool_value(bool val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -417,7 +417,7 @@ private:
         end_value();
     }
 
-    virtual void write_null(std::basic_ostream<Char>& os)
+    virtual void do_null_value(std::basic_ostream<Char>& os)
     {
         begin_value(os);
 

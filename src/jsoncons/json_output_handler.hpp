@@ -21,98 +21,98 @@ public:
     // Overloaded methods
     void value(const std::basic_string<Char>& value) 
     {
-        write_string(&value[0], value.length());
+        do_string_value(&value[0], value.length());
     }
 
     void value(const Char* value, size_t length) 
     {
-        write_string(value, length);
+        do_string_value(value, length);
     }
 
     void value(null_type)
     {
-        write_null();
+        do_null_value();
     }
 
     void value(float value)
     {
-        write_double((double)value);
+        do_double_value((double)value);
     }
 
     void value(double value)
     {
-        write_double(value);
+        do_double_value(value);
     }
 
     void value(int value) 
     {
-        write_longlong((long long)value);
+        do_longlong_value((long long)value);
     }
 
     void value(unsigned int value)
     {
-        write_ulonglong((unsigned long long)value);
+        do_ulonglong_value((unsigned long long)value);
     }
 
     void value(long value) 
     {
-        write_longlong((long long)value);
+        do_longlong_value((long long)value);
     }
 
     void value(unsigned long value)
     {
-        write_ulonglong((unsigned long long)value);
+        do_ulonglong_value((unsigned long long)value);
     }
 
     void value(long long value) 
     {
-        write_longlong(value);
+        do_longlong_value(value);
     }
 
     void value(unsigned long long value)
     {
-        write_ulonglong(value);
+        do_ulonglong_value(value);
     }
 
     void value(bool value)
     {
-        write_bool(value);
+        do_bool_value(value);
     }
 
     void name(const std::basic_string<Char>& name)
     {
-        write_name(&name[0], name.length());
+        do_name(&name[0], name.length());
     }
 
 //  Implementation start here
 
-    virtual void begin_json() = 0;
+    virtual void do_begin_json() = 0;
 
-    virtual void end_json() = 0;
+    virtual void do_end_json() = 0;
 
-    virtual void write_name(const Char* name, size_t length) = 0;
+    virtual void do_name(const Char* name, size_t length) = 0;
 
-    virtual void begin_object() = 0;
+    virtual void do_begin_object() = 0;
 
-    virtual void end_object() = 0;
+    virtual void do_end_object() = 0;
 
-    virtual void begin_array() = 0;
+    virtual void do_begin_array() = 0;
 
-    virtual void end_array() = 0;
+    virtual void do_end_array() = 0;
 
 // value(...) implementation
 
-    virtual void write_null() = 0;
+    virtual void do_null_value() = 0;
 
-    virtual void write_string(const Char* value, size_t length) = 0;
+    virtual void do_string_value(const Char* value, size_t length) = 0;
 
-    virtual void write_double(double value) = 0;
+    virtual void do_double_value(double value) = 0;
 
-    virtual void write_longlong(long long value) = 0;
+    virtual void do_longlong_value(long long value) = 0;
 
-    virtual void write_ulonglong(unsigned long long value) = 0;
+    virtual void do_ulonglong_value(unsigned long long value) = 0;
 
-    virtual void write_bool(bool value) = 0;
+    virtual void do_bool_value(bool value) = 0;
 };
 
 template <typename Char>
@@ -120,57 +120,57 @@ class null_basic_json_output_handler : public basic_json_output_handler<Char>
 {
 public:
 
-    virtual void begin_json()
+    virtual void do_begin_json()
     {
     }
 
-    virtual void end_json()
+    virtual void do_end_json()
     {
     }
 
-    virtual void write_name(const Char* name, size_t length)
+    virtual void do_name(const Char* name, size_t length)
     {
     }
 
-    virtual void begin_object()
+    virtual void do_begin_object()
     {
     }
 
-    virtual void end_object()
+    virtual void do_end_object()
     {
     }
 
-    virtual void begin_array()
+    virtual void do_begin_array()
     {
     }
 
-    virtual void end_array()
+    virtual void do_end_array()
     {
     }
 
-    virtual void write_null()
+    virtual void do_null_value()
     {
     }
 
 // value(...) implementation
 
-    virtual void write_string(const Char*, size_t length)
+    virtual void do_string_value(const Char*, size_t length)
     {
     }
 
-    virtual void write_double(double)
+    virtual void do_double_value(double)
     {
     }
 
-    virtual void write_longlong(long long)
+    virtual void do_longlong_value(long long)
     {
     }
 
-    virtual void write_ulonglong(unsigned long long)
+    virtual void do_ulonglong_value(unsigned long long)
     {
     }
 
-    virtual void write_bool(bool)
+    virtual void do_bool_value(bool)
     {
     }
 
