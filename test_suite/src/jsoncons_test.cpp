@@ -408,42 +408,42 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 
     std::clock_t t = std::clock();
 
-    handler.do_begin_array();
+    handler.begin_array();
     for (size_t i = 0; i < 100; ++i)
     {
-        handler.do_begin_object();
+        handler.begin_object();
         handler.name(person);
-        handler.do_begin_object();
+        handler.begin_object();
         handler.name(first_name);
-        handler.value(john_first_name);
+        handler.string_value(john_first_name);
         handler.name(last_name);
-        handler.value(john_last_name);
+        handler.string_value(john_last_name);
         handler.name(birthdate);
-        handler.value(john_birthdate);
+        handler.string_value(john_birthdate);
         handler.name(sex);
-        handler.value(john_sex);
+        handler.string_value(john_sex);
         handler.name(salary);
-        handler.value((long long)70000);
+        handler.longlong_value(70000);
         handler.name(interests);
-        handler.do_begin_array();
-        handler.value(reading);
-        handler.value(mountain_biking);
-        handler.value(hacking);
-        handler.do_end_array();
+        handler.begin_array();
+        handler.string_value(reading);
+        handler.string_value(mountain_biking);
+        handler.string_value(hacking);
+        handler.end_array();
         handler.name(favorites);
-        handler.do_begin_object();
+        handler.begin_object();
         handler.name(color);
-        handler.value(john_color);
+        handler.string_value(john_color);
         handler.name(sport);
-        handler.value(john_sport);
+        handler.string_value(john_sport);
         handler.name(food);
-        handler.value(john_food);
-        handler.do_end_object();
+        handler.string_value(john_food);
+        handler.end_object();
 
-        handler.do_end_object();
-        handler.do_end_object();
+        handler.end_object();
+        handler.end_object();
     }
-    handler.do_end_array();
+    handler.end_array();
     os.flush();
     std::clock_t s = std::clock() - t;
     std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";

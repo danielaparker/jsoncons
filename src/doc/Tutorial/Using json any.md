@@ -49,8 +49,7 @@ the `jsoncons` namespace, in a header file, like this:
     namespace jsoncons {
 
     template<> inline 
-    void serialize(json_output_handler& os, 
-                   const boost::numeric::ublas::matrix<double>& A)
+    void serialize(json_output_handler& os, const boost::numeric::ublas::matrix<double>& A)
     {
         os.begin_array();
         for (size_t i = 0; i < A.size1(); ++i)
@@ -58,7 +57,7 @@ the `jsoncons` namespace, in a header file, like this:
             os.begin_array();
             for (size_t j = 0; j < A.size2(); ++j)
             {
-                os.value(A(i, j));
+                os.double_value(A(i, j));
             }
             os.end_array();
         }
