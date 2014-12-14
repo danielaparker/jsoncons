@@ -312,7 +312,7 @@ img {
 <li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
-<h2>What's new since Release 0.94.1</h2>
+<h2>What's new on master since Release 0.94.1</h2>
 <ul>
 <li>
 <p>A template method <code>any_cast</code> has been added to the <code>json</code> class.</p>
@@ -324,9 +324,11 @@ img {
   or variable amounts of memory, these always use the default allocators.</p>
 </li>
 <li>
-<p>If you have implemented your own input and output handlers that derive from 
-  <code>json_input_handler</code> or <code>json_output_handler</code>, you will need to make some
-  changes to method signatures, refer to the Changelog for details.</p>
+<p><code>json_input_handler</code> and <code>json_output_handler</code> have been changed to make the interfaces public 
+  non-virtual and the implementations private virtual. If you have implemented your own input 
+  and output handlers, or have passed json events to serializers or deserializers directly,
+  you will need to make changes to your code, refer to the Changelog, and to the revised
+  documentation and tutorials for details.</p>
 </li>
 <li>
 <p>A bug has been fixed in <code>csv_reader</code></p>
