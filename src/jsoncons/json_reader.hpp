@@ -418,7 +418,7 @@ void basic_json_reader<Char>::read()
                             }
                             else
                             {
-                                handler_->string_value(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -483,7 +483,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_->bool_value(true, *this);
+                        handler_->value(true, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -494,7 +494,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 4;
                         column_ += 4;
-                        handler_->bool_value(false, *this);
+                        handler_->value(false, *this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -505,7 +505,7 @@ void basic_json_reader<Char>::read()
                         }
                         buffer_position_ += 3;
                         column_ += 3;
-                        handler_->null_value(*this);
+                        handler_->value(null_type(),*this);
                         stack_.back().comma_ = false;
                         ++stack_.back().value_count_;
                         break;
@@ -656,12 +656,12 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_->double_value(d, *this);
+                            handler_->value(d, *this);
                         }
                         catch (...)
                         {
                             err_handler_->fatal_error("JPE203", "Invalid double value", *this);
-                            handler_->null_value(*this);
+                            handler_->value(null_type(),*this);
                         }
                     }
                     else if (has_neg)
@@ -669,19 +669,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_->longlong_value(-d, *this);
+                            handler_->value(-d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->double_value(-d, *this);
+                                handler_->value(-d, *this);
                             }
                             catch (...)
                             {
                                 err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_->null_value(*this);
+                                handler_->value(null_type(),*this);
                             }
                         }
                     }
@@ -690,19 +690,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_->ulonglong_value(d, *this);
+                            handler_->value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->double_value(d, *this);
+                                handler_->value(d, *this);
                             }
                             catch (...)
                             {
                                 err_handler_->fatal_error("JPE203", "Invalid integer value", *this);
-                                handler_->null_value(*this);
+                                handler_->value(null_type(),*this);
                             }
                         }
                     }

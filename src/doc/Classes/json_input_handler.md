@@ -40,31 +40,31 @@ line and column information is provided in the [parsing_context](parsing_context
 Pass name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  Uses `do_name`.
 
-    void string_value(const std::string& value, const parsing_context& context)
+    void value(const std::string& value, const parsing_context& context)
 Pass character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
-    void string_value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
 Pass character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
-    void longlong_value(long long value, const parsing_context& context)
+    void value(long long value, const parsing_context& context)
 Pass signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_longlong_value`.
 
-    void ulonglong_value(unsigned long long value, const parsing_context& context)
+    void value(unsigned long long value, const parsing_context& context)
 Pass non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_ulonglong_value`.
 
-    void double_value(double value, const parsing_context& context)
+    void value(double value, const parsing_context& context)
 Pass floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_double_value`.
 
-    void bool_value(bool value, const parsing_context& context)
+    void value(bool value, const parsing_context& context)
 Pass boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_bool_value`.
 
-    void null_value(const parsing_context& context)
+    void value(const parsing_context& context)
 Pass null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_null_value`.
 

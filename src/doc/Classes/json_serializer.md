@@ -58,7 +58,7 @@ Constructs a new serializer that writes to the specified output stream using the
             os.begin_array();
             for (size_t j = 0; j < A.size2(); ++j)
             {
-                os.double_value(A(i, j));
+                os.value(A(i, j));
             }
             os.end_array();
         }

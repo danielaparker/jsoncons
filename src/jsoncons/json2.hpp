@@ -836,22 +836,22 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     switch (type_)
     {
     case string_t:
-        handler.string_value(&internal_string()[0],internal_string().length());
+        handler.value(&internal_string()[0],internal_string().length());
         break;
     case double_t:
-        handler.double_value(value_.double_value_);
+        handler.value(value_.double_value_);
         break;
     case longlong_t:
-        handler.longlong_value(value_.longlong_value_);
+        handler.value(value_.longlong_value_);
         break;
     case ulonglong_t:
-        handler.ulonglong_value(value_.ulonglong_value_);
+        handler.value(value_.ulonglong_value_);
         break;
     case bool_t:
-        handler.bool_value(value_.bool_value_);
+        handler.value(value_.bool_value_);
         break;
     case null_t:
-        handler.null_value();
+        handler.value(null_type());
         break;
     case empty_object_t:
         handler.begin_object();
