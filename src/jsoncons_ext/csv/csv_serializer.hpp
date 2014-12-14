@@ -154,6 +154,8 @@ public:
     {
     }
 
+private:
+
     virtual void do_begin_json()
     {
     }
@@ -258,7 +260,6 @@ public:
             }
         }
     }
-// value(...) implementation
 
     virtual void do_string_value(const Char* val, size_t length)
     {
@@ -335,7 +336,6 @@ public:
         }
     }
 
-private:
     virtual void value(const Char* val, size_t length, std::basic_ostream<Char>& os)
     {
         begin_value(os);

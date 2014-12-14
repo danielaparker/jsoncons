@@ -95,7 +95,7 @@ public:
         do_null_value();
     }
 
-//  Implementation start here
+private:
 
     virtual void do_begin_json() = 0;
 
@@ -110,8 +110,6 @@ public:
     virtual void do_begin_array() = 0;
 
     virtual void do_end_array() = 0;
-
-// value(...) implementation
 
     virtual void do_null_value() = 0;
 
@@ -129,7 +127,7 @@ public:
 template <typename Char>
 class null_basic_json_output_handler : public basic_json_output_handler<Char>
 {
-public:
+private:
 
     virtual void do_begin_json()
     {
@@ -162,8 +160,6 @@ public:
     virtual void do_null_value()
     {
     }
-
-// value(...) implementation
 
     virtual void do_string_value(const Char*, size_t length)
     {
