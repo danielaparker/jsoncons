@@ -97,6 +97,7 @@ public:
         do_null_value(context);
     }
 
+private:
     virtual void do_begin_json() = 0;
 
     virtual void do_end_json() = 0;
@@ -110,8 +111,6 @@ public:
     virtual void do_end_array(const basic_parsing_context<Char>& context) = 0;
 
     virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context) = 0;
-
-// value(...) implementation
 
     virtual void do_null_value(const basic_parsing_context<Char>& context) = 0;
 

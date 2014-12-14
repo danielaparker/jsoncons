@@ -338,9 +338,9 @@ void basic_csv_reader<Char,Alloc>::read()
     line_ = 1;
     column_ = 0;
 
-    handler_->do_begin_json();
+    handler_->begin_json();
     stack_.push_back(stack_item());
-    handler_->do_begin_array(*this);
+    handler_->begin_array(*this);
     stack_.back().array_begun_ = true;
     if (assume_header_)
     {
@@ -350,9 +350,9 @@ void basic_csv_reader<Char,Alloc>::read()
     {
         read_array_of_arrays();
     }
-    handler_->do_end_array(*this);
+    handler_->end_array(*this);
     stack_.pop_back();
-    handler_->do_end_json();
+    handler_->end_json();
 }
 
 template<typename Char,class Alloc>
@@ -390,7 +390,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
         {
             if (stack_.back().array_begun_)
             {
-                handler_->do_end_array(*this);
+                handler_->end_array(*this);
             }
             stack_.pop_back();
             stack_.push_back(stack_item());
@@ -418,11 +418,11 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                     if (!stack_.back().array_begun_)
                     {
                         minimum_structure_capacity_ = row_capacity;
-                        handler_->do_begin_array(*this);
+                        handler_->begin_array(*this);
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->do_string_value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->string_value(&string_buffer_[0],string_buffer_.length(),*this);
                 }
                 else
                 {
@@ -431,11 +431,11 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                     if (!stack_.back().array_begun_)
                     {
                         minimum_structure_capacity_ = row_capacity;
-                        handler_->do_begin_array(*this);
+                        handler_->begin_array(*this);
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->do_string_value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->string_value(&string_buffer_[0],string_buffer_.length(),*this);
                 }
             }
         }
@@ -445,7 +445,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
     {
         if (stack_.back().array_begun_)
         {
-            handler_->do_end_array(*this);
+            handler_->end_array(*this);
         }
         stack_.pop_back();
     }
@@ -487,7 +487,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
         {
             if (stack_.back().array_begun_)
             {
-                handler_->do_end_object(*this);
+                handler_->end_object(*this);
             }
             stack_.pop_back();
             stack_.push_back(stack_item());
@@ -500,14 +500,14 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
             if (!stack_.back().array_begun_)
             {
                 minimum_structure_capacity_ = header.size();
-                handler_->do_begin_object(*this);
+                handler_->begin_object(*this);
                 minimum_structure_capacity_ = 0;
                 stack_.back().array_begun_ = true;
             }
             if (column_index < header.size())
             {
                 handler_->name(header[column_index],*this);
-                handler_->do_string_value(&string_buffer_[0],string_buffer_.length(),*this);
+                handler_->string_value(&string_buffer_[0],string_buffer_.length(),*this);
             }
             ++column_index;
         }
@@ -524,14 +524,14 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
                 if (!stack_.back().array_begun_)
                 {
                     minimum_structure_capacity_ = header.size();
-                    handler_->do_begin_object(*this);
+                    handler_->begin_object(*this);
                     minimum_structure_capacity_ = 0;
                     stack_.back().array_begun_ = true;
                 }
                 if (column_index < header.size())
                 {
                     handler_->name(header[column_index],*this);
-                    handler_->do_string_value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->string_value(&string_buffer_[0],string_buffer_.length(),*this);
                 }
             }
             ++column_index;
@@ -543,7 +543,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
     {
         if (stack_.back().array_begun_)
         {
-            handler_->do_end_object(*this);
+            handler_->end_object(*this);
         }
         stack_.pop_back();
     }

@@ -465,13 +465,14 @@ public:
     {
     }
 
+private:
     virtual void do_name(const char* p, int length, const parsing_context& context)
     {
         string name(p,length);
         name_ = name;
         if (name != "name")
         {
-            parent().do_name(p, length, context);
+            parent().name(p, length, context);
         }
     }
 
@@ -500,10 +501,10 @@ public:
         }
         else
         {
-            parent().do_string_value(p, length, context);
+            parent().string_value(p, length, context);
         }
     }
-private:
+
     std::string name_;
 };
 
