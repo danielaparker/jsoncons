@@ -14,32 +14,35 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
-    void value(const std::string& value, const parsing_context& context)
+    void name(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+Send name event for a name-value pair. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter.  
+
+    void string_value(const std::string& value, const parsing_context& context)
 Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(float value, const parsing_context& context)
-    void value(double value, const parsing_context& context)
-Send floating point value event. Contextual information including
+    void string_value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(int value, const parsing_context& context)
-    void value(long value, const parsing_context& context)
-    void value(long long value, const parsing_context& context)
+    void longlong_value(long long value, const parsing_context& context)
 Send signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(unsigned int value, const parsing_context& context)
-    void value(unsigned long value, const parsing_context& context)
-    void value(unsigned long long value, const parsing_context& context)
+    void ulonglong_value(unsigned long long value, const parsing_context& context)
 Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(bool value, const parsing_context& context)
+    void double_value(double value, const parsing_context& context)
+Send floating point value event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. 
+
+    void bool_value(bool value, const parsing_context& context)
 Send boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    void value(null_type, const parsing_context& context)
+    void null_value(null_type, const parsing_context& context)
 Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 

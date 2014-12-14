@@ -23,69 +23,49 @@ public:
     virtual ~basic_json_input_handler() {}
     virtual void do_begin_json() = 0;
 
-    void value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    {
+        do_name(&name[0], name.length(), context);
+    }
+
+    void name(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
+    {
+        do_name(p, length, context);
+    }
+
+    void string_value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
         do_string_value(&value[0], value.length(), context);
     }
 
-    void value(const Char* value, size_t length, const basic_parsing_context<Char>& context) 
+    void string_value(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
     {
-        do_string_value(value, length, context);
+        do_string_value(p, length, context);
     }
 
-    void value(null_type, const basic_parsing_context<Char>& context)
-    {
-        do_null_value(context);
-    }
-
-    void value(float value, const basic_parsing_context<Char>& context)
-    {
-        do_double_value((double)value, context);
-    }
-
-    void value(double value, const basic_parsing_context<Char>& context)
-    {
-        do_double_value(value, context);
-    }
-
-    void value(long long value, const basic_parsing_context<Char>& context) 
+    void longlong_value(long long value, const basic_parsing_context<Char>& context) 
     {
         do_longlong_value(value,context);
     }
 
-    void value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    void ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
         do_ulonglong_value(value,context);
     }
 
-    void value(long value, const basic_parsing_context<Char>& context) 
+    void double_value(double value, const basic_parsing_context<Char>& context)
     {
-        do_longlong_value((long)value,context);
+        do_double_value(value, context);
     }
 
-    void value(unsigned long value, const basic_parsing_context<Char>& context) 
-    {
-        do_ulonglong_value((unsigned long)value,context);
-    }
-
-    void value(int value, const basic_parsing_context<Char>& context) 
-    {
-        do_longlong_value((int)value,context);
-    }
-
-    void value(unsigned int value, const basic_parsing_context<Char>& context) 
-    {
-        do_ulonglong_value((unsigned int)value,context);
-    }
-
-    void value(bool value, const basic_parsing_context<Char>& context) 
+    void bool_value(bool value, const basic_parsing_context<Char>& context) 
     {
         do_bool_value(value,context);
     }
 
-    void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    void null_value(const basic_parsing_context<Char>& context)
     {
-        do_name(&name[0], name.length(), context);
+        do_null_value(context);
     }
 
     virtual void do_end_json() = 0;
