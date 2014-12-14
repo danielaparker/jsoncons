@@ -151,12 +151,7 @@ public:
 
     virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_->do_name(name, length, context);
-    }
-
-    virtual void do_null_value(const basic_parsing_context<Char>& context)
-    {
-        parent_->do_null_value(context);
+        parent_->name(name, length, context);
     }
 
     basic_json_input_handler<Char>& parent()
@@ -167,27 +162,32 @@ public:
 // value(...) implementation
     virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,length,context);
+        parent_->string_value(value,length,context);
     }
 
     virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        parent_->double_value(value,context);
     }
 
     virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        parent_->longlong_value(value,context);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        parent_->ulonglong_value(value,context);
     }
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        parent_->bool_value(value,context);
+    }
+
+    virtual void do_null_value(const basic_parsing_context<Char>& context)
+    {
+        parent_->null_value(context);
     }
 private:
     basic_json_input_output_adapter<Char> input_output_adapter_;
