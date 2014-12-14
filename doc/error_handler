@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>error_handler</title>
+<title>json_filter</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -291,45 +291,29 @@ img {
 </style>
 </head>
 <body>
-<pre><code>jsoncons::error_handler
+<pre><code>jsoncons::json_filter
 
-typedef basic_error_handler&lt;char&gt; error_handler
+typedef basic_json_filter&lt;char&gt; json_filter
 </code></pre>
 
-<p>When parsing JSON text with <a href="json_reader">json_reader</a>, if you need to implement
-cutomized error handling, you must implement this pure virtual class
-and pass it in the constructor of <a href="json_reader">json_reader</a>. The <code>read</code> method 
-will then report all warnings and errors through this interface.</p>
+<p>The <code>json_filter</code> class is an instantiation of the <code>basic_json_filter</code> class template that uses <code>char</code> as the character type.</p>
 <h3>Header</h3>
-<pre><code>#include &quot;jsoncons/error_handler.hpp&quot;
+<pre><code>#include &quot;jsoncons/json_filter.hpp&quot;
 </code></pre>
 
-<h3>Destructor</h3>
-<pre><code>virtual ~error_handler()
+<h3>Base classes</h3>
+<p><a href="json_input_handler">json<em>input</em>handler</a></p>
+<h3>Constructors</h3>
+<pre><code>json_filter(json_input_handler&amp; parent)
+
+json_filter(json_output_handler&amp; output_handler)
 </code></pre>
 
-<h3>Member functions</h3>
-<pre><code>virtual void warning(const std::string&amp; error_code,
-                     const std::string&amp; message,
-                     const parsing_context&amp; context) throw (json_parse_exception) = 0
+<h3>Accessors</h3>
+<pre><code>json_input_handler&amp; parent()
 </code></pre>
 
-<p>Receive a warning event. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
-line and column information is provided in the <a href="parsing_context">context</a> parameter.</p>
-<pre><code>virtual void error(const std::string&amp; error_code,
-                   const std::string&amp; message,
-                   const parsing_context&amp; context) throw (json_parse_exception) = 0
-</code></pre>
-
-<p>Receive a content error event, possibly recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
-line and column information is provided in the <a href="parsing_context">context</a> parameter. </p>
-<pre><code>virtual void fatal_error(const std::string&amp; error_code,
-                         const std::string&amp; message,
-                         const parsing_context&amp; context) throw (json_parse_exception) = 0
-</code></pre>
-
-<p>Receive a well-formedness error event, not recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
-line and column information is provided in the <a href="parsing_context">context</a> parameter. </p>
+<p>Returns a reference to the parent input handler. </p>
 
 </body>
 </html>

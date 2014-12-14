@@ -339,8 +339,7 @@ the <code>jsoncons</code> namespace, in a header file, like this:</p>
 namespace jsoncons {
 
 template&lt;&gt; inline 
-void serialize(json_output_handler&amp; os, 
-               const boost::numeric::ublas::matrix&lt;double&gt;&amp; A)
+void serialize(json_output_handler&amp; os, const boost::numeric::ublas::matrix&lt;double&gt;&amp; A)
 {
     os.begin_array();
     for (size_t i = 0; i &lt; A.size1(); ++i)
@@ -348,7 +347,7 @@ void serialize(json_output_handler&amp; os,
         os.begin_array();
         for (size_t j = 0; j &lt; A.size2(); ++j)
         {
-            os.value(A(i, j));
+            os.double_value(A(i, j));
         }
         os.end_array();
     }
