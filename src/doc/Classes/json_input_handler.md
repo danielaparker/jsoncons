@@ -11,61 +11,61 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 ### Public interface methods
 
     void begin_json()
-Pass begin JSON document event. Uses `do_begin_json`.
+Send begin JSON document event. Uses `do_begin_json`.
 
     void end_json()
-Pass end JSON document event. Uses `do_end_json`.
+Send end JSON document event. Uses `do_end_json`.
 
     void begin_object(const parsing_context& context)
-Pass begin JSON object event. Contextual information including
+Send begin JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_begin_object`.
 
     void end_object(const parsing_context& context)
-Pass end JSON object event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_end_json`.
+Send end JSON object event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_end_object`.
 
     void begin_array(const parsing_context& context)
-Pass begin JSON array event. Contextual information including
+Send begin JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_begin_array`.
 
     void end_array(const parsing_context& context)
-Pass end JSON array event. Contextual information including
+Send end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_end_array`.
 
     void name(const std::string& value, const parsing_context& context)
-Pass name event for a name-value pair. Contextual information including
+Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  Uses `do_name`.
 
-    void name(const Char* p, size_t length, const basic_parsing_context<Char>& context)
-Pass name event for a name-value pair. Contextual information including
+    void name(const Char* p, size_t length, const parsing_context& context)
+Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  Uses `do_name`.
 
     void value(const std::string& value, const parsing_context& context)
-Pass character data event. Contextual information including
+Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
-    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
-Pass character data event. Contextual information including
+    void value(const Char* p, size_t length, const parsing_context& context)
+Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
     void value(long long value, const parsing_context& context)
-Pass signed integer event. Contextual information including
+Send signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_longlong_value`.
 
     void value(unsigned long long value, const parsing_context& context)
-Pass non-negative integer event. Contextual information including
+Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_ulonglong_value`.
 
     void value(double value, const parsing_context& context)
-Pass floating point value event. Contextual information including
+Send floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_double_value`.
 
     void value(bool value, const parsing_context& context)
-Pass boolean value event. Contextual information including
+Send boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_bool_value`.
 
     void value(const parsing_context& context)
-Pass null value event. Contextual information including
+Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_null_value`.
 
 ### Private virtual implementation methods
