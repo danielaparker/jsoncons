@@ -17,12 +17,6 @@ will then report all warnings and errors through this interface.
 
 ### Member functions
 
-    virtual void warning(int error_code,
-                         const std::string& message,
-                         const parsing_context& context) throw (json_parse_exception) = 0
-Receive a warning event. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parsing_context) parameter.
-
     virtual void error(int error_code,
                        const std::string& message,
                        const parsing_context& context) throw (json_parse_exception) = 0

@@ -31,12 +31,6 @@ public:
     {
     }
 
-    virtual void warning(int error_code,
-                         const std::string& message,
-                         const parsing_context& context) throw(json_parse_exception)
-    {
-    }
-
     virtual void error(int error_code,
                        const std::string& message,
                        const parsing_context& context) throw(json_parse_exception)
@@ -66,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     std::istringstream is("{\"field1\"{}}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unexpected_end_of_object);
+    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unexpected_end_of_object);
 
     json_reader reader(is,handler,err_handler);
 
@@ -78,7 +72,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
     std::istringstream is("{\"field1\":ru}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unrecognized_value);
+    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unrecognized_value);
 
     json_reader reader(is,handler,err_handler);
 
@@ -90,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
     std::istringstream is("{\"field1\":{}");
 
     json_deserializer handler;
-	my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unexpected_eof);
+	my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unexpected_eof);
 
     json_reader reader(is,handler,err_handler);
 
@@ -102,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     std::istringstream is("{\"field1\":}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::value_not_found);
+    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::value_not_found);
 
     json_reader reader(is,handler,err_handler);
 
