@@ -9,6 +9,7 @@
 #define JSONCONS_ERROR_HANDLER_HPP
 
 #include "jsoncons/jsoncons.hpp"
+#include <system_error>
 
 namespace jsoncons {
 
@@ -80,7 +81,7 @@ public:
     {
     }
 
-    virtual void error(int error_code,
+    virtual void error(std::error_code,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 };
@@ -89,7 +90,7 @@ template <typename Char>
 class default_basic_error_handler : public basic_error_handler<Char>
 {
 public:
-    virtual void error(int,
+    virtual void error(std::error_code,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
