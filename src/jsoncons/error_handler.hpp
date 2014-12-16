@@ -81,16 +81,16 @@ public:
     {
     }
 
-    void warning(std::error_code error_code,
+    void warning(std::error_code ec,
                  const basic_parsing_context<Char>& context) throw (json_parse_exception) 
     {
-        do_warning(error_code,context);
+        do_warning(ec,context);
     }
 
-    void error(std::error_code error_code,
+    void error(std::error_code ec,
                const basic_parsing_context<Char>& context) throw (json_parse_exception) 
     {
-        do_error(error_code,context);
+        do_error(ec,context);
     }
 
 private:
@@ -110,10 +110,10 @@ private:
     {
     }
 
-    virtual void do_error(std::error_code error_code,
+    virtual void do_error(std::error_code ec,
                           const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
-        throw json_parse_exception(error_code.message(),context.line_number(),context.column_number());
+        throw json_parse_exception(ec.message(),context.line_number(),context.column_number());
     }
 };
 

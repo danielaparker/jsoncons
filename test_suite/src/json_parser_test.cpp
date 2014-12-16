@@ -32,12 +32,12 @@ public:
     }
 
 private:
-    virtual void do_error(std::error_code error_code,
+    virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {
-        BOOST_CHECK(error_code.category() == json_parser_category());
-        BOOST_CHECK(error_code.value() == error_code_);
-        throw json_parse_exception(error_code.message(),context.line_number(),context.column_number());
+        BOOST_CHECK(ec.category() == json_parser_category());
+        BOOST_CHECK(ec.value() == error_code_);
+        throw json_parse_exception(ec.message(),context.line_number(),context.column_number());
     }
 
     int error_code_;
