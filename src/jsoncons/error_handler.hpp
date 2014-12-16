@@ -10,19 +10,6 @@
 
 #include "jsoncons/jsoncons.hpp"
 
-// Error codes
-//
-// JPE001 Informational
-// JPE101 Unexpected end of file
-// JPE102 Unexpected value separator
-// JPE103 Unexpected end of object
-// JPE104 Unexpected end of array
-// JPE105 Unrecognized value
-// JPE106 Expected name-value separator
-// JPE201 Illegal character
-// JPE202 Invalid codepoint
-// JPE203 Invalid number
-
 namespace jsoncons {
 
 class json_parse_exception : public json_exception
@@ -93,10 +80,6 @@ public:
     {
     }
 
-    virtual void warning(int error_code,
-                         const std::string& message,
-                         const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
-
     virtual void error(int error_code,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
@@ -110,12 +93,6 @@ template <typename Char>
 class default_basic_error_handler : public basic_error_handler<Char>
 {
 public:
-    virtual void warning(int,
-                         const std::string&,
-                         const basic_parsing_context<Char>&) throw (json_parse_exception)
-    {
-        // Do nothing
-    }
     virtual void error(int,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception)

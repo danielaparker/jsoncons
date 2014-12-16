@@ -12,11 +12,6 @@
 
 ### Member functions
 
-    virtual void warning(int error_code,
-                         const std::string& message,
-                         const parsing_context& context) throw (json_parse_exception)
-Does nothing
-
     virtual void error(int error_code,
                        const std::string& message,
                        const parsing_context& context) throw (json_parse_exception)
