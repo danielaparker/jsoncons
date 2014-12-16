@@ -17,10 +17,12 @@ using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
 using jsoncons::error_handler;
+using jsoncons::default_error_handler;
 using jsoncons::json_parse_exception;
+using jsoncons::json_parser_category;
 using std::string;
 
-class my_error_handler : public error_handler
+class my_error_handler : public default_error_handler
 {
 
 public:
@@ -29,12 +31,13 @@ public:
     {
     }
 
-    virtual void error(std::error_code error_code,
-                       const std::string& message,
-                       const parsing_context& context) throw(json_parse_exception)
+private:
+    virtual void do_error(std::error_code error_code,
+                          const parsing_context& context) throw(json_parse_exception)
     {
+        BOOST_CHECK(error_code.category() == json_parser_category());
         BOOST_CHECK(error_code.value() == error_code_);
-        throw json_parse_exception(message,context.line_number(),context.column_number());
+        throw json_parse_exception(error_code.message(),context.line_number(),context.column_number());
     }
 
     int error_code_;
@@ -45,7 +48,7 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     std::istringstream is("{\"field1\"{}}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::unexpected_end_of_object);
+    my_error_handler err_handler(jsoncons::json_parser_error::expected_name_separator);
 
     json_reader reader(is,handler,err_handler);
 
