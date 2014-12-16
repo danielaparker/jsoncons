@@ -23,8 +23,4 @@ will then report all warnings and errors through this interface.
 Receive a content error event, possibly recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
 line and column information is provided in the [context](parsing_context) parameter. 
     
-    virtual void fatal_error(int error_code,
-                             const std::string& message,
-                             const parsing_context& context) throw (json_parse_exception) = 0
-Receive a well-formedness error event, not recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parsing_context) parameter. 
+

@@ -456,14 +456,14 @@ void basic_json_reader<Char>::read()
                     case value_separator:
                         if (stack_.back().value_count_ == 0)
                         {
-                            err_handler_->fatal_error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
+                            err_handler_->error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
                         }
                         stack_.back().comma_ = true;
                         break;
                     case '\"':
                         if ((stack_.back().value_count_ > 0) & !stack_.back().comma_)
                         {
-                            err_handler_->fatal_error(json_parser_error::expected_value_separator, "Expected comma", *this);
+                            err_handler_->error(json_parser_error::expected_value_separator, "Expected comma", *this);
                         }
                         {
                             parse_string();
@@ -501,15 +501,15 @@ void basic_json_reader<Char>::read()
                         {
                             if (!stack_.back().is_object_)
                             {
-                                err_handler_->fatal_error(json_parser_error::unexpected_end_of_object, "Unexpected }", *this);
+                                err_handler_->error(json_parser_error::unexpected_end_of_object, "Unexpected }", *this);
                             }
                             if (stack_.back().comma_)
                             {
-                                err_handler_->fatal_error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
+                                err_handler_->error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
                             }
                             if (stack_.back().name_count_ != stack_.back().value_count_)
                             {
-                                err_handler_->fatal_error(json_parser_error::value_not_found, "Value not found", *this);
+                                err_handler_->error(json_parser_error::value_not_found, "Value not found", *this);
                             }
                             handler_->end_object(*this);
                             stack_.pop_back();
@@ -529,11 +529,11 @@ void basic_json_reader<Char>::read()
                         {
                             if (stack_.back().is_object_)
                             {
-                                err_handler_->fatal_error(json_parser_error::unexpected_end_of_array, "Unexpected ]", *this);
+                                err_handler_->error(json_parser_error::unexpected_end_of_array, "Unexpected ]", *this);
                             }
                             if (stack_.back().comma_)
                             {
-                                err_handler_->fatal_error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
+                                err_handler_->error(json_parser_error::unexpected_value_separator, "Unexpected comma", *this);
                             }
                             handler_->end_array(*this);
                             stack_.pop_back();
@@ -552,7 +552,7 @@ void basic_json_reader<Char>::read()
                     case 't':
                         if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                         {
-                            err_handler_->fatal_error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
+                            err_handler_->error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
                         column_ += 3;
@@ -563,7 +563,7 @@ void basic_json_reader<Char>::read()
                     case 'f':
                         if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                         {
-                            err_handler_->fatal_error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
+                            err_handler_->error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
                         }
                         buffer_position_ += 4;
                         column_ += 4;
@@ -574,7 +574,7 @@ void basic_json_reader<Char>::read()
                     case 'n':
                         if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                         {
-                            err_handler_->fatal_error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
+                            err_handler_->error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
                         }
                         buffer_position_ += 3;
                         column_ += 3;
@@ -598,7 +598,7 @@ void basic_json_reader<Char>::read()
                         ++stack_.back().value_count_;
                         break;
                     default:
-                        err_handler_->fatal_error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
+                        err_handler_->error(json_parser_error::unrecognized_value, "Unrecognized value", *this);
                         break;
                     }
                     break;
@@ -613,7 +613,7 @@ void basic_json_reader<Char>::read()
 
     if (stack_.size() > 0)
     {
-        err_handler_->fatal_error(json_parser_error::unexpected_eof, "End of file", *this);
+        err_handler_->error(json_parser_error::unexpected_eof, "End of file", *this);
     }
 }
 
@@ -664,7 +664,7 @@ void basic_json_reader<Char>::parse_separator()
                 done = true;
                 break;
             default:
-                err_handler_->fatal_error(json_parser_error::unexpected_end_of_object, "Expected :", *this);
+                err_handler_->error(json_parser_error::unexpected_end_of_object, "Expected :", *this);
             }
         }
         if (!done)
@@ -672,7 +672,7 @@ void basic_json_reader<Char>::parse_separator()
             read_some();
             if (eof())
             {
-                err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+                err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
             }
         }
     }
@@ -733,7 +733,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                         }
                         catch (...)
                         {
-                            err_handler_->fatal_error(json_parser_error::invalid_number, "Invalid double value", *this);
+                            err_handler_->error(json_parser_error::invalid_number, "Invalid double value", *this);
                             handler_->value(null_type(), *this);
                         }
                     }
@@ -753,7 +753,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             }
                             catch (...)
                             {
-                                err_handler_->fatal_error(json_parser_error::invalid_number, "Invalid integer value", *this);
+                                err_handler_->error(json_parser_error::invalid_number, "Invalid integer value", *this);
                                 handler_->value(null_type(), *this);
                             }
                         }
@@ -774,7 +774,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                             }
                             catch (...)
                             {
-                                err_handler_->fatal_error(json_parser_error::invalid_number, "Invalid integer value", *this);
+                                err_handler_->error(json_parser_error::invalid_number, "Invalid integer value", *this);
                                 handler_->value(null_type(), *this);
                             }
                         }
@@ -789,7 +789,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             read_some();
             if (eof())
             {
-                err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+                err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
             }
         }
     }
@@ -889,7 +889,7 @@ void basic_json_reader<Char>::parse_string()
                         }
                         break;
                     default:
-                        err_handler_->fatal_error(json_parser_error::illegal_character, "Invalid character following \\", *this);
+                        err_handler_->error(json_parser_error::illegal_character, "Invalid character following \\", *this);
                     }
                 }
                 break;
@@ -906,7 +906,7 @@ void basic_json_reader<Char>::parse_string()
             read_some();
             if (eof())
             {
-                err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+                err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
             }
         }
     }
@@ -946,7 +946,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+                err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
             }
         }
     }
@@ -995,7 +995,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+                err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
             }
         }
     }
@@ -1239,7 +1239,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
     {
-        err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+        err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
     }
     if (cp >= min_lead_surrogate && cp <= max_lead_surrogate)
     {
@@ -1253,7 +1253,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
         }
         else
         {
-            err_handler_->fatal_error(json_parser_error::invalid_codepoint, "expecting another \\u token to begin the second half of a codepoint surrogate pair.", *this);
+            err_handler_->error(json_parser_error::invalid_codepoint, "expecting another \\u token to begin the second half of a codepoint surrogate pair.", *this);
         }
     }
     return cp;
@@ -1264,7 +1264,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
-        err_handler_->fatal_error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
+        err_handler_->error(json_parser_error::unexpected_eof, "Unexpected EOF", *this);
     }
     uint32_t cp = 0;
     size_t index = 0;
@@ -1290,13 +1290,13 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
         {
             std::ostringstream os;
             os << "Expected hexadecimal digit, found " << u << ".";
-            err_handler_->fatal_error(json_parser_error::invalid_codepoint, os.str(), *this);
+            err_handler_->error(json_parser_error::invalid_codepoint, os.str(), *this);
         }
         ++index;
     }
     if (index != 4)
     {
-        err_handler_->fatal_error(json_parser_error::invalid_codepoint, "Bad codepoint escape sequence in string: four digits expected.", *this);
+        err_handler_->error(json_parser_error::invalid_codepoint, "Bad codepoint escape sequence in string: four digits expected.", *this);
     }
     return cp;
 }

@@ -83,10 +83,6 @@ public:
     virtual void error(int error_code,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
-
-    virtual void fatal_error(int error_code,
-                             const std::string& message,
-                             const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 };
 
 template <typename Char>
@@ -96,12 +92,6 @@ public:
     virtual void error(int,
                        const std::string& message,
                        const basic_parsing_context<Char>& context) throw (json_parse_exception)
-    {
-        throw json_parse_exception(message,context.line_number(),context.column_number());
-    }
-    virtual void fatal_error(int,
-                             const std::string& message,
-                             const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
