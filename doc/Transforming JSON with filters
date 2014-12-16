@@ -329,7 +329,8 @@ public:
     }
 
 private:
-    virtual void do_name(const char* p, int length, const parsing_context&amp; context)
+    virtual void do_name(const char* p, int length, 
+                         const parsing_context&amp; context)
     {
         string name(p,length);
         name_ = name;
