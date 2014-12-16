@@ -14,12 +14,14 @@
 Constructs a `json_reader` that is associated with an input stream
 `is` of JSON text, a [json_input_handler](json_input_handler) handler that receives
 JSON events, and the specified [error_handler](error_handler).
+You must ensure that the input stream, input handler, and error handler exist as long as `json_reader` does, as `json_reader` holds pointers to but does not own these objects.
 
     json_reader(std::istream& is,
                 json_input_handler& handler)
 Constructs a `json_reader` that is associated with an input stream
 `is` of JSON text, a [json_input_handler](json_input_handler) handler that receives
 JSON events, and a [default_error_handler](default_error_handler)
+You must ensure that the input stream and input handler exist as long as `json_reader` does, as `json_reader` holds pointers to does not own these objects.
 
 ### Member functions
 

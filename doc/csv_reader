@@ -306,7 +306,8 @@ img {
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text and a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-JSON events. Uses default [csv formatting parameters](csv formatting parameters).</p>
+JSON events. Uses default [csv formatting parameters](csv formatting parameters).
+You must ensure that the input stream and input handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            const json&amp; params)
@@ -314,7 +315,8 @@ JSON events. Uses default [csv formatting parameters](csv formatting parameters)
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
-JSON events, and [csv formatting parameters](csv formatting parameters).</p>
+JSON events, and [csv formatting parameters](csv formatting parameters).
+You must ensure that the input stream and input handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            error_handler&amp; err_handler)
@@ -323,7 +325,8 @@ JSON events, and [csv formatting parameters](csv formatting parameters).</p>
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
 JSON events and the specified <a href="error_handler">error_handler</a>.
-Uses default [csv formatting parameters](csv formatting parameters).</p>
+Uses default [csv formatting parameters](csv formatting parameters).
+You must ensure that the input stream, input handler, and error handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            error_handler&amp; err_handler,
@@ -333,7 +336,8 @@ Uses default [csv formatting parameters](csv formatting parameters).</p>
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
 <code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
 JSON events, the specified <a href="error_handler">error_handler</a>,
-and [csv formatting parameters](csv formatting parameters).</p>
+and [csv formatting parameters](csv formatting parameters).
+You must ensure that the input stream, input handler, and error handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <h3>Member functions</h3>
 <pre><code>bool eof() const
 </code></pre>
