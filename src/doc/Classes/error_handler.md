@@ -15,12 +15,28 @@ will then report all warnings and errors through this interface.
 
     virtual ~error_handler()
 
-### Member functions
+### Public interface methods
 
-    virtual void error(int error_code,
-                       const std::string& message,
-                       const parsing_context& context) throw (json_parse_exception) = 0
-Receive a content error event, possibly recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
+    void warning(std::error_code error_code,
+                 const parsing_context& context) throw (json_parse_exception) = 0
+Send a warning event. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
+line and column information is provided in the [context](parsing_context) parameter. Uses `do_warning`.
+
+    void error(std::error_code error_code,
+               const parsing_context& context) throw (json_parse_exception) = 0
+Send a error event, possibly recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
+line and column information is provided in the [context](parsing_context) parameter.  Uses `do_error`.
+
+### Private virtual implementation methods
+
+    virtual void do_warning(std::error_code error_code,
+                            const parsing_context& context) throw (json_parse_exception) = 0
+Receive a warning event. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
+line and column information is provided in the [context](parsing_context) parameter.
+
+    virtual void do_error(std::error_code error_code,
+                          const parsing_context& context) throw (json_parse_exception) = 0
+Receive a error event, possibly recoverable. An [error_code](JSON parser error codes) indicates the type of error. Contextual information including
 line and column information is provided in the [context](parsing_context) parameter. 
     
 

@@ -1,23 +1,23 @@
-`JPE001` Informational
-
-`JPE101` Unexpected end of file
-
-`JPE102` Unexpected value separator
-
-`JPE103` Unexpected end of object
-
-`JPE104` Unexpected end of array
-
-`JPE105` Unrecognized value
-
-`JPE106` Expected name-value separator
-
-`JPE107` Value not found
-
-`JPE201` Illegal character
-
-`JPE202` Invalid codepoint
-
-`JPE203` Invalid number
+    namespace json_parser_error {
+        enum json_parser_error_t 
+        {
+            unexpected_eof,
+            unexpected_value_separator,
+            expected_value_separator,
+            unexpected_end_of_object,
+            unexpected_end_of_array,
+            unrecognized_value,
+            expected_name_separator,
+            illegal_control_character,
+            illegal_escaped_character,
+            invalid_codepoint_surrogate_pair,
+            invalid_hex_escape_sequence,
+            invalid_unicode_escape_sequence,
+            invalid_number,
+            value_not_found,
+            eof_reading_string_value,
+            eof_reading_numeric_value
+        };
+    }
 
 
