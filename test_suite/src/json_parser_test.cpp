@@ -29,11 +29,11 @@ public:
     {
     }
 
-    virtual void error(int error_code,
+    virtual void error(std::error_code error_code,
                        const std::string& message,
                        const parsing_context& context) throw(json_parse_exception)
     {
-        BOOST_CHECK(error_code == error_code_);
+        BOOST_CHECK(error_code.value() == error_code_);
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
 
