@@ -81,20 +81,39 @@ public:
     {
     }
 
-    virtual void error(std::error_code,
-                       const std::string& message,
-                       const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+    void warning(std::error_code error_code,
+                 const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+    {
+        do_warning(error_code,context);
+    }
+
+    void error(std::error_code error_code,
+               const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+    {
+        do_error(error_code,context);
+    }
+
+private:
+    virtual void do_warning(std::error_code,
+                            const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+
+    virtual void do_error(std::error_code,
+                          const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
 };
 
 template <typename Char>
 class default_basic_error_handler : public basic_error_handler<Char>
 {
-public:
-    virtual void error(std::error_code,
-                       const std::string& message,
-                       const basic_parsing_context<Char>& context) throw (json_parse_exception)
+private:
+    virtual void do_warning(std::error_code,
+                            const basic_parsing_context<Char>& context) throw (json_parse_exception) 
     {
-        throw json_parse_exception(message,context.line_number(),context.column_number());
+    }
+
+    virtual void do_error(std::error_code error_code,
+                          const basic_parsing_context<Char>& context) throw (json_parse_exception)
+    {
+        throw json_parse_exception(error_code.message(),context.line_number(),context.column_number());
     }
 };
 
