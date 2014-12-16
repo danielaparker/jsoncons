@@ -23,7 +23,8 @@
 namespace jsoncons {
 
 namespace json_parser_error {
-enum json_parser_error_t {
+enum json_parser_error_t 
+{
     unexpected_eof,
     unexpected_value_separator,
     expected_value_separator,

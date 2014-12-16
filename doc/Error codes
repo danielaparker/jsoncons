@@ -291,17 +291,29 @@ img {
 </style>
 </head>
 <body>
-<p><code>JPE001</code> Informational</p>
-<p><code>JPE101</code> Unexpected end of file</p>
-<p><code>JPE102</code> Unexpected value separator</p>
-<p><code>JPE103</code> Unexpected end of object</p>
-<p><code>JPE104</code> Unexpected end of array</p>
-<p><code>JPE105</code> Unrecognized value</p>
-<p><code>JPE106</code> Expected name-value separator</p>
-<p><code>JPE107</code> Value not found</p>
-<p><code>JPE201</code> Illegal character</p>
-<p><code>JPE202</code> Invalid codepoint</p>
-<p><code>JPE203</code> Invalid number</p>
+<pre><code>namespace json_parser_error {
+    enum json_parser_error_t 
+    {
+        unexpected_eof,
+        unexpected_value_separator,
+        expected_value_separator,
+        unexpected_end_of_object,
+        unexpected_end_of_array,
+        unrecognized_value,
+        expected_name_separator,
+        illegal_control_character,
+        illegal_escaped_character,
+        invalid_codepoint_surrogate_pair,
+        invalid_hex_escape_sequence,
+        invalid_unicode_escape_sequence,
+        invalid_number,
+        value_not_found,
+        eof_reading_string_value,
+        eof_reading_numeric_value
+    };
+}
+</code></pre>
+
 
 </body>
 </html>
