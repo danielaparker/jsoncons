@@ -38,7 +38,8 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         }
 
     private:
-        virtual void do_name(const char* p, int length, const parsing_context& context)
+        virtual void do_name(const char* p, int length, 
+                             const parsing_context& context)
         {
             string name(p,length);
             name_ = name;
