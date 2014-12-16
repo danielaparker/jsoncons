@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
+#include "jsoncons/json_reader.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -23,20 +24,20 @@ class my_error_handler : public error_handler
 {
 
 public:
-    my_error_handler(std::string error_code,
-                     std::string fatal_error_code)
+    my_error_handler(int error_code,
+                     int fatal_error_code)
         : error_code_(error_code),
           fatal_error_code_(fatal_error_code)
     {
     }
 
-    virtual void warning(const std::string& error_code,
+    virtual void warning(int error_code,
                          const std::string& message,
                          const parsing_context& context) throw(json_parse_exception)
     {
     }
 
-    virtual void error(const std::string& error_code,
+    virtual void error(int error_code,
                        const std::string& message,
                        const parsing_context& context) throw(json_parse_exception)
     {
@@ -44,7 +45,7 @@ public:
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
 
-    virtual void fatal_error(const std::string& error_code,
+    virtual void fatal_error(int error_code,
                              const std::string& message,
                              const parsing_context& context) throw(json_parse_exception)
     {
@@ -56,8 +57,8 @@ public:
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
 
-    std::string error_code_;
-    std::string fatal_error_code_;
+    int error_code_;
+    int fatal_error_code_;
 };
 
 BOOST_AUTO_TEST_CASE(test_missing_separator)
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     std::istringstream is("{\"field1\"{}}");
 
     json_deserializer handler;
-    my_error_handler err_handler("","JPE106");
+    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unexpected_end_of_object);
 
     json_reader reader(is,handler,err_handler);
 
@@ -77,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
     std::istringstream is("{\"field1\":ru}");
 
     json_deserializer handler;
-    my_error_handler err_handler("","JPE105");
+    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unrecognized_value);
 
     json_reader reader(is,handler,err_handler);
 
@@ -89,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
     std::istringstream is("{\"field1\":{}");
 
     json_deserializer handler;
-    my_error_handler err_handler("","JPE101");
+	my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::unexpected_eof);
 
     json_reader reader(is,handler,err_handler);
 
@@ -101,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     std::istringstream is("{\"field1\":}");
 
     json_deserializer handler;
-    my_error_handler err_handler("","JPE107");
+    my_error_handler err_handler(jsoncons::json_reader_error_code::success,jsoncons::json_reader_error_code::value_not_found);
 
     json_reader reader(is,handler,err_handler);
 
