@@ -24,10 +24,8 @@ class my_error_handler : public error_handler
 {
 
 public:
-    my_error_handler(int error_code,
-                     int fatal_error_code)
-        : error_code_(error_code),
-          fatal_error_code_(fatal_error_code)
+    my_error_handler(int error_code)
+        : error_code_(error_code)
     {
     }
 
@@ -39,20 +37,7 @@ public:
         throw json_parse_exception(message,context.line_number(),context.column_number());
     }
 
-    virtual void fatal_error(int error_code,
-                             const std::string& message,
-                             const parsing_context& context) throw(json_parse_exception)
-    {
-        if (error_code != fatal_error_code_)
-        {
-            std::cout << error_code << " " << message << std::endl;
-        }
-        BOOST_CHECK(error_code == fatal_error_code_);
-        throw json_parse_exception(message,context.line_number(),context.column_number());
-    }
-
     int error_code_;
-    int fatal_error_code_;
 };
 
 BOOST_AUTO_TEST_CASE(test_missing_separator)
@@ -60,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     std::istringstream is("{\"field1\"{}}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unexpected_end_of_object);
+    my_error_handler err_handler(jsoncons::json_parser_error::unexpected_end_of_object);
 
     json_reader reader(is,handler,err_handler);
 
@@ -72,7 +57,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
     std::istringstream is("{\"field1\":ru}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unrecognized_value);
+    my_error_handler err_handler(jsoncons::json_parser_error::unrecognized_value);
 
     json_reader reader(is,handler,err_handler);
 
@@ -84,7 +69,7 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
     std::istringstream is("{\"field1\":{}");
 
     json_deserializer handler;
-	my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::unexpected_eof);
+	my_error_handler err_handler(jsoncons::json_parser_error::unexpected_eof);
 
     json_reader reader(is,handler,err_handler);
 
@@ -96,7 +81,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     std::istringstream is("{\"field1\":}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::success,jsoncons::json_parser_error::value_not_found);
+    my_error_handler err_handler(jsoncons::json_parser_error::value_not_found);
 
     json_reader reader(is,handler,err_handler);
 
