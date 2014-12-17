@@ -52,7 +52,10 @@ The rationale for these changes is to follow best C++ practices by making the
 json_input_handler and json_output_handler interfaces public non-virtual and 
 the implementations private virtual. Refer to the documentation and tutorials for details.   
 
-- The error_handler virtual implementation methods have been renamed to do_warning and do_error, and made private. Non virtual public interface methods warning and error have been added. 
+- The error_handler virtual implementation methods have been renamed to do_warning and 
+  do_error, and made private. Non virtual public interface methods warning and error 
+  have been added. Error handling now leverages `std::error_code` to communicate parser 
+  error events in an extendable way.
 
 Bug fixes:
 
