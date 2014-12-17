@@ -24,11 +24,11 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
 
 ### Accessors
 
-    json_input_handler& content_handler()
+    json_input_handler& input_handler()
 Returns a reference to the JSON event handler. 
 
 ### Deprecated methods
 
     json_input_handler& parent()
-Replaced by `content_handler`. 
+Replaced by `input_handler`. 
 

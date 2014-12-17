@@ -121,7 +121,7 @@ public:
     {
     }
 
-    basic_json_input_handler<Char>& content_handler()
+    basic_json_input_handler<Char>& input_handler()
     {
         return *handler_;
     }
