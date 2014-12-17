@@ -62,7 +62,7 @@ public:
         do_name(p, length, context);
     }
 
-    void value(std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
         do_string_value(&value[0], value.length(), context);
     }

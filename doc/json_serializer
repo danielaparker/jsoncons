@@ -308,22 +308,22 @@ typedef basic_json_serializer&lt;char&gt; json_serializer
 </code></pre>
 
 <p>Constructs a new serializer that writes to the specified output stream.
-You must ensure that the output stream exists as long as <code>json_serializer</code> does, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
 <pre><code>json_serializer(std::ostream&amp; os, bool indenting)
 </code></pre>
 
 <p>Constructs a new serializer that writes to the specified output stream.
-You must ensure that the output stream exists as long as <code>json_serializer</code> does, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
 <pre><code>json_serializer(std::ostream&amp; os, const output_format&amp; format)
 </code></pre>
 
 <p>Constructs a new serializer that writes to the specified output stream using the specified <a href="output_format">output_format</a>.
-You must ensure that the output stream exists as long as <code>json_serializer</code> does, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
 <pre><code>json_serializer(std::ostream&amp; os, const output_format&amp; format, bool indenting)
 </code></pre>
 
 <p>Constructs a new serializer that writes to the specified output stream using the specified <a href="output_format">output_format</a>.
-You must ensure that the output stream exists as long as <code>json_serializer</code> does, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
 <h3>Destructor</h3>
 <pre><code>virtual ~json_serializer()
 </code></pre>

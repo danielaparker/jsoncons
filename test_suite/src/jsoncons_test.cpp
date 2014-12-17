@@ -460,37 +460,36 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 class my_json_filter : public json_filter
 {
 public:
-    my_json_filter(json_output_handler& parent)
-       : json_filter(parent)
+    my_json_filter(json_output_handler& handler)
+       : json_filter(handler)
     {
     }
 
 private:
     virtual void do_name(const char* p, int length, const parsing_context& context)
     {
-        string name(p,length);
-        name_ = name;
-        if (name != "name")
+        property_name_ = string(p,length);
+        if (property_name_ != "name")
         {
-            parent().name(p, length, context);
+            content_handler().name(p, length, context);
         }
     }
 
     virtual void do_string_value(const char* p, int length, const parsing_context& context)
     {
-        if (name_ == "name")
+        if (property_name_ == "name")
         {
             string value(p,length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            parent().name("first-name", context);
+            content_handler().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            parent().value(first, context); 
+            content_handler().value(first, context); 
             if (start_last != std::string::npos)
             {
-                parent().name("last-name", context);
+                content_handler().name("last-name", context);
                 std::string last = value.substr(start_last);
-                parent().value(last, context); 
+                content_handler().value(last, context); 
             }
             else
             {
@@ -501,11 +500,11 @@ private:
         }
         else
         {
-            parent().value(p, length, context);
+            content_handler().value(p, length, context);
         }
     }
 
-    std::string name_;
+    std::string property_name_;
 };
 
 BOOST_AUTO_TEST_CASE(test_filter)

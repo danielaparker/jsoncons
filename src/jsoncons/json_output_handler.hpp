@@ -60,7 +60,7 @@ public:
         do_name(p, length);
     }
 
-    void value(std::basic_string<Char>& value) 
+    void value(const std::basic_string<Char>& value) 
     {
         do_string_value(&value[0], value.length());
     }
