@@ -305,28 +305,28 @@ img {
 </code></pre>
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
-<code>is</code> of CSV text and a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
+<code>is</code> of CSV text and a <a href="json_input_handler">json<em>input</em>handler</a> that receives
 JSON events. Uses default [csv formatting parameters](csv formatting parameters).
-You must ensure that the input stream and input handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to does not own these objects.</p>
+You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            const json&amp; params)
 </code></pre>
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
-<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
+<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> that receives
 JSON events, and [csv formatting parameters](csv formatting parameters).
-You must ensure that the input stream and input handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to does not own these objects.</p>
+You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            error_handler&amp; err_handler)
 </code></pre>
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
-<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
+<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> that receives
 JSON events and the specified <a href="error_handler">error_handler</a>.
 Uses default [csv formatting parameters](csv formatting parameters).
-You must ensure that the input stream, input handler, and error handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
+You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            error_handler&amp; err_handler,
@@ -334,10 +334,10 @@ You must ensure that the input stream, input handler, and error handler exist as
 </code></pre>
 
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream
-<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> handler that receives
+<code>is</code> of CSV text, a <a href="json_input_handler">json<em>input</em>handler</a> that receives
 JSON events, the specified <a href="error_handler">error_handler</a>,
 and [csv formatting parameters](csv formatting parameters).
-You must ensure that the input stream, input handler, and error handler exist as long as <code>csv_reader</code> does, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
+You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
 <h3>Member functions</h3>
 <pre><code>bool eof() const
 </code></pre>
@@ -346,7 +346,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 <pre><code>void read()
 </code></pre>
 
-<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json<em>input</em>handler</a> handler, such as a <a href="json_deserializer">json_deserializer</a>.</p>
+<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json<em>input</em>handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.</p>
 <pre><code>size_t buffer_capacity() const
 
 void buffer_capacity(size_t buffer_capacity)

@@ -111,89 +111,95 @@ template <typename Char>
 class basic_json_filter : public basic_json_input_handler<Char>
 {
 public:
-    basic_json_filter(basic_json_input_handler<Char>& parent)
-        : parent_(std::addressof(parent))
+    basic_json_filter(basic_json_input_handler<Char>& handler)
+        : handler_(std::addressof(handler))
     {
     }
 
     basic_json_filter(basic_json_output_handler<Char>& output_handler)
-        : input_output_adapter_(output_handler), parent_(std::addressof(input_output_adapter_))
+        : input_output_adapter_(output_handler), handler_(std::addressof(input_output_adapter_))
     {
     }
 
+    basic_json_input_handler<Char>& content_handler()
+    {
+        return *handler_;
+    }
+
+    // Deprecated
     basic_json_input_handler<Char>& parent()
     {
-        return *parent_;
+        return *handler_;
     }
 
 private:
     virtual void do_begin_json()
     {
-        parent_->begin_json();
+        handler_->begin_json();
     }
 
     virtual void do_end_json()
     {
-        parent_->end_json();
+        handler_->end_json();
     }
 
     virtual void do_begin_object(const basic_parsing_context<Char>& context)
     {
-        parent_->begin_object(context);
+        handler_->begin_object(context);
     }
 
     virtual void do_end_object(const basic_parsing_context<Char>& context)
     {
-        parent_->end_object(context);
+        handler_->end_object(context);
     }
 
     virtual void do_begin_array(const basic_parsing_context<Char>& context)
     {
-        parent_->begin_array(context);
+        handler_->begin_array(context);
     }
 
     virtual void do_end_array(const basic_parsing_context<Char>& context)
     {
-        parent_->end_array(context);
+        handler_->end_array(context);
     }
 
     virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_->name(name, length, context);
+        handler_->name(name, length, context);
     }
 
     virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,length,context);
+        handler_->value(value,length,context);
     }
 
     virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        handler_->value(value,context);
     }
 
     virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        handler_->value(value,context);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        handler_->value(value,context);
     }
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context)
     {
-        parent_->value(value,context);
+        handler_->value(value,context);
     }
 
     virtual void do_null_value(const basic_parsing_context<Char>& context)
     {
-        parent_->value(null_type(),context);
+        handler_->value(null_type(),context);
     }
 
     basic_json_input_output_adapter<Char> input_output_adapter_;
-    basic_json_input_handler<Char>* parent_;
+    basic_json_input_handler<Char>* handler_;
 };
 
 typedef basic_json_filter<char> json_filter;
