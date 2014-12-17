@@ -38,30 +38,32 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         }
 
     private:
-        virtual void do_name(const char* p, int length, const parsing_context& context)
+        virtual void do_name(const char* p, int length, 
+                             const parsing_context& context)
         {
             property_name_ = string(p,length);
             if (property_name_ != "name")
             {
-                content_handler().name(p, length, context);
+                input_handler().name(p, length, context);
             }
         }
 
-        virtual void do_string_value(const char* p, int length, const parsing_context& context)
+        virtual void do_string_value(const char* p, int length, 
+                                     const parsing_context& context)
         {
             if (property_name_ == "name")
             {
                 string value(p,length);
                 size_t end_first = value.find_first_of(" \t");
                 size_t start_last = value.find_first_not_of(" \t", end_first);
-                content_handler().name("first-name", context);
+                input_handler().name("first-name", context);
                 std::string first = value.substr(0, end_first);
-                content_handler().value(first, context); 
+                input_handler().value(first, context); 
                 if (start_last != std::string::npos)
                 {
-                    content_handler().name("last-name", context);
+                    input_handler().name("last-name", context);
                     std::string last = value.substr(start_last);
-                    content_handler().value(last, context); 
+                    input_handler().value(last, context); 
                 }
                 else
                 {
@@ -72,7 +74,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
             else
             {
-                content_handler().value(p, length, context);
+                input_handler().value(p, length, context);
             }
         }
 

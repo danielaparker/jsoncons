@@ -12,7 +12,7 @@ Enhancements:
 
 Non-breaking Change:
  
-- `json_filter` method `parent` has been renamed to `content_handler` (old name still works) 
+- `json_filter` method `parent` has been renamed to `input_handler` (old name still works) 
 
 Breaking change (if you've implemented your own input and output handlers, or if you've
 passed json events to input and output handlers directly):
