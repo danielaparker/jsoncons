@@ -293,22 +293,22 @@ img {
 <body>
 <ul>
 <li>
-<p>Examine other data storage than vectors that could   benefit from custom allocators.</p>
+<p>Revisit error codes, parsing<em>context, and opportunities for error recovery. Attempt to support <a href="http://json5.org/">json 5</a> behaviour through an error</em>handler and a json_filter.</p>
 </li>
 <li>
-<p>Implement a path search.</p>
-</li>
-<li>
-<p>Review hooks for error handling and recovery</p>
-</li>
-<li>
-<p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p>
+<p>Support <a href="http://www.ietf.org/id/draft-newton-json-content-rules-04.txt">JSON Content Rules</a></p>
 </li>
 <li>
 <p>Improve csv_reader </p>
 </li>
 <li>
-<p>Support some type of schema validation</p>
+<p>Examine other data storage than vectors that could benefit from custom allocators.</p>
+</li>
+<li>
+<p>Implement a path search.</p>
+</li>
+<li>
+<p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p>
 </li>
 </ul>
 
