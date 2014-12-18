@@ -305,11 +305,15 @@ typedef basic_json_filter&lt;char&gt; json_filter
 <p><a href="json_input_handler">json<em>input</em>handler</a></p>
 <h3>Constructors</h3>
 <pre><code>json_filter(json_input_handler&amp; handler)
+json_filter(json_input_handler&amp; handler,
+             error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_input_handler</code> (i.e. another filter.)
 You must ensure that the <code>handler</code> exists as long as does <code>json_filter</code>, as <code>json_filter</code> holds a pointer to but does not own this object.</p>
 <pre><code>json_filter(json_output_handler&amp; handler)
+json_filter(json_output_handler&amp; handler,
+             error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_output_handler</code>.
