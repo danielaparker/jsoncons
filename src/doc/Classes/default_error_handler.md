@@ -1,13 +1,11 @@
     jsoncons::default_error_handler
 
-    typedef default_basic_error_handler<char> default_error_handler
-
-### Header
-
     #include "jsoncons/error_handler.hpp"
 
-### Base class
+    template <typename Char>
+    error_handler& default_error_handler(); 
 
-[error_handler](error_handler)    
+Obtains a reference to the static default `error_handler` instance.
+
 
 

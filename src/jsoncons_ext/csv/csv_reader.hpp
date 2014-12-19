@@ -25,8 +25,6 @@ namespace jsoncons_ext { namespace csv {
 template<typename Char,class Alloc>
 class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
 {
-    static jsoncons::default_basic_error_handler<Char> default_err_handler;
-
     struct stack_item
     {
         stack_item()
@@ -59,7 +57,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_err_handler)),
+         err_handler_(std::addressof(jsoncons::default_error_handler<Char>())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -87,7 +85,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_err_handler)),
+         err_handler_(std::addressof(jsoncons::default_error_handler<Char>())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -320,9 +318,6 @@ private:
     bool bof_;
     bool eof_;
 };
-
-template<typename Char,class Alloc>
-jsoncons::default_basic_error_handler<Char> basic_csv_reader<Char,Alloc>::default_err_handler;
 
 template<typename Char,class Alloc>
 void basic_csv_reader<Char,Alloc>::read()

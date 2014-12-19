@@ -102,7 +102,7 @@ private:
 };
 
 template <typename Char>
-class default_basic_error_handler : public basic_error_handler<Char>
+class default_error_handler_impl : public basic_error_handler<Char>
 {
 private:
     virtual void do_warning(std::error_code,
@@ -120,11 +120,15 @@ private:
 typedef basic_error_handler<char> error_handler;
 typedef basic_error_handler<wchar_t> werror_handler;
 
-typedef default_basic_error_handler<char> default_error_handler;
-typedef default_basic_error_handler<wchar_t> wdefault_error_handler;
-
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;
+
+template<typename Char>
+basic_error_handler<Char>& default_error_handler()
+{
+    static default_error_handler_impl<Char> instance;
+    return instance;
+}
 
 }
 #endif
