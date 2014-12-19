@@ -150,6 +150,71 @@ private:
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
 
+
+template <typename Char>
+class null_json_input_handler_impl : public basic_json_input_handler<Char>
+{
+public:
+    virtual void do_begin_json()
+    {
+    }
+
+    virtual void do_end_json()
+    {
+    }
+
+    virtual void do_begin_object(const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_end_object(const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_begin_array(const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_end_array(const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void name(const std::basic_string<Char>&, const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_null_value(const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_string_value(const Char*, size_t length, const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_double_value(double, const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_longlong_value(long long, const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
+    {
+    }
+
+    virtual void do_bool_value(bool, const basic_parsing_context<Char>&)
+    {
+    }
+};
+
+template<typename Char>
+basic_json_input_handler<Char>& null_json_input_handler()
+{
+    static null_json_input_handler_impl<Char> instance;
+    return instance;
+}
+
 typedef basic_json_input_handler<char> json_input_handler;
 typedef basic_json_input_handler<wchar_t> wjson_input_handler;
 

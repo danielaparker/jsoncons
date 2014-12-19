@@ -206,7 +206,7 @@ private:
 template<typename Char>
 basic_json_output_handler<Char>& null_json_output_handler()
 {
-    static basic_json_output_handler<Char> instance;
+    static null_json_output_handler_impl<Char> instance;
     return instance;
 }
 
