@@ -293,13 +293,15 @@ img {
 <body>
 <pre><code>jsoncons::default_error_handler
 
-#include &quot;jsoncons/error_handler.hpp&quot;
-
 template &lt;typename Char&gt;
-error_handler&amp; default_error_handler(); 
+basic_error_handler&lt;Char&gt;&amp; default_error_handler(); 
 </code></pre>
 
 <p>Obtains a reference to the static default <code>error_handler</code> instance.</p>
+<h3>Header</h3>
+<pre><code>#include &quot;jsoncons/error_handler.hpp&quot;
+</code></pre>
+
 
 </body>
 </html>
