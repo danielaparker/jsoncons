@@ -112,8 +112,6 @@ std::error_code make_error_code(json_parser_error::json_parser_error_t e)
 template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
-    static default_basic_error_handler<Char> default_err_handler;
-
     struct stack_item
     {
         stack_item(bool type)
@@ -178,7 +176,7 @@ public:
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_err_handler)),
+         err_handler_(std::addressof(default_error_handler<Char>())),
          bof_(true),
          eof_(false),
          is_(std::addressof(is))
@@ -334,9 +332,6 @@ private:
     bool eof_;
     std::basic_istream<Char> *is_;
 };
-
-template<typename Char>
-default_basic_error_handler<Char> basic_json_reader<Char>::default_err_handler;
 
 template<typename Char>
 unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)

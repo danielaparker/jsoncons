@@ -17,12 +17,12 @@ using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
 using jsoncons::error_handler;
-using jsoncons::default_error_handler;
+using jsoncons::default_error_handler_impl;
 using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
 using std::string;
 
-class my_error_handler : public default_error_handler
+class my_error_handler : public error_handler
 {
 
 public:
@@ -32,6 +32,11 @@ public:
     }
 
 private:
+    virtual void do_warning(std::error_code ec,
+                            const parsing_context& context) throw(json_parse_exception)
+    {
+    }
+
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {

@@ -145,7 +145,7 @@ private:
 };
 
 template <typename Char>
-class null_basic_json_output_handler : public basic_json_output_handler<Char>
+class null_json_output_handler_impl : public basic_json_output_handler<Char>
 {
 private:
 
@@ -203,11 +203,15 @@ private:
 
 };
 
+template<typename Char>
+basic_json_output_handler<Char>& null_json_output_handler()
+{
+    static basic_json_output_handler<Char> instance;
+    return instance;
+}
+
 typedef basic_json_output_handler<char> json_output_handler;
 typedef basic_json_output_handler<wchar_t> wjson_output_handler;
-
-typedef null_basic_json_output_handler<char> null_json_output_handler;
-typedef null_basic_json_output_handler<wchar_t> wnull_json_output_handler;
 
 }
 #endif

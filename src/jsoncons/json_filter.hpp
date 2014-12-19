@@ -19,10 +19,8 @@ template <typename Char>
 class basic_json_input_output_adapter : public basic_json_input_handler<Char>
 {
 public:
-    static null_basic_json_output_handler<Char> null_writer;
-
     basic_json_input_output_adapter()
-        : writer_(std::addressof(null_writer))
+        : writer_(std::addressof(null_json_output_handler<Char>()))
     {
     }
 
@@ -105,16 +103,12 @@ private:
 };
 
 template <typename Char>
-null_basic_json_output_handler<Char> basic_json_input_output_adapter<Char>::null_writer;
-
-template <typename Char>
 class basic_json_filter : public basic_json_input_handler<Char>
 {
-    static default_basic_error_handler<Char> default_err_handler;
 public:
     basic_json_filter(basic_json_input_handler<Char>& handler)
         : handler_(std::addressof(handler)),
-          err_handler_(std::addressof(default_err_handler))
+          err_handler_(std::addressof(default_error_handler<Char>()))
     {
     }
 
@@ -127,7 +121,7 @@ public:
 
     basic_json_filter(basic_json_output_handler<Char>& output_handler)
         : input_output_adapter_(output_handler), handler_(std::addressof(input_output_adapter_)),
-          err_handler_(std::addressof(default_err_handler))
+          err_handler_(std::addressof(default_error_handler<Char>()))
     {
     }
 
@@ -219,9 +213,6 @@ private:
     basic_json_input_handler<Char>* handler_;
     basic_error_handler<Char>* err_handler_;
 };
-
-template<typename Char>
-default_basic_error_handler<Char> basic_json_filter<Char>::default_err_handler;
 
 typedef basic_json_filter<char> json_filter;
 typedef basic_json_filter<wchar_t> wjson_filter;
