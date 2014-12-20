@@ -22,93 +22,6 @@
 
 namespace jsoncons {
 
-namespace json_parser_error {
-enum json_parser_error_t 
-{
-    unexpected_eof,
-    unexpected_value_separator,
-    expected_value_separator,
-    unexpected_end_of_object,
-    unexpected_end_of_array,
-    unrecognized_value,
-    expected_name_separator,
-    illegal_control_character,
-    illegal_escaped_character,
-    invalid_codepoint_surrogate_pair,
-    invalid_hex_escape_sequence,
-    invalid_unicode_escape_sequence,
-    invalid_number,
-    value_not_found,
-    eof_reading_string_value,
-    eof_reading_numeric_value
-};
-}
-
-class json_parser_category_impl
-   : public std::error_category
-{
-public:
-    virtual const char* name() const
-    {
-        return "JSON parser";
-    }
-    virtual std::string message(int ev) const
-    {
-        switch (ev)
-        {
-        case json_parser_error::unexpected_eof:
-            return "Unexpected end of file";
-        case json_parser_error::unexpected_value_separator:
-            return "Unexpected value separator ','";
-        case json_parser_error::expected_value_separator:
-            return "Expected value separator ','";
-        case json_parser_error::unexpected_end_of_object:
-            return "Unexpected end of object '}'";
-        case json_parser_error::unexpected_end_of_array:
-            return "Unexpected end of array ']'";
-        case json_parser_error::unrecognized_value:
-            return "Unrecognized value";
-        case json_parser_error::expected_name_separator:
-            return "Expected name separator ':'";
-        case json_parser_error::illegal_control_character:
-            return "Illegal control character in string";
-        case json_parser_error::illegal_escaped_character:
-            return "Illegal escaped character in string";
-        case json_parser_error::invalid_codepoint_surrogate_pair:
-            return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
-        case json_parser_error::invalid_hex_escape_sequence:
-            return "Invalid codepoint, expected hexadecimal digit.";
-        case json_parser_error::invalid_unicode_escape_sequence:
-            return "Invalid codepoint, expected four hexadecimal digits.";
-        case json_parser_error::invalid_number:
-            return "Invalid number";
-        case json_parser_error::value_not_found:
-            return "Value not found";
-        case json_parser_error::eof_reading_string_value:
-            return "Reached end of file while reading string value";
-        case json_parser_error::eof_reading_numeric_value:
-            return "Reached end of file while reading numeric value";
-        default:
-            return "Unknown JSON parser error";
-        }
-    }
-};
-
-inline
-const std::error_category& json_parser_category()
-{
-  static json_parser_category_impl instance;
-  return instance;
-}
-
-inline
-std::error_code make_error_code(json_parser_error::json_parser_error_t e)
-{
-  return std::error_code(
-      static_cast<int>(e),
-      json_parser_category());
-}
-
 template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
@@ -129,7 +42,9 @@ class basic_json_reader : private basic_parsing_context<Char>
         size_t name_count_;
 
     };
+
 public:
+
     // Structural characters
     static const char do_begin_array = '[';
     static const char do_begin_object = '{';
@@ -202,26 +117,6 @@ public:
     void buffer_capacity(size_t buffer_capacity)
     {
         buffer_capacity_ = buffer_capacity;
-    }
-
-    virtual unsigned long line_number() const
-    {
-        return line_;
-    }
-
-    virtual unsigned long column_number() const
-    {
-        return column_;
-    }
-
-    virtual size_t minimum_structure_capacity() const
-    {
-        return minimum_structure_capacity_;
-    }
-
-    virtual const std::basic_string<Char>& buffer() const
-    {
-        return string_buffer_;
     }
 
 private:
@@ -313,6 +208,58 @@ private:
             eof_ = true;
         }
 
+    }
+
+    virtual unsigned long do_line_number() const
+    {
+        return line_;
+    }
+
+    virtual unsigned long do_column_number() const
+    {
+        return column_;
+    }
+
+    virtual size_t do_minimum_structure_capacity() const
+    {
+        return minimum_structure_capacity_;
+    }
+
+    virtual Char do_get()
+    {
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_some();
+        }
+        Char c = buffer_position_++;
+        if ((c == '\r') & (buffer_[buffer_position_] == '\n'))
+        {
+            ++buffer_position_;
+        }
+        else if ((c == '\n') | (c == '\r'))
+        {
+            ++line_;
+            column_ = 0;
+        }
+        else
+        {
+            ++column_;
+        }
+        return c;
+    }
+
+    virtual Char do_peek()
+    {
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_some();
+        }
+        return buffer_[buffer_position_];
+    }
+
+    virtual bool do_eof()
+    {
+        return eof_;
     }
 
     size_t minimum_structure_capacity_;
