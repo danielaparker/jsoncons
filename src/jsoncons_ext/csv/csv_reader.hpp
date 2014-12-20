@@ -17,7 +17,6 @@
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/error_handler.hpp"
-#include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
 
 namespace jsoncons_ext { namespace csv {
@@ -189,26 +188,6 @@ public:
         buffer_capacity_ = buffer_capacity;
     }
 
-    virtual unsigned long line_number() const
-    {
-        return line_;
-    }
-
-    virtual unsigned long column_number() const
-    {
-        return column_;
-    }
-
-    virtual size_t minimum_structure_capacity() const
-    {
-        return minimum_structure_capacity_;
-    }
-
-    virtual const std::basic_string<Char>& buffer() const
-    {
-        return string_buffer_;
-    }
-
 private:
     basic_csv_reader(const basic_csv_reader&); // noop
     basic_csv_reader& operator = (const basic_csv_reader&); // noop
@@ -296,6 +275,58 @@ private:
             --buffer_position_;
             --column_;
         }
+    }
+
+    virtual Char do_get()
+    {
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_some();
+        }
+        Char c = buffer_position_++;
+        if ((c == '\r') & (buffer_[buffer_position_] == '\n'))
+        {
+            ++buffer_position_;
+        }
+        else if ((c == '\n') | (c == '\r'))
+        {
+            ++line_;
+            column_ = 0;
+        }
+        else
+        {
+            ++column_;
+        }
+        return c;
+    }
+
+    virtual Char do_peek()
+    {
+        if (buffer_position_ >= buffer_length_)
+        {
+            read_some();
+        }
+        return buffer_[buffer_position_];
+    }
+
+    virtual bool do_eof()
+    {
+        return eof_;
+    }
+
+    virtual unsigned long do_line_number() const
+    {
+        return line_;
+    }
+
+    virtual unsigned long do_column_number() const
+    {
+        return column_;
+    }
+
+    virtual size_t do_minimum_structure_capacity() const
+    {
+        return minimum_structure_capacity_;
     }
 
     size_t minimum_structure_capacity_;
