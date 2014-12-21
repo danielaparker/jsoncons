@@ -167,7 +167,7 @@ enum json_parser_error_t
     expected_value_separator,
     unexpected_end_of_object,
     unexpected_end_of_array,
-    unrecognized_value,
+    expected_name_or_value
     expected_name_separator,
     illegal_control_character,
     illegal_escaped_character,
@@ -203,8 +203,8 @@ public:
             return "Unexpected end of object '}'";
         case json_parser_error::unexpected_end_of_array:
             return "Unexpected end of array ']'";
-        case json_parser_error::unrecognized_value:
-            return "Unrecognized value";
+        case json_parser_error::expected_name_or_value:
+            return "Expected name or value";
         case json_parser_error::expected_name_separator:
             return "Expected name separator ':'";
         case json_parser_error::illegal_control_character:
