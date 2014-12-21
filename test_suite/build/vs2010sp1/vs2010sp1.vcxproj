@@ -150,7 +150,8 @@
     <ClCompile Include="..\..\src\allocator_tests.cpp" />
     <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
-    <ClCompile Include="..\..\src\jsoncons_test.cpp" />
+    <ClCompile Include="..\..\src\error_recovery_tests.cpp" />
+    <ClCompile Include="..\..\src\jsoncons_tests.cpp" />
     <ClCompile Include="..\..\src\json_accessor_tests.cpp" />
     <ClCompile Include="..\..\src\json_any_tests.cpp" />
     <ClCompile Include="..\..\src\json_array_tests.cpp" />
@@ -158,7 +159,7 @@
     <ClCompile Include="..\..\src\json_equals_tests.cpp" />
     <ClCompile Include="..\..\src\json_extensibility_tests.cpp" />
     <ClCompile Include="..\..\src\json_object_tests.cpp" />
-    <ClCompile Include="..\..\src\json_parser_test.cpp" />
+    <ClCompile Include="..\..\src\json_parser_tests.cpp" />
     <ClCompile Include="..\..\src\json_reader_exception_tests.cpp" />
     <ClCompile Include="..\..\src\json_serializer_tests.cpp" />
     <ClCompile Include="..\..\src\string_to_double_tests.cpp" />

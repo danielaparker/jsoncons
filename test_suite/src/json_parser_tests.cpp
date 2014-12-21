@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
     std::istringstream is("{\"field1\":ru}");
 
     json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::unrecognized_value);
+    my_error_handler err_handler(jsoncons::json_parser_error::expected_name_or_value);
 
     json_reader reader(is,handler,err_handler);
 

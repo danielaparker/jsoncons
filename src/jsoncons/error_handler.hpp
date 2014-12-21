@@ -167,7 +167,7 @@ enum json_parser_error_t
     expected_value_separator,
     unexpected_end_of_object,
     unexpected_end_of_array,
-    expected_name_or_value
+    expected_name_or_value,
     expected_name_separator,
     illegal_control_character,
     illegal_escaped_character,
