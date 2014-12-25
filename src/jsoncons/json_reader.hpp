@@ -25,31 +25,47 @@ namespace jsoncons {
 template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
+    enum state_type {top_t,object_t,array_t};
+
     struct stack_item
     {
+        stack_item(state_type type)
+           :
+             value_count_(0),
+             state_(type),
+             comma_(false),
+             name_count_(0)
+        {
+        }
         stack_item(bool type)
            :
              value_count_(0),
-             is_object_(type),
+             state_(type? object_t : array_t),
              comma_(false),
              name_count_(0)
         {
         }
 
+        bool is_object() const {return state_ == object_t;}
+        bool is_array() const {return state_ == array_t;}
+        bool is_top() const {return state_ == top_t;}
+
+        state_type state_;
         size_t value_count_;
-        bool is_object_;
         bool comma_;
         size_t name_count_;
 
     };
 
+    void parse();
+
 public:
 
     // Structural characters
-    static const char do_begin_array = '[';
-    static const char do_begin_object = '{';
-    static const char do_end_array = ']';
-    static const char do_end_object = '}';
+    static const char begin_array = '[';
+    static const char begin_object = '{';
+    static const char end_array = ']';
+    static const char end_object = '}';
     static const char name_separator = ':';
     static const char value_separator = ',';
 
@@ -326,6 +342,19 @@ void basic_json_reader<Char>::read()
     {
         read_some();
     }
+
+    stack_.push_back(stack_item(top_t));
+    parse();
+    stack_.pop_back();
+    if (stack_.size() > 0)
+    {
+        err_handler_->error(std::error_code(json_parser_error::unexpected_eof, json_parser_category()), *this);
+    }
+}
+
+template<typename Char>
+void basic_json_reader<Char>::parse()
+{
     while (!eof())
     {
         while (buffer_position_ < buffer_length_)
@@ -334,6 +363,7 @@ void basic_json_reader<Char>::read()
             ++column_;
             switch (c)
             {
+            // Skip whitespace
             case '\r':
                 ++line_;
                 column_ = 0;
@@ -368,6 +398,7 @@ void basic_json_reader<Char>::read()
                     }
                 }
                 break;
+            // Skip comments
             case '/':
                 {
                     Char next = buffer_[buffer_position_];
@@ -383,30 +414,31 @@ void basic_json_reader<Char>::read()
                     }
                 }
                 continue;
-            case do_begin_object:
-                if (stack_.size() == 0)
+
+            case begin_object:
+                if (stack_.back().is_top())
                 {
                     handler_->begin_json();
                 }
-                stack_.push_back(stack_item(true));
+                stack_.push_back(stack_item(object_t));
                 minimum_structure_capacity_ = estimate_minimum_object_capacity();
                 handler_->begin_object(*this);
                 minimum_structure_capacity_ = 0;
                 break;
-            case do_begin_array:
-                if (stack_.size() == 0)
+            case begin_array:
+                if (stack_.back().is_top())
                 {
                     handler_->begin_json();
                 }
                 {
-                    stack_.push_back(stack_item(false));
+                    stack_.push_back(stack_item(array_t));
                     minimum_structure_capacity_ = estimate_minimum_array_capacity();
                     handler_->begin_array(*this);
                     minimum_structure_capacity_ = 0;
                 }
                 break;
             default:
-                if (stack_.size() > 0)
+                if (!stack_.back().is_top())
                 {
                     switch (c)
                     {
@@ -425,7 +457,7 @@ void basic_json_reader<Char>::read()
                         {
                             parse_string();
                             size_t count1 = 0;
-                            if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
+                            if (stack_.back().is_object() & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
                                 handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
                                 count1 = 0;
@@ -454,9 +486,9 @@ void basic_json_reader<Char>::read()
                             }
                         }
                         break;
-                    case do_end_object:
+                    case end_object:
                         {
-                            if (!stack_.back().is_object_)
+                            if (!stack_.back().is_object())
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_object, json_parser_category()), *this);
                             }
@@ -471,7 +503,7 @@ void basic_json_reader<Char>::read()
                             handler_->end_object(*this);
                             stack_.pop_back();
                         }
-                        if (stack_.size() > 0)
+                        if (!stack_.back().is_top())
                         {
                             stack_.back().comma_ = false;
                             ++stack_.back().value_count_;
@@ -482,9 +514,9 @@ void basic_json_reader<Char>::read()
                             return;
                         }
                         break;
-                    case do_end_array:
+                    case end_array:
                         {
-                            if (stack_.back().is_object_)
+                            if (stack_.back().is_object())
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_array, json_parser_category()), *this);
                             }
@@ -495,7 +527,7 @@ void basic_json_reader<Char>::read()
                             handler_->end_array(*this);
                             stack_.pop_back();
                         }
-                        if (stack_.size() > 0)
+                        if (!stack_.back().is_top())
                         {
                             stack_.back().comma_ = false;
                             ++stack_.back().value_count_;
@@ -566,11 +598,6 @@ void basic_json_reader<Char>::read()
         {
             read_some();
         }
-    }
-
-    if (stack_.size() > 0)
-    {
-        err_handler_->error(std::error_code(json_parser_error::unexpected_eof, json_parser_category()), *this);
     }
 }
 
@@ -969,14 +996,14 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
     {
         switch (buffer_[pos])
         {
-        case do_end_array:
+        case end_array:
             done = true;
             break;
-        case do_begin_array:
+        case begin_array:
             pos = skip_array(pos + 1, end);
             ++size;
             break;
-        case do_begin_object:
+        case begin_object:
             pos = skip_object(pos + 1, end);
             ++size;
             break;
@@ -1030,7 +1057,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
     {
         switch (buffer_[pos])
         {
-        case do_end_object:
+        case end_object:
             done = true;
             break;
         case '\"':
@@ -1040,10 +1067,10 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
             ++size;
             ++pos;
             break;
-        case do_begin_array:
+        case begin_array:
             pos = skip_array(pos + 1, end);
             break;
-        case do_begin_object:
+        case begin_object:
             pos = skip_object(pos + 1, end);
             break;
         case 't':
@@ -1072,16 +1099,16 @@ size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
     {
         switch (buffer_[pos])
         {
-        case do_begin_array:
+        case begin_array:
             pos = skip_array(pos + 1, end);
             break;
-        case do_begin_object:
+        case begin_object:
             pos = skip_object(pos + 1, end);
             break;
         case '\"':
             pos = skip_string(pos + 1, end);
             break;
-        case do_end_array:
+        case end_array:
             done = true;
             ++pos;
             break;
@@ -1168,16 +1195,16 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
     {
         switch (buffer_[pos])
         {
-        case do_begin_object:
+        case begin_object:
             pos = skip_object(pos + 1, end);
             break;
-        case do_begin_array:
+        case begin_array:
             pos = skip_array(pos + 1, end);
             break;
         case '\"':
             pos = skip_string(pos + 1, end);
             break;
-        case do_end_object:
+        case end_object:
             done = true;
             ++pos;
             break;
