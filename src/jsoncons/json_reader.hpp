@@ -26,7 +26,7 @@ template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
     enum state_type {top_t,object_t,array_t};
-    enum substate_type {unknown_t,name_t,value_separator_t,name_separator_t,value_completed_t};
+    enum substate_type {init_t,name_t,value_separator_t,name_separator_t,value_completed_t};
 
     struct stack_item
     {
@@ -35,13 +35,34 @@ class basic_json_reader : private basic_parsing_context<Char>
              value_count_(0),
              state_(type),
              name_count_(0),
-             substate_(unknown_t)
+             substate_(init_t)
         {
         }
 
         bool is_object() const {return state_ == object_t;}
         bool is_array() const {return state_ == array_t;}
         bool is_top() const {return state_ == top_t;}
+
+        int before_value() const
+        {
+            int err = 0;
+            if (substate_ == value_completed_t)
+            {
+                err = json_parser_error::expected_value_separator;
+            }
+            else if ((state_ == object_t) & (substate_ != name_separator_t))
+            {
+                if (substate_ == name_t)
+                {
+                    err = json_parser_error::expected_name_separator;
+                }
+                else
+                {
+                    err = json_parser_error::expected_name;
+                }
+            }
+            return err;
+        }
 
         state_type state_;
         size_t value_count_;
@@ -409,6 +430,13 @@ void basic_json_reader<Char>::parse()
                 continue;
 
             case begin_object:
+                {
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
+                }
                 if (stack_.back().is_top())
                 {
                     handler_->begin_json();
@@ -419,6 +447,13 @@ void basic_json_reader<Char>::parse()
                 minimum_structure_capacity_ = 0;
                 break;
             case begin_array:
+                {
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
+                }
                 if (stack_.back().is_top())
                 {
                     handler_->begin_json();
@@ -456,6 +491,11 @@ void basic_json_reader<Char>::parse()
                     }
                     else
                     {
+                        int err = stack_.back().before_value();
+                        if (err != 0)
+                        {
+                            err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                        }
                         handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
                         stack_.back().substate_ = value_completed_t;
                         ++stack_.back().value_count_;
@@ -515,9 +555,12 @@ void basic_json_reader<Char>::parse()
                 }
                 break;
             case 't':
-                if (stack_.back().substate_ == value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
                 }
                 if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                 {
@@ -530,9 +573,12 @@ void basic_json_reader<Char>::parse()
                 ++stack_.back().value_count_;
                 break;
             case 'f':
-                if (stack_.back().substate_ == value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
                 }
                 if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                 {
@@ -545,9 +591,12 @@ void basic_json_reader<Char>::parse()
                 ++stack_.back().value_count_;
                 break;
             case 'n':
-                if (stack_.back().substate_ == value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
                 }
                 if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                 {
@@ -570,13 +619,16 @@ void basic_json_reader<Char>::parse()
             case '8':
             case '9':
             case '-':
-                if (stack_.back().substate_ == value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
+                    int err = stack_.back().before_value();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
+                    parse_number(c);
+                    stack_.back().substate_ = value_completed_t;
+                    ++stack_.back().value_count_;
                 }
-                parse_number(c);
-                stack_.back().substate_ = value_completed_t;
-                ++stack_.back().value_count_;
                 break;
             default:
                 err_handler_->error(std::error_code(json_parser_error::expected_name_or_value, json_parser_category()), *this);
