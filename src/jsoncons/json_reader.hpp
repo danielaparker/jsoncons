@@ -18,7 +18,7 @@
 #include <system_error>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/error_handler.hpp"
+#include "jsoncons/input_error_handler.hpp"
 
 namespace jsoncons {
 
@@ -89,7 +89,7 @@ public:
     //  Parse an input stream of JSON text into a json object
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
-                      basic_error_handler<Char>& err_handler)
+                      basic_input_error_handler<Char>& err_handler)
        :
          minimum_structure_capacity_(0),
          column_(0),
@@ -121,7 +121,7 @@ public:
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_error_handler<Char>())),
+         err_handler_(std::addressof(default_input_error_handler<Char>())),
          bof_(true),
          eof_(false),
          is_(std::addressof(is))
@@ -304,7 +304,7 @@ private:
     size_t hard_buffer_length_;
     size_t estimation_buffer_length_;
     basic_json_input_handler<Char> *handler_;
-    basic_error_handler<Char> *err_handler_;
+    basic_input_error_handler<Char> *err_handler_;
     bool bof_;
     bool eof_;
     std::basic_istream<Char> *is_;

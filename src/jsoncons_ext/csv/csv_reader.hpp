@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/error_handler.hpp"
+#include "jsoncons/input_error_handler.hpp"
 #include "jsoncons/json.hpp"
 
 namespace jsoncons_ext { namespace csv {
@@ -56,7 +56,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_error_handler<Char>())),
+         err_handler_(std::addressof(jsoncons::default_input_error_handler<Char>())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -84,7 +84,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_error_handler<Char>())),
+         err_handler_(std::addressof(jsoncons::default_input_error_handler<Char>())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -98,7 +98,7 @@ public:
 
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_error_handler<Char>& err_handler)
+                     jsoncons::basic_input_error_handler<Char>& err_handler)
        :
 
          minimum_structure_capacity_(),
@@ -128,7 +128,7 @@ public:
 
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_error_handler<Char>& err_handler,
+                     jsoncons::basic_input_error_handler<Char>& err_handler,
                      const jsoncons::basic_json<Char,Alloc>& params)
        :
          minimum_structure_capacity_(),
@@ -340,7 +340,7 @@ private:
     size_t buffer_position_;
     size_t buffer_length_;
     jsoncons::basic_json_input_handler<Char>* handler_;
-    jsoncons::basic_error_handler<Char>* err_handler_;
+    jsoncons::basic_input_error_handler<Char>* err_handler_;
     bool assume_header_;
     Char field_delimiter_;
     Char quote_char_;

@@ -16,13 +16,13 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
     json_filter(json_input_handler& handler)
     json_filter(json_input_handler& handler,
-                 error_handler& err_handler)
+                 input_error_handler& err_handler)
 All JSON events that pass through the `json_filter` go to the specified `json_input_handler` (i.e. another filter.)
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
     json_filter(json_output_handler& handler)
     json_filter(json_output_handler& handler,
-                 error_handler& err_handler)
+                 input_error_handler& err_handler)
 All JSON events that pass through the `json_filter` go to the specified `json_output_handler`.
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 

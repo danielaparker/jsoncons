@@ -1,6 +1,6 @@
-    jsoncons::error_handler
+    jsoncons::input_error_handler
 
-    typedef basic_error_handler<char> error_handler
+    typedef basic_input_error_handler<char> input_error_handler
 
 When parsing JSON text with [json_reader](json_reader), if you need to implement
 cutomized error handling, you must implement this pure virtual class
@@ -13,7 +13,7 @@ will then report all warnings and errors through this interface.
 
 ### Destructor
 
-    virtual ~error_handler()
+    virtual ~input_error_handler()
 
 ### Public interface methods
 
