@@ -140,5 +140,12 @@ BOOST_AUTO_TEST_CASE(test_expected_name)
 	test_error_code("{[]}", jsoncons::json_parser_error::expected_name);
 }
 
+BOOST_AUTO_TEST_CASE(test_expected_value)
+{
+	test_error_code("[tru]", jsoncons::json_parser_error::expected_value);
+    test_error_code("[fa]", jsoncons::json_parser_error::expected_value);
+    test_error_code("[n]", jsoncons::json_parser_error::expected_value);
+}
+
 
 
