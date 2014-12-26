@@ -34,7 +34,6 @@ class basic_json_reader : private basic_parsing_context<Char>
            :
              value_count_(0),
              state_(type),
-             comma_(false),
              name_count_(0),
              substate_(unknown_t)
         {
@@ -46,7 +45,6 @@ class basic_json_reader : private basic_parsing_context<Char>
 
         state_type state_;
         size_t value_count_;
-        bool comma_;
         size_t name_count_;
         substate_type substate_;
 
@@ -442,11 +440,10 @@ void basic_json_reader<Char>::parse()
                         {
                             err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
                         }
-                        stack_.back().comma_ = true;
                         stack_.back().substate_ = value_separator_t;
                         break;
                     case '\"':
-                        if ((stack_.back().value_count_ > 0) & !stack_.back().comma_)
+                        if ((stack_.back().value_count_ > 0) & (!stack_.back().substate_ == value_separator_t))
                         {
                             err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
                         }
@@ -477,7 +474,6 @@ void basic_json_reader<Char>::parse()
                             else
                             {
                                 handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
-                                stack_.back().comma_ = false;
                                 stack_.back().substate_ = value_completed_t;
                                 ++stack_.back().value_count_;
                             }
@@ -489,7 +485,7 @@ void basic_json_reader<Char>::parse()
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_object, json_parser_category()), *this);
                             }
-                            if (stack_.back().comma_)
+                            if (stack_.back().substate_ == value_separator_t) // dap
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
                             }
@@ -502,7 +498,6 @@ void basic_json_reader<Char>::parse()
                         }
                         if (!stack_.back().is_top())
                         {
-                            stack_.back().comma_ = false;
                             stack_.back().substate_ = value_completed_t;
                             ++stack_.back().value_count_;
                         }
@@ -518,7 +513,7 @@ void basic_json_reader<Char>::parse()
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_array, json_parser_category()), *this);
                             }
-                            if (stack_.back().comma_)
+                            if (stack_.back().substate_ == value_separator_t) // dap
                             {
                                 err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
                             }
@@ -527,7 +522,6 @@ void basic_json_reader<Char>::parse()
                         }
                         if (!stack_.back().is_top())
                         {
-                            stack_.back().comma_ = false;
                             stack_.back().substate_ = value_completed_t;
                             ++stack_.back().value_count_;
                         }
@@ -545,7 +539,6 @@ void basic_json_reader<Char>::parse()
                         buffer_position_ += 3;
                         column_ += 3;
                         handler_->value(true, *this);
-                        stack_.back().comma_ = false;
                         stack_.back().substate_ = value_completed_t;
                         ++stack_.back().value_count_;
                         break;
@@ -557,7 +550,6 @@ void basic_json_reader<Char>::parse()
                         buffer_position_ += 4;
                         column_ += 4;
                         handler_->value(false, *this);
-                        stack_.back().comma_ = false;
                         stack_.back().substate_ = value_completed_t;
                         ++stack_.back().value_count_;
                         break;
@@ -569,7 +561,6 @@ void basic_json_reader<Char>::parse()
                         buffer_position_ += 3;
                         column_ += 3;
                         handler_->value(null_type(), *this);
-                        stack_.back().comma_ = false;
                         stack_.back().substate_ = value_completed_t;
                         ++stack_.back().value_count_;
                         break;
@@ -585,7 +576,6 @@ void basic_json_reader<Char>::parse()
                     case '9':
                     case '-':
                         parse_number(c);
-                        stack_.back().comma_ = false;
                         stack_.back().substate_ = value_completed_t;
                         ++stack_.back().value_count_;
                         break;
