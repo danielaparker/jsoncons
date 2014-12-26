@@ -117,7 +117,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         s.push_back('-');
     }
 
-    int len = precision;
+    int len = static_cast<int>(precision);
 
     int decimal;
     int exponent;

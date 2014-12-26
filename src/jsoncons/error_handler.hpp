@@ -163,6 +163,7 @@ namespace json_parser_error {
 enum json_parser_error_t 
 {
     unexpected_eof,
+    unexpected_name_separator,
     unexpected_value_separator,
     expected_value_separator,
     unexpected_end_of_object,
@@ -195,6 +196,8 @@ public:
         {
         case json_parser_error::unexpected_eof:
             return "Unexpected end of file";
+        case json_parser_error::unexpected_name_separator:
+            return "Unexpected name separator ','";
         case json_parser_error::unexpected_value_separator:
             return "Unexpected value separator ','";
         case json_parser_error::expected_value_separator:
