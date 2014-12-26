@@ -151,7 +151,6 @@
     <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
     <ClCompile Include="..\..\src\error_recovery_tests.cpp" />
-    <ClCompile Include="..\..\src\input_error_tests.cpp" />
     <ClCompile Include="..\..\src\jsoncons_tests.cpp" />
     <ClCompile Include="..\..\src\json_accessor_tests.cpp" />
     <ClCompile Include="..\..\src\json_any_tests.cpp" />
