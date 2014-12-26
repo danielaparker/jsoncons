@@ -16,10 +16,10 @@ namespace jsoncons {
 class json_parse_exception : public json_exception
 {
 public:
-    json_parse_exception(std::string message,
+    json_parse_exception(std::error_code ec,
                          unsigned long line,
                          unsigned long column)
-        : message_(message),
+        : error_code_(ec),
           line_number_(line),
           column_number_(column)
     {
@@ -33,17 +33,12 @@ public:
     const char* what() const JSONCONS_NOEXCEPT
     {
         std::ostringstream os;
-        os << message_ << " on line " << line_number_ << " at column " << column_number_;
+        os << error_code_.message() << " on line " << line_number_ << " at column " << column_number_;
         const_cast<std::string&>(message_) = os.str();
         return message_.c_str();
     }
 
-    const std::string& message() const
-    {
-        return message_;
-    }
-
-    unsigned long line_number() const
+   unsigned long line_number() const
     {
         return line_number_;
     }
@@ -53,6 +48,7 @@ public:
         return column_number_;
     }
 private:
+    std::error_code error_code_;
     std::string message_;
     std::string buffer_;
     unsigned long line_number_;
@@ -142,7 +138,7 @@ private:
     virtual void do_error(std::error_code ec,
                           const basic_parsing_context<Char>& context) throw (json_parse_exception)
     {
-        throw json_parse_exception(ec.message(),context.line_number(),context.column_number());
+        throw json_parse_exception(ec,context.line_number(),context.column_number());
     }
 };
 
@@ -169,6 +165,8 @@ enum json_parser_error_t
     unexpected_end_of_object,
     unexpected_end_of_array,
     expected_name_or_value,
+    expected_name,
+    expected_value,
     expected_name_separator,
     illegal_control_character,
     illegal_escaped_character,
@@ -208,6 +206,10 @@ public:
             return "Unexpected end of array ']'";
         case json_parser_error::expected_name_or_value:
             return "Expected name or value";
+        case json_parser_error::expected_name:
+            return "Expected name";
+        case json_parser_error::expected_value:
+            return "Expected value";
         case json_parser_error::expected_name_separator:
             return "Expected name separator ':'";
         case json_parser_error::illegal_control_character:

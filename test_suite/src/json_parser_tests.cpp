@@ -30,6 +30,7 @@ public:
         : error_code_(error_code)
     {
     }
+    int error_code_;
 
 private:
     virtual void do_warning(std::error_code ec,
@@ -40,12 +41,10 @@ private:
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {
-        BOOST_CHECK(ec.category() == json_parser_category());
-        BOOST_CHECK(ec.value() == error_code_);
-        throw json_parse_exception(ec.message(),context.line_number(),context.column_number());
+		error_code_ = ec.value();
+        throw json_parse_exception(ec,context.line_number(),context.column_number());
     }
 
-    int error_code_;
 };
 
 BOOST_AUTO_TEST_CASE(test_missing_separator)
@@ -104,5 +103,27 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
     json o = json::parse_string(input);
     BOOST_CHECK(expected == o[0].as<std::string>());
 }
+
+BOOST_AUTO_TEST_CASE(test_expected_name)
+{
+	std::cout << "test_expected_name" << std::endl;
+    std::istringstream is("{10}");
+    
+    my_error_handler err_handler(jsoncons::json_parser_error::expected_name);
+	json_reader reader(is,jsoncons::null_json_input_handler<char>(),err_handler);
+
+	try
+	{
+		reader.read();
+	}
+	catch (const json_parse_exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		BOOST_CHECK(err_handler.error_code_ == jsoncons::json_parser_error::expected_name);
+	}
+
+    //std::cout << in << std::endl;
+}
+
 
 

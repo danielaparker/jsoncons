@@ -42,7 +42,7 @@ private:
     {
         BOOST_CHECK(ec.category() == json_parser_category());
         BOOST_CHECK(ec.value() == error_code_);
-        throw json_parse_exception(ec.message(),context.line_number(),context.column_number());
+        throw json_parse_exception(ec,context.line_number(),context.column_number());
     }
 
     int error_code_;
