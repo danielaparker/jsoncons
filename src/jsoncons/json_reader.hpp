@@ -26,7 +26,7 @@ template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
     enum state_type {top_t,object_t,array_t};
-    enum substate_type {unknown_t,value_separator_t,name_separator_t,value_completed_t};
+    enum substate_type {unknown_t,name_t,value_separator_t,name_separator_t,value_completed_t};
 
     struct stack_item
     {
@@ -448,24 +448,11 @@ void basic_json_reader<Char>::parse()
                     if (stack_.back().is_object() & (stack_.back().name_count_ == stack_.back().value_count_))
                     {
                         handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
-                        count1 = 0;
-                        if (buffer_[buffer_position_] == ':')
-                        {
-                            ++count1;
-                        }
-                        else if ((buffer_[buffer_position_] == ' ') & (buffer_[buffer_position_ + 1] == ':'))
-                        {
-                            count1 += 2;
-                        }
-                        buffer_position_ += count1;
-                        column_ += count1;
-
-                        if (count1 == 0)
-                        {
-                            parse_separator();
-                            stack_.back().substate_ = name_separator_t;
-                        }
+                        stack_.back().substate_ = name_t;
                         ++stack_.back().name_count_;
+                        count1 = 0;
+                        parse_separator();
+                        stack_.back().substate_ = name_separator_t;
                     }
                     else
                     {
