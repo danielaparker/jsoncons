@@ -109,17 +109,17 @@ BOOST_AUTO_TEST_CASE(test_expected_name)
 	std::cout << "test_expected_name" << std::endl;
     std::istringstream is("{10}");
     
-    my_error_handler err_handler(jsoncons::json_parser_error::expected_name);
-	json_reader reader(is,jsoncons::null_json_input_handler<char>(),err_handler);
+	json_reader reader(is,jsoncons::null_json_input_handler<char>());
 
 	try
 	{
 		reader.read();
+		BOOST_FAIL("Must throw");
 	}
 	catch (const json_parse_exception& e)
 	{
 		std::cout << e.what() << std::endl;
-		BOOST_CHECK(err_handler.error_code_ == jsoncons::json_parser_error::expected_name);
+		BOOST_CHECK(e.error_code().value() == jsoncons::json_parser_error::expected_name);
 	}
 
     //std::cout << in << std::endl;
