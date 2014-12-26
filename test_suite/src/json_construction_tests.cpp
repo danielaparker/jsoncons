@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     {
         std::ostringstream os;
 
-        os << max_value;
+        //os << max_value;
 
         os << "{\"max_longlong\":-" << max_value << "}";
         json val = json::parse_string(os.str());
@@ -169,9 +169,13 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     {
         std::ostringstream os;
 
-        os << max_value;
+        //os << max_value;
 
+        std::cout << "TEST LIMITS" << std::endl;
         os << "{\"max_longlong_overflow\":-" << max_value << "0}";
+        std::cout << os.str() << std::endl;
+
+
         json val = json::parse_string(os.str());
         std::cout << val << std::endl;
         BOOST_CHECK(val["max_longlong_overflow"].is_double());
