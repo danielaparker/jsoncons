@@ -154,7 +154,7 @@ private:
 template <typename Char>
 class null_json_input_handler_impl : public basic_json_input_handler<Char>
 {
-public:
+private:
     virtual void do_begin_json()
     {
     }
@@ -179,7 +179,7 @@ public:
     {
     }
 
-    virtual void name(const std::basic_string<Char>&, const basic_parsing_context<Char>&)
+    virtual void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&)
     {
     }
 
