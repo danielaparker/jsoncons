@@ -47,6 +47,11 @@ public:
     {
         return column_number_;
     }
+
+    std::error_code error_code() const
+    {
+        return error_code_;
+    }
 private:
     std::error_code error_code_;
     std::string message_;
