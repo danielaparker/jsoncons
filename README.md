@@ -38,7 +38,7 @@ The library has a number of features, which are listed below:
   you will need to make changes to your code, refer to the Changelog, and to the revised
   documentation and tutorials for details.
 
-- The error_handler virtual implementation methods have been renamed to `do_warning` and `do_error`, and made private. Non virtual public interface methods `warning` and `error` have been added. 
+- The input_error_handler virtual implementation methods have been renamed to `do_warning` and `do_error`, and made private. Non virtual public interface methods `warning` and `error` have been added. 
   Error handling now leverages `std::error_code` to communicate parser error events in an extendable way.
 
 - A bug has been fixed in `csv_reader`
