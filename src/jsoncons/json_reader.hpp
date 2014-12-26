@@ -438,7 +438,7 @@ void basic_json_reader<Char>::parse()
                 stack_.back().substate_ = value_separator_t;
                 break;
             case '\"':
-                if ((stack_.back().value_count_ > 0) & (!stack_.back().substate_ == value_separator_t))
+                if (stack_.back().substate_ == value_completed_t)
                 {
                     err_handler_->error(std::error_code(json_parser_error::expected_value_separator, json_parser_category()), *this);
                 }
