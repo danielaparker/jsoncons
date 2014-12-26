@@ -564,7 +564,7 @@ void basic_json_reader<Char>::parse()
                 }
                 if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_name_or_value, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                 }
                 buffer_position_ += 3;
                 column_ += 3;
@@ -582,7 +582,7 @@ void basic_json_reader<Char>::parse()
                 }
                 if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_name_or_value, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                 }
                 buffer_position_ += 4;
                 column_ += 4;
@@ -600,7 +600,7 @@ void basic_json_reader<Char>::parse()
                 }
                 if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                 {
-                    err_handler_->error(std::error_code(json_parser_error::expected_name_or_value, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                 }
                 buffer_position_ += 3;
                 column_ += 3;
