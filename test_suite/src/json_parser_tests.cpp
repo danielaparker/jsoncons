@@ -47,6 +47,21 @@ private:
 
 };
 
+void test_error_code(const std::string& text, int ec)
+{
+    std::istringstream is(text);
+	json_reader reader(is,jsoncons::null_json_input_handler<char>());
+	try
+	{
+		reader.read();
+		BOOST_FAIL("Must throw");
+	}
+	catch (const json_parse_exception& e)
+	{
+		BOOST_CHECK_MESSAGE(e.error_code().value() == ec, e.what());
+	}
+}
+
 BOOST_AUTO_TEST_CASE(test_missing_separator)
 {
     std::istringstream is("{\"field1\"{}}");
@@ -85,14 +100,7 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
 
 BOOST_AUTO_TEST_CASE(test_value_not_found)
 {
-    std::istringstream is("{\"field1\":}");
-
-    json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::value_not_found);
-
-    json_reader reader(is,handler,err_handler);
-
-    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
+    test_error_code("{\"name\":}", jsoncons::json_parser_error::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_escaped_characters)
@@ -102,21 +110,6 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
 
     json o = json::parse_string(input);
     BOOST_CHECK(expected == o[0].as<std::string>());
-}
-
-void test_error_code(const std::string& text, int ec)
-{
-    std::istringstream is(text);
-	json_reader reader(is,jsoncons::null_json_input_handler<char>());
-	try
-	{
-		reader.read();
-		BOOST_FAIL("Must throw");
-	}
-	catch (const json_parse_exception& e)
-	{
-		BOOST_CHECK_MESSAGE(e.error_code().value() == ec, e.what());
-	}
 }
 
 BOOST_AUTO_TEST_CASE(test_expected_name_separator)
