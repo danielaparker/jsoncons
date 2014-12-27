@@ -17,7 +17,6 @@ using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
 using jsoncons::input_error_handler;
-using jsoncons::default_error_handler_impl;
 using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
 using std::string;

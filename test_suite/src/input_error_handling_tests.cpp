@@ -19,17 +19,11 @@ using jsoncons::json_input_handler;
 using jsoncons::input_error_handler;
 using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
+using jsoncons::input_error_handler;
 using std::string;
 
-class error_recovery_handler : public input_error_handler
+class my_input_error_handler : public input_error_handler
 {
-
-public:
-    error_recovery_handler(int error_code)
-        : error_code_(error_code)
-    {
-    }
-
 private:
     virtual void do_warning(std::error_code ec,
                             const parsing_context& context) throw(json_parse_exception)
@@ -39,16 +33,19 @@ private:
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {
-        BOOST_CHECK(ec.category() == json_parser_category());
-        BOOST_CHECK(ec.value() == error_code_);
-        throw json_parse_exception(ec,context.line_number(),context.column_number());
+		if (ec.value() != jsoncons::json_parser_error::unexpected_trailing_value_separator)
+		{
+			jsoncons::default_input_error_handler<char>().error(ec,context);
+		}
     }
-
-    int error_code_;
 };
 
-BOOST_AUTO_TEST_CASE(test_missing_name_quote)
+BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
 {
-}
+    my_input_error_handler err_handler;
 
+    json val = json::parse_string("[1,2,3,]", err_handler);
+
+    std::cout << val << std::endl;
+}
 

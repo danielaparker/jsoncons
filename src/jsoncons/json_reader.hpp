@@ -517,11 +517,11 @@ void basic_json_reader<Char>::parse()
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_object, json_parser_category()), *this);
                     }
-                    if (stack_.back().substate_ == value_separator_t) // dap
+                    else if (stack_.back().substate_ == value_separator_t) // dap
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_trailing_value_separator, json_parser_category()), *this);
                     }
-                    if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
+                    else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
                         err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                     }
@@ -544,11 +544,11 @@ void basic_json_reader<Char>::parse()
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_end_of_array, json_parser_category()), *this);
                     }
-                    if (stack_.back().substate_ == value_separator_t) // dap
+                    else if (stack_.back().substate_ == value_separator_t) // dap
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_trailing_value_separator, json_parser_category()), *this);
                     }
-                    if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
+                    else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
                         err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                     }
