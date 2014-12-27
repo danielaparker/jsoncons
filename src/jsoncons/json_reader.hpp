@@ -463,7 +463,7 @@ void basic_json_reader<Char>::parse()
                 {
                     parse_string();
                     size_t count1 = 0;
-                    if (stack_.back().is_object() & (stack_.back().name_count_ == stack_.back().value_count_))
+                    if (stack_.back().is_object() & ((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_separator_t)))
                     {
                         handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
                         stack_.back().substate_ = name_t;
@@ -495,9 +495,9 @@ void basic_json_reader<Char>::parse()
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
                     }
-                    if (stack_.back().name_count_ != stack_.back().value_count_)
+                    if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
-                        err_handler_->error(std::error_code(json_parser_error::value_not_found, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     stack_.pop_back();
@@ -522,6 +522,10 @@ void basic_json_reader<Char>::parse()
                     if (stack_.back().substate_ == value_separator_t) // dap
                     {
                         err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
+                    }
+                    if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
+                    {
+                        err_handler_->error(std::error_code(json_parser_error::expected_value, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     stack_.pop_back();
