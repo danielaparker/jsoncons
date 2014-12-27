@@ -394,24 +394,7 @@ void basic_json_reader<Char>::parse()
             case '\v':
             case '\f':
             case ' ':
-                {
-                    if (buffer_[buffer_position_] == ' ')
-                    {
-                        ++buffer_position_;
-                        ++column_;
-                        if (buffer_[buffer_position_] == ' ')
-                        {
-                            ++buffer_position_;
-                            ++column_;
-                            if (buffer_[buffer_position_] == ' ')
-                            {
-                                ++buffer_position_;
-                                ++column_;
-                            }
-                        }
-                    }
-                }
-                break;
+                continue;
             // Skip comments
             case '/':
                 {
@@ -466,7 +449,7 @@ void basic_json_reader<Char>::parse()
                 }
                 break;
             case value_separator:
-                if (stack_.back().value_count_ == 0)
+                if (stack_.back().substate_ != value_completed_t)
                 {
                     err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), *this);
                 }
