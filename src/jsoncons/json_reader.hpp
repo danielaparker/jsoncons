@@ -43,6 +43,20 @@ class basic_json_reader : private basic_parsing_context<Char>
         bool is_array() const {return state_ == array_t;}
         bool is_top() const {return state_ == top_t;}
 
+        int before_default() const
+        {
+            int err = 0;
+            if (is_object() & ((substate_ == init_t) | (substate_ == value_separator_t)))
+            {
+                err = json_parser_error::expected_name;
+            }
+            else
+            {
+                err = json_parser_error::expected_value;
+            }
+            return err;
+        }
+
         int before_value() const
         {
             int err = 0;
@@ -618,7 +632,13 @@ void basic_json_reader<Char>::parse()
                 }
                 break;
             default:
-                err_handler_->error(std::error_code(json_parser_error::expected_name_or_value, json_parser_category()), *this);
+                {
+                    int err = stack_.back().before_default();
+                    if (err != 0)
+                    {
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
+                    }
+                }
                 break;
             }
         }

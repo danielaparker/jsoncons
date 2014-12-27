@@ -22,31 +22,6 @@ using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
 using std::string;
 
-class my_error_handler : public input_error_handler
-{
-
-public:
-    my_error_handler(int error_code)
-        : error_code_(error_code)
-    {
-    }
-    int error_code_;
-
-private:
-    virtual void do_warning(std::error_code ec,
-                            const parsing_context& context) throw(json_parse_exception)
-    {
-    }
-
-    virtual void do_error(std::error_code ec,
-                          const parsing_context& context) throw(json_parse_exception)
-    {
-		error_code_ = ec.value();
-        throw json_parse_exception(ec,context.line_number(),context.column_number());
-    }
-
-};
-
 void test_error_code(const std::string& text, int ec)
 {
     std::istringstream is(text);
@@ -64,38 +39,17 @@ void test_error_code(const std::string& text, int ec)
 
 BOOST_AUTO_TEST_CASE(test_missing_separator)
 {
-    std::istringstream is("{\"field1\"{}}");
-
-    json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::expected_name_separator);
-
-    json_reader reader(is,handler,err_handler);
-
-    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
+    test_error_code("{\"field1\"{}}", jsoncons::json_parser_error::expected_name_separator);
 }
 
 BOOST_AUTO_TEST_CASE(test_invalid_value)
 {
-    std::istringstream is("{\"field1\":ru}");
-
-    json_deserializer handler;
-    my_error_handler err_handler(jsoncons::json_parser_error::expected_name_or_value);
-
-    json_reader reader(is,handler,err_handler);
-
-    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
+    test_error_code("{\"field1\":ru}",jsoncons::json_parser_error::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
 {
-    std::istringstream is("{\"field1\":{}");
-
-    json_deserializer handler;
-	my_error_handler err_handler(jsoncons::json_parser_error::unexpected_eof);
-
-    json_reader reader(is,handler,err_handler);
-
-    BOOST_REQUIRE_THROW(reader.read(), json_parse_exception);
+    test_error_code("{\"field1\":{}", jsoncons::json_parser_error::unexpected_eof);
 }
 
 BOOST_AUTO_TEST_CASE(test_value_not_found)
