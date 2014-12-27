@@ -1015,6 +1015,18 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
 }
 
 template<typename Char, typename Alloc>
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, basic_input_error_handler<Char>& err_handler)
+{
+    std::basic_istringstream<Char> is(s);
+    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_reader<Char> parser(is, handler, err_handler);
+    parser.read();
+    basic_json<Char, Alloc> val;
+    handler.root().swap(val);
+    return val;
+}
+
+template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename)
 {
     std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
