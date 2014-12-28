@@ -41,60 +41,60 @@ private:
         writer_->end_json();
     }
 
-    virtual void do_begin_object(basic_parsing_context<Char> context)
+    virtual void do_begin_object(basic_parse_context<Char> context)
     {
         writer_->begin_object();
     }
 
-    virtual void do_end_object(basic_parsing_context<Char> context)
+    virtual void do_end_object(basic_parse_context<Char> context)
     {
         writer_->end_object();
     }
 
-    virtual void do_begin_array(basic_parsing_context<Char> context)
+    virtual void do_begin_array(basic_parse_context<Char> context)
     {
         writer_->begin_array();
     }
 
-    virtual void do_end_array(basic_parsing_context<Char> context)
+    virtual void do_end_array(basic_parse_context<Char> context)
     {
         writer_->end_array();
     }
 
     virtual void do_name(const Char* name, size_t length, 
-                            basic_parsing_context<Char> context)
+                            basic_parse_context<Char> context)
     {
         writer_->name(name, length);
     }
 
     virtual void do_string_value(const Char* value, size_t length, 
-                              basic_parsing_context<Char> context)
+                              basic_parse_context<Char> context)
     {
         writer_->value(value, length);
     }
 
-    virtual void do_longlong_value(long long value, basic_parsing_context<Char> context)
+    virtual void do_longlong_value(long long value, basic_parse_context<Char> context)
     {
         writer_->value(value);
     }
 
     virtual void do_ulonglong_value(unsigned long long value, 
-                                 basic_parsing_context<Char> context)
+                                 basic_parse_context<Char> context)
     {
         writer_->value(value);
     }
 
-    virtual void do_double_value(double value, basic_parsing_context<Char> context)
+    virtual void do_double_value(double value, basic_parse_context<Char> context)
     {
         writer_->value(value);
     }
 
-    virtual void do_bool_value(bool value, basic_parsing_context<Char> context)
+    virtual void do_bool_value(bool value, basic_parse_context<Char> context)
     {
         writer_->value(value);
     }
 
-    virtual void do_null_value(basic_parsing_context<Char> context)
+    virtual void do_null_value(basic_parse_context<Char> context)
     {
         writer_->value(null_type());
     }
@@ -108,12 +108,12 @@ class basic_json_filter : public basic_json_input_handler<Char>
 public:
     basic_json_filter(basic_json_input_handler<Char>& handler)
         : handler_(std::addressof(handler)),
-          err_handler_(std::addressof(default_basic_input_error_handler<Char>::instance()))
+          err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance()))
     {
     }
 
     basic_json_filter(basic_json_input_handler<Char>& handler,
-                      basic_input_error_handler<Char>& err_handler)
+                      basic_parse_error_handler<Char>& err_handler)
         : handler_(std::addressof(handler)),
           err_handler_(std::addressof(err_handler))
     {
@@ -121,12 +121,12 @@ public:
 
     basic_json_filter(basic_json_output_handler<Char>& output_handler)
         : input_output_adapter_(output_handler), handler_(std::addressof(input_output_adapter_)),
-          err_handler_(std::addressof(default_basic_input_error_handler<Char>::instance()))
+          err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance()))
     {
     }
 
     basic_json_filter(basic_json_output_handler<Char>& output_handler,
-                      basic_input_error_handler<Char>& err_handler)
+                      basic_parse_error_handler<Char>& err_handler)
         : input_output_adapter_(output_handler), handler_(std::addressof(input_output_adapter_)),
           err_handler_(std::addressof(err_handler))
     {
@@ -154,64 +154,64 @@ private:
         handler_->end_json();
     }
 
-    virtual void do_begin_object(basic_parsing_context<Char> context)
+    virtual void do_begin_object(basic_parse_context<Char> context)
     {
         handler_->begin_object(context);
     }
 
-    virtual void do_end_object(basic_parsing_context<Char> context)
+    virtual void do_end_object(basic_parse_context<Char> context)
     {
         handler_->end_object(context);
     }
 
-    virtual void do_begin_array(basic_parsing_context<Char> context)
+    virtual void do_begin_array(basic_parse_context<Char> context)
     {
         handler_->begin_array(context);
     }
 
-    virtual void do_end_array(basic_parsing_context<Char> context)
+    virtual void do_end_array(basic_parse_context<Char> context)
     {
         handler_->end_array(context);
     }
 
-    virtual void do_name(const Char* name, size_t length, basic_parsing_context<Char> context)
+    virtual void do_name(const Char* name, size_t length, basic_parse_context<Char> context)
     {
         handler_->name(name, length, context);
     }
 
-    virtual void do_string_value(const Char* value, size_t length, basic_parsing_context<Char> context)
+    virtual void do_string_value(const Char* value, size_t length, basic_parse_context<Char> context)
     {
         handler_->value(value,length,context);
     }
 
-    virtual void do_double_value(double value, basic_parsing_context<Char> context)
+    virtual void do_double_value(double value, basic_parse_context<Char> context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_longlong_value(long long value, basic_parsing_context<Char> context)
+    virtual void do_longlong_value(long long value, basic_parse_context<Char> context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_ulonglong_value(unsigned long long value, basic_parsing_context<Char> context)
+    virtual void do_ulonglong_value(unsigned long long value, basic_parse_context<Char> context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_bool_value(bool value, basic_parsing_context<Char> context)
+    virtual void do_bool_value(bool value, basic_parse_context<Char> context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_null_value(basic_parsing_context<Char> context)
+    virtual void do_null_value(basic_parse_context<Char> context)
     {
         handler_->value(null_type(),context);
     }
 
     basic_json_input_output_adapter<Char> input_output_adapter_;
     basic_json_input_handler<Char>* handler_;
-    basic_input_error_handler<Char>* err_handler_;
+    basic_parse_error_handler<Char>* err_handler_;
 };
 
 typedef basic_json_filter<char> json_filter;

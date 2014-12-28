@@ -1015,7 +1015,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, basic_input_error_handler<Char>& err_handler)
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, basic_parse_error_handler<Char>& err_handler)
 {
     std::basic_istringstream<Char> is(s);
     basic_json_deserializer<Char, Alloc> handler;

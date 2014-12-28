@@ -11,35 +11,35 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
+using jsoncons::parse_context;
 using jsoncons::json_deserializer;
 using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
-using jsoncons::input_error_handler;
+using jsoncons::parse_error_handler;
 using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
-using jsoncons::input_error_handler;
-using jsoncons::default_input_error_handler;
+using jsoncons::parse_error_handler;
+using jsoncons::default_parse_error_handler;
 using std::string;
 
-class my_input_error_handler : public input_error_handler
+class my_parse_error_handler : public parse_error_handler
 {
 private:
     virtual void do_warning(std::error_code ec,
-                            parsing_context context) throw(json_parse_exception)
+                            parse_context context) throw(json_parse_exception)
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          parsing_context context) throw(json_parse_exception)
+                          parse_context context) throw(json_parse_exception)
     {
         if (ec.category() == json_parser_category())
         {
             if (ec.value() != jsoncons::json_parser_error::unexpected_value_separator && (context.last_char() == ']' || context.last_char() == '}'))
             {
-                default_input_error_handler::instance().error(ec,context);
+                default_parse_error_handler::instance().error(ec,context);
             }
         }
     }
@@ -47,7 +47,7 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
 {
-    my_input_error_handler err_handler;
+    my_parse_error_handler err_handler;
 
     json val = json::parse_string("[1,2,3,]", err_handler);
 
