@@ -297,7 +297,7 @@ typedef basic_parse_error_handler&lt;char&gt; parse_error_handler
 </code></pre>
 
 <p>When parsing JSON text with <a href="json_reader">json_reader</a>, if you need to implement
-cutomized error handling, you must implement this pure virtual class
+customized error handling, you must implement this abstract class
 and pass it in the constructor of <a href="json_reader">json_reader</a>. The <code>read</code> method 
 will then report all warnings and errors through this interface.</p>
 <h3>Header</h3>
