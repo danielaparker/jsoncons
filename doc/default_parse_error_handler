@@ -301,7 +301,12 @@ typedef default_basic_parse_error_handler&lt;char&gt; default_parse_error_handle
 </code></pre>
 
 <h3>Base class</h3>
-<p><a href="error_handler">error_handler</a>    </p>
+<p><a href="parse_error_handler">parse<em>error</em>handler</a>  </p>
+<h3>Static memebr functions</h3>
+<pre><code>static parse_error_handler&amp; instance()   
+</code></pre>
+
+<p>Returns a singleton instance of a <code>default_parse_error_handler</code>       </p>
 <h3>Private virtual implementation methods</h3>
 <pre><code>virtual void do_warning(const std::string&amp; error_code,
                         std::error_code ec,

@@ -1021,11 +1021,15 @@ public:
 
     static basic_json parse(std::basic_istream<Char>& is);
 
+    static basic_json parse(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler);
+
     static basic_json parse_string(const std::basic_string<Char>& s);
 
     static basic_json parse_string(const std::basic_string<Char>& s, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json parse_file(const std::string& s);
+
+    static basic_json parse_file(const std::string& s, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json make_array()
     {
