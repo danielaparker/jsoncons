@@ -120,7 +120,6 @@ public:
                       basic_json_input_handler<Char>& handler,
                       basic_input_error_handler<Char>& err_handler)
        :
-         minimum_structure_capacity_(0),
          column_(0),
          line_(0),
          stack_(),
@@ -140,7 +139,6 @@ public:
                       basic_json_input_handler<Char>& handler)
 
        :
-         minimum_structure_capacity_(0),
          column_(0),
          line_(0),
          stack_(),
@@ -279,11 +277,6 @@ private:
         return column_;
     }
 
-    virtual size_t do_minimum_structure_capacity() const
-    {
-        return minimum_structure_capacity_;
-    }
-
     virtual Char do_get()
     {
         if (buffer_position_ >= buffer_length_)
@@ -321,7 +314,6 @@ private:
         return eof_;
     }
 
-    size_t minimum_structure_capacity_;
     unsigned long column_;
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
@@ -454,9 +446,7 @@ void basic_json_reader<Char>::parse()
                     handler_->begin_json();
                 }
                 stack_.push_back(stack_item(object_t));
-                minimum_structure_capacity_ = estimate_minimum_object_capacity();
-                handler_->begin_object(basic_parsing_context<Char>(c,this));
-                minimum_structure_capacity_ = 0;
+                handler_->begin_object(basic_parsing_context<Char>(c,this,estimate_minimum_object_capacity()));
                 break;
             case begin_array:
                 {
@@ -472,9 +462,7 @@ void basic_json_reader<Char>::parse()
                 }
                 {
                     stack_.push_back(stack_item(array_t));
-                    minimum_structure_capacity_ = estimate_minimum_array_capacity();
-                    handler_->begin_array(basic_parsing_context<Char>(c,this));
-                    minimum_structure_capacity_ = 0;
+                    handler_->begin_array(basic_parsing_context<Char>(c,this,estimate_minimum_array_capacity()));
                 }
                 break;
             case value_separator:
