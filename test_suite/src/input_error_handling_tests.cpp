@@ -27,12 +27,12 @@ class my_input_error_handler : public input_error_handler
 {
 private:
     virtual void do_warning(std::error_code ec,
-                            const parsing_context& context) throw(json_parse_exception)
+                            parsing_context context) throw(json_parse_exception)
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          const parsing_context& context) throw(json_parse_exception)
+                          parsing_context context) throw(json_parse_exception)
     {
 		if (ec.value() != jsoncons::json_parser_error::unexpected_trailing_value_separator)
 		{

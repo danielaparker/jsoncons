@@ -32,92 +32,92 @@ public:
         do_end_json();
     }
 
-    void begin_object(const basic_parsing_context<Char>& context)
+    void begin_object(basic_parsing_context<Char> context)
     {
         do_begin_object(context);
     }
 
-    void end_object(const basic_parsing_context<Char>& context)
+    void end_object(basic_parsing_context<Char> context)
     {
         do_end_object(context);
     }
 
-    void begin_array(const basic_parsing_context<Char>& context)
+    void begin_array(basic_parsing_context<Char> context)
     {
         do_begin_array(context);
     }
 
-    void end_array(const basic_parsing_context<Char>& context)
+    void end_array(basic_parsing_context<Char> context)
     {
         do_end_array(context);
     }
 
-    void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
+    void name(const std::basic_string<Char>& name, basic_parsing_context<Char> context)
     {
         do_name(&name[0], name.length(), context);
     }
 
-    void name(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
+    void name(const Char* p, size_t length, basic_parsing_context<Char> context) 
     {
         do_name(p, length, context);
     }
 
-    void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
+    void value(const std::basic_string<Char>& value, basic_parsing_context<Char> context) 
     {
         do_string_value(&value[0], value.length(), context);
     }
 
-    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
+    void value(const Char* p, size_t length, basic_parsing_context<Char> context) 
     {
         do_string_value(p, length, context);
     }
 
-    void value(int value, const basic_parsing_context<Char>& context) 
+    void value(int value, basic_parsing_context<Char> context) 
     {
         do_longlong_value(value,context);
     }
 
-    void value(long value, const basic_parsing_context<Char>& context) 
+    void value(long value, basic_parsing_context<Char> context) 
     {
         do_longlong_value(value,context);
     }
 
-    void value(long long value, const basic_parsing_context<Char>& context) 
+    void value(long long value, basic_parsing_context<Char> context) 
     {
         do_longlong_value(value,context);
     }
 
-    void value(unsigned int value, const basic_parsing_context<Char>& context) 
+    void value(unsigned int value, basic_parsing_context<Char> context) 
     {
         do_ulonglong_value(value,context);
     }
 
-    void value(unsigned long value, const basic_parsing_context<Char>& context) 
+    void value(unsigned long value, basic_parsing_context<Char> context) 
     {
         do_ulonglong_value(value,context);
     }
 
-    void value(unsigned long long value, const basic_parsing_context<Char>& context) 
+    void value(unsigned long long value, basic_parsing_context<Char> context) 
     {
         do_ulonglong_value(value,context);
     }
 
-    void value(float value, const basic_parsing_context<Char>& context)
+    void value(float value, basic_parsing_context<Char> context)
     {
         do_double_value(value, context);
     }
 
-    void value(double value, const basic_parsing_context<Char>& context)
+    void value(double value, basic_parsing_context<Char> context)
     {
         do_double_value(value, context);
     }
 
-    void value(bool value, const basic_parsing_context<Char>& context) 
+    void value(bool value, basic_parsing_context<Char> context) 
     {
         do_bool_value(value,context);
     }
 
-    void value(null_type, const basic_parsing_context<Char>& context)
+    void value(null_type, basic_parsing_context<Char> context)
     {
         do_null_value(context);
     }
@@ -127,27 +127,27 @@ private:
 
     virtual void do_end_json() = 0;
 
-    virtual void do_begin_object(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_begin_object(basic_parsing_context<Char> context) = 0;
 
-    virtual void do_end_object(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_end_object(basic_parsing_context<Char> context) = 0;
 
-    virtual void do_begin_array(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_begin_array(basic_parsing_context<Char> context) = 0;
 
-    virtual void do_end_array(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_end_array(basic_parsing_context<Char> context) = 0;
 
-    virtual void do_name(const Char* name, size_t length, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_name(const Char* name, size_t length, basic_parsing_context<Char> context) = 0;
 
-    virtual void do_null_value(const basic_parsing_context<Char>& context) = 0;
+    virtual void do_null_value(basic_parsing_context<Char> context) = 0;
 
-    virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_string_value(const Char* value, size_t length, basic_parsing_context<Char> context) = 0;
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_double_value(double value, basic_parsing_context<Char> context) = 0;
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_longlong_value(long long value, basic_parsing_context<Char> context) = 0;
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_ulonglong_value(unsigned long long value, basic_parsing_context<Char> context) = 0;
 
-    virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_bool_value(bool value, basic_parsing_context<Char> context) = 0;
 };
 
 
@@ -169,47 +169,47 @@ private:
     {
     }
 
-    virtual void do_begin_object(const basic_parsing_context<Char>&)
+    virtual void do_begin_object(basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_end_object(const basic_parsing_context<Char>&)
+    virtual void do_end_object(basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_begin_array(const basic_parsing_context<Char>&)
+    virtual void do_begin_array(basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_end_array(const basic_parsing_context<Char>&)
+    virtual void do_end_array(basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&)
+    virtual void do_name(const Char* p, size_t length, basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_null_value(const basic_parsing_context<Char>&)
+    virtual void do_null_value(basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_string_value(const Char*, size_t length, const basic_parsing_context<Char>&)
+    virtual void do_string_value(const Char*, size_t length, basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_double_value(double, const basic_parsing_context<Char>&)
+    virtual void do_double_value(double, basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_longlong_value(long long, const basic_parsing_context<Char>&)
+    virtual void do_longlong_value(long long, basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
+    virtual void do_ulonglong_value(unsigned long long, basic_parsing_context<Char>)
     {
     }
 
-    virtual void do_bool_value(bool, const basic_parsing_context<Char>&)
+    virtual void do_bool_value(bool, basic_parsing_context<Char>)
     {
     }
 };
