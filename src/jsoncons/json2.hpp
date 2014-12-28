@@ -1003,10 +1003,11 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is)
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is, 
+                                                       basic_parse_error_handler<Char>& err_handler)
 {
     basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> reader(is, handler);
+    basic_json_reader<Char> reader(is, handler, err_handler);
     reader.read();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
@@ -1014,12 +1015,11 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, 
-                                                              basic_parse_error_handler<Char>& err_handler)
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s)
 {
     std::basic_istringstream<Char> is(s);
     basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> reader(is, handler, err_handler);
+    basic_json_reader<Char> reader(is, handler);
     reader.read();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);

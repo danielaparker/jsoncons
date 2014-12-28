@@ -277,29 +277,6 @@ private:
         }
     }
 
-    virtual Char do_get()
-    {
-        if (buffer_position_ >= buffer_length_)
-        {
-            read_some();
-        }
-        Char c = buffer_position_++;
-        if ((c == '\r') & (buffer_[buffer_position_] == '\n'))
-        {
-            ++buffer_position_;
-        }
-        else if ((c == '\n') | (c == '\r'))
-        {
-            ++line_;
-            column_ = 0;
-        }
-        else
-        {
-            ++column_;
-        }
-        return c;
-    }
-
     virtual Char do_peek()
     {
         if (buffer_position_ >= buffer_length_)
@@ -309,7 +286,7 @@ private:
         return buffer_[buffer_position_];
     }
 
-    virtual bool do_eof()
+    virtual bool do_eof() const
     {
         return eof_;
     }
