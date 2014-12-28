@@ -24,7 +24,7 @@ using std::string;
 void test_error_code(const std::string& text, int ec)
 {
     std::istringstream is(text);
-	json_reader reader(is,jsoncons::null_json_input_handler<char>());
+	json_reader reader(is,jsoncons::empty_json_input_handler::instance());
 	try
 	{
 		reader.read();
