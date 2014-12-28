@@ -14,7 +14,7 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parse_context;
+using jsoncons::parsing_context;
 using jsoncons::json_serializer;
 using jsoncons::output_format;
 using jsoncons::woutput_format;

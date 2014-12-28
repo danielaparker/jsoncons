@@ -60,10 +60,10 @@ private:
 };
 
 template<typename Char>
-class basic_parse_context_impl
+class basic_parsing_context_impl
 {
 public:
-    virtual ~basic_parse_context_impl() {}
+    virtual ~basic_parsing_context_impl() {}
 
     bool eof() const
     {
@@ -88,18 +88,18 @@ private:
 };
 
 template<typename Char>
-class basic_parse_context
+class basic_parsing_context
 {
 public:
-    basic_parse_context(Char c, basic_parse_context_impl<Char>* impl)
+    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl)
         : c_(c), impl_(impl), minimum_structure_capacity_(0)
     {
     }
-    basic_parse_context(Char c, basic_parse_context_impl<Char>* impl, size_t minimum_structure_capacity)
+    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl, size_t minimum_structure_capacity)
         : c_(c), impl_(impl), minimum_structure_capacity_(minimum_structure_capacity)
     {
     }
-    basic_parse_context(basic_parse_context& context)
+    basic_parsing_context(basic_parsing_context& context)
         : c_(context.c_), impl_(context.impl_), minimum_structure_capacity_(context.minimum_structure_capacity_)
     {
     }
@@ -129,11 +129,11 @@ public:
 private:
     Char c_;
     size_t minimum_structure_capacity_;
-    basic_parse_context_impl<Char>* impl_;
+    basic_parsing_context_impl<Char>* impl_;
 };
 
-typedef basic_parse_context<char> parse_context;
-typedef basic_parse_context<wchar_t> wparse_context;
+typedef basic_parsing_context<char> parsing_context;
+typedef basic_parsing_context<wchar_t> wparsing_context;
 
 template <typename Char>
 class basic_parse_error_handler
@@ -144,23 +144,23 @@ public:
     }
 
     void warning(std::error_code ec,
-                 basic_parse_context<Char> context) throw (json_parse_exception) 
+                 basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
         do_warning(ec,context);
     }
 
     void error(std::error_code ec,
-               basic_parse_context<Char> context) throw (json_parse_exception) 
+               basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
         do_error(ec,context);
     }
 
 private:
     virtual void do_warning(std::error_code,
-                            basic_parse_context<Char> context) throw (json_parse_exception) = 0;
+                            basic_parsing_context<Char> context) throw (json_parse_exception) = 0;
 
     virtual void do_error(std::error_code,
-                          basic_parse_context<Char> context) throw (json_parse_exception) = 0;
+                          basic_parsing_context<Char> context) throw (json_parse_exception) = 0;
 };
 
 template <typename Char>
@@ -174,12 +174,12 @@ public:
     }
 private:
     virtual void do_warning(std::error_code,
-                            basic_parse_context<Char> context) throw (json_parse_exception) 
+                            basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          basic_parse_context<Char> context) throw (json_parse_exception)
+                          basic_parsing_context<Char> context) throw (json_parse_exception)
     {
         throw json_parse_exception(ec,context.line_number(),context.column_number());
     }
@@ -191,8 +191,8 @@ typedef basic_parse_error_handler<wchar_t> wparse_error_handler;
 typedef default_basic_parse_error_handler<char> default_parse_error_handler;
 typedef default_basic_parse_error_handler<wchar_t> wdefault_parse_error_handler;
 
-typedef basic_parse_context<char> parse_context;
-typedef basic_parse_context<wchar_t> wparse_context;
+typedef basic_parsing_context<char> parsing_context;
+typedef basic_parsing_context<wchar_t> wparsing_context;
 
 namespace json_parser_error {
 enum json_parser_error_t 

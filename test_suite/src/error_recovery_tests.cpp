@@ -11,7 +11,7 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parse_context;
+using jsoncons::parsing_context;
 using jsoncons::json_deserializer;
 using jsoncons::json;
 using jsoncons::wjson;
@@ -28,12 +28,12 @@ class my_parse_error_handler : public parse_error_handler
 {
 private:
     virtual void do_warning(std::error_code ec,
-                            parse_context context) throw(json_parse_exception)
+                            parsing_context context) throw(json_parse_exception)
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          parse_context context) throw(json_parse_exception)
+                          parsing_context context) throw(json_parse_exception)
     {
         if (ec.category() == json_parser_category())
         {

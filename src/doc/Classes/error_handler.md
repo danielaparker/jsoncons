@@ -18,25 +18,25 @@ will then report all warnings and errors through this interface.
 ### Public interface methods
 
     void warning(std::error_code ec,
-                 const parse_context& context) throw (json_parse_exception) = 0
+                 const parsing_context& context) throw (json_parse_exception) = 0
 Send a warning event. An [error_code](JSON%20parser%20error%20codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parse_context) parameter. Uses `do_warning`.
+line and column information is provided in the [context](parsing_context) parameter. Uses `do_warning`.
 
     void error(std::error_code ec,
-               const parse_context& context) throw (json_parse_exception) = 0
+               const parsing_context& context) throw (json_parse_exception) = 0
 Send a error event, possibly recoverable. An [error_code](JSON%20parser%20error%20codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parse_context) parameter.  Uses `do_error`.
+line and column information is provided in the [context](parsing_context) parameter.  Uses `do_error`.
 
 ### Private virtual implementation methods
 
     virtual void do_warning(std::error_code ec,
-                            const parse_context& context) throw (json_parse_exception) = 0
+                            const parsing_context& context) throw (json_parse_exception) = 0
 Receive a warning event. An [error_code](JSON%20parser%20error%20codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parse_context) parameter.
+line and column information is provided in the [context](parsing_context) parameter.
 
     virtual void do_error(std::error_code ec,
-                          const parse_context& context) throw (json_parse_exception) = 0
+                          const parsing_context& context) throw (json_parse_exception) = 0
 Receive a error event, possibly recoverable. An [error_code](JSON%20parser%20error%20codes) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parse_context) parameter. 
+line and column information is provided in the [context](parsing_context) parameter. 
     
 
