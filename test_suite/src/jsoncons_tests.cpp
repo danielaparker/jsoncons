@@ -469,7 +469,7 @@ public:
     }
 
 private:
-    virtual void do_name(const char* p, int length, const parsing_context& context)
+    virtual void do_name(const char* p, int length, parsing_context context)
     {
         property_name_ = string(p,length);
         if (property_name_ != "name")
@@ -478,7 +478,7 @@ private:
         }
     }
 
-    virtual void do_string_value(const char* p, int length, const parsing_context& context)
+    virtual void do_string_value(const char* p, int length, parsing_context context)
     {
         if (property_name_ == "name")
         {

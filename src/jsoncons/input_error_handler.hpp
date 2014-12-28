@@ -60,19 +60,11 @@ private:
 };
 
 template<typename Char>
-class basic_parsing_context
+class basic_parsing_context_impl
 {
 public:
-    virtual ~basic_parsing_context() {}
+    virtual ~basic_parsing_context_impl() {}
 
-    Char get() 
-    {
-        return do_get();
-    }
-    Char peek() 
-    {
-        return do_peek();
-    }
     bool eof() const
     {
         return do_eof();
@@ -91,12 +83,49 @@ public:
     }
 
 private:
-    virtual Char do_get() = 0; 
-    virtual Char do_peek() = 0;
-    virtual bool do_eof() = 0;
     virtual unsigned long do_line_number() const = 0;
     virtual unsigned long do_column_number() const = 0;
     virtual size_t do_minimum_structure_capacity() const = 0;
+};
+
+template<typename Char>
+class basic_parsing_context
+{
+public:
+    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl)
+        : c_(c), impl_(impl)
+    {
+    }
+    basic_parsing_context(basic_parsing_context& context)
+        : c_(context.c_), impl_(context.impl_)
+    {
+    }
+
+    Char current_char() const
+    {
+        return c_;
+    }
+
+    bool eof() const
+    {
+        return impl_->eof();
+    }
+    unsigned long line_number() const
+    {
+        return impl_->line_number();
+    }
+    unsigned long column_number() const 
+    {
+        return impl_->column_number();
+    }
+    size_t minimum_structure_capacity() const 
+    {
+        return impl_->minimum_structure_capacity();
+    }
+
+private:
+    Char c_;
+    basic_parsing_context_impl<Char>* impl_;
 };
 
 typedef basic_parsing_context<char> parsing_context;
@@ -111,23 +140,23 @@ public:
     }
 
     void warning(std::error_code ec,
-                 const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+                 basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
         do_warning(ec,context);
     }
 
     void error(std::error_code ec,
-               const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+               basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
         do_error(ec,context);
     }
 
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+                            basic_parsing_context<Char> context) throw (json_parse_exception) = 0;
 
     virtual void do_error(std::error_code,
-                          const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+                          basic_parsing_context<Char> context) throw (json_parse_exception) = 0;
 };
 
 template <typename Char>
@@ -141,12 +170,12 @@ public:
     }
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+                            basic_parsing_context<Char> context) throw (json_parse_exception) 
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          const basic_parsing_context<Char>& context) throw (json_parse_exception)
+                          basic_parsing_context<Char> context) throw (json_parse_exception)
     {
         throw json_parse_exception(ec,context.line_number(),context.column_number());
     }
