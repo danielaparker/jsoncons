@@ -22,7 +22,7 @@
 namespace jsoncons_ext { namespace csv {
 
 template<typename Char,class Alloc>
-class basic_csv_reader : private jsoncons::basic_parsing_context_impl<Char>
+class basic_csv_reader : private jsoncons::parsing_context_state<Char>
 {
     struct stack_item
     {
