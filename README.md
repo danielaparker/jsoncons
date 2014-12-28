@@ -23,7 +23,24 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
+## What's new on master since Release 0.95
+
+- Enhancements to json parsing and json parse event error notification.
+
+- Renamed `error_handler` to `parse_error_handler`
+
+- The `json_input_handler` and `parse_error_handler` event notification
+  methods now take a `parsing_context` value rather than a const reference.
+
+- Static singleton `instance` methods have been added to `default_parse_error_handler`
+  and `empty_json_input_handler`. 
+
+- Added to the `json` class overloaded static methods `parse`, `parse_string` 
+  and `parse_file` that take a `parse_error_handler` as a parameter. 
+
 ## What's new on master since Release 0.94.1
+
+- Enhancements to json parsing and json parse event error notification.
 
 - A template method `any_cast` has been added to the `json` class.
 

@@ -312,8 +312,32 @@ img {
 <li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
+<h2>What's new on master since Release 0.95</h2>
+<ul>
+<li>
+<p>Enhancements to json parsing and json parse event error notification.</p>
+</li>
+<li>
+<p>Renamed <code>error_handler</code> to <code>parse_error_handler</code></p>
+</li>
+<li>
+<p>The <code>json_input_handler</code> and <code>parse_error_handler</code> event notification
+  methods now take a <code>parsing_context</code> value rather than a const reference.</p>
+</li>
+<li>
+<p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code>
+  and <code>empty_json_input_handler</code>. </p>
+</li>
+<li>
+<p>Added to the <code>json</code> class overloaded static methods <code>parse</code>, <code>parse_string</code> 
+  and <code>parse_file</code> that take a <code>parse_error_handler</code> as a parameter. </p>
+</li>
+</ul>
 <h2>What's new on master since Release 0.94.1</h2>
 <ul>
+<li>
+<p>Enhancements to json parsing and json parse event error notification.</p>
+</li>
 <li>
 <p>A template method <code>any_cast</code> has been added to the <code>json</code> class.</p>
 </li>
@@ -331,7 +355,7 @@ img {
   documentation and tutorials for details.</p>
 </li>
 <li>
-<p>The error<em>handler virtual implementation methods have been renamed to do</em>warning and do_error, and made private. Non virtual public interface methods warning and error have been added. 
+<p>The parse<em>error</em>handler virtual implementation methods have been renamed to <code>do_warning</code> and <code>do_error</code>, and made private. Non virtual public interface methods <code>warning</code> and <code>error</code> have been added. 
   Error handling now leverages <code>std::error_code</code> to communicate parser error events in an extendable way.</p>
 </li>
 <li>

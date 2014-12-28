@@ -18,6 +18,8 @@ New features
 
 - Added methods `last_char()` and `eof()` to `parsing_context`.
 
+- Enhancements to json parsing and json parse event error notification.
+
 0.95
 ----
 
