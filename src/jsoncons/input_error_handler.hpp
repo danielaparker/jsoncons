@@ -85,7 +85,6 @@ public:
 private:
     virtual unsigned long do_line_number() const = 0;
     virtual unsigned long do_column_number() const = 0;
-    virtual size_t do_minimum_structure_capacity() const = 0;
 };
 
 template<typename Char>
@@ -93,11 +92,15 @@ class basic_parsing_context
 {
 public:
     basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl)
-        : c_(c), impl_(impl)
+        : c_(c), impl_(impl), minimum_structure_capacity_(0)
+    {
+    }
+    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl, size_t minimum_structure_capacity)
+        : c_(c), impl_(impl), minimum_structure_capacity_(minimum_structure_capacity)
     {
     }
     basic_parsing_context(basic_parsing_context& context)
-        : c_(context.c_), impl_(context.impl_)
+        : c_(context.c_), impl_(context.impl_), minimum_structure_capacity_(context.minimum_structure_capacity_)
     {
     }
 
@@ -120,11 +123,12 @@ public:
     }
     size_t minimum_structure_capacity() const 
     {
-        return impl_->minimum_structure_capacity();
+        return minimum_structure_capacity_;
     }
 
 private:
     Char c_;
+    size_t minimum_structure_capacity_;
     basic_parsing_context_impl<Char>* impl_;
 };
 
