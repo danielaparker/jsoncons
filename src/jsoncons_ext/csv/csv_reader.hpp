@@ -22,7 +22,7 @@
 namespace jsoncons_ext { namespace csv {
 
 template<typename Char,class Alloc>
-class basic_csv_reader : private jsoncons::basic_parse_context_impl<Char>
+class basic_csv_reader : private jsoncons::basic_parsing_context_impl<Char>
 {
     struct stack_item
     {
@@ -366,7 +366,7 @@ void basic_csv_reader<Char,Alloc>::read()
 
     handler_->begin_json();
     stack_.push_back(stack_item());
-    handler_->begin_array(jsoncons::basic_parse_context<Char>(0,this));
+    handler_->begin_array(jsoncons::basic_parsing_context<Char>(0,this));
     stack_.back().array_begun_ = true;
     if (assume_header_)
     {
@@ -376,7 +376,7 @@ void basic_csv_reader<Char,Alloc>::read()
     {
         read_array_of_arrays();
     }
-    handler_->end_array(jsoncons::basic_parse_context<Char>(0,this));
+    handler_->end_array(jsoncons::basic_parsing_context<Char>(0,this));
     stack_.pop_back();
     handler_->end_json();
 }
@@ -416,7 +416,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
         {
             if (stack_.back().array_begun_)
             {
-                handler_->end_array(jsoncons::basic_parse_context<Char>(c,this));
+                handler_->end_array(jsoncons::basic_parsing_context<Char>(c,this));
             }
             stack_.pop_back();
             stack_.push_back(stack_item());
@@ -426,7 +426,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
             skip_ch();
             if (eof())
             {
-                err_handler_->error(std::error_code(jsoncons::json_parser_error::unexpected_eof, jsoncons::json_parser_category()), jsoncons::basic_parse_context<Char>(c,this));
+                err_handler_->error(std::error_code(jsoncons::json_parser_error::unexpected_eof, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
             }
             ignore_single_line_comment();
         }
@@ -444,11 +444,11 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                     if (!stack_.back().array_begun_)
                     {
                         minimum_structure_capacity_ = row_capacity;
-                        handler_->begin_array(jsoncons::basic_parse_context<Char>(c,this));
+                        handler_->begin_array(jsoncons::basic_parsing_context<Char>(c,this));
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parse_context<Char>(c,this));
+                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parsing_context<Char>(c,this));
                 }
                 else
                 {
@@ -457,11 +457,11 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                     if (!stack_.back().array_begun_)
                     {
                         minimum_structure_capacity_ = row_capacity;
-                        handler_->begin_array(jsoncons::basic_parse_context<Char>(c,this));
+                        handler_->begin_array(jsoncons::basic_parsing_context<Char>(c,this));
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parse_context<Char>(c,this));
+                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parsing_context<Char>(c,this));
                 }
             }
         }
@@ -471,7 +471,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
     {
         if (stack_.back().array_begun_)
         {
-            handler_->end_array(jsoncons::basic_parse_context<Char>(0,this));
+            handler_->end_array(jsoncons::basic_parsing_context<Char>(0,this));
         }
         stack_.pop_back();
     }
@@ -513,7 +513,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
         {
             if (stack_.back().array_begun_)
             {
-                handler_->end_object(jsoncons::basic_parse_context<Char>(c,this));
+                handler_->end_object(jsoncons::basic_parsing_context<Char>(c,this));
             }
             stack_.pop_back();
             stack_.push_back(stack_item());
@@ -526,14 +526,14 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
             if (!stack_.back().array_begun_)
             {
                 minimum_structure_capacity_ = header.size();
-                handler_->begin_object(jsoncons::basic_parse_context<Char>(c,this));
+                handler_->begin_object(jsoncons::basic_parsing_context<Char>(c,this));
                 minimum_structure_capacity_ = 0;
                 stack_.back().array_begun_ = true;
             }
             if (column_index < header.size())
             {
-                handler_->name(header[column_index],jsoncons::basic_parse_context<Char>(c,this));
-                handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parse_context<Char>(c,this));
+                handler_->name(header[column_index],jsoncons::basic_parsing_context<Char>(c,this));
+                handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parsing_context<Char>(c,this));
             }
             ++column_index;
         }
@@ -550,14 +550,14 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
                 if (!stack_.back().array_begun_)
                 {
                     minimum_structure_capacity_ = header.size();
-                    handler_->begin_object(jsoncons::basic_parse_context<Char>(c,this));
+                    handler_->begin_object(jsoncons::basic_parsing_context<Char>(c,this));
                     minimum_structure_capacity_ = 0;
                     stack_.back().array_begun_ = true;
                 }
                 if (column_index < header.size())
                 {
-                    handler_->name(header[column_index],jsoncons::basic_parse_context<Char>(c,this));
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parse_context<Char>(c,this));
+                    handler_->name(header[column_index],jsoncons::basic_parsing_context<Char>(c,this));
+                    handler_->value(&string_buffer_[0],string_buffer_.length(),jsoncons::basic_parsing_context<Char>(c,this));
                 }
             }
             ++column_index;
@@ -569,7 +569,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
     {
         if (stack_.back().array_begun_)
         {
-            handler_->end_object(jsoncons::basic_parse_context<Char>(0,this));
+            handler_->end_object(jsoncons::basic_parsing_context<Char>(0,this));
         }
         stack_.pop_back();
     }
@@ -623,7 +623,7 @@ void basic_csv_reader<Char,Alloc>::parse_quoted_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_->error(std::error_code(jsoncons::json_parser_error::eof_reading_string_value, jsoncons::json_parser_category()), jsoncons::basic_parse_context<Char>(c,this));
+            err_handler_->error(std::error_code(jsoncons::json_parser_error::eof_reading_string_value, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
         }
         else if (c == quote_escape_char_ && peek() == quote_char_)
         {

@@ -14,13 +14,13 @@
 
     virtual void do_warning(const std::string& error_code,
                             std::error_code ec,
-                            parse_context context) throw (json_parse_exception)
+                            parsing_context context) throw (json_parse_exception)
 Does nothing
 
     virtual void do_error(const std::string& error_code,
                           std::error_code ec,
-                          parse_context context) throw (json_parse_exception)
+                          parsing_context context) throw (json_parse_exception)
 Throws a [json_parse_exception](json_parse_exception) with the message and the line 
-number and column number taken from the [context](parse_context) parameter.
+number and column number taken from the [context](parsing_context) parameter.
     
 

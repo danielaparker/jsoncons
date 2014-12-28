@@ -23,7 +23,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
     #include "jsoncons/json_filter.hpp"
     #include "jsoncons/json_reader.hpp"
 
-    using jsoncons::parse_context;
+    using jsoncons::parsing_context;
     using jsoncons::json_serializer;
     using jsoncons::json_reader;
     using jsoncons::json_input_handler;
@@ -39,7 +39,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
 
     private:
         virtual void do_name(const char* p, int length, 
-                             const parse_context& context)
+                             const parsing_context& context)
         {
             property_name_ = string(p,length);
             if (property_name_ != "name")
@@ -49,7 +49,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         }
 
         virtual void do_string_value(const char* p, int length, 
-                                     const parse_context& context)
+                                     const parsing_context& context)
         {
             if (property_name_ == "name")
             {

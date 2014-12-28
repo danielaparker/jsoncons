@@ -1,3 +1,10 @@
+0.96
+----
+
+Changes
+
+- Renamed `error_handler` to `parse_error_handler`
+
 0.95
 ----
 
