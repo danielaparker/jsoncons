@@ -29,7 +29,7 @@ The library has a number of features, which are listed below:
 
 - Renamed `error_handler` to `parse_error_handler`
 
-- The `json_input_handler` and `parse_error_handler` event notification
+- The `json_input_handler`, `json_filter` and `parse_error_handler` event notification
   methods now take a `parsing_context` value rather than a const reference.
 
 - Static singleton `instance` methods have been added to `default_parse_error_handler`
