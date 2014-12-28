@@ -16,6 +16,8 @@ New features
 - Added to the `json` class overloaded static methods parse, parse_string 
   and parse_file that take a `parse_error_handler` as a parameter. 
 
+- Added methods `last_char()` and `eof()` to `parsing_context`.
+
 0.95
 ----
 
