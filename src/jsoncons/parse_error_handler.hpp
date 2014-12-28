@@ -77,14 +77,11 @@ public:
     {
         return do_column_number();
     }
-    size_t minimum_structure_capacity() const 
-    {
-        return do_minimum_structure_capacity();
-    }
 
 private:
     virtual unsigned long do_line_number() const = 0;
     virtual unsigned long do_column_number() const = 0;
+    virtual bool do_eof() const = 0;
 };
 
 template<typename Char>
