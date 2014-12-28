@@ -34,7 +34,7 @@ private:
     virtual void do_error(std::error_code ec,
                           parsing_context context) throw(json_parse_exception)
     {
-		if (ec.value() != jsoncons::json_parser_error::unexpected_trailing_value_separator)
+		if (ec.value() != jsoncons::json_parser_error::unexpected_value_separator && (context.current_char() == ']' || context.current_char() == '}'))
 		{
 			default_input_error_handler::instance().error(ec,context);
 		}
