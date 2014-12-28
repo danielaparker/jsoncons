@@ -8,7 +8,12 @@
 
 ### Base class
 
-[error_handler](error_handler)    
+[parse_error_handler](parse_error_handler)  
+  
+### Static memebr functions
+  
+    static parse_error_handler& instance()   
+Returns a singleton instance of a `default_parse_error_handler`       
 
 ### Private virtual implementation methods
 
