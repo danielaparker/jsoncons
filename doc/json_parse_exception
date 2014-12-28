@@ -303,7 +303,7 @@ img {
 </code></pre>
 
 <h3>Constructors</h3>
-<pre><code>json_parse_exception(std::string message,
+<pre><code>json_parse_exception(std::error_code ec,
                      unsigned long line,
                      unsigned long column)
 
@@ -311,7 +311,7 @@ json_parse_exception(const json_parse_exception&amp; other)
 </code></pre>
 
 <h3>Member functions</h3>
-<pre><code>const std::string&amp; message() const
+<pre><code>const std::error_code error_code() const
 </code></pre>
 
 <p>Returns a message for this exception</p>

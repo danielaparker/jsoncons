@@ -10,7 +10,7 @@
 
 ### Constructors
 
-    json_parse_exception(std::string message,
+    json_parse_exception(std::error_code ec,
                          unsigned long line,
                          unsigned long column)
 
@@ -18,7 +18,7 @@
 
 ### Member functions
 
-    const std::string& message() const
+    const std::error_code error_code() const
 Returns a message for this exception
 
     unsigned long line_number() const
