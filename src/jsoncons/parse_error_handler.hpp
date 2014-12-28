@@ -60,10 +60,10 @@ private:
 };
 
 template<typename Char>
-class basic_parsing_context_impl
+class parsing_context_state
 {
 public:
-    virtual ~basic_parsing_context_impl() {}
+    virtual ~parsing_context_state() {}
 
     bool eof() const
     {
@@ -88,11 +88,11 @@ template<typename Char>
 class basic_parsing_context
 {
 public:
-    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl)
+    basic_parsing_context(Char c, parsing_context_state<Char>* impl)
         : c_(c), impl_(impl), minimum_structure_capacity_(0)
     {
     }
-    basic_parsing_context(Char c, basic_parsing_context_impl<Char>* impl, size_t minimum_structure_capacity)
+    basic_parsing_context(Char c, parsing_context_state<Char>* impl, size_t minimum_structure_capacity)
         : c_(c), impl_(impl), minimum_structure_capacity_(minimum_structure_capacity)
     {
     }
@@ -126,7 +126,7 @@ public:
 private:
     Char c_;
     size_t minimum_structure_capacity_;
-    basic_parsing_context_impl<Char>* impl_;
+    parsing_context_state<Char>* impl_;
 };
 
 typedef basic_parsing_context<char> parsing_context;

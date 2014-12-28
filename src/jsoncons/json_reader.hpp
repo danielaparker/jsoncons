@@ -23,7 +23,7 @@
 namespace jsoncons {
 
 template<typename Char>
-class basic_json_reader : private basic_parsing_context_impl<Char>
+class basic_json_reader : private parsing_context_state<Char>
 {
     enum state_type {top_t,object_t,array_t};
     enum substate_type {init_t,name_t,value_separator_t,name_separator_t,value_completed_t};
