@@ -104,7 +104,7 @@ public:
     {
     }
 
-    Char current_char() const
+    Char last_char() const
     {
         return c_;
     }
