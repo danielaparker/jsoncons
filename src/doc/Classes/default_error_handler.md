@@ -1,13 +1,26 @@
-    jsoncons::default_error_handler
+    jsoncons::default_parse_error_handler
 
-    template <typename Char>
-    basic_input_error_handler<Char>& default_error_handler(); 
-
-Obtains a reference to the static default `input_error_handler` instance.
+    typedef default_basic_parse_error_handler<char> default_parse_error_handler
 
 ### Header
 
-    #include "jsoncons/error_handler.hpp"
+    #include "jsoncons/parse_error_handler.hpp"
 
+### Base class
 
+[error_handler](error_handler)    
+
+### Private virtual implementation methods
+
+    virtual void do_warning(const std::string& error_code,
+                            std::error_code ec,
+                            parse_context context) throw (json_parse_exception)
+Does nothing
+
+    virtual void do_error(const std::string& error_code,
+                          std::error_code ec,
+                          parse_context context) throw (json_parse_exception)
+Throws a [json_parse_exception](json_parse_exception) with the message and the line 
+number and column number taken from the [context](parse_context) parameter.
+    
 
