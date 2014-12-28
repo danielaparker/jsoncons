@@ -186,7 +186,6 @@ private:
     size_t skip_object(size_t pos, const size_t end) const;
     size_t skip_string(size_t pos, const size_t end) const;
     size_t skip_number(size_t pos, const size_t end) const;
-    void parse_separator();
     void parse_number(Char c);
     void parse_string();
     void ignore_single_line_comment();
@@ -472,6 +471,13 @@ void basic_json_reader<Char>::parse()
                 }
                 stack_.back().substate_ = value_separator_t;
                 break;
+            case name_separator:
+                if (stack_.back().substate_ != name_t)
+                {
+                    err_handler_->error(std::error_code(json_parser_error::unexpected_name_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                }
+                stack_.back().substate_ = name_separator_t;
+                break;
             case '\"':
                 if (stack_.back().substate_ == value_completed_t)
                 {
@@ -484,8 +490,6 @@ void basic_json_reader<Char>::parse()
                     {
                         handler_->name(&string_buffer_[0], string_buffer_.length(), basic_parsing_context<Char>(c,this));
                         stack_.back().substate_ = name_t;
-                        parse_separator();
-                        stack_.back().substate_ = name_separator_t;
                     }
                     else
                     {
@@ -507,7 +511,7 @@ void basic_json_reader<Char>::parse()
                     }
                     else if (stack_.back().substate_ == value_separator_t) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_error::unexpected_trailing_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
                     }
                     else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
@@ -534,7 +538,7 @@ void basic_json_reader<Char>::parse()
                     }
                     else if (stack_.back().substate_ == value_separator_t) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_error::unexpected_trailing_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_error::unexpected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
                     }
                     else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
@@ -639,67 +643,6 @@ void basic_json_reader<Char>::parse()
         if (buffer_position_ >= buffer_length_)
         {
             read_some();
-        }
-    }
-}
-
-template<typename Char>
-void basic_json_reader<Char>::parse_separator()
-{
-    bool done = false;
-    while (!done)
-    {
-        const size_t end = buffer_length_;
-        while (!done & (buffer_position_ < end))
-        {
-            Char c = buffer_[buffer_position_++];
-            ++column_;
-            switch (c)
-            {
-            case '\r':
-                if (buffer_[buffer_position_] == '\n')
-                {
-                    ++buffer_position_;
-                }
-                ++line_;
-                column_ = 0;
-                break;
-            case '\n':
-                ++line_;
-                column_ = 0;
-                break;
-            case '\t':
-            case '\v':
-            case '\f':
-            case ' ':
-                break;
-            case '/':
-                {
-                    Char next = buffer_[buffer_position_];
-                    if (next == '/')
-                    {
-                        ignore_single_line_comment();
-                    }
-                    if (next == '*')
-                    {
-                        ignore_multi_line_comment();
-                    }
-                }
-                break;
-            case name_separator:
-                done = true;
-                break;
-            default:
-                err_handler_->error(std::error_code(json_parser_error::expected_name_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
-            }
-        }
-        if (!done)
-        {
-            read_some();
-            if (eof())
-            {
-                err_handler_->error(std::error_code(json_parser_error::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
-            }
         }
     }
 }

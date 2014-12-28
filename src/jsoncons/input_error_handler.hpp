@@ -197,22 +197,21 @@ typedef basic_parsing_context<wchar_t> wparsing_context;
 namespace json_parser_error {
 enum json_parser_error_t 
 {
-    unexpected_eof,
-    unexpected_value_separator,
-    unexpected_trailing_value_separator,
     expected_value_separator,
+    unexpected_value_separator,
     unexpected_end_of_object,
     unexpected_end_of_array,
     expected_name,
     expected_value,
     expected_name_separator,
+    unexpected_name_separator,
     illegal_control_character,
     illegal_escaped_character,
     invalid_codepoint_surrogate_pair,
     invalid_hex_escape_sequence,
     invalid_unicode_escape_sequence,
     invalid_number,
-    value_not_found,
+    unexpected_eof,
     eof_reading_string_value,
     eof_reading_numeric_value
 };
@@ -230,12 +229,8 @@ public:
     {
         switch (ev)
         {
-        case json_parser_error::unexpected_eof:
-            return "Unexpected end of file";
         case json_parser_error::unexpected_value_separator:
             return "Unexpected value separator ','";
-        case json_parser_error::unexpected_trailing_value_separator:
-            return "Unexpected trailing value separator ','";
         case json_parser_error::expected_value_separator:
             return "Expected value separator ','";
         case json_parser_error::unexpected_end_of_object:
@@ -246,6 +241,8 @@ public:
             return "Expected name";
         case json_parser_error::expected_value:
             return "Expected value";
+        case json_parser_error::unexpected_name_separator:
+            return "Unexpected name separator ':'";
         case json_parser_error::expected_name_separator:
             return "Expected name separator ':'";
         case json_parser_error::illegal_control_character:
@@ -260,8 +257,8 @@ public:
             return "Invalid codepoint, expected four hexadecimal digits.";
         case json_parser_error::invalid_number:
             return "Invalid number";
-        case json_parser_error::value_not_found:
-            return "Value not found";
+        case json_parser_error::unexpected_eof:
+            return "Unexpected end of file";
         case json_parser_error::eof_reading_string_value:
             return "Reached end of file while reading string value";
         case json_parser_error::eof_reading_numeric_value:
