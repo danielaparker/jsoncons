@@ -301,7 +301,7 @@ cutomized error handling, you must implement this pure virtual class
 and pass it in the constructor of <a href="json_reader">json_reader</a>. The <code>read</code> method 
 will then report all warnings and errors through this interface.</p>
 <h3>Header</h3>
-<pre><code>#include &quot;jsoncons/error_handler.hpp&quot;
+<pre><code>#include &quot;jsoncons/parse_error_handler.hpp&quot;
 </code></pre>
 
 <h3>Destructor</h3>

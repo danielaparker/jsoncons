@@ -9,7 +9,7 @@ will then report all warnings and errors through this interface.
 
 ### Header
 
-    #include "jsoncons/error_handler.hpp"
+    #include "jsoncons/parse_error_handler.hpp"
 
 ### Destructor
 
