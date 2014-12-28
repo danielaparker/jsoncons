@@ -152,8 +152,14 @@ private:
 
 
 template <typename Char>
-class null_json_input_handler_impl : public basic_json_input_handler<Char>
+class empty_basic_json_input_handler : public basic_json_input_handler<Char>
 {
+public:
+    static basic_json_input_handler<Char>& instance()
+    {
+        static empty_basic_json_input_handler<Char> instance;
+        return instance;
+    }
 private:
     virtual void do_begin_json()
     {
@@ -208,15 +214,11 @@ private:
     }
 };
 
-template<typename Char>
-basic_json_input_handler<Char>& null_json_input_handler()
-{
-    static null_json_input_handler_impl<Char> instance;
-    return instance;
-}
-
 typedef basic_json_input_handler<char> json_input_handler;
 typedef basic_json_input_handler<wchar_t> wjson_input_handler;
+
+typedef empty_basic_json_input_handler<char> empty_json_input_handler;
+typedef empty_basic_json_input_handler<wchar_t> wempty_json_input_handler;
 
 }
 
