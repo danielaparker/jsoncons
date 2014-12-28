@@ -150,7 +150,7 @@ public:
          hard_buffer_length_(0),
          estimation_buffer_length_(default_max_buffer_length),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_input_error_handler<Char>())),
+         err_handler_(std::addressof(default_basic_input_error_handler<Char>::instance())),
          bof_(true),
          eof_(false),
          is_(std::addressof(is))

@@ -20,6 +20,7 @@ using jsoncons::input_error_handler;
 using jsoncons::json_parse_exception;
 using jsoncons::json_parser_category;
 using jsoncons::input_error_handler;
+using jsoncons::default_input_error_handler;
 using std::string;
 
 class my_input_error_handler : public input_error_handler
@@ -35,7 +36,7 @@ private:
     {
 		if (ec.value() != jsoncons::json_parser_error::unexpected_trailing_value_separator)
 		{
-			jsoncons::default_input_error_handler<char>().error(ec,context);
+			default_input_error_handler::instance().error(ec,context);
 		}
     }
 };

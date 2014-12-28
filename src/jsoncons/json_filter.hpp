@@ -108,7 +108,7 @@ class basic_json_filter : public basic_json_input_handler<Char>
 public:
     basic_json_filter(basic_json_input_handler<Char>& handler)
         : handler_(std::addressof(handler)),
-          err_handler_(std::addressof(default_input_error_handler<Char>()))
+          err_handler_(std::addressof(default_basic_input_error_handler<Char>::instance()))
     {
     }
 
@@ -121,7 +121,7 @@ public:
 
     basic_json_filter(basic_json_output_handler<Char>& output_handler)
         : input_output_adapter_(output_handler), handler_(std::addressof(input_output_adapter_)),
-          err_handler_(std::addressof(default_input_error_handler<Char>()))
+          err_handler_(std::addressof(default_basic_input_error_handler<Char>::instance()))
     {
     }
 

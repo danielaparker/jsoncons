@@ -131,8 +131,14 @@ private:
 };
 
 template <typename Char>
-class default_input_error_handler_impl : public basic_input_error_handler<Char>
+class default_basic_input_error_handler : public basic_input_error_handler<Char>
 {
+public:
+    static basic_input_error_handler<Char>& instance()
+    {
+        static default_basic_input_error_handler<Char> instance;
+        return instance;
+    }
 private:
     virtual void do_warning(std::error_code,
                             const basic_parsing_context<Char>& context) throw (json_parse_exception) 
@@ -149,15 +155,11 @@ private:
 typedef basic_input_error_handler<char> input_error_handler;
 typedef basic_input_error_handler<wchar_t> winput_error_handler;
 
+typedef default_basic_input_error_handler<char> default_input_error_handler;
+typedef default_basic_input_error_handler<wchar_t> wdefault_input_error_handler;
+
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;
-
-template<typename Char>
-basic_input_error_handler<Char>& default_input_error_handler()
-{
-    static default_input_error_handler_impl<Char> instance;
-    return instance;
-}
 
 namespace json_parser_error {
 enum json_parser_error_t 
