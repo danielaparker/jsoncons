@@ -478,8 +478,7 @@ vertical-align:1px;
 
 <h3>Base class</h3>
 
-<pre><code>[json_exception](json_exception)
-</code></pre>
+<p><a href="json_exception">json_exception</a></p>
 
 <h3>Constructors</h3>
 
