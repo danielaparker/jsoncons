@@ -638,8 +638,7 @@ void basic_json_reader<Char>::parse_number(Char c)
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++]; // shouldn't be lf
-            ++column_;
+            Char c = buffer_[buffer_position_]; // shouldn't be lf
             switch (c)
             {
             case '0':
@@ -653,6 +652,8 @@ void basic_json_reader<Char>::parse_number(Char c)
             case '8':
             case '9':
                 string_buffer_.push_back(c);
+                ++buffer_position_;
+                ++column_;
                 break;
             case '-':
             case '+':
@@ -661,11 +662,11 @@ void basic_json_reader<Char>::parse_number(Char c)
             case 'E':
                 has_frac_or_exp = true;
                 string_buffer_.push_back(c);
+                ++buffer_position_;
+                ++column_;
                 break;
             default:
                 {
-                    --buffer_position_;
-					--column_;
                     if (has_frac_or_exp)
                     {
                         try
