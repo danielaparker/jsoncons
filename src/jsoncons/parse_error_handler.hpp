@@ -38,7 +38,7 @@ public:
         return buffer_.c_str();
     }
 
-    const std::error_code error_code() const
+    const std::error_code code() const
     {
         return error_code_;
     }
@@ -191,27 +191,28 @@ typedef default_basic_parse_error_handler<wchar_t> wdefault_parse_error_handler;
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;
 
-namespace json_parser_error {
-enum json_parser_error_t 
+namespace json_parser_errc 
 {
-    expected_value_separator,
-    unexpected_value_separator,
-    unexpected_end_of_object,
-    unexpected_end_of_array,
-    expected_name,
-    expected_value,
-    expected_name_separator,
-    unexpected_name_separator,
-    illegal_control_character,
-    illegal_escaped_character,
-    invalid_codepoint_surrogate_pair,
-    invalid_hex_escape_sequence,
-    invalid_unicode_escape_sequence,
-    invalid_number,
-    unexpected_eof,
-    eof_reading_string_value,
-    eof_reading_numeric_value
-};
+    enum json_parser_errc_t 
+    {
+        expected_value_separator,
+        unexpected_value_separator,
+        unexpected_end_of_object,
+        unexpected_end_of_array,
+        expected_name,
+        expected_value,
+        expected_name_separator,
+        unexpected_name_separator,
+        illegal_control_character,
+        illegal_escaped_character,
+        invalid_codepoint_surrogate_pair,
+        invalid_hex_escape_sequence,
+        invalid_unicode_escape_sequence,
+        invalid_number,
+        unexpected_eof,
+        eof_reading_string_value,
+        eof_reading_numeric_value
+    };
 }
 
 class json_parser_category_impl
@@ -226,39 +227,39 @@ public:
     {
         switch (ev)
         {
-        case json_parser_error::unexpected_value_separator:
+        case json_parser_errc::unexpected_value_separator:
             return "Unexpected value separator ','";
-        case json_parser_error::expected_value_separator:
+        case json_parser_errc::expected_value_separator:
             return "Expected value separator ','";
-        case json_parser_error::unexpected_end_of_object:
+        case json_parser_errc::unexpected_end_of_object:
             return "Unexpected end of object '}'";
-        case json_parser_error::unexpected_end_of_array:
+        case json_parser_errc::unexpected_end_of_array:
             return "Unexpected end of array ']'";
-        case json_parser_error::expected_name:
+        case json_parser_errc::expected_name:
             return "Expected name";
-        case json_parser_error::expected_value:
+        case json_parser_errc::expected_value:
             return "Expected value";
-        case json_parser_error::unexpected_name_separator:
+        case json_parser_errc::unexpected_name_separator:
             return "Unexpected name separator ':'";
-        case json_parser_error::expected_name_separator:
+        case json_parser_errc::expected_name_separator:
             return "Expected name separator ':'";
-        case json_parser_error::illegal_control_character:
+        case json_parser_errc::illegal_control_character:
             return "Illegal control character in string";
-        case json_parser_error::illegal_escaped_character:
+        case json_parser_errc::illegal_escaped_character:
             return "Illegal escaped character in string";
-        case json_parser_error::invalid_codepoint_surrogate_pair:
+        case json_parser_errc::invalid_codepoint_surrogate_pair:
             return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
-        case json_parser_error::invalid_hex_escape_sequence:
+        case json_parser_errc::invalid_hex_escape_sequence:
             return "Invalid codepoint, expected hexadecimal digit.";
-        case json_parser_error::invalid_unicode_escape_sequence:
+        case json_parser_errc::invalid_unicode_escape_sequence:
             return "Invalid codepoint, expected four hexadecimal digits.";
-        case json_parser_error::invalid_number:
+        case json_parser_errc::invalid_number:
             return "Invalid number";
-        case json_parser_error::unexpected_eof:
+        case json_parser_errc::unexpected_eof:
             return "Unexpected end of file";
-        case json_parser_error::eof_reading_string_value:
+        case json_parser_errc::eof_reading_string_value:
             return "Reached end of file while reading string value";
-        case json_parser_error::eof_reading_numeric_value:
+        case json_parser_errc::eof_reading_numeric_value:
             return "Reached end of file while reading numeric value";
         default:
             return "Unknown JSON parser error";
@@ -274,7 +275,7 @@ const std::error_category& json_parser_category()
 }
 
 inline
-std::error_code make_error_code(json_parser_error::json_parser_error_t e)
+std::error_code make_error_code(json_parser_errc::json_parser_errc_t e)
 {
   return std::error_code(
       static_cast<int>(e),

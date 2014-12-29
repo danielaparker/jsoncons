@@ -18,7 +18,7 @@
 
 ### Member functions
 
-    const std::error_code error_code() const
+    const std::error_code code() const
 Returns a message for this exception
 
     unsigned long line_number() const

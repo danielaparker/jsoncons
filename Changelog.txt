@@ -3,7 +3,9 @@
 
 Changes
 
-- Renamed `error_handler` to `parse_error_handler`
+- Renamed `error_handler` to `parse_error_handler`.
+
+- Renamed namespace `json_parser_error` to `json_parser_errc`
 
 - The `json_input_handler`, `json_filter` and `parse_error_handler` 
   event notification methods now take a `parsing_context` value 
