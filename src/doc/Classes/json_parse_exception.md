@@ -47,7 +47,8 @@ Constructs an error message, including line and column position
         } 
     	catch(const jsoncons::json_parse_exception& e) 
     	{
-            std::cout << "Caught json_parse_exception with category " << e.code().category().name() 
+            std::cout << "Caught json_parse_exception with category " 
+                      << e.code().category().name() 
     			      << ", code " << e.code().value() 
                       << " and message " << e.what() << std::endl;
         }

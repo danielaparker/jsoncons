@@ -529,7 +529,8 @@ int main()
     } 
     catch(const jsoncons::json_parse_exception&amp; e) 
     {
-        std::cout &lt;&lt; "Caught json_parse_exception with category " &lt;&lt; e.code().category().name() 
+        std::cout &lt;&lt; "Caught json_parse_exception with category " 
+                  &lt;&lt; e.code().category().name() 
                   &lt;&lt; ", code " &lt;&lt; e.code().value() 
                   &lt;&lt; " and message " &lt;&lt; e.what() &lt;&lt; std::endl;
     }
