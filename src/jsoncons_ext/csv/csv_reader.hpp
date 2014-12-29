@@ -403,7 +403,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
             skip_ch();
             if (eof())
             {
-                err_handler_->error(std::error_code(jsoncons::json_parser_error::unexpected_eof, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
+                err_handler_->error(std::error_code(jsoncons::json_parser_errc::unexpected_eof, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
             }
             ignore_single_line_comment();
         }
@@ -600,7 +600,7 @@ void basic_csv_reader<Char,Alloc>::parse_quoted_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_->error(std::error_code(jsoncons::json_parser_error::eof_reading_string_value, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
+            err_handler_->error(std::error_code(jsoncons::json_parser_errc::eof_reading_string_value, jsoncons::json_parser_category()), jsoncons::basic_parsing_context<Char>(c,this));
         }
         else if (c == quote_escape_char_ && peek() == quote_char_)
         {
