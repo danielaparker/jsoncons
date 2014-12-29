@@ -242,6 +242,21 @@ void read_and_write_escaped_unicode()
     std::cout << output << std::endl;
 }
 
+void parse_exception_example()
+{
+	string s = "[1,2,3,4,]";
+    try 
+	{
+        jsoncons::json val = jsoncons::json::parse_string(s);
+    } 
+	catch(const jsoncons::json_parse_exception& e) 
+	{
+        std::cout << "Caught json_parse_exception with category " << e.code().category().name() 
+			      << ", code " << e.code().value() 
+                  << " and message " << e.what() << std::endl;
+    }
+}
+
 int main()
 {
     first_example_a();
@@ -265,6 +280,8 @@ int main()
     wjson_examples();
 
     read_and_write_escaped_unicode();
+
+	parse_exception_example();
 
     return 0;
 }
