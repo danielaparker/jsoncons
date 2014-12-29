@@ -33,7 +33,7 @@ public:
     const char* what() const JSONCONS_NOEXCEPT
     {
         std::ostringstream os;
-        os << error_code_.message() << " on line " << line_number_ << " at column " << column_number_;
+        os << error_code_.message() << " detected at line " << line_number_ << " and column " << column_number_;
         const_cast<std::string&>(buffer_) = os.str();
         return buffer_.c_str();
     }
@@ -221,7 +221,7 @@ class json_parser_category_impl
 public:
     virtual const char* name() const
     {
-        return "JSON parser";
+        return "json_input";
     }
     virtual std::string message(int ev) const
     {

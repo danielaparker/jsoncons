@@ -1,6 +1,10 @@
 0.96
 ----
 
+Bug fixes:
+
+- Fixed issue with column number reported by json_reader
+
 Changes
 
 - Renamed `error_handler` to `parse_error_handler`.

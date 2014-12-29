@@ -513,6 +513,33 @@ Column numbers start at 1.</p>
 </code></pre>
 
 <p>Constructs an error message, including line and column position</p>
+
+<h3>Example</h3>
+
+<pre><code>#include "jsoncons/json.hpp"
+
+using jsoncons::json;
+
+int main()
+{
+    string s = "[1,2,3,4,]";
+    try 
+    {
+        jsoncons::json val = jsoncons::json::parse_string(s);
+    } 
+    catch(const jsoncons::json_parse_exception&amp; e) 
+    {
+        std::cout &lt;&lt; "Caught json_parse_exception with category " &lt;&lt; e.code().category().name() 
+                  &lt;&lt; ", code " &lt;&lt; e.code().value() 
+                  &lt;&lt; " and message " &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>Caught json_parse_exception with category json_input, code 1 and message Unexpected value separator ',' detected at line 1 and column 10
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

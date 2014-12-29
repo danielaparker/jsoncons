@@ -537,15 +537,16 @@ void basic_json_reader<Char>::parse()
                     {
                         err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
                     }
+                
+                    if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
+                    {
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    }
+                    buffer_position_ += 3;
+                    column_ += 3;
+                    handler_->value(true, basic_parsing_context<Char>(c,this));
+                    stack_.back().substate_ = value_completed_t;
                 }
-                if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
-                {
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
-                }
-                buffer_position_ += 3;
-                column_ += 3;
-                handler_->value(true, basic_parsing_context<Char>(c,this));
-                stack_.back().substate_ = value_completed_t;
                 break;
             case 'f':
                 {
@@ -664,6 +665,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             default:
                 {
                     --buffer_position_;
+					--column_;
                     if (has_frac_or_exp)
                     {
                         try
