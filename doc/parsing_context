@@ -480,7 +480,7 @@ typedef basic_parsing_context&lt;char&gt; parsing_context
 <pre><code>#include "jsoncons/parse_error_handler.hpp"
 </code></pre>
 
-<h3>Member functions</h3>
+<h3>Public interface methods</h3>
 
 <pre><code>unsigned long line_number() const
 </code></pre>
@@ -507,7 +507,20 @@ Column numbers start at 1.</p>
 <pre><code>bool eof() const
 </code></pre>
 
-<p>Returns <code>true</code> if the parser has reached end-of-file     </p>
+<p>Returns <code>true</code> if the parser has reached end-of-file </p>
+
+<h3>Private virtual implementation methods</h3>
+
+<pre><code>virtual unsigned long do_line_number() const = 0
+
+virtual unsigned long do_column_number() const = 0
+
+virtual bool do_eof() const = 0
+
+virtual size_t do_minimum_structure_capacity() const = 0
+
+virtual char do_last_char() const = 0
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
