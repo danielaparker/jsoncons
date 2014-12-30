@@ -19,7 +19,7 @@ Returns the column number to the end of the text being parsed.
 Column numbers start at 1.
 
     size_t minimum_structure_capacity() const 
-Provides a hint to the [json_output_handler](json_output_handler) for how many elements to reserve for a json array or object
+Provides a hint to the [json_input_handler](json_input_handler) for how many elements to reserve for a json array or object
 
     char last_char() const 
 Returns the last character consumed by the parser
