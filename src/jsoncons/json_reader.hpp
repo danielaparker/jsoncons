@@ -23,17 +23,17 @@
 namespace jsoncons {
 
 template<typename Char>
-class basic_json_reader : private parsing_context_state<Char>
+class basic_json_reader : private basic_parsing_context<Char>
 {
     enum state_type {top_t,object_t,array_t};
     enum substate_type {init_t,name_t,value_separator_t,name_separator_t,value_completed_t};
 
     struct stack_item
     {
-        stack_item(state_type type)
-           :
-             state_(type),
-             substate_(init_t)
+        stack_item(state_type state, size_t minimum_structure_capacity=0)
+           : state_(state),
+             substate_(init_t),
+             minimum_structure_capacity_(minimum_structure_capacity)
         {
         }
 
@@ -97,7 +97,7 @@ class basic_json_reader : private parsing_context_state<Char>
 
         state_type state_;
         substate_type substate_;
-
+        size_t minimum_structure_capacity_;
     };
 
     void parse();
@@ -186,7 +186,7 @@ private:
     size_t skip_object(size_t pos, const size_t end) const;
     size_t skip_string(size_t pos, const size_t end) const;
     size_t skip_number(size_t pos, const size_t end) const;
-    void parse_number(Char c);
+    void parse_number();
     void parse_string();
     void ignore_single_line_comment();
     void ignore_multi_line_comment();
@@ -286,6 +286,16 @@ private:
         return eof_;
     }
 
+    virtual Char do_last_char() const
+    {
+        return c_;
+    }
+
+    virtual size_t do_minimum_structure_capacity() const
+    {
+        return stack_.size() > 0 ? stack_.back().minimum_structure_capacity_ : 0;
+    }
+
     unsigned long column_;
     unsigned long line_;
     std::basic_string<Char> string_buffer_;
@@ -301,6 +311,7 @@ private:
     bool bof_;
     bool eof_;
     std::basic_istream<Char> *is_;
+    Char c_;
 };
 
 template<typename Char>
@@ -355,7 +366,7 @@ void basic_json_reader<Char>::read()
     stack_.pop_back();
     if (stack_.size() > 0)
     {
-        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
+        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
     }
 }
 
@@ -366,9 +377,9 @@ void basic_json_reader<Char>::parse()
     {
         while (buffer_position_ < buffer_length_)
         {
-            Char c = buffer_[buffer_position_++];
+            c_ = buffer_[buffer_position_++];
             ++column_;
-            switch (c)
+            switch (c_)
             {
             // Skip whitespace
             case '\r':
@@ -410,22 +421,22 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 }
                 if (stack_.back().is_top())
                 {
                     handler_->begin_json();
                 }
-                stack_.push_back(stack_item(object_t));
-                handler_->begin_object(basic_parsing_context<Char>(c,this,estimate_minimum_object_capacity()));
+                stack_.push_back(stack_item(object_t,estimate_minimum_object_capacity()));
+                handler_->begin_object(*this);
                 break;
             case begin_array:
                 {
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 }
                 if (stack_.back().is_top())
@@ -433,35 +444,35 @@ void basic_json_reader<Char>::parse()
                     handler_->begin_json();
                 }
                 {
-                    stack_.push_back(stack_item(array_t));
-                    handler_->begin_array(basic_parsing_context<Char>(c,this,estimate_minimum_array_capacity()));
+                    stack_.push_back(stack_item(array_t,estimate_minimum_array_capacity()));
+                    handler_->begin_array(*this);
                 }
                 break;
             case value_separator:
                 if (stack_.back().substate_ != value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
                 }
                 stack_.back().substate_ = value_separator_t;
                 break;
             case name_separator:
                 if (stack_.back().substate_ != name_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::unexpected_name_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    err_handler_->error(std::error_code(json_parser_errc::unexpected_name_separator, json_parser_category()), *this);
                 }
                 stack_.back().substate_ = name_separator_t;
                 break;
             case '\"':
                 if (stack_.back().substate_ == value_completed_t)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    err_handler_->error(std::error_code(json_parser_errc::expected_value_separator, json_parser_category()), *this);
                 }
                 {
                     parse_string();
                     size_t count1 = 0;
                     if (stack_.back().is_object() & ((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_separator_t)))
                     {
-                        handler_->name(&string_buffer_[0], string_buffer_.length(), basic_parsing_context<Char>(c,this));
+                        handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
                         stack_.back().substate_ = name_t;
                     }
                     else
@@ -469,9 +480,9 @@ void basic_json_reader<Char>::parse()
                         int err = stack_.back().check_value_precondition();
                         if (err != 0)
                         {
-                            err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                            err_handler_->error(std::error_code(err, json_parser_category()), *this);
                         }
-                        handler_->value(&string_buffer_[0], string_buffer_.length(), basic_parsing_context<Char>(c,this));
+                        handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
                         stack_.back().substate_ = value_completed_t;
                     }
                 }
@@ -480,17 +491,17 @@ void basic_json_reader<Char>::parse()
                 {
                     if (!stack_.back().is_object())
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
                     }
                     else if (stack_.back().substate_ == value_separator_t) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
                     }
                     else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     }
-                    handler_->end_object(basic_parsing_context<Char>(c,this));
+                    handler_->end_object(*this);
                     stack_.pop_back();
                 }
                 if (!stack_.back().is_top())
@@ -507,17 +518,17 @@ void basic_json_reader<Char>::parse()
                 {
                     if (stack_.back().is_object())
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
                     }
                     else if (stack_.back().substate_ == value_separator_t) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
                     }
                     else if (!((stack_.back().substate_ == init_t) | (stack_.back().substate_ == value_completed_t)))
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     }
-                    handler_->end_array(basic_parsing_context<Char>(c,this));
+                    handler_->end_array(*this);
                     stack_.pop_back();
                 }
                 if (!stack_.back().is_top())
@@ -535,16 +546,16 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 
                     if (!((buffer_[buffer_position_] == 'r') & (buffer_[buffer_position_ + 1] == 'u') & (buffer_[buffer_position_ + 2] == 'e')))
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     }
                     buffer_position_ += 3;
                     column_ += 3;
-                    handler_->value(true, basic_parsing_context<Char>(c,this));
+                    handler_->value(true, *this);
                     stack_.back().substate_ = value_completed_t;
                 }
                 break;
@@ -553,16 +564,16 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 }
                 if (!((buffer_[buffer_position_] == 'a') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 's') & (buffer_[buffer_position_ + 3] == 'e')))
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                 }
                 buffer_position_ += 4;
                 column_ += 4;
-                handler_->value(false, basic_parsing_context<Char>(c,this));
+                handler_->value(false, *this);
                 stack_.back().substate_ = value_completed_t;
                 break;
             case 'n':
@@ -570,16 +581,16 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 }
                 if (!((buffer_[buffer_position_] == 'u') & (buffer_[buffer_position_ + 1] == 'l') & (buffer_[buffer_position_ + 2] == 'l')))
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                 }
                 buffer_position_ += 3;
                 column_ += 3;
-                handler_->value(null_type(), basic_parsing_context<Char>(c,this));
+                handler_->value(null_type(), *this);
                 stack_.back().substate_ = value_completed_t;
                 break;
             case '0':
@@ -597,9 +608,9 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_value_precondition();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
-                    parse_number(c);
+                    parse_number();
                     stack_.back().substate_ = value_completed_t;
                 }
                 break;
@@ -608,7 +619,7 @@ void basic_json_reader<Char>::parse()
                     int err = stack_.back().check_default();
                     if (err != 0)
                     {
-                        err_handler_->error(std::error_code(err, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(err, json_parser_category()), *this);
                     }
                 }
                 break;
@@ -622,14 +633,14 @@ void basic_json_reader<Char>::parse()
 }
 
 template<typename Char>
-void basic_json_reader<Char>::parse_number(Char c)
+void basic_json_reader<Char>::parse_number()
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
-    bool has_neg = (c == '-') ? true : false;
+    bool has_neg = (c_ == '-') ? true : false;
     if (!has_neg)
     {
-        string_buffer_.push_back(c);
+        string_buffer_.push_back(c_);
     }
 
     bool done = false;
@@ -638,8 +649,8 @@ void basic_json_reader<Char>::parse_number(Char c)
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_]; // shouldn't be lf
-            switch (c)
+            c_ = buffer_[buffer_position_]; // shouldn't be lf
+            switch (c_)
             {
             case '0':
             case '1':
@@ -651,7 +662,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             case '7':
             case '8':
             case '9':
-                string_buffer_.push_back(c);
+                string_buffer_.push_back(c_);
                 ++buffer_position_;
                 ++column_;
                 break;
@@ -661,7 +672,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             case 'e':
             case 'E':
                 has_frac_or_exp = true;
-                string_buffer_.push_back(c);
+                string_buffer_.push_back(c_);
                 ++buffer_position_;
                 ++column_;
                 break;
@@ -674,12 +685,12 @@ void basic_json_reader<Char>::parse_number(Char c)
                             double d = string_to_double(string_buffer_);
                             if (has_neg)
                                 d = -d;
-                            handler_->value(d, basic_parsing_context<Char>(c,this));
+                            handler_->value(d, *this);
                         }
                         catch (...)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), basic_parsing_context<Char>(c,this));
-                            handler_->value(null_type(), basic_parsing_context<Char>(c,this));
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                            handler_->value(null_type(), *this);
                         }
                     }
                     else if (has_neg)
@@ -687,19 +698,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_->value(-d, basic_parsing_context<Char>(c,this));
+                            handler_->value(-d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->value(-d, basic_parsing_context<Char>(c,this));
+                                handler_->value(-d, *this);
                             }
                             catch (...)
                             {
-                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), basic_parsing_context<Char>(c,this));
-                                handler_->value(null_type(), basic_parsing_context<Char>(c,this));
+                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                                handler_->value(null_type(), *this);
                             }
                         }
                     }
@@ -708,19 +719,19 @@ void basic_json_reader<Char>::parse_number(Char c)
                         try
                         {
                             unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
-                            handler_->value(d, basic_parsing_context<Char>(c,this));
+                            handler_->value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
                                 double d = string_to_double(string_buffer_);
-                                handler_->value(d, basic_parsing_context<Char>(c,this));
+                                handler_->value(d, *this);
                             }
                             catch (...)
                             {
-                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), basic_parsing_context<Char>(c,this));
-                                handler_->value(null_type(), basic_parsing_context<Char>(c,this));
+                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                                handler_->value(null_type(), *this);
                             }
                         }
                     }
@@ -734,7 +745,7 @@ void basic_json_reader<Char>::parse_number(Char c)
             read_some();
             if (eof())
             {
-                err_handler_->error(std::error_code(json_parser_errc::eof_reading_numeric_value, json_parser_category()), basic_parsing_context<Char>(c,this));
+                err_handler_->error(std::error_code(json_parser_errc::eof_reading_numeric_value, json_parser_category()), *this);
             }
         }
     }
@@ -751,9 +762,9 @@ void basic_json_reader<Char>::parse_string()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            c_ = buffer_[buffer_position_++];
             ++column_;
-            switch (c)
+            switch (c_)
             {
             case 0x00:
             case 0x01:
@@ -787,7 +798,7 @@ void basic_json_reader<Char>::parse_string()
             case 0x1d:
             case 0x1e:
             case 0x1f:
-                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_parser_category()), basic_parsing_context<Char>(c,this));
+                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_parser_category()), *this);
                 break;
             case '\\':
                 {
@@ -834,7 +845,7 @@ void basic_json_reader<Char>::parse_string()
                         }
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::illegal_escaped_character, json_parser_category()), basic_parsing_context<Char>(c,this));
+                        err_handler_->error(std::error_code(json_parser_errc::illegal_escaped_character, json_parser_category()), *this);
                     }
                 }
                 break;
@@ -842,7 +853,7 @@ void basic_json_reader<Char>::parse_string()
                 done = true;
                 break;
             default:
-                string_buffer_.push_back(c);
+                string_buffer_.push_back(c_);
                 break;
             }
         }
@@ -851,7 +862,7 @@ void basic_json_reader<Char>::parse_string()
             read_some();
             if (eof())
             {
-                err_handler_->error(std::error_code(json_parser_errc::eof_reading_string_value, json_parser_category()), basic_parsing_context<Char>(0,this));
+                err_handler_->error(std::error_code(json_parser_errc::eof_reading_string_value, json_parser_category()), *this);
             }
         }
     }
@@ -866,9 +877,9 @@ void basic_json_reader<Char>::ignore_single_line_comment()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            c_ = buffer_[buffer_position_++];
             ++column_;
-            switch (c)
+            switch (c_)
             {
             case '\r':
                 if (buffer_[buffer_position_] == '\n')
@@ -891,7 +902,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
+                err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
             }
         }
     }
@@ -906,9 +917,9 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
         const size_t end = buffer_length_;
         while (!done & (buffer_position_ < end))
         {
-            Char c = buffer_[buffer_position_++];
+            c_ = buffer_[buffer_position_++];
             ++column_;
-            switch (c)
+            switch (c_)
             {
             case '\r':
                 if (buffer_[buffer_position_] == '\n')
@@ -940,7 +951,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
             read_some();
             if (eof())
             {
-                err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
+                err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
             }
         }
     }
@@ -1184,7 +1195,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
     uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
     {
-        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
+        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
     }
     if (cp >= min_lead_surrogate && cp <= max_lead_surrogate)
     {
@@ -1198,7 +1209,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
         }
         else
         {
-            err_handler_->error(std::error_code(json_parser_errc::invalid_codepoint_surrogate_pair, json_parser_category()), basic_parsing_context<Char>(0,this));
+            err_handler_->error(std::error_code(json_parser_errc::invalid_codepoint_surrogate_pair, json_parser_category()), *this);
         }
     }
     return cp;
@@ -1209,15 +1220,15 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
-        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), basic_parsing_context<Char>(0,this));
+        err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
     }
     uint32_t cp = 0;
     size_t index = 0;
     while (index < 4)
     {
-        Char c = buffer_[buffer_position_++];
+        c_ = buffer_[buffer_position_++];
         ++column_;
-        const uint32_t u(c >= 0 ? c : 256 + c);
+        const uint32_t u(c_ >= 0 ? c_ : 256 + c_);
         cp *= 16;
         if (u >= '0'  &&  u <= '9')
         {
@@ -1233,13 +1244,13 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
         }
         else
         {
-            err_handler_->error(std::error_code(json_parser_errc::invalid_hex_escape_sequence, json_parser_category()), basic_parsing_context<Char>(c,this));
+            err_handler_->error(std::error_code(json_parser_errc::invalid_hex_escape_sequence, json_parser_category()), *this);
         }
         ++index;
     }
     if (index != 4)
     {
-        err_handler_->error(std::error_code(json_parser_errc::invalid_unicode_escape_sequence, json_parser_category()), basic_parsing_context<Char>(0,this));
+        err_handler_->error(std::error_code(json_parser_errc::invalid_unicode_escape_sequence, json_parser_category()), *this);
     }
     return cp;
 }

@@ -28,12 +28,12 @@ class my_parse_error_handler : public parse_error_handler
 {
 private:
     virtual void do_warning(std::error_code ec,
-                            parsing_context context) throw(json_parse_exception)
+                            const parsing_context& context) throw(json_parse_exception)
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          parsing_context context) throw(json_parse_exception)
+                          const parsing_context& context) throw(json_parse_exception)
     {
         if (ec.category() == json_parser_category())
         {
