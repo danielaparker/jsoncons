@@ -29,14 +29,13 @@ The library has a number of features, which are listed below:
 
 - Renamed `error_handler` to `parse_error_handler`
 
-- The `json_input_handler`, `json_filter` and `parse_error_handler` event notification
-  methods now take a `parsing_context` value rather than a const reference.
-
 - Static singleton `instance` methods have been added to `default_parse_error_handler`
   and `empty_json_input_handler`. 
 
 - Added to the `json` class overloaded static methods `parse`, `parse_string` 
   and `parse_file` that take a `parse_error_handler` as a parameter. 
+
+_(A change in `json_input_handler`, `json_filter` and `parse_error_handler` event notification methods has been reversed, the `const parsing_context&` parameter has been restored.)_
 
 ## What's new on master since Release 0.94.1
 
