@@ -22,24 +22,28 @@
 
 namespace jsoncons {
 
+namespace structure_type
+{
+    enum structure_type_t {json_text,json_object,json_array};
+}
+
 template<typename Char>
 class basic_json_reader : private basic_parsing_context<Char>
 {
-    enum state_type {top_t,object_t,array_t};
     enum substate_type {init_t,name_t,value_separator_t,name_separator_t,value_completed_t};
 
     struct stack_item
     {
-        stack_item(state_type state, size_t minimum_structure_capacity=0)
+        stack_item(structure_type::structure_type_t state, size_t minimum_structure_capacity=0)
            : state_(state),
              substate_(init_t),
              minimum_structure_capacity_(minimum_structure_capacity)
         {
         }
 
-        bool is_object() const {return state_ == object_t;}
-        bool is_array() const {return state_ == array_t;}
-        bool is_top() const {return state_ == top_t;}
+        bool is_object() const {return state_ == structure_type::json_object;}
+        bool is_array() const {return state_ == structure_type::json_array   ;}
+        bool is_top() const {return state_ == structure_type::json_text;}
 
         int check_default() const
         {
@@ -81,7 +85,7 @@ class basic_json_reader : private basic_parsing_context<Char>
             {
                 err = json_parser_errc::expected_value_separator;
             }
-            else if ((state_ == object_t) & (substate_ != name_separator_t))
+            else if ((state_ == structure_type::json_object) & (substate_ != name_separator_t))
             {
                 if (substate_ == name_t)
                 {
@@ -95,7 +99,7 @@ class basic_json_reader : private basic_parsing_context<Char>
             return err;
         }
 
-        state_type state_;
+        structure_type::structure_type_t state_;
         substate_type substate_;
         size_t minimum_structure_capacity_;
     };
@@ -115,7 +119,7 @@ public:
     static const size_t read_ahead_length = 12;
     static const size_t default_max_buffer_length = 16384;
 
-    //  Parse an input stream of JSON text into a json object
+    //  Parse an input stream of JSON text into a json json_object
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_parse_error_handler<Char>& err_handler)
@@ -361,7 +365,7 @@ void basic_json_reader<Char>::read()
         read_some();
     }
 
-    stack_.push_back(stack_item(top_t));
+    stack_.push_back(stack_item(structure_type::json_text));
     parse();
     stack_.pop_back();
     if (stack_.size() > 0)
@@ -428,7 +432,7 @@ void basic_json_reader<Char>::parse()
                 {
                     handler_->begin_json();
                 }
-                stack_.push_back(stack_item(object_t,estimate_minimum_object_capacity()));
+                stack_.push_back(stack_item(structure_type::json_object,estimate_minimum_object_capacity()));
                 handler_->begin_object(*this);
                 break;
             case begin_array:
@@ -444,7 +448,7 @@ void basic_json_reader<Char>::parse()
                     handler_->begin_json();
                 }
                 {
-                    stack_.push_back(stack_item(array_t,estimate_minimum_array_capacity()));
+                    stack_.push_back(stack_item(structure_type::json_array   ,estimate_minimum_array_capacity()));
                     handler_->begin_array(*this);
                 }
                 break;
