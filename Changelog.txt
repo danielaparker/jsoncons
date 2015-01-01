@@ -23,6 +23,8 @@ New features
 
 - Enhancements to json parsing and json parse event error notification.
 
+- Added to `json_input_handler` and `json_output_handler` a non virtual method `value` that takes a null terminated string.
+
 0.95
 ----
 
