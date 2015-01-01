@@ -70,6 +70,11 @@ public:
         do_string_value(p, length);
     }
 
+    void value(const Char* p) 
+    {
+        do_string_value(p, std::char_traits<Char>::length());
+    }
+
     void value(int value) 
     {
         do_longlong_value(value);
