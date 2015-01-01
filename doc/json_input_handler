@@ -540,6 +540,12 @@ line and column information is provided in the <a href="parsing_context">parsing
 <p>Send character data event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
 
+<pre><code>void value(const Char* p, const parsing_context&amp; context)
+</code></pre>
+
+<p>Send a null terminated string event. Contextual information including<br>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
+
 <pre><code>void value(long long value, const parsing_context&amp; context)
 </code></pre>
 
