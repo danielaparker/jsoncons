@@ -72,6 +72,11 @@ public:
         do_string_value(p, length, context);
     }
 
+    void value(const Char* p, const basic_parsing_context<Char>& context) 
+    {
+        do_string_value(p, std::char_traits<Char>::length(), context);
+    }
+
     void value(int value, const basic_parsing_context<Char>& context) 
     {
         do_longlong_value(value,context);

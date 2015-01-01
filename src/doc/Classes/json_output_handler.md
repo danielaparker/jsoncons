@@ -31,13 +31,13 @@ Output end JSON array event. Uses `do_end_array`.
     void name(const std::string& value)
 Output name event for a name-value pair. Uses `do_name`.
 
-    void name(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+    void name(const Char* p, size_t length)
 Output name event for a name-value pair. Uses `do_name`.
 
-    void value(const std::string& value)
-Output character data event. Uses `do_string_value`.
+    void value(const Char* p)
+Send a null terminated string event.
 
-    void value(const Char* p, size_t length, const basic_parsing_context<Char>& context)
+    void value(const std::string& value)
 Output character data event. Uses `do_string_value`.
 
     void value(long long value)

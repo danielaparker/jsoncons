@@ -48,6 +48,10 @@ line and column information is provided in the [parsing_context](parsing_context
 Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
+    void value(const Char* p, const parsing_context& context)
+Send a null terminated string event. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
+
     void value(long long value, const parsing_context& context)
 Send signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_longlong_value`.
