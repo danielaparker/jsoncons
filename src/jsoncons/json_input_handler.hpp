@@ -74,7 +74,7 @@ public:
 
     void value(const Char* p, const basic_parsing_context<Char>& context) 
     {
-        do_string_value(p, std::char_traits<Char>::length(), context);
+        do_string_value(p, std::char_traits<Char>::length(p), context);
     }
 
     void value(int value, const basic_parsing_context<Char>& context) 

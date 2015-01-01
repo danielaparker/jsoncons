@@ -72,7 +72,7 @@ public:
 
     void value(const Char* p) 
     {
-        do_string_value(p, std::char_traits<Char>::length());
+        do_string_value(p, std::char_traits<Char>::length(p));
     }
 
     void value(int value) 

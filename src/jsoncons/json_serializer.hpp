@@ -261,12 +261,12 @@ private:
 
     void indent()
     {
-        indent_ += format_.indent();
+        indent_ += static_cast<int>(format_.indent());
     }
 
     void unindent()
     {
-        indent_ -= format_.indent();
+        indent_ -= static_cast<int>(format_.indent());
     }
 
     void write_indent()
