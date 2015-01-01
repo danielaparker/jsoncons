@@ -107,7 +107,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         precision = _CVTBUFSIZE - 1;
     }
 
-    int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal_point, &sign);
+    int err = _ecvt_s(buf, _CVTBUFSIZE, val, static_cast<int>(precision), &decimal_point, &sign);
     if (err != 0)
     {
         throw std::runtime_error("Failed attempting double to string conversion");
