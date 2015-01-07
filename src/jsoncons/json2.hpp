@@ -35,14 +35,14 @@ namespace jsoncons {
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json()
 {
-    type_ = empty_object_t;
+    type_ = value_type::empty_object_t;
 }
 
 template<typename Char, typename Alloc>
 template<class InputIterator>
 basic_json<Char, Alloc>::basic_json(InputIterator first, InputIterator last)
 {
-    type_ = array_t;
+    type_ = value_type::array_t;
     value_.array_ = new json_array<Char, Alloc>(first, last);
 }
 
@@ -52,25 +52,25 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
     type_ = val.type_;
     switch (type_)
     {
-    case null_t:
-    case empty_object_t:
+    case value_type::null_t:
+    case value_type::empty_object_t:
         break;
-    case double_t:
-    case longlong_t:
-    case ulonglong_t:
-    case bool_t:
+    case value_type::double_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::bool_t:
         value_ = val.value_;
         break;
-    case string_t:
+    case value_type::string_t:
         value_.string_wrapper_ = new string_wrapper(val.internal_string());
         break;
-    case array_t:
+    case value_type::array_t:
         value_.array_ = val.value_.array_->clone();
         break;
-    case object_t:
+    case value_type::object_t:
         value_.object_ = val.value_.object_->clone();
         break;
-    case json_any_t:
+    case value_type::any_t:
         value_.any_value_ = new any(*(val.value_.any_value_));
         break;
     default:
@@ -82,138 +82,138 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(json_object<Char, Alloc> *var)
 {
-    type_ = object_t;
+    type_ = value_type::object_t;
     value_.object_ = var;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(json_array<Char, Alloc> *var)
 {
-    type_ = array_t;
+    type_ = value_type::array_t;
     value_.array_ = var;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(typename basic_json<Char, Alloc>::any var)
 {
-    type_ = json_any_t;
+    type_ = value_type::any_t;
     value_.any_value_ = new any(var);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(jsoncons::null_type)
 {
-    type_ = null_t;
+    type_ = value_type::null_t;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(double val)
 {
-    type_ = double_t;
+    type_ = value_type::double_t;
     value_.double_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(long long val)
 {
-    type_ = longlong_t;
+    type_ = value_type::longlong_t;
     value_.longlong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(int val)
 {
-    type_ = longlong_t;
+    type_ = value_type::longlong_t;
     value_.longlong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(unsigned int val)
 {
-    type_ = ulonglong_t;
+    type_ = value_type::ulonglong_t;
     value_.longlong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(long val)
 {
-    type_ = longlong_t;
+    type_ = value_type::longlong_t;
     value_.longlong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(unsigned long val)
 {
-    type_ = ulonglong_t;
+    type_ = value_type::ulonglong_t;
     value_.longlong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(unsigned long long val)
 {
-    type_ = ulonglong_t;
+    type_ = value_type::ulonglong_t;
     value_.ulonglong_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(bool val)
 {
-    type_ = bool_t;
+    type_ = value_type::bool_t;
     value_.bool_value_ = val;
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(Char c)
 {
-    type_ = string_t;
+    type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(c);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
 {
-    type_ = string_t;
+    type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s)
 {
-    type_ = string_t;
+    type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
 {
-    type_ = string_t;
+    type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s,length);
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(value_type t)
+basic_json<Char, Alloc>::basic_json(value_type::value_type_t t)
 {
     type_ = t;
     switch (type_)
     {
-    case null_t:
-    case empty_object_t:
-    case double_t:
-    case longlong_t:
-    case ulonglong_t:
-    case bool_t:
+    case value_type::null_t:
+    case value_type::empty_object_t:
+    case value_type::double_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::bool_t:
         break;
-    case string_t:
+    case value_type::string_t:
         value_.string_wrapper_ = new string_wrapper();
         break;
-    case array_t:
+    case value_type::array_t:
         value_.array_ = new json_array<Char, Alloc>();
         break;
-    case object_t:
+    case value_type::object_t:
         value_.object_ = new json_object<Char, Alloc>();
         break;
 
-    case json_any_t:
+    case value_type::any_t:
         JSONCONS_ASSERT(false);
     }
 }
@@ -223,23 +223,23 @@ basic_json<Char, Alloc>::~basic_json()
 {
     switch (type_)
     {
-    case null_t:
-    case empty_object_t:
-    case double_t:
-    case longlong_t:
-    case ulonglong_t:
-    case bool_t:
+    case value_type::null_t:
+    case value_type::empty_object_t:
+    case value_type::double_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::bool_t:
         break;
-    case string_t:
+    case value_type::string_t:
         delete value_.string_wrapper_;
         break;
-    case array_t:
+    case value_type::array_t:
         delete value_.array_;
         break;
-    case object_t:
+    case value_type::object_t:
         delete value_.object_;
         break;
-    case json_any_t:
+    case value_type::any_t:
         delete value_.any_value_;
         break;
     }
@@ -250,13 +250,13 @@ void basic_json<Char, Alloc>::assign_any(const typename basic_json<Char,Alloc>::
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = json_any_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::any_t;
         value_.any_value_ = new any(rhs);
         break;
     default:
@@ -270,13 +270,13 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = string_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::string_t;
         value_.string_wrapper_ = new string_wrapper(rhs);
         break;
     default:
@@ -290,13 +290,13 @@ void basic_json<Char, Alloc>::assign_double(double rhs)
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = double_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::double_t;
         value_.double_value_ = rhs;
         break;
     default:
@@ -310,13 +310,13 @@ void basic_json<Char, Alloc>::assign_longlong(long long rhs)
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = longlong_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::longlong_t;
         value_.longlong_value_ = rhs;
         break;
     default:
@@ -329,13 +329,13 @@ void basic_json<Char, Alloc>::assign_ulonglong(unsigned long long rhs)
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = ulonglong_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::ulonglong_t;
         value_.ulonglong_value_ = rhs;
         break;
     default:
@@ -348,13 +348,13 @@ void basic_json<Char, Alloc>::assign_bool(bool rhs)
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = bool_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::bool_t;
         value_.bool_value_ = rhs;
         break;
     default:
@@ -367,13 +367,13 @@ void basic_json<Char, Alloc>::assign_null()
 {
     switch (type_)
     {
-    case null_t:
-    case bool_t:
-    case empty_object_t:
-    case longlong_t:
-    case ulonglong_t:
-    case double_t:
-        type_ = null_t;
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::longlong_t:
+    case value_type::ulonglong_t:
+    case value_type::double_t:
+        type_ = value_type::null_t;
         break;
     default:
         basic_json<Char, Alloc>(null_type()).swap(*this);
@@ -401,36 +401,36 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
     {
         switch (type_)
         {
-        case longlong_t:
+        case value_type::longlong_t:
             switch (rhs.type())
             {
-            case longlong_t:
+            case value_type::longlong_t:
                 return value_.longlong_value_ == rhs.value_.longlong_value_;
-            case ulonglong_t:
+            case value_type::ulonglong_t:
                 return value_.longlong_value_ == rhs.value_.ulonglong_value_;
-            case double_t:
+            case value_type::double_t:
                 return value_.longlong_value_ == rhs.value_.double_value_;
             }
             break;
-        case ulonglong_t:
+        case value_type::ulonglong_t:
             switch (rhs.type())
             {
-            case longlong_t:
+            case value_type::longlong_t:
                 return value_.ulonglong_value_ == rhs.value_.longlong_value_;
-            case ulonglong_t:
+            case value_type::ulonglong_t:
                 return value_.ulonglong_value_ == rhs.value_.ulonglong_value_;
-            case double_t:
+            case value_type::double_t:
                 return value_.ulonglong_value_ == rhs.value_.double_value_;
             }
             break;
-        case double_t:
+        case value_type::double_t:
             switch (rhs.type())
             {
-            case longlong_t:
+            case value_type::longlong_t:
                 return value_.double_value_ == rhs.value_.longlong_value_;
-            case ulonglong_t:
+            case value_type::ulonglong_t:
                 return value_.double_value_ == rhs.value_.ulonglong_value_;
-            case double_t:
+            case value_type::double_t:
                 return value_.double_value_ == rhs.value_.double_value_;
             }
             break;
@@ -443,20 +443,20 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
     }
     switch (type_)
     {
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ == rhs.value_.bool_value_;
-    case null_t:
-    case empty_object_t:
+    case value_type::null_t:
+    case value_type::empty_object_t:
         return true;
-    case string_t:
+    case value_type::string_t:
         return internal_string() == rhs.internal_string();
-    case array_t:
+    case value_type::array_t:
         return *(value_.array_) == *(rhs.value_.array_);
         break;
-    case object_t:
+    case value_type::object_t:
         return *(value_.object_) == *(rhs.value_.object_);
         break;
-    case json_any_t:
+    case value_type::any_t:
         break;
     default:
         // throw
@@ -470,7 +470,7 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->at(i);
     default:
         JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
@@ -482,7 +482,7 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->at(i);
     default:
         JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
@@ -494,9 +494,9 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Cha
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         JSONCONS_THROW_EXCEPTION_1("%s not found", name);
-    case object_t:
+    case value_type::object_t:
         return value_.object_->get(name);
     default:
         {
@@ -510,9 +510,9 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_stri
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         JSONCONS_THROW_EXCEPTION_1("%s not found", name);
-    case object_t:
+    case value_type::object_t:
         return value_.object_->get(name);
     default:
         {
@@ -526,9 +526,9 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_str
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         return basic_json<Char, Alloc>::null;
-    case object_t:
+    case value_type::object_t:
         {
             const_object_iterator it = value_.object_->find(name);
             return it != end_members() ? it->value() : basic_json<Char, Alloc>::null;
@@ -546,11 +546,11 @@ typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(c
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         {
             return const_val_proxy(default_val);
         }
-    case object_t:
+    case value_type::object_t:
         {
             const_object_iterator it = value_.object_->find(name);
             if (it != end_members())
@@ -574,10 +574,10 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
 {
     switch (type_)
     {
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char, Alloc>();
-    case object_t:
+    case value_type::object_t:
         value_.object_->set(name, value);
         break;
     default:
@@ -591,13 +591,13 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(basic_json&& other){
     type_ = other.type_;
     value_ = other.value_;
-    other.type_ = null_t;
+    other.type_ = value_type::null_t;
 }
 
 template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
     switch (type_){
-    case array_t:
+    case value_type::array_t:
         value_.array_->push_back(value);
         break;
     default:
@@ -610,7 +610,7 @@ void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
 template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value){
     switch (type_){
-    case array_t:
+    case value_type::array_t:
         value_.array_->add(index, value);
         break;
     default:
@@ -623,10 +623,10 @@ void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value)
 template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
     switch (type_){
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char,Alloc>();
-    case object_t:
+    case value_type::object_t:
         value_.object_->set(name,value);
         break;
     default:
@@ -643,10 +643,10 @@ void basic_json<Char, Alloc>::set_custom_data(const std::basic_string<Char>& nam
 {
     switch (type_)
     {
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char, Alloc>();
-    case object_t:
+    case value_type::object_t:
         value_.object_->set(name, basic_json<Char, Alloc>(any(value)));
         break;
     default:
@@ -661,10 +661,10 @@ void basic_json<Char, Alloc>::clear()
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->clear();
         break;
-    case object_t:
+    case value_type::object_t:
         value_.object_->clear();
         break;
     default:
@@ -677,7 +677,7 @@ void basic_json<Char, Alloc>::remove_range(size_t from_index, size_t to_index)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->remove_range(from_index, to_index);
         break;
     default:
@@ -690,7 +690,7 @@ void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
 {
     switch (type_)
     {
-    case object_t:
+    case value_type::object_t:
         value_.object_->remove(name);
         break;
     default:
@@ -703,7 +703,7 @@ void basic_json<Char, Alloc>::add(const basic_json<Char, Alloc>& value)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->push_back(value);
         break;
     default:
@@ -718,7 +718,7 @@ void basic_json<Char, Alloc>::add(size_t index, const basic_json<Char, Alloc>& v
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->add(index, value);
         break;
     default:
@@ -735,7 +735,7 @@ void basic_json<Char, Alloc>::add_custom_data(T value)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         {
             add(basic_json<Char, Alloc>(any(value)));
         }
@@ -754,7 +754,7 @@ void basic_json<Char, Alloc>::add_custom_data(size_t index, T value)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->add(index, basic_json<Char, Alloc>(any(value)));
         break;
     default:
@@ -769,11 +769,11 @@ size_t basic_json<Char, Alloc>::size() const
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         return 0;
-    case object_t:
+    case value_type::object_t:
         return value_.object_->size();
-    case array_t:
+    case value_type::array_t:
         return value_.array_->size();
     default:
         return 0;
@@ -827,29 +827,29 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
 {
     switch (type_)
     {
-    case string_t:
+    case value_type::string_t:
         handler.value(&internal_string()[0],internal_string().length());
         break;
-    case double_t:
+    case value_type::double_t:
         handler.value(value_.double_value_);
         break;
-    case longlong_t:
+    case value_type::longlong_t:
         handler.value(value_.longlong_value_);
         break;
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         handler.value(value_.ulonglong_value_);
         break;
-    case bool_t:
+    case value_type::bool_t:
         handler.value(value_.bool_value_);
         break;
-    case null_t:
+    case value_type::null_t:
         handler.value(null_type());
         break;
-    case empty_object_t:
+    case value_type::empty_object_t:
         handler.begin_object();
         handler.end_object();
         break;
-    case object_t:
+    case value_type::object_t:
         {
             handler.begin_object();
             json_object<Char, Alloc> *o = value_.object_;
@@ -861,7 +861,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
             handler.end_object();
         }
         break;
-    case array_t:
+    case value_type::array_t:
         {
             handler.begin_array();
             json_array<Char, Alloc> *o = value_.array_;
@@ -872,7 +872,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
             handler.end_array();
         }
         break;
-    case json_any_t:
+    case value_type::any_t:
         value_.any_value_->to_stream(handler);
         break;
     default:
@@ -1071,10 +1071,10 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin
 {
     switch (type_)
     {
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char, Alloc>();
-    case object_t:
+    case value_type::object_t:
         return value_.object_->begin();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
@@ -1086,9 +1086,9 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         return an_object.begin_members();
-    case object_t:
+    case value_type::object_t:
         return value_.object_->begin();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
@@ -1100,10 +1100,10 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_m
 {
     switch (type_)
     {
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char, Alloc>();
-    case object_t:
+    case value_type::object_t:
         return value_.object_->end();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
@@ -1115,9 +1115,9 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
 {
     switch (type_)
     {
-    case empty_object_t:
+    case value_type::empty_object_t:
         return an_object.end_members();
-    case object_t:
+    case value_type::object_t:
         return value_.object_->end();
     default:
         JSONCONS_THROW_EXCEPTION("Not an object");
@@ -1129,7 +1129,7 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::begin_
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->begin();
     default:
         JSONCONS_THROW_EXCEPTION("Not an array");
@@ -1141,7 +1141,7 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->begin();
     default:
         JSONCONS_THROW_EXCEPTION("Not an array");
@@ -1153,7 +1153,7 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::end_el
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->end();
     default:
         JSONCONS_THROW_EXCEPTION("Not an array");
@@ -1174,7 +1174,7 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->end();
     default:
         JSONCONS_THROW_EXCEPTION("Not an array");
@@ -1186,13 +1186,13 @@ double basic_json<Char, Alloc>::as_double() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return value_.double_value_;
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<double>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<double>(value_.ulonglong_value_);
-    case null_t:
+    case value_type::null_t:
         return std::numeric_limits<double>::quiet_NaN();;
     default:
         JSONCONS_THROW_EXCEPTION("Not a double");
@@ -1204,13 +1204,13 @@ bool basic_json<Char, Alloc>::is_empty() const
 {
     switch (type_)
     {
-    case string_t:
+    case value_type::string_t:
         return internal_string().size() == 0;
-    case array_t:
+    case value_type::array_t:
         return value_.array_->size() == 0;
-    case empty_object_t:
+    case value_type::empty_object_t:
         return true;
-    case object_t:
+    case value_type::object_t:
         return value_.object_->size() == 0;
     default:
         return false;
@@ -1222,13 +1222,13 @@ void basic_json<Char, Alloc>::reserve(size_t n)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->reserve(n);
         break;
-    case empty_object_t:
-        type_ = object_t;
+    case value_type::empty_object_t:
+        type_ = value_type::object_t;
         value_.object_ = new json_object<Char, Alloc>();
-    case object_t:
+    case value_type::object_t:
         value_.object_->reserve(n);
         break;
     }
@@ -1239,7 +1239,7 @@ void basic_json<Char, Alloc>::resize_array(size_t n)
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->resize(n);
         break;
     }
@@ -1253,7 +1253,7 @@ void basic_json<Char, Alloc>::resize_array(size_t n, T val)
     j = val;
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         value_.array_->resize(n, j);
         break;
     }
@@ -1264,9 +1264,9 @@ size_t basic_json<Char, Alloc>::capacity() const
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         return value_.array_->capacity();
-    case object_t:
+    case value_type::object_t:
         return value_.object_->capacity();
     default:
         return 0;
@@ -1278,7 +1278,7 @@ bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) co
 {
     switch (type_)
     {
-    case object_t:
+    case value_type::object_t:
         {
             const_object_iterator it = value_.object_->find(name);
             return it != end_members();
@@ -1294,7 +1294,7 @@ bool basic_json<Char, Alloc>::as_bool() const
 {
     switch (type_)
     {
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_;
     default:
         JSONCONS_THROW_EXCEPTION("Not a bool");
@@ -1306,13 +1306,13 @@ int basic_json<Char, Alloc>::as_int() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<int>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<int>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<int>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a int");
@@ -1324,13 +1324,13 @@ unsigned int basic_json<Char, Alloc>::as_uint() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<unsigned int>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<unsigned int>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<unsigned int>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a unsigned int");
@@ -1342,13 +1342,13 @@ long long basic_json<Char, Alloc>::as_longlong() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<long long>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<long long>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<long long>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a long long");
@@ -1360,13 +1360,13 @@ unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<unsigned long long>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<unsigned long long>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<unsigned long long>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
@@ -1378,13 +1378,13 @@ long basic_json<Char, Alloc>::as_long() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<long long>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<long long>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<long long>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a long");
@@ -1396,13 +1396,13 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
 {
     switch (type_)
     {
-    case double_t:
+    case value_type::double_t:
         return static_cast<unsigned long long>(value_.double_value_);
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<unsigned long long>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<unsigned long long>(value_.ulonglong_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not an unsigned long");
@@ -1416,7 +1416,7 @@ const T& basic_json<Char, Alloc>::custom_data() const
 {
     switch (type_)
     {
-    case json_any_t:
+    case value_type::any_t:
 			const T& p = value_.any_value_->template cast<T>();
 			return p;
     default:
@@ -1431,7 +1431,7 @@ T& basic_json<Char, Alloc>::custom_data()
 {
     switch (type_)
     {
-    case json_any_t:
+    case value_type::any_t:
         {
 			T& p = value_.any_value_->template cast<T>();
 			return p;
@@ -1446,7 +1446,7 @@ typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value()
 {
     switch (type_)
     {
-    case json_any_t:
+    case value_type::any_t:
         {
 			return *value_.any_value_;
         }
@@ -1460,7 +1460,7 @@ const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value(
 {
     switch (type_)
     {
-    case json_any_t:
+    case value_type::any_t:
         {
 			return *value_.any_value_;
         }
@@ -1474,7 +1474,7 @@ typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value(
 {
     switch (type_)
     {
-    case object_t:
+    case value_type::object_t:
         {
 			return *value_.object_;
         }
@@ -1488,7 +1488,7 @@ const typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_
 {
     switch (type_)
     {
-    case object_t:
+    case value_type::object_t:
         {
 			return *value_.object_;
         }
@@ -1502,7 +1502,7 @@ typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value()
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         {
 			return *value_.array_;
         }
@@ -1516,7 +1516,7 @@ const typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_va
 {
     switch (type_)
     {
-    case array_t:
+    case value_type::array_t:
         {
 			return *value_.array_;
         }
@@ -1530,7 +1530,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
 {
     switch (type_)
     {
-    case string_t:
+    case value_type::string_t:
         return std::basic_string<Char>(&internal_string()[0],internal_string().length());
     default:
         return to_string();
@@ -1542,7 +1542,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
 {
     switch (type_)
     {
-    case string_t:
+    case value_type::string_t:
         return std::basic_string<Char>(&internal_string()[0],internal_string().length());
     default:
         return to_string(format);
@@ -1554,17 +1554,17 @@ Char basic_json<Char, Alloc>::as_char() const
 {
     switch (type_)
     {
-    case string_t:
+    case value_type::string_t:
         return internal_string().length() > 0 ? internal_string()[0] : '\0';
-    case longlong_t:
+    case value_type::longlong_t:
         return static_cast<Char>(value_.longlong_value_);
-    case ulonglong_t:
+    case value_type::ulonglong_t:
         return static_cast<Char>(value_.ulonglong_value_);
-    case double_t:
+    case value_type::double_t:
         return static_cast<Char>(value_.double_value_);
-    case bool_t:
+    case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
-    case null_t:
+    case value_type::null_t:
         return 0;
     default:
         JSONCONS_THROW_EXCEPTION("Cannot convert to char");
