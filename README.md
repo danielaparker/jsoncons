@@ -25,9 +25,13 @@ The library has a number of features, which are listed below:
 
 ## What's new on master since Release 0.95
 
-- Enhancements to json parsing and json parse event error notification.
-
 - Renamed `error_handler` to `parse_error_handler`
+
+- Renamed `value_adapter` to `json_type_traits`
+
+- Only json arrays now support indexing to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
+
+- Enhancements to json parsing and json parse event error notification.
 
 - Static singleton `instance` methods have been added to `default_parse_error_handler`
   and `empty_json_input_handler`. 

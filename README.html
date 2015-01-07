@@ -498,16 +498,17 @@ vertical-align:1px;
 <h2>What's new on master since Release 0.95</h2>
 
 <ul class="task-list">
-<li><p>Enhancements to json parsing and json parse event error notification.</p></li>
 <li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code></p></li>
+<li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code></p></li>
+<li><p>Only json arrays now support indexing to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
+<li><p>Enhancements to json parsing and json parse event error notification.</p></li>
 <li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
 and <code>empty_json_input_handler</code>. </p></li>
 <li><p>Added to the <code>json</code> class overloaded static methods <code>parse</code>, <code>parse_string</code> <br>
 and <code>parse_file</code> that take a <code>parse_error_handler</code> as a parameter. </p></li>
 </ul>
 
-<p>(A change in <code>json_input_handler</code>, <code>json_filter</code> and <code>parse_error_handler</code> event notification<br>
-methods has been reversed, the <code>const parsing_context&amp;</code> parameter has been restored.)</p>
+<p><em>(A change in <code>json_input_handler</code>, <code>json_filter</code> and <code>parse_error_handler</code> event notification methods has been reversed, the <code>const parsing_context&amp;</code> parameter has been restored.)</em></p>
 
 <h2>What's new on master since Release 0.94.1</h2>
 
@@ -792,10 +793,10 @@ template &lt;typename T&gt;
 basic_json&amp; operator=(T val)
 </code></pre>
 
-<p>The implementations of these functions and operators make use of the class template <code>value_adapter</code></p>
+<p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 
 <pre><code>template &lt;typename Char, typename Alloc, typename T&gt;
-class value_adapter
+class json_type_traits
 {
 public:
     bool is(const basic_json&amp; val) const {return false;}
@@ -804,7 +805,7 @@ public:
 };
 </code></pre>
 
-<p>This class template is extensible, you as a user can extend <code>value_adapter</code> in the <code>jsoncons</code> namespace with your own types. You can, for example, extend <code>value_adapter</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>, and in your code, write</p>
+<p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. You can, for example, extend <code>json_type_traits</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>, and in your code, write</p>
 
 <pre><code>json deal;
 deal["maturity"] = boost::gregorian::date(2015,1,1);
