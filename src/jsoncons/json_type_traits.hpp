@@ -28,7 +28,7 @@
 namespace jsoncons {
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, std::basic_string<Char>>
+class json_type_traits<Char, Alloc, std::basic_string<Char>>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -46,7 +46,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, basic_json<Char, Alloc>>
+class json_type_traits<Char, Alloc, basic_json<Char, Alloc>>
 {
 public:
     bool is(const basic_json<Char, Alloc>&) const
@@ -64,7 +64,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::any>
+class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::any>
 {
 public:
     bool is(const basic_json<Char, Alloc>& self) const
@@ -82,7 +82,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, const Char *>
+class json_type_traits<Char, Alloc, const Char *>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -101,7 +101,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::object>
+class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::object>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -116,7 +116,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, typename basic_json<Char, Alloc>::array>
+class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::array>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -130,7 +130,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, jsoncons::null_type>
+class json_type_traits<Char, Alloc, jsoncons::null_type>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -149,7 +149,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, bool>
+class json_type_traits<Char, Alloc, bool>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -167,7 +167,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, int>
+class json_type_traits<Char, Alloc, int>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -196,7 +196,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, unsigned int>
+class json_type_traits<Char, Alloc, unsigned int>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -225,7 +225,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, short>
+class json_type_traits<Char, Alloc, short>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -254,7 +254,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, unsigned short>
+class json_type_traits<Char, Alloc, unsigned short>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -283,7 +283,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, long>
+class json_type_traits<Char, Alloc, long>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -312,7 +312,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, unsigned long>
+class json_type_traits<Char, Alloc, unsigned long>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -341,7 +341,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, Char>
+class json_type_traits<Char, Alloc, Char>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -361,7 +361,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, double>
+class json_type_traits<Char, Alloc, double>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -380,7 +380,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, long long>
+class json_type_traits<Char, Alloc, long long>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -409,7 +409,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class value_adapter<Char, Alloc, unsigned long long>
+class json_type_traits<Char, Alloc, unsigned long long>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const
@@ -438,7 +438,7 @@ public:
 };
 
 template<typename Char, typename Alloc, typename T>
-class value_adapter<Char, Alloc, std::vector<T>>
+class json_type_traits<Char, Alloc, std::vector<T>>
 {
 public:
     bool is(const basic_json<Char, Alloc>& val) const

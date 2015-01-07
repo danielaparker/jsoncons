@@ -223,10 +223,6 @@ public:
         return members_[i];
     }
 
-    basic_json<Char,Alloc>& at(size_t i) {return members_[i].value();}
-
-    const basic_json<Char,Alloc>& at(size_t i) const {return members_[i].value;}
-
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
 
     void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)

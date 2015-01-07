@@ -470,14 +470,10 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
 {
     switch (type_)
     {
-    case empty_object_t:
-        JSONCONS_THROW_EXCEPTION("Out of range");
-    case object_t:
-        return value_.object_->at(i);
     case array_t:
         return value_.array_->at(i);
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array or object");
+        JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
     }
 }
 
@@ -486,14 +482,10 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
 {
     switch (type_)
     {
-    case empty_object_t:
-        JSONCONS_THROW_EXCEPTION("Out of range");
-    case object_t:
-        return value_.object_->at(i);
     case array_t:
         return value_.array_->at(i);
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array or object");
+        JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
     }
 }
 
@@ -1172,7 +1164,7 @@ template<typename Char, typename Alloc>
 template <class T>
 basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator=(T val)
 {
-    value_adapter<Char,Alloc,T> adapter;
+    json_type_traits<Char,Alloc,T> adapter;
     adapter.assign(*this,val);
     return *this;
 }

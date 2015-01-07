@@ -98,7 +98,7 @@ template <typename Char>
 class basic_parse_error_handler;
 
 template <typename Char, typename Alloc, typename T>
-class value_adapter
+class json_type_traits
 {
 public:
     bool is(const basic_json<Char,Alloc>&) const
@@ -1182,7 +1182,7 @@ public:
     template<typename T>
     bool is() const
     {
-        value_adapter<Char,Alloc,T> adapter;
+        json_type_traits<Char,Alloc,T> adapter;
         return adapter.is(*this);
     }
 
@@ -1251,7 +1251,7 @@ public:
     template<typename T>
     T as() const
     {
-        value_adapter<Char,Alloc,T> adapter;
+        json_type_traits<Char,Alloc,T> adapter;
         return adapter.as(*this);
     }
 
@@ -1333,7 +1333,7 @@ public:
             value_.object_ = new json_object<Char,Alloc>();
         case object_t:
             {
-                value_adapter<Char,Alloc,T> adapter;
+                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> o;
                 adapter.assign(o,value);
                 value_.object_->set(name,o);
@@ -1358,7 +1358,7 @@ public:
         {
         case array_t:
             {
-                value_adapter<Char,Alloc,T> adapter;
+                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
                 adapter.assign(a,val);
                 value_.array_->push_back(std::move(a));
@@ -1378,7 +1378,7 @@ public:
         {
         case array_t:
             {
-                value_adapter<Char,Alloc,T> adapter;
+                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
                 adapter.assign(a,val);
                 value_.array_->add(index, std::move(a));
@@ -1418,7 +1418,7 @@ public:
     std::vector<T> as_vector() const
     {
         std::vector<T> v(size());
-        value_adapter<Char,Alloc,T> adapter;
+        json_type_traits<Char,Alloc,T> adapter;
         for (size_t i = 0; i < v.size(); ++i)
         {
             v[i] = adapter.as(at(i));
