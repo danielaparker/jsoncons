@@ -28,10 +28,10 @@ these always use the default allocators.
 Type tags that can be used with `is<T>` and `as<T>`
 
     object_iterator
-A random access iterator to `json::member_type`
+A bidirectional iterator to `json::member_type`
 
     const_object_iterator
-A random access iterator to `const json::member_type`
+A bidirectional iterator to `const json::member_type`
 
     array_iterator
 A random access iterator to `json`

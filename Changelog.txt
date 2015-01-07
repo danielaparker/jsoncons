@@ -14,6 +14,11 @@ Changes
 - Static singleton `instance` methods have been added to `default_parse_error_handler`
   and `empty_json_input_handler`. 
 
+- Renamed 'value_adapter` to `json_type_traits`
+
+- Only json arrays now support indexing to loop over values, this is no longer supported for `json` objects.
+  Use a json object iterator instead.
+
 New features
 
 - Added to the `json` class overloaded static methods parse, parse_string 

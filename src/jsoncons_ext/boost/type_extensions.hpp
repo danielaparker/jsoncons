@@ -19,7 +19,7 @@
 namespace jsoncons {
 
     template <typename Alloc>
-    class value_adapter<char,Alloc,boost::gregorian::date>
+    class json_type_traits<char,Alloc,boost::gregorian::date>
     {
     public:
         bool is(const basic_json<char,Alloc>& val) const

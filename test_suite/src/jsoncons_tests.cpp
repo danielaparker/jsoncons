@@ -31,9 +31,15 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse_string(input);
 
-    BOOST_CHECK(val[0].type() == json::string_t);
-    BOOST_CHECK(val[1].type() == json::string_t);
-    BOOST_CHECK(val[2].type() == json::ulonglong_t);
+    json::object_iterator it = val.begin_members();
+
+    BOOST_CHECK(it->value().type() == json::string_t);
+    ++it;
+    BOOST_CHECK(it->value().type() == json::string_t);
+    ++it;
+    BOOST_CHECK(it->value().type() == json::ulonglong_t);
+    ++it;
+    BOOST_CHECK(it == val.end_members());
 }
 
 BOOST_AUTO_TEST_CASE(test_assignment)

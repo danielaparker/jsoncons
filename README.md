@@ -296,10 +296,10 @@ In the json class, accessors and modifiers are templated, for example,
     template <typename T>
     basic_json& operator=(T val)
 
-The implementations of these functions and operators make use of the class template `value_adapter`
+The implementations of these functions and operators make use of the class template `json_type_traits`
 
     template <typename Char, typename Alloc, typename T>
-    class value_adapter
+    class json_type_traits
     {
     public:
         bool is(const basic_json& val) const {return false;}
@@ -307,7 +307,7 @@ The implementations of these functions and operators make use of the class templ
         void assign(basic_json& self, const T val);
     };
 
-This class template is extensible, you as a user can extend `value_adapter` in the `jsoncons` namespace with your own types. You can, for example, extend `value_adapter` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write
+This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write
 
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
