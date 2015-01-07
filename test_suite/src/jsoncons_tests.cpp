@@ -33,11 +33,11 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
 
     json::object_iterator it = val.begin_members();
 
-    BOOST_CHECK(it->value().type() == json::string_t);
+    BOOST_CHECK(it->value().type() == jsoncons::value_type::string_t);
     ++it;
-    BOOST_CHECK(it->value().type() == json::string_t);
+    BOOST_CHECK(it->value().type() == jsoncons::value_type::string_t);
     ++it;
-    BOOST_CHECK(it->value().type() == json::ulonglong_t);
+    BOOST_CHECK(it->value().type() == jsoncons::value_type::ulonglong_t);
     ++it;
     BOOST_CHECK(it == val.end_members());
 }

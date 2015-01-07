@@ -109,10 +109,9 @@ public:
     void assign(basic_json<Char,Alloc>& self, const T val);
 };
 
-class json_base
+namespace value_type
 {
-public:
-    enum value_type 
+    enum value_type_t 
     {
         empty_object_t,
         object_t,
@@ -123,8 +122,13 @@ public:
         ulonglong_t,
         bool_t,
         null_t,
-        json_any_t
+        any_t
     };
+}
+
+class json_base
+{
+public:
 };
 
 template <typename Char, typename Alloc = std::allocator<void>>
@@ -298,7 +302,7 @@ public:
             return val_.size();
         }
 
-        value_type type() const
+        value_type::value_type_t type() const
         {
             return val_.type();
         }
@@ -610,7 +614,7 @@ public:
             return val_.at(name_).size();
         }
 
-        value_type type() const
+        value_type::value_type_t type() const
         {
             return val_.at(name_).type();
         }
@@ -1174,7 +1178,7 @@ public:
 
     bool is_null() const
     {
-        return type_ == null_t;
+        return type_ == value_type::null_t;
     }
 
     bool has_member(const std::basic_string<Char>& name) const;
@@ -1188,53 +1192,53 @@ public:
 
     bool is_string() const
     {
-        return type_ == string_t;
+        return type_ == value_type::string_t;
     }
 
     bool is_numeric() const
     {
-        return type_ == double_t || type_ == longlong_t || type_ == ulonglong_t;
+        return type_ == value_type::double_t || type_ == value_type::longlong_t || type_ == value_type::ulonglong_t;
     }
 
     bool is_longlong() const
     {
-        return type_ == longlong_t;
+        return type_ == value_type::longlong_t;
     }
 
     bool is_ulonglong() const
     {
-        return type_ == ulonglong_t;
+        return type_ == value_type::ulonglong_t;
     }
 
     bool is_double() const
     {
-        return type_ == double_t;
+        return type_ == value_type::double_t;
     }
 
     bool is_bool() const
     {
-        return type_ == bool_t;
+        return type_ == value_type::bool_t;
     }
 
     bool is_object() const
     {
-        return type_ == object_t || type_ == empty_object_t;
+        return type_ == value_type::object_t || type_ == value_type::empty_object_t;
     }
 
     bool is_array() const
     {
-        return type_ == array_t;
+        return type_ == value_type::array_t;
     }
 
     bool is_any() const
     {
-        return type_ == json_any_t;
+        return type_ == value_type::any_t;
     }
 
     // Deprecated
     bool is_custom() const
     {
-        return type_ == json_any_t;
+        return type_ == value_type::any_t;
     }
 
     bool is_empty() const;
@@ -1328,10 +1332,10 @@ public:
     {
         switch (type_)
         {
-        case empty_object_t:
-            type_ = object_t;
+        case value_type::empty_object_t:
+            type_ = value_type::object_t;
             value_.object_ = new json_object<Char,Alloc>();
-        case object_t:
+        case value_type::object_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> o;
@@ -1356,7 +1360,7 @@ public:
     {
         switch (type_)
         {
-        case array_t:
+        case value_type::array_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
@@ -1376,7 +1380,7 @@ public:
     {
         switch (type_)
         {
-        case array_t:
+        case value_type::array_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
@@ -1399,7 +1403,7 @@ public:
 
     void add(size_t index, const basic_json<Char,Alloc>& value);
 
-    value_type type() const
+    value_type::value_type_t type() const
     {
         return type_;
     }
@@ -1442,14 +1446,14 @@ public:
     template <typename T>
     const T& any_cast() const
     {
-        JSONCONS_ASSERT(type_ == json_any_t);
+        JSONCONS_ASSERT(type_ == value_type::any_t);
         const T* p = (const T*)value_.any_value_->content_->data();
         return *p;
     }
     template <typename T>
     T& any_cast() 
     {
-        JSONCONS_ASSERT(type_ == json_any_t);
+        JSONCONS_ASSERT(type_ == value_type::any_t);
         T* p = (T*)value_.any_value_->content_->data();
         return *p;
     }
@@ -1517,7 +1521,7 @@ public:
         return is_numeric();
     }
 private:
-	basic_json(value_type t);
+	basic_json(value_type::value_type_t t);
 
     template<typename Char2, typename Allocator2, size_t size>
     class build_array
@@ -1628,7 +1632,7 @@ private:
         std::basic_string<Char> s_;
     };
 
-    value_type type_;
+    value_type::value_type_t type_;
     union
     {
         double double_value_;
