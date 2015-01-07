@@ -39,8 +39,6 @@ The library has a number of features, which are listed below:
 - Added to the `json` class overloaded static methods `parse`, `parse_string` 
   and `parse_file` that take a `parse_error_handler` as a parameter. 
 
-_(A change in `json_input_handler`, `json_filter` and `parse_error_handler` event notification methods has been reversed, the `const parsing_context&` parameter has been restored.)_
-
 ## What's new on master since Release 0.94.1
 
 - Enhancements to json parsing and json parse event error notification.
