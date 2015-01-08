@@ -135,15 +135,42 @@ template <typename Char, typename Alloc = std::allocator<void>>
 class basic_json : public json_base
 {
 public:
+
+    class object : public basic_json<Char,Alloc>
+    {
+    public:
+        object(const object& o)
+            : basic_json<Char,Alloc>(o)
+        {
+        }
+        object(const basic_json<Char,Alloc> a)
+            : basic_json<Char,Alloc>(a)
+        {
+            JSONCONS_ASSERT(is_object());
+        }
+    };
+
+    class array : public basic_json<Char,Alloc>
+    {
+    public:
+        array(const array& o)
+            : basic_json<Char,Alloc>(o)
+        {
+        }
+        array(const basic_json<Char,Alloc> a)
+            : basic_json<Char,Alloc>(a)
+        {
+            JSONCONS_ASSERT(is_array());
+        }
+    };
+
     typedef Char char_type;
     typedef Alloc allocator_type;
 
     typedef jsoncons::null_type null_type;
-    typedef json_object<Char,Alloc> object;
-    typedef json_array<Char,Alloc> array;
 
     // Allocation
-    static void* operator new(std::size_t) { std::cout << "json" << std::endl; return typename Alloc::template rebind<basic_json>::other().allocate(1); }
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<basic_json>::other().allocate(1); }
     static void operator delete(void* ptr) { return typename Alloc::template rebind<basic_json>::other().deallocate(static_cast<basic_json*>(ptr), 1); }
 
     typedef typename std::basic_string<Char> internal_string_type;
@@ -1094,6 +1121,8 @@ public:
 
     basic_json(const basic_json& val);
 
+    basic_json(basic_json&& val);
+
     explicit basic_json(any val);
 
     explicit basic_json(jsoncons::null_type);
@@ -1295,14 +1324,6 @@ public:
 
     const any& any_value() const;
 
-    object& object_value();
-
-    const object& object_value() const;
-
-    array& array_value();
-
-    const array& array_value() const;
-
     basic_json<Char,Alloc>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const;
 
@@ -1324,8 +1345,6 @@ public:
 
     void remove_member(const std::basic_string<Char>& name);
     // Removes a member from an object value
-
-    basic_json(basic_json&& val);
 
     template <typename T>
     void set(const std::basic_string<Char>& name, T value)
