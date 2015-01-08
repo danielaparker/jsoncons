@@ -110,8 +110,7 @@ public:
     }
     typename basic_json<Char, Alloc>::object as(const basic_json<Char, Alloc>& val) const
     {
-        JSONCONS_ASSERT(val.is_object());
-        return val.is_empty() ? typename basic_json<Char, Alloc>::object() : val.object_value();
+        return basic_json<Char, Alloc>::object(val);
     }
 };
 
@@ -125,7 +124,7 @@ public:
     }
     typename basic_json<Char, Alloc>::array as(const basic_json<Char, Alloc>& val) const
     {
-        return val.array_value();
+        return basic_json<Char, Alloc>::array(val);
     }
 };
 

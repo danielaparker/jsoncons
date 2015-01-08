@@ -1470,62 +1470,6 @@ const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value(
 }
 
 template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value()
-{
-    switch (type_)
-    {
-    case value_type::object_t:
-        {
-			return *value_.object_;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not an object value");
-    }
-}
-
-template<typename Char, typename Alloc>
-const typename basic_json<Char, Alloc>::object& basic_json<Char, Alloc>::object_value() const
-{
-    switch (type_)
-    {
-    case value_type::object_t:
-        {
-			return *value_.object_;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not an object value");
-    }
-}
-
-template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value()
-{
-    switch (type_)
-    {
-    case value_type::array_t:
-        {
-			return *value_.array_;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not an array value");
-    }
-}
-
-template<typename Char, typename Alloc>
-const typename basic_json<Char, Alloc>::array& basic_json<Char, Alloc>::array_value() const
-{
-    switch (type_)
-    {
-    case value_type::array_t:
-        {
-			return *value_.array_;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not an array value");
-    }
-}
-
-template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
 {
     switch (type_)
