@@ -126,15 +126,12 @@ namespace value_type
     };
 }
 
-class json_base
-{
-public:
-};
-
 template <typename Char, typename Alloc = std::allocator<void>>
-class basic_json : public json_base
+class basic_json
 {
 public:
+
+    typedef typename Alloc allocator_type;
 
     class object : public basic_json<Char,Alloc>
     {
@@ -1539,6 +1536,54 @@ public:
     {
         return is_numeric();
     }
+    class string_wrapper
+    {
+    public:
+
+        // Allocation
+        static void* operator new(std::size_t) { return typename Alloc::template rebind<string_wrapper>::other().allocate(1); }
+        static void operator delete(void* ptr) { return typename Alloc::template rebind<string_wrapper>::other().deallocate(static_cast<string_wrapper*>(ptr), 1); }
+
+        string_wrapper()
+        {
+        }
+
+        string_wrapper(const string_wrapper& wrapper)
+            : s_(wrapper.s_)
+        {
+        }
+
+        string_wrapper(string_wrapper&& wrapper)
+            : s_(wrapper.s_)
+        {
+        }
+
+        string_wrapper(const std::basic_string<Char>& s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(Char c)
+        {
+            s_->push_back(c);
+        }
+
+        string_wrapper(std::basic_string<Char>&& s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(const Char* s)
+            : s_(s)
+        {
+        }
+
+        string_wrapper(const Char* s, size_t length)
+            : s_(s,length)
+        {
+        }
+        std::basic_string<Char> s_;
+    };
 private:
 	basic_json(value_type::value_type_t t);
 
@@ -1602,54 +1647,6 @@ private:
         return value_.string_wrapper_->s_;
     }
 
-    class string_wrapper
-    {
-    public:
-
-        // Allocation
-        static void* operator new(std::size_t) { return typename Alloc::template rebind<string_wrapper>::other().allocate(1); }
-        static void operator delete(void* ptr) { return typename Alloc::template rebind<string_wrapper>::other().deallocate(static_cast<string_wrapper*>(ptr), 1); }
-
-        string_wrapper()
-        {
-        }
-
-        string_wrapper(const string_wrapper& wrapper)
-            : s_(wrapper.s_)
-        {
-        }
-
-        string_wrapper(string_wrapper&& wrapper)
-            : s_(wrapper.s_)
-        {
-        }
-
-        string_wrapper(const std::basic_string<Char>& s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(Char c)
-        {
-            s_->push_back(c);
-        }
-
-        string_wrapper(std::basic_string<Char>&& s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(const Char* s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(const Char* s, size_t length)
-            : s_(s,length)
-        {
-        }
-        std::basic_string<Char> s_;
-    };
 
     value_type::value_type_t type_;
     union

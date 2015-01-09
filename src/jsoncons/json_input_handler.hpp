@@ -54,7 +54,7 @@ public:
 
     void name(const std::basic_string<Char>& name, const basic_parsing_context<Char>& context)
     {
-        do_name(&name[0], name.length(), context);
+        do_name(name.c_str(), name.length(), context);
     }
 
     void name(const Char* p, size_t length, const basic_parsing_context<Char>& context) 
@@ -64,7 +64,7 @@ public:
 
     void value(const std::basic_string<Char>& value, const basic_parsing_context<Char>& context) 
     {
-        do_string_value(&value[0], value.length(), context);
+        do_string_value(value.c_str(), value.length(), context);
     }
 
     void value(const Char* p, size_t length, const basic_parsing_context<Char>& context) 

@@ -59,8 +59,6 @@ The library has a number of features, which are listed below:
 - The parse_error_handler virtual implementation methods have been renamed to `do_warning` and `do_error`, and made private. Non virtual public interface methods `warning` and `error` have been added. 
   Error handling now leverages `std::error_code` to communicate parser error events in an extendable way.
 
-- A bug has been fixed in `csv_reader`
-
 ## Using the code
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.
