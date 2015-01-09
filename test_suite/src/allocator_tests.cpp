@@ -17,7 +17,8 @@ using std::string;
 
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
-    basic_json<char, boost::pool_allocator<void>> o;
+    typedef basic_json<char, boost::pool_allocator<void>> myjson;
+    myjson o;
 
     o.set("field1",10.0);
     o.set("field2",20.0);
@@ -26,5 +27,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 	string s = o["field3"].as<string>();
 
     std::cout << o << std::endl;
+
+    //boost::singleton_pool<boost::pool_allocator_tag, sizeof(myjson::string_wrapper)>::release_memory();
 }
 

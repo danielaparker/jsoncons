@@ -479,7 +479,7 @@ void basic_json_reader<Char>::parse()
                     size_t count1 = 0;
                     if (stack_.back().is_object() & ((stack_.back().state_ == parse_state_type::initial_s) | (stack_.back().state_ == parse_state_type::value_separator_s)))
                     {
-                        handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
+                        handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
                         stack_.back().state_ = parse_state_type::name_s;
                     }
                     else
@@ -489,7 +489,7 @@ void basic_json_reader<Char>::parse()
                         {
                             err_handler_->error(std::error_code(err, json_parser_category()), *this);
                         }
-                        handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
+                        handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
                         stack_.back().state_ = parse_state_type::value_completed_s;
                     }
                 }
@@ -704,7 +704,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
+                            long long d = static_cast<long long>(string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
                             handler_->value(-d, *this);
                         }
                         catch (const std::exception&)
@@ -725,7 +725,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
+                            unsigned long long d = string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)

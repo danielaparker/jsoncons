@@ -5,6 +5,10 @@ Bug fixes:
 
 - Fixed issue with column number reported by json_reader
 
+- Where &s[0] and s.length() were passed to methods,
+  &s[0] has been replaced with s.c_str().
+  &s[0] is an issue when the string is of zero length.
+
 Changes
 
 - Renamed `error_handler` to `parse_error_handler`.
