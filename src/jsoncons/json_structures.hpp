@@ -389,8 +389,6 @@ private:
 
 	internal_iterator remove(internal_iterator at); 
 
-    void insert(internal_iterator it, typename basic_json<Char,Alloc>::member_type member);
-
     std::vector<typename basic_json<Char,Alloc>::member_type> members_;
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
@@ -400,12 +398,6 @@ template <typename Char,class Alloc>
 void json_object<Char,Alloc>::sort_members()
 {
     std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
-}
-
-template <typename Char,class Alloc>
-void json_object<Char,Alloc>::insert(internal_iterator it, typename basic_json<Char,Alloc>::member_type member)
-{
-    members_.insert(it,member);
 }
 
 template <typename Char,class Alloc>
