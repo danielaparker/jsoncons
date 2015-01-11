@@ -351,7 +351,10 @@ public:
 
     const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
 
-    void sort_members();
+	void sort_members()
+	{
+		std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
+	}
 
     iterator begin() {return iterator(members_.begin());}
 
@@ -394,11 +397,6 @@ private:
 };
 
 
-template <typename Char,class Alloc>
-void json_object<Char,Alloc>::sort_members()
-{
-    std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
-}
 
 template <typename Char,class Alloc>
 typename json_object<Char,Alloc>::internal_iterator json_object<Char,Alloc>::remove(internal_iterator at)
