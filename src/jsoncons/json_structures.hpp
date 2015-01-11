@@ -44,25 +44,13 @@ public:
         return a.name() < b.name();
     }
 };
-template <bool flag, class IsTrue, class IsFalse>
-struct choose;
 
-template <class IsTrue, class IsFalse>
-struct choose<true, IsTrue, IsFalse> {
-   typedef IsTrue type;
-};
-
-template <class IsTrue, class IsFalse>
-struct choose<false, IsTrue, IsFalse> {
-   typedef IsFalse type;
-};
-
-template <typename T, bool isconst = false>
+template <typename T, bool IsConst = false>
 class object_iterator : public std::iterator<std::bidirectional_iterator_tag, 
                                              T,
                                              ptrdiff_t,
-                                             typename choose<isconst, const T*, T*>::type,
-                                             typename choose<isconst, const T&, T&>::type>
+                                             typename std::conditional<IsConst, const T*, T*>::type,
+                                             typename std::conditional<IsConst, const T&, T&>::type>
 {
     typedef typename std::vector<T>::iterator iterator_impl;
 public:
