@@ -347,9 +347,25 @@ public:
         //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
     }
 
-    basic_json<Char,Alloc>& get(const std::basic_string<Char>& name);
+    basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) 
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+        }
+        return it->value();
+    }
 
-    const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
+    const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+        }
+        return it->value_;
+    }
 
 	void sort_members()
 	{
@@ -421,27 +437,6 @@ void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const bas
     }
 }
 
-template <typename Char,class Alloc>
-basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) 
-{
-    auto it = find(name);
-    if (it == end())
-    {
-        JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
-    }
-    return it->value();
-}
-
-template <typename Char,class Alloc>
-const basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) const
-{
-    auto it = find(name);
-    if (it == end())
-    {
-        JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
-    }
-    return it->value_;
-}
 
 }
 
