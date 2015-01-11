@@ -406,21 +406,9 @@ public:
 
 private:
 
-	internal_iterator remove(internal_iterator at); 
-
     std::vector<typename basic_json<Char,Alloc>::member_type> members_;
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
-
-
-
-template <typename Char,class Alloc>
-typename json_object<Char,Alloc>::internal_iterator json_object<Char,Alloc>::remove(internal_iterator at)
-{
-    key_compare<Char,Alloc> comp;
-    auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-    return it != members_.end() ? members_.erase(at) : members_.end();
-}
 
 template <typename Char,class Alloc>
 void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
@@ -428,7 +416,6 @@ void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const bas
     auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
     if (it != members_.end() && it->name() == name)
     {
-        //it = remove(it);
         *it = typename basic_json<Char,Alloc>::member_type(name,value);
     }
     else
