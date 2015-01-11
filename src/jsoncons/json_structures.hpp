@@ -318,11 +318,22 @@ public:
         return members_[i];
     }
 
-    void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
-
     void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
     {
         members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val));
+    }
+
+    void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        if (it != members_.end() && it->name() == name)
+        {
+            *it = typename basic_json<Char,Alloc>::member_type(name,value);
+        }
+        else
+        {
+            members_.insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
+        }
     }
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
@@ -410,19 +421,6 @@ private:
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 
-template <typename Char,class Alloc>
-void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
-{
-    auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-    if (it != members_.end() && it->name() == name)
-    {
-        *it = typename basic_json<Char,Alloc>::member_type(name,value);
-    }
-    else
-    {
-        members_.insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
-    }
-}
 
 
 }
