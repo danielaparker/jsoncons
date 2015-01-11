@@ -341,7 +341,6 @@ public:
         auto it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
         if (it != end() && it->name() == name)
         {
-            //it = remove(it);
             *it = typename basic_json<Char,Alloc>::member_type(name,value);
         }
         else
