@@ -45,71 +45,6 @@ public:
     }
 };
 
-template <typename T, bool IsConst = false>
-class object_iterator : public std::iterator<std::bidirectional_iterator_tag, 
-                                             T,
-                                             ptrdiff_t,
-                                             typename std::conditional<IsConst, const T*, T*>::type,
-                                             typename std::conditional<IsConst, const T&, T&>::type>
-{
-    typedef typename std::vector<T>::iterator iterator_impl;
-public:
-    object_iterator(iterator_impl it)
-        : it_(it)
-    {
-    }
-
-    object_iterator(const object_iterator<T,false>& it)
-        : it_(it.it_)
-    {
-    }
-
-    object_iterator& operator=(object_iterator rhs)
-    {
-        swap(*this,rhs);
-        return *this;
-    }
-
-    object_iterator& operator++()
-    {
-        ++it_;
-        return *this;
-    }
-
-    object_iterator& operator--()
-    {
-        --it_;
-        return *this;
-    }
-
-    reference operator*() const
-    {
-        return *it_;
-    }
-
-    pointer operator->() const
-    {
-        return it_.operator->();
-    }
-
-    friend bool operator==(const object_iterator& it1, const object_iterator& it2)
-    {
-        return it1.it_ == it2.it_;
-    }
-    friend bool operator!=(const object_iterator& it1, const object_iterator& it2)
-    {
-        return it1.it_ != it2.it_;
-    }
-    friend void swap(iterator& lhs, iterator& rhs)
-    {
-        using std::swap;
-        swap(lhs.it_,rhs.it_);
-    }
-//private:
-
-    iterator_impl it_;
-};
-
 template <typename Char,class Alloc>
 class json_array 
 {
@@ -229,14 +164,79 @@ private:
     json_array& operator=(const json_array<Char,Alloc>&);
 };
 
+template <typename Char, typename Alloc, bool IsConst = false>
+class object_iterator : public std::iterator<std::bidirectional_iterator_tag, 
+                                             typename basic_json<Char,Alloc>::member_type,
+                                             ptrdiff_t,
+                                             typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type,
+                                             typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type>
+{
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator_impl;
+public:
+    object_iterator(iterator_impl it)
+        : it_(it)
+    {
+    }
+
+    object_iterator(const object_iterator<Char,Alloc,false>& it)
+        : it_(it.it_)
+    {
+    }
+
+    object_iterator& operator=(object_iterator rhs)
+    {
+        swap(*this,rhs);
+        return *this;
+    }
+
+    object_iterator& operator++()
+    {
+        ++it_;
+        return *this;
+    }
+
+    object_iterator& operator--()
+    {
+        --it_;
+        return *this;
+    }
+
+    reference operator*() const
+    {
+        return *it_;
+    }
+
+    pointer operator->() const
+    {
+        return it_.operator->();
+    }
+
+    friend bool operator==(const object_iterator& it1, const object_iterator& it2)
+    {
+        return it1.it_ == it2.it_;
+    }
+    friend bool operator!=(const object_iterator& it1, const object_iterator& it2)
+    {
+        return it1.it_ != it2.it_;
+    }
+    friend void swap(iterator& lhs, iterator& rhs)
+    {
+        using std::swap;
+        swap(lhs.it_,rhs.it_);
+    }
+//private:
+
+    iterator_impl it_;
+};
+
 template <typename Char,class Alloc>
 class json_object
 {
     typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator internal_iterator;
     typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_internal_iterator;
 public:
-    typedef typename object_iterator<typename basic_json<Char,Alloc>::member_type,false> iterator;
-    typedef typename object_iterator<typename basic_json<Char,Alloc>::member_type,true> const_iterator;
+    typedef typename object_iterator<Char,Alloc,false> iterator;
+    typedef typename object_iterator<Char,Alloc,true> const_iterator;
 	typedef typename basic_json<Char,Alloc>::member_type member_type;
 
     // Allocation
