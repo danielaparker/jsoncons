@@ -215,6 +215,7 @@ public:
         any& operator=(any rhs)
         {
             std::swap(content_,rhs.content_);
+            return *this;
         }
 
         void to_stream(basic_json_output_handler<Char>& os) const 
