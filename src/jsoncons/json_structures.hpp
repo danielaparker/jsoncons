@@ -44,6 +44,83 @@ public:
         return a.name() < b.name();
     }
 };
+template <bool flag, class IsTrue, class IsFalse>
+struct choose;
+
+template <class IsTrue, class IsFalse>
+struct choose<true, IsTrue, IsFalse> {
+   typedef IsTrue type;
+};
+
+template <class IsTrue, class IsFalse>
+struct choose<false, IsTrue, IsFalse> {
+   typedef IsFalse type;
+};
+
+template <typename T, bool isconst = false>
+class object_iterator : public std::iterator<std::bidirectional_iterator_tag, 
+                                             T,
+                                             ptrdiff_t,
+                                             typename choose<isconst, const T*, T*>::type,
+                                             typename choose<isconst, const T&, T&>::type>
+{
+    typedef typename std::vector<T>::iterator iterator_impl;
+public:
+    object_iterator(iterator_impl it)
+        : it_(it)
+    {
+    }
+
+    object_iterator(const object_iterator<T,false>& it)
+        : it_(it.it_)
+    {
+    }
+
+    object_iterator& operator=(object_iterator rhs)
+    {
+        swap(*this,rhs);
+        return *this;
+    }
+
+    object_iterator& operator++()
+    {
+        ++it_;
+        return *this;
+    }
+
+    object_iterator& operator--()
+    {
+        --it_;
+        return *this;
+    }
+
+    reference operator*() const
+    {
+        return *it_;
+    }
+
+    pointer operator->() const
+    {
+        return it_.operator->();
+    }
+
+    friend bool operator==(const object_iterator& it1, const object_iterator& it2)
+    {
+        return it1.it_ == it2.it_;
+    }
+    friend bool operator!=(const object_iterator& it1, const object_iterator& it2)
+    {
+        return it1.it_ != it2.it_;
+    }
+    friend void swap(iterator& lhs, iterator& rhs)
+    {
+        using std::swap;
+        swap(lhs.it_,rhs.it_);
+    }
+//private:
+
+    iterator_impl it_;
+};
 
 template <typename Char,class Alloc>
 class json_array 
@@ -167,9 +244,12 @@ private:
 template <typename Char,class Alloc>
 class json_object
 {
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator internal_iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_internal_iterator;
 public:
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator;
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_iterator;
+    typedef typename object_iterator<typename basic_json<Char,Alloc>::member_type,false> iterator;
+    typedef typename object_iterator<typename basic_json<Char,Alloc>::member_type,true> const_iterator;
+	typedef typename basic_json<Char,Alloc>::member_type member_type;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
@@ -202,6 +282,20 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
+    iterator find(const std::basic_string<Char>& name)
+    {
+        key_compare<Char,Alloc> comp;
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+    }
+
+    const_iterator find(const std::basic_string<Char>& name) const
+    {
+        key_compare<Char,Alloc> comp;
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+    }
+
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
@@ -211,7 +305,8 @@ public:
 
     void remove(const std::basic_string<Char>& name) 
     {
-        iterator it = find(name);
+        key_compare<Char,Alloc> comp;
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         if (it != members_.end())
         {
             members_.erase(it);
@@ -232,7 +327,7 @@ public:
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
-        iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
+        auto it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
         if (it != end() && it->name() == name)
         {
             //it = remove(it);
@@ -252,27 +347,19 @@ public:
         //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
     }
 
-    iterator remove(iterator at); 
-
     basic_json<Char,Alloc>& get(const std::basic_string<Char>& name);
 
     const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
 
-    iterator find(const std::basic_string<Char>& name);
-
-    const_iterator find(const std::basic_string<Char>& name) const;
-
-    void insert(iterator it, typename basic_json<Char,Alloc>::member_type member);
-
     void sort_members();
 
-    iterator begin() {return members_.begin();}
+    iterator begin() {return iterator(members_.begin());}
 
-    iterator end() {return members_.end();}
+    iterator end() {return iterator(members_.end());}
 
-    const_iterator begin() const {return members_.begin();}
+    const_iterator begin() const {return const_iterator(members_.begin());}
 
-    const_iterator end() const {return members_.end();}
+    const_iterator end() const {return const_iterator(members_.end());}
 
     bool operator==(const json_object<Char,Alloc>& rhs) const
     {
@@ -280,12 +367,12 @@ public:
         {
             return false;
         }
-        for (const_iterator it = members_.begin(); it != members_.end(); ++it)
+        for (auto it = members_.begin(); it != members_.end(); ++it)
         {
 
-            const_iterator rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
+            auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
-            if (rhs_it == rhs.end() || rhs_it->value() != it->value())
+            if (rhs_it == rhs.members_.end() || rhs_it->value() != it->value())
             {
                 return false;
             }
@@ -299,6 +386,11 @@ public:
     }
 
 private:
+
+	internal_iterator remove(internal_iterator at); 
+
+    void insert(internal_iterator it, typename basic_json<Char,Alloc>::member_type member);
+
     std::vector<typename basic_json<Char,Alloc>::member_type> members_;
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
@@ -311,36 +403,38 @@ void json_object<Char,Alloc>::sort_members()
 }
 
 template <typename Char,class Alloc>
-void json_object<Char,Alloc>::insert(iterator it, typename basic_json<Char,Alloc>::member_type member)
+void json_object<Char,Alloc>::insert(internal_iterator it, typename basic_json<Char,Alloc>::member_type member)
 {
     members_.insert(it,member);
 }
 
 template <typename Char,class Alloc>
-typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::remove(iterator at)
+typename json_object<Char,Alloc>::internal_iterator json_object<Char,Alloc>::remove(internal_iterator at)
 {
-    return members_.erase(at);
+    key_compare<Char,Alloc> comp;
+    auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+    return it != members_.end() ? members_.erase(at) : members_.end();
 }
 
 template <typename Char,class Alloc>
 void json_object<Char,Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
 {
-    iterator it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
-    if (it != end() && it->name() == name)
+    auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+    if (it != members_.end() && it->name() == name)
     {
         //it = remove(it);
         *it = typename basic_json<Char,Alloc>::member_type(name,value);
     }
     else
     {
-        insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
+        members_.insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
     }
 }
 
 template <typename Char,class Alloc>
 basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) 
 {
-    iterator it = find(name);
+    auto it = find(name);
     if (it == end())
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
@@ -351,28 +445,12 @@ basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Cha
 template <typename Char,class Alloc>
 const basic_json<Char,Alloc>& json_object<Char,Alloc>::get(const std::basic_string<Char>& name) const
 {
-    const_iterator it = find(name);
+    auto it = find(name);
     if (it == end())
     {
         JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
     }
     return it->value_;
-}
-
-template <typename Char,class Alloc>
-typename json_object<Char,Alloc>::iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name)
-{
-    key_compare<Char,Alloc> comp;
-    iterator it = std::lower_bound(begin(),end(), name, comp);
-    return (it != end() && it->name() == name) ? it : end();
-}
-
-template <typename Char,class Alloc>
-typename json_object<Char,Alloc>::const_iterator json_object<Char,Alloc>::find(const std::basic_string<Char>& name) const
-{
-    key_compare<Char,Alloc> comp;
-    const_iterator it = std::lower_bound(begin(),end(),name, comp);
-    return (it != end() && it->name_ == name) ? it : end();
 }
 
 }
