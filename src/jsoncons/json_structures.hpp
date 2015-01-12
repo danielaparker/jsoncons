@@ -185,12 +185,12 @@ class object_iterator : public std::iterator<std::bidirectional_iterator_tag,
     public:
         const std::basic_string<Char>& name() const
         {
-            return (it_->it_)->name_;
+            return (it_->it_)->first;
         }
 
         basic_json<Char,Alloc>& value() const
         {
-            return (it_->it_)->value_;
+            return (it_->it_)->second;
         }
 
         void operator =(value_type const& value)
@@ -383,8 +383,8 @@ public:
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
         members_.push_back(typename basic_json<Char,Alloc>::member_type());
-        members_.back().name_.swap(name);
-        members_.back().value_.swap(val);
+        members_.back().first.swap(name);
+        members_.back().second.swap(val);
         //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
     }
 
@@ -405,7 +405,7 @@ public:
         {
             JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
         }
-        return it->value_;
+        return it->second;
     }
 
 	void sort_members()
