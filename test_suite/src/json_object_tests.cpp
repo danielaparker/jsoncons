@@ -205,3 +205,75 @@ BOOST_AUTO_TEST_CASE(test_object_equals)
     BOOST_CHECK(a != c);
 }
 
+BOOST_AUTO_TEST_CASE(test_json_object_iterator_1)
+{
+    json a;
+    a["name1"] = "value1";
+    a["name2"] = "value2";
+    a["name3"] = "value3";
+
+    json::object_iterator it = a.begin_members();
+    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).value() == json("value1"));
+    ++it;
+    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+    BOOST_CHECK((*(it++)).name() == "name2");
+    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value3"));
+
+    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+	BOOST_CHECK((*(--it)).value() == json("value1"));
+}
+
+BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
+{
+    json a;
+    a["name1"] = "value1";
+    a["name2"] = "value2";
+    a["name3"] = "value3";
+
+    json::const_object_iterator it = a.begin_members();
+    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).value() == json("value1"));
+    ++it;
+    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+    BOOST_CHECK((*(it++)).name() == "name2");
+    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value3"));
+
+    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+	BOOST_CHECK((*(--it)).value() == json("value1"));
+}
+
+BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
+{
+    json a;
+    a["name1"] = "value1";
+    a["name2"] = "value2";
+    a["name3"] = "value3";
+
+    json::const_object_iterator it = static_cast<const json&>(a).begin_members();
+    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).value() == json("value1"));
+    ++it;
+    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+    BOOST_CHECK((*(it++)).name() == "name2");
+    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value3"));
+
+    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*it).value() == json("value2"));
+
+	BOOST_CHECK((*(--it)).value() == json("value1"));
+}
+

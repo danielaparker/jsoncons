@@ -27,10 +27,10 @@ template <typename Char,class Alloc>
 class key_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
+    bool operator()(const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& a, 
                     const std::basic_string<Char>& b) const
     {
-        return a.name() < b;
+        return a.first < b;
     }
 };
 
@@ -38,10 +38,10 @@ template <typename Char,class Alloc>
 class member_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
-                    const typename basic_json<Char,Alloc>::member_type& b) const
+    bool operator()(const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& a, 
+                    const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& b) const
     {
-        return a.name() < b.name();
+        return a.first < b.first;
     }
 };
 
@@ -171,7 +171,7 @@ class object_iterator : public std::iterator<std::bidirectional_iterator_tag,
                                              typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type,
                                              typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type>
 {
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator_impl;
+    typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>>::iterator iterator_impl;
     class deref_proxy;
     friend class deref_proxy;
 
@@ -232,10 +232,24 @@ public:
         return *this;
     }
 
+    object_iterator operator++(int) // postfix increment
+    {
+        object_iterator temp(*this);
+        ++it_;
+        return temp;
+    }
+
     object_iterator& operator--()
     {
         --it_;
         return *this;
+    }
+
+    object_iterator operator--(int)
+    {
+        object_iterator temp(*this);
+        --it_;
+        return temp;
     }
 
     deref_proxy operator*() const
@@ -295,7 +309,7 @@ public:
     {
     }
 
-    json_object(std::vector<typename basic_json<Char,Alloc>::member_type> members)
+    json_object(std::vector<member_type> members)
         : members_(members)
     {
     }
@@ -317,7 +331,7 @@ public:
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+        return (it != members_.end() && it->first == name) ? iterator(it) : end();
     }
 
     const_iterator find(const std::basic_string<Char>& name) const
@@ -357,13 +371,13 @@ public:
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it != members_.end() && it->first == name)
         {
-            *it = typename basic_json<Char,Alloc>::member_type(name,value);
+            *it = member_type(name,value);
         }
         else
         {
-            members_.insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
+            members_.insert(it,member_type(name,value));
         }
     }
 
@@ -372,17 +386,17 @@ public:
         auto it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
         if (it != end() && it->name() == name)
         {
-            *it = typename basic_json<Char,Alloc>::member_type(name,value);
+            *it = member_type(name,value);
         }
         else
         {
-            insert(it,typename basic_json<Char,Alloc>::member_type(name,value));
+            insert(it,member_type(name,value));
         }
     }
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
-        members_.push_back(typename basic_json<Char,Alloc>::member_type());
+        members_.push_back(member_type());
         members_.back().first.swap(name);
         members_.back().second.swap(val);
         //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
@@ -432,7 +446,7 @@ public:
 
             auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
-            if (rhs_it == rhs.members_.end() || rhs_it->value() != it->value())
+            if (rhs_it == rhs.members_.end() || rhs_it->second != it->second)
             {
                 return false;
             }
@@ -447,7 +461,7 @@ public:
 
 private:
 
-    std::vector<typename basic_json<Char,Alloc>::member_type> members_;
+    std::vector<member_type> members_;
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 
