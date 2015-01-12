@@ -275,12 +275,12 @@ public:
 template <typename Char,class Alloc>
 class json_object
 {
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator internal_iterator;
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_internal_iterator;
 public:
     typedef typename object_iterator<Char,Alloc,false> iterator;
     typedef typename object_iterator<Char,Alloc,true> const_iterator;
-	typedef typename basic_json<Char,Alloc>::member_type member_type;
+	typedef typename std::pair<std::basic_string<Char>,basic_json<Char,Alloc>> member_type;
+    typedef typename std::vector<member_type>::iterator internal_iterator;
+    typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
