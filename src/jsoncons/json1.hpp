@@ -280,7 +280,7 @@ public:
             first.swap(pair.first);
             second.swap(pair.second);
         }
-
+    
         std::basic_string<Char> first;
         basic_json<Char,Alloc> second;
     };
