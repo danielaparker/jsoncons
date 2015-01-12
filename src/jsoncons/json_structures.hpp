@@ -172,6 +172,43 @@ class object_iterator : public std::iterator<std::bidirectional_iterator_tag,
                                              typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type>
 {
     typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator_impl;
+    class deref_proxy;
+    friend class deref_proxy;
+
+    class deref_proxy
+    {
+    public:
+      deref_proxy(object_iterator const * it)
+        : it_(it)
+      {}
+
+    public:
+        const std::basic_string<Char>& name() const
+        {
+            return (it_->it_)->name_;
+        }
+
+        basic_json<Char,Alloc>& value() const
+        {
+            return (it_->it_)->value_;
+        }
+
+        void operator =(value_type const& value)
+        {
+          it_->invoke_(value);
+        }
+
+        deref_proxy const * operator->() const
+        {
+            return this;
+        }
+    private:
+      object_iterator const * const it_;
+
+    // Not to be implemented
+    private:
+      void operator =(deref_proxy const &);
+    };
 public:
     object_iterator(iterator_impl it)
         : it_(it)
@@ -201,14 +238,14 @@ public:
         return *this;
     }
 
-    reference operator*() const
+    deref_proxy operator*() const
     {
-        return *it_;
+        return deref_proxy(this);
     }
 
-    pointer operator->() const
+    deref_proxy operator->() const
     {
-        return it_.operator->();
+        return deref_proxy(this);
     }
 
     friend bool operator==(const object_iterator& it1, const object_iterator& it2)
@@ -227,6 +264,12 @@ public:
 //private:
 
     iterator_impl it_;
+    typename basic_json<Char,Alloc>::member_type member_;
+
+    void invoke_(value_type const & value)
+    {
+        *it_ = value;
+    }
 };
 
 template <typename Char,class Alloc>
