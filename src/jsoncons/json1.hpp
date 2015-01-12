@@ -236,37 +236,37 @@ public:
         {
         }
         member_type(const member_type& pair)
-            : name_(pair.name_), value_(pair.value_)
+            : first(pair.first), second(pair.second)
         {
         }
         member_type(member_type&& pair)
-            //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
+            //: name_(std::move(pair.name_)), second(std::move(pair.second))
         {
-            name_.swap(pair.name_);
-            value_.swap(pair.value_);
+            first.swap(pair.first);
+            second.swap(pair.second);
         }
         member_type(const std::basic_string<Char>& nam, const basic_json<Char,Alloc>& val)
-            : name_(nam), value_(val)
+            : first(nam), second(val)
         {
         }
         member_type(std::basic_string<Char>&& nam, basic_json<Char,Alloc>&& val)
-            : name_(nam), value_(val)
+            : first(nam), second(val)
         {
         }
 
         const std::basic_string<Char>& name() const
         {
-            return name_;
+            return first;
         }
 
         basic_json<Char,Alloc>& value()
         {
-            return value_;
+            return second;
         }
 
         const basic_json<Char,Alloc>& value() const
         {
-            return value_;
+            return second;
         }
 
         member_type& operator=(member_type rhs)
@@ -277,12 +277,12 @@ public:
 
         void swap(member_type& pair)
         {
-            name_.swap(pair.name_);
-            value_.swap(pair.value_);
+            first.swap(pair.first);
+            second.swap(pair.second);
         }
 
-        std::basic_string<Char> name_;
-        basic_json<Char,Alloc> value_;
+        std::basic_string<Char> first;
+        basic_json<Char,Alloc> second;
     };
 
     typedef member_type name_value_pair;
