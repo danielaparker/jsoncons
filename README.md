@@ -25,11 +25,14 @@ The library has a number of features, which are listed below:
 
 ## What's new on master since Release 0.95
 
-- Renamed `error_handler` to `parse_error_handler`
+- Renamed `error_handler` to `parse_error_handler`.
 
-- Renamed `value_adapter` to `json_type_traits`
+- Renamed 'value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
+  you will have to rename 'value_adapter` also.
 
 - Only json arrays now support indexing to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
+
+- `json` member function `begin_object` now returns a bidirectional iterator rather than a random access iterator.
 
 - Enhancements to json parsing and json parse event error notification.
 
@@ -267,13 +270,15 @@ The library includes an instantiation for wide characters as well,
     typedef basic_json<wchar_t,std::allocator<void>> wjson
 
 Note that the allocator type allows you to supply a custom allocator for dynamically allocated, 
-fixed size small objects in the json container, the container rebinds it as necessay. For example, 
-if you wish, you can use the boost pool allocator:
+fixed size small objects in the json container, the container rebinds it as necessay. 
+For instance, you can use the boost `fast_pool_allocator`:
 
     #include <boost/pool/pool_alloc.hpp>
     #include "jsoncons/json.hpp"
 
-    basic_json<char, boost::pool_allocator<void>> o;
+    typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> myjson;
+
+    myjson o;
 
     o.set("FirstName","Joe");
     o.set("LastName","Smith");

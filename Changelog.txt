@@ -5,6 +5,8 @@ Bug fixes:
 
 - Fixed issue with column number reported by json_reader
 
+Quality of implementation issues:
+
 - Where &s[0] and s.length() were passed to methods,
   &s[0] has been replaced with s.c_str().
   &s[0] is an issue when the string is of zero length.
@@ -18,7 +20,8 @@ Changes
 - Static singleton `instance` methods have been added to `default_parse_error_handler`
   and `empty_json_input_handler`. 
 
-- Renamed 'value_adapter` to `json_type_traits`
+- Renamed 'value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
+  you will have to rename 'value_adapter` also.
 
 - Only json arrays now support indexing to loop over values, this is no longer supported for `json` objects.
   Use a json object iterator instead.

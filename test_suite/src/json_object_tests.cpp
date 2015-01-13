@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <map>
 
 using jsoncons::pretty_print;
 using jsoncons::output_format;
@@ -225,8 +226,11 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_1)
 
     BOOST_CHECK((*(it--)).name() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
+    BOOST_CHECK((*(--it)).value() == json("value1"));
 
-	BOOST_CHECK((*(--it)).value() == json("value1"));
+    json::member_type member = *it;
+    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.value() == json("value1"));
 }
 
 BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
@@ -250,7 +254,11 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
     BOOST_CHECK((*(it--)).name() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
 
-	BOOST_CHECK((*(--it)).value() == json("value1"));
+    BOOST_CHECK((*(--it)).value() == json("value1"));
+
+    json::member_type member = *it;
+    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.value() == json("value1"));
 }
 
 BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
@@ -261,19 +269,31 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
     a["name3"] = "value3";
 
     json::const_object_iterator it = static_cast<const json&>(a).begin_members();
+    BOOST_CHECK(it == a.begin_members());
+    BOOST_CHECK(it != a.end_members());
     BOOST_CHECK((*it).name() == "name1");
     BOOST_CHECK((*it).value() == json("value1"));
     ++it;
+    BOOST_CHECK(it != a.end_members());
     BOOST_CHECK((*it).name() == "name2");
     BOOST_CHECK((*it).value() == json("value2"));
 
     BOOST_CHECK((*(it++)).name() == "name2");
+    BOOST_CHECK(it != a.end_members());
     BOOST_CHECK((*it).name() == "name3");
     BOOST_CHECK((*it).value() == json("value3"));
 
     BOOST_CHECK((*(it--)).name() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
 
-	BOOST_CHECK((*(--it)).value() == json("value1"));
+    BOOST_CHECK((*(--it)).value() == json("value1"));
+    BOOST_CHECK(it == a.begin_members());
+
+    json::member_type member = *it;
+    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.value() == json("value1"));
+
+    //*it = member; // Don't want this to compile
 }
+
 

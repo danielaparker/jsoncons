@@ -498,9 +498,11 @@ vertical-align:1px;
 <h2>What's new on master since Release 0.95</h2>
 
 <ul class="task-list">
-<li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code></p></li>
-<li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code></p></li>
+<li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code>.</p></li>
+<li><p>Renamed 'value_adapter<code>to</code>json_type_traits<code>, if you have implemented your own type specializations,<br>
+you will have to rename 'value_adapter</code> also.</p></li>
 <li><p>Only json arrays now support indexing to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
+<li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
 <li><p>Enhancements to json parsing and json parse event error notification.</p></li>
 <li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
 and <code>empty_json_input_handler</code>. </p></li>
@@ -524,7 +526,6 @@ you will need to make changes to your code, refer to the Changelog, and to the r
 documentation and tutorials for details.</p></li>
 <li><p>The parse_error_handler virtual implementation methods have been renamed to <code>do_warning</code> and <code>do_error</code>, and made private. Non virtual public interface methods <code>warning</code> and <code>error</code> have been added. <br>
 Error handling now leverages <code>std::error_code</code> to communicate parser error events in an extendable way.</p></li>
-<li><p>A bug has been fixed in <code>csv_reader</code></p></li>
 </ul>
 
 <h2>Using the code</h2>
@@ -760,13 +761,15 @@ and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
 </code></pre>
 
 <p>Note that the allocator type allows you to supply a custom allocator for dynamically allocated, <br>
-fixed size small objects in the json container, the container rebinds it as necessay. For example, <br>
-if you wish, you can use the boost pool allocator:</p>
+fixed size small objects in the json container, the container rebinds it as necessay. <br>
+For instance, you can use the boost <code>fast_pool_allocator</code>:</p>
 
 <pre><code>#include &lt;boost/pool/pool_alloc.hpp&gt;
 #include "jsoncons/json.hpp"
 
-basic_json&lt;char, boost::pool_allocator&lt;void&gt;&gt; o;
+typedef jsoncons::basic_json&lt;char, boost::fast_pool_allocator&lt;void&gt;&gt; myjson;
+
+myjson o;
 
 o.set("FirstName","Joe");
 o.set("LastName","Smith");
