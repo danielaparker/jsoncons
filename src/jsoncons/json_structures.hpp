@@ -193,6 +193,11 @@ class object_iterator : public std::iterator<std::bidirectional_iterator_tag,
             return (it_->it_)->second;
         }
 
+        operator value_type() const
+        {
+            return value_type(name(),value());
+        }
+
         void operator =(value_type const& value)
         {
           it_->invoke_(value);

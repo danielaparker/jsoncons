@@ -16,6 +16,7 @@
 #include <cstring>
 #include <ostream>
 #include <memory>
+#include <array>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
@@ -236,53 +237,50 @@ public:
         {
         }
         member_type(const member_type& pair)
-            : first(pair.first), second(pair.second)
+            : name_(pair.name_), value_(pair.value_)
         {
         }
         member_type(member_type&& pair)
-            //: name_(std::move(pair.name_)), second(std::move(pair.second))
+            //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
         {
-            first.swap(pair.first);
-            second.swap(pair.second);
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
         }
-        member_type(const std::basic_string<Char>& nam, const basic_json<Char,Alloc>& val)
-            : first(nam), second(val)
+        member_type(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
+            : name_(name), value_(value)
         {
         }
-        member_type(std::basic_string<Char>&& nam, basic_json<Char,Alloc>&& val)
-            : first(nam), second(val)
+        member_type(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+            : name_(name), value_(value)
         {
         }
 
         const std::basic_string<Char>& name() const
         {
-            return first;
+            return name_;
         }
 
         basic_json<Char,Alloc>& value()
         {
-            return second;
+            return value_;
         }
 
         const basic_json<Char,Alloc>& value() const
         {
-            return second;
-        }
-
-        member_type& operator=(member_type rhs)
-        {
-            swap(rhs);
-            return *this;
+            return value_;
         }
 
         void swap(member_type& pair)
         {
-            first.swap(pair.first);
-            second.swap(pair.second);
+            name_.swap(pair.name_);
+            value_.swap(pair.value_);
         }
-    
-        std::basic_string<Char> first;
-        basic_json<Char,Alloc> second;
+    private:
+        // Not to be implemented
+        void operator=(member_type const &); 
+
+        std::basic_string<Char> name_;
+        basic_json<Char,Alloc> value_;
     };
 
     typedef member_type name_value_pair;
