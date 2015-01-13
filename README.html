@@ -499,9 +499,9 @@ vertical-align:1px;
 
 <ul class="task-list">
 <li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code>.</p></li>
-<li><p>Renamed 'value_adapter<code>to</code>json_type_traits<code>, if you have implemented your own type specializations,<br>
-you will have to rename 'value_adapter</code> also.</p></li>
-<li><p>Only json arrays now support indexing to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
+<li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code>, if you have implemented your own type specializations,<br>
+you will have to rename <code>value_adapter</code> also.</p></li>
+<li><p>Only json arrays now support <code>operator[](size_t)</code> to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
 <li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
 <li><p>Enhancements to json parsing and json parse event error notification.</p></li>
 <li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
