@@ -27,8 +27,8 @@ The library has a number of features, which are listed below:
 
 - Renamed `error_handler` to `parse_error_handler`.
 
-- Renamed 'value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
-  you will have to rename 'value_adapter` also.
+- Renamed `value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
+  you will have to rename `value_adapter` also.
 
 - Only json arrays now support indexing to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
