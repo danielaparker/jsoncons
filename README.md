@@ -253,6 +253,24 @@ from the boost memory pool. The allocator type is not used for structures
 including vectors and strings that use large or variable amounts of memory, 
 these always use the default allocators.
 
+## Wide character support
+
+jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4.
+You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
+
+    using jsoncons::wjson;
+
+    wjson root;
+    root[L"field1"] = L"test";
+    root[L"field2"] = 3.9;
+    root[L"field3"] = true;
+
+    std::wcout << root << L"\n";
+
+which prints
+
+    {"field1":"test","field2":3.9,"field3":true}
+
 ## Type Extensibility
 
 In the json class, accessors and modifiers are templated, for example,
