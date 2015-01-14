@@ -23,44 +23,9 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
-## What's new on master since Release 0.95
+## What's new 
 
-- Renamed `error_handler` to `parse_error_handler`.
-
-- Renamed `value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
-  you will have to rename `value_adapter` also.
-
-- Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
-
-- `json` member function `begin_object` now returns a bidirectional iterator rather than a random access iterator.
-
-- Enhancements to json parsing and json parse event error notification.
-
-- Static singleton `instance` methods have been added to `default_parse_error_handler`
-  and `empty_json_input_handler`. 
-
-- Added to the `json` class overloaded static methods `parse`, `parse_string` 
-  and `parse_file` that take a `parse_error_handler` as a parameter. 
-
-## What's new on master since Release 0.94.1
-
-- Enhancements to json parsing and json parse event error notification.
-
-- A template method `any_cast` has been added to the `json` class.
-
-- The allocator type parameter in `basic_json` is now supported, it allows you to supply a 
-  custom allocator for dynamically allocated, fixed size small objects in the json container.
-  The allocator type is not used for structures including vectors and strings that use large 
-  or variable amounts of memory, these always use the default allocators.
-
-- `json_input_handler` and `json_output_handler` have been changed to make the interfaces public 
-  non-virtual and the implementations private virtual. If you have implemented your own input 
-  and output handlers, or have passed json events to serializers or deserializers directly,
-  you will need to make changes to your code, refer to the Changelog, and to the revised
-  documentation and tutorials for details.
-
-- The parse_error_handler virtual implementation methods have been renamed to `do_warning` and `do_error`, and made private. Non virtual public interface methods `warning` and `error` have been added. 
-  Error handling now leverages `std::error_code` to communicate parser error events in an extendable way.
+Details of changes to the master branch since previous releases may be found in [Changelog.txt](https://github.com/danielaparker/jsoncons/blob/master/Changelog.txt). 
 
 ## Using the code
 
