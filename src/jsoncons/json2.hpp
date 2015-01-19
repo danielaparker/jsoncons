@@ -63,6 +63,7 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
         break;
     case value_type::string_t:
         value_.string_wrapper_ = new string_wrapper(val.internal_string());
+        value_.string_value_ = create_string_env(val.value_.string_value_);
         break;
     case value_type::array_t:
         value_.array_ = val.value_.array_->clone();
@@ -167,6 +168,7 @@ basic_json<Char, Alloc>::basic_json(Char c)
 {
     type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(c);
+    value_.string_value_ = create_string_env(c);
 }
 
 template<typename Char, typename Alloc>
@@ -174,6 +176,7 @@ basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s);
+    value_.string_value_ = create_string_env(s);
 }
 
 template<typename Char, typename Alloc>
@@ -181,6 +184,7 @@ basic_json<Char, Alloc>::basic_json(const Char *s)
 {
     type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s);
+    value_.string_value_ = create_string_env(s);
 }
 
 template<typename Char, typename Alloc>
@@ -188,6 +192,7 @@ basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
 {
     type_ = value_type::string_t;
     value_.string_wrapper_ = new string_wrapper(s,length);
+    value_.string_value_ = create_string_env(s,length);
 }
 
 template<typename Char, typename Alloc>
@@ -205,6 +210,7 @@ basic_json<Char, Alloc>::basic_json(value_type::value_type_t t)
         break;
     case value_type::string_t:
         value_.string_wrapper_ = new string_wrapper();
+        value_.string_value_ = create_string_env();
         break;
     case value_type::array_t:
         value_.array_ = new json_array<Char, Alloc>();
@@ -232,6 +238,7 @@ basic_json<Char, Alloc>::~basic_json()
         break;
     case value_type::string_t:
         delete value_.string_wrapper_;
+        delete_string_env(value_.string_value_);
         break;
     case value_type::array_t:
         delete value_.array_;
@@ -278,6 +285,7 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
     case value_type::double_t:
         type_ = value_type::string_t;
         value_.string_wrapper_ = new string_wrapper(rhs);
+        value_.string_value_ = create_string_env(rhs);
         break;
     default:
         basic_json<Char, Alloc>(rhs).swap(*this);
