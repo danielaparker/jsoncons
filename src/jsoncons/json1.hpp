@@ -1542,54 +1542,6 @@ public:
         Char* p;
     };
 
-    /*class string_wrapper
-    {
-    public:
-
-        // Allocation
-        static void* operator new(std::size_t) { return typename Alloc::template rebind<string_wrapper>::other().allocate(1); }
-        static void operator delete(void* ptr) { return typename Alloc::template rebind<string_wrapper>::other().deallocate(static_cast<string_wrapper*>(ptr), 1); }
-
-        string_wrapper()
-        {
-        }
-
-        string_wrapper(const string_wrapper& wrapper)
-            : s_(wrapper.s_)
-        {
-        }
-
-        string_wrapper(string_wrapper&& wrapper)
-            : s_(wrapper.s_)
-        {
-        }
-
-        string_wrapper(const std::basic_string<Char>& s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(Char c)
-        {
-            s_->push_back(c);
-        }
-
-        string_wrapper(std::basic_string<Char>&& s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(const Char* s)
-            : s_(s)
-        {
-        }
-
-        string_wrapper(const Char* s, size_t length)
-            : s_(s,length)
-        {
-        }
-        std::basic_string<Char> s_;
-    };*/
 private:
 	basic_json(value_type::value_type_t t);
 
@@ -1649,17 +1601,6 @@ private:
         return value_.string_value_;
     }
 
-    internal_string_type internal_string() 
-    {
-        //return value_.string_wrapper_->s_;
-        return std::basic_string(value_.string_value_.p,value_.string_value_.length);
-    }
-/*
-    const internal_string_type& internal_string() const
-    {
-        return value_.string_wrapper_->s_;
-    }
-*/
     static void delete_string_env(const string_data* other)
     {
         other->~string_data();
@@ -1673,7 +1614,7 @@ private:
         string_data* env = new(buffer)string_data;
         env->length = other->length;
         env->p = new(buffer+sizeof(string_data))Char[other->length+1];
-		memcpy(env->p,other->p,other->length);
+		memcpy(env->p,other->p,other->length*sizeof(Char));
 		env->p[env->length] = 0;
         return env;
     }
@@ -1685,7 +1626,7 @@ private:
         string_data* env = new(buffer)string_data;
         env->length = s.length();
         env->p = new(buffer+sizeof(string_data))Char[s.length()+1];
-        memcpy(env->p,s.c_str(),s.length());
+        memcpy(env->p,s.c_str(),s.length()*sizeof(Char));
         env->p[env->length] = 0;
         return env;
     }
@@ -1702,7 +1643,7 @@ private:
         string_data* env = new(buffer)string_data;
         env->length = length;
         env->p = new(buffer+sizeof(string_data))Char[length+1];
-        memcpy(env->p,p,length);
+        memcpy(env->p,p,length*sizeof(Char));
         env->p[env->length] = 0;
         return env;
     }
