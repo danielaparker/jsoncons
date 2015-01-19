@@ -1601,7 +1601,7 @@ private:
 
     static void delete_string_env(const string_data* other)
     {
-        other->~string_data();
+        //other->~string_data();
         ::operator delete((void*)other);
     }
 
