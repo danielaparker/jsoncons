@@ -495,38 +495,9 @@ vertical-align:1px;
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
 
-<h2>What's new on master since Release 0.95</h2>
+<h2>What's new</h2>
 
-<ul class="task-list">
-<li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code>.</p></li>
-<li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code>, if you have implemented your own type specializations,<br>
-you will have to rename <code>value_adapter</code> also.</p></li>
-<li><p>Only json arrays now support <code>operator[](size_t)</code> to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
-<li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
-<li><p>Enhancements to json parsing and json parse event error notification.</p></li>
-<li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
-and <code>empty_json_input_handler</code>. </p></li>
-<li><p>Added to the <code>json</code> class overloaded static methods <code>parse</code>, <code>parse_string</code> <br>
-and <code>parse_file</code> that take a <code>parse_error_handler</code> as a parameter. </p></li>
-</ul>
-
-<h2>What's new on master since Release 0.94.1</h2>
-
-<ul class="task-list">
-<li><p>Enhancements to json parsing and json parse event error notification.</p></li>
-<li><p>A template method <code>any_cast</code> has been added to the <code>json</code> class.</p></li>
-<li><p>The allocator type parameter in <code>basic_json</code> is now supported, it allows you to supply a <br>
-custom allocator for dynamically allocated, fixed size small objects in the json container.<br>
-The allocator type is not used for structures including vectors and strings that use large <br>
-or variable amounts of memory, these always use the default allocators.</p></li>
-<li><p><code>json_input_handler</code> and <code>json_output_handler</code> have been changed to make the interfaces public <br>
-non-virtual and the implementations private virtual. If you have implemented your own input <br>
-and output handlers, or have passed json events to serializers or deserializers directly,<br>
-you will need to make changes to your code, refer to the Changelog, and to the revised<br>
-documentation and tutorials for details.</p></li>
-<li><p>The parse_error_handler virtual implementation methods have been renamed to <code>do_warning</code> and <code>do_error</code>, and made private. Non virtual public interface methods <code>warning</code> and <code>error</code> have been added. <br>
-Error handling now leverages <code>std::error_code</code> to communicate parser error events in an extendable way.</p></li>
-</ul>
+<p>Details of changes to the master branch since previous releases may be found in <a href="https://github.com/danielaparker/jsoncons/blob/master/Changelog.txt">Changelog.txt</a>. </p>
 
 <h2>Using the code</h2>
 
@@ -775,10 +746,29 @@ o.set("FirstName","Joe");
 o.set("LastName","Smith");
 </code></pre>
 
-<p>This results in a json object class and a string wrapper being allocated<br>
-from the boost memory pool. The allocator type is not used for structures <br>
-including vectors and strings that use large or variable amounts of memory, <br>
+<p>This results in a json object instance being allocated from the boost memory pool. <br>
+The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory, <br>
 these always use the default allocators.</p>
+
+<h2>Wide character support</h2>
+
+<p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It supports <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4.<br>
+You can construct a <code>wjson</code> value in exactly the same way as a <code>json</code> value, for instance:</p>
+
+<pre><code>using jsoncons::wjson;
+
+wjson root;
+root[L"field1"] = L"test";
+root[L"field2"] = 3.9;
+root[L"field3"] = true;
+
+std::wcout &lt;&lt; root &lt;&lt; L"\n";
+</code></pre>
+
+<p>which prints</p>
+
+<pre><code>{"field1":"test","field2":3.9,"field3":true}
+</code></pre>
 
 <h2>Type Extensibility</h2>
 

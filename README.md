@@ -248,9 +248,8 @@ For instance, you can use the boost `fast_pool_allocator`:
     o.set("FirstName","Joe");
     o.set("LastName","Smith");
 
-This results in a json object class and a string wrapper being allocated
-from the boost memory pool. The allocator type is not used for structures 
-including vectors and strings that use large or variable amounts of memory, 
+This results in a json object instance being allocated from the boost memory pool. 
+The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory, 
 these always use the default allocators.
 
 ## Wide character support
