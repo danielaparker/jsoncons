@@ -270,7 +270,7 @@ which prints
 
     {"field1":"test","field2":3.9,"field3":true}
 
-## Type Extensibility
+## Type extensibility
 
 In the json class, accessors and modifiers are templated, for example,
 
