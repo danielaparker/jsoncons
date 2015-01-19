@@ -171,8 +171,6 @@ public:
     static void* operator new(std::size_t) { return typename Alloc::template rebind<basic_json>::other().allocate(1); }
     static void operator delete(void* ptr) { return typename Alloc::template rebind<basic_json>::other().deallocate(static_cast<basic_json*>(ptr), 1); }
 
-    typedef typename std::basic_string<Char> internal_string_type;
-
     class any
     {
     public:
