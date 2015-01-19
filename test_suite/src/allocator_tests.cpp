@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 {
 	// Works but leaves memory leaks
     
-    myjson o;
-
+    /*myjson o;
+	
     o.set("field1",10.0);
     o.set("field2",20.0);
     o.set("field3","Three");
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 	string s = o["field3"].as<string>();
 
     std::cout << o << std::endl;
-	
+	*/
     //boost::singleton_pool<boost::pool_allocator_tag, sizeof(myjson::string_wrapper)>::release_memory();
 }
 
