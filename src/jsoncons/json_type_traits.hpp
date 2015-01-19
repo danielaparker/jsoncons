@@ -390,7 +390,7 @@ public:
         }
         else if (val.is_ulonglong())
         {
-            return val.as_ulonglong() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {

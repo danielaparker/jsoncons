@@ -1535,7 +1535,14 @@ public:
     {
         return is_numeric();
     }
-    class string_wrapper
+
+    struct string_data
+    {
+        size_t length;
+        Char* p;
+    };
+
+    /*class string_wrapper
     {
     public:
 
@@ -1582,7 +1589,7 @@ public:
         {
         }
         std::basic_string<Char> s_;
-    };
+    };*/
 private:
 	basic_json(value_type::value_type_t t);
 
@@ -1636,85 +1643,82 @@ private:
         }
     };
 
-    internal_string_type& internal_string() 
+    string_data get_string_data() 
     {
-        return value_.string_wrapper_->s_;
+        //return value_.string_wrapper_->s_;
+        return value_.string_value_;
     }
 
+    internal_string_type internal_string() 
+    {
+        //return value_.string_wrapper_->s_;
+        return std::basic_string(value_.string_value_.p,value_.string_value_.length);
+    }
+/*
     const internal_string_type& internal_string() const
     {
         return value_.string_wrapper_->s_;
     }
-
-    struct string_env
+*/
+    static void delete_string_env(const string_data* other)
     {
-        size_t length;
-        Char* p;
-    };
-
-    static void delete_string_env(const string_env* other)
-    {
-        //other->~string_env();
-        //::operator delete((void*)other);
+        other->~string_data();
+        ::operator delete((void*)other);
     }
 
-    static string_env* create_string_env(const string_env* other)
+    static string_data* create_string_env(const string_data* other)
     {
-        //size_t size = sizeof(string_env) + (other->length+1)*sizeof(Char);
-        //char* buffer = (char*)::operator new(size);
-        //string_env* env = new(buffer)string_env;
-        //env->length = other->length;
-        //env->p = new(buffer+sizeof(string_env))Char[other->length+1];
-		//memcpy(env->p,other->p,other->length);
-		//env->p[env->length] = 0;
-        //return env;
-        return nullptr;
+        size_t size = sizeof(string_data) + (other->length+1)*sizeof(Char);
+        char* buffer = (char*)::operator new(size);
+        string_data* env = new(buffer)string_data;
+        env->length = other->length;
+        env->p = new(buffer+sizeof(string_data))Char[other->length+1];
+		memcpy(env->p,other->p,other->length);
+		env->p[env->length] = 0;
+        return env;
     }
 
-    static string_env* create_string_env(const std::basic_string<Char>& s)
+    static string_data* create_string_env(const std::basic_string<Char>& s)
     {
-        //size_t size = sizeof(string_env) + (s.length()+1)*sizeof(Char);
-        //char* buffer = (char*)::operator new(size);
-        //string_env* env = new(buffer)string_env;
-        //env->length = s.length();
-        //env->p = new(buffer+sizeof(string_env))Char[s.length()+1];
-        //memcpy(env->p,s.c_str(),s.length());
-        //env->p[env->length] = 0;
-        //return env;
-        return nullptr;
+        size_t size = sizeof(string_data) + (s.length()+1)*sizeof(Char);
+        char* buffer = (char*)::operator new(size);
+        string_data* env = new(buffer)string_data;
+        env->length = s.length();
+        env->p = new(buffer+sizeof(string_data))Char[s.length()+1];
+        memcpy(env->p,s.c_str(),s.length());
+        env->p[env->length] = 0;
+        return env;
     }
 
-    static string_env* create_string_env(const Char* p)
+    static string_data* create_string_env(const Char* p)
     {
         return create_string_env(p,std::char_traits<Char>::length(p));
     }
 
-    static string_env* create_string_env(const Char* p, size_t length)
+    static string_data* create_string_env(const Char* p, size_t length)
     {
-        //size_t size = sizeof(string_env) + (length+1)*sizeof(Char);
-        //char* buffer = (char*)::operator new(size);
-        //string_env* env = new(buffer)string_env;
-        //env->length = length;
-        //env->p = new(buffer+sizeof(string_env))Char[length+1];
-        //memcpy(env->p,p,length);
-        //env->p[env->length] = 0;
-        //return env;
-        return nullptr;
+        size_t size = sizeof(string_data) + (length+1)*sizeof(Char);
+        char* buffer = (char*)::operator new(size);
+        string_data* env = new(buffer)string_data;
+        env->length = length;
+        env->p = new(buffer+sizeof(string_data))Char[length+1];
+        memcpy(env->p,p,length);
+        env->p[env->length] = 0;
+        return env;
     }
 
-    static string_env* create_string_env()
+    static string_data* create_string_env()
     {
-        //size_t size = sizeof(string_env) + sizeof(Char);
-        //char* buffer = (char*)::operator new(size);
-        //string_env* env = new(buffer)string_env;
-        //env->length = 0;
-        //env->p = new(buffer+sizeof(string_env))Char[1];
-        //env->p[0] = 0;
-        //return env;
-        return nullptr;
+        size_t size = sizeof(string_data) + sizeof(Char);
+        char* buffer = (char*)::operator new(size);
+        string_data* env = new(buffer)string_data;
+        env->length = 0;
+        env->p = new(buffer+sizeof(string_data))Char[1];
+        env->p[0] = 0;
+        return env;
     }
 
-    static string_env* create_string_env(Char c)
+    static string_data* create_string_env(Char c)
     {
         return create_string_env(&c,1);
     }
@@ -1728,9 +1732,9 @@ private:
         bool bool_value_;
         json_object<Char,Alloc>* object_;
         json_array<Char,Alloc>* array_;
-        string_wrapper* string_wrapper_;
+        //string_wrapper* string_wrapper_;
         any* any_value_;
-        string_env* string_value_;
+        string_data* string_value_;
     } value_;
 };
 

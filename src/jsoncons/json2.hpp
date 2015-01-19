@@ -62,7 +62,6 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
         value_ = val.value_;
         break;
     case value_type::string_t:
-        value_.string_wrapper_ = new string_wrapper(val.internal_string());
         value_.string_value_ = create_string_env(val.value_.string_value_);
         break;
     case value_type::array_t:
@@ -167,7 +166,6 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(Char c)
 {
     type_ = value_type::string_t;
-    value_.string_wrapper_ = new string_wrapper(c);
     value_.string_value_ = create_string_env(c);
 }
 
@@ -175,7 +173,6 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
 {
     type_ = value_type::string_t;
-    value_.string_wrapper_ = new string_wrapper(s);
     value_.string_value_ = create_string_env(s);
 }
 
@@ -183,7 +180,6 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s)
 {
     type_ = value_type::string_t;
-    value_.string_wrapper_ = new string_wrapper(s);
     value_.string_value_ = create_string_env(s);
 }
 
@@ -191,7 +187,6 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
 {
     type_ = value_type::string_t;
-    value_.string_wrapper_ = new string_wrapper(s,length);
     value_.string_value_ = create_string_env(s,length);
 }
 
@@ -209,7 +204,6 @@ basic_json<Char, Alloc>::basic_json(value_type::value_type_t t)
     case value_type::bool_t:
         break;
     case value_type::string_t:
-        value_.string_wrapper_ = new string_wrapper();
         value_.string_value_ = create_string_env();
         break;
     case value_type::array_t:
@@ -237,7 +231,7 @@ basic_json<Char, Alloc>::~basic_json()
     case value_type::bool_t:
         break;
     case value_type::string_t:
-        delete value_.string_wrapper_;
+        //delete value_.string_wrapper_;
         delete_string_env(value_.string_value_);
         break;
     case value_type::array_t:
@@ -284,7 +278,6 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
     case value_type::ulonglong_t:
     case value_type::double_t:
         type_ = value_type::string_t;
-        value_.string_wrapper_ = new string_wrapper(rhs);
         value_.string_value_ = create_string_env(rhs);
         break;
     default:
@@ -457,7 +450,7 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
     case value_type::empty_object_t:
         return true;
     case value_type::string_t:
-        return internal_string() == rhs.internal_string();
+        return value_.string_value_->length == rhs.value_.string_value_->length ? std::char_traits<Char>::compare(value_.string_value_->p,rhs.value_.string_value_->p,value_.string_value_->length) == 0 : false;
     case value_type::array_t:
         return *(value_.array_) == *(rhs.value_.array_);
         break;
@@ -836,7 +829,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     switch (type_)
     {
     case value_type::string_t:
-        handler.value(internal_string().c_str(),internal_string().length());
+        handler.value(value_.string_value_->p,value_.string_value_->length);
         break;
     case value_type::double_t:
         handler.value(value_.double_value_);
@@ -1213,7 +1206,7 @@ bool basic_json<Char, Alloc>::is_empty() const
     switch (type_)
     {
     case value_type::string_t:
-        return internal_string().size() == 0;
+        return value_.string_value_->length == 0;
     case value_type::array_t:
         return value_.array_->size() == 0;
     case value_type::empty_object_t:
@@ -1387,11 +1380,11 @@ long basic_json<Char, Alloc>::as_long() const
     switch (type_)
     {
     case value_type::double_t:
-        return static_cast<long long>(value_.double_value_);
+        return static_cast<long>(value_.double_value_);
     case value_type::longlong_t:
-        return static_cast<long long>(value_.longlong_value_);
+        return static_cast<long>(value_.longlong_value_);
     case value_type::ulonglong_t:
-        return static_cast<long long>(value_.ulonglong_value_);
+        return static_cast<long>(value_.ulonglong_value_);
     case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1405,11 +1398,11 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
     switch (type_)
     {
     case value_type::double_t:
-        return static_cast<unsigned long long>(value_.double_value_);
+        return static_cast<unsigned long>(value_.double_value_);
     case value_type::longlong_t:
-        return static_cast<unsigned long long>(value_.longlong_value_);
+        return static_cast<unsigned long>(value_.longlong_value_);
     case value_type::ulonglong_t:
-        return static_cast<unsigned long long>(value_.ulonglong_value_);
+        return static_cast<unsigned long>(value_.ulonglong_value_);
     case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1483,7 +1476,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     switch (type_)
     {
     case value_type::string_t:
-        return std::basic_string<Char>(internal_string().c_str(),internal_string().length());
+        return std::basic_string<Char>(value_.string_value_->p,value_.string_value_->length);
     default:
         return to_string();
     }
@@ -1495,7 +1488,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     switch (type_)
     {
     case value_type::string_t:
-        return std::basic_string<Char>(internal_string().c_str(),internal_string().length());
+        return std::basic_string<Char>(value_.string_value_->p,value_.string_value_->length);
     default:
         return to_string(format);
     }
@@ -1507,7 +1500,7 @@ Char basic_json<Char, Alloc>::as_char() const
     switch (type_)
     {
     case value_type::string_t:
-        return internal_string().length() > 0 ? internal_string()[0] : '\0';
+        return value_.string_value_->length > 0 ? value_.string_value_->p[0] : '\0';
     case value_type::longlong_t:
         return static_cast<Char>(value_.longlong_value_);
     case value_type::ulonglong_t:
