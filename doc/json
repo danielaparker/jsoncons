@@ -801,9 +801,9 @@ is&lt;unsigned long long&gt;
 <pre><code>bool is_null() const
 bool is_string() const
 bool is_numeric() const
-bool is_longlong() const
-bool is_ulonglong() const
-bool is_double() const
+bool is_integer() const
+bool is_unsigned_integer() const
+bool is_float() const
 bool is_bool() const
 bool is_object() const
 bool is_array() const
@@ -885,9 +885,9 @@ as&lt;unsigned long long&gt;
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
 
 <pre><code>bool as_bool() const
-double as_double() const
-long long as_longlong() const
-unsigned long long as_ulonglong() const
+integer_type as_integer() const
+unsigned_integer_type as_unsigned_integer() const
+float_type as_float() const
 std::string as_string() const
 </code></pre>
 
@@ -1008,6 +1008,24 @@ The content of <code>val</code> is copied (or moved) to the new element.</p>
 <p>typedefed to <code>jsoncons::null_type</code> for backwards compatability, use <code>jsoncons::null_type</code> instead</p>
 
 <h3>Deprecated methods</h3>
+
+<pre><code>long long as_longlong() const
+</code></pre>
+
+<p>Use <code>as_integer()</code> or <code>as&lt;long long&gt;()</code> instead<br>
+    unsigned long long as_ulonglong() const<br>
+Use <code>as_unsigned_integer()</code> or <code>as&lt;unsigned long long&gt;()</code> instead<br>
+    double as_double() const<br>
+Use <code>as_float()</code> or <code>as&lt;double&gt;()</code> instead</p>
+
+<pre><code>bool is_longlong() const
+</code></pre>
+
+<p>Use <code>is_integer()</code> or <code>is&lt;long long&gt;()</code> instead<br>
+    bool is_ulonglong() const<br>
+Use <code>is_unsigned_integer()</code> or <code>is&lt;unsigned long long&gt;()</code> instead<br>
+    bool is_double() const<br>
+Use <code>is_float()</code> or <code>is&lt;double&gt;()</code> instead</p>
 
 <pre><code>bool is_custom() const
 

@@ -24,7 +24,7 @@
 
 namespace jsoncons {
 
-typedef long double float_type;
+typedef double float_type;
 typedef long long integer_type;
 typedef unsigned long long unsigned_integer_type;
 
