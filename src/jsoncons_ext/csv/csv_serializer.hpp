@@ -50,7 +50,7 @@ struct csv_char_traits<wchar_t>
 
     static const std::wstring nonnumeric_literal() {return L"nonumeric";};
 };
-
+ 
 template <typename Char>
 void escape_string(const Char* s,
                    size_t length,
