@@ -48,7 +48,7 @@ class json_parser_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const
+    virtual const char* name() const JSONCONS_NOEXCEPT
     {
         return "JSON parser";
     }
@@ -477,10 +477,10 @@ void basic_json_reader<Char>::read()
                         }
                         {
                             parse_string();
-                            size_t count1 = 0;
+                            unsigned long count1 = 0;
                             if (stack_.back().is_object_ & (stack_.back().name_count_ == stack_.back().value_count_))
                             {
-                                handler_->name(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
                                 count1 = 0;
                                 if (buffer_[buffer_position_] == ':')
                                 {
@@ -501,7 +501,7 @@ void basic_json_reader<Char>::read()
                             }
                             else
                             {
-                                handler_->value(&string_buffer_[0], string_buffer_.length(), *this);
+                                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
                                 stack_.back().comma_ = false;
                                 ++stack_.back().value_count_;
                             }
@@ -751,7 +751,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                     {
                         try
                         {
-                            long long d = static_cast<long long>(string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
+                            long long d = static_cast<long long>(string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
                             handler_->value(-d, *this);
                         }
                         catch (const std::exception&)
@@ -772,7 +772,7 @@ void basic_json_reader<Char>::parse_number(Char c)
                     {
                         try
                         {
-                            unsigned long long d = string_to_ulonglong(&string_buffer_[0], string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
+                            unsigned long long d = string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)

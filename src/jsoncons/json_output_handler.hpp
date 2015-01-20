@@ -52,7 +52,7 @@ public:
 
     void name(const std::basic_string<Char>& name)
     {
-        do_name(&name[0], name.length());
+        do_name(name.c_str(), name.length());
     }
 
     void name(const Char* p, size_t length) 
@@ -62,7 +62,7 @@ public:
 
     void value(const std::basic_string<Char>& value) 
     {
-        do_string_value(&value[0], value.length());
+        do_string_value(value.c_str(), value.length());
     }
 
     void value(const Char* p, size_t length) 

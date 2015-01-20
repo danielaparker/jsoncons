@@ -107,7 +107,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         precision = _CVTBUFSIZE - 1;
     }
 
-    int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision, &decimal_point, &sign);
+    int err = _ecvt_s(buf, _CVTBUFSIZE, val, static_cast<int>(precision), &decimal_point, &sign);
     if (err != 0)
     {
         throw std::runtime_error("Failed attempting double to string conversion");
@@ -117,7 +117,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
         s.push_back('-');
     }
 
-    int len = precision;
+    int len = static_cast<int>(precision);
 
     int decimal;
     int exponent;
@@ -208,7 +208,7 @@ double string_to_double(const std::string& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-    const char* begin = &s[0];
+    const char* begin = s.c_str();
     char* end = const_cast<char*>(begin)+s.size();
     double val = _strtod_l(begin,&end,locale);
     if (begin == end)
@@ -222,7 +222,7 @@ double string_to_double(const std::wstring& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-    const wchar_t* begin = &s[0];
+    const wchar_t* begin = s.c_str();
     wchar_t* end = const_cast<wchar_t*>(begin)+s.size();
     double val = _wcstod_l(begin,&end,locale);
     if (begin == end)

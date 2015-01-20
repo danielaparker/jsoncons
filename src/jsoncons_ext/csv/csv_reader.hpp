@@ -417,7 +417,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->value(string_buffer_.c_str(),string_buffer_.length(),*this);
                 }
                 else
                 {
@@ -430,7 +430,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
                         minimum_structure_capacity_ = 0;
                         stack_.back().array_begun_ = true;
                     }
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->value(string_buffer_.c_str(),string_buffer_.length(),*this);
                 }
             }
         }
@@ -502,7 +502,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
             if (column_index < header.size())
             {
                 handler_->name(header[column_index],*this);
-                handler_->value(&string_buffer_[0],string_buffer_.length(),*this);
+                handler_->value(string_buffer_.c_str(),string_buffer_.length(),*this);
             }
             ++column_index;
         }
@@ -526,7 +526,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_objects()
                 if (column_index < header.size())
                 {
                     handler_->name(header[column_index],*this);
-                    handler_->value(&string_buffer_[0],string_buffer_.length(),*this);
+                    handler_->value(string_buffer_.c_str(),string_buffer_.length(),*this);
                 }
             }
             ++column_index;

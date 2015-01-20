@@ -836,7 +836,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     switch (type_)
     {
     case string_t:
-        handler.value(&internal_string()[0],internal_string().length());
+        handler.value(internal_string().c_str(),internal_string().length());
         break;
     case double_t:
         handler.value(value_.double_value_);
@@ -863,7 +863,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
             json_object<Char, Alloc> *o = value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.name(&(it->name())[0],it->name().length());
+                handler.name((it->name()).c_str(),it->name().length());
                 it->value().to_stream(handler);
             }
             handler.end_object();
@@ -1344,11 +1344,11 @@ long basic_json<Char, Alloc>::as_long() const
     switch (type_)
     {
     case double_t:
-        return static_cast<long long>(value_.double_value_);
+        return static_cast<long>(value_.double_value_);
     case longlong_t:
-        return static_cast<long long>(value_.longlong_value_);
+        return static_cast<long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<long long>(value_.ulonglong_value_);
+        return static_cast<long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1362,11 +1362,11 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
     switch (type_)
     {
     case double_t:
-        return static_cast<unsigned long long>(value_.double_value_);
+        return static_cast<unsigned long>(value_.double_value_);
     case longlong_t:
-        return static_cast<unsigned long long>(value_.longlong_value_);
+        return static_cast<unsigned long>(value_.longlong_value_);
     case ulonglong_t:
-        return static_cast<unsigned long long>(value_.ulonglong_value_);
+        return static_cast<unsigned long>(value_.ulonglong_value_);
     case bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
@@ -1496,7 +1496,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     switch (type_)
     {
     case string_t:
-        return std::basic_string<Char>(&internal_string()[0],internal_string().length());
+        return std::basic_string<Char>(internal_string().c_str(),internal_string().length());
     default:
         return to_string();
     }
@@ -1508,7 +1508,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     switch (type_)
     {
     case string_t:
-        return std::basic_string<Char>(&internal_string()[0],internal_string().length());
+        return std::basic_string<Char>(internal_string().c_str(),internal_string().length());
     default:
         return to_string(format);
     }
