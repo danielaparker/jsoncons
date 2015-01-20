@@ -285,9 +285,47 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
         break;
     }
 }
+template<typename Char, class Alloc>
+void basic_json<Char, Alloc>::assign_integer(integer_type rhs)
+{
+    switch (type_)
+    {
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::integer_t:
+    case value_type::unsigned_integer_t:
+    case value_type::float_t:
+        type_ = value_type::integer_t;
+        value_.si_value_ = rhs;
+        break;
+    default:
+        basic_json<Char, Alloc>(rhs).swap(*this);
+        break;
+    }
+}
+template<typename Char, class Alloc>
+void basic_json<Char, Alloc>::assign_unsigned_integer(unsigned_integer_type rhs)
+{
+    switch (type_)
+    {
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::integer_t:
+    case value_type::unsigned_integer_t:
+    case value_type::float_t:
+        type_ = value_type::unsigned_integer_t;
+        value_.ui_value_ = rhs;
+        break;
+    default:
+        basic_json<Char, Alloc>(rhs).swap(*this);
+        break;
+    }
+}
 
 template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_double(double rhs)
+void basic_json<Char, Alloc>::assign_float(float_type rhs)
 {
     switch (type_)
     {
@@ -344,6 +382,27 @@ void basic_json<Char, Alloc>::assign_ulonglong(unsigned long long rhs)
         break;
     }
 }
+
+template<typename Char, class Alloc>
+void basic_json<Char, Alloc>::assign_double(double rhs)
+{
+    switch (type_)
+    {
+    case value_type::null_t:
+    case value_type::bool_t:
+    case value_type::empty_object_t:
+    case value_type::integer_t:
+    case value_type::unsigned_integer_t:
+    case value_type::float_t:
+        type_ = value_type::float_t;
+        value_.float_value_ = rhs;
+        break;
+    default:
+        basic_json<Char, Alloc>(rhs).swap(*this);
+        break;
+    }
+}
+
 template<typename Char, class Alloc>
 void basic_json<Char, Alloc>::assign_bool(bool rhs)
 {
@@ -1183,24 +1242,6 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
 }
 
 template<typename Char, typename Alloc>
-double basic_json<Char, Alloc>::as_double() const
-{
-    switch (type_)
-    {
-    case value_type::float_t:
-        return value_.float_value_;
-    case value_type::integer_t:
-        return static_cast<double>(value_.si_value_);
-    case value_type::unsigned_integer_t:
-        return static_cast<double>(value_.ui_value_);
-    case value_type::null_t:
-        return std::numeric_limits<double>::quiet_NaN();;
-    default:
-        JSONCONS_THROW_EXCEPTION("Not a double");
-    }
-}
-
-template<typename Char, typename Alloc>
 bool basic_json<Char, Alloc>::is_empty() const
 {
     switch (type_)
@@ -1299,6 +1340,78 @@ bool basic_json<Char, Alloc>::as_bool() const
         return value_.bool_value_;
     default:
         JSONCONS_THROW_EXCEPTION("Not a bool");
+    }
+}
+
+template<typename Char, typename Alloc>
+integer_type basic_json<Char, Alloc>::as_integer() const
+{
+    switch (type_)
+    {
+    case value_type::float_t:
+        return static_cast<integer_type>(value_.float_value_);
+    case value_type::integer_t:
+        return value_.si_value_;
+    case value_type::unsigned_integer_t:
+        return static_cast<integer_type>(value_.ui_value_);
+    case value_type::bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an integer type");
+    }
+}
+
+template<typename Char, typename Alloc>
+unsigned_integer_type basic_json<Char, Alloc>::as_unsigned_integer() const
+{
+    switch (type_)
+    {
+    case value_type::float_t:
+        return static_cast<unsigned_integer_type>(value_.float_value_);
+    case value_type::integer_t:
+        return static_cast<unsigned_integer_type>(value_.si_value_);
+    case value_type::unsigned_integer_t:
+        return value_.ui_value_;
+    case value_type::bool_t:
+        return value_.bool_value_ ? 1 : 0;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not an unsigned integer type");
+    }
+}
+
+template<typename Char, typename Alloc>
+float_type basic_json<Char, Alloc>::as_float() const
+{
+    switch (type_)
+    {
+    case value_type::float_t:
+        return value_.float_value_;
+    case value_type::integer_t:
+        return static_cast<float_type>(value_.si_value_);
+    case value_type::unsigned_integer_t:
+        return static_cast<float_type>(value_.ui_value_);
+    case value_type::null_t:
+        return std::numeric_limits<float_type>::quiet_NaN();;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a float type");
+    }
+}
+
+template<typename Char, typename Alloc>
+double basic_json<Char, Alloc>::as_double() const
+{
+    switch (type_)
+    {
+    case value_type::float_t:
+        return value_.float_value_;
+    case value_type::integer_t:
+        return static_cast<double>(value_.si_value_);
+    case value_type::unsigned_integer_t:
+        return static_cast<double>(value_.ui_value_);
+    case value_type::null_t:
+        return std::numeric_limits<double>::quiet_NaN();;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a double");
     }
 }
 

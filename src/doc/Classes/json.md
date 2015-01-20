@@ -228,9 +228,9 @@ Returns `true` if the json value is an array and each element has type `T`, `fal
     bool is_null() const
     bool is_string() const
     bool is_numeric() const
-    bool is_longlong() const
-    bool is_ulonglong() const
-    bool is_double() const
+    bool is_integer() const
+    bool is_unsigned_integer() const
+    bool is_float() const
     bool is_bool() const
     bool is_object() const
     bool is_array() const
@@ -286,9 +286,9 @@ Return integer value if value has integral type, performs cast if value has doub
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const
-    double as_double() const
-    long long as_longlong() const
-    unsigned long long as_ulonglong() const
+    integer_type as_integer() const
+    unsigned_integer_type as_unsigned_integer() const
+    float_type as_float() const
     std::string as_string() const
 Non-generic versions of `as` methods
 
@@ -371,6 +371,20 @@ Exchanges the values of `a` and `b`
 typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
 
 ### Deprecated methods
+
+    long long as_longlong() const
+Use `as_integer()` or `as<long long>()` instead
+    unsigned long long as_ulonglong() const
+Use `as_unsigned_integer()` or `as<unsigned long long>()` instead
+    double as_double() const
+Use `as_float()` or `as<double>()` instead
+
+    bool is_longlong() const
+Use `is_integer()` or `is<long long>()` instead
+    bool is_ulonglong() const
+Use `is_unsigned_integer()` or `is<unsigned long long>()` instead
+    bool is_double() const
+Use `is_float()` or `is<double>()` instead
 
     bool is_custom() const
 

@@ -14,7 +14,7 @@ Breaking changes:
 
 - Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
-- Virtual methods `do_double_value`, `do_longlong_value` and `do_ulonglong_value` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_integer_value`, 
+- The virtual methods `do_double_value`, `do_longlong_value` and `do_ulonglong_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_integer_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_integer_type`.
   The rationale for this change is to allow different configurations for internal number types.
 
@@ -33,6 +33,10 @@ General changes
 - Enhancements to json parsing and json parse event error notification.
 
 - Added to `json_input_handler` and `json_output_handler` a non virtual method `value` that takes a null terminated string.
+
+- Added methods `is_integer`, `is_unsigned_integer` and `is_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which hae been deprecatd.
+
+- Added methods `as_integer`, `as_unsigned_integer` and `as_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which hae been deprecatd.
 
 Bug fixes:
 

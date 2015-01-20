@@ -369,19 +369,19 @@ public:
             return val_.is_numeric();
         }
 
-        bool is_longlong() const
+        bool is_integer() const
         {
-            return val_.is_longlong();
+            return val_.is_integer();
         }
 
-        bool is_ulonglong() const
+        bool is_unsigned_integer() const
         {
-            return val_.is_ulonglong();
+            return val_.is_unsigned_integer();
         }
 
-        bool is_double() const
+        bool is_float() const
         {
-            return val_.is_double();
+            return val_.is_float();
         }
 
         bool is_bool() const
@@ -405,6 +405,22 @@ public:
         }
 
         // Deprecated
+
+        bool is_longlong() const
+        {
+            return val_.is_longlong();
+        }
+
+        bool is_ulonglong() const
+        {
+            return val_.is_ulonglong();
+        }
+
+        bool is_double() const
+        {
+            return val_.is_double();
+        }
+
         bool is_custom() const
         {
             return val_.is_custom();
@@ -446,6 +462,29 @@ public:
             return val_.as_bool();
         }
 
+        integer_type as_integer() const
+        {
+            return val_.as_integer();
+        }
+
+        unsigned_integer_type as_unsigned_integer() const
+        {
+            return val_.as_unsigned_integer();
+        }
+
+        float_type as_float() const
+        {
+            return val_.as_float();
+        }
+
+        template <class T>
+        std::vector<T> as_vector() const
+        {
+            return val_.as_vector<T>();
+        }
+
+        // Deprecated
+
         double as_double() const
         {
             return val_.as_double();
@@ -481,13 +520,6 @@ public:
             return val_.as_ulonglong();
         }
 
-        template <class T>
-        std::vector<T> as_vector() const
-        {
-            return val_.as_vector<T>();
-        }
-
-        // Deprecated
         template <class T>
         const T& custom_data() const
         {
@@ -697,19 +729,19 @@ public:
             return val_.at(name_).is_numeric();
         }
 
-        bool is_longlong() const
+        bool is_integer() const
         {
-            return val_.at(name_).is_longlong();
+            return val_.at(name_).is_integer();
         }
 
-        bool is_ulonglong() const
+        bool is_unsigned_integer() const
         {
-            return val_.at(name_).is_ulonglong();
+            return val_.at(name_).is_unsigned_integer();
         }
 
-        bool is_double() const
+        bool is_float() const
         {
-            return val_.at(name_).is_double();
+            return val_.at(name_).is_float();
         }
 
         bool is_bool() const
@@ -733,6 +765,22 @@ public:
         }
 
         // Deprecated
+
+        bool is_longlong() const
+        {
+            return val_.at(name_).is_longlong();
+        }
+
+        bool is_ulonglong() const
+        {
+            return val_.at(name_).is_ulonglong();
+        }
+
+        bool is_double() const
+        {
+            return val_.at(name_).is_double();
+        }
+
         bool is_custom() const
         {
             return val_.at(name_).is_custom();
@@ -774,6 +822,29 @@ public:
             return val_.at(name_).as_bool();
         }
 
+        integer_type as_integer() const
+        {
+            return val_.at(name_).as_integer();
+        }
+
+        unsigned_integer_type as_unsigned_integer() const
+        {
+            return val_.at(name_).as_unsigned_integer();
+        }
+
+        float_type as_float() const
+        {
+            return val_.at(name_).as_float();
+        }
+
+        template <class T>
+        std::vector<T> as_vector() const
+        {
+            return val_.at(name_).template as_vector<T>();
+        }
+
+        // Deprecated
+
         double as_double() const
         {
             return val_.at(name_).as_double();
@@ -809,13 +880,6 @@ public:
             return val_.at(name_).as_ulonglong();
         }
 
-        template <class T>
-        std::vector<T> as_vector() const
-        {
-            return val_.at(name_).template as_vector<T>();
-        }
-
-        // Deprecated
         template <class T>
         const T& custom_data() const
         {
@@ -1244,17 +1308,17 @@ public:
         return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_integer_t;
     }
 
-    bool is_longlong() const
+    bool is_integer() const
     {
         return type_ == value_type::integer_t;
     }
 
-    bool is_ulonglong() const
+    bool is_unsigned_integer() const
     {
         return type_ == value_type::unsigned_integer_t;
     }
 
-    bool is_double() const
+    bool is_float() const
     {
         return type_ == value_type::float_t;
     }
@@ -1280,6 +1344,22 @@ public:
     }
 
     // Deprecated
+
+    bool is_longlong() const
+    {
+        return type_ == value_type::integer_t;
+    }
+
+    bool is_ulonglong() const
+    {
+        return type_ == value_type::unsigned_integer_t;
+    }
+
+    bool is_double() const
+    {
+        return type_ == value_type::float_t;
+    }
+
     bool is_custom() const
     {
         return type_ == value_type::any_t;
@@ -1305,6 +1385,14 @@ public:
 
     bool as_bool() const;
 
+    integer_type as_integer() const;
+
+    unsigned_integer_type as_unsigned_integer() const;
+
+    float_type as_float() const;
+
+    // Deprecated
+
     double as_double() const;
 
     int as_int() const;
@@ -1319,7 +1407,6 @@ public:
 
     unsigned long long as_ulonglong() const;
 
-    // Deprecated
     template <class T>
     const T& custom_data() const;
     // Returns a const reference to the custom data associated with name
@@ -1471,9 +1558,9 @@ public:
 
     void assign_any(const any& rhs);
     void assign_string(const std::basic_string<Char>& rhs);
-    void assign_double(double rhs);
-    void assign_longlong(long long rhs);
-    void assign_ulonglong(unsigned long long rhs);
+    void assign_integer(integer_type rhs);
+    void assign_unsigned_integer(unsigned_integer_type rhs);
+    void assign_float(float_type rhs);
     void assign_bool(bool rhs);
     void assign_null();
 
@@ -1494,6 +1581,9 @@ public:
 
 
 //  Deprecated
+    void assign_double(double rhs);
+    void assign_longlong(long long rhs);
+    void assign_ulonglong(unsigned long long rhs);
 
     template <class T>
     void set_custom_data(const std::basic_string<Char>& name, T value);
