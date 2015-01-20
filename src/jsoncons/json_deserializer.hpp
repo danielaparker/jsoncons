@@ -175,7 +175,7 @@ private:
         }
     }
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>&)
+    virtual void do_integer_value(integer_type value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -187,7 +187,7 @@ private:
         }
     }
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&)
+    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
@@ -199,7 +199,7 @@ private:
         }
     }
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>&)
+    virtual void do_float_value(float_type value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {

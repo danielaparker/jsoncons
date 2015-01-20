@@ -156,7 +156,7 @@ private:
         end_value();
     }
 
-    virtual void do_double_value(double value)
+    virtual void do_float_value(float_type value)
     {
         begin_value();
 
@@ -189,7 +189,7 @@ private:
         end_value();
     }
 
-    virtual void do_longlong_value(long long value)
+    virtual void do_integer_value(integer_type value)
     {
         begin_value();
 
@@ -198,7 +198,7 @@ private:
         end_value();
     }
 
-    virtual void do_ulonglong_value(unsigned long long value)
+    virtual void do_unsigned_integer_value(unsigned_integer_type value)
     {
         begin_value();
 

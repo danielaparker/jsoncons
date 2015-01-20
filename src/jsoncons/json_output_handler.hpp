@@ -77,37 +77,37 @@ public:
 
     void value(int value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(long value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(long long value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(unsigned int value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(unsigned long value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(unsigned long long value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(double value)
     {
-        do_double_value(value);
+        do_float_value(value);
     }
 
     void value(bool value) 
@@ -140,11 +140,11 @@ private:
 
     virtual void do_string_value(const Char* value, size_t length) = 0;
 
-    virtual void do_double_value(double value) = 0;
+    virtual void do_float_value(float_type value) = 0;
 
-    virtual void do_longlong_value(long long value) = 0;
+    virtual void do_integer_value(integer_type value) = 0;
 
-    virtual void do_ulonglong_value(unsigned long long value) = 0;
+    virtual void do_unsigned_integer_value(unsigned_integer_type value) = 0;
 
     virtual void do_bool_value(bool value) = 0;
 };
@@ -190,15 +190,15 @@ private:
     {
     }
 
-    virtual void do_double_value(double)
+    virtual void do_float_value(float_type)
     {
     }
 
-    virtual void do_longlong_value(long long)
+    virtual void do_integer_value(integer_type)
     {
     }
 
-    virtual void do_ulonglong_value(unsigned long long)
+    virtual void do_unsigned_integer_value(unsigned_integer_type)
     {
     }
 

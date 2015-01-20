@@ -25,7 +25,8 @@ The library has a number of features, which are listed below:
 
 ## What's new 
 
-Details of changes to the master branch since previous releases may be found in [Changelog.txt](https://github.com/danielaparker/jsoncons/blob/master/Changelog.txt). 
+The master branch includes breaking changes to interfaces.
+Details of the changes may be found in [Changelog.html](https://github.com/danielaparker/jsoncons/blob/master/Changelog.html). 
 
 ## Using the code
 

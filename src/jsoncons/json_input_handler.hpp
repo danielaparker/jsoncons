@@ -79,42 +79,42 @@ public:
 
     void value(int value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(long value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(long long value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(float value, const basic_parsing_context<Char>& context)
     {
-        do_double_value(value, context);
+        do_float_value(value, context);
     }
 
     void value(double value, const basic_parsing_context<Char>& context)
     {
-        do_double_value(value, context);
+        do_float_value(value, context);
     }
 
     void value(bool value, const basic_parsing_context<Char>& context) 
@@ -146,11 +146,11 @@ private:
 
     virtual void do_string_value(const Char* value, size_t length, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_float_value(float_type value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_integer_value(integer_type value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
@@ -202,15 +202,15 @@ private:
     {
     }
 
-    virtual void do_double_value(double, const basic_parsing_context<Char>&)
+    virtual void do_float_value(float_type, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void do_longlong_value(long long, const basic_parsing_context<Char>&)
+    virtual void do_integer_value(integer_type, const basic_parsing_context<Char>&)
     {
     }
 
-    virtual void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
+    virtual void do_unsigned_integer_value(unsigned_integer_type, const basic_parsing_context<Char>&)
     {
     }
 

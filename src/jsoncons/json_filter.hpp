@@ -73,18 +73,18 @@ private:
         writer_->value(value, length);
     }
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
+    virtual void do_integer_value(integer_type value, const basic_parsing_context<Char>& context)
     {
         writer_->value(value);
     }
 
-    virtual void do_ulonglong_value(unsigned long long value, 
+    virtual void do_unsigned_integer_value(unsigned_integer_type value, 
                                  const basic_parsing_context<Char>& context)
     {
         writer_->value(value);
     }
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void do_float_value(float_type value, const basic_parsing_context<Char>& context)
     {
         writer_->value(value);
     }
@@ -184,17 +184,17 @@ private:
         handler_->value(value,length,context);
     }
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>& context)
+    virtual void do_float_value(float_type value, const basic_parsing_context<Char>& context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context)
+    virtual void do_integer_value(integer_type value, const basic_parsing_context<Char>& context)
     {
         handler_->value(value,context);
     }
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context)
+    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>& context)
     {
         handler_->value(value,context);
     }
