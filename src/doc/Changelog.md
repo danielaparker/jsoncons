@@ -1,33 +1,29 @@
-Master branch
--------------
+0.96 Stream
+-----------
 
-Bug fixes:
+This release includes breaking changes to interfaces.
 
-- Fixed issue with column number reported by json_reader
-
-Quality of implementation issues:
-
-- Where &s[0] and s.length() were passed to methods,
-  &s[0] has been replaced with s.c_str().
-  &s[0] is an issue when the string is of zero length.
-
-Changes
+Breaking changes:
 
 - Renamed `error_handler` to `parse_error_handler`.
 
 - Renamed namespace `json_parser_error` to `json_parser_errc`
-
-- Static singleton `instance` methods have been added to `default_parse_error_handler`
-  and `empty_json_input_handler`. 
 
 - Renamed `value_adapter` to `json_type_traits`, if you have implemented your own type specializations,
   you will have to rename `value_adapter` also.
 
 - Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
+- Virtual methods `do_double_value`, `do_longlong_value` and `do_ulonglong_value` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_integer_value`, 
+  and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_integer_type`.
+  The rationale for this change is to allow different configurations for internal number types.
+
+General changes
+
 - `json` member function `begin_object` now returns a bidirectional iterator rather than a random access iterator.
 
-New features
+- Static singleton `instance` methods have been added to `default_parse_error_handler`
+  and `empty_json_input_handler`. 
 
 - Added to the `json` class overloaded static methods parse, parse_string 
   and parse_file that take a `parse_error_handler` as a parameter. 
@@ -37,6 +33,13 @@ New features
 - Enhancements to json parsing and json parse event error notification.
 
 - Added to `json_input_handler` and `json_output_handler` a non virtual method `value` that takes a null terminated string.
+
+Bug fixes:
+
+- Fixed issue with column number reported by json_reader
+
+- Where &s[0] and s.length() were passed to methods, &s[0] has been replaced with s.c_str(). 
+  While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.
 
 0.95
 ----

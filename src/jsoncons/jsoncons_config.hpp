@@ -24,6 +24,10 @@
 
 namespace jsoncons {
 
+typedef double float_type;
+typedef long long integer_type;
+typedef unsigned long long unsigned_integer_type;
+
 // Follow boost
 
 #if defined (__clang__)

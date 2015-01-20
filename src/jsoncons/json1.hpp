@@ -118,9 +118,9 @@ namespace value_type
         object_t,
         array_t,
         string_t,
-        double_t,
-        longlong_t,
-        ulonglong_t,
+        float_t,
+        integer_t,
+        unsigned_integer_t,
         bool_t,
         null_t,
         any_t
@@ -1220,22 +1220,22 @@ public:
 
     bool is_numeric() const
     {
-        return type_ == value_type::double_t || type_ == value_type::longlong_t || type_ == value_type::ulonglong_t;
+        return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_integer_t;
     }
 
     bool is_longlong() const
     {
-        return type_ == value_type::longlong_t;
+        return type_ == value_type::integer_t;
     }
 
     bool is_ulonglong() const
     {
-        return type_ == value_type::ulonglong_t;
+        return type_ == value_type::unsigned_integer_t;
     }
 
     bool is_double() const
     {
-        return type_ == value_type::double_t;
+        return type_ == value_type::float_t;
     }
 
     bool is_bool() const
@@ -1665,13 +1665,12 @@ private:
     value_type::value_type_t type_;
     union
     {
-        double double_value_;
-        long long longlong_value_;
-        unsigned long long ulonglong_value_;
+        float_type float_value_;
+        integer_type si_value_;
+        unsigned_integer_type ui_value_;
         bool bool_value_;
         json_object<Char,Alloc>* object_;
         json_array<Char,Alloc>* array_;
-        //string_wrapper* string_wrapper_;
         any* any_value_;
         string_data* string_value_;
     } value_;
