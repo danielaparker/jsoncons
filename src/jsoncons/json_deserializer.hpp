@@ -179,11 +179,11 @@ private:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>::make_integer(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::make_integer(value));
         }
     }
 
@@ -191,11 +191,11 @@ private:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>::make_unsigned_integer(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::make_unsigned_integer(value));
         }
     }
 
@@ -203,11 +203,11 @@ private:
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>::make_float(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::make_float(value));
         }
     }
 
