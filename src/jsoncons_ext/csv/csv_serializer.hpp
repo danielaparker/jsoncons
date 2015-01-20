@@ -59,7 +59,7 @@ void escape_string(const Char* s,
 {
     const Char* begin = s;
     const Char* end = s + length;
-    for (typename const Char* it = begin; it != end; ++it)
+    for (const Char* it = begin; it != end; ++it)
     {
         Char c = *it;
         if (c == quote_char)
