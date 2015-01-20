@@ -1056,6 +1056,27 @@ public:
 
     static basic_json parse_file(const std::string& s, basic_parse_error_handler<Char>& err_handler);
 
+    static basic_json<Char,Alloc> make_float(float_type val)
+    {
+        basic_json<Char,Alloc> temp(value_type::float_t);
+        temp.value_.float_value_ = val;
+        return temp;
+    }
+
+    static basic_json<Char,Alloc> make_integer(integer_type val)
+    {
+        basic_json<Char,Alloc> temp(value_type::integer_t);
+        temp.value_.si_value_ = val;
+        return temp;
+    }
+
+    static basic_json<Char,Alloc> make_unsigned_integer(unsigned_integer_type val)
+    {
+        basic_json<Char,Alloc> temp(value_type::unsigned_integer_t);
+        temp.value_.ui_value_ = val;
+        return temp;
+    }
+
     static basic_json make_array()
     {
         return basic_json<Char, Alloc>(new json_array<Char, Alloc>());
