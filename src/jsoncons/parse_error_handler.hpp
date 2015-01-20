@@ -184,7 +184,7 @@ class json_parser_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const
+    virtual const char* name() const JSONCONS_NOEXCEPT
     {
         return "json_input";
     }
