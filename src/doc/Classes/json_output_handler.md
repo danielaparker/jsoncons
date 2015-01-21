@@ -44,7 +44,7 @@ Output character data event. Uses `do_string_value`.
 Output signed integer event. Uses `do_integer_value`.
 
     void value(unsigned long long value)
-Output non-negative integer event. Uses `do_unsigned_integer_value`.
+Output non-negative integer event. Uses `do_unsigned_value`.
 
     void value(double value)
 Output floating point value event. Uses `do_float_value`.
@@ -81,7 +81,7 @@ Receive character data event
     virtual void do_integer_value(integer_type value)
 Receive signed integer value event
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value)
+    virtual void do_unsigned_value(unsigned_type value)
 Receive non-negative integer value event
 
     virtual void do_float_value(float_type value)

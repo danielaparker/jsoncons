@@ -198,7 +198,7 @@ private:
         end_value();
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value)
+    virtual void do_unsigned_value(unsigned_type value)
     {
         begin_value();
 

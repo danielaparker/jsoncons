@@ -306,7 +306,7 @@ private:
         }
     }
 
-    virtual void do_unsigned_integer_value(jsoncons::unsigned_integer_type val)
+    virtual void do_unsigned_value(jsoncons::unsigned_type val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {

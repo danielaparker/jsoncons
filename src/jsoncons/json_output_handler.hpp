@@ -92,17 +92,17 @@ public:
 
     void value(unsigned int value) 
     {
-        do_unsigned_integer_value(value);
+        do_unsigned_value(value);
     }
 
     void value(unsigned long value) 
     {
-        do_unsigned_integer_value(value);
+        do_unsigned_value(value);
     }
 
     void value(unsigned long long value) 
     {
-        do_unsigned_integer_value(value);
+        do_unsigned_value(value);
     }
 
     void value(double value)
@@ -144,7 +144,7 @@ private:
 
     virtual void do_integer_value(integer_type value) = 0;
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value) = 0;
+    virtual void do_unsigned_value(unsigned_type value) = 0;
 
     virtual void do_bool_value(bool value) = 0;
 };
@@ -198,7 +198,7 @@ private:
     {
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type)
+    virtual void do_unsigned_value(unsigned_type)
     {
     }
 
