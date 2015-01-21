@@ -22,7 +22,7 @@ namespace jsoncons {
 
 // null_type
 
-class null_type
+struct null_type
 {
 };
 

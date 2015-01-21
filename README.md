@@ -35,11 +35,12 @@ The jsoncons library is header-only: it consists solely of header files containi
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-The jsoncons classes and functions are in namespace `jsoncons`. This namespace includes names declared using typedef
+The jsoncons classes and functions are in namespace `jsoncons`. This namespace includes names declared using `typedef` and an empty `struct`
 
     typedef double float_type
     typedef long long integer_type
     typedef unsigned long long unsigned_type
+    struct null_type {}
 
 The following using declarations are for the examples that appear below.
 
