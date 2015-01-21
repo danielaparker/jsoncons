@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h2>0.96 Stream</h2>
+<h2>0.96 Candidate Release</h2>
 
 <p>This release includes breaking changes to interfaces.</p>
 
@@ -480,8 +480,8 @@ vertical-align:1px;
 <li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code>, if you have implemented your own type specializations,<br>
 you will have to rename <code>value_adapter</code> also.</p></li>
 <li><p>Only json arrays now support <code>operator[](size_t)</code> to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
-<li><p>Virtual methods <code>do_double_value</code>, <code>do_longlong_value</code> and <code>do_ulonglong_value</code> have been renamed to <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_integer_value</code>, <br>
-and their parameters have been changed from <code>double</code>, <code>long long</code>, and <code>unsigned long long</code> to typedefs <code>float_type</code>, <code>integer_type</code>, and <code>unsigned_integer_type</code>.<br>
+<li><p>The virtual methods <code>do_double_value</code>, <code>do_longlong_value</code> and <code>do_ulonglong_value</code> of <code>json_input_handler</code> and <code>json_outputhandler</code> have been renamed to <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_value</code>, <br>
+and their parameters have been changed from <code>double</code>, <code>long long</code>, and <code>unsigned long long</code> to typedefs <code>float_type</code>, <code>integer_type</code>, and <code>unsigned_type</code>.<br>
 The rationale for this change is to allow different configurations for internal number types.</p></li>
 </ul>
 
@@ -496,6 +496,8 @@ and parse_file that take a <code>parse_error_handler</code> as a parameter. </p>
 <li><p>Added methods <code>last_char()</code> and <code>eof()</code> to <code>parsing_context</code>.</p></li>
 <li><p>Enhancements to json parsing and json parse event error notification.</p></li>
 <li><p>Added to <code>json_input_handler</code> and <code>json_output_handler</code> a non virtual method <code>value</code> that takes a null terminated string.</p></li>
+<li><p>Added methods <code>is_integer</code>, <code>is_unsigned</code> and <code>is_float</code> to <code>json</code> to replace <code>is_longlong</code>, <code>is_ulonglong</code> and <code>is_double</code>, which hae been deprecatd.</p></li>
+<li><p>Added methods <code>as_integer</code>, <code>as_unsigned</code> and <code>as_float</code> to <code>json</code> to replace <code>is_longlong</code>, <code>is_ulonglong</code> and <code>is_double</code>, which hae been deprecatd.</p></li>
 </ul>
 
 <p>Bug fixes:</p>

@@ -1,5 +1,5 @@
-0.96 Stream
------------
+0.96 Candidate Release
+----------------------
 
 This release includes breaking changes to interfaces.
 
