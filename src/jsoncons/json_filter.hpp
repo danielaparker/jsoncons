@@ -78,7 +78,7 @@ private:
         writer_->value(value);
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value, 
+    virtual void do_unsigned_value(unsigned_type value, 
                                  const basic_parsing_context<Char>& context)
     {
         writer_->value(value);
@@ -194,7 +194,7 @@ private:
         handler_->value(value,context);
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>& context)
+    virtual void do_unsigned_value(unsigned_type value, const basic_parsing_context<Char>& context)
     {
         handler_->value(value,context);
     }

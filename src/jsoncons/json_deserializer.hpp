@@ -187,15 +187,15 @@ private:
         }
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>&)
+    virtual void do_unsigned_value(unsigned_type value, const basic_parsing_context<Char>&)
     {
         if (stack_.back().is_object())
         {
-            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>::make_unsigned_integer(value));
+            stack_.back().object_->push_back(std::move(stack_.back().name_),basic_json<Char,Alloc>::make_unsigned(value));
         } 
         else
         {
-            stack_.back().array_->push_back(basic_json<Char,Alloc>::make_unsigned_integer(value));
+            stack_.back().array_->push_back(basic_json<Char,Alloc>::make_unsigned(value));
         }
     }
 

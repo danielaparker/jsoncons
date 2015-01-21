@@ -175,9 +175,9 @@ public:
         {
             return val.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -204,9 +204,9 @@ public:
         {
             return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -233,9 +233,9 @@ public:
         {
             return val.as_integer() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -262,9 +262,9 @@ public:
         {
             return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -291,9 +291,9 @@ public:
         {
             return val.as_integer() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -320,9 +320,9 @@ public:
         {
             return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -388,9 +388,9 @@ public:
         {
             return true;
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
-            return val.as_unsigned_integer() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
+            return val.as_unsigned() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -417,7 +417,7 @@ public:
         {
             return val.as_integer() >= 0;
         }
-        else if (val.is_unsigned_integer())
+        else if (val.is_unsigned())
         {
             return true;
         }
@@ -428,7 +428,7 @@ public:
     }
     unsigned long long as(const basic_json<Char, Alloc>& val) const
     {
-        return val.as_unsigned_integer();
+        return val.as_unsigned();
     }
     void assign(basic_json<Char, Alloc>& self, unsigned long long val)
     {

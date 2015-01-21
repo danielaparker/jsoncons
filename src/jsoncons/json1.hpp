@@ -120,7 +120,7 @@ namespace value_type
         string_t,
         float_t,
         integer_t,
-        unsigned_integer_t,
+        unsigned_t,
         bool_t,
         null_t,
         any_t
@@ -374,9 +374,9 @@ public:
             return val_.is_integer();
         }
 
-        bool is_unsigned_integer() const
+        bool is_unsigned() const
         {
-            return val_.is_unsigned_integer();
+            return val_.is_unsigned();
         }
 
         bool is_float() const
@@ -467,9 +467,9 @@ public:
             return val_.as_integer();
         }
 
-        unsigned_integer_type as_unsigned_integer() const
+        unsigned_type as_unsigned() const
         {
-            return val_.as_unsigned_integer();
+            return val_.as_unsigned();
         }
 
         float_type as_float() const
@@ -734,9 +734,9 @@ public:
             return val_.at(name_).is_integer();
         }
 
-        bool is_unsigned_integer() const
+        bool is_unsigned() const
         {
-            return val_.at(name_).is_unsigned_integer();
+            return val_.at(name_).is_unsigned();
         }
 
         bool is_float() const
@@ -827,9 +827,9 @@ public:
             return val_.at(name_).as_integer();
         }
 
-        unsigned_integer_type as_unsigned_integer() const
+        unsigned_type as_unsigned() const
         {
-            return val_.at(name_).as_unsigned_integer();
+            return val_.at(name_).as_unsigned();
         }
 
         float_type as_float() const
@@ -1134,9 +1134,9 @@ public:
         return temp;
     }
 
-    static basic_json<Char,Alloc> make_unsigned_integer(unsigned_integer_type val)
+    static basic_json<Char,Alloc> make_unsigned(unsigned_type val)
     {
-        basic_json<Char,Alloc> temp(value_type::unsigned_integer_t);
+        basic_json<Char,Alloc> temp(value_type::unsigned_t);
         temp.value_.ui_value_ = val;
         return temp;
     }
@@ -1305,7 +1305,7 @@ public:
 
     bool is_numeric() const
     {
-        return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_integer_t;
+        return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_t;
     }
 
     bool is_integer() const
@@ -1313,9 +1313,9 @@ public:
         return type_ == value_type::integer_t;
     }
 
-    bool is_unsigned_integer() const
+    bool is_unsigned() const
     {
-        return type_ == value_type::unsigned_integer_t;
+        return type_ == value_type::unsigned_t;
     }
 
     bool is_float() const
@@ -1352,7 +1352,7 @@ public:
 
     bool is_ulonglong() const
     {
-        return type_ == value_type::unsigned_integer_t;
+        return type_ == value_type::unsigned_t;
     }
 
     bool is_double() const
@@ -1387,7 +1387,7 @@ public:
 
     integer_type as_integer() const;
 
-    unsigned_integer_type as_unsigned_integer() const;
+    unsigned_type as_unsigned() const;
 
     float_type as_float() const;
 
@@ -1559,7 +1559,7 @@ public:
     void assign_any(const any& rhs);
     void assign_string(const std::basic_string<Char>& rhs);
     void assign_integer(integer_type rhs);
-    void assign_unsigned_integer(unsigned_integer_type rhs);
+    void assign_unsigned(unsigned_type rhs);
     void assign_float(float_type rhs);
     void assign_bool(bool rhs);
     void assign_null();
@@ -1778,7 +1778,7 @@ private:
     {
         float_type float_value_;
         integer_type si_value_;
-        unsigned_integer_type ui_value_;
+        unsigned_type ui_value_;
         bool bool_value_;
         json_object<Char,Alloc>* object_;
         json_array<Char,Alloc>* array_;

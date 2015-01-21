@@ -94,17 +94,17 @@ public:
 
     void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
-        do_unsigned_integer_value(value,context);
+        do_unsigned_value(value,context);
     }
 
     void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
-        do_unsigned_integer_value(value,context);
+        do_unsigned_value(value,context);
     }
 
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
-        do_unsigned_integer_value(value,context);
+        do_unsigned_value(value,context);
     }
 
     void value(float value, const basic_parsing_context<Char>& context)
@@ -150,7 +150,7 @@ private:
 
     virtual void do_integer_value(integer_type value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_unsigned_value(unsigned_type value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
@@ -210,7 +210,7 @@ private:
     {
     }
 
-    virtual void do_unsigned_integer_value(unsigned_integer_type, const basic_parsing_context<Char>&)
+    virtual void do_unsigned_value(unsigned_type, const basic_parsing_context<Char>&)
     {
     }
 
