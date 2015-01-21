@@ -263,8 +263,7 @@ these always use the default allocators.
 
 ## Wide character support
 
-jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4.
-You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
+jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
 
     using jsoncons::wjson;
 
