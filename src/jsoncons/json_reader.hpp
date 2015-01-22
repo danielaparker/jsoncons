@@ -322,9 +322,9 @@ private:
 };
 
 template<typename Char>
-unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsigned long long max_value) throw(std::overflow_error)
+unsigned_type string_to_unsigned(const Char *s, size_t length, const unsigned_type max_value) throw(std::overflow_error)
 {
-    unsigned long long n = 0;
+    unsigned_type n = 0;
     for (size_t i = 0; i < length; ++i)
     {
         Char c = s[i];
@@ -335,7 +335,7 @@ unsigned long long string_to_ulonglong(const Char *s, size_t length, const unsig
                 throw std::overflow_error("Integer overflow");
             }
             n = n * 10;
-            long long k = (c - '0');
+            integer_type k = (c - '0');
             if (n > max_value - k)
             {
                 throw std::overflow_error("Integer overflow");
@@ -704,7 +704,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            long long d = static_cast<long long>(string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP()));
+                            integer_type d = static_cast<integer_type>(string_to_unsigned(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<integer_type>::max JSONCONS_NO_MACRO_EXP()));
                             handler_->value(-d, *this);
                         }
                         catch (const std::exception&)
@@ -725,7 +725,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            unsigned long long d = string_to_ulonglong(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP());
+                            unsigned_type d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<unsigned_type>::max JSONCONS_NO_MACRO_EXP());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)
