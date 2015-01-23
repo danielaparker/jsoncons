@@ -1,7 +1,7 @@
-0.96 Candidate Release
-----------------------
+0.96 Release
+------------
 
-This release includes breaking changes to interfaces.
+This release includes breaking changes to interfaces. Going forward, the interfaces are expected to be stable.
 
 Breaking changes:
 
@@ -44,6 +44,8 @@ Bug fixes:
 
 - Where &s[0] and s.length() were passed to methods, &s[0] has been replaced with s.c_str(). 
   While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.
+
+- Fixes two issues reported by Alex Merry that cause errors with GCC 4.8.2: a superfluous has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_parser_category_impl name method.
 
 0.95
 ----
@@ -340,7 +342,7 @@ Release 0.71
 Release 0.70
 -------------
 
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (‘.’) is now always used as the decimal point, non English locales are ignored.
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.
 
 - The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.
 
