@@ -132,7 +132,7 @@ class basic_json
 {
 public:
 
-    typedef typename Alloc allocator_type;
+    typedef Alloc allocator_type;
 
     class object : public basic_json<Char,Alloc>
     {
