@@ -14,9 +14,8 @@ project (Tests CXX)
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
-
 set (Boost_NO_BOOST_CMAKE ON)
-find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework)
+find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework system)
 
 add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/allocator_tests.cpp
@@ -27,12 +26,11 @@ add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/json_construction_tests.cpp
                                ../../src/json_equals_tests.cpp
                                ../../src/json_object_tests.cpp
-                               ../../src/error_recovery_tests.cpp
-                               ../../src/json_parse_tests.cpp
+                               ../../src/json_parser_test.cpp
                                ../../src/json_reader_exception_tests.cpp
                                ../../src/json_serializer_tests.cpp
                                ../../src/json_any_tests.cpp
-                               ../../src/jsoncons_tests.cpp
+                               ../../src/jsoncons_test.cpp
                                ../../src/string_to_double_tests.cpp
                                ../../src/unicode_tests.cpp
                                ../../src/wjson_tests.cpp)

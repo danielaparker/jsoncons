@@ -58,7 +58,8 @@ cpppath = [
 ]
 libs = [
     'boost_date_time',
-    'boost_unit_test_framework'
+    'boost_unit_test_framework',
+    'boost_system'
 ]
 libpath = []
 
