@@ -14,9 +14,8 @@ project (Tests CXX)
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
-
 set (Boost_NO_BOOST_CMAKE ON)
-find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework)
+find_package (Boost REQUIRED COMPONENTS date_time unit_test_framework system)
 
 add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/allocator_tests.cpp
