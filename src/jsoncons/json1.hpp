@@ -84,6 +84,12 @@ template <typename Char, class Alloc>
 class basic_json;
 
 template <typename Char,class Alloc>
+class json_object_impl;
+
+template <typename Char,class Alloc>
+class json_array_impl;
+
+template <typename Char,class Alloc>
 class json_object;
 
 template <typename Char,class Alloc>
@@ -134,33 +140,8 @@ public:
 
     typedef Alloc allocator_type;
 
-    class object : public basic_json<Char,Alloc>
-    {
-    public:
-        object(const object& o)
-            : basic_json<Char,Alloc>(o)
-        {
-        }
-        object(const basic_json<Char,Alloc> a)
-            : basic_json<Char,Alloc>(a)
-        {
-            JSONCONS_ASSERT(is_object());
-        }
-    };
-
-    class array : public basic_json<Char,Alloc>
-    {
-    public:
-        array(const array& o)
-            : basic_json<Char,Alloc>(o)
-        {
-        }
-        array(const basic_json<Char,Alloc> a)
-            : basic_json<Char,Alloc>(a)
-        {
-            JSONCONS_ASSERT(is_array());
-        }
-    };
+    typedef typename json_array<Char,Alloc> array;
+    typedef typename json_object<Char,Alloc> object;
 
     typedef Char char_type;
     typedef Alloc allocator_type;
@@ -287,11 +268,11 @@ public:
     static const basic_json<Char,Alloc> an_array;
     static const basic_json<Char,Alloc> null;
     
-    typedef typename json_object<Char,Alloc>::iterator object_iterator;
-    typedef typename json_object<Char,Alloc>::const_iterator const_object_iterator;
+    typedef typename json_object_impl<Char,Alloc>::iterator object_iterator;
+    typedef typename json_object_impl<Char,Alloc>::const_iterator const_object_iterator;
 
-    typedef typename json_array<Char,Alloc>::iterator array_iterator;
-    typedef typename json_array<Char,Alloc>::const_iterator const_array_iterator;
+    typedef typename json_array_impl<Char,Alloc>::iterator array_iterator;
+    typedef typename json_array_impl<Char,Alloc>::const_iterator const_array_iterator;
 
     class const_val_proxy 
     {
@@ -1143,12 +1124,12 @@ public:
 
     static basic_json make_array()
     {
-        return basic_json<Char, Alloc>(new json_array<Char, Alloc>());
+        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>());
     }
 
     static basic_json make_array(size_t n)
     {
-        return basic_json<Char, Alloc>(new json_array<Char, Alloc>(n));
+        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(n));
     }
 
     template <typename T>
@@ -1156,7 +1137,7 @@ public:
     {
         basic_json<Char, Alloc> v;
         v = val;
-        return basic_json<Char, Alloc>(new json_array<Char, Alloc>(n, v));
+        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(n, v));
     }
 
     template<int size>
@@ -1233,9 +1214,9 @@ public:
     template <class InputIterator>
     basic_json(InputIterator name, InputIterator last);
 
-    explicit basic_json(json_object<Char,Alloc>* var);
+    explicit basic_json(json_object_impl<Char,Alloc>* var);
 
-    explicit basic_json(json_array<Char,Alloc>* var);
+    explicit basic_json(json_array_impl<Char,Alloc>* var);
 
     ~basic_json();
 
@@ -1455,7 +1436,7 @@ public:
         {
         case value_type::empty_object_t:
             type_ = value_type::object_t;
-            value_.object_ = new json_object<Char,Alloc>();
+            value_.object_ = new json_object_impl<Char,Alloc>();
         case value_type::object_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
@@ -1780,8 +1761,8 @@ private:
         integer_type si_value_;
         unsigned_type ui_value_;
         bool bool_value_;
-        json_object<Char,Alloc>* object_;
-        json_array<Char,Alloc>* array_;
+        json_object_impl<Char,Alloc>* object_;
+        json_array_impl<Char,Alloc>* array_;
         any* any_value_;
         string_data* string_value_;
     } value_;

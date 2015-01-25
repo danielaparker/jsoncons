@@ -24,7 +24,7 @@ namespace jsoncons {
 
 namespace structure_type
 {
-    enum structure_type_t {json_text,json_object,json_array};
+    enum structure_type_t {json_text,json_object_impl,json_array_impl};
 }
 
 namespace parse_state_type
@@ -44,8 +44,8 @@ class basic_json_reader : private basic_parsing_context<Char>
         {
         }
 
-        bool is_object() const {return structure_ == structure_type::json_object;}
-        bool is_array() const {return structure_ == structure_type::json_array   ;}
+        bool is_object() const {return structure_ == structure_type::json_object_impl;}
+        bool is_array() const {return structure_ == structure_type::json_array_impl   ;}
         bool is_top() const {return structure_ == structure_type::json_text;}
 
         int check_default() const
@@ -88,7 +88,7 @@ class basic_json_reader : private basic_parsing_context<Char>
             {
                 err = json_parser_errc::expected_value_separator;
             }
-            else if ((structure_ == structure_type::json_object) & (state_ != parse_state_type::name_separator_s))
+            else if ((structure_ == structure_type::json_object_impl) & (state_ != parse_state_type::name_separator_s))
             {
                 if (state_ == parse_state_type::name_s)
                 {
@@ -122,7 +122,7 @@ public:
     static const size_t read_ahead_length = 12;
     static const size_t default_max_buffer_length = 16384;
 
-    //  Parse an input stream of JSON text into a json json_object
+    //  Parse an input stream of JSON text into a json json_object_impl
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_parse_error_handler<Char>& err_handler)
@@ -435,7 +435,7 @@ void basic_json_reader<Char>::parse()
                 {
                     handler_->begin_json();
                 }
-                stack_.push_back(stack_item(structure_type::json_object,estimate_minimum_object_capacity()));
+                stack_.push_back(stack_item(structure_type::json_object_impl,estimate_minimum_object_capacity()));
                 handler_->begin_object(*this);
                 break;
             case begin_array:
@@ -451,7 +451,7 @@ void basic_json_reader<Char>::parse()
                     handler_->begin_json();
                 }
                 {
-                    stack_.push_back(stack_item(structure_type::json_array   ,estimate_minimum_array_capacity()));
+                    stack_.push_back(stack_item(structure_type::json_array_impl   ,estimate_minimum_array_capacity()));
                     handler_->begin_array(*this);
                 }
                 break;

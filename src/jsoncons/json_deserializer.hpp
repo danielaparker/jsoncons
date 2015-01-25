@@ -32,12 +32,12 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             minimum_structure_capacity_ = minimum_structure_capacity;
             if (is_object_)
             {
-                object_ = new json_object<Char,Alloc>();
+                object_ = new json_object_impl<Char,Alloc>();
                 object_->reserve(minimum_structure_capacity);
             }
             else
             {
-                array_ = new json_array<Char,Alloc>();
+                array_ = new json_array_impl<Char,Alloc>();
                 array_->reserve(minimum_structure_capacity);
             }
         }
@@ -70,14 +70,14 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
             return !is_object_;
         }
 
-        json_object<Char,Alloc>* release_object() {json_object<Char,Alloc>* p(0); std::swap(p,object_); return p;}
+        json_object_impl<Char,Alloc>* release_object() {json_object_impl<Char,Alloc>* p(0); std::swap(p,object_); return p;}
 
-        json_array<Char,Alloc>* release_array() {json_array<Char,Alloc>* p(0); std::swap(p,array_); return p;}
+        json_array_impl<Char,Alloc>* release_array() {json_array_impl<Char,Alloc>* p(0); std::swap(p,array_); return p;}
 
         std::basic_string<Char> name_;
         bool is_object_;
-        json_object<Char,Alloc>* object_;
-        json_array<Char,Alloc>* array_;
+        json_object_impl<Char,Alloc>* object_;
+        json_array_impl<Char,Alloc>* array_;
         size_t minimum_structure_capacity_;
     };
 
