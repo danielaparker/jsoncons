@@ -1,9 +1,19 @@
-Andrew Hutko for early code review 	
+A big thanks to the following individuals for contributing:
 
-Marc Chevrier for contributing clang port, build files, json is<T> and as<T> methods, and make_multi_array template implementation.
+Andrew Hutko (early code review) 	
 
-Pedro Larroy and the developers of the clearskies_core project for contributing build system for posix systems, adding GCC to list of supported compilers, bug fixes, Android fix
+Marc Chevrier (contributed clang port, build files, json is<T> and as<T> methods, 
+and make_array template implementation.)
 
-Cory Fields for code cleanup
+Pedro Larroy and the developers of the clearskies_core project (contributed build 
+system for posix systems, adding GCC to list of supported compilers, bug fixes, 
+Android fix)
 
-Vitaliy Gusev for reporting error in json object operator[size_t i]
+Cory Fields (code cleanup)
+
+Vitaliy Gusev (reported error in json object operator[size_t i])
+
+Alex Merry (reported errors with "typename" keyword experienced with gcc and providing 
+fixes for 0.95.)
+
+Ignatov Serguei (reported issues experienced with gcc)
