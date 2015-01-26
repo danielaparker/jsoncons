@@ -99,7 +99,7 @@ inline bool is_neg_inf(double x) {return  std::isinf(x) && x > 0;}
 
 #ifdef _MSC_VER
 template <typename Char>
-std::basic_string<Char> double_to_string(double val, size_t precision)
+std::basic_string<Char> float_to_string(double val, size_t precision)
 {
     std::basic_string<Char> s;
     char buf[_CVTBUFSIZE];
@@ -176,7 +176,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
 }
 #else
 template <typename Char>
-std::basic_string<Char> double_to_string(double val, size_t precision)
+std::basic_string<Char> float_to_string(double val, size_t precision)
 {
     std::basic_ostringstream<Char> os;
     os.imbue(std::locale::classic());
@@ -208,7 +208,7 @@ std::basic_string<Char> double_to_string(double val, size_t precision)
 
 #ifdef _MSC_VER
 inline
-double string_to_double(const std::string& s)
+double string_to_float(const std::string& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -217,12 +217,12 @@ double string_to_double(const std::string& s)
     double val = _strtod_l(begin,&end,locale);
     if (begin == end)
     {
-        throw std::invalid_argument("Invalid double value");
+        throw std::invalid_argument("Invalid float value");
     }
     return val;
 }
 inline
-double string_to_double(const std::wstring& s)
+double string_to_float(const std::wstring& s)
 {
     static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
@@ -231,21 +231,21 @@ double string_to_double(const std::wstring& s)
     double val = _wcstod_l(begin,&end,locale);
     if (begin == end)
     {
-        throw std::invalid_argument("Invalid double value");
+        throw std::invalid_argument("Invalid float value");
     }
     return val;
 }
 #else
 template <typename Char> inline
-double string_to_double(const std::basic_string<Char>& s)
+double string_to_float(const std::basic_string<Char>& s)
 {
-    std::basic_stringstream<Char> ss(s);
+    std::basic_istringstream<Char> ss(s);
     ss.imbue(std::locale::classic());
     double val;
     ss >> val;
     if (ss.fail())
     {
-        throw std::invalid_argument("Invalid double value");
+        throw std::invalid_argument("Invalid float value");
     }
     return val;
 }

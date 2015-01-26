@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_string_to_double)
     const char* endptr = begin + strlen(begin);
     const double value1 = 1.15507e-173;
     const double value2 = strtod((char*) begin, (char**)&endptr );
-    const double value3 = jsoncons::string_to_double(std::string(begin));
+    const double value3 = jsoncons::string_to_float(std::string(begin));
 
     BOOST_CHECK(value1 == value2);
     BOOST_CHECK(value2 == value3);
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(test_wstring_to_double)
     const wchar_t* endptr = begin + wcslen(begin);
     const double value1 = 1.15507e-173;
     const double value2 = wcstod((wchar_t*)begin, (wchar_t**)&endptr );
-    const double value3 = jsoncons::string_to_double(std::wstring(begin));
+    const double value3 = jsoncons::string_to_float(std::wstring(begin));
 
     BOOST_CHECK(value1 == value2);
     BOOST_CHECK(value2 == value3);
