@@ -322,29 +322,52 @@ private:
 };
 
 template<typename Char>
-unsigned_type string_to_unsigned(const Char *s, size_t length, const unsigned_type max_value) throw(std::overflow_error)
+unsigned_type string_to_unsigned(const Char *s, size_t length) throw(std::overflow_error)
 {
+    const unsigned_type max_value = std::numeric_limits<unsigned_type>::max JSONCONS_NO_MACRO_EXP();
+    const unsigned_type max_value_div_10 = max_value/10;
     unsigned_type n = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        Char c = s[i];
-        if ((c >= '0') & (c <= '9'))
+        unsigned_type x = s[i] - '0';
+        if (n > max_value_div_10)
         {
-            if (n > max_value / 10)
-            {
-                throw std::overflow_error("Integer overflow");
-            }
-            n = n * 10;
-            integer_type k = (c - '0');
-            if (n > max_value - k)
-            {
-                throw std::overflow_error("Integer overflow");
-            }
-
-            n += k;
+            throw std::overflow_error("Unsigned overflow");
         }
+        n = n * 10;
+        if (n > max_value - x)
+        {
+            throw std::overflow_error("Unsigned overflow");
+        }
+
+        n += x;
     }
     return n;
+}
+
+template<typename Char>
+integer_type string_to_integer(bool has_neg, const Char *s, size_t length) throw(std::overflow_error)
+{
+    const integer_type max_value = std::numeric_limits<integer_type>::max JSONCONS_NO_MACRO_EXP();
+    const integer_type max_value_div_10 = max_value/10;
+
+    integer_type n = 0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        integer_type x = s[i] - '0';
+        if (n > max_value_div_10)
+        {
+            throw std::overflow_error("Integer overflow");
+        }
+        n = n * 10;
+        if (n > max_value - x)
+        {
+            throw std::overflow_error("Integer overflow");
+        }
+
+        n += x;
+    }
+    return has_neg ? -n : n;
 }
 
 template<typename Char>
@@ -689,7 +712,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            double d = string_to_double(string_buffer_);
+                            double d = string_to_float(string_buffer_);
                             if (has_neg)
                                 d = -d;
                             handler_->value(d, *this);
@@ -704,14 +727,14 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            integer_type d = static_cast<integer_type>(string_to_unsigned(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<integer_type>::max JSONCONS_NO_MACRO_EXP()));
-                            handler_->value(-d, *this);
+                            integer_type d = string_to_integer(has_neg,string_buffer_.c_str(), string_buffer_.length());
+                            handler_->value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
-                                double d = string_to_double(string_buffer_);
+                                double d = string_to_float(string_buffer_);
                                 handler_->value(-d, *this);
                             }
                             catch (...)
@@ -725,14 +748,14 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            unsigned_type d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length(), std::numeric_limits<unsigned_type>::max JSONCONS_NO_MACRO_EXP());
+                            unsigned_type d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)
                         {
                             try
                             {
-                                double d = string_to_double(string_buffer_);
+                                double d = string_to_float(string_buffer_);
                                 handler_->value(d, *this);
                             }
                             catch (...)

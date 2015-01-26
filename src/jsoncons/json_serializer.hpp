@@ -182,7 +182,7 @@ private:
         }
         else
         {
-            std::basic_string<Char> buf = double_to_string<Char>(value,format_.precision());
+            std::basic_string<Char> buf = float_to_string<Char>(value,format_.precision());
             *os_ << buf;
         }
 

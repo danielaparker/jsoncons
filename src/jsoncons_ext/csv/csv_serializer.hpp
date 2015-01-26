@@ -382,7 +382,7 @@ private:
         }
         else
         {
-            std::basic_string<Char> buf = jsoncons::double_to_string<Char>(val,format_.precision());
+            std::basic_string<Char> buf = jsoncons::float_to_string<Char>(val,format_.precision());
             os << buf;
         }
 
