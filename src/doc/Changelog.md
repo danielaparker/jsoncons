@@ -47,6 +47,8 @@ Bug fixes:
 
 - Fixes two issues reported by Alex Merry that cause errors with GCC 4.8.2: a superfluous has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_parser_category_impl name method.
 
+- Fixes issues with testsuite cmake and scons
+
 0.95
 ----
 
