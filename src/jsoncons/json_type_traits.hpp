@@ -166,64 +166,6 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, int>
-{
-public:
-    bool is(const basic_json<Char, Alloc>& val) const
-    {
-        if (val.is_integer())
-        {
-            return val.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_unsigned())
-        {
-            return val.as_unsigned() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    int as(const basic_json<Char, Alloc>& val) const
-    {
-        return val.as_int();
-    }
-    void assign(basic_json<Char, Alloc>& self, int val)
-    {
-        self.assign_longlong(val);
-    }
-};
-
-template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, unsigned int>
-{
-public:
-    bool is(const basic_json<Char, Alloc>& val) const
-    {
-        if (val.is_integer())
-        {
-            return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (val.is_unsigned())
-        {
-            return val.as_unsigned() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned int as(const basic_json<Char, Alloc>& val) const
-    {
-        return val.as_uint();
-    }
-    void assign(basic_json<Char, Alloc>& self, unsigned int val)
-    {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, short>
 {
 public:
@@ -235,7 +177,7 @@ public:
         }
         else if (val.is_unsigned())
         {
-            return val.as_unsigned() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= static_cast<unsigned_type>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -260,7 +202,7 @@ public:
     {
         if (val.is_integer())
         {
-            return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_integer() >= 0 && static_cast<unsigned_type>(val.as_integer()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (val.is_unsigned())
         {
@@ -282,6 +224,64 @@ public:
 };
 
 template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, int>
+{
+public:
+    bool is(const basic_json<Char, Alloc>& val) const
+    {
+        if (val.is_integer())
+        {
+            return val.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_unsigned())
+        {
+            return val.as_unsigned() <= static_cast<unsigned_type>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    int as(const basic_json<Char, Alloc>& val) const
+    {
+        return val.as_int();
+    }
+    void assign(basic_json<Char, Alloc>& self, int val)
+    {
+        self.assign_longlong(val);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, unsigned int>
+{
+public:
+    bool is(const basic_json<Char, Alloc>& val) const
+    {
+        if (val.is_integer())
+        {
+            return val.as_integer() >= 0 && static_cast<unsigned_type>(val.as_integer()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_unsigned())
+        {
+            return val.as_unsigned() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned int as(const basic_json<Char, Alloc>& val) const
+    {
+        return val.as_uint();
+    }
+    void assign(basic_json<Char, Alloc>& self, unsigned int val)
+    {
+        self.assign_ulonglong(val);
+    }
+};
+
+template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, long>
 {
 public:
@@ -293,7 +293,7 @@ public:
         }
         else if (val.is_unsigned())
         {
-            return val.as_unsigned() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_unsigned() <= static_cast<unsigned_type>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -318,7 +318,7 @@ public:
     {
         if (val.is_integer())
         {
-            return val.as_integer() >= 0 && val.as_integer() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return val.as_integer() >= 0 && static_cast<unsigned_type>(val.as_integer()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (val.is_unsigned())
         {
@@ -334,6 +334,64 @@ public:
         return val.as_ulong();
     }
     void assign(basic_json<Char, Alloc>& self, unsigned long val)
+    {
+        self.assign_ulonglong(val);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, long long>
+{
+public:
+    bool is(const basic_json<Char, Alloc>& val) const
+    {
+        if (val.is_integer())
+        {
+            return val.as_integer() >= std::numeric_limits<long long>::min JSONCONS_NO_MACRO_EXP() && val.as_integer() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_unsigned())
+        {
+            return val.as_unsigned() <= static_cast<unsigned_type>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    long long as(const basic_json<Char, Alloc>& val) const
+    {
+        return val.as_integer();
+    }
+    void assign(basic_json<Char, Alloc>& self, long long val)
+    {
+        self.assign_integer(val);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, unsigned long long>
+{
+public:
+    bool is(const basic_json<Char, Alloc>& val) const
+    {
+        if (val.is_integer())
+        {
+            return val.as_integer() >= 0 && static_cast<unsigned_type>(val.as_integer()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (val.is_unsigned())
+        {
+            return val.as_unsigned() <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    unsigned long long as(const basic_json<Char, Alloc>& val) const
+    {
+        return val.as_unsigned();
+    }
+    void assign(basic_json<Char, Alloc>& self, unsigned long long val)
     {
         self.assign_ulonglong(val);
     }
@@ -375,64 +433,6 @@ public:
     void assign(basic_json<Char, Alloc>& self, double val)
     {
         self.assign_float(val);
-    }
-};
-
-template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, long long>
-{
-public:
-    bool is(const basic_json<Char, Alloc>& val) const
-    {
-        if (val.is_integer())
-        {
-            return true;
-        }
-        else if (val.is_unsigned())
-        {
-            return val.as_unsigned() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    long long as(const basic_json<Char, Alloc>& val) const
-    {
-        return val.as_integer();
-    }
-    void assign(basic_json<Char, Alloc>& self, long long val)
-    {
-        self.assign_integer(val);
-    }
-};
-
-template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, unsigned long long>
-{
-public:
-    bool is(const basic_json<Char, Alloc>& val) const
-    {
-        if (val.is_integer())
-        {
-            return val.as_integer() >= 0;
-        }
-        else if (val.is_unsigned())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    unsigned long long as(const basic_json<Char, Alloc>& val) const
-    {
-        return val.as_unsigned();
-    }
-    void assign(basic_json<Char, Alloc>& self, unsigned long long val)
-    {
-        self.assign_ulonglong(val);
     }
 };
 

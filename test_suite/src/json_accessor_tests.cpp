@@ -70,6 +70,7 @@ BOOST_AUTO_TEST_CASE(test_is)
     BOOST_CHECK(obj["field3"].type() == jsoncons::value_type::unsigned_t);
 
     BOOST_CHECK(!obj["field1"].is<std::string>());
+    BOOST_CHECK(obj["field1"].is<short>());
     BOOST_CHECK(obj["field1"].is<int>());
     BOOST_CHECK(obj["field1"].is<long>());
     BOOST_CHECK(obj["field1"].is<long long>());
@@ -79,15 +80,18 @@ BOOST_AUTO_TEST_CASE(test_is)
     BOOST_CHECK(!obj["field1"].is<double>());
 
     BOOST_CHECK(!obj["field2"].is<std::string>());
+    BOOST_CHECK(obj["field2"].is<short>());
     BOOST_CHECK(obj["field2"].is<int>());
     BOOST_CHECK(obj["field2"].is<long>());
     BOOST_CHECK(obj["field2"].is<long long>());
+    BOOST_CHECK(!obj["field2"].is<unsigned short>());
     BOOST_CHECK(!obj["field2"].is<unsigned int>());
     BOOST_CHECK(!obj["field2"].is<unsigned long>());
     BOOST_CHECK(!obj["field2"].is<unsigned long long>());
     BOOST_CHECK(!obj["field2"].is<double>());
 
     BOOST_CHECK(!obj["field3"].is<std::string>());
+    BOOST_CHECK(obj["field3"].is<short>());
     BOOST_CHECK(obj["field3"].is<int>());
     BOOST_CHECK(obj["field3"].is<long>());
     BOOST_CHECK(obj["field3"].is<long long>());
