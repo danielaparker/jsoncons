@@ -144,7 +144,6 @@ public:
     typedef json_object<Char,Alloc> object;
 
     typedef Char char_type;
-    typedef Alloc allocator_type;
 
     typedef jsoncons::null_type null_type;
 
