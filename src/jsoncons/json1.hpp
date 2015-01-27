@@ -140,8 +140,8 @@ public:
 
     typedef Alloc allocator_type;
 
-    typedef typename json_array<Char,Alloc> array;
-    typedef typename json_object<Char,Alloc> object;
+    typedef json_array<Char,Alloc> array;
+    typedef json_object<Char,Alloc> object;
 
     typedef Char char_type;
     typedef Alloc allocator_type;
