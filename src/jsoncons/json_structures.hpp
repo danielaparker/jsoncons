@@ -27,7 +27,7 @@ template <typename Char,class Alloc>
 class key_compare
 {
 public:
-    bool operator()(const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& a, 
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& a, 
                     const std::basic_string<Char>& b) const
     {
         return a.first < b;
@@ -38,8 +38,8 @@ template <typename Char,class Alloc>
 class member_compare
 {
 public:
-    bool operator()(const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& a, 
-                    const std::pair<std::basic_string<Char>,typename basic_json<Char,Alloc>>& b) const
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& a, 
+                    const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& b) const
     {
         return a.first < b.first;
     }
@@ -295,9 +295,9 @@ template <typename Char,class Alloc>
 class json_object_impl
 {
 public:
-    typedef typename object_iterator<Char,Alloc,false> iterator;
-    typedef typename object_iterator<Char,Alloc,true> const_iterator;
-	typedef typename std::pair<std::basic_string<Char>,basic_json<Char,Alloc>> member_type;
+    typedef object_iterator<Char,Alloc,false> iterator;
+    typedef object_iterator<Char,Alloc,true> const_iterator;
+	typedef std::pair<std::basic_string<Char>,basic_json<Char,Alloc>> member_type;
     typedef typename std::vector<member_type>::iterator internal_iterator;
     typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
 
