@@ -199,7 +199,7 @@ class object_iterator
             return value_type(name(),value());
         }
 
-        void operator =(typename value_type const& value)
+        void operator =(value_type const& value)
         {
           it_->invoke_(value);
         }
