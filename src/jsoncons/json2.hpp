@@ -43,7 +43,7 @@ public:
     json_object(const basic_json<Char,Alloc> a)
         : basic_json<Char,Alloc>(a)
     {
-        JSONCONS_ASSERT(is_object());
+        JSONCONS_ASSERT(this->is_object());
     }
 };
 
@@ -58,7 +58,7 @@ public:
     json_array(const basic_json<Char,Alloc> a)
         : basic_json<Char,Alloc>(a)
     {
-        JSONCONS_ASSERT(is_array());
+        JSONCONS_ASSERT(this->is_array());
     }
 };
 
