@@ -165,12 +165,13 @@ private:
 };
 
 template <typename Char, typename Alloc, bool IsConst = false>
-class object_iterator : public std::iterator<std::bidirectional_iterator_tag, 
-                                             typename basic_json<Char,Alloc>::member_type,
-                                             ptrdiff_t,
-                                             typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type,
-                                             typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type>
+class object_iterator
 {
+    typedef typename basic_json<Char,Alloc>::member_type value_type;
+    typedef ptrdiff_t difference_type;
+    typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
+    typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
+    typedef std::bidirectional_iterator_tag  iterator_category;
     typedef typename std::vector<std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>>::iterator iterator_impl;
     class deref_proxy;
     friend class deref_proxy;
@@ -198,7 +199,7 @@ class object_iterator : public std::iterator<std::bidirectional_iterator_tag,
             return value_type(name(),value());
         }
 
-        void operator =(value_type const& value)
+        void operator =(typename value_type const& value)
         {
           it_->invoke_(value);
         }
@@ -275,7 +276,7 @@ public:
     {
         return it1.it_ != it2.it_;
     }
-    friend void swap(iterator& lhs, iterator& rhs)
+    friend void swap(object_iterator& lhs, object_iterator& rhs)
     {
         using std::swap;
         swap(lhs.it_,rhs.it_);
