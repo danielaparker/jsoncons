@@ -168,7 +168,7 @@ template <typename Char, typename Alloc, bool IsConst = false>
 class object_iterator
 {
     typedef typename basic_json<Char,Alloc>::member_type value_type;
-    typedef ptrdiff_t difference_type;
+    typedef std::ptrdiff_t difference_type;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
     typedef std::bidirectional_iterator_tag  iterator_category;
