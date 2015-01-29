@@ -273,7 +273,3 @@ The output is
     {"a":4,"b":5,"c":6}
     {"a":7,"b":8,"c":9}
 
-### Acknowledgements
-
-Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
-

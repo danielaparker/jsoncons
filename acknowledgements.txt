@@ -16,4 +16,4 @@ Vitaliy Gusev (reported error in json object operator[size_t i])
 Alex Merry (reported errors with "typename" keyword experienced with gcc and providing 
 fixes for 0.95.)
 
-Ignatov Serguei (reported issues experienced with gcc)
+Ignatov Serguei (reported issues experienced with gcc for 0.95 and 0.96 candidate and helped fix them)

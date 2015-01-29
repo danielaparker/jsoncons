@@ -350,3 +350,7 @@ a `json::any value`, like this:
 
     matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
 
+### Acknowledgements
+
+Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
+
