@@ -25,9 +25,7 @@ The library has a number of features, which are listed below:
 
 ## What's new 
 
-The master branch includes breaking changes to interfaces, which will be released as 0.96.
-Details of the changes may be found in the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md). 
-Going forward, the interfaces are expected to be stable.
+Release 0.96 includes breaking changes to interfaces. Details of the changes may be found in the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md). Going forward, the interfaces are expected to be stable.
 
 ## Using the code
 
