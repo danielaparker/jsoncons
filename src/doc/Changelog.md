@@ -34,9 +34,9 @@ General changes
 
 - Added to `json_input_handler` and `json_output_handler` a non virtual method `value` that takes a null terminated string.
 
-- Added methods `is_integer`, `is_unsigned` and `is_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which hae been deprecatd.
+- Added methods `is_integer`, `is_unsigned` and `is_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which have been deprecated.
 
-- Added methods `as_integer`, `as_unsigned` and `as_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which hae been deprecatd.
+- Added methods `as_integer`, `as_unsigned` and `as_float` to `json` to replace `is_longlong`, `is_ulonglong` and `is_double`, which have been deprecated.
 
 Bug fixes:
 
