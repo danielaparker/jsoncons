@@ -499,7 +499,6 @@ void basic_json_reader<Char>::parse()
                 }
                 {
                     parse_string();
-                    size_t count1 = 0;
                     if (stack_.back().is_object() & ((stack_.back().state_ == parse_state_type::initial_s) | (stack_.back().state_ == parse_state_type::value_separator_s)))
                     {
                         handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
