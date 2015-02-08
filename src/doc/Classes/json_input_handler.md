@@ -54,15 +54,15 @@ line and column information is provided in the [parsing_context](parsing_context
 
     void value(long long value, const parsing_context& context)
 Send signed integer event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_integer_value`.
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_longlong_value`.
 
     void value(unsigned long long value, const parsing_context& context)
 Send non-negative integer event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_unsigned_value`.
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_ulonglong_value`.
 
     void value(double value, const parsing_context& context)
 Send floating point value event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_float_value`.
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_double_value`.
 
     void value(bool value, const parsing_context& context)
 Send boolean value event. Contextual information including
@@ -106,16 +106,16 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_integer_value(integer_type value, const parsing_context& context)
+    virtual void do_longlong_value(long long value, const parsing_context& context)
 Receive signed integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_unsigned_value(unsigned_type value, 
+    virtual void do_ulonglong_value(unsigned long long value, 
                                     const parsing_context& context)
 Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_float_value(float_type value, const parsing_context& context)
+    virtual void do_double_value(double value, const parsing_context& context)
 Receive floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 

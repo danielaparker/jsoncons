@@ -316,7 +316,7 @@ void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
     }
 }
 template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_integer(integer_type rhs)
+void basic_json<Char, Alloc>::assign_integer(long long rhs)
 {
     switch (type_)
     {
@@ -335,7 +335,7 @@ void basic_json<Char, Alloc>::assign_integer(integer_type rhs)
     }
 }
 template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_unsigned(unsigned_type rhs)
+void basic_json<Char, Alloc>::assign_unsigned(unsigned long long rhs)
 {
     switch (type_)
     {
@@ -355,7 +355,7 @@ void basic_json<Char, Alloc>::assign_unsigned(unsigned_type rhs)
 }
 
 template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_float(float_type rhs)
+void basic_json<Char, Alloc>::assign_float(double rhs)
 {
     switch (type_)
     {
@@ -1374,56 +1374,38 @@ bool basic_json<Char, Alloc>::as_bool() const
 }
 
 template<typename Char, typename Alloc>
-integer_type basic_json<Char, Alloc>::as_integer() const
+long long basic_json<Char, Alloc>::as_longlong() const
 {
     switch (type_)
     {
     case value_type::float_t:
-        return static_cast<integer_type>(value_.float_value_);
+        return static_cast<long long>(value_.float_value_);
     case value_type::integer_t:
-        return value_.si_value_;
+        return static_cast<long long>(value_.si_value_);
     case value_type::unsigned_t:
-        return static_cast<integer_type>(value_.ui_value_);
+        return static_cast<long long>(value_.ui_value_);
     case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not an integer type");
+        JSONCONS_THROW_EXCEPTION("Not a long long");
     }
 }
 
 template<typename Char, typename Alloc>
-unsigned_type basic_json<Char, Alloc>::as_unsigned() const
+unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
 {
     switch (type_)
     {
     case value_type::float_t:
-        return static_cast<unsigned_type>(value_.float_value_);
+        return static_cast<unsigned long long>(value_.float_value_);
     case value_type::integer_t:
-        return static_cast<unsigned_type>(value_.si_value_);
+        return static_cast<unsigned long long>(value_.si_value_);
     case value_type::unsigned_t:
-        return value_.ui_value_;
+        return static_cast<unsigned long long>(value_.ui_value_);
     case value_type::bool_t:
         return value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not an unsigned integer type");
-    }
-}
-
-template<typename Char, typename Alloc>
-float_type basic_json<Char, Alloc>::as_float() const
-{
-    switch (type_)
-    {
-    case value_type::float_t:
-        return value_.float_value_;
-    case value_type::integer_t:
-        return static_cast<float_type>(value_.si_value_);
-    case value_type::unsigned_t:
-        return static_cast<float_type>(value_.ui_value_);
-    case value_type::null_t:
-        return std::numeric_limits<float_type>::quiet_NaN();;
-    default:
-        JSONCONS_THROW_EXCEPTION("Not a float type");
+        JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
     }
 }
 
@@ -1478,42 +1460,6 @@ unsigned int basic_json<Char, Alloc>::as_uint() const
         return value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not a unsigned int");
-    }
-}
-
-template<typename Char, typename Alloc>
-long long basic_json<Char, Alloc>::as_longlong() const
-{
-    switch (type_)
-    {
-    case value_type::float_t:
-        return static_cast<long long>(value_.float_value_);
-    case value_type::integer_t:
-        return static_cast<long long>(value_.si_value_);
-    case value_type::unsigned_t:
-        return static_cast<long long>(value_.ui_value_);
-    case value_type::bool_t:
-        return value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION("Not a long long");
-    }
-}
-
-template<typename Char, typename Alloc>
-unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
-{
-    switch (type_)
-    {
-    case value_type::float_t:
-        return static_cast<unsigned long long>(value_.float_value_);
-    case value_type::integer_t:
-        return static_cast<unsigned long long>(value_.si_value_);
-    case value_type::unsigned_t:
-        return static_cast<unsigned long long>(value_.ui_value_);
-    case value_type::bool_t:
-        return value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
     }
 }
 

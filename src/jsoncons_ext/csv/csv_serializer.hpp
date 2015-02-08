@@ -276,7 +276,7 @@ private:
         }
     }
 
-    virtual void do_float_value(jsoncons::float_type val)
+    virtual void do_double_value(double val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -291,7 +291,7 @@ private:
         }
     }
 
-    virtual void do_integer_value(jsoncons::integer_type val)
+    virtual void do_longlong_value(long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -306,7 +306,7 @@ private:
         }
     }
 
-    virtual void do_unsigned_value(jsoncons::unsigned_type val)
+    virtual void do_ulonglong_value(unsigned long long val)
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
