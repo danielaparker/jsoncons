@@ -322,14 +322,14 @@ private:
 };
 
 template<typename Char>
-unsigned_type string_to_unsigned(const Char *s, size_t length) throw(std::overflow_error)
+unsigned long long string_to_unsigned(const Char *s, size_t length) throw(std::overflow_error)
 {
-    const unsigned_type max_value = std::numeric_limits<unsigned_type>::max JSONCONS_NO_MACRO_EXP();
-    const unsigned_type max_value_div_10 = max_value/10;
-    unsigned_type n = 0;
+    const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+    const unsigned long long max_value_div_10 = max_value/10;
+    unsigned long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        unsigned_type x = s[i] - '0';
+        unsigned long long x = s[i] - '0';
         if (n > max_value_div_10)
         {
             throw std::overflow_error("Unsigned overflow");
@@ -346,15 +346,15 @@ unsigned_type string_to_unsigned(const Char *s, size_t length) throw(std::overfl
 }
 
 template<typename Char>
-integer_type string_to_integer(bool has_neg, const Char *s, size_t length) throw(std::overflow_error)
+long long string_to_integer(bool has_neg, const Char *s, size_t length) throw(std::overflow_error)
 {
-    const integer_type max_value = std::numeric_limits<integer_type>::max JSONCONS_NO_MACRO_EXP();
-    const integer_type max_value_div_10 = max_value/10;
+    const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+    const long long max_value_div_10 = max_value/10;
 
-    integer_type n = 0;
+    long long n = 0;
     for (size_t i = 0; i < length; ++i)
     {
-        integer_type x = s[i] - '0';
+        long long x = s[i] - '0';
         if (n > max_value_div_10)
         {
             throw std::overflow_error("Integer overflow");
@@ -726,7 +726,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            integer_type d = string_to_integer(has_neg,string_buffer_.c_str(), string_buffer_.length());
+                            long long d = string_to_integer(has_neg,string_buffer_.c_str(), string_buffer_.length());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)
@@ -747,7 +747,7 @@ void basic_json_reader<Char>::parse_number()
                     {
                         try
                         {
-                            unsigned_type d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length());
+                            unsigned long long d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length());
                             handler_->value(d, *this);
                         }
                         catch (const std::exception&)

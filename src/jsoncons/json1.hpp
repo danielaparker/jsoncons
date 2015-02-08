@@ -349,21 +349,6 @@ public:
             return val_.is_numeric();
         }
 
-        bool is_integer() const
-        {
-            return val_.is_integer();
-        }
-
-        bool is_unsigned() const
-        {
-            return val_.is_unsigned();
-        }
-
-        bool is_float() const
-        {
-            return val_.is_float();
-        }
-
         bool is_bool() const
         {
             return val_.is_bool();
@@ -384,8 +369,6 @@ public:
             return val_.is_any();
         }
 
-        // Deprecated
-
         bool is_longlong() const
         {
             return val_.is_longlong();
@@ -400,6 +383,8 @@ public:
         {
             return val_.is_double();
         }
+
+        // Deprecated
 
         bool is_custom() const
         {
@@ -440,21 +425,6 @@ public:
         bool as_bool() const
         {
             return val_.as_bool();
-        }
-
-        integer_type as_integer() const
-        {
-            return val_.as_integer();
-        }
-
-        unsigned_type as_unsigned() const
-        {
-            return val_.as_unsigned();
-        }
-
-        float_type as_float() const
-        {
-            return val_.as_float();
         }
 
         template <class T>
@@ -709,21 +679,6 @@ public:
             return val_.at(name_).is_numeric();
         }
 
-        bool is_integer() const
-        {
-            return val_.at(name_).is_integer();
-        }
-
-        bool is_unsigned() const
-        {
-            return val_.at(name_).is_unsigned();
-        }
-
-        bool is_float() const
-        {
-            return val_.at(name_).is_float();
-        }
-
         bool is_bool() const
         {
             return val_.at(name_).is_bool();
@@ -744,8 +699,6 @@ public:
             return val_.at(name_).is_any();
         }
 
-        // Deprecated
-
         bool is_longlong() const
         {
             return val_.at(name_).is_longlong();
@@ -760,6 +713,8 @@ public:
         {
             return val_.at(name_).is_double();
         }
+
+        // Deprecated
 
         bool is_custom() const
         {
@@ -800,21 +755,6 @@ public:
         bool as_bool() const
         {
             return val_.at(name_).as_bool();
-        }
-
-        integer_type as_integer() const
-        {
-            return val_.at(name_).as_integer();
-        }
-
-        unsigned_type as_unsigned() const
-        {
-            return val_.at(name_).as_unsigned();
-        }
-
-        float_type as_float() const
-        {
-            return val_.at(name_).as_float();
         }
 
         template <class T>
@@ -1100,21 +1040,21 @@ public:
 
     static basic_json parse_file(const std::string& s, basic_parse_error_handler<Char>& err_handler);
 
-    static basic_json<Char,Alloc> make_float(float_type val)
+    static basic_json<Char,Alloc> make_float(double val)
     {
         basic_json<Char,Alloc> temp(value_type::float_t);
         temp.value_.float_value_ = val;
         return temp;
     }
 
-    static basic_json<Char,Alloc> make_integer(integer_type val)
+    static basic_json<Char,Alloc> make_integer(long long val)
     {
         basic_json<Char,Alloc> temp(value_type::integer_t);
         temp.value_.si_value_ = val;
         return temp;
     }
 
-    static basic_json<Char,Alloc> make_unsigned(unsigned_type val)
+    static basic_json<Char,Alloc> make_unsigned(unsigned long long val)
     {
         basic_json<Char,Alloc> temp(value_type::unsigned_t);
         temp.value_.ui_value_ = val;
@@ -1288,21 +1228,6 @@ public:
         return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_t;
     }
 
-    bool is_integer() const
-    {
-        return type_ == value_type::integer_t;
-    }
-
-    bool is_unsigned() const
-    {
-        return type_ == value_type::unsigned_t;
-    }
-
-    bool is_float() const
-    {
-        return type_ == value_type::float_t;
-    }
-
     bool is_bool() const
     {
         return type_ == value_type::bool_t;
@@ -1323,8 +1248,6 @@ public:
         return type_ == value_type::any_t;
     }
 
-    // Deprecated
-
     bool is_longlong() const
     {
         return type_ == value_type::integer_t;
@@ -1339,6 +1262,8 @@ public:
     {
         return type_ == value_type::float_t;
     }
+
+    // Deprecated
 
     bool is_custom() const
     {
@@ -1365,15 +1290,13 @@ public:
 
     bool as_bool() const;
 
-    integer_type as_integer() const;
+    long long as_longlong() const;
 
-    unsigned_type as_unsigned() const;
-
-    float_type as_float() const;
-
-    // Deprecated
+    unsigned long long as_ulonglong() const;
 
     double as_double() const;
+
+    // Deprecated
 
     int as_int() const;
 
@@ -1382,10 +1305,6 @@ public:
     long as_long() const;
 
     unsigned long as_ulong() const;
-
-    long long as_longlong() const;
-
-    unsigned long long as_ulonglong() const;
 
     template <class T>
     const T& custom_data() const;
@@ -1538,9 +1457,9 @@ public:
 
     void assign_any(const any& rhs);
     void assign_string(const std::basic_string<Char>& rhs);
-    void assign_integer(integer_type rhs);
-    void assign_unsigned(unsigned_type rhs);
-    void assign_float(float_type rhs);
+    void assign_integer(long long rhs);
+    void assign_unsigned(unsigned long long rhs);
+    void assign_float(double rhs);
     void assign_bool(bool rhs);
     void assign_null();
 
@@ -1756,9 +1675,9 @@ private:
     value_type::value_type_t type_;
     union
     {
-        float_type float_value_;
-        integer_type si_value_;
-        unsigned_type ui_value_;
+        double float_value_;
+        long long si_value_;
+        unsigned long long ui_value_;
         bool bool_value_;
         json_object_impl<Char,Alloc>* object_;
         json_array_impl<Char,Alloc>* array_;
