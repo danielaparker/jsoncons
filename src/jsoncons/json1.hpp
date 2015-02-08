@@ -124,9 +124,9 @@ namespace value_type
         object_t,
         array_t,
         string_t,
-        float_t,
-        integer_t,
-        unsigned_t,
+        double_t,
+        longlong_t,
+        ulonglong_t,
         bool_t,
         null_t,
         any_t
@@ -1042,21 +1042,21 @@ public:
 
     static basic_json<Char,Alloc> make_float(double val)
     {
-        basic_json<Char,Alloc> temp(value_type::float_t);
+        basic_json<Char,Alloc> temp(value_type::double_t);
         temp.value_.float_value_ = val;
         return temp;
     }
 
     static basic_json<Char,Alloc> make_integer(long long val)
     {
-        basic_json<Char,Alloc> temp(value_type::integer_t);
+        basic_json<Char,Alloc> temp(value_type::longlong_t);
         temp.value_.si_value_ = val;
         return temp;
     }
 
     static basic_json<Char,Alloc> make_unsigned(unsigned long long val)
     {
-        basic_json<Char,Alloc> temp(value_type::unsigned_t);
+        basic_json<Char,Alloc> temp(value_type::ulonglong_t);
         temp.value_.ui_value_ = val;
         return temp;
     }
@@ -1225,7 +1225,7 @@ public:
 
     bool is_numeric() const
     {
-        return type_ == value_type::float_t || type_ == value_type::integer_t || type_ == value_type::unsigned_t;
+        return type_ == value_type::double_t || type_ == value_type::longlong_t || type_ == value_type::ulonglong_t;
     }
 
     bool is_bool() const
@@ -1250,17 +1250,17 @@ public:
 
     bool is_longlong() const
     {
-        return type_ == value_type::integer_t;
+        return type_ == value_type::longlong_t;
     }
 
     bool is_ulonglong() const
     {
-        return type_ == value_type::unsigned_t;
+        return type_ == value_type::ulonglong_t;
     }
 
     bool is_double() const
     {
-        return type_ == value_type::float_t;
+        return type_ == value_type::double_t;
     }
 
     // Deprecated

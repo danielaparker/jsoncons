@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     ++it;
     BOOST_CHECK(it->value().type() == jsoncons::value_type::string_t);
     ++it;
-    BOOST_CHECK(it->value().type() == jsoncons::value_type::unsigned_t);
+    BOOST_CHECK(it->value().type() == jsoncons::value_type::ulonglong_t);
     ++it;
     BOOST_CHECK(it == val.end_members());
 }
