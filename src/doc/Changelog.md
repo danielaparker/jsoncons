@@ -27,7 +27,7 @@ Breaking changes:
 
 - The virtual methods `do_double_value`, `do_longlong_value` and `do_ulonglong_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_type`.
-  The rationale for this change is to allow different configurations for internal number types.
+  The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)
 
 General changes
 
