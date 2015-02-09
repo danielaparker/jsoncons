@@ -495,9 +495,11 @@ vertical-align:1px;
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
 
-<h2>What's new</h2>
+<h2>What's new in 0.97</h2>
 
-<p>Release 0.96 includes breaking changes to interfaces. Details of the changes may be found in the <a href="https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md">Changelog</a>. Going forward, the interfaces are expected to be stable.</p>
+<p>Release 0.96 introduced name changes to the event methods do_longlong_value, do_ulonglong_value and do_double_value, as well as typedefs for long long, unsigned long long and double. These changes have been reverted to as they were before. Details and rationale may be found in the <a href="https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md">Changelog</a>. </p>
+
+<p>Going forward, the interfaces are expected to be stable.</p>
 
 <h2>Using the code</h2>
 
@@ -505,12 +507,9 @@ vertical-align:1px;
 
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
 
-<p>The jsoncons classes and functions are in namespace <code>jsoncons</code>.  Namespace <code>jsoncons</code> includes names for number types declared with typedef, and a name for a null type defined as an empty struct:</p>
+<p>The jsoncons classes and functions are in namespace <code>jsoncons</code>.  Namespace <code>jsoncons</code> includes a name for a null type defined as an empty struct:</p>
 
-<pre><code>typedef double float_type
-typedef long long integer_type
-typedef unsigned long long unsigned_type
-struct null_type{}
+<pre><code>struct null_type{}
 </code></pre>
 
 <p>The following using declarations are for the examples that appear below.</p>

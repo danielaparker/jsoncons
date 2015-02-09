@@ -347,7 +347,7 @@ public:
     {
         if (val.is_longlong())
         {
-            return val.as_longlong() >= std::numeric_limits<long long>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+            return true;
         }
         else if (val.is_ulonglong())
         {
@@ -380,7 +380,7 @@ public:
         }
         else if (val.is_ulonglong())
         {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();;
+            return true;
         }
         else
         {

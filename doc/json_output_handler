@@ -535,17 +535,17 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 <pre><code>void value(long long value)
 </code></pre>
 
-<p>Output signed integer event. Uses <code>do_integer_value</code>.</p>
+<p>Output signed integer event. Uses <code>do_longlong_value</code>.</p>
 
 <pre><code>void value(unsigned long long value)
 </code></pre>
 
-<p>Output non-negative integer event. Uses <code>do_unsigned_value</code>.</p>
+<p>Output non-negative integer event. Uses <code>do_ulonglong_value</code>.</p>
 
 <pre><code>void value(double value)
 </code></pre>
 
-<p>Output floating point value event. Uses <code>do_float_value</code>.</p>
+<p>Output floating point value event. Uses <code>do_double_value</code>.</p>
 
 <pre><code>void value(bool value)
 </code></pre>
@@ -594,17 +594,17 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 
 <p>Receive character data event</p>
 
-<pre><code>virtual void do_integer_value(integer_type value)
+<pre><code>virtual void do_longlong_value(long long value)
 </code></pre>
 
 <p>Receive signed integer value event</p>
 
-<pre><code>virtual void do_unsigned_value(unsigned_type value)
+<pre><code>virtual void do_ulonglong_value(unsigned long long value)
 </code></pre>
 
 <p>Receive non-negative integer value event</p>
 
-<pre><code>virtual void do_float_value(float_type value)
+<pre><code>virtual void do_double_value(double value)
 </code></pre>
 
 <p>Receive floating point value event</p>

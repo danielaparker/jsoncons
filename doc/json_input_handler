@@ -550,19 +550,19 @@ line and column information is provided in the <a href="parsing_context">parsing
 </code></pre>
 
 <p>Send signed integer event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_integer_value</code>.</p>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_longlong_value</code>.</p>
 
 <pre><code>void value(unsigned long long value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Send non-negative integer event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_unsigned_value</code>.</p>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_ulonglong_value</code>.</p>
 
 <pre><code>void value(double value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Send floating point value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_float_value</code>.</p>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_double_value</code>.</p>
 
 <pre><code>void value(bool value, const parsing_context&amp; context)
 </code></pre>
@@ -626,20 +626,20 @@ line and column information is provided in the <a href="parsing_context">parsing
 <p>Receive character data event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 
-<pre><code>virtual void do_integer_value(integer_type value, const parsing_context&amp; context)
+<pre><code>virtual void do_longlong_value(long long value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive signed integer value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 
-<pre><code>virtual void do_unsigned_value(unsigned_type value, 
+<pre><code>virtual void do_ulonglong_value(unsigned long long value, 
                                 const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive non-negative integer value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 
-<pre><code>virtual void do_float_value(float_type value, const parsing_context&amp; context)
+<pre><code>virtual void do_double_value(double value, const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive floating point value event. Contextual information including<br>
