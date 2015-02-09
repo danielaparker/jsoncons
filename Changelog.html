@@ -468,6 +468,20 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>0.97 Release</h2>
+
+<ul class="task-list">
+<li>Reversion of 0.96 change:</li>
+</ul>
+
+<p>The virtual methods <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_value</code> of <code>json_input_handler</code> and <code>json_outputhandler</code> have been restored to <code>do_double_value</code>, <code>do_longlong_value</code> and <code>do_ulonglong_value</code>, and their typedefed parameter types <code>float_type</code>, <code>integer_type</code>, and <code>unsigned_type</code> have been restored to <code>double</code>, <code>long long</code>, and <code>unsigned long long</code>.</p>
+
+<p>The rationale for this reversion is that the change doesn't really help to make the software more flexible, and that it's better to leave out the typedefs. There will be future enhancements to support greater numeric precision, but these will not affect the current method signatures.</p>
+
+<ul class="task-list">
+<li>Fix for "unused variable" warning message</li>
+</ul>
+
 <h2>0.96 Release</h2>
 
 <p>This release includes breaking changes to interfaces. Going forward, the interfaces are expected to be stable.</p>

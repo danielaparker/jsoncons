@@ -1,3 +1,14 @@
+0.97 Release
+------------
+
+- Reversion of 0.96 change:
+
+The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_outputhandler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedefed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
+
+The rationale for this reversion is that the change doesn't really help to make the software more flexible, and that it's better to leave out the typedefs. There will be future enhancements to support greater numeric precision, but these will not affect the current method signatures.
+
+- Fix for "unused variable" warning message
+
 0.96 Release
 ------------
 

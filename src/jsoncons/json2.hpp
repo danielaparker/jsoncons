@@ -1421,7 +1421,7 @@ double basic_json<Char, Alloc>::as_double() const
     case value_type::ulonglong_t:
         return static_cast<double>(value_.ui_value_);
     case value_type::null_t:
-        return std::numeric_limits<double>::quiet_NaN();;
+        return std::numeric_limits<double>::quiet_NaN();
     default:
         JSONCONS_THROW_EXCEPTION("Not a double");
     }
