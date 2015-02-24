@@ -26,6 +26,7 @@ The library has a number of features, which are listed below:
 ## What's new in master
 
 - "Transforming JSON with filters" example fixed
+- Added a class-specific in-place new to the json class that is implemented in terms of the global version
 
 ## Using the code
 
