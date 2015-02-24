@@ -67,15 +67,15 @@ public:
 
 private:
     // Implementing methods
-    virtual void do_begin_json()
+    void do_begin_json() override
     {
     }
 
-    virtual void do_end_json()
+    void do_end_json() override
     {
     }
 
-    virtual void do_begin_object()
+    void do_begin_object() override
     {
         begin_structure();
 
@@ -88,7 +88,7 @@ private:
         indent();
     }
 
-    virtual void do_end_object()
+    void do_end_object() override
     {
         unindent();
         if (indenting_ && !stack_.empty())
@@ -101,7 +101,7 @@ private:
         end_value();
     }
 
-    virtual void do_begin_array()
+    void do_begin_array() override
     {
         begin_structure();
 
@@ -114,7 +114,7 @@ private:
         indent();
     }
 
-    virtual void do_end_array()
+    void do_end_array() override
     {
         unindent();
         if (indenting_ && !stack_.empty() && stack_.back().content_indented_)
@@ -127,7 +127,7 @@ private:
         end_value();
     }
 
-    virtual void do_name(const Char* name, size_t length)
+    void do_name(const Char* name, size_t length) override
     {
         begin_element();
         os_->put('\"');
@@ -136,7 +136,7 @@ private:
         os_->put(':');
     }
 
-    virtual void do_null_value()
+    void do_null_value() override
     {
         begin_value();
 
@@ -145,7 +145,7 @@ private:
         end_value();
     }
 
-    virtual void do_string_value(const Char* value, size_t length)
+    void do_string_value(const Char* value, size_t length) override
     {
         begin_value();
 
@@ -156,7 +156,7 @@ private:
         end_value();
     }
 
-    virtual void do_double_value(double value)
+    void do_double_value(double value) override
     {
         begin_value();
 
@@ -189,7 +189,7 @@ private:
         end_value();
     }
 
-    virtual void do_longlong_value(long long value)
+    void do_longlong_value(long long value) override
     {
         begin_value();
 
@@ -198,7 +198,7 @@ private:
         end_value();
     }
 
-    virtual void do_ulonglong_value(unsigned long long value)
+    void do_ulonglong_value(unsigned long long value) override
     {
         begin_value();
 
@@ -207,7 +207,7 @@ private:
         end_value();
     }
 
-    virtual void do_bool_value(bool value)
+    void do_bool_value(bool value) override
     {
         begin_value();
 

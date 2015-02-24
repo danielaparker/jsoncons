@@ -166,55 +166,55 @@ public:
         return instance;
     }
 private:
-    virtual void do_begin_json()
+    void do_begin_json() override
     {
     }
 
-    virtual void do_end_json()
+    void do_end_json() override
     {
     }
 
-    virtual void do_begin_object(const basic_parsing_context<Char>&)
+    void do_begin_object(const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_end_object(const basic_parsing_context<Char>&)
+    void do_end_object(const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_begin_array(const basic_parsing_context<Char>&)
+    void do_begin_array(const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_end_array(const basic_parsing_context<Char>&)
+    void do_end_array(const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&)
+    void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_null_value(const basic_parsing_context<Char>&)
+    void do_null_value(const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_string_value(const Char*, size_t length, const basic_parsing_context<Char>&)
+    void do_string_value(const Char*, size_t length, const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_double_value(double, const basic_parsing_context<Char>&)
+    void do_double_value(double, const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_longlong_value(long long, const basic_parsing_context<Char>&)
+    void do_longlong_value(long long, const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&)
+    void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&) override
     {
     }
 
-    virtual void do_bool_value(bool, const basic_parsing_context<Char>&)
+    void do_bool_value(bool, const basic_parsing_context<Char>&) override
     {
     }
 };

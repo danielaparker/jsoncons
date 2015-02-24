@@ -2,11 +2,12 @@
     "address-book":
     [
         {
-            "name":"Jane Roe",
+            "first-name":"Jane",
+            "last-name":"Roe",
             "email":"jane.roe@example.com"
         },
         {
-            "name":"John",
+            "first-name":"John",
             "email":"john.doe@example.com"
         }
     ]

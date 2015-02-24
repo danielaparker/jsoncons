@@ -97,20 +97,20 @@ public:
 
 private:
 
-    virtual void do_begin_json()
+    void do_begin_json() override
     {
     }
 
-    virtual void do_end_json()
+    void do_end_json() override
     {
     }
 
-    virtual void do_begin_object(const basic_parsing_context<Char>& context)
+    void do_begin_object(const basic_parsing_context<Char>& context) override
     {
         stack_.push_back(stack_item(true,context.minimum_structure_capacity()));
     }
 
-    virtual void do_end_object(const basic_parsing_context<Char>&)
+    void do_end_object(const basic_parsing_context<Char>&) override
     {
         stack_.back().object_->sort_members();
         basic_json<Char,Alloc> val(stack_.back().release_object());	    
@@ -132,12 +132,12 @@ private:
         }
     }
 
-    virtual void do_begin_array(const basic_parsing_context<Char>& context)
+    void do_begin_array(const basic_parsing_context<Char>& context) override
     {
         stack_.push_back(stack_item(false,context.minimum_structure_capacity()));
     }
 
-    virtual void do_end_array(const basic_parsing_context<Char>&)
+    void do_end_array(const basic_parsing_context<Char>&) override
     {
         basic_json<Char,Alloc> val(stack_.back().release_array());	    
         stack_.pop_back();
@@ -158,12 +158,12 @@ private:
         }
     }
 
-    virtual void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&)
+    void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&) override
     {
         stack_.back().name_ = std::basic_string<Char>(p,length);
     }
 
-    virtual void do_string_value(const Char* p, size_t length, const basic_parsing_context<Char>&)
+    void do_string_value(const Char* p, size_t length, const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {
@@ -175,7 +175,7 @@ private:
         }
     }
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>&)
+    void do_longlong_value(long long value, const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {
@@ -187,7 +187,7 @@ private:
         }
     }
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&)
+    void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {
@@ -199,7 +199,7 @@ private:
         }
     }
 
-    virtual void do_double_value(double value, const basic_parsing_context<Char>&)
+    void do_double_value(double value, const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {
@@ -211,7 +211,7 @@ private:
         }
     }
 
-    virtual void do_bool_value(bool value, const basic_parsing_context<Char>&)
+    void do_bool_value(bool value, const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {
@@ -223,7 +223,7 @@ private:
         }
     }
 
-    virtual void do_null_value(const basic_parsing_context<Char>&)
+    void do_null_value(const basic_parsing_context<Char>&) override
     {
         if (stack_.back().is_object())
         {

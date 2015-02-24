@@ -475,7 +475,7 @@ public:
     }
 
 private:
-    virtual void do_name(const char* p, int length, const parsing_context& context)
+    void do_name(const char* p, size_t length, const parsing_context& context) override
     {
         property_name_ = string(p,length);
         if (property_name_ != "name")
@@ -484,7 +484,7 @@ private:
         }
     }
 
-    virtual void do_string_value(const char* p, int length, const parsing_context& context)
+    void do_string_value(const char* p, size_t length, const parsing_context& context) override
     {
         if (property_name_ == "name")
         {

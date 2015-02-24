@@ -23,11 +23,9 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
-## What's new in 0.97
+## What's new in master
 
-Release 0.96 introduced name changes to the event methods do_longlong_value, do_ulonglong_value and do_double_value, as well as typedefs for long long, unsigned long long and double. These changes have been reverted to as they were before. Details and rationale may be found in the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md). 
-
-Going forward, the interfaces are expected to be stable.
+- "Transforming JSON with filters" example fixed
 
 ## Using the code
 

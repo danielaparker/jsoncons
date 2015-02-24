@@ -154,55 +154,55 @@ class null_json_output_handler_impl : public basic_json_output_handler<Char>
 {
 private:
 
-    virtual void do_begin_json()
+    void do_begin_json() override
     {
     }
 
-    virtual void do_end_json()
+    void do_end_json() override
     {
     }
 
-    virtual void do_name(const Char* name, size_t length)
+    void do_name(const Char* name, size_t length) override
     {
     }
 
-    virtual void do_begin_object()
+    void do_begin_object() override
     {
     }
 
-    virtual void do_end_object()
+    void do_end_object() override
     {
     }
 
-    virtual void do_begin_array()
+    void do_begin_array() override
     {
     }
 
-    virtual void do_end_array()
+    void do_end_array() override
     {
     }
 
-    virtual void do_null_value()
+    void do_null_value() override
     {
     }
 
-    virtual void do_string_value(const Char*, size_t length)
+    void do_string_value(const Char*, size_t length) override
     {
     }
 
-    virtual void do_double_value(double)
+    void do_double_value(double) override
     {
     }
 
-    virtual void do_longlong_value(long long)
+    void do_longlong_value(long long) override
     {
     }
 
-    virtual void do_ulonglong_value(unsigned long long)
+    void do_ulonglong_value(unsigned long long) override
     {
     }
 
-    virtual void do_bool_value(bool)
+    void do_bool_value(bool) override
     {
     }
 

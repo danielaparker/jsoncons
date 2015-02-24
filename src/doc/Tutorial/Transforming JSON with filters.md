@@ -38,8 +38,8 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
         }
 
     private:
-        virtual void do_name(const char* p, int length, 
-                             const parsing_context& context)
+        void do_name(const char* p, size_t length, 
+                     const parsing_context& context) override
         {
             property_name_ = string(p,length);
             if (property_name_ != "name")
@@ -48,8 +48,8 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
             }
         }
 
-        virtual void do_string_value(const char* p, int length, 
-                                     const parsing_context& context)
+        void do_string_value(const char* p, size_t length, 
+                             const parsing_context& context) override
         {
             if (property_name_ == "name")
             {
