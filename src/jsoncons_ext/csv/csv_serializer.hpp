@@ -156,20 +156,20 @@ public:
 
 private:
 
-    virtual void do_begin_json()
+    void do_begin_json() override
     {
     }
 
-    virtual void do_end_json()
+    void do_end_json() override
     {
     }
 
-    virtual void do_begin_object()
+    void do_begin_object() override
     {
         stack_.push_back(stack_item(true));
     }
 
-    virtual void do_end_object()
+    void do_end_object() override
     {
         if (stack_.size() == 2)
         {
@@ -184,12 +184,12 @@ private:
         end_value();
     }
 
-    virtual void do_begin_array()
+    void do_begin_array() override
     {
         stack_.push_back(stack_item(false));
     }
 
-    virtual void do_end_array()
+    void do_end_array() override
     {
         if (stack_.size() == 2)
         {
@@ -200,7 +200,7 @@ private:
         end_value();
     }
 
-    virtual void do_name(const Char* name, size_t length)
+    void do_name(const Char* name, size_t length) override
     {
         if (stack_.size() == 2)
         {
@@ -246,7 +246,7 @@ private:
         }
     }
 
-    virtual void do_null_value()
+    void do_null_value() override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -261,7 +261,7 @@ private:
         }
     }
 
-    virtual void do_string_value(const Char* val, size_t length)
+    void do_string_value(const Char* val, size_t length) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -276,7 +276,7 @@ private:
         }
     }
 
-    virtual void do_double_value(double val)
+    void do_double_value(double val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -291,7 +291,7 @@ private:
         }
     }
 
-    virtual void do_longlong_value(long long val)
+    void do_longlong_value(long long val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -306,7 +306,7 @@ private:
         }
     }
 
-    virtual void do_ulonglong_value(unsigned long long val)
+    void do_ulonglong_value(unsigned long long val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -321,7 +321,7 @@ private:
         }
     }
 
-    virtual void do_bool_value(bool val)
+    void do_bool_value(bool val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -336,7 +336,7 @@ private:
         }
     }
 
-    virtual void value(const Char* val, size_t length, std::basic_ostream<Char>& os)
+    void value(const Char* val, size_t length, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -356,7 +356,7 @@ private:
         end_value();
     }
 
-    virtual void value(double val, std::basic_ostream<Char>& os)
+    void value(double val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -390,7 +390,7 @@ private:
 
     }
 
-    virtual void value(long long val, std::basic_ostream<Char>& os)
+    void value(long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -399,7 +399,7 @@ private:
         end_value();
     }
 
-    virtual void value(unsigned long long val, std::basic_ostream<Char>& os)
+    void value(unsigned long long val, std::basic_ostream<Char>& os)
     {
         begin_value(os);
 
@@ -408,7 +408,7 @@ private:
         end_value();
     }
 
-    virtual void value(bool val, std::basic_ostream<Char>& os)
+    void value(bool val, std::basic_ostream<Char>& os) 
     {
         begin_value(os);
 
@@ -417,7 +417,7 @@ private:
         end_value();
     }
 
-    virtual void do_null_value(std::basic_ostream<Char>& os)
+    void do_null_value(std::basic_ostream<Char>& os) 
     {
         begin_value(os);
 

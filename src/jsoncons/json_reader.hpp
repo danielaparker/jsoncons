@@ -273,32 +273,32 @@ private:
 
     }
 
-    virtual unsigned long do_line_number() const
+    unsigned long do_line_number() const override
     {
         return line_;
     }
 
-    virtual unsigned long do_column_number() const
+    unsigned long do_column_number() const override
     {
         return column_;
     }
 
-    virtual Char do_peek()
-    {
-        return buffer_[buffer_position_];
-    }
+    //Char do_peek() const override
+    //{
+       // return buffer_[buffer_position_];
+    //}
 
-    virtual bool do_eof() const
+    bool do_eof() const override
     {
         return eof_;
     }
 
-    virtual Char do_last_char() const
+    Char do_last_char() const override
     {
         return c_;
     }
 
-    virtual size_t do_minimum_structure_capacity() const
+    size_t do_minimum_structure_capacity() const override
     {
         return stack_.size() > 0 ? stack_.back().minimum_structure_capacity_ : 0;
     }
