@@ -150,6 +150,10 @@ public:
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<basic_json>::other().allocate(1); }
     static void operator delete(void* ptr) { return typename Alloc::template rebind<basic_json>::other().deallocate(static_cast<basic_json*>(ptr), 1); }
+    static void* operator new( std::size_t s, void* p ) throw()
+    {
+        return ::operator new( s, p );
+    }
 
     class any
     {

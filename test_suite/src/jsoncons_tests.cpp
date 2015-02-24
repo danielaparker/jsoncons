@@ -14,6 +14,8 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <new>
+#include <boost/optional.hpp>
 
 using jsoncons::parsing_context;
 using jsoncons::json_serializer;
@@ -25,6 +27,12 @@ using jsoncons::json_output_handler;
 using std::string;
 using jsoncons::json_filter;
 using jsoncons::pretty_print;
+
+BOOST_AUTO_TEST_CASE(test_boost_optional)
+{
+    boost::optional<jsoncons::json> opt_json;
+    opt_json = jsoncons::json(jsoncons::json::an_object);
+}
 
 BOOST_AUTO_TEST_CASE(test_for_each_value)
 {
