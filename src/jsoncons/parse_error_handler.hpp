@@ -176,7 +176,8 @@ namespace json_parser_errc
         invalid_number,
         unexpected_eof,
         eof_reading_string_value,
-        eof_reading_numeric_value
+        eof_reading_numeric_value,
+expected_container
     };
 }
 
@@ -226,6 +227,8 @@ public:
             return "Reached end of file while reading string value";
         case json_parser_errc::eof_reading_numeric_value:
             return "Reached end of file while reading numeric value";
+case json_parser_errc::expected_container:
+            return "Expected array or object ('[' or '{')";
         default:
             return "Unknown JSON parser error";
         }
