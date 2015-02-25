@@ -102,6 +102,15 @@ class basic_json_reader : private basic_parsing_context<Char>
             return err;
         }
 
+        int check_sub_value_precondition() const
+        {
+            int err = check_value_precondition();
+    if (!err && is_top()) {
+err = json_parser_errc::expected_container;
+    }
+    return err;
+        }
+
         structure_type::structure_type_t structure_;
         parse_state_type::parse_state_type_t state_;
         size_t minimum_structure_capacity_;
@@ -506,7 +515,7 @@ void basic_json_reader<Char>::parse()
                     }
                     else
                     {
-                        int err = stack_.back().check_value_precondition();
+                        int err = stack_.back().check_sub_value_precondition();
                         if (err != 0)
                         {
                             err_handler_->error(std::error_code(err, json_parser_category()), *this);
@@ -572,7 +581,7 @@ void basic_json_reader<Char>::parse()
                 break;
             case 't':
                 {
-                    int err = stack_.back().check_value_precondition();
+                    int err = stack_.back().check_sub_value_precondition();
                     if (err != 0)
                     {
                         err_handler_->error(std::error_code(err, json_parser_category()), *this);
@@ -590,7 +599,7 @@ void basic_json_reader<Char>::parse()
                 break;
             case 'f':
                 {
-                    int err = stack_.back().check_value_precondition();
+                    int err = stack_.back().check_sub_value_precondition();
                     if (err != 0)
                     {
                         err_handler_->error(std::error_code(err, json_parser_category()), *this);
@@ -607,7 +616,7 @@ void basic_json_reader<Char>::parse()
                 break;
             case 'n':
                 {
-                    int err = stack_.back().check_value_precondition();
+                    int err = stack_.back().check_sub_value_precondition();
                     if (err != 0)
                     {
                         err_handler_->error(std::error_code(err, json_parser_category()), *this);
@@ -634,7 +643,7 @@ void basic_json_reader<Char>::parse()
             case '9':
             case '-':
                 {
-                    int err = stack_.back().check_value_precondition();
+                    int err = stack_.back().check_sub_value_precondition();
                     if (err != 0)
                     {
                         err_handler_->error(std::error_code(err, json_parser_category()), *this);
