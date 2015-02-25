@@ -16,7 +16,6 @@
 #include <map>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/output_format.hpp"
-#include "jsoncons/json2.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
 

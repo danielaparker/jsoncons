@@ -13,6 +13,7 @@
 #include <new>
 #include "jsoncons/json_serializer.hpp"
 #include "jsoncons/json_filter.hpp"
+#include "jsoncons/json_reader.hpp"
 
 using std::string;
 
@@ -20,6 +21,7 @@ using jsoncons::parsing_context;
 using jsoncons::json_serializer;
 using jsoncons::json_reader;
 using jsoncons::json_filter;
+using jsoncons::json_output_handler;
 
 class my_json_filter : public json_filter
 {
