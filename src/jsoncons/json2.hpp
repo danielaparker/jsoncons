@@ -1507,8 +1507,10 @@ const T& basic_json<Char, Alloc>::custom_data() const
     switch (type_)
     {
     case value_type::any_t:
+        {
 			const T& p = value_.any_value_->template cast<T>();
 			return p;
+        }
     default:
         JSONCONS_THROW_EXCEPTION("Not userdata");
     }
