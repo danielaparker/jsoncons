@@ -468,6 +468,16 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>0.97.1 Release</h2>
+
+<ul class="task-list">
+<li>"Transforming JSON with filters" example fixed</li>
+<li>Added a class-specific in-place new to the json class that is implemented in terms of the global version</li>
+<li>Reorganized header files, removing unnecessary includes. </li>
+<li>Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.</li>
+<li>Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error</li>
+</ul>
+
 <h2>0.97 Release</h2>
 
 <ul class="task-list">
@@ -496,7 +506,7 @@ you will have to rename <code>value_adapter</code> also.</p></li>
 <li><p>Only json arrays now support <code>operator[](size_t)</code> to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
 <li><p>The virtual methods <code>do_double_value</code>, <code>do_longlong_value</code> and <code>do_ulonglong_value</code> of <code>json_input_handler</code> and <code>json_outputhandler</code> have been renamed to <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_value</code>, <br>
 and their parameters have been changed from <code>double</code>, <code>long long</code>, and <code>unsigned long long</code> to typedefs <code>float_type</code>, <code>integer_type</code>, and <code>unsigned_type</code>.<br>
-The rationale for this change is to allow different configurations for internal number types.</p></li>
+The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)</p></li>
 </ul>
 
 <p>General changes</p>
@@ -860,7 +870,7 @@ arr.resize_array(10,0.0);
 <h2>Release 0.70</h2>
 
 <ul class="task-list">
-<li><p>Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (‘.’) is now always used as the decimal point, non English locales are ignored.</p></li>
+<li><p>Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.</p></li>
 <li><p>The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.</p></li>
 <li>
 <p>Added a template method as_vector to the json class. If a json value is an array and conversion is possible to the template type, returns a std::vector of that type, otherwise throws an std::exception. Specializations are provided for std::string, bool, char, int, unsigned int, long, unsigned long, long long, unsigned long long, and double. For example</p>
