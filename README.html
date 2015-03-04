@@ -495,11 +495,11 @@ vertical-align:1px;
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
 
-<h2>What's new in master</h2>
+<h2>What's new in Release 0.97.1</h2>
 
 <ul class="task-list">
 <li>"Transforming JSON with filters" example fixed</li>
-<li>Added a class-specific in-place new to the json class that is implemented in terms of the global version</li>
+<li>Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)</li>
 <li>Reorganized header files, removing unnecessary includes. </li>
 <li>Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.</li>
 <li>Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error</li>
