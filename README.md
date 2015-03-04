@@ -23,10 +23,10 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
-## What's new in master
+## What's new in Release 0.97.1
 
 - "Transforming JSON with filters" example fixed
-- Added a class-specific in-place new to the json class that is implemented in terms of the global version
+- Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)
 - Reorganized header files, removing unnecessary includes. 
 - Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.
 - Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error
