@@ -29,7 +29,7 @@ The library has a number of features, which are listed below:
 - Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)
 - Reorganized header files, removing unnecessary includes. 
 - Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.
-- Incorporates fix contributed by Milan Burda for ìSwitch case is in protected scopeî clang build error
+- Incorporates fix contributed by Milan Burda for ‚ÄúSwitch case is in protected scope‚Äù clang build error
 
 ## Using the code
 
@@ -41,14 +41,16 @@ The jsoncons classes and functions are in namespace `jsoncons`.  Namespace `json
 
 	struct null_type{}
 
-The following using declarations are for the examples that appear below.
+These include and using declarations are for the examples that appear below.
 
     #include "jsoncons/json.hpp"
 
     using std::string;
     using std::cout;
+    using std::cerr;
     using std::endl;
     using jsoncons::json;
+    using jsoncons::json_exception;    
     using jsoncons::pretty_print;
 
 ### Reading json values from a file

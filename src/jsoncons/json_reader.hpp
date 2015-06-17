@@ -670,15 +670,43 @@ void basic_json_reader<Char>::parse()
     }
 }
 
+namespace number_state
+{
+    enum number_state_t
+    {
+        initial = 0,
+        starts_with_zero = 1,
+        number = 2,
+        frac = 3,
+        exp = 4,
+        frac_or_exp_number = 5,
+        plus_or_minus = 6
+    };
+}
+
 template<typename Char>
 void basic_json_reader<Char>::parse_number()
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
-    bool has_neg = (c_ == '-') ? true : false;
-    if (!has_neg)
+    int state;
+    bool has_neg;
+    switch (c_)
     {
+    case '-':
+        has_neg = true;
+        state = number_state::initial;
+        break;
+    case '0':
+        has_neg = false;
         string_buffer_.push_back(c_);
+        state = number_state::starts_with_zero;
+        break;
+    default:
+        has_neg = false;
+        string_buffer_.push_back(c_);
+        state = number_state::number;
+        break;
     }
 
     bool done = false;
@@ -691,6 +719,25 @@ void basic_json_reader<Char>::parse_number()
             switch (c_)
             {
             case '0':
+                switch (state)
+                {
+                case number_state::initial:
+                    state = number_state::starts_with_zero;
+                    break;
+                case number_state::starts_with_zero:
+                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                    state = number_state::number;
+                    break;
+                case number_state::frac:
+                case number_state::exp:
+                case number_state::plus_or_minus:
+                    state = number_state::frac_or_exp_number;
+                    break;
+                }
+                string_buffer_.push_back(c_);
+                ++buffer_position_;
+                ++column_;
+                break;
             case '1':
             case '2':
             case '3':
@@ -700,16 +747,52 @@ void basic_json_reader<Char>::parse_number()
             case '7':
             case '8':
             case '9':
+                switch (state)
+                {
+                case number_state::initial:
+                    state = number_state::number;
+                    break;
+                case number_state::starts_with_zero:
+                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                    state = number_state::number;
+                    break;
+                case number_state::plus_or_minus:
+                case number_state::frac:
+                case number_state::exp:
+                    state = number_state::frac_or_exp_number;
+                    break;
+                }
+                string_buffer_.push_back(c_);
+                ++buffer_position_;
+                ++column_;
+                break;
+            case '.':
+                state = number_state::frac;
+                has_frac_or_exp = true;
+                string_buffer_.push_back(c_);
+                ++buffer_position_;
+                ++column_;
+                break;
+            case 'e':
+            case 'E':
+                state = number_state::exp;
+                has_frac_or_exp = true;
                 string_buffer_.push_back(c_);
                 ++buffer_position_;
                 ++column_;
                 break;
             case '-':
             case '+':
-            case '.':
-            case 'e':
-            case 'E':
-                has_frac_or_exp = true;
+                switch (state)
+                {
+                case number_state::exp:
+                    state = number_state::plus_or_minus;
+                    break;
+                default:
+                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                    state = number_state::plus_or_minus;
+                    break;
+                }
                 string_buffer_.push_back(c_);
                 ++buffer_position_;
                 ++column_;
@@ -718,6 +801,10 @@ void basic_json_reader<Char>::parse_number()
                 {
                     if (has_frac_or_exp)
                     {
+                        if (state != number_state::frac_or_exp_number)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                        }
                         try
                         {
                             double d = string_to_float(string_buffer_);
