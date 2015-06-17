@@ -155,6 +155,7 @@
     <ClCompile Include="..\..\src\json_accessor_tests.cpp" />
     <ClCompile Include="..\..\src\json_any_tests.cpp" />
     <ClCompile Include="..\..\src\json_array_tests.cpp" />
+    <ClCompile Include="..\..\src\json_checker_tests.cpp" />
     <ClCompile Include="..\..\src\json_construction_tests.cpp" />
     <ClCompile Include="..\..\src\json_equals_tests.cpp" />
     <ClCompile Include="..\..\src\json_extensibility_tests.cpp" />
