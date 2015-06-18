@@ -26,8 +26,9 @@ The library has a number of features, which are listed below:
 ## What's new on master
 
 - Incorporates test suite files from http://www.json.org/JSON_checker/ into test suite
+- The `jsoncons` parser accepts all of the JSON_checker files that its supposed to accept.
 - Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.
-- The `jsoncons` parser now rejects all of the JSON_checker files that its supposed to except ones with stuff after the end of the document, e.g.
+- The `jsoncons` parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.
 
     ["Extra close"]]
 

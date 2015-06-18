@@ -468,9 +468,24 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>Master</h2>
+
+<ul>
+<li>Incorporates test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> into test suite</li>
+<li>The <code>jsoncons</code> parser accepts all of the JSON_checker files that its supposed to accept.</li>
+<li>Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.</li>
+<li>
+<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.</p>
+
+<p>["Extra close"]]</p>
+
+<p>(Currently the <code>jsoncons</code> parser stops after reading a full <code>json</code> document, and supports reading a sequence of documents.)  </p>
+</li>
+</ul>
+
 <h2>0.97.1 Release</h2>
 
-<ul class="task-list">
+<ul>
 <li>"Transforming JSON with filters" example fixed</li>
 <li>Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)</li>
 <li>Reorganized header files, removing unnecessary includes. </li>
@@ -480,7 +495,7 @@ vertical-align:1px;
 
 <h2>0.97 Release</h2>
 
-<ul class="task-list">
+<ul>
 <li>Reversion of 0.96 change:</li>
 </ul>
 
@@ -488,7 +503,7 @@ vertical-align:1px;
 
 <p>The rationale for this reversion is that the change doesn't really help to make the software more flexible, and that it's better to leave out the typedefs. There will be future enhancements to support greater numeric precision, but these will not affect the current method signatures.</p>
 
-<ul class="task-list">
+<ul>
 <li>Fix for "unused variable" warning message</li>
 </ul>
 
@@ -498,7 +513,7 @@ vertical-align:1px;
 
 <p>Breaking changes:</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Renamed <code>error_handler</code> to <code>parse_error_handler</code>.</p></li>
 <li><p>Renamed namespace <code>json_parser_error</code> to <code>json_parser_errc</code></p></li>
 <li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code>, if you have implemented your own type specializations,<br>
@@ -511,7 +526,7 @@ The rationale for this change is to allow different configurations for internal 
 
 <p>General changes</p>
 
-<ul class="task-list">
+<ul>
 <li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
 <li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
 and <code>empty_json_input_handler</code>. </p></li>
@@ -526,7 +541,7 @@ and parse_file that take a <code>parse_error_handler</code> as a parameter. </p>
 
 <p>Bug fixes:</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Fixed issue with column number reported by json_reader</p></li>
 <li><p>Where &amp;s[0] and s.length() were passed to methods, &amp;s[0] has been replaced with s.c_str(). <br>
 While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.</p></li>
@@ -539,7 +554,7 @@ While this shouldn't be an issue on most implementations, VS throws an exception
 
 <p>Enhancements:</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Added template method <code>any_cast</code> to <code>json</code> class.</p></li>
 <li><p>The allocator type parameter in basic_json is now supported, it allows you to supply a <br>
 custom allocator for dynamically allocated, fixed size small objects in the json container.<br>
@@ -549,7 +564,7 @@ or variable amounts of memory, these always use the default allocators.</p></li>
 
 <p>Non-breaking Change:</p>
 
-<ul class="task-list">
+<ul>
 <li>
 <code>json_filter</code> method <code>parent</code> has been renamed to <code>input_handler</code> (old name still works) </li>
 </ul>
@@ -557,7 +572,7 @@ or variable amounts of memory, these always use the default allocators.</p></li>
 <p>Breaking change (if you've implemented your own input and output handlers, or if you've<br>
 passed json events to input and output handlers directly):</p>
 
-<ul class="task-list">
+<ul>
 <li><p>The input handler virtual method <br>
 <code>name(const std::string&amp; name, const parsing_context&amp; context)</code> <br>
 has been changed to<br>
@@ -579,7 +594,7 @@ has been changed to<br>
 <p>The rationale for the method parameter changes is to allow different internal<br>
 representations of strings but preserve efficiency. </p>
 
-<ul class="task-list">
+<ul>
 <li><p>The input and output handler virtual implementation methods begin_json, end_json,<br>
 begin_object, end_object, begin_array, end_array, name, string_value, <br>
 longlong_value, ulonglong_value, double_value, bool_value and null_value <br>
@@ -596,7 +611,7 @@ have been added to json_input_handler and json_output_handler. </p></li>
 json_input_handler and json_output_handler interfaces public non-virtual and <br>
 the implementations private virtual. Refer to the documentation and tutorials for details.   </p>
 
-<ul class="task-list">
+<ul>
 <li>The error_handler virtual implementation methods have been renamed to <code>do_warning</code> and 
 <code>do_error</code>, and made private. Non virtual public interface methods <code>warning</code> and <code>error</code> 
 have been added. Error handling now leverages <code>std::error_code</code> to communicate parser 
@@ -605,7 +620,7 @@ error events in an extendable way.</li>
 
 <p>Bug fixes:</p>
 
-<ul class="task-list">
+<ul>
 <li>Fixed bug in csv_reader</li>
 </ul>
 
@@ -613,7 +628,7 @@ error events in an extendable way.</li>
 
 <p>Bug fixes:</p>
 
-<ul class="task-list">
+<ul>
 <li>Incorporates fix from Alex Merry for comparison of json objects</li>
 </ul>
 
@@ -621,7 +636,7 @@ error events in an extendable way.</li>
 
 <p>Bug fixes </p>
 
-<ul class="task-list">
+<ul>
 <li>Incorporates contributions from Cory Fields for silencing some compiler warnings</li>
 <li>Fixes bug reported by Vitaliy Gusev in json object operator[size_t]</li>
 <li>Fixes bug in json is_empty method for empty objects</li>
@@ -629,7 +644,7 @@ error events in an extendable way.</li>
 
 <p>Changes</p>
 
-<ul class="task-list">
+<ul>
 <li>json constructors that take string, double etc. are now declared explicit (assignments and defaults to get and make_array methods have their own implementation and do not depend on implicit constructors.)</li>
 <li>make_multi_array renamed to make_array (old name is still supported)</li>
 <li>Previous versions supported any type values through special methods set_custom_data, add_custom_data, and custom_data. This version introduces a new type json::any that wraps any values and works with the usual accessors set, add and as, so the specialized methods are no longer required.</li>
@@ -637,14 +652,14 @@ error events in an extendable way.</li>
 
 <p>Enhancements </p>
 
-<ul class="task-list">
+<ul>
 <li>json get method with default value now accepts extended types as defaults</li>
 <li>json make_array method with default value now accepts extended types as defaults</li>
 </ul>
 
 <p>New extensions</p>
 
-<ul class="task-list">
+<ul>
 <li>Added jsoncons_ext/boost/type_extensions.hpp to collect 
 extensions traits for boost types, in particular, for
 boost::gregorian dates.</li>
@@ -654,14 +669,14 @@ boost::gregorian dates.</li>
 
 <p>New features</p>
 
-<ul class="task-list">
+<ul>
 <li>Supports wide character strings and streams with wjson, wjson_reader etc. Assumes UTF16 encoding if sizeof(wchar_t)=2 and UTF32 encoding if sizeof(wchar_t)=4.</li>
 <li>The empty class null_type  is added to the jsoncons namespace, it replaces the member type json::null_type (json::null_type is typedefed to jsoncons::null_type for backward compatibility.)</li>
 </ul>
 
 <p>Defect fixes:</p>
 
-<ul class="task-list">
+<ul>
 <li>The ascii character 0x7f (del) was not being considered a control character to be escaped, this is fixed.</li>
 <li>Fixed two issues with serialization when the output format property escape_all_non_ascii is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being handled when decoding.</li>
 </ul>
@@ -674,26 +689,26 @@ boost::gregorian dates.</li>
 
 <p>Breaking change (but only if you have subclassed json_input_handler or json_output_handler)</p>
 
-<ul class="task-list">
+<ul>
 <li>For consistency with other names, the input and output handler methods new to 0.91 - value_string, value_double, value_longlong, value_ulonglong and value_bool - have been renamed to string_value, double_value, longlong_value, ulonglong_value and bool_value.</li>
 </ul>
 
 <p>Non breaking changes (previous features are deprecated but still work)</p>
 
-<ul class="task-list">
+<ul>
 <li><p>name_value_pair has been renamed to member_type (typedefed to previous name.)</p></li>
 <li><p>as_string(output_format format) has been deprecated, use the existing to_string(output_format format) instead</p></li>
 </ul>
 
 <p>Enhancements:</p>
 
-<ul class="task-list">
+<ul>
 <li>json now has extensibilty, you can access and modify json values with new types, see the tutorial Extensibility </li>
 </ul>
 
 <p>Preparation for allocator support:</p>
 
-<ul class="task-list">
+<ul>
 <li>The basic_json and related classes now have an Storage template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the json and related classes.</li>
 </ul>
 
@@ -701,21 +716,21 @@ boost::gregorian dates.</li>
 
 <p>This release should be largely backwards compatible with 0.90 and 0.83 with two exceptions: </p>
 
-<ol class="task-list">
+<ol>
 <li><p>If you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, first becomes name() and second becomes value(). </p></li>
 <li><p>If you have subclassed json_input_handler, json_output_handler, or json_filter, and have implemented value(const std::string&amp; ...,  value(double ..., etc., you will need to modify the names to  value_string(const std::string&amp; ...,  value_double(double ... (no changes if you are feeding existing implementations.)</p></li>
 </ol>
 
 <p>The changes are</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Replaced std::pairstd::string,json with name_value_pair that has accessors name() and value()</p></li>
 <li><p>In json_input_handler and json_output_handler, allowed for overrides of the value methods by making them non-virtual and adding virtual methods value_string, value_double, value_longlong, value_ulonglong, and value_bool</p></li>
 </ul>
 
 <p>Other new features:</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Changed implementation of is and as, the current implementation should be user extensible</p></li>
 <li><p>make_multi_array makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces make_2d_array and make_3d_array, which are now deprecated.</p></li>
 <li><p>Added support for isstd::vector&lt;T&gt; and asstd::vector&lt;T&gt;</p></li>
@@ -724,7 +739,7 @@ boost::gregorian dates.</li>
 
 <p>Incorporates a number of contributions from Pedro Larroy and the developers of the clearskies_core project:</p>
 
-<ul class="task-list">
+<ul>
 <li>build system for posix systems</li>
 <li>GCC to list of supported compilers</li>
 <li>Android fix</li>
@@ -737,13 +752,13 @@ boost::gregorian dates.</li>
 <pre><code>make_array
 </code></pre>
 
-<p>Use json val(json::an_array) or json::make_multi_array(...) instead (but make_array will continue to work)</p>
+<p>Use json val(json::an_array) or json::make_multi_array&lt;1&gt;(...) instead (but make_array will continue to work)</p>
 
 <pre><code>make_2d_array
 make_3d_array
 </code></pre>
 
-<p>Use make_multi_array and make_multi_array instead</p>
+<p>Use make_multi_array&lt;2&gt; and make_multi_array&lt;3&gt; instead</p>
 
 <pre><code>as_vector
 </code></pre>
@@ -771,7 +786,7 @@ as_char
 
 <p>Incorporates a number of patches contributed by Marc Chevrier:</p>
 
-<ul class="task-list">
+<ul>
 <li>Fixed issue with set member on json object when a member with that name already exists</li>
 <li>clang port</li>
 <li>cmake build files for examples and test suite</li>
@@ -783,26 +798,26 @@ as_char
 
 <p>Optimizations (very unlikely to break earlier code)</p>
 
-<ul class="task-list">
+<ul>
 <li><p>get(const std::name&amp; name) const now returns const json&amp; if keyed value exists, otherwise a const reference to json::null</p></li>
 <li><p>get(const std::string&amp; name, const json&amp; default_val) const now returns const json (actually a const proxy that evaluates to json if read)</p></li>
 </ul>
 
 <p>Bug fixes</p>
 
-<ul class="task-list">
+<ul>
 <li>Line number not incremented within multiline comment - fixed</li>
 </ul>
 
 <p>Deprecated features removed</p>
 
-<ul class="task-list">
+<ul>
 <li>Removed deprecated output_format properties (too much bagage to carry around)</li>
 </ul>
 
 <h2>Release 0.82a</h2>
 
-<ul class="task-list">
+<ul>
 <li><p>The const version of the json operator didn't need to return a proxy, the return value has been changed to const json&amp; (this change is transparent to the user.) </p></li>
 <li><p>get(const std::name&amp; name) has been changed to return a copy (rather than a reference), and json::null if there is no member with that name (rather than throw.) This way both get methods return default values if no keyed value exists.</p></li>
 <li><p>non-const and const methods json&amp; at(const std::name&amp; name) have been added to replace the old single argument get method. These have the same behavior as the corresponding operator[] functions, but the non-const at is more efficient.</p></li>
@@ -810,7 +825,7 @@ as_char
 
 <h2>Release 0.81</h2>
 
-<ul class="task-list">
+<ul>
 <li><p>Added accessor and modifier methods floatfield to output_format to provide a supported way to set the floatfield format flag to fixed or scientific with a specified number of decimal places (this can be done in older versions, but only with deprecated methods.)</p></li>
 <li><p>The default constructor now constructs an empty object (rather than a null object.) While this is a change, it's unlikely to break exisitng code (all test cases passed without modification.)</p></li>
 </ul>
@@ -829,7 +844,7 @@ obj["field"] = "field";
 
 <p>The former notation is still supported, though.</p>
 
-<ul class="task-list">
+<ul>
 <li><p>Added a version of 'resize_array' to json that resizes the array to n elements and initializes them to a specified value.</p></li>
 <li><p>Added a version of the static method json::make_array that takes no arguments and makes an empty json array</p></li>
 </ul>
@@ -859,7 +874,7 @@ arr.resize_array(10,0.0);
 
 <h2>Release 0.71</h2>
 
-<ul class="task-list">
+<ul>
 <li><p>Added resize_array method to json for resizing json arrays </p></li>
 <li><p>Fixed issue with remove_range method (templated code failed to compile if calling this method.)</p></li>
 <li><p>Added remove_member method to remove a member from a json object</p></li>
@@ -869,7 +884,7 @@ arr.resize_array(10,0.0);
 
 <h2>Release 0.70</h2>
 
-<ul class="task-list">
+<ul>
 <li><p>Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.</p></li>
 <li><p>The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.</p></li>
 <li>
@@ -892,7 +907,7 @@ arr.resize_array(10,0.0);
 
 <h3>Enhancements</h3>
 
-<ul class="task-list">
+<ul>
 <li><p>Added swap member function to json</p></li>
 <li><p>Added add and add_custom_data overrides to json that take an index value, for adding a new element at the specified index and shifting all elements currently at or above that index to the right.</p></li>
 <li><p>Added capacity member functions to json</p></li>
@@ -900,7 +915,7 @@ arr.resize_array(10,0.0);
 
 <h3>0.60  extensions</h3>
 
-<ul class="task-list">
+<ul>
 <li>csv_serializer has been added to the csv extension</li>
 </ul>
 
@@ -910,39 +925,39 @@ arr.resize_array(10,0.0);
 
 <p>Bug fixes</p>
 
-<ul class="task-list">
+<ul>
 <li>When reading the escaped characters "\b", "\f", "\r" and "\t" appearing in json strings, json_reader was replacing them with the linefeed character, this has been fixed.</li>
 </ul>
 
 <p>Deprecated </p>
 
-<ul class="task-list">
+<ul>
 <li>Deprecated modifiers precision and fixed_decimal_places from output_format. Use set_floating_point_format instead.</li>
 <li>Deprecated constructor that takes indenting parameter from output_format. For pretty printing with indenting, use the pretty_print function or pass the indenting parameter in json_serializer.</li>
 </ul>
 
 <p>Changes</p>
 
-<ul class="task-list">
+<ul>
 <li>When serializing floating point values to a stream, previous versions defaulted to default floating point precision with a precision of 16. This has been changed to truncate trailing zeros  but keep one if immediately after a decimal point.</li>
 </ul>
 
 <p>New features</p>
 
-<ul class="task-list">
+<ul>
 <li>For line reporting in parser error messages, json_reader now recognizes \r\n, \n alone or \r alone (\r alone is new.)</li>
 <li>Added set_floating_point_format methods to output_format to give more control over floating point notation.</li>
 </ul>
 
 <p>Non functional enhancements</p>
 
-<ul class="task-list">
+<ul>
 <li>json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocations.</li>
 </ul>
 
 <h2>Release 0.42</h2>
 
-<ul class="task-list">
+<ul>
 <li>Fixed another bug with multi line /**/ comments </li>
 <li>Minor fixes to reporting line and column number of errors</li>
 <li>Added fixed_decimal_places setter to output_format</li>
@@ -952,7 +967,7 @@ arr.resize_array(10,0.0);
 
 <h2>Release 0.41</h2>
 
-<ul class="task-list">
+<ul>
 <li>Added non-member overload swap(json&amp; a, json&amp; b)</li>
 <li>Fixed bug with multi line /**/ comments </li>
 <li>Added begin_json and end_json methods to json_output_handler</li>
@@ -965,7 +980,7 @@ arr.resize_array(10,0.0);
 
 <h2>Release 0.40</h2>
 
-<ul class="task-list">
+<ul>
 <li>json_listener renamed to json_input_handler</li>
 <li><p>json_writer renamed to json_output_handler</p></li>
 <li><p>Added json_filter class</p></li>
