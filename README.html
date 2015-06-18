@@ -499,9 +499,10 @@ vertical-align:1px;
 
 <ul>
 <li>Incorporates test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> into test suite</li>
+<li>The <code>jsoncons</code> parser accepts all of the JSON_checker files that its supposed to accept.</li>
 <li>Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.</li>
 <li>
-<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to except ones with stuff after the end of the document, e.g.</p>
+<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.</p>
 
 <p>["Extra close"]]</p>
 
