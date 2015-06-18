@@ -478,7 +478,7 @@ vertical-align:1px;
 
 <p>The library has a number of features, which are listed below:</p>
 
-<ul class="task-list">
+<ul>
 <li>Uses the standard C++ input/output streams library</li>
 <li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
 <li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
@@ -495,14 +495,18 @@ vertical-align:1px;
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 </ul>
 
-<h2>What's new in Release 0.97.1</h2>
+<h2>What's new on master</h2>
 
-<ul class="task-list">
-<li>"Transforming JSON with filters" example fixed</li>
-<li>Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)</li>
-<li>Reorganized header files, removing unnecessary includes. </li>
-<li>Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.</li>
-<li>Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error</li>
+<ul>
+<li>Incorporates test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> into test suite</li>
+<li>Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.</li>
+<li>
+<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to except ones with stuff after the end of the document, e.g.</p>
+
+<p>["Extra close"]]</p>
+
+<p>(Currently the <code>jsoncons</code> parser stops after reading a full <code>json</code> document, and supports reading a sequence of documents.)  </p>
+</li>
 </ul>
 
 <h2>Using the code</h2>
@@ -516,14 +520,16 @@ vertical-align:1px;
 <pre><code>struct null_type{}
 </code></pre>
 
-<p>The following using declarations are for the examples that appear below.</p>
+<p>These include and using declarations are for the examples that appear below.</p>
 
 <pre><code>#include "jsoncons/json.hpp"
 
 using std::string;
 using std::cout;
+using std::cerr;
 using std::endl;
 using jsoncons::json;
+using jsoncons::json_exception;    
 using jsoncons::pretty_print;
 </code></pre>
 
