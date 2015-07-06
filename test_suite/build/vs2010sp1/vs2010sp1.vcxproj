@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\jsoncons\utf8_decode.c" />
+    <ClCompile Include="..\..\..\src\jsoncons\utf8_to_utf16.c" />
     <ClCompile Include="..\..\src\allocator_tests.cpp" />
     <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
@@ -169,6 +171,9 @@
     <ClCompile Include="..\..\src\wjson_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\jsoncons\json_parser.hpp" />
+    <ClInclude Include="..\..\..\src\jsoncons\utf8_decode.h" />
+    <ClInclude Include="..\..\..\src\jsoncons\utf8_to_utf16.h" />
     <ClInclude Include="..\..\src\my_any_specializations.hpp" />
     <ClInclude Include="..\..\src\my_custom_data.hpp" />
   </ItemGroup>

@@ -117,7 +117,8 @@ struct json_char_traits<char,1>
 
     static const std::string true_literal() {return "true";};
 
-    static uint32_t convert_char_to_codepoint(const char*& it, const char*)
+    static uint32_t convert_char_to_codepoint(const char*& it, 
+                                              const char*)
     {
         char c = *it;
         uint32_t u(c >= 0 ? c : 256 + c );

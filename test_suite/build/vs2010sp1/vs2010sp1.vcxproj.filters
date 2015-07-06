@@ -72,6 +72,12 @@
     <ClCompile Include="..\..\src\json_filter_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\jsoncons\utf8_decode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jsoncons\utf8_to_utf16.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\json_checker_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,6 +87,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\my_any_specializations.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jsoncons\utf8_decode.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jsoncons\utf8_to_utf16.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jsoncons\json_parser.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
