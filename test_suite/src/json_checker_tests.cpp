@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
-#include "jsoncons/json_reader.hpp"
+#include "jsoncons/json_parser.hpp"
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_deserializer.hpp"
 #include <sstream>
@@ -21,7 +21,6 @@ using jsoncons::pretty_print;
 using std::string;
 using jsoncons::json_exception;
 using jsoncons::json_parse_exception;
-using jsoncons::json_parser;
 
 using namespace boost::filesystem;
 
@@ -46,8 +45,8 @@ BOOST_AUTO_TEST_CASE(test_json_parser2)
     output_format format;
     format.escape_all_non_ascii(true);
     json_deserializer handler;
-    json_parser jc(is,handler,20);
-    jc.parse();
+    json_reader jc(is,handler);
+    jc.read();
 
     std::cout << "JSON CHECKER 1" << std::endl;
     json val = std::move(handler.root());
