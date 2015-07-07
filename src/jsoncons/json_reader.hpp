@@ -33,7 +33,7 @@ namespace parse_state_type
 }
 
 template<typename Char>
-class basic_json_reader : private basic_parsing_context<Char>
+class basic_json_reader2 : private basic_parsing_context<Char>
 {
     struct stack_item
     {
@@ -132,7 +132,7 @@ public:
     static const size_t default_max_buffer_length = 16384;
 
     //  Parse an input stream of JSON text into a json json_object_impl
-    basic_json_reader(std::basic_istream<Char>& is,
+    basic_json_reader2(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_parse_error_handler<Char>& err_handler)
        :
@@ -151,7 +151,7 @@ public:
          is_(std::addressof(is))
     {
     }
-    basic_json_reader(std::basic_istream<Char>& is,
+    basic_json_reader2(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
 
        :
@@ -171,7 +171,7 @@ public:
     {
     }
 
-    ~basic_json_reader()
+    ~basic_json_reader2()
     {
     }
 
@@ -193,8 +193,8 @@ public:
     }
 
 private:
-    basic_json_reader(const basic_json_reader&); // noop
-    basic_json_reader& operator = (const basic_json_reader&); // noop
+    basic_json_reader2(const basic_json_reader2&); // noop
+    basic_json_reader2& operator = (const basic_json_reader2&); // noop
 
     size_t estimate_minimum_array_capacity() const;
     size_t estimate_minimum_object_capacity() const;
@@ -380,7 +380,7 @@ long long string_to_integer(bool has_neg, const Char *s, size_t length) throw(st
 }
 
 template<typename Char>
-void basic_json_reader<Char>::read()
+void basic_json_reader2<Char>::read()
 {
     if (is_->bad())
     {
@@ -410,7 +410,7 @@ void basic_json_reader<Char>::read()
 }
 
 template<typename Char>
-void basic_json_reader<Char>::parse()
+void basic_json_reader2<Char>::parse()
 {
     while (!eof())
     {
@@ -685,7 +685,7 @@ namespace number_state
 }
 
 template<typename Char>
-void basic_json_reader<Char>::parse_number()
+void basic_json_reader2<Char>::parse_number()
 {
     string_buffer_.clear();
     bool has_frac_or_exp = false;
@@ -877,7 +877,7 @@ void basic_json_reader<Char>::parse_number()
 }
 
 template<typename Char>
-void basic_json_reader<Char>::parse_string()
+void basic_json_reader2<Char>::parse_string()
 {
     string_buffer_.clear();
 
@@ -994,7 +994,7 @@ void basic_json_reader<Char>::parse_string()
 }
 
 template<typename Char>
-void basic_json_reader<Char>::ignore_single_line_comment()
+void basic_json_reader2<Char>::ignore_single_line_comment()
 {
     bool done = false;
     while (!done)
@@ -1034,7 +1034,7 @@ void basic_json_reader<Char>::ignore_single_line_comment()
 }
 
 template<typename Char>
-void basic_json_reader<Char>::ignore_multi_line_comment()
+void basic_json_reader2<Char>::ignore_multi_line_comment()
 {
     bool done = false;
     while (!done)
@@ -1083,7 +1083,7 @@ void basic_json_reader<Char>::ignore_multi_line_comment()
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
+size_t basic_json_reader2<Char>::estimate_minimum_array_capacity() const
 {
     size_t size = 0;
     size_t pos = buffer_position_;
@@ -1144,7 +1144,7 @@ size_t basic_json_reader<Char>::estimate_minimum_array_capacity() const
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
+size_t basic_json_reader2<Char>::estimate_minimum_object_capacity() const
 {
     size_t size = 0;
     size_t pos = buffer_position_;
@@ -1189,7 +1189,7 @@ size_t basic_json_reader<Char>::estimate_minimum_object_capacity() const
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
+size_t basic_json_reader2<Char>::skip_array(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1219,7 +1219,7 @@ size_t basic_json_reader<Char>::skip_array(size_t pos, const size_t end) const
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
+size_t basic_json_reader2<Char>::skip_string(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1251,7 +1251,7 @@ size_t basic_json_reader<Char>::skip_string(size_t pos, const size_t end) const
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
+size_t basic_json_reader2<Char>::skip_number(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1285,7 +1285,7 @@ size_t basic_json_reader<Char>::skip_number(size_t pos, const size_t end) const
 }
 
 template<typename Char>
-size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
+size_t basic_json_reader2<Char>::skip_object(size_t pos, const size_t end) const
 {
     bool done = false;
     while (!done & (pos < end))
@@ -1315,7 +1315,7 @@ size_t basic_json_reader<Char>::skip_object(size_t pos, const size_t end) const
 }
 
 template<typename Char>
-uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
+uint32_t basic_json_reader2<Char>::decode_unicode_codepoint()
 {
     uint32_t cp = decode_unicode_escape_sequence();
     if (hard_buffer_length_ - buffer_position_ < 2)
@@ -1341,7 +1341,7 @@ uint32_t basic_json_reader<Char>::decode_unicode_codepoint()
 }
 
 template<typename Char>
-uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
+uint32_t basic_json_reader2<Char>::decode_unicode_escape_sequence()
 {
     if (hard_buffer_length_ - buffer_position_ < 4)
     {
@@ -1380,8 +1380,8 @@ uint32_t basic_json_reader<Char>::decode_unicode_escape_sequence()
     return cp;
 }
 
-typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<wchar_t> wjson_reader;
+typedef basic_json_reader2<char> json_reader2;
+typedef basic_json_reader2<wchar_t> wjson_reader2;
 
 }
 

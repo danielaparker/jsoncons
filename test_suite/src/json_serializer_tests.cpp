@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1, 1) = 4;
 
     output_format format;
-    format.escape_all_non_ascii(true);
     json_serializer os(std::cout, format, true); // pretty printing
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <boost/test/unit_test.hpp>
-#include "jsoncons/json_reader.hpp"
+#include "jsoncons/json_parser.hpp"
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_deserializer.hpp"
 #include <sstream>

@@ -13,7 +13,7 @@
 #include <new>
 #include "jsoncons/json_serializer.hpp"
 #include "jsoncons/json_filter.hpp"
-#include "jsoncons/json_reader.hpp"
+#include "jsoncons/json_parser.hpp"
 
 using std::string;
 
