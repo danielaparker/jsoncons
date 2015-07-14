@@ -452,7 +452,7 @@ public:
 
             auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
-            if (rhs_it == rhs.members_.end() || rhs_it->second != it->second)
+            if (rhs_it == rhs.members_.end() || rhs_it->first != it->first || rhs_it->second != it->second)
             {
                 return false;
             }
