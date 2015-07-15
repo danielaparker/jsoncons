@@ -365,7 +365,7 @@ public:
             string_buffer_.push_back('\"');
             state_ = ST;
             break;
-        case input::backs:  /* \ */
+        case '\\': 
             string_buffer_.push_back('\\');
             state_ = ST;
             break;
@@ -900,7 +900,7 @@ public:
                 case '\t':
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     break;
-                case input::backs:  /* \ */
+                case '\\': 
                     state_ = ES;
                     break;
                 case '\"':
@@ -941,7 +941,7 @@ public:
             case SP:  /* SP       */
                 switch (next_input)
                 {
-                case input::backs:  /* \ */
+                case '\\': 
                     cp2_ = 0;
                     state_ = U5;
                     break;
@@ -1625,7 +1625,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     input::etc,   'A', 'B', 'C', 'D', 'E',     'F', input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   input::etc,   input::lsqrb, input::backs, input::rsqrb, input::etc,   input::etc,
+    input::etc,   input::etc,   input::etc,   input::lsqrb, '\\', input::rsqrb, input::etc,   input::etc,
 
     input::etc,   input::a, input::b, input::c, input::d, input::e, input::f, input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::l, input::etc,   input::n, input::etc,
