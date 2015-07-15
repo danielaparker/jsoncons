@@ -148,9 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\jsoncons_tests.cpp" />
-    <ClCompile Include="..\..\src\json_construction_tests.cpp" />
-    <ClCompile Include="..\..\src\json_object_tests.cpp" />
-    <ClCompile Include="..\..\src\unicode_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\my_custom_data.hpp" />
