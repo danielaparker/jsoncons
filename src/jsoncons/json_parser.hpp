@@ -325,8 +325,8 @@ public:
         case input::d:  /* d */
         case input::e:  /* e */
         case input::f:  /* f */
-        case input::ABCDF:  /* ABCDF */
-        case input::E:      /* E */
+        case 'A':case 'B':case 'C':case 'D':case 'F':
+        case 'E':
             append_to_codepoint(next_char);
             break;
         default:
@@ -347,8 +347,8 @@ public:
         case input::d:  /* d */
         case input::e:  /* e */
         case input::f:  /* f */
-        case input::ABCDF:  /* ABCDF */
-        case input::E:      /* E */
+        case 'A':case 'B':case 'C':case 'D':case 'F':
+        case 'E':
             append_to_codepoint(next_char);
             break;
         default:
@@ -1622,7 +1622,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', input::c_colon, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
-    input::etc,   input::ABCDF, input::ABCDF, input::ABCDF, input::ABCDF, input::E,     input::ABCDF, input::etc,
+    input::etc,   'A', 'B', 'C', 'D', 'E',     'F', input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   input::lsqrb, input::backs, input::rsqrb, input::etc,   input::etc,
