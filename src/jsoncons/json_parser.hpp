@@ -764,7 +764,7 @@ public:
                 case '\r':
                 case '\t':
                     break;
-                case input::c_colon:  /* : */
+                case ':':
                     flip_key_object();
                     state_ = VA;
                     break;
@@ -882,7 +882,7 @@ public:
                 case input::rcurb:  /* } */
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
                     break;
-                case input::c_colon:  /* : */
+                case ':':
                     break;
                 case ',':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
@@ -1620,7 +1620,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::star,   input::plus,  ',', input::minus, input::point, input::slash,
     '0',  '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', input::c_colon, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
+    '8', '9', ':', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
     input::etc,   'A', 'B', 'C', 'D', 'E',     'F', input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
