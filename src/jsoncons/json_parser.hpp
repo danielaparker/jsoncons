@@ -361,7 +361,7 @@ public:
     {
         switch (next_input)
         {
-        case input::quote:  /* " */
+        case '\"':
             string_buffer_.push_back('\"');
             state_ = ST;
             break;
@@ -660,10 +660,10 @@ public:
             case GO:  /* start    */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break; // No change
                 case input::lcurb:  /* {  */
                     push_key(i);
@@ -690,10 +690,10 @@ public:
             case OK:  /* ok       */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break; // No change
                 case input::rcurb:  /* } */
                     pop_object();
@@ -701,7 +701,7 @@ public:
                 case input::rsqrb:  /* ] */
                     pop_array();
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     flip_object_key();
                     break;
                 case input::slash:  /* / */
@@ -716,15 +716,15 @@ public:
             case OB:  /* object   */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break;
                 case input::rcurb:  /* } */
                     pop_key();
                     break;
-                case input::quote:  /* " */
+                case '\"':
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
@@ -739,12 +739,12 @@ public:
             case KE:  /* key      */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break;
-                case input::quote:  /* " */
+                case '\"':
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
@@ -759,10 +759,10 @@ public:
             case CO:  /* colon    */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break;
                 case input::c_colon:  /* : */
                     flip_key_object();
@@ -780,10 +780,10 @@ public:
             case VA:  /* value    */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break;
                 case input::lcurb:  /* {  */
                     push_key(i);
@@ -791,7 +791,7 @@ public:
                 case input::lsqrb:  /* [ */
                     push_array(i);
                     break;
-                case input::quote:  /* " */
+                case '\"':
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
@@ -825,7 +825,7 @@ public:
                 case input::rsqrb:  /* ] */
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
                     break;
                 default:
@@ -836,10 +836,10 @@ public:
             case AR:  /* array    */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     break;
                 case input::lcurb:  /* {  */
                     push_key(i);
@@ -850,7 +850,7 @@ public:
                 case input::rsqrb:  /* ] */
                     pop_array();
                     break;
-                case input::quote:  /* " */
+                case '\"':
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
@@ -884,7 +884,7 @@ public:
                     break;
                 case input::c_colon:  /* : */
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
                     break;
                 default:
@@ -895,15 +895,15 @@ public:
             case ST:  /* string   */
                 switch (next_input)
                 {
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case '\n':
+                case '\r':
+                case '\t':
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     break;
                 case input::backs:  /* \ */
                     state_ = ES;
                     break;
-                case input::quote:  /* " */
+                case '\"':
                     end_string_value();
 					break;
                 default:
@@ -997,10 +997,10 @@ public:
             case ZE:  /* zero     */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     end_integer_value();
                     state_ = OK;
                     break; // No change
@@ -1016,7 +1016,7 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     end_integer_value();
                     flip_object_key();
                     break;
@@ -1028,10 +1028,10 @@ public:
             case IN:  /* integer  */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     end_integer_value();
                     state_ = OK;
                     break; // No change
@@ -1052,7 +1052,7 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     end_integer_value();
                     flip_object_key();
                     break;
@@ -1068,10 +1068,10 @@ public:
             case FR:  /* fraction */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     end_frac_value();
                     state_ = OK;
                     break; // No change
@@ -1088,7 +1088,7 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     end_frac_value();
                     flip_object_key();
                     break;
@@ -1137,10 +1137,10 @@ public:
             case E3:  /* exp      */
                 switch (next_input)
                 {
-                case input::space:  /* space */
-                case input::lf: // Linefeed
-                case input::cr: // Carriage return
-                case input::white:  /* other whitespace */
+                case ' ':
+                case '\n':
+                case '\r':
+                case '\t':
                     end_frac_value();
                     state_ = OK;
                     break; // No change
@@ -1152,7 +1152,7 @@ public:
                     end_frac_value();
                     pop_array();
                     break;
-                case input::c_comma:  /* , */
+                case ',':
                     end_frac_value();
                     flip_object_key();
                     break;
@@ -1613,12 +1613,12 @@ int basic_json_reader<Char>::ascii_class[128] =
         Non-whitespace control characters are errors.
     */
     __,      __,      __,      __,      __,      __,      __,      __,
-    __,      input::white, input::lf, __,      __,      input::cr, __,      __,
+    __,      '\t', '\n', __,      __,      '\r', __,      __,
     __,      __,      __,      __,      __,      __,      __,      __,
     __,      __,      __,      __,      __,      __,      __,      __,
 
-    input::space, input::etc,   input::quote, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   input::star,   input::plus,  input::c_comma, input::minus, input::point, input::slash,
+    ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
+    input::etc,   input::etc,   input::star,   input::plus,  ',', input::minus, input::point, input::slash,
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', input::c_colon, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
