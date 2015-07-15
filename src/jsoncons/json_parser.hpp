@@ -317,8 +317,8 @@ public:
     {
         switch (next_input)
         {
-        case input::zero:  /* 0 */
-        case input::digit:  /* 123456789 */
+        case '0': 
+        case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case input::a:  /* a */
         case input::b:  /* b */
         case input::c:  /* c */
@@ -339,8 +339,8 @@ public:
     {
         switch (next_input)
         {
-        case input::zero:  /* 0 */
-        case input::digit:  /* 123456789 */
+        case '0': 
+        case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case input::a:  /* a */
         case input::b:  /* b */
         case input::c:  /* c */
@@ -802,11 +802,11 @@ public:
                     is_negative_ = true;
                     state_ = MI;
                     break;
-                case input::zero:  /* 0 */
+                case '0': 
                     string_buffer_.push_back(next_char);
                     state_ = ZE;
                     break;
-                case input::digit:  /* 123456789 */
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
@@ -861,11 +861,11 @@ public:
                     is_negative_ = true;
                     state_ = MI;
                     break;
-                case input::zero:  /* 0 */
+                case '0': 
                     string_buffer_.push_back(next_char);
                     state_ = ZE;
                     break;
-                case input::digit:  /* 123456789 */
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
@@ -981,11 +981,11 @@ public:
             case MI:  /* minus    */
                 switch (next_input)
                 {
-                case input::zero:  /* 0 */
+                case '0': 
                     string_buffer_.push_back(next_char);
                     state_ = ZE;
                     break;
-                case input::digit:  /* 123456789 */
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
@@ -1043,8 +1043,8 @@ public:
                     end_integer_value();
                     pop_array();
                     break;
-                case input::zero:  /* 0 */
-                case input::digit:  /* 123456789 */
+                case '0': 
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
@@ -1083,8 +1083,8 @@ public:
                     end_frac_value();
                     pop_array();
                     break;
-                case input::zero:  /* 0 */
-                case input::digit:  /* 123456789 */
+                case '0': 
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
@@ -1111,8 +1111,8 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = E2;
                     break;
-                case input::zero:  /* 0 */
-                case input::digit:  /* 123456789 */
+                case '0': 
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = E3;
                     break;
@@ -1124,8 +1124,8 @@ public:
             case E2:  /* ex       */
                 switch (next_input)
                 {
-                case input::zero:  /* 0 */
-                case input::digit:  /* 123456789 */
+                case '0': 
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = E3;
                     break;
@@ -1156,8 +1156,8 @@ public:
                     end_frac_value();
                     flip_object_key();
                     break;
-                case input::zero:  /* 0 */
-                case input::digit:  /* 123456789 */
+                case '0': 
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                     string_buffer_.push_back(next_char);
                     state_ = E3;
                     break;
@@ -1619,8 +1619,8 @@ int basic_json_reader<Char>::ascii_class[128] =
 
     input::space, input::etc,   input::quote, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::star,   input::plus,  input::c_comma, input::minus, input::point, input::slash,
-    input::zero,  input::digit, input::digit, input::digit, input::digit, input::digit, input::digit, input::digit,
-    input::digit, input::digit, input::c_colon, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
+    '0',  '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', input::c_colon, input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
     input::etc,   input::ABCDF, input::ABCDF, input::ABCDF, input::ABCDF, input::E,     input::ABCDF, input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
