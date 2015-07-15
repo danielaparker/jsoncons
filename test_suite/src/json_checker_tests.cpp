@@ -11,7 +11,6 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include "jsoncons/json_parser.hpp"
 
 using jsoncons::json_deserializer;
 using jsoncons::json;
@@ -24,7 +23,9 @@ using jsoncons::json_parse_exception;
 
 using namespace boost::filesystem;
 
-/*BOOST_AUTO_TEST_CASE(test_json_parser)
+/*
+using jsoncons::json_parser;
+BOOST_AUTO_TEST_CASE(test_json_parser)
 {
     std::string in_file = "input/JSON_checker/pass1.json";
     std::ifstream is(in_file);
@@ -35,7 +36,7 @@ using namespace boost::filesystem;
     std::cout << "JSON CHECKER 1" << std::endl;
     json val = std::move(handler.root());
     std::cout << val << std::endl;
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(test_json_parser2)
 {
@@ -53,6 +54,7 @@ BOOST_AUTO_TEST_CASE(test_json_parser2)
     std::cout << jsoncons::pretty_print(val,format) << std::endl;
 
 }
+*/
 
 BOOST_AUTO_TEST_CASE(test_fail1)
 {
