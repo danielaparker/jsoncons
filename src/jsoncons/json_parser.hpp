@@ -1012,7 +1012,7 @@ public:
                     end_integer_value();
                     pop_array();
                     break;
-                case input::point:  /* . */
+                case '.':
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
@@ -1048,7 +1048,7 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
-                case input::point:  /* . */
+                case '.':
                     string_buffer_.push_back(next_char);
                     state_ = FR;
                     break;
@@ -1618,7 +1618,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     __,      __,      __,      __,      __,      __,      __,      __,
 
     ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   input::star,   input::plus,  ',', input::minus, input::point, input::slash,
+    input::etc,   input::etc,   input::star,   input::plus,  ',', input::minus, '.', input::slash,
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', ':', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
