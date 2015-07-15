@@ -1214,7 +1214,7 @@ public:
             case F2:  /* fal      */
                 switch (next_input)
                 {
-                case input::l: 
+                case 'l': 
                     state_ = F3;
                     break;
                 default:
@@ -1259,7 +1259,7 @@ public:
             case N2:  /* nul      */
                 switch (next_input)
                 {
-                case input::l:  /* l */
+                case 'l': 
                     state_ = N3;
                     break;
                 default:
@@ -1270,7 +1270,7 @@ public:
             case N3:  /* null     */
                 switch (next_input)
                 {
-                case input::l:  /* l */
+                case 'l': 
                     handler_->value(null_type(), *this);
                     state_ = OK;
                     break;
@@ -1628,7 +1628,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     input::etc,   input::etc,   input::etc,   '[', '\\', ']', input::etc,   input::etc,
 
     input::etc,   'a', 'b', 'c', 'd', 'e', 'f', input::etc,
-    input::etc,   input::etc,   input::etc,   input::etc,   input::l, input::etc,   'n', input::etc,
+    input::etc,   input::etc,   input::etc,   input::etc,   'l', input::etc,   'n', input::etc,
     input::etc,   input::etc,   'r', 's', 't', 'u', input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   '{', input::etc,   '}', input::etc,   input::etc
 };
