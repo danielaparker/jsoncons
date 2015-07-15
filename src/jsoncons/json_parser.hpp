@@ -319,12 +319,12 @@ public:
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case input::a:  /* a */
-        case input::b:  /* b */
-        case input::c:  /* c */
-        case input::d:  /* d */
-        case input::e:  /* e */
-        case input::f:  /* f */
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'F':
         case 'E':
             append_to_codepoint(next_char);
@@ -341,12 +341,12 @@ public:
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case input::a:  /* a */
-        case input::b:  /* b */
-        case input::c:  /* c */
-        case input::d:  /* d */
-        case input::e:  /* e */
-        case input::f:  /* f */
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'F':
         case 'E':
             append_to_codepoint(next_char);
@@ -373,27 +373,27 @@ public:
             string_buffer_.push_back('/');
             state_ = ST;
             break;
-        case input::b:  /* b */
+        case 'b':
             string_buffer_.push_back('\b');
             state_ = ST;
             break;
-        case input::f:  /* f */
+        case 'f':  
             string_buffer_.push_back('\f');
             state_ = ST;
             break;
-        case input::n:  /* n */
+        case 'n':
             string_buffer_.push_back('\n');
             state_ = ST;
             break;
-        case input::r:  /* r */
+        case 'r':
             string_buffer_.push_back('\r');
             state_ = ST;
             break;
-        case input::t:  /* t */
+        case 't':
             string_buffer_.push_back('\t');
             state_ = ST;
             break;
-        case input::u:  /* u */
+        case 'u':
             cp_ = 0;
             state_ = U1;
             break;
@@ -810,13 +810,13 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
-                case input::f:  /* f */
+                case 'f':
                     state_ = F1;
                     break;
-                case input::n:  /* n */
+                case 'n':
                     state_ = N1;
                     break;
-                case input::t:  /* t */
+                case 't':
                     state_ = T1;
                     break;
                 case '}':
@@ -869,13 +869,13 @@ public:
                     string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
-                case input::f:  /* f */
+                case 'f':
                     state_ = F1;
                     break;
-                case input::n:  /* n */
+                case 'n':
                     state_ = N1;
                     break;
-                case input::t:  /* t */
+                case 't':
                     state_ = T1;
                     break;
 
@@ -953,7 +953,7 @@ public:
             case U5:  /* u5       */
                 switch (next_input)
                 {
-                case input::u:  /* u */
+                case 'u':
                     state_ = U6;
                     break;
                 default:
@@ -1056,7 +1056,7 @@ public:
                     end_integer_value();
                     flip_object_key();
                     break;
-                case input::e:  /* e */
+                case 'e':
                     string_buffer_.push_back(next_char);
                     state_ = E1;
                     break;
@@ -1092,7 +1092,7 @@ public:
                     end_frac_value();
                     flip_object_key();
                     break;
-                case input::e:  /* e */
+                case 'e':
                     string_buffer_.push_back(next_char);
                     state_ = E1;
                     break;
@@ -1169,7 +1169,7 @@ public:
             case T1:  /* tr       */
                 switch (next_input)
                 {
-                case input::r:
+                case 'r':
                     state_ = T2;
                     break;
                 default:
@@ -1180,7 +1180,7 @@ public:
             case T2:  /* tru      */
                 switch (next_input)
                 {
-                case input::u:  /* u */
+                case 'u':
                     state_ = T3;
                     break;
                 default:
@@ -1191,7 +1191,7 @@ public:
             case T3:  /* true     */
                 switch (next_input)
                 {
-                case input::e: 
+                case 'e': 
                     handler_->value(true, *this);
                     state_ = OK;
                     break;
@@ -1203,7 +1203,7 @@ public:
             case F1:  /* fa       */
                 switch (next_input)
                 {
-                case input::a:  /* u */
+                case 'a':
                     state_ = F2;
                     break;
                 default:
@@ -1225,7 +1225,7 @@ public:
             case F3:  /* fals     */
                 switch (next_input)
                 {
-                case input::s:  /* u */
+                case 's':
                     state_ = F4;
                     break;
                 default:
@@ -1236,7 +1236,7 @@ public:
             case F4:  /* false    */
                 switch (next_input)
                 {
-                case input::e:  /* u */
+                case 'e':
                     handler_->value(false, *this);
                     state_ = OK;
                     break;
@@ -1248,7 +1248,7 @@ public:
             case N1:  // nu 
                 switch (next_input)
                 {
-                case input::u:  /* u */
+                case 'u':
                     state_ = N2;
                     break;
                 default:
@@ -1627,9 +1627,9 @@ int basic_json_reader<Char>::ascii_class[128] =
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   '[', '\\', ']', input::etc,   input::etc,
 
-    input::etc,   input::a, input::b, input::c, input::d, input::e, input::f, input::etc,
-    input::etc,   input::etc,   input::etc,   input::etc,   input::l, input::etc,   input::n, input::etc,
-    input::etc,   input::etc,   input::r, input::s, input::t, input::u, input::etc,   input::etc,
+    input::etc,   'a', 'b', 'c', 'd', 'e', 'f', input::etc,
+    input::etc,   input::etc,   input::etc,   input::etc,   input::l, input::etc,   'n', input::etc,
+    input::etc,   input::etc,   'r', 's', 't', 'u', input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   '{', input::etc,   '}', input::etc,   input::etc
 };
 
