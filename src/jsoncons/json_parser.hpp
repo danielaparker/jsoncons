@@ -798,7 +798,7 @@ public:
                     saved_state_ = state_;
                     state_ = C1;
                     break;
-                case input::minus:  /* - */
+                case '-':
                     is_negative_ = true;
                     state_ = MI;
                     break;
@@ -857,7 +857,7 @@ public:
                     saved_state_ = state_;
                     state_ = C1;
                     break;
-                case input::minus:  /* - */
+                case '-':
                     is_negative_ = true;
                     state_ = MI;
                     break;
@@ -1104,10 +1104,10 @@ public:
             case E1:  /* e        */
                 switch (next_input)
                 {
-                case input::plus:   /* + */
+                case '+':
                     state_ = E2;
                     break;
-                case input::minus:  /* - */
+                case '-':
                     string_buffer_.push_back(next_char);
                     state_ = E2;
                     break;
@@ -1618,7 +1618,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     __,      __,      __,      __,      __,      __,      __,      __,
 
     ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   '*',   input::plus,  ',', input::minus, '.', '/',
+    input::etc,   input::etc,   '*',   '+',  ',', '-', '.', '/',
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', ':', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
