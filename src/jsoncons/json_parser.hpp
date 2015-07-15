@@ -1282,7 +1282,7 @@ public:
             case C1:  // /
                 switch (next_input)
                 {
-                case input::star:   /* * */
+                case '*':
                     state_ = C2;
                     break;
                 default:    
@@ -1293,7 +1293,7 @@ public:
             case C2:  // /*
                 switch (next_input)
                 {
-                case input::star:   /* * */
+                case '*':
                     state_ = C3;
                     break;
                 }
@@ -1618,7 +1618,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     __,      __,      __,      __,      __,      __,      __,      __,
 
     ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   input::star,   input::plus,  ',', input::minus, '.', input::slash,
+    input::etc,   input::etc,   '*',   input::plus,  ',', input::minus, '.', input::slash,
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', ':', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
