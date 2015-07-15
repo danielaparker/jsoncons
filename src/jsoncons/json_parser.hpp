@@ -369,7 +369,7 @@ public:
             string_buffer_.push_back('\\');
             state_ = ST;
             break;
-        case input::slash:  /* / */
+        case '/':
             string_buffer_.push_back('/');
             state_ = ST;
             break;
@@ -671,7 +671,7 @@ public:
                 case input::lsqrb:  /* [ */
                     push_array(i);
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -704,7 +704,7 @@ public:
                 case ',':
                     flip_object_key();
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -727,7 +727,7 @@ public:
                 case '\"':
                     state_ = ST;
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -747,7 +747,7 @@ public:
                 case '\"':
                     state_ = ST;
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -768,7 +768,7 @@ public:
                     flip_key_object();
                     state_ = VA;
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -794,7 +794,7 @@ public:
                 case '\"':
                     state_ = ST;
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -853,7 +853,7 @@ public:
                 case '\"':
                     state_ = ST;
                     break;
-                case input::slash:  /* / */
+                case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
@@ -1301,7 +1301,7 @@ public:
             case C3:  // *
                 switch (next_input)
                 {
-                case input::slash:  /* slash */
+                case '/':
                     state_ = saved_state_;
                     break;
                 default:    /* everything else */
@@ -1618,7 +1618,7 @@ int basic_json_reader<Char>::ascii_class[128] =
     __,      __,      __,      __,      __,      __,      __,      __,
 
     ' ', input::etc,   '\"', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   '*',   input::plus,  ',', input::minus, '.', input::slash,
+    input::etc,   input::etc,   '*',   input::plus,  ',', input::minus, '.', '/',
     '0',  '1', '2', '3', '4', '5', '6', '7',
     '8', '9', ':', input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
 
