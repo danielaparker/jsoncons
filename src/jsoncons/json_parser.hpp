@@ -665,20 +665,20 @@ public:
                 case '\r':
                 case '\t':
                     break; // No change
-                case input::lcurb:  /* {  */
+                case '{':
                     push_key(i);
                     break;
-                case input::lsqrb:  /* [ */
+                case '[':
                     push_array(i);
                     break;
                 case '/':
                     saved_state_ = state_;
                     state_ = C1;
                     break;
-                case input::rcurb:  /* } */
+                case '}':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
                     break;
                 default:
@@ -695,10 +695,10 @@ public:
                 case '\r':
                 case '\t':
                     break; // No change
-                case input::rcurb:  /* } */
+                case '}':
                     pop_object();
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     pop_array();
                     break;
                 case ',':
@@ -721,7 +721,7 @@ public:
                 case '\r':
                 case '\t':
                     break;
-                case input::rcurb:  /* } */
+                case '}':
                     pop_key();
                     break;
                 case '\"':
@@ -785,10 +785,10 @@ public:
                 case '\r':
                 case '\t':
                     break;
-                case input::lcurb:  /* {  */
+                case '{':
                     push_key(i);
                     break;
-                case input::lsqrb:  /* [ */
+                case '[':
                     push_array(i);
                     break;
                 case '\"':
@@ -819,10 +819,10 @@ public:
                 case input::t:  /* t */
                     state_ = T1;
                     break;
-                case input::rcurb:  /* } */
+                case '}':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
                     break;
                 case ',':
@@ -841,13 +841,13 @@ public:
                 case '\r':
                 case '\t':
                     break;
-                case input::lcurb:  /* {  */
+                case '{':
                     push_key(i);
                     break;
-                case input::lsqrb:  /* [ */
+                case '[':
                     push_array(i);
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     pop_array();
                     break;
                 case '\"':
@@ -879,7 +879,7 @@ public:
                     state_ = T1;
                     break;
 
-                case input::rcurb:  /* } */
+                case '}':
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
                     break;
                 case ':':
@@ -1004,11 +1004,11 @@ public:
                     end_integer_value();
                     state_ = OK;
                     break; // No change
-                case input::rcurb:  /* } */
+                case '}':
                     end_integer_value();
                     pop_object();
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     end_integer_value();
                     pop_array();
                     break;
@@ -1035,11 +1035,11 @@ public:
                     end_integer_value();
                     state_ = OK;
                     break; // No change
-                case input::rcurb:  /* } */
+                case '}':
                     end_integer_value();
                     pop_object();
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     end_integer_value();
                     pop_array();
                     break;
@@ -1075,11 +1075,11 @@ public:
                     end_frac_value();
                     state_ = OK;
                     break; // No change
-                case input::rcurb:  /* } */
+                case '}':
                     end_frac_value();
                     pop_object();
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     end_frac_value();
                     pop_array();
                     break;
@@ -1144,11 +1144,11 @@ public:
                     end_frac_value();
                     state_ = OK;
                     break; // No change
-                case input::rcurb:  /* } */
+                case '}':
                     end_frac_value();
                     pop_object();
                     break;
-                case input::rsqrb:  /* ] */
+                case ']':
                     end_frac_value();
                     pop_array();
                     break;
@@ -1625,12 +1625,12 @@ int basic_json_reader<Char>::ascii_class[128] =
     input::etc,   'A', 'B', 'C', 'D', 'E',     'F', input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,   input::etc,
-    input::etc,   input::etc,   input::etc,   input::lsqrb, '\\', input::rsqrb, input::etc,   input::etc,
+    input::etc,   input::etc,   input::etc,   '[', '\\', ']', input::etc,   input::etc,
 
     input::etc,   input::a, input::b, input::c, input::d, input::e, input::f, input::etc,
     input::etc,   input::etc,   input::etc,   input::etc,   input::l, input::etc,   input::n, input::etc,
     input::etc,   input::etc,   input::r, input::s, input::t, input::u, input::etc,   input::etc,
-    input::etc,   input::etc,   input::etc,   input::lcurb, input::etc,   input::rcurb, input::etc,   input::etc
+    input::etc,   input::etc,   input::etc,   '{', input::etc,   '}', input::etc,   input::etc
 };
 
 template<typename Char>
