@@ -193,7 +193,26 @@ public:
     {
     }
 
-    void end_number_value()
+    void end_frac_value()
+    {
+        try
+        {
+            double d = string_to_float(string_buffer_);
+            if (is_negative_)
+                d = -d;
+            handler_->value(d, *this);
+        }
+        catch (...)
+        {
+            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+            handler_->value(null_type(), *this);
+        }
+        string_buffer_.clear();
+        is_negative_ = false;
+        state_ = OK;
+    }
+
+    void end_integer_value()
     {
         if (is_negative_)
         {
@@ -239,6 +258,7 @@ public:
         }
         string_buffer_.clear();
         is_negative_ = false;
+        state_ = OK;
     }
 
     void pop_key() // -9
@@ -350,7 +370,7 @@ public:
             state_ = ST;
             break;
         case input::slash:  /* / */
-            string_buffer_.push_back('\\');
+            string_buffer_.push_back('/');
             state_ = ST;
             break;
         case input::b:  /* b */
@@ -359,6 +379,10 @@ public:
             break;
         case input::f:  /* f */
             string_buffer_.push_back('\f');
+            state_ = ST;
+            break;
+        case input::n:  /* n */
+            string_buffer_.push_back('\n');
             state_ = ST;
             break;
         case input::r:  /* r */
@@ -396,7 +420,10 @@ public:
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
+            break;
         }
+        string_buffer_.clear();
+        is_negative_ = false;
     }
 
     void flip_object_key() // , -3
@@ -417,6 +444,7 @@ public:
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
+            break;
         }
     }
 
@@ -573,6 +601,7 @@ public:
 
     void read()
     {
+        state_ = GO;
         eof_ = false;
         handler_->begin_json();
         buffer_.resize(buffer_capacity_);
@@ -643,6 +672,7 @@ public:
                     push_array(i);
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 case input::rcurb:  /* } */
@@ -674,6 +704,10 @@ public:
                 case input::c_comma:  /* , */
                     flip_object_key();
                     break;
+                case input::slash:  /* / */
+                    saved_state_ = state_;
+                    state_ = C1;
+                    break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
                     break;
@@ -694,6 +728,7 @@ public:
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 default:
@@ -713,6 +748,7 @@ public:
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 default:
@@ -730,8 +766,10 @@ public:
                     break;
                 case input::c_colon:  /* : */
                     flip_key_object();
+                    state_ = VA;
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 default:
@@ -757,6 +795,7 @@ public:
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 case input::minus:  /* - */
@@ -764,9 +803,11 @@ public:
                     state_ = MI;
                     break;
                 case input::zero:  /* 0 */
+                    string_buffer_.push_back(next_char);
                     state_ = ZE;
                     break;
                 case input::digit:  /* 123456789 */
+                    string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
                 case input::f:  /* f */
@@ -783,8 +824,6 @@ public:
                     break;
                 case input::rsqrb:  /* ] */
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
-                    break;
-                case input::c_colon:  /* : */
                     break;
                 case input::c_comma:  /* , */
                     err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
@@ -811,11 +850,11 @@ public:
                 case input::rsqrb:  /* ] */
                     pop_array();
                     break;
-
                 case input::quote:  /* " */
                     state_ = ST;
                     break;
                 case input::slash:  /* / */
+                    saved_state_ = state_;
                     state_ = C1;
                     break;
                 case input::minus:  /* - */
@@ -823,9 +862,11 @@ public:
                     state_ = MI;
                     break;
                 case input::zero:  /* 0 */
+                    string_buffer_.push_back(next_char);
                     state_ = ZE;
                     break;
                 case input::digit:  /* 123456789 */
+                    string_buffer_.push_back(next_char);
                     state_ = IN;
                     break;
                 case input::f:  /* f */
@@ -864,6 +905,7 @@ public:
                     break;
                 case input::quote:  /* " */
                     end_string_value();
+					break;
                 default:
                     string_buffer_.push_back(next_char);
                     break;
@@ -959,15 +1001,15 @@ public:
                 case input::lf: // Linefeed
                 case input::cr: // Carriage return
                 case input::white:  /* other whitespace */
-                    end_number_value();
+                    end_integer_value();
                     state_ = OK;
                     break; // No change
                 case input::rcurb:  /* } */
-                    end_number_value();
+                    end_integer_value();
                     pop_object();
                     break;
                 case input::rsqrb:  /* ] */
-                    end_number_value();
+                    end_integer_value();
                     pop_array();
                     break;
                 case input::point:  /* . */
@@ -975,7 +1017,7 @@ public:
                     state_ = FR;
                     break;
                 case input::c_comma:  /* , */
-                    end_number_value();
+                    end_integer_value();
                     flip_object_key();
                     break;
                 default:
@@ -990,15 +1032,15 @@ public:
                 case input::lf: // Linefeed
                 case input::cr: // Carriage return
                 case input::white:  /* other whitespace */
-                    end_number_value();
+                    end_integer_value();
                     state_ = OK;
                     break; // No change
                 case input::rcurb:  /* } */
-                    end_number_value();
+                    end_integer_value();
                     pop_object();
                     break;
                 case input::rsqrb:  /* ] */
-                    end_number_value();
+                    end_integer_value();
                     pop_array();
                     break;
                 case input::zero:  /* 0 */
@@ -1011,7 +1053,7 @@ public:
                     state_ = FR;
                     break;
                 case input::c_comma:  /* , */
-                    end_number_value();
+                    end_integer_value();
                     flip_object_key();
                     break;
                 case input::e:  /* e */
@@ -1030,15 +1072,15 @@ public:
                 case input::lf: // Linefeed
                 case input::cr: // Carriage return
                 case input::white:  /* other whitespace */
-                    end_number_value();
+                    end_frac_value();
                     state_ = OK;
                     break; // No change
                 case input::rcurb:  /* } */
-                    end_number_value();
+                    end_frac_value();
                     pop_object();
                     break;
                 case input::rsqrb:  /* ] */
-                    end_number_value();
+                    end_frac_value();
                     pop_array();
                     break;
                 case input::zero:  /* 0 */
@@ -1047,7 +1089,7 @@ public:
                     state_ = FR;
                     break;
                 case input::c_comma:  /* , */
-                    end_number_value();
+                    end_frac_value();
                     flip_object_key();
                     break;
                 case input::e:  /* e */
@@ -1099,16 +1141,20 @@ public:
                 case input::lf: // Linefeed
                 case input::cr: // Carriage return
                 case input::white:  /* other whitespace */
-                    end_number_value();
+                    end_frac_value();
                     state_ = OK;
                     break; // No change
                 case input::rcurb:  /* } */
-                    end_number_value();
+                    end_frac_value();
                     pop_object();
                     break;
                 case input::rsqrb:  /* ] */
-                    end_number_value();
+                    end_frac_value();
                     pop_array();
+                    break;
+                case input::c_comma:  /* , */
+                    end_frac_value();
+                    flip_object_key();
                     break;
                 case input::zero:  /* 0 */
                 case input::digit:  /* 123456789 */
@@ -1269,337 +1315,6 @@ public:
         return true;
     }
 
-    int check_char()
-    {
-        for (size_t i = 0; i < buffer_length_; ++i)
-        {
-            int next_char = buffer_[i];
-
-            int next_input, next_state;
-            /*
-                Determine the character's class.
-            */
-            if (next_char < 0)
-            {
-                return false;
-            }
-            if (next_char >= 128)
-            {
-                next_input = input::etc;
-            }
-            else
-            {
-                next_input = ascii_class[next_char];
-                if (next_input <= __)
-                {
-                    return false;
-                }
-            }
-            /*
-                Get the next state from the state transition table.
-            */
-            next_state = state_transition_table[state_][next_input];
-
-            switch (state_)
-            {
-            case ZE:
-            case IN:
-                switch (next_state)
-                {
-                case ZE:
-                case IN:
-                case FR:
-                case E1:
-                case E2:
-                case E3:
-                    break;
-                default:
-                    if (is_negative_)
-                    {
-                        try
-                        {
-                            long long d = string_to_integer(is_negative_, string_buffer_.c_str(), string_buffer_.length());
-                            handler_->value(d, *this);
-                        }
-                        catch (const std::exception&)
-                        {
-                            try
-                            {
-                                double d = string_to_float(string_buffer_);
-                                handler_->value(-d, *this);
-                            }
-                            catch (...)
-                            {
-                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
-                                handler_->value(null_type(), *this);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            unsigned long long d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length());
-                            handler_->value(d, *this);
-                        }
-                        catch (const std::exception&)
-                        {
-                            try
-                            {
-                                double d = string_to_float(string_buffer_);
-                                handler_->value(d, *this);
-                            }
-                            catch (...)
-                            {
-                                err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
-                                handler_->value(null_type(), *this);
-                            }
-                        }
-                    }
-                    string_buffer_.clear();
-                    is_negative_ = false;
-                    break;
-                }
-                break;
-            case FR:
-            case E1:
-            case E2:
-            case E3:
-                switch (next_state)
-                {
-                case ZE:
-                case IN:
-                case FR:
-                case E1:
-                case E2:
-                case E3:
-                    break;
-                default:
-                    try
-                    {
-                        double d = string_to_float(string_buffer_);
-                        if (is_negative_)
-                            d = -d;
-                        handler_->value(d, *this);
-                    }
-                    catch (...)
-                    {
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
-                        handler_->value(null_type(), *this);
-                    }
-                    string_buffer_.clear();
-                    is_negative_ = false;
-                    break;
-                }
-                break;
-            }
-
-            switch (next_state)
-            {
-            case C1:
-                saved_state_ = state_;
-                state_ = next_state;
-                break;
-            case C4:
-                state_ = saved_state_;
-                break;
-            case U0:
-                cp_ = 0;
-                state_ = next_state;
-                break;
-            case U1:
-            case U2:
-            case U3:
-                append_to_codepoint(next_char);
-                state_ = next_state;
-                break;
-            case U4:
-                append_to_codepoint(next_char);
-                if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
-                {
-                    state_ = SP;
-                }
-                else
-                {
-                    json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp_, string_buffer_);
-                    state_ = ST;
-                }
-                break;
-            case T4:
-                handler_->value(true, *this);
-                state_ = OK;
-                break;
-            case F5:
-                handler_->value(false, *this);
-                state_ = OK;
-                break;
-            case N4:
-                handler_->value(null_type(), *this);
-                state_ = OK;
-                break;
-            case __:
-                return false;
-                break;
-            case S2:
-                string_buffer_.push_back(next_char);
-                state_ = ST;
-                break;
-            case S3:
-                string_buffer_.push_back('\"');
-                state_ = ST;
-                break;
-            case S4:
-                string_buffer_.push_back('\\');
-                state_ = ST;
-                break;
-            case S5:
-                string_buffer_.push_back('/');
-                state_ = ST;
-                break;
-            case Sb:
-                string_buffer_.push_back('\b');
-                state_ = ST;
-                break;
-            case Sf:
-                string_buffer_.push_back('\f');
-                state_ = ST;
-                break;
-            case Sn:
-                string_buffer_.push_back('\n');
-                state_ = ST;
-                break;
-            case Sr:
-                string_buffer_.push_back('\r');
-                state_ = ST;
-                break;
-            case St:
-                string_buffer_.push_back('\t');
-                state_ = ST;
-                break;
-                // [object,'}']
-            case MI:
-                is_negative_ = true;
-                state_ = next_state;
-                break;
-            case ZE:
-            case IN:
-            case FR:
-            case E1:
-            case E2:
-            case E3:
-                string_buffer_.push_back(next_char);
-                state_ = next_state;
-                break;
-            case -9:
-                if (!pop(mode::key))
-                {
-                    return false;
-                }
-                handler_->end_object(*this);
-                state_ = OK;
-                break;
-
-            /* } */ case -8:
-                if (!pop(mode::object))
-                {
-                    return false;
-                }
-                handler_->end_object(*this);
-                state_ = OK;
-                break;
-
-            /* ] */ case -7:
-                if (!pop(mode::array))
-                {
-                    return false;
-                }
-                handler_->end_array(*this);
-                state_ = OK;
-                break;
-
-                // [start,'{']
-            case -6:
-                if (!push(mode::key))
-                {
-                    return false;
-                }
-                state_ = OB;
-                //count_members(i+1);
-                handler_->begin_object(*this);
-                break;
-
-            /* [ */ case -5:
-                if (!push(mode::array))
-                {
-                    return false;
-                }
-                state_ = AR;
-                count_members(i + 1);
-                handler_->begin_array(*this);
-                break;
-
-            /* " */ case -4:
-                switch (stack_[top_].mode)
-                {
-                case mode::key:
-                    handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
-                    string_buffer_.clear();
-                    state_ = CO;
-                    break;
-                case mode::array:
-                case mode::object:
-                    handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-                    string_buffer_.clear();
-                    state_ = OK;
-                    break;
-                default:
-                    return false;
-                }
-                break;
-
-            /* , */ case -3:
-                switch (stack_[top_].mode)
-                {
-                case mode::object:
-                    // A comma causes a flip from object mode to key mode.
-                    if (!flip(mode::object, mode::key))
-                    {
-                        return false;
-                    }
-                    //handler_->end_object(*this);
-                    state_ = KE;
-                    break;
-                case mode::array:
-                    state_ = VA;
-                    break;
-                default:
-                    return false;
-                }
-                break;
-
-            /* : */ case -2:
-                // A colon causes a flip from key mode to object mode.
-                if (!flip(mode::key, mode::object))
-                {
-                    return false;
-                }
-                //count_members(i+1);
-                //handler_->begin_object(*this);
-                state_ = VA;
-                break;
-                /*
-                    Bad action.
-                */
-            default:
-                state_ = next_state;
-                break;
-                //return false;
-            }
-
-        }
-        return true;
-    }
-
     int count_members(size_t start_index)
     {
         int start_top = top_;
@@ -1624,6 +1339,8 @@ public:
             */
             if (next_char < 0)
             {
+                top_ = start_top;
+                state_ = start_state;
                 return false;
             }
             if (next_char >= 128)
@@ -1635,6 +1352,8 @@ public:
                 next_input = ascii_class[next_char];
                 if (next_input <= __)
                 {
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
             }
@@ -1700,6 +1419,8 @@ public:
                 state_ = ST;
                 break;
             case __:
+                top_ = start_top;
+                state_ = start_state;
                 return false;
                 break;
             case -9:
@@ -1711,6 +1432,8 @@ public:
                 {
                     if (!pop(mode::key))
                     {
+                        top_ = start_top;
+                        state_ = start_state;
                         return false;
                     }
                     if (top_ == start_top)
@@ -1730,6 +1453,8 @@ public:
                 {
                     if (!pop(mode::object))
                     {
+                        top_ = start_top;
+                        state_ = start_state;
                         return false;
                     }
                     if (top_ == start_top)
@@ -1749,6 +1474,8 @@ public:
                 {
                     if (!pop(mode::array))
                     {
+                        top_ = start_top;
+                        state_ = start_state;
                         return false;
                     }
                     if (top_ == start_top)
@@ -1762,6 +1489,8 @@ public:
             /* { */ case -6:
                 if (!push(mode::key))
                 {
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
                 state_ = OB;
@@ -1770,6 +1499,8 @@ public:
             /* [ */ case -5:
                 if (!push(mode::array))
                 {
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
                 state_ = AR;
@@ -1787,6 +1518,8 @@ public:
                     ++stack_[start_top].minimum_structure_capacity;
                     break;
                 default:
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
                 break;
@@ -1798,6 +1531,8 @@ public:
                     // A comma causes a flip from object mode to key mode.
                     if (!flip(mode::object, mode::key))
                     {
+                        top_ = start_top;
+                        state_ = start_state;
                         return false;
                     }
                     state_ = KE;
@@ -1806,6 +1541,8 @@ public:
                     state_ = VA;
                     break;
                 default:
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
                 break;
@@ -1814,6 +1551,8 @@ public:
                 // A colon causes a flip from key mode to object mode.
                 if (!flip(mode::key, mode::object))
                 {
+                    top_ = start_top;
+                    state_ = start_state;
                     return false;
                 }
                 state_ = VA;
@@ -1828,6 +1567,7 @@ public:
 
         }
         state_ = start_state;
+        top_ = start_top;
 
         return true;
     }
@@ -1901,47 +1641,47 @@ int basic_json_reader<Char>::state_transition_table[state_count][input::input_co
         negative number. A JSON text is accepted if at the end of the text the
         state is OK and if the mode is MODE_DONE.
 
-                     white                                      1-9                                                                  ABCDF    etc
-                 space  |  {   }   [   ]   :   ,   "   \   /   *   +   -   .   0   |   a   b   c   d   e   f   l   n   r   s   t   u   |   E   |*/
-    /*start  GO*/{ GO, GO, -6, __, -5, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*ok     OK*/{ OK, OK, __, -8, __, -7, __, -3, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*object OB*/{ OB, OB, __, -9, __, __, __, __, ST, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*key    KE*/{ KE, KE, __, __, __, __, __, __, ST, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*colon  CO*/{ CO, CO, __, __, __, __, -2, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*value  VA*/{ VA, VA, -6, __, -5, __, __, __, ST, __, C1, __, __, MI, __, ZE, IN, __, __, __, __, __, F1, __, N1, __, __, T1, __, __, __, __ },
-    /*array  AR*/{ AR, AR, -6, __, -5, -7, __, __, ST, __, C1, __, __, MI, __, ZE, IN, __, __, __, __, __, F1, __, N1, __, __, T1, __, __, __, __ },
-    /*string ST*/{ S2, __, S2, S2, S2, S2, S2, S2, -4, ES, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2, S2 },
-    /*escape ES*/{ __, __, __, __, __, __, __, __, S3, S4, S5, __, __, __, __, __, __, __, Sb, __, __, __, Sf, __, Sn, Sr, __, St, U0, __, __, __ },
-    /*u1     U0*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U1, U1, U1, U1, U1, U1, U1, U1, __, __, __, __, __, __, U1, U1, __ },
-    /*u2     U1*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U2, U2, U2, U2, U2, U2, U2, U2, __, __, __, __, __, __, U2, U2, __ },
-    /*u3     U2*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U3, U3, U3, U3, U3, U3, U3, U3, __, __, __, __, __, __, U3, U3, __ },
-    /*u4     U3*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U4, U4, U4, U4, U4, U4, U4, U4, __, __, __, __, __, __, U4, U4, __ },
-    /*SP     SP*/{ __, __, __, __, __, __, __, __, __, U5, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*escape U5*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, U6, __, __, __ },
-    /*u1     U6*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U7, U7, U7, U7, U7, U7, U7, U7, __, __, __, __, __, __, U7, U7, __ },
-    /*u2     U7*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U8, U8, U8, U8, U8, U8, U8, U8, __, __, __, __, __, __, U8, U8, __ },
-    /*u3     U8*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U9, U9, U9, U9, U9, U9, U9, U9, __, __, __, __, __, __, U9, U9, __ },
-    /*u4     U9*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, U10, U10, U10, U10, U10, U10, U10, U10, __, __, __, __, __, __, U10, U10, __ },
-    /*minus  MI*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, ZE, IN, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*zero   ZE*/{ OK, OK, __, -8, __, -7, __, -3, __, __, C1, __, __, __, FR, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*int    IN*/{ OK, OK, __, -8, __, -7, __, -3, __, __, C1, __, __, __, FR, IN, IN, __, __, __, __, E1, __, __, __, __, __, __, __, __, E1, __ },
-    /*frac   FR*/{ OK, OK, __, -8, __, -7, __, -3, __, __, C1, __, __, __, __, FR, FR, __, __, __, __, E1, __, __, __, __, __, __, __, __, E1, __ },
-    /*e      E1*/{ __, __, __, __, __, __, __, __, __, __, C1, __, E2, E2, __, E3, E3, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*ex     E2*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, E3, E3, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*exp    E3*/{ OK, OK, __, -8, __, -7, __, -3, __, __, C1, __, __, __, __, E3, E3, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*tr     T1*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, T2, __, __, __, __, __, __ },
-    /*tru    T2*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, T3, __, __, __ },
-    /*true   T3*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, T4, __, __, __, __, __, __, __, __, __, __ },
-    /*fa     F1*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, F2, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*fal    F2*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, F3, __, __, __, __, __, __, __, __ },
-    /*fals   F3*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, F4, __, __, __, __, __ },
-    /*false  F4*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, F5, __, __, __, __, __, __, __, __, __, __ },
-    /*nu     N1*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, N2, __, __, __ },
-    /*nul    N2*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, N3, __, __, __, __, __, __, __, __ },
-    /*null   N3*/{ __, __, __, __, __, __, __, __, __, __, C1, __, __, __, __, __, __, __, __, __, __, __, __, N4, __, __, __, __, __, __, __, __ },
-    /*       C1*/{ __, __, __, __, __, __, __, __, __, __, __, C2, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-    /*       C2*/{ C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C3, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2 },
-    /*       C3*/{ C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C4, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2, C2 },
+                 white                                      1-9                                                                  ABCDF    etc
+                 space   {  }  [  ]  :  ,  "  \  /  *  +  -  .  0  |  a  b  c  d  e  f  l  n  r  s  t  u  |  E  |*/
+    /*start  GO*/{GO,GO,GO,GO,-6,__,-5,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*ok     OK*/{OK,OK,OK,OK,__,-8,__,-7,__,-3,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*object OB*/{OB,OB,OB,OB,__,-9,__,__,__,__,ST,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*key    KE*/{KE,KE,KE,KE,__,__,__,__,__,__,ST,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*colon  CO*/{CO,CO,CO,CO,__,__,__,__,-2,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*value  VA*/{VA,VA,VA,VA,-6,__,-5,__,__,__,ST,__,C1,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__},
+    /*array  AR*/{AR,AR,AR,AR,-6,__,-5,-7,__,__,ST,__,C1,__,__,MI,__,ZE,IN,__,__,__,__,__,F1,__,N1,__,__,T1,__,__,__,__},
+    /*string ST*/{S2,__,__,__,S2,S2,S2,S2,S2,S2,-4,ES,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2,S2},
+    /*escape ES*/{__,__,__,__,__,__,__,__,__,__,S3,S4,S5,__,__,__,__,__,__,__,Sb,__,__,__,Sf,__,Sn,Sr,__,St,U0,__,__,__},
+    /*u1     U0*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U1,U1,U1,U1,U1,U1,U1,U1,__,__,__,__,__,__,U1,U1,__},
+    /*u2     U1*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U2,U2,U2,U2,U2,U2,U2,U2,__,__,__,__,__,__,U2,U2,__},
+    /*u3     U2*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U3,U3,U3,U3,U3,U3,U3,U3,__,__,__,__,__,__,U3,U3,__},
+    /*u4     U3*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U4,U4,U4,U4,U4,U4,U4,U4,__,__,__,__,__,__,U4,U4,__},
+    /*SP     SP*/{__,__,__,__,__,__,__,__,__,__,__,U5,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*escape U5*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,U6,__,__,__},
+    /*u1     U6*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U7,U7,U7,U7,U7,U7,U7,U7,__,__,__,__,__,__,U7,U7,__},
+    /*u2     U7*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U8,U8,U8,U8,U8,U8,U8,U8,__,__,__,__,__,__,U8,U8,__},
+    /*u3     U8*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U9,U9,U9,U9,U9,U9,U9,U9,__,__,__,__,__,__,U9,U9,__},
+    /*u4     U9*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,U10,U10,U10,U10,U10,U10,U10,U10,__,__,__,__,__,__,U10,U10,__},
+    /*minus  MI*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,ZE,IN,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*zero   ZE*/{OK,OK,OK,OK,__,-8,__,-7,__,-3,__,__,C1,__,__,__,FR,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*int    IN*/{OK,OK,OK,OK,__,-8,__,-7,__,-3,__,__,C1,__,__,__,FR,IN,IN,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__},
+    /*frac   FR*/{OK,OK,OK,OK,__,-8,__,-7,__,-3,__,__,C1,__,__,__,__,FR,FR,__,__,__,__,E1,__,__,__,__,__,__,__,__,E1,__},
+    /*e      E1*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,E2,E2,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*ex     E2*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*exp    E3*/{OK,OK,OK,OK,__,-8,__,-7,__,-3,__,__,C1,__,__,__,__,E3,E3,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*tr     T1*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T2,__,__,__,__,__,__},
+    /*tru    T2*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,T3,__,__,__},
+    /*true   T3*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,T4,__,__,__,__,__,__,__,__,__,__},
+    /*fa     F1*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,F2,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*fal    F2*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,F3,__,__,__,__,__,__,__,__},
+    /*fals   F3*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,F4,__,__,__,__,__},
+    /*false  F4*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,F5,__,__,__,__,__,__,__,__,__,__},
+    /*nu     N1*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,N2,__,__,__},
+    /*nul    N2*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,N3,__,__,__,__,__,__,__,__},
+    /*null   N3*/{__,__,__,__,__,__,__,__,__,__,__,__,C1,__,__,__,__,__,__,__,__,__,__,__,__,N4,__,__,__,__,__,__,__,__},
+    /*       C1*/{__,__,__,__,__,__,__,__,__,__,__,__,__,C2,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__},
+    /*       C2*/{C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C3,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2},
+    /*       C3*/{C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C4,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2,C2},
 };
 
 typedef basic_json_reader<char> json_reader;
