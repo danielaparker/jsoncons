@@ -65,6 +65,7 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
     BOOST_CHECK(expected == o[0].as<std::string>());
 }
 
+
 BOOST_AUTO_TEST_CASE(test_expected_name_separator)
 {
 	test_error_code("{\"name\" 10}", jsoncons::json_parser_errc::expected_name_separator);
@@ -101,6 +102,7 @@ BOOST_AUTO_TEST_CASE(test_expected_container)
     test_error_code("10", jsoncons::json_parser_errc::expected_container);
     test_error_code("\"string\"", jsoncons::json_parser_errc::expected_container);
 }
+
 
 
 
