@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(e.line_number(), 14);
-        BOOST_CHECK_EQUAL(e.column_number(), 30);
+        BOOST_CHECK_EQUAL(e.column_number(), 31);
     }
 }
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(e.line_number(),17);
-        BOOST_CHECK_EQUAL(e.column_number(), 9);
+        BOOST_CHECK_EQUAL(e.column_number(), 10);
     }
 }
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 3);
+        BOOST_CHECK_EQUAL(e.column_number(), 4);
     }
 }
 
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 2);
+        BOOST_CHECK_EQUAL(e.column_number(), 4);
     }
 }
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 2);
+        BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
 }
 
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 2);
+        BOOST_CHECK_EQUAL(e.column_number(), 4);
     }
 }
 
