@@ -34,11 +34,11 @@ namespace mode {
 namespace state {
     enum state_t {
         start, 
-        ok,  
+        expect_comma_or_end,  
         object,
         key, 
-        colon,
-        value,
+        expect_colon,
+        expect_value,
         array, 
         string,
         escape, 
@@ -105,8 +105,14 @@ public:
          eof_(false) 
 
     {
-        state_ = state::start;
         this->depth_ = 200;
+        state_ = state::start;
+        top_ = -1;
+        line_ = 1;
+        column_ = 0;
+        prev_char_ = 0;
+        eof_ = false;
+        push(mode::done);
     }
 
     basic_json_reader(std::basic_istream<Char>& is,
@@ -123,15 +129,21 @@ public:
          eof_(false)
 
     {
-        state_ = state::start;
         this->depth_ = 200;
+        state_ = state::start;
+        top_ = -1;
+        line_ = 1;
+        column_ = 0;
+        prev_char_ = 0;
+        eof_ = false;
+        push(mode::done);
     }
 
     ~basic_json_reader()
     {
     }
 
-    void end_frac_value()
+    void end_fraction_value()
     {
         try
         {
@@ -147,7 +159,7 @@ public:
         }
         string_buffer_.clear();
         is_negative_ = false;
-        state_ = state::ok;
+        state_ = state::expect_comma_or_end;
     }
 
     void end_integer_value()
@@ -196,7 +208,7 @@ public:
         }
         string_buffer_.clear();
         is_negative_ = false;
-        state_ = state::ok;
+        state_ = state::expect_comma_or_end;
     }
 
     void append_codepoint(int next_char)
@@ -289,20 +301,20 @@ public:
         }
     }
 
-    void end_string_value() // " -4 
+    void end_string_value() 
     {
         switch (stack_[top_].mode)
         {
         case mode::key:
             handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
             string_buffer_.clear();
-            state_ = state::colon;
+            state_ = state::expect_colon;
             break;
         case mode::array:
         case mode::object:
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             string_buffer_.clear();
-            state_ = state::ok;
+            state_ = state::expect_comma_or_end;
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
@@ -312,7 +324,7 @@ public:
         is_negative_ = false;
     }
 
-    void flip_object_key() // , -3
+    void flip_object_key() 
     {
         switch (stack_[top_].mode)
         {
@@ -322,11 +334,10 @@ public:
             {
                 err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
             }
-            //handler_->end_object(*this);
             state_ = state::key;
             break;
         case mode::array:
-            state_ = state::value;
+            state_ = state::expect_value;
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
@@ -340,7 +351,7 @@ public:
         {
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
         }
-        state_ = state::value;
+        state_ = state::expect_value;
     }
  
     uint32_t append_to_codepoint(uint32_t cp, int next_char)
@@ -484,7 +495,8 @@ public:
         column_ = 0;
         prev_char_ = 0;
         eof_ = false;
-        handler_->begin_json();
+        push(mode::done);
+
         buffer_.resize(buffer_capacity_);
         while (!eof_ && state_ != state::done)
         {
@@ -506,12 +518,11 @@ public:
                 read_buffer();
             }
         }
-        if (top_ >= 0)
+        if (top_ > 0)
         {
             err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
         }
         //check_done();
-        handler_->end_json();
     }
 
     void read_buffer()
@@ -571,21 +582,26 @@ public:
             case state::start: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    break; // No change
+                case ' ':case '\n':case '\r':case '\t':
+                    break; 
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    //count_members(i+1);
+                    count_members(i+1);
                     handler_->begin_object(*this);
                     break;
                 case '[':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::array))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
@@ -610,21 +626,26 @@ public:
                 }
                 break;
 
-            case state::ok: 
+            case state::expect_comma_or_end: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    break; // No change
+                case ' ':case '\n':case '\r':case '\t':
+                    break; 
                 case '}':
                     if (!pop(mode::object))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ']':
                     if (!pop(mode::array))
@@ -632,7 +653,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ',':
                     flip_object_key();
@@ -649,10 +678,7 @@ public:
             case state::object: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '}':
                     if (!pop(mode::key))
@@ -660,7 +686,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case '\"':
                     state_ = state::string;
@@ -677,10 +711,7 @@ public:
             case state::key: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '\"':
                     state_ = state::string;
@@ -694,17 +725,14 @@ public:
                     break;
                 }
                 break;
-            case state::colon: 
+            case state::expect_colon: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case ':':
                     flip_key_object();
-                    state_ = state::value;
+                    state_ = state::expect_value;
                     break;
                 case '/':
                     saved_state_ = state_;
@@ -715,24 +743,29 @@ public:
                     break;
                 }
                 break;
-            case state::value: 
+            case state::expect_value: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    //count_members(i+1);
+                    count_members(i+1);
                     handler_->begin_object(*this);
                     break;
                 case '[':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::array))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
@@ -777,21 +810,26 @@ public:
             case state::array: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    //count_members(i+1);
+                    count_members(i+1);
                     handler_->begin_object(*this);
                     break;
                 case '[':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::array))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
@@ -806,7 +844,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case '\"':
                     state_ = state::string;
@@ -958,12 +1004,9 @@ public:
             case state::zero:  
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     end_integer_value();
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; // No change
                 case '}':
                     end_integer_value();
@@ -972,7 +1015,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ']':
                     end_integer_value();
@@ -981,7 +1032,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case '.':
                     string_buffer_.push_back(next_char);
@@ -999,12 +1058,9 @@ public:
             case state::integer: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     end_integer_value();
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
                     end_integer_value();
@@ -1013,7 +1069,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ']':
                     end_integer_value();
@@ -1022,7 +1086,15 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case '0': 
                 case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1050,30 +1122,43 @@ public:
             case state::fraction: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    end_frac_value();
-                    state_ = state::ok;
+                case ' ':case '\n':case '\r':case '\t':
+                    end_fraction_value();
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
-                    end_frac_value();
+                    end_fraction_value();
                     if (!pop(mode::object))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ']':
-                    end_frac_value();
+                    end_fraction_value();
                     if (!pop(mode::array))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case '0': 
                 case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1081,7 +1166,7 @@ public:
                     state_ = state::fraction;
                     break;
                 case ',':
-                    end_frac_value();
+                    end_fraction_value();
                     flip_object_key();
                     break;
                 case 'e':
@@ -1130,33 +1215,46 @@ public:
             case state::exp3: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
-                    end_frac_value();
-                    state_ = state::ok;
+                case ' ':case '\n':case '\r':case '\t':
+                    end_fraction_value();
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
-                    end_frac_value();
+                    end_fraction_value();
                     if (!pop(mode::object))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ']':
-                    end_frac_value();
+                    end_fraction_value();
                     if (!pop(mode::array))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
-                    state_ = top_ == -1 ? state::done : state::ok;
+                    if (top_ == 0)
+                    {
+                        state_ = state::done;
+                        handler_->end_json();
+                    }
+                    else
+                    {
+                        state_ = state::expect_comma_or_end;
+                    }
                     break;
                 case ',':
-                    end_frac_value();
+                    end_fraction_value();
                     flip_object_key();
                     break;
                 case '0': 
@@ -1196,7 +1294,7 @@ public:
                 {
                 case 'e': 
                     handler_->value(true, *this);
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
@@ -1241,7 +1339,7 @@ public:
                 {
                 case 'e':
                     handler_->value(false, *this);
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
@@ -1275,7 +1373,7 @@ public:
                 {
                 case 'l': 
                     handler_->value(null_type(), *this);
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
@@ -1348,12 +1446,13 @@ public:
             case state::start:  
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break; 
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         done = true;
@@ -1383,13 +1482,10 @@ public:
                 }
                 break;
 
-            case state::ok: 
+            case state::expect_comma_or_end: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break; 
                 case '}':
                     if (top_ == start_top)
@@ -1404,7 +1500,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1425,7 +1521,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1448,10 +1544,7 @@ public:
             case state::object:
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '}':
                     if (top_ == start_top)
@@ -1466,7 +1559,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1489,10 +1582,7 @@ public:
             case state::key: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '\"':
                     state_ = state::string;
@@ -1506,17 +1596,14 @@ public:
                     break;
                 }
                 break;
-            case state::colon:  
+            case state::expect_colon:  
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case ':':
                     flip_key_object();
-                    state_ = state::value;
+                    state_ = state::expect_value;
                     break;
                 case '/':
                     saved_state_ = state_;
@@ -1527,15 +1614,16 @@ public:
                     break;
                 }
                 break;
-            case state::value:  
+            case state::expect_value:  
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         done = true;
@@ -1572,13 +1660,16 @@ public:
                     state_ = state::integer;
                     break;
                 case 'f':
-                    state_ = state::f;
+                    i += 4; // skip ahead
+                    state_ = state::fals;
                     break;
                 case 'n':
-                    state_ = state::n;
+                    i += 3;
+                    state_ = state::nul;
                     break;
                 case 't':
-                    state_ = state::t;
+                    i += 3;
+                    state_ = state::tru;
                     break;
                 default:
                     done = true; // Error
@@ -1588,12 +1679,13 @@ public:
             case state::array: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
+                    if (top_ == 0)
+                    {
+                        handler_->begin_json();
+                    }
                     if (!push(mode::key))
                     {
                         done = true;
@@ -1626,7 +1718,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1651,13 +1743,16 @@ public:
                     state_ = state::integer;
                     break;
                 case 'f':
-                    state_ = state::f;
+                    i += 4; // skip ahead
+                    state_ = state::fals;
                     break;
                 case 'n':
-                    state_ = state::n;
+                    i += 3;
+                    state_ = state::nul;
                     break;
                 case 't':
-                    state_ = state::t;
+                    i += 3;
+                    state_ = state::tru;
                     break;
                 default:
                     done = true; // Error
@@ -1679,7 +1774,7 @@ public:
                     switch (stack_[top_].mode)
                     {
                     case mode::key:
-                        state_ = state::colon;
+                        state_ = state::expect_colon;
                         break;
                     case mode::array:
                     case mode::object:
@@ -1687,7 +1782,7 @@ public:
                         {
                             ++stack_[start_top].minimum_structure_capacity;
                         }
-                        state_ = state::ok;
+                        state_ = state::expect_comma_or_end;
                         break;
                     default:
                         done = true; // Error
@@ -1712,21 +1807,13 @@ public:
                     state_ = state::string;
                     break;
                 case 'u':
-                    state_ = state::u1;
+                    i += 3;
+                    state_ = state::u4;
                     break;
                 default:   
                     done = true; // Error
                     break;
                 }
-                break;
-            case state::u1:  
-                state_ = state::u2;
-                break;
-            case state::u2:  
-                state_ = state::u3;
-                break;
-            case state::u3:  
-                state_ = state::u4;
                 break;
             case state::u4:  
                 state_ = state::string;
@@ -1748,15 +1835,12 @@ public:
             case state::zero: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     if (top_ == start_top)
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
                     if (top_ == start_top)
@@ -1771,7 +1855,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1792,7 +1876,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1814,15 +1898,12 @@ public:
             case state::integer: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     if (top_ == start_top)
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
                     if (top_ == start_top)
@@ -1837,7 +1918,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1858,7 +1939,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1888,15 +1969,12 @@ public:
             case state::fraction: 
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     if (top_ == start_top)
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; 
                 case '}':
                     if (top_ == start_top)
@@ -1911,7 +1989,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1932,7 +2010,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -1989,15 +2067,12 @@ public:
             case state::exp3:  
                 switch (next_char)
                 {
-                case ' ':
-                case '\n':
-                case '\r':
-                case '\t':
+                case ' ':case '\n':case '\r':case '\t':
                     if (top_ == start_top)
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break; // No change
                 case '}':
                     if (top_ == start_top)
@@ -2012,7 +2087,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -2033,7 +2108,7 @@ public:
                         }
                         else
                         {
-                            state_ = state::ok;
+                            state_ = state::expect_comma_or_end;
                             if (top_ == start_top)
                             {
                                 ++stack_[start_top].minimum_structure_capacity;
@@ -2053,28 +2128,6 @@ public:
                     break;
                 }
                 break;
-            case state::t: 
-                switch (next_char)
-                {
-                case 'r':
-                    state_ = state::tr;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::tr: 
-                switch (next_char)
-                {
-                case 'u':
-                    state_ = state::tru;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
             case state::tru:  
                 switch (next_char)
                 {
@@ -2083,40 +2136,7 @@ public:
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::f:  
-                switch (next_char)
-                {
-                case 'a':
-                    state_ = state::fa;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::fa:  
-                switch (next_char)
-                {
-                case 'l': 
-                    state_ = state::fal;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::fal:  
-                switch (next_char)
-                {
-                case 's':
-                    state_ = state::fals;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     done = true; // Error
@@ -2131,29 +2151,7 @@ public:
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::n:  
-                switch (next_char)
-                {
-                case 'u':
-                    state_ = state::nu;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::nu:  
-                switch (next_char)
-                {
-                case 'l': 
-                    state_ = state::nul;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     done = true; // Error
@@ -2168,7 +2166,7 @@ public:
                     {
                         ++stack_[start_top].minimum_structure_capacity;
                     }
-                    state_ = state::ok;
+                    state_ = state::expect_comma_or_end;
                     break;
                 default:
                     done = true; // Error
@@ -2229,7 +2227,7 @@ public:
 
     bool check_done()
     {
-        bool result = (state_ == state::ok) && pop(mode::done);
+        bool result = (state_ == state::expect_comma_or_end) && pop(mode::done);
         return result;
     }
 
