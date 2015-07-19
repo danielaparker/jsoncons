@@ -217,14 +217,8 @@ public:
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'A':case 'B':case 'C':case 'D':case 'F':
-        case 'E':
+        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
             cp_ = append_to_codepoint(cp_, next_char);
             break;
         default:
@@ -239,14 +233,8 @@ public:
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'A':case 'B':case 'C':case 'D':case 'F':
-        case 'E':
+        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
             cp2_ = append_to_codepoint(cp2_, next_char);
             break;
         default:
@@ -1109,8 +1097,7 @@ public:
                     end_integer_value();
                     flip_object_key();
                     break;
-                case 'e':
-                case 'E':
+                case 'e':case 'E':
                     string_buffer_.push_back(next_char);
                     state_ = state::exp1;
                     break;
@@ -1169,8 +1156,7 @@ public:
                     end_fraction_value();
                     flip_object_key();
                     break;
-                case 'e':
-                case 'E':
+                case 'e':case 'E':
                     string_buffer_.push_back(next_char);
                     state_ = state::exp1;
                     break;
@@ -1957,8 +1943,7 @@ public:
                 case ',':
                     flip_object_key();
                     break;
-                case 'e':
-                case 'E':
+                case 'e':case 'E':
                     state_ = state::exp1;
                     break;
                 default:
@@ -2025,8 +2010,7 @@ public:
                 case ',':
                     flip_object_key();
                     break;
-                case 'e':
-                case 'E':
+                case 'e':case 'E':
                     state_ = state::exp1;
                     break;
                 default:
