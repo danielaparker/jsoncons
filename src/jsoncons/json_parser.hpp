@@ -24,19 +24,23 @@ namespace jsoncons {
 
 namespace mode {
     enum mode_t {
-        array,
-        done,
-        key,
-        object
+        array_element,
+        object_member_name,
+        object_member_value,
+        done
     };
 };
 
 namespace state {
     enum state_t {
         start, 
+        slash,  
+        slash_slash, 
+        slash_star, 
+        slash_star_star,
         expect_comma_or_end,  
         object,
-        key, 
+        expect_member_name, 
         expect_colon,
         expect_value,
         array, 
@@ -46,7 +50,7 @@ namespace state {
         u2, 
         u3, 
         u4, 
-        surrogate_pair, 
+        expect_surrogate_pair, 
         u5, 
         u6, 
         u7, 
@@ -59,6 +63,9 @@ namespace state {
         exp1,
         exp2,
         exp3,
+        n,
+        nu,
+        nul,
         t,  
         tr,  
         tru, 
@@ -66,13 +73,6 @@ namespace state {
         fa, 
         fal,
         fals,
-        n,
-        nu,
-        nul,
-        slash,  
-        slash_slash, 
-        slash_star, 
-        slash_star_star,
         done 
     };
 };
@@ -293,13 +293,13 @@ public:
     {
         switch (stack_[top_].mode)
         {
-        case mode::key:
+        case mode::object_member_name:
             handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
             string_buffer_.clear();
             state_ = state::expect_colon;
             break;
-        case mode::array:
-        case mode::object:
+        case mode::array_element:
+        case mode::object_member_value:
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             string_buffer_.clear();
             state_ = state::expect_comma_or_end;
@@ -316,15 +316,15 @@ public:
     {
         switch (stack_[top_].mode)
         {
-        case mode::object:
-            // A comma causes a flip from object mode to key mode.
-            if (!flip(mode::object, mode::key))
+        case mode::object_member_value:
+            // A comma causes a flip from object_member_value mode to object_member_name mode.
+            if (!flip(mode::object_member_value, mode::object_member_name))
             {
                 err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
             }
-            state_ = state::key;
+            state_ = state::expect_member_name;
             break;
-        case mode::array:
+        case mode::array_element:
             state_ = state::expect_value;
             break;
         default:
@@ -335,7 +335,7 @@ public:
 
     void flip_key_object()
     {
-        if (!flip(mode::key, mode::object))
+        if (!flip(mode::object_member_name, mode::object_member_value))
         {
             err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
         }
@@ -515,7 +515,8 @@ public:
 
     void read_buffer()
     {
-        for (size_t i = 0; i < buffer_length_ && state_ != state::done; ++i)
+        bool done = false;
+        for (size_t i = 0; i < buffer_length_ && !done; ++i)
         {
             int next_char = buffer_[i];
             switch (next_char)
@@ -573,11 +574,8 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break; 
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    handler_->begin_json();
+                    if (!push(mode::object_member_name))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -586,11 +584,8 @@ public:
                     handler_->begin_object(*this);
                     break;
                 case '[':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::array))
+                    handler_->begin_json();
+                    if (!push(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -620,15 +615,16 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break; 
                 case '}':
-                    if (!pop(mode::object))
+                    if (!pop(mode::object_member_value))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = true;
                     }
                     else
                     {
@@ -636,15 +632,16 @@ public:
                     }
                     break;
                 case ']':
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -669,15 +666,16 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '}':
-                    if (!pop(mode::key))
+                    if (!pop(mode::object_member_name))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -696,7 +694,7 @@ public:
                     break;
                 }
                 break;
-            case state::key: 
+            case state::expect_member_name: 
                 switch (next_char)
                 {
                 case ' ':case '\n':case '\r':case '\t':
@@ -737,11 +735,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    if (!push(mode::object_member_name))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -750,11 +744,7 @@ public:
                     handler_->begin_object(*this);
                     break;
                 case '[':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::array))
+                    if (!push(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -801,11 +791,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    if (!push(mode::object_member_name))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -814,11 +800,7 @@ public:
                     handler_->begin_object(*this);
                     break;
                 case '[':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::array))
+                    if (!push(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
@@ -827,15 +809,16 @@ public:
                     handler_->begin_array(*this);
                     break;
                 case ']':
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -922,7 +905,7 @@ public:
                 append_codepoint(next_char);
                 if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
                 {
-                    state_ = state::surrogate_pair;
+                    state_ = state::expect_surrogate_pair;
                 }
                 else
                 {
@@ -930,7 +913,7 @@ public:
                     state_ = state::string;
                 }
                 break;
-            case state::surrogate_pair: 
+            case state::expect_surrogate_pair: 
                 switch (next_char)
                 {
                 case '\\': 
@@ -938,7 +921,7 @@ public:
                     state_ = state::u5;
                     break;
                 default:
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_parser_category()), *this);
                     break;
                 }
                 break;
@@ -998,15 +981,16 @@ public:
                     break; // No change
                 case '}':
                     end_integer_value();
-                    if (!pop(mode::object))
+                    if (!pop(mode::object_member_value))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1015,15 +999,16 @@ public:
                     break;
                 case ']':
                     end_integer_value();
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1052,15 +1037,16 @@ public:
                     break; 
                 case '}':
                     end_integer_value();
-                    if (!pop(mode::object))
+                    if (!pop(mode::object_member_value))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1069,15 +1055,16 @@ public:
                     break;
                 case ']':
                     end_integer_value();
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1115,15 +1102,16 @@ public:
                     break; 
                 case '}':
                     end_fraction_value();
-                    if (!pop(mode::object))
+                    if (!pop(mode::object_member_value))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1132,15 +1120,16 @@ public:
                     break;
                 case ']':
                     end_fraction_value();
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1207,15 +1196,16 @@ public:
                     break; 
                 case '}':
                     end_fraction_value();
-                    if (!pop(mode::object))
+                    if (!pop(mode::object_member_value))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1224,15 +1214,16 @@ public:
                     break;
                 case ']':
                     end_fraction_value();
-                    if (!pop(mode::array))
+                    if (!pop(mode::array_element))
                     {
                         err_handler_->error(std::error_code(json_parser_errc::expected_container, json_parser_category()), *this);
                     }
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::done;
+                        state_ = state::start;
                         handler_->end_json();
+                        done = false;
                     }
                     else
                     {
@@ -1435,11 +1426,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break; 
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    if (!push(mode::object_member_name))
                     {
                         done = true;
                     }
@@ -1449,7 +1436,7 @@ public:
                     }
                     break;
                 case '[':
-                    if (!push(mode::array))
+                    if (!push(mode::array_element))
                     {
                         done = true;
                     }
@@ -1480,7 +1467,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::object))
+                        if (!pop(mode::object_member_value))
                         {
                             done = true;
                         }
@@ -1501,7 +1488,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }
@@ -1539,7 +1526,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::key))
+                        if (!pop(mode::object_member_name))
                         {
                             done = true;
                         }
@@ -1565,7 +1552,7 @@ public:
                     break;
                 }
                 break;
-            case state::key: 
+            case state::expect_member_name: 
                 switch (next_char)
                 {
                 case ' ':case '\n':case '\r':case '\t':
@@ -1606,11 +1593,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    if (!push(mode::object_member_name))
                     {
                         done = true;
                     }
@@ -1620,7 +1603,7 @@ public:
                     }
                     break;
                 case '[':
-                    if (!push(mode::array))
+                    if (!push(mode::array_element))
                     {
                         done = true;
                     }
@@ -1668,11 +1651,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case '{':
-                    if (top_ == 0)
-                    {
-                        handler_->begin_json();
-                    }
-                    if (!push(mode::key))
+                    if (!push(mode::object_member_name))
                     {
                         done = true;
                     }
@@ -1682,7 +1661,7 @@ public:
                     }
                     break;
                 case '[':
-                    if (!push(mode::array))
+                    if (!push(mode::array_element))
                     {
                         done = true;
                     }
@@ -1698,7 +1677,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }
@@ -1759,11 +1738,11 @@ public:
                 case '\"':
                     switch (stack_[top_].mode)
                     {
-                    case mode::key:
+                    case mode::object_member_name:
                         state_ = state::expect_colon;
                         break;
-                    case mode::array:
-                    case mode::object:
+                    case mode::array_element:
+                    case mode::object_member_value:
                         if (top_ == start_top)
                         {
                             ++stack_[start_top].minimum_structure_capacity;
@@ -1835,7 +1814,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::object))
+                        if (!pop(mode::object_member_value))
                         {
                             done = true;
                         }
@@ -1856,7 +1835,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }
@@ -1898,7 +1877,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::object))
+                        if (!pop(mode::object_member_value))
                         {
                             done = true;
                         }
@@ -1919,7 +1898,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }
@@ -1968,7 +1947,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::object))
+                        if (!pop(mode::object_member_value))
                         {
                             done = true;
                         }
@@ -1989,7 +1968,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }
@@ -2065,7 +2044,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::object))
+                        if (!pop(mode::object_member_value))
                         {
                             done = true;
                         }
@@ -2086,7 +2065,7 @@ public:
                     }
                     else
                     {
-                        if (!pop(mode::array))
+                        if (!pop(mode::array_element))
                         {
                             done = true;
                         }

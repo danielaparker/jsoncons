@@ -170,6 +170,7 @@ namespace json_parser_errc
         unexpected_name_separator,
         illegal_control_character,
         illegal_escaped_character,
+        expected_codepoint_surrogate_pair,
         invalid_codepoint_surrogate_pair,
         invalid_hex_escape_sequence,
         invalid_unicode_escape_sequence,
@@ -213,6 +214,8 @@ public:
             return "Illegal control character in string";
         case json_parser_errc::illegal_escaped_character:
             return "Illegal escaped character in string";
+        case json_parser_errc::expected_codepoint_surrogate_pair:
+            return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
         case json_parser_errc::invalid_codepoint_surrogate_pair:
             return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
         case json_parser_errc::invalid_hex_escape_sequence:

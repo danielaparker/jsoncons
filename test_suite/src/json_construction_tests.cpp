@@ -213,14 +213,20 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     jsoncons::json_deserializer handler;
     json_reader reader(is,handler);
 
-    while (!reader.eof())
+    if (!reader.eof())
     {
         reader.read();
-        if (!reader.eof())
-        {
-            json val = std::move(handler.root());
-            std::cout << val << std::endl;
-        }
+        BOOST_CHECK(!reader.eof());
+        json val = std::move(handler.root());
+        BOOST_CHECK_EQUAL(1,val["a"].as<int>());
     }
+    if (!reader.eof())
+    {
+        reader.read();
+        BOOST_CHECK(!reader.eof());
+        json val = std::move(handler.root());
+        BOOST_CHECK_EQUAL(4,val["a"].as<int>());
+    }
+
 }
 
