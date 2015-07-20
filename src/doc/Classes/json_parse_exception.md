@@ -57,4 +57,4 @@ Constructs an error message, including line and column position
 
 Output:
 
-    Caught json_parse_exception with category json_input, code 1 and message Unexpected value separator ',' detected at line 1 and column 10
+    Caught json_parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10

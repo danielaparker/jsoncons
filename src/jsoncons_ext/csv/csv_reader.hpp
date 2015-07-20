@@ -605,7 +605,7 @@ void basic_csv_reader<Char,Alloc>::parse_quoted_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_->error(std::error_code(jsoncons::json_parser_errc::eof_reading_string_value, jsoncons::json_parser_category()), *this);
+            err_handler_->error(std::error_code(jsoncons::json_parser_errc::unexpected_eof, jsoncons::json_parser_category()), *this);
         }
         else if (c == quote_escape_char_ && peek() == quote_char_)
         {

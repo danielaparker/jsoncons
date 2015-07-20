@@ -10,14 +10,14 @@ The enumeration values scoped by `jsoncons::json_parser_errc` define the values 
 
 constant                            |Description
 ------------------------------------|------------------------------
-`unexpected_value_separator`        |Unexpected value separator ','     
-`expected_value_separator`          |Expected value separator ','       
+`extra_comma`        |Unexpected value separator ','     
+`expected_comma_or_end`          |Expected value separator ','       
 `unexpected_end_of_object`          |Unexpected end of object '}'       
 `unexpected_end_of_array`           |Unexpected end of array ']'        
 `expected_name`                     |Expected name                      
 `expected_value`                    |Expected value                     
-`unexpected_name_separator`         |Unexpected name separator '`'      
-`expected_name_separator`           |Expected name separator '`'        
+`unexpected_colon`         |Unexpected name separator '`'      
+`expected_colon`           |Expected name separator '`'        
 `illegal_control_character`         |Illegal control character in string
 `illegal_escaped_character`         |Illegal escaped character in string
 `invalid_codepoint_surrogate_pair`  |Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.

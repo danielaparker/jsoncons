@@ -38,7 +38,7 @@ void test_error_code(const std::string& text, int ec)
 
 BOOST_AUTO_TEST_CASE(test_missing_separator)
 {
-    test_error_code("{\"field1\"{}}", jsoncons::json_parser_errc::expected_name_separator);
+    test_error_code("{\"field1\"{}}", jsoncons::json_parser_errc::expected_colon);
 }
 
 BOOST_AUTO_TEST_CASE(test_invalid_value)
@@ -66,15 +66,15 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
 }
 
 
-BOOST_AUTO_TEST_CASE(test_expected_name_separator)
+BOOST_AUTO_TEST_CASE(test_expected_colon)
 {
-	test_error_code("{\"name\" 10}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" true}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" false}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" null}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" \"value\"}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" {}}", jsoncons::json_parser_errc::expected_name_separator);
-	test_error_code("{\"name\" []}", jsoncons::json_parser_errc::expected_name_separator);
+	test_error_code("{\"name\" 10}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" true}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" false}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" null}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" \"value\"}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" {}}", jsoncons::json_parser_errc::expected_colon);
+	test_error_code("{\"name\" []}", jsoncons::json_parser_errc::expected_colon);
 }
 
 BOOST_AUTO_TEST_CASE(test_expected_name)
@@ -96,11 +96,11 @@ BOOST_AUTO_TEST_CASE(test_expected_value)
 
 BOOST_AUTO_TEST_CASE(test_expected_container)
 {
-    test_error_code("null", jsoncons::json_parser_errc::expected_container);
-    test_error_code("false", jsoncons::json_parser_errc::expected_container);
-    test_error_code("true", jsoncons::json_parser_errc::expected_container);
-    test_error_code("10", jsoncons::json_parser_errc::expected_container);
-    test_error_code("\"string\"", jsoncons::json_parser_errc::expected_container);
+    test_error_code("null", jsoncons::json_parser_errc::invalid_json_text);
+    test_error_code("false", jsoncons::json_parser_errc::invalid_json_text);
+    test_error_code("true", jsoncons::json_parser_errc::invalid_json_text);
+    test_error_code("10", jsoncons::json_parser_errc::invalid_json_text);
+    test_error_code("\"string\"", jsoncons::json_parser_errc::invalid_json_text);
 }
 
 
