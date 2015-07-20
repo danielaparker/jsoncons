@@ -161,6 +161,62 @@ public:
         buffer_.resize(buffer_capacity_);
     }
 
+    void read()
+    {
+        state_ = state::start;
+        bool done = false;
+        while (!eof_ && !done)
+        {
+            if (!(index_ < buffer_length_))
+            {
+                if (!is_->eof())
+                {
+                    is_->read(&buffer_[0], buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    if (buffer_length_ == 0)
+                    {
+                        eof_ = true;
+                    }
+                    index_ = 0;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            if (!eof_)
+            {
+                done = read_buffer();
+            }
+        }
+        if (top_ > 0)
+        {
+            err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
+        }
+    }
+
+    void assert_done()
+    {
+		bool err = false;
+		try
+		{
+			read();
+		}
+		catch (...)
+		{
+			err = true;
+		}
+        if (err || state_ == state::done || top_ > 0)
+        {
+            err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), *this);
+        }
+    }
+
+    bool eof() const
+    {
+        return eof_;
+    }
+private:
     void end_fraction_value()
     {
         try
@@ -379,11 +435,6 @@ public:
         return cp;
     }
 
-    bool eof() const
-    {
-        return eof_;
-    }
-
     unsigned long do_line_number() const override
     {
         return line_;
@@ -488,40 +539,6 @@ public:
             n += x;
         }
         return has_neg ? -n : n;
-    }
-
-    void read()
-    {
-        bool done = false;
-        while (!eof_ && !done)
-        {
-            if (!(index_ < buffer_length_))
-            {
-                if (!is_->eof())
-                {
-                    is_->read(&buffer_[0], buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_->gcount());
-                    if (buffer_length_ == 0)
-                    {
-                        eof_ = true;
-                    }
-					index_ = 0;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            if (!eof_)
-            {
-                done = read_buffer();
-            }
-        }
-        if (top_ > 0)
-        {
-            err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
-        }
-        //check_done();
     }
 
     bool read_buffer()
@@ -634,7 +651,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -651,7 +668,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -685,7 +702,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -828,7 +845,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1000,7 +1017,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1018,7 +1035,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1056,7 +1073,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1074,7 +1091,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1121,7 +1138,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1139,7 +1156,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1215,7 +1232,7 @@ public:
                     handler_->end_object(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -1233,7 +1250,7 @@ public:
                     handler_->end_array(*this);
                     if (top_ == 0)
                     {
-                        state_ = state::start;
+                        state_ = state::done;
                         handler_->end_json();
                         done = true;
                     }
@@ -2200,12 +2217,6 @@ public:
         top_ = start_top;
         saved_state_ = start_saved_state;
         stack_[top_].mode = start_mode;
-    }
-
-    bool check_done()
-    {
-        bool result = (state_ == state::expect_comma_or_end) && pop(mode::done);
-        return result;
     }
 
     int state_;

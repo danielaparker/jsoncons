@@ -178,7 +178,8 @@ namespace json_parser_errc
         unexpected_eof,
         eof_reading_string_value,
         eof_reading_numeric_value,
-        expected_container
+        expected_container,
+        extra_character
     };
 }
 
@@ -232,6 +233,8 @@ public:
             return "Reached end of file while reading numeric value";
         case json_parser_errc::expected_container:
             return "Expected array or object ('[' or '{')";
+        case json_parser_errc::extra_character:
+            return "Unexpected non-whitespace character after jSON structure";
         default:
             return "Unknown JSON parser error";
         }
