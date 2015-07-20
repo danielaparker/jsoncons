@@ -78,7 +78,7 @@ namespace state {
 };
 
 template<typename Char>
-class basic_json_reader : private basic_parsing_context<Char>
+class basic_json_parser : private basic_parsing_context<Char>
 {
     struct stack_item
     {
@@ -92,7 +92,7 @@ class basic_json_reader : private basic_parsing_context<Char>
     };
     static const size_t default_max_buffer_length = 16384;
 public:
-    basic_json_reader(std::basic_istream<Char>& is,
+    basic_json_parser(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
        : top_(-1),
          stack_(100),
@@ -119,7 +119,7 @@ public:
 
     }
 
-    basic_json_reader(std::basic_istream<Char>& is,
+    basic_json_parser(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_parse_error_handler<Char>& err_handler)
        : top_(-1),
@@ -146,7 +146,7 @@ public:
         push(mode::done);
     }
 
-    ~basic_json_reader()
+    ~basic_json_parser()
     {
     }
 
@@ -2253,8 +2253,8 @@ private:
     size_t index_;
 };
 
-typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<wchar_t> wjson_reader;
+typedef basic_json_parser<char> json_parser;
+typedef basic_json_parser<wchar_t> wjson_parser;
 
 }
 
