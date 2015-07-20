@@ -50,8 +50,8 @@ namespace state {
         u2, 
         u3, 
         u4, 
-        expect_surrogate_pair, 
-        u5, 
+        expect_surrogate_pair1, 
+        expect_surrogate_pair2, 
         u6, 
         u7, 
         u8, 
@@ -102,9 +102,12 @@ public:
          buffer_capacity_(default_max_buffer_length),
          is_negative_(false),
          cp_(0),
-         eof_(false) 
+         eof_(false),
+         buffer_length_(0),
+         index_(0) 
 
     {
+        buffer_.resize(buffer_capacity_);
         this->depth_ = 200;
         state_ = state::start;
         top_ = -1;
@@ -113,6 +116,7 @@ public:
         prev_char_ = 0;
         eof_ = false;
         push(mode::done);
+
     }
 
     basic_json_reader(std::basic_istream<Char>& is,
@@ -126,9 +130,12 @@ public:
          buffer_capacity_(default_max_buffer_length),
          is_negative_(false),
          cp_(0),
-         eof_(false)
+         eof_(false),
+         buffer_length_(0),
+         index_(0)
 
     {
+        buffer_.resize(buffer_capacity_);
         this->depth_ = 200;
         state_ = state::start;
         top_ = -1;
@@ -143,6 +150,17 @@ public:
     {
     }
 
+    size_t buffer_capacity() const
+    {
+        return buffer_capacity_;
+    }
+
+    void buffer_capacity(size_t buffer_capacity)
+    {
+        buffer_capacity_ = buffer_capacity;
+        buffer_.resize(buffer_capacity_);
+    }
+
     void end_fraction_value()
     {
         try
@@ -155,7 +173,7 @@ public:
         catch (...)
         {
             err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
-            handler_->value(null_type(), *this);
+            handler_->value(null_type(), *this); // recovery
         }
         string_buffer_.clear();
         is_negative_ = false;
@@ -295,13 +313,11 @@ public:
         {
         case mode::object_member_name:
             handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
-            string_buffer_.clear();
             state_ = state::expect_colon;
             break;
         case mode::array_element:
         case mode::object_member_value:
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-            string_buffer_.clear();
             state_ = state::expect_comma_or_end;
             break;
         default:
@@ -309,10 +325,9 @@ public:
             break;
         }
         string_buffer_.clear();
-        is_negative_ = false;
     }
 
-    void flip_object_key() 
+    void begin_member_or_element() 
     {
         switch (stack_[top_].mode)
         {
@@ -333,7 +348,7 @@ public:
         }
     }
 
-    void flip_key_object()
+    void begin_member_value()
     {
         if (!flip(mode::object_member_name, mode::object_member_value))
         {
@@ -477,33 +492,29 @@ public:
 
     void read()
     {
-        state_ = state::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        prev_char_ = 0;
-        eof_ = false;
-        push(mode::done);
-
-        buffer_.resize(buffer_capacity_);
-        while (!eof_ && state_ != state::done)
+        bool done = false;
+        while (!eof_ && !done)
         {
-            if (!is_->eof())
+            if (!(index_ < buffer_length_))
             {
-                is_->read(&buffer_[0], buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(is_->gcount());
-                if (buffer_length_ == 0)
+                if (!is_->eof())
+                {
+                    is_->read(&buffer_[0], buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    if (buffer_length_ == 0)
+                    {
+                        eof_ = true;
+                    }
+					index_ = 0;
+                }
+                else
                 {
                     eof_ = true;
                 }
             }
-            else
-            {
-                eof_ = true;
-            }
             if (!eof_)
             {
-                read_buffer();
+                done = read_buffer();
             }
         }
         if (top_ > 0)
@@ -513,10 +524,11 @@ public:
         //check_done();
     }
 
-    void read_buffer()
+    bool read_buffer()
     {
         bool done = false;
-        for (size_t i = 0; i < buffer_length_ && !done; ++i)
+        size_t i = index_;
+        for (; i < buffer_length_ && !done; ++i)
         {
             int next_char = buffer_[i];
             switch (next_char)
@@ -641,7 +653,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -649,7 +661,7 @@ public:
                     }
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case '/':
                     saved_state_ = state_;
@@ -675,7 +687,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -717,7 +729,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case ':':
-                    flip_key_object();
+                    begin_member_value();
                     state_ = state::expect_value;
                     break;
                 case '/':
@@ -818,7 +830,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -905,7 +917,7 @@ public:
                 append_codepoint(next_char);
                 if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
                 {
-                    state_ = state::expect_surrogate_pair;
+                    state_ = state::expect_surrogate_pair1;
                 }
                 else
                 {
@@ -913,26 +925,26 @@ public:
                     state_ = state::string;
                 }
                 break;
-            case state::expect_surrogate_pair: 
+            case state::expect_surrogate_pair1: 
                 switch (next_char)
                 {
                 case '\\': 
                     cp2_ = 0;
-                    state_ = state::u5;
+                    state_ = state::expect_surrogate_pair2;
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_parser_category()), *this);
                     break;
                 }
                 break;
-            case state::u5: 
+            case state::expect_surrogate_pair2: 
                 switch (next_char)
                 {
                 case 'u':
                     state_ = state::u6;
                     break;
                 default:
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_parser_category()), *this);
                     break;
                 }
                 break;
@@ -990,7 +1002,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1008,7 +1020,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1021,7 +1033,7 @@ public:
                     break;
                 case ',':
                     end_integer_value();
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
@@ -1046,7 +1058,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1064,7 +1076,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1082,7 +1094,7 @@ public:
                     break;
                 case ',':
                     end_integer_value();
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case 'e':case 'E':
                     string_buffer_.push_back(next_char);
@@ -1111,7 +1123,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1129,7 +1141,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1143,7 +1155,7 @@ public:
                     break;
                 case ',':
                     end_fraction_value();
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case 'e':case 'E':
                     string_buffer_.push_back(next_char);
@@ -1205,7 +1217,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1223,7 +1235,7 @@ public:
                     {
                         state_ = state::start;
                         handler_->end_json();
-                        done = false;
+                        done = true;
                     }
                     else
                     {
@@ -1232,7 +1244,7 @@ public:
                     break;
                 case ',':
                     end_fraction_value();
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case '0': 
                 case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1402,6 +1414,8 @@ public:
             }
             prev_char_ = next_char;
         }
+        index_ = i;
+        return done;
     }
 
     void count_members(size_t start_index)
@@ -1503,7 +1517,7 @@ public:
                     }
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case '/':
                     saved_state_ = state_;
@@ -1575,7 +1589,7 @@ public:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 case ':':
-                    flip_key_object();
+                    begin_member_value();
                     state_ = state::expect_value;
                     break;
                 case '/':
@@ -1853,7 +1867,7 @@ public:
                     state_ = state::fraction;
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 default:
                     done = true; // Error
@@ -1920,7 +1934,7 @@ public:
                     state_ = state::fraction;
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case 'e':case 'E':
                     state_ = state::exp1;
@@ -1987,7 +2001,7 @@ public:
                     state_ = state::fraction;
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case 'e':case 'E':
                     state_ = state::exp1;
@@ -2080,7 +2094,7 @@ public:
                     }
                     break;
                 case ',':
-                    flip_object_key();
+                    begin_member_or_element();
                     break;
                 case '0': 
                 case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -2214,6 +2228,7 @@ public:
     bool is_negative_;
     int saved_state_;
     int prev_char_;
+    size_t index_;
 };
 
 typedef basic_json_reader<char> json_reader;

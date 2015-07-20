@@ -28,6 +28,15 @@ using std::string;
 using jsoncons::json_filter;
 using jsoncons::pretty_print;
 
+BOOST_AUTO_TEST_CASE(test_multiline_comments)
+{
+    json obj = json::parse_file("input/json-multiline-comment.json");
+    BOOST_CHECK(obj.is_array());
+    BOOST_CHECK(obj.is<json::array>());
+    BOOST_CHECK_EQUAL(obj.size(), 0);
+}
+
+#if 0
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
     boost::optional<jsoncons::json> opt_json;
@@ -481,4 +490,4 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
-
+#endif
