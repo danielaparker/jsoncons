@@ -37,7 +37,7 @@ private:
     {
         if (ec.category() == json_parser_category())
         {
-            if (ec.value() != jsoncons::json_parser_errc::unexpected_value_separator && (context.last_char() == ']' || context.last_char() == '}'))
+            if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.last_char() == ']' || context.last_char() == '}'))
             {
                 default_parse_error_handler::instance().error(ec,context);
             }

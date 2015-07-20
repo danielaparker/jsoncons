@@ -33,7 +33,7 @@ public:
     const char* what() const JSONCONS_NOEXCEPT
     {
         std::ostringstream os;
-        os << error_code_.message() << " detected at line " << line_number_ << " and column " << column_number_;
+        os << error_code_.message() << " at line " << line_number_ << " and column " << column_number_;
         const_cast<std::string&>(buffer_) = os.str();
         return buffer_.c_str();
     }
@@ -160,25 +160,25 @@ namespace json_parser_errc
 {
     enum json_parser_errc_t 
     {
-        expected_value_separator,
-        unexpected_value_separator,
+        mismatched_parentheses_or_brackets,
+        illegal_character_in_string,
+        expected_comma_or_end,
+        extra_comma,
         unexpected_end_of_object,
         unexpected_end_of_array,
         expected_name,
         expected_value,
-        expected_name_separator,
-        unexpected_name_separator,
+        expected_colon,
         illegal_control_character,
         illegal_escaped_character,
         expected_codepoint_surrogate_pair,
         invalid_codepoint_surrogate_pair,
         invalid_hex_escape_sequence,
         invalid_unicode_escape_sequence,
+        leading_zero,
         invalid_number,
         unexpected_eof,
-        eof_reading_string_value,
-        eof_reading_numeric_value,
-        expected_container,
+        invalid_json_text,
         extra_character
     };
 }
@@ -195,21 +195,23 @@ public:
     {
         switch (ev)
         {
-        case json_parser_errc::unexpected_value_separator:
-            return "Unexpected value separator ','";
-        case json_parser_errc::expected_value_separator:
-            return "Expected value separator ','";
+        case json_parser_errc::mismatched_parentheses_or_brackets:
+            return "Mismatched parentheses or brackets";
+        case json_parser_errc::illegal_character_in_string:
+            return "Illegal character in string";
+        case json_parser_errc::extra_comma:
+            return "Extra comma";
+        case json_parser_errc::expected_comma_or_end:
+            return "Expected comma or end";
         case json_parser_errc::unexpected_end_of_object:
             return "Unexpected end of object '}'";
         case json_parser_errc::unexpected_end_of_array:
             return "Unexpected end of array ']'";
         case json_parser_errc::expected_name:
-            return "Expected name";
+            return "Expected object member name";
         case json_parser_errc::expected_value:
             return "Expected value";
-        case json_parser_errc::unexpected_name_separator:
-            return "Unexpected name separator ':'";
-        case json_parser_errc::expected_name_separator:
+        case json_parser_errc::expected_colon:
             return "Expected name separator ':'";
         case json_parser_errc::illegal_control_character:
             return "Illegal control character in string";
@@ -225,16 +227,14 @@ public:
             return "Invalid codepoint, expected four hexadecimal digits.";
         case json_parser_errc::invalid_number:
             return "Invalid number";
+        case json_parser_errc::leading_zero:
+            return "A number cannot have a leading zero";
         case json_parser_errc::unexpected_eof:
             return "Unexpected end of file";
-        case json_parser_errc::eof_reading_string_value:
-            return "Reached end of file while reading string value";
-        case json_parser_errc::eof_reading_numeric_value:
-            return "Reached end of file while reading numeric value";
-        case json_parser_errc::expected_container:
-            return "Expected array or object ('[' or '{')";
+        case json_parser_errc::invalid_json_text:
+            return "A jSON text must be an object or array";
         case json_parser_errc::extra_character:
-            return "Unexpected non-whitespace character after jSON structure";
+            return "Unexpected non-whitespace character after JSON text";
         default:
             return "Unknown JSON parser error";
         }

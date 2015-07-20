@@ -59,7 +59,7 @@ class basic_json_reader2 : private basic_parsing_context<Char>
                 }
                 else if (state_ == parse_state_type::name_s)
                 {
-                    err = json_parser_errc::expected_name_separator;
+                    err = json_parser_errc::expected_colon;
                 }
                 else if (state_ == parse_state_type::name_separator_s)
                 {
@@ -86,13 +86,13 @@ class basic_json_reader2 : private basic_parsing_context<Char>
             int err = 0;
             if (state_ == parse_state_type::value_completed_s)
             {
-                err = json_parser_errc::expected_value_separator;
+                err = json_parser_errc::expected_comma_or_end;
             }
             else if ((structure_ == structure_type::json_object_impl) & (state_ != parse_state_type::name_separator_s))
             {
                 if (state_ == parse_state_type::name_s)
                 {
-                    err = json_parser_errc::expected_name_separator;
+                    err = json_parser_errc::expected_colon;
                 }
                 else
                 {
@@ -106,7 +106,7 @@ class basic_json_reader2 : private basic_parsing_context<Char>
         {
             int err = check_value_precondition();
     if (!err && is_top()) {
-err = json_parser_errc::expected_container;
+err = json_parser_errc::invalid_json_text;
     }
     return err;
         }
@@ -490,21 +490,21 @@ void basic_json_reader2<Char>::parse()
             case value_separator:
                 if (stack_.back().state_ != parse_state_type::value_completed_s)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
                 }
                 stack_.back().state_ = parse_state_type::value_separator_s;
                 break;
             case name_separator:
                 if (stack_.back().state_ != parse_state_type::name_s)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::unexpected_name_separator, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::unexpected_colon, json_parser_category()), *this);
                 }
                 stack_.back().state_ = parse_state_type::name_separator_s;
                 break;
             case '\"':
                 if (stack_.back().state_ == parse_state_type::value_completed_s)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::expected_value_separator, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_parser_category()), *this);
                 }
                 {
                     parse_string();
@@ -533,7 +533,7 @@ void basic_json_reader2<Char>::parse()
                     }
                     else if (stack_.back().state_ == parse_state_type::value_separator_s) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
                     }
                     else if (!((stack_.back().state_ == parse_state_type::initial_s) | (stack_.back().state_ == parse_state_type::value_completed_s)))
                     {
@@ -560,7 +560,7 @@ void basic_json_reader2<Char>::parse()
                     }
                     else if (stack_.back().state_ == parse_state_type::value_separator_s) // dap
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_value_separator, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
                     }
                     else if (!((stack_.back().state_ == parse_state_type::initial_s) | (stack_.back().state_ == parse_state_type::value_completed_s)))
                     {
