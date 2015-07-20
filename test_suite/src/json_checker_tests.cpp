@@ -23,39 +23,6 @@ using jsoncons::json_parse_exception;
 
 using namespace boost::filesystem;
 
-/*
-using jsoncons::json_parser;
-BOOST_AUTO_TEST_CASE(test_json_parser)
-{
-    std::string in_file = "input/JSON_checker/pass1.json";
-    std::ifstream is(in_file);
-    json_deserializer handler;
-    json_parser jc(is,handler,20);
-    jc.parse();
-
-    std::cout << "JSON CHECKER 1" << std::endl;
-    json val = std::move(handler.root());
-    std::cout << val << std::endl;
-}
-
-BOOST_AUTO_TEST_CASE(test_json_parser2)
-{
-    std::string in_file = "input/JSON_checker/pass1.json";
-    std::ifstream is(in_file);
-
-    output_format format;
-    format.escape_all_non_ascii(true);
-    json_deserializer handler;
-    json_reader jc(is,handler);
-    jc.read();
-
-    std::cout << "JSON CHECKER 1" << std::endl;
-    json val = std::move(handler.root());
-    std::cout << jsoncons::pretty_print(val,format) << std::endl;
-
-}
-*/
-
 BOOST_AUTO_TEST_CASE(test_fail1)
 {
     std::string in_file = "input/JSON_checker/fail1.json";
@@ -166,38 +133,40 @@ BOOST_AUTO_TEST_CASE(test_fail6)
 
 BOOST_AUTO_TEST_CASE(test_fail7)
 {
-    //std::string in_file = "input/JSON_checker/fail7.json";
-    //std::ifstream is(in_file);
+    std::string in_file = "input/JSON_checker/fail7.json";
+    std::ifstream is(in_file);
 
-    //try
-    //{
-    //    json_deserializer handler;
-    //    json_reader reader(is,handler);
-    //    reader.read();
-    //    BOOST_CHECK_MESSAGE(0 != 0, in_file);
-    //}
-    //catch (...)
-    //{
-        //std::cout << in_file << " " << e.what() << std::endl;
-    //}
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();
+		reader.assert_done();
+        BOOST_CHECK_MESSAGE(0 != 0, in_file);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << in_file << " " << e.what() << std::endl;
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_fail8)
 {
-    //std::string in_file = "input/JSON_checker/fail8.json";
-    //std::ifstream is(in_file);
+    std::string in_file = "input/JSON_checker/fail8.json";
+    std::ifstream is(in_file);
 
-    //try
-    //{
-    //    json_deserializer handler;
-    //    json_reader reader(is,handler);
-    //    reader.read();
-    //    BOOST_CHECK_MESSAGE(0 != 0, in_file);
-    //}
-    //catch (...)
-    //{
-    //    //std::cout << in_file << " " << e.what() << std::endl;
-    //}
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.read();
+        reader.assert_done();
+        BOOST_CHECK_MESSAGE(0 != 0, in_file);
+    }
+    catch (...)
+    {
+        //std::cout << in_file << " " << e.what() << std::endl;
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_fail9)
@@ -663,6 +632,7 @@ BOOST_AUTO_TEST_CASE(test_pass1)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();
+		reader.assert_done();
     }
     catch (const json_parse_exception& e)
     {
@@ -681,6 +651,7 @@ BOOST_AUTO_TEST_CASE(test_pass2)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();
+		reader.assert_done();
     }
     catch (const json_parse_exception& e)
     {
@@ -699,6 +670,7 @@ BOOST_AUTO_TEST_CASE(test_pass3)
         json_deserializer handler;
         json_reader reader(is,handler);
         reader.read();
+		reader.assert_done();
     }
     catch (const json_parse_exception& e)
     {
