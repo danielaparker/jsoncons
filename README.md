@@ -33,7 +33,7 @@ old name has been deprecated but still works.
     - An `assert_done` method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
 to `read_next`.
     - The `json` static methods `parse_string`, `parse_file`, and `parse_stream` now make one call to `read_next` followed by one call to `assert_done` 
-    - Getter and setter 'max_depth' methods have been added to allow setting the maximum JSON depth supported, if desired, by default
+    - Getter and setter `max_depth` methods have been added to allow setting the maximum JSON depth supported, if desired, by default
 it is arbitrarily large (limited by heap memory.)
     - Parse error codes have been refined
     
