@@ -583,7 +583,7 @@ Member price not found.
 
 <p>Note the following:</p>
 
-<ul class="task-list">
+<ul>
 <li>The assignment <code>json&amp; book = books[i]</code> is to a reference, the reference identifies a <a href="json">json</a> object owned by <code>books</code>. </li>
 <li>The book "Cutter's Way" has no price, so <code>book["price"]</code> throws a <a href="json_exception">json_exception</a> ("Member price not found")</li>
 </ul>
@@ -743,7 +743,7 @@ json_reader reader(is,handler);
 
 while (!reader.eof())
 {
-    reader.read();
+    reader.read_next();
     if (!reader.eof())
     {
         json val = std::move(handler.root());
@@ -758,10 +758,6 @@ while (!reader.eof())
 {"a":4,"b":5,"c":6}
 {"a":7,"b":8,"c":9}
 </code></pre>
-
-<h3>Acknowledgements</h3>
-
-<p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
