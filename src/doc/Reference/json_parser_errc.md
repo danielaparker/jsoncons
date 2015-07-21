@@ -11,7 +11,7 @@ The enumeration values scoped by `jsoncons::json_parser_errc` define the values 
 constant                            |Description
 ------------------------------------|------------------------------
 `unexpected_eof`                    |Unexpected end of file
-`invalid_json_text`                    |A jSON text must be an object or array
+`invalid_json_text`                    |A JSON text must be an object or array
 `extra_character`          |Unexpected non-whitespace character after JSON text
 `max_depth_exceeded`         |Maximum stack depth exceeded
 `mismatched_parentheses_or_brackets`        |Mismatched parentheses or brackets      
