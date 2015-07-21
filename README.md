@@ -23,7 +23,7 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 
-## What's new on master
+## What's new on Release 0.97.2
 
 - Incorporates test suite files from http://www.json.org/JSON_checker/ into test suite
 - The `jsoncons` parser accepts all of the JSON_checker files that its supposed to accept.
@@ -32,7 +32,9 @@ The library has a number of features, which are listed below:
 
     ["Extra close"]]
 
-  (Currently the `jsoncons` parser stops after reading a full `json` document, and supports reading a sequence of documents.)  
+  (Currently the `jsoncons` parser stops after reading a complete JSON text, and supports reading a sequence of JSON texts.)  
+
+- Incorporates a fix to operator== on json objects, contributed by Alex Merry
 
 ## Using the code
 
