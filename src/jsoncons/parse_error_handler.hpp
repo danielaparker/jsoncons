@@ -161,6 +161,7 @@ namespace json_parser_errc
     enum json_parser_errc_t 
     {
         mismatched_parentheses_or_brackets,
+        single_quote,
         illegal_character_in_string,
         expected_comma_or_end,
         extra_comma,
@@ -197,6 +198,8 @@ public:
         {
         case json_parser_errc::mismatched_parentheses_or_brackets:
             return "Mismatched parentheses or brackets";
+        case json_parser_errc::single_quote:
+            return "JSON strings cannot be quoted with single quotes";
         case json_parser_errc::illegal_character_in_string:
             return "Illegal character in string";
         case json_parser_errc::extra_comma:

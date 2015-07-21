@@ -543,7 +543,7 @@ BOOST_AUTO_TEST_CASE(test_fail24)
         //std::cout << in_file << " " << e.what() << std::endl;
     }
     // Single quote
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::single_quote);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail25)

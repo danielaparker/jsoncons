@@ -105,11 +105,11 @@ public:
          cp_(0),
          eof_(false),
          buffer_length_(0),
-         index_(0) 
+         index_(0)
 
     {
         buffer_.resize(buffer_capacity_);
-        this->depth_ = 200;
+        depth_ = 200;
         state_ = state::start;
         top_ = -1;
         line_ = 1;
@@ -135,7 +135,7 @@ public:
 
     {
         buffer_.resize(buffer_capacity_);
-        this->depth_ = 200;
+        depth_ = 200;
         state_ = state::start;
         top_ = -1;
         line_ = 1;
@@ -727,6 +727,9 @@ private:
                     saved_state_ = state_;
                     state_ = state::slash;
                     break;
+                case '\'':
+                    err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                    break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_name, json_parser_category()), *this);
                     break;
@@ -746,6 +749,9 @@ private:
                     break;
                 case '}':
                     err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
+                    break;
+                case '\'':
+                    err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_name, json_parser_category()), *this);
@@ -831,6 +837,9 @@ private:
                         err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     }
                     break;
+                case '\'':
+                    err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                    break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
                     break;
@@ -902,6 +911,9 @@ private:
                     break;
                 case 't':
                     state_ = state::t;
+                    break;
+                case '\'':
+                    err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
                     break;
                 default:
                     err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
