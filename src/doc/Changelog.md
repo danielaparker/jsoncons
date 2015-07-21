@@ -1,5 +1,5 @@
-Master
-------
+0.97.2 Release
+--------------
 
 - Incorporates test suite files from http://www.json.org/JSON_checker/ into test suite
 - The `jsoncons` parser accepts all of the JSON_checker files that its supposed to accept.
@@ -8,7 +8,9 @@ Master
 
     ["Extra close"]]
 
-  (Currently the `jsoncons` parser stops after reading a full `json` document, and supports reading a sequence of documents.)  
+  (Currently the `jsoncons` parser stops after reading a complete JSON text, and supports reading a sequence of JSON texts.)  
+
+- Incorporates a fix to operator== on json objects, contributed by Alex Merry
 
 0.97.1 Release
 --------------
