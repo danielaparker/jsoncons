@@ -15,9 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\jsoncons_tests.cpp">
+    <ClInclude Include="..\..\src\my_custom_data.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\my_any_specializations.hpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\..\src\allocator_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +71,9 @@
     <ClCompile Include="..\..\src\json_serializer_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\jsoncons_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\string_to_double_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,13 +83,5 @@
     <ClCompile Include="..\..\src\wjson_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\my_custom_data.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\my_any_specializations.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
