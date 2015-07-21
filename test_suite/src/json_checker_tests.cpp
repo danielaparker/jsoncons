@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
     catch (const json_parse_exception& e)
     {
          err = e.code().value();
-         std::cout << in_file << " " << e.what() << std::endl;
+         //std::cout << in_file << " " << e.what() << std::endl;
     }
     BOOST_CHECK(err == jsoncons::json_parser_errc::max_depth_exceeded);
 }
