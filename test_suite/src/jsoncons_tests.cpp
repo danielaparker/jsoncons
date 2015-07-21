@@ -27,6 +27,8 @@ using jsoncons::json_output_handler;
 using std::string;
 using jsoncons::json_filter;
 using jsoncons::pretty_print;
+using jsoncons::json_deserializer;
+using jsoncons::json_parse_exception;
 
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
@@ -481,4 +483,3 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
-

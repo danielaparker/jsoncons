@@ -180,7 +180,8 @@ namespace json_parser_errc
         invalid_number,
         unexpected_eof,
         invalid_json_text,
-        extra_character
+        extra_character,
+        max_depth_exceeded
     };
 }
 
@@ -238,6 +239,8 @@ public:
             return "A jSON text must be an object or array";
         case json_parser_errc::extra_character:
             return "Unexpected non-whitespace character after JSON text";
+        case json_parser_errc::max_depth_exceeded:
+            return "Too deep";
         default:
             return "Unknown JSON parser error";
         }

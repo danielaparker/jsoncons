@@ -147,6 +147,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\my_any_specializations.hpp" />
+    <ClInclude Include="..\..\src\my_custom_data.hpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\..\src\allocator_tests.cpp" />
     <ClCompile Include="..\..\src\csv_tests.cpp" />
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
@@ -167,10 +171,6 @@
     <ClCompile Include="..\..\src\string_to_double_tests.cpp" />
     <ClCompile Include="..\..\src\unicode_tests.cpp" />
     <ClCompile Include="..\..\src\wjson_tests.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\my_any_specializations.hpp" />
-    <ClInclude Include="..\..\src\my_custom_data.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

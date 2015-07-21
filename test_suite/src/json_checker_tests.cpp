@@ -373,7 +373,6 @@ BOOST_AUTO_TEST_CASE(test_fail17)
 {
     std::string in_file = "input/JSON_checker/fail17.json";
     std::ifstream is(in_file);
-
     int err = 0;
 
     try
@@ -394,23 +393,24 @@ BOOST_AUTO_TEST_CASE(test_fail17)
 
 BOOST_AUTO_TEST_CASE(test_fail18)
 {
-    // Not an issue
+    std::string in_file = "input/JSON_checker/fail18.json";
+    std::ifstream is(in_file);
+    int err = 0;
 
-    //std::string in_file = "input/JSON_checker/fail18.json";
-    //std::ifstream is(in_file);
-
-    //try
-    //{
-    //    json_deserializer handler;
-    //    json_reader reader(is,handler);
-    //    reader.read_next();
-    //    reader.assert_done();
-    //}
-    //catch (const json_parse_exception& e)
-    //{
-    //     err = e.code().value();
-    //     std::cout << in_file << " " << e.what() << std::endl;
-    //}
+    try
+    {
+        json_deserializer handler;
+        json_reader reader(is,handler);
+        reader.max_depth(20);
+        reader.read_next();
+        reader.assert_done();
+    }
+    catch (const json_parse_exception& e)
+    {
+         err = e.code().value();
+         std::cout << in_file << " " << e.what() << std::endl;
+    }
+    BOOST_CHECK(err == jsoncons::json_parser_errc::max_depth_exceeded);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail19)
