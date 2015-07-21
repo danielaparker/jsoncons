@@ -83,6 +83,6 @@ BOOST_AUTO_TEST_CASE(test_filter)
     json_serializer serializer(os, true);
     my_json_filter filter(serializer);
     json_reader reader(is, filter);
-    reader.read();
+    reader.read_next();
 }
 

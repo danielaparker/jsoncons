@@ -1078,7 +1078,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler);
-    reader.read();
+    reader.read_next();
+    reader.assert_done();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;
@@ -1090,7 +1091,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);
-    reader.read();
+    reader.read_next();
+    reader.assert_done();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;
@@ -1102,7 +1104,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     std::basic_istringstream<Char> is(s);
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler);
-    reader.read();
+    reader.read_next();
+    reader.assert_done();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;
@@ -1115,7 +1118,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     std::basic_istringstream<Char> is(s);
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);
-    reader.read();
+    reader.read_next();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;
@@ -1132,7 +1135,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler);
-    reader.read();
+    reader.read_next();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;
@@ -1150,7 +1153,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);
-    reader.read();
+    reader.read_next();
     basic_json<Char, Alloc> val;
     handler.root().swap(val);
     return val;

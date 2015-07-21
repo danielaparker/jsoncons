@@ -259,7 +259,7 @@ and here is the code to read them:
 
     while (!reader.eof())
     {
-        reader.read();
+        reader.read_next();
         if (!reader.eof())
         {
             json val = std::move(handler.root());

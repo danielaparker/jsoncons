@@ -169,7 +169,7 @@ void mulitple_json_objects()
 
     while (!reader.eof())
     {
-        reader.read();
+        reader.read_next();
         if (!reader.eof())
         {
             json val = std::move(handler.root());

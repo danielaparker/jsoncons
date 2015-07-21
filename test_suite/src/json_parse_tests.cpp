@@ -27,7 +27,7 @@ void test_error_code(const std::string& text, int ec)
 	json_reader reader(is,jsoncons::empty_json_input_handler::instance());
 	try
 	{
-		reader.read();
+		reader.read_next();
 		BOOST_FAIL("Must throw");
 	}
 	catch (const json_parse_exception& e)

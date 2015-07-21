@@ -51,7 +51,7 @@ Note
 
     json_deserializer handler;
     json_reader reader(is,handler);
-    reader.read();
+    reader.read_next();
     json countries = std::move(handler.root());
 
     csv_serializer serializer(std::cout);
@@ -116,7 +116,7 @@ Note
     params["field_delimiter"] = "\t";
 
     json_reader reader(is,handler);
-    reader.read();
+    reader.read_next();
     json employees = std::move(handler.root());
 
     csv_serializer serializer(std::cout,params);

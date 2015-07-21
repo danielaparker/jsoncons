@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 
     json_deserializer handler;
     json_reader reader(is,handler);
-    reader.read();
+    reader.read_next();
     json countries = std::move(handler.root());
 
     csv_serializer serializer(std::cout);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     params["field_delimiter"] = "\t";
 
     json_reader reader(is,handler);
-    reader.read();
+    reader.read_next();
     json employees = std::move(handler.root());
 
     csv_serializer serializer(std::cout,params);
