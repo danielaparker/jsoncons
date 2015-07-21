@@ -203,7 +203,7 @@ public:
         case json_parser_errc::extra_character:
             return "Unexpected non-whitespace character after JSON text";
         case json_parser_errc::max_depth_exceeded:
-            return "Maximum stack depth exceeded";
+            return "Maximum JSON depth exceeded";
         case json_parser_errc::mismatched_parentheses_or_brackets:
             return "Mismatched parentheses or brackets";
         case json_parser_errc::single_quote:

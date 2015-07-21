@@ -22,19 +22,22 @@ The library has a number of features, which are listed below:
 - Allows extensions to the types accepted by the json class accessors and modifiers
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
+- 100 percent pass of test suite files from http://www.json.org/JSON_checker/
+- Handles JSON texts of arbitrarily large depth, a limit can be set if desired
 
-## What's new on Release 0.97.2
+## What's new on Master
 
-- Incorporates test suite files from http://www.json.org/JSON_checker/ into test suite
-- The `jsoncons` parser accepts all of the JSON_checker files that its supposed to accept.
-- Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.
-- The `jsoncons` parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.
-
-    ["Extra close"]]
-
-  (Currently the `jsoncons` parser stops after reading a complete JSON text, and supports reading a sequence of JSON texts.)  
-
-- Incorporates a fix to operator== on json objects, contributed by Alex Merry
+- `json_reader` has been rewritten internally.
+    - The `json_reader` method `read` has been renamed to `read_next`, reflecting that it supports reading a sequence of JSON texts from a stream. The 
+old name has been deprecated but still works.
+    - An `assert_done` method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
+to `read_next`.
+    - The `json` static methods `parse_string`, `parse_file`, and `parse_stream` now make one call to `read_next` followed by one call to `assert_done` 
+    - Getter and setter 'max_depth' methods have been added to allow setting the maximum JSON depth supported, if desired, by default
+it is arbitrarily large (limited by heap memory.)
+    - Parse error codes have been refined
+    
+- `jsoncons` now passes all of the tests in the http://www.json.org/JSON_checker/ test suite 
 
 ## Using the code
 

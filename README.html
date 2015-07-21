@@ -493,22 +493,29 @@ vertical-align:1px;
 <li>Allows extensions to the types accepted by the json class accessors and modifiers</li>
 <li>Supports storing "any" values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
+<li>100 percent pass of test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a>
+</li>
+<li>Handles JSON texts of arbitrarily large depth, a limit can be set if desired</li>
 </ul>
 
-<h2>What's new on Release 0.97.2</h2>
+<h2>What's new on Master</h2>
 
 <ul>
-<li>Incorporates test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> into test suite</li>
-<li>The <code>jsoncons</code> parser accepts all of the JSON_checker files that its supposed to accept.</li>
-<li>Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.</li>
 <li>
-<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.</p>
+<p><code>json_reader</code> has been rewritten internally.</p>
 
-<p>["Extra close"]]</p>
-
-<p>(Currently the <code>jsoncons</code> parser stops after reading a complete JSON text, and supports reading a sequence of JSON texts.)  </p>
+<ul>
+<li>The <code>json_reader</code> method <code>read</code> has been renamed to <code>read_next</code>, reflecting that it supports reading a sequence of JSON texts from a stream. The 
+old name has been deprecated but still works.</li>
+<li>An <code>assert_done</code> method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
+to <code>read_next</code>.</li>
+<li>The <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> now make one call to <code>read_next</code> followed by one call to <code>assert_done</code> </li>
+<li>Getter and setter 'max_depth' methods have been added to allow setting the maximum JSON depth supported, if desired, by default
+it is arbitrarily large (limited by heap memory.)</li>
+<li>Parse error codes have been refined</li>
+</ul>
 </li>
-<li><p>Incorporates a fix to operator== on json objects, contributed by Alex Merry</p></li>
+<li><p><code>jsoncons</code> now passes all of the tests in the <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> test suite </p></li>
 </ul>
 
 <h2>Using the code</h2>
