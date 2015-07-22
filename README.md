@@ -17,7 +17,7 @@ The library has a number of features, which are listed below:
 - Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
 - Supports optional escaping of the solidus (/) character
 - Supports Nan, Inf and -Inf replacement
-- Supports reading multiple json objects from a stream
+- Supports reading a sequence of JSON texts from a stream
 - Supports optional escaping of non-ascii UTF-8 octets
 - Allows extensions to the types accepted by the json class accessors and modifiers
 - Supports storing "any" values in a json object or array, with specialized serialization
