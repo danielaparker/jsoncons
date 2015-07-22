@@ -39,7 +39,7 @@ it is arbitrarily large (limited by heap memory.)
     
 - `jsoncons` now passes all of the tests in the http://www.json.org/JSON_checker/ test suite 
 
-## Using the code
+## Using the jsoncons library
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
 
