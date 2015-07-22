@@ -542,7 +542,7 @@ using jsoncons::json_exception;
 using jsoncons::pretty_print;
 </code></pre>
 
-<h3>Reading json values from a file</h3>
+<h3>Reading JSON text from a file</h3>
 
 <p>Here is a sample file (books.json):</p>
 
@@ -564,7 +564,7 @@ using jsoncons::pretty_print;
 ]
 </code></pre>
 
-<p>You can read the file into a json value like this</p>
+<p>You can read the JSON text into a <code>json</code> value like this</p>
 
 <pre><code>json books = json::parse_file("books.json");
 </code></pre>
@@ -847,10 +847,8 @@ cout &lt;&lt; deal &lt;&lt; endl;
 
 <h2>json any</h2>
 
-<p>jsoncons provides a class <code>json::any</code> that can contain a value of <br>
-any type as long as that type supports copy construction and <br>
-assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, <br>
-and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>
+<p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and <br>
+assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>
 a <code>json::any value</code>, like this:</p>
 
 <pre><code>#include "jsoncons/json.hpp"
@@ -870,6 +868,44 @@ A(1,1) = 4;
 obj.set("mydata",json::any(A));
 
 matrix&lt;double&gt;&amp; B = obj["mydata"].any_cast&lt;matrix&lt;double&gt;&gt;();
+</code></pre>
+
+<h3>Reading a sequence of JSON texts from a stream</h3>
+
+<p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>multiple-json-objects.json</code>):</p>
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+</code></pre>
+
+<p>This is the code that reads them: </p>
+
+<pre><code>std::ifstream is("input/multiple-json-objects.json");
+if (!is.is_open())
+{
+    throw std::exception("Cannot open file");
+}
+
+json_deserializer handler;
+json_reader reader(is,handler);
+
+while (!reader.eof())
+{
+    reader.read_next();
+    if (!reader.eof())
+    {
+        json val = std::move(handler.root());
+        std::cout &lt;&lt; val &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>The output is</p>
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
 </code></pre>
 
 <h3>Acknowledgements</h3>

@@ -335,10 +335,8 @@ producing
 
 ## json any
 
-jsoncons provides a class `json::any` that can contain a value of 
-any type as long as that type supports copy construction and 
-assignment. This allows you to, for example, insert a boost matrix into a `json` object, 
-and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
+jsoncons provides a class `json::any` that can contain a value of any type as long as that type supports copy construction and 
+assignment. This allows you to, for example, insert a boost matrix into a `json` object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
 a `json::any value`, like this:
 
     #include "jsoncons/json.hpp"
