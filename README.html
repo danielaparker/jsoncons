@@ -872,7 +872,7 @@ matrix&lt;double&gt;&amp; B = obj["mydata"].any_cast&lt;matrix&lt;double&gt;&gt;
 
 <h3>Reading a sequence of JSON texts from a stream</h3>
 
-<p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>multiple-json-objects.json</code>):</p>
+<p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
 
 <pre><code>{"a":1,"b":2,"c":3}
 {"a":4,"b":5,"c":6}
@@ -881,7 +881,7 @@ matrix&lt;double&gt;&amp; B = obj["mydata"].any_cast&lt;matrix&lt;double&gt;&gt;
 
 <p>This is the code that reads them: </p>
 
-<pre><code>std::ifstream is("input/multiple-json-objects.json");
+<pre><code>std::ifstream is("json-texts.json");
 if (!is.is_open())
 {
     throw std::exception("Cannot open file");

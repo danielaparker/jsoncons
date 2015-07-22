@@ -359,7 +359,7 @@ a `json::any value`, like this:
 
 ### Reading a sequence of JSON texts from a stream
 
-`jsoncons` supports reading a sequence of JSON texts, such as shown below (`multiple-json-objects.json`):
+`jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
 
     {"a":1,"b":2,"c":3}
     {"a":4,"b":5,"c":6}
@@ -367,7 +367,7 @@ a `json::any value`, like this:
 
 This is the code that reads them: 
 
-    std::ifstream is("input/multiple-json-objects.json");
+    std::ifstream is("json-texts.json");
     if (!is.is_open())
     {
         throw std::exception("Cannot open file");
