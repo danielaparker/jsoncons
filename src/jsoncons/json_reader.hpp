@@ -132,7 +132,7 @@ public:
     // Deprecated
     void read()
     {
-        parser_.read_next();
+        read_next();
     }
 private:
     basic_json_parser<Char> parser_;
