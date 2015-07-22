@@ -242,7 +242,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    count_members(p, index_+1, length);
                     handler_->begin_object(*this);
                     break;
                 case '[':
@@ -253,7 +252,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::array;
-                    count_members(p, index_ + 1, length);
                     handler_->begin_array(*this);
                     break;
                 case '/':
@@ -423,7 +421,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    count_members(p, index_+1, length);
                     handler_->begin_object(*this);
                     break;
                 case '[':
@@ -433,7 +430,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::array;
-                    count_members(p, index_ + 1, length);
                     handler_->begin_array(*this);
                     break;
                 case '\"':
@@ -457,12 +453,42 @@ public:
                     break;
                 case 'f':
                     state_ = state::f;
+                    if (index_ < (length-4))
+                    {
+                        if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
+                        {
+                            index_ += 4;
+                            column_ += 4;
+                            handler_->value(false, *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case 'n':
                     state_ = state::n;
+                    if (index_ < (length-3))
+                    {
+                        if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
+                        {
+                            index_ += 3;
+                            column_ += 3;
+                            handler_->value(null_type(), *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case 't':
                     state_ = state::t;
+                    if (index_ < (length-3))
+                    {
+                        if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
+                        {
+                            index_ += 3;
+                            column_ += 3;
+                            handler_->value(true, *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case ']':
                     if (peek() == mode::array_element)
@@ -498,7 +524,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::object;
-                    count_members(p, index_+1, length);
                     handler_->begin_object(*this);
                     break;
                 case '[':
@@ -508,7 +533,6 @@ public:
                         err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
                     }
                     state_ = state::array;
-                    count_members(p, index_ + 1, length);
                     handler_->begin_array(*this);
                     break;
                 case ']':
@@ -549,12 +573,42 @@ public:
                     break;
                 case 'f':
                     state_ = state::f;
+                    if (index_ < (length-4))
+                    {
+                        if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
+                        {
+                            index_ += 4;
+                            column_ += 4;
+                            handler_->value(false, *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case 'n':
                     state_ = state::n;
+                    if (index_ < (length-3))
+                    {
+                        if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
+                        {
+                            index_ += 3;
+                            column_ += 3;
+                            handler_->value(null_type(), *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case 't':
                     state_ = state::t;
+                    if (index_ < (length-3))
+                    {
+                        if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
+                        {
+                            index_ += 3;
+                            column_ += 3;
+                            handler_->value(true, *this);
+                            state_ = state::expect_comma_or_end;
+                        }
+                    }
                     break;
                 case '\'':
                     state_ = state::error;
@@ -1488,790 +1542,6 @@ private:
             n += x;
         }
         return has_neg ? -n : n;
-    }
-
-    void count_members(Char const* p, size_t start_index, size_t length)
-    {
-        int start_top = top_;
-        state::state_t start_state = state_;
-        state::state_t start_saved_state = saved_state_;
-        mode::mode_t start_mode = stack_[top_].mode;
-
-        stack_[top_].minimum_structure_capacity = 0;
-
-        bool done = false;
-        for (size_t i = start_index; !done && i < length; ++i)
-        {
-            int next_char = p[i];
-
-            switch (state_)
-            {
-            case state::start:  
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break; 
-                case '{':
-                    if (!push(mode::object_member_name))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::object;
-                    }
-                    break;
-                case '[':
-                    if (!push(mode::array_element))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::array;
-                    }
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-
-            case state::expect_comma_or_end: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break; 
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_value))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ',':
-                    begin_member_or_element();
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                default:
-                    done = true; 
-                    break;
-                }
-                break;
-            case state::object:
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break;
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_name))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case '\"':
-                    state_ = state::string;
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::expect_member_name: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break;
-                case '\"':
-                    state_ = state::string;
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::expect_colon:  
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break;
-                case ':':
-                    begin_member_value();
-                    state_ = state::expect_value;
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::expect_value:  
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break;
-                case '{':
-                    if (!push(mode::object_member_name))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::object;
-                    }
-                    break;
-                case '[':
-                    if (!push(mode::array_element))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::array;
-                    }
-                    break;
-                case '\"':
-                    state_ = state::string;
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                case '-':
-                    state_ = state::minus;
-                    break;
-                case '0': 
-                    state_ = state::zero;
-                    break;
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::integer;
-                    break;
-                case 'f':
-                    i += 4; // skip ahead
-                    state_ = state::fals;
-                    break;
-                case 'n':
-                    i += 3;
-                    state_ = state::nul;
-                    break;
-                case 't':
-                    i += 3;
-                    state_ = state::tru;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::array: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    break;
-                case '{':
-                    if (!push(mode::object_member_name))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::object;
-                    }
-                    break;
-                case '[':
-                    if (!push(mode::array_element))
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        state_ = state::array;
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case '\"':
-                    state_ = state::string;
-                    break;
-                case '/':
-                    saved_state_ = state_;
-                    state_ = state::slash;
-                    break;
-                case '-':
-                    state_ = state::minus;
-                    break;
-                case '0': 
-                    state_ = state::zero;
-                    break;
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::integer;
-                    break;
-                case 'f':
-                    i += 4; // skip ahead
-                    state_ = state::fals;
-                    break;
-                case 'n':
-                    i += 3;
-                    state_ = state::nul;
-                    break;
-                case 't':
-                    i += 3;
-                    state_ = state::tru;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::string: 
-                switch (next_char)
-                {
-                case '\n':
-                case '\r':
-                case '\t':
-                    done = true; // Error
-                    break;
-                case '\\': 
-                    state_ = state::escape;
-                    break;
-                case '\"':
-                    switch (stack_[top_].mode)
-                    {
-                    case mode::object_member_name:
-                        state_ = state::expect_colon;
-                        break;
-                    case mode::array_element:
-                    case mode::object_member_value:
-                        if (top_ == start_top)
-                        {
-                            ++stack_[start_top].minimum_structure_capacity;
-                        }
-                        state_ = state::expect_comma_or_end;
-                        break;
-                    default:
-                        done = true; // Error
-                        break;
-                    }
-					break;
-                default:
-                    break;
-                }
-                break;
-            case state::escape: 
-                switch (next_char)
-                {
-                case '\"':
-                case '\\': 
-                case '/':
-                case 'b':
-                case 'f':  
-                case 'n':
-                case 'r':
-                case 't':
-                    state_ = state::string;
-                    break;
-                case 'u':
-                    i += 3;
-                    state_ = state::u4;
-                    break;
-                default:   
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::u4:  
-                state_ = state::string;
-                break;
-            case state::minus:
-                switch (next_char)
-                {
-                case '0': 
-                    state_ = state::zero;
-                    break;
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::integer;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::zero: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break; 
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_value))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case '.':
-                    state_ = state::fraction;
-                    break;
-                case ',':
-                    begin_member_or_element();
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::integer: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break; 
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_value))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::integer;
-                    break;
-                case '.':
-                    state_ = state::fraction;
-                    break;
-                case ',':
-                    begin_member_or_element();
-                    break;
-                case 'e':case 'E':
-                    state_ = state::exp1;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::fraction: 
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break; 
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_value))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::fraction;
-                    break;
-                case ',':
-                    begin_member_or_element();
-                    break;
-                case 'e':case 'E':
-                    state_ = state::exp1;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::exp1:
-                switch (next_char)
-                {
-                case '+':
-                    state_ = state::exp2;
-                    break;
-                case '-':
-                    state_ = state::exp2;
-                    break;
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::exp3;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::exp2:  
-                switch (next_char)
-                {
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::exp3;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::exp3:  
-                switch (next_char)
-                {
-                case ' ':case '\n':case '\r':case '\t':
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break; // No change
-                case '}':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::object_member_value))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ']':
-                    if (top_ == start_top)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        if (!pop(mode::array_element))
-                        {
-                            done = true;
-                        }
-                        else
-                        {
-                            state_ = state::expect_comma_or_end;
-                            if (top_ == start_top)
-                            {
-                                ++stack_[start_top].minimum_structure_capacity;
-                            }
-                        }
-                    }
-                    break;
-                case ',':
-                    begin_member_or_element();
-                    break;
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    state_ = state::exp3;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::tru:  
-                switch (next_char)
-                {
-                case 'e': 
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::fals:  
-                switch (next_char)
-                {
-                case 'e':
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::nul:  
-                switch (next_char)
-                {
-                case 'l': 
-                    if (top_ == start_top)
-                    {
-                        ++stack_[start_top].minimum_structure_capacity;
-                    }
-                    state_ = state::expect_comma_or_end;
-                    break;
-                default:
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::slash: 
-                switch (next_char)
-                {
-                case '*':
-                    state_ = state::slash_star;
-                    break;
-                case '/':
-                    state_ = state::slash_slash;
-                    break;
-                default:    
-                    done = true; // Error
-                    break;
-                }
-                break;
-            case state::slash_star:  
-                switch (next_char)
-                {
-                case '*':
-                    state_ = state::slash_star_star;
-                    break;
-                }
-                break;
-            case state::slash_slash: 
-                switch (next_char)
-                {
-                case '\n':
-                case '\r':
-                    state_ = saved_state_;
-                    break;
-                }
-                break;
-            case state::slash_star_star: 
-                switch (next_char)
-                {
-                case '/':
-                    state_ = saved_state_;
-                    break;
-                default:    
-                    state_ = state::slash_star;
-                    break;
-                }
-                break;
-            }
-            prev_char_ = next_char;
-        }
-
-        state_ = start_state;
-        top_ = start_top;
-        saved_state_ = start_saved_state;
-        stack_[top_].mode = start_mode;
     }
 
     state::state_t state_;
