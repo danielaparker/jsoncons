@@ -65,10 +65,6 @@ class basic_parsing_context
 public:
     virtual ~basic_parsing_context() {}
 
-    bool eof() const
-    {
-        return do_eof();
-    }
     unsigned long line_number() const
     {
         return do_line_number();
@@ -89,7 +85,6 @@ public:
 private:
     virtual unsigned long do_line_number() const = 0;
     virtual unsigned long do_column_number() const = 0;
-    virtual bool do_eof() const = 0;
     virtual size_t do_minimum_structure_capacity() const = 0;
     virtual Char do_last_char() const = 0;
 };

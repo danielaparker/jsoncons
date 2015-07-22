@@ -26,28 +26,44 @@ namespace jsoncons {
 template<typename Char>
 class basic_json_reader 
 {
+    static const size_t default_max_buffer_length = 16384;
 public:
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler)
-        : parser_(is,handler)
+        : parser_(handler),
+          is_(std::addressof(is)),
+          buffer_capacity_(default_max_buffer_length),
+          err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
+          eof_(false),
+          buffer_length_(0),
+          index_(0)
     {
+        buffer_.resize(buffer_capacity_);
     }
 
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
                       basic_parse_error_handler<Char>& err_handler)
-       : parser_(is,handler,err_handler)
+       : parser_(handler,err_handler),
+         is_(std::addressof(is)),
+         buffer_capacity_(default_max_buffer_length),
+         err_handler_(std::addressof(err_handler)),
+         eof_(false),
+         buffer_length_(0),
+         index_(0)
     {
+        buffer_.resize(buffer_capacity_);
     }
 
     size_t buffer_capacity() const
     {
-        return parser_.buffer_capacity();
+        return buffer_capacity_;
     }
 
     void buffer_capacity(size_t capacity)
     {
-        parser_.buffer_capacity(capacity);
+        buffer_capacity_ = capacity;
+        buffer_.resize(buffer_capacity_);
     }
 
     size_t max_depth() const
@@ -62,17 +78,55 @@ public:
 
     void read_next()
     {
-        parser_.read_next();
+        parser_.begin_parse();
+        while (!eof_ && !parser_.done())
+        {
+            if (!(index_ < buffer_length_))
+            {
+                if (!is_->eof())
+                {
+                    is_->read(&buffer_[0], buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    if (buffer_length_ == 0)
+                    {
+                        eof_ = true;
+                    }
+                    index_ = 0;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            if (!eof_)
+            {
+                parser_.parse(&buffer_[0],index_,buffer_length_);
+                index_ = parser_.index();
+            }
+        }
+        parser_.end_parse();
     }
 
     void assert_done()
     {
-        parser_.assert_done();
+        bool err = false;
+        try
+        {
+            read_next();
+        }
+        catch (...)
+        {
+            err = true;
+        }
+        if (err || parser_.state() != state::start)
+        {
+            err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), parser_.parsing_context());
+        }
     }
 
     bool eof() const
     {
-        return parser_.eof();
+        return eof_;
     }
 
     // Deprecated
@@ -82,6 +136,13 @@ public:
     }
 private:
     basic_json_parser<Char> parser_;
+    std::basic_istream<Char> *is_;
+    basic_parse_error_handler<Char> *err_handler_;
+    bool eof_;
+    std::vector<Char> buffer_;
+    size_t buffer_length_;
+    size_t buffer_capacity_;
+    size_t index_;
 };
 
 typedef basic_json_reader<char> json_reader;
