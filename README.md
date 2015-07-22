@@ -27,7 +27,7 @@ The library has a number of features, which are listed below:
 
 ## What's new on Master
 
-- `json_reader` has been rewritten internally.
+- `json_reader` has been rewritten internally. In addition:
     - The `json_reader` method `read` has been renamed to `read_next`, reflecting that it supports reading a sequence of JSON texts from a stream. The 
 old name has been deprecated but still works.
     - An `assert_done` method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
@@ -61,7 +61,7 @@ These include and using declarations are for the examples that appear below.
     using jsoncons::json_exception;    
     using jsoncons::pretty_print;
 
-### Reading json values from a file
+### Reading JSON text from a file
 
 Here is a sample file (books.json):
 
@@ -82,7 +82,7 @@ Here is a sample file (books.json):
         }
     ]
 
-You can read the file into a json value like this
+You can read the JSON text into a `json` value like this
 
     json books = json::parse_file("books.json");
 
@@ -358,6 +358,41 @@ a `json::any value`, like this:
     obj.set("mydata",json::any(A));
 
     matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
+
+### Reading a sequence of JSON texts from a stream
+
+`jsoncons` supports reading a sequence of JSON texts, such as shown below (`multiple-json-objects.json`):
+
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
+
+This is the code that reads them: 
+
+    std::ifstream is("input/multiple-json-objects.json");
+    if (!is.is_open())
+    {
+        throw std::exception("Cannot open file");
+    }
+
+    json_deserializer handler;
+    json_reader reader(is,handler);
+
+    while (!reader.eof())
+    {
+        reader.read_next();
+        if (!reader.eof())
+        {
+            json val = std::move(handler.root());
+            std::cout << val << std::endl;
+        }
+    }
+
+The output is
+
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
 
 ### Acknowledgements
 
