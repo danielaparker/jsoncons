@@ -238,17 +238,18 @@ The output is
 
     {"field1":null,"field2":1e9999,"field3":-1e9999}
 
-### Reading multiple JSON objects from a stream
 
-Here is a sample json file containing multiple json objects (`multiple-json-objects.json`):
+### Reading a sequence of JSON texts from a stream
+
+`jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
 
     {"a":1,"b":2,"c":3}
     {"a":4,"b":5,"c":6}
     {"a":7,"b":8,"c":9}
 
-and here is the code to read them: 
+This is the code that reads them: 
 
-    std::ifstream is("input/multiple-json-objects.json");
+    std::ifstream is("json-texts.json");
     if (!is.is_open())
     {
         throw std::exception("Cannot open file");

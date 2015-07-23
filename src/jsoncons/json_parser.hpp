@@ -84,16 +84,6 @@ class basic_json_parser : private basic_parsing_context<Char>
     static const size_t default_max_buffer_length = 16384;
     static const int default_depth = 100;
 
-    struct stack_item
-    {
-        stack_item()
-           : mode(mode::done),
-             minimum_structure_capacity(0)
-        {
-        }
-        mode::mode_t mode;
-        size_t minimum_structure_capacity;
-    };
 public:
     basic_json_parser(basic_json_input_handler<Char>& handler)
        : top_(-1),
@@ -1354,7 +1344,7 @@ private:
 
     void end_string_value() 
     {
-        switch (stack_[top_].mode)
+        switch (stack_[top_])
         {
         case mode::object_member_name:
             handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
@@ -1375,7 +1365,7 @@ private:
 
     void begin_member_or_element() 
     {
-        switch (stack_[top_].mode)
+        switch (stack_[top_])
         {
         case mode::object_member_value:
             // A comma causes a flip from object_member_value mode to object_member_name mode.
@@ -1444,11 +1434,6 @@ private:
         return c_;
     }
 
-    size_t do_minimum_structure_capacity() const override
-    {
-        return top_ >= 0 ? stack_[top_].minimum_structure_capacity : 0;
-    }
-
     bool push(mode::mode_t mode)
     {
         ++top_;
@@ -1461,33 +1446,33 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].mode = mode;
+        stack_[top_] = mode;
         return true;
     }
 
     int peek()
     {
-        return stack_[top_].mode;
+        return stack_[top_];
     }
 
     bool peek(mode::mode_t mode)
     {
-        return stack_[top_].mode == mode;
+        return stack_[top_] == mode;
     }
 
     bool flip(mode::mode_t mode1, mode::mode_t mode2)
     {
-        if (top_ < 0 || stack_[top_].mode != mode1)
+        if (top_ < 0 || stack_[top_] != mode1)
         {
             return false;
         }
-        stack_[top_].mode = mode2;
+        stack_[top_] = mode2;
         return true;
     }
 
     bool pop(mode::mode_t mode)
     {
-        if (top_ < 0 || stack_[top_].mode != mode)
+        if (top_ < 0 || stack_[top_] != mode)
         {
             return false;
         }
@@ -1546,7 +1531,7 @@ private:
 
     state::state_t state_;
     int top_;
-    std::vector<stack_item> stack_;
+    std::vector<mode::mode_t> stack_;
     basic_json_input_handler<Char> *handler_;
     basic_parse_error_handler<Char> *err_handler_;
     unsigned long column_;

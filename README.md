@@ -357,41 +357,6 @@ a `json::any value`, like this:
 
     matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
 
-### Reading a sequence of JSON texts from a stream
-
-`jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
-
-    {"a":1,"b":2,"c":3}
-    {"a":4,"b":5,"c":6}
-    {"a":7,"b":8,"c":9}
-
-This is the code that reads them: 
-
-    std::ifstream is("json-texts.json");
-    if (!is.is_open())
-    {
-        throw std::exception("Cannot open file");
-    }
-
-    json_deserializer handler;
-    json_reader reader(is,handler);
-
-    while (!reader.eof())
-    {
-        reader.read_next();
-        if (!reader.eof())
-        {
-            json val = std::move(handler.root());
-            std::cout << val << std::endl;
-        }
-    }
-
-The output is
-
-    {"a":1,"b":2,"c":3}
-    {"a":4,"b":5,"c":6}
-    {"a":7,"b":8,"c":9}
-
 ### Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
