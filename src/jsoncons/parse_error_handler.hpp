@@ -77,15 +77,10 @@ public:
     {
         return do_last_char();
     }
-    size_t minimum_structure_capacity() const 
-    {
-        return do_minimum_structure_capacity();
-    }
 
 private:
     virtual unsigned long do_line_number() const = 0;
     virtual unsigned long do_column_number() const = 0;
-    virtual size_t do_minimum_structure_capacity() const = 0;
     virtual Char do_last_char() const = 0;
 };
 

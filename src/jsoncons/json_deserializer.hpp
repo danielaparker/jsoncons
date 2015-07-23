@@ -26,19 +26,16 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
 {
     struct stack_item
     {
-        stack_item(bool is_object, size_t minimum_structure_capacity)
+        stack_item(bool is_object)
             : is_object_(is_object)
         {
-            minimum_structure_capacity_ = minimum_structure_capacity;
             if (is_object_)
             {
                 object_ = new json_object_impl<Char,Alloc>();
-                object_->reserve(minimum_structure_capacity);
             }
             else
             {
                 array_ = new json_array_impl<Char,Alloc>();
-                array_->reserve(minimum_structure_capacity);
             }
         }
 
@@ -78,7 +75,6 @@ class basic_json_deserializer : public basic_json_input_handler<Char>
         bool is_object_;
         json_object_impl<Char,Alloc>* object_;
         json_array_impl<Char,Alloc>* array_;
-        size_t minimum_structure_capacity_;
     };
 
 public:
@@ -107,7 +103,7 @@ private:
 
     void do_begin_object(const basic_parsing_context<Char>& context) override
     {
-        stack_.push_back(stack_item(true,context.minimum_structure_capacity()));
+        stack_.push_back(stack_item(true));
     }
 
     void do_end_object(const basic_parsing_context<Char>&) override
@@ -134,7 +130,7 @@ private:
 
     void do_begin_array(const basic_parsing_context<Char>& context) override
     {
-        stack_.push_back(stack_item(false,context.minimum_structure_capacity()));
+        stack_.push_back(stack_item(false));
     }
 
     void do_end_array(const basic_parsing_context<Char>&) override

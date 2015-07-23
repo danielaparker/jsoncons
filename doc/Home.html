@@ -721,18 +721,18 @@ std::cout &lt;&lt; std::endl;
 <pre><code>{"field1":null,"field2":1e9999,"field3":-1e9999}
 </code></pre>
 
-<h3>Reading multiple JSON objects from a stream</h3>
+<h3>Reading a sequence of JSON texts from a stream</h3>
 
-<p>Here is a sample json file containing multiple json objects (<code>multiple-json-objects.json</code>):</p>
+<p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
 
 <pre><code>{"a":1,"b":2,"c":3}
 {"a":4,"b":5,"c":6}
 {"a":7,"b":8,"c":9}
 </code></pre>
 
-<p>and here is the code to read them: </p>
+<p>This is the code that reads them: </p>
 
-<pre><code>std::ifstream is("input/multiple-json-objects.json");
+<pre><code>std::ifstream is("json-texts.json");
 if (!is.is_open())
 {
     throw std::exception("Cannot open file");
