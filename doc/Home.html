@@ -712,13 +712,16 @@ format.nan_replacement("null");        // default is "null"
 format.pos_inf_replacement("1e9999");  // default is "null"
 format.neg_inf_replacement("-1e9999"); // default is "null"
 
-obj.to_stream(std::cout,format);
-std::cout &lt;&lt; std::endl;
+std::cout &lt;&lt; pretty_print(obj,format) &lt;&lt; std::endl;
 </code></pre>
 
 <p>The output is</p>
 
-<pre><code>{"field1":null,"field2":1e9999,"field3":-1e9999}
+<pre><code>{
+    "field1":null,
+    "field2":1e9999,
+    "field3":-1e9999
+}
 </code></pre>
 
 <h3>Reading a sequence of JSON texts from a stream</h3>

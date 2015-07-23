@@ -229,8 +229,11 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
     format.pos_inf_replacement("1e9999");
     format.neg_inf_replacement("-1e9999");
 
-    obj.to_stream(std::cout, format);
-    std::cout << std::endl;
+    //obj.to_stream(std::cout, format);
+    //std::cout << std::endl;
+
+    std::cout << "TRY" << std::endl;
+    std::cout << pretty_print(obj,format) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
