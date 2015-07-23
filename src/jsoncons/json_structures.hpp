@@ -389,14 +389,14 @@ public:
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
-        auto it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
-        if (it != end() && it->name() == name)
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        if (it != members_.end() && it->first == name)
         {
             *it = member_type(name,value);
         }
         else
         {
-            insert(it,member_type(name,value));
+            members_.insert(it,member_type(name,value));
         }
     }
 
