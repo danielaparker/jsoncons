@@ -231,13 +231,15 @@ The output is
     format.pos_inf_replacement("1e9999");  // default is "null"
     format.neg_inf_replacement("-1e9999"); // default is "null"
 
-    obj.to_stream(std::cout,format);
-    std::cout << std::endl;
+    std::cout << pretty_print(obj,format) << std::endl;
 
 The output is
 
-    {"field1":null,"field2":1e9999,"field3":-1e9999}
-
+    {
+        "field1":null,
+        "field2":1e9999,
+        "field3":-1e9999
+    }
 
 ### Reading a sequence of JSON texts from a stream
 
