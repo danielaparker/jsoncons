@@ -405,7 +405,7 @@ public:
     {
         return val.is_string() && val.as_string().size() == 1;
     }
-    char as(const basic_json<Char, Alloc>& val) const
+    Char as(const basic_json<Char, Alloc>& val) const
     {
         return val.as_char();
     }
