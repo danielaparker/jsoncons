@@ -443,7 +443,7 @@ public:
                     break;
                 case 'f':
                     state_ = state::f;
-                    if (index_ < (length-4))
+                    if ((index_+4) < length)
                     {
                         if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
                         {
@@ -456,7 +456,7 @@ public:
                     break;
                 case 'n':
                     state_ = state::n;
-                    if (index_ < (length-3))
+                    if ((index_+3) < length)
                     {
                         if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
                         {
@@ -469,7 +469,7 @@ public:
                     break;
                 case 't':
                     state_ = state::t;
-                    if (index_ < (length-3))
+                    if ((index_+3) < length)
                     {
                         if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
                         {
@@ -563,7 +563,7 @@ public:
                     break;
                 case 'f':
                     state_ = state::f;
-                    if (index_ < (length-4))
+                    if ((index_+4) < length)
                     {
                         if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
                         {
@@ -576,7 +576,7 @@ public:
                     break;
                 case 'n':
                     state_ = state::n;
-                    if (index_ < (length-3))
+                    if ((index_+3) < length)
                     {
                         if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
                         {
@@ -589,7 +589,7 @@ public:
                     break;
                 case 't':
                     state_ = state::t;
-                    if (index_ < (length-3))
+                    if ((index_+3) < length)
                     {
                         if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
                         {
