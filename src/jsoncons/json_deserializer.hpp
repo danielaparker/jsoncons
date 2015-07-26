@@ -74,7 +74,7 @@ private:
 
     bool pop_object()
     {
-        if (top_ < 0 || !stack_[top_].value.is_object())
+        if (top_ < 0 /*|| !stack_[top_].value.is_object()*/)
         {
             return false;
         }
@@ -84,7 +84,7 @@ private:
 
     bool pop_array()
     {
-        if (top_ < 0 || !stack_[top_].value.is_array())
+        if (top_ < 0 /*|| !stack_[top_].value.is_array()*/)
         {
             return false;
         }
@@ -113,7 +113,7 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.insert(std::move(stack_[top_].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.insert(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
             else
             {
@@ -138,7 +138,7 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.insert(std::move(stack_[top_].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.insert(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
             else
             {
