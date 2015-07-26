@@ -1554,6 +1554,32 @@ public:
         Char* p;
     };
 
+    void begin_insert()
+    {
+        switch (type_)
+        {
+        case value_type::empty_object_t:
+            type_ = value_type::object_t;
+            value_.object_ = new json_object_impl<Char,Alloc>();
+        case value_type::object_t:
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Not an object.");
+            }
+        }
+    }
+
+    void insert(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+    {
+        value_.object_->push_back(std::move(name),std::move(value));
+    }
+
+    void end_insert()
+    {
+        value_.object_->sort_members();
+    }
+
 private:
 	basic_json(value_type::value_type_t t);
 
@@ -1675,7 +1701,7 @@ private:
     {
         return create_string_env(&c,1);
     }
-
+public:
     value_type::value_type_t type_;
     union
     {

@@ -369,11 +369,6 @@ public:
         return members_[i];
     }
 
-    void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
-    {
-        members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val));
-    }
-
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
@@ -399,6 +394,11 @@ public:
             members_.insert(it,member_type(name,value));
         }
     }
+
+    /*void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
+    {
+        members_.push_back(member_type(name,val));
+    }*/
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {

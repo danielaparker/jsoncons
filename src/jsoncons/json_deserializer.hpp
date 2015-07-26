@@ -103,15 +103,17 @@ private:
     void do_begin_object(const basic_parsing_context<Char>& context) override
     {
         push_object();
+        stack_[top_].value.begin_insert();
     }
 
     void do_end_object(const basic_parsing_context<Char>&) override
     {
+        stack_[top_-1].value.end_insert();
         if (top_ > 0)
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.set(std::move(stack_[top_].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.insert(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
                 pop_object();
             }
             else
@@ -138,7 +140,7 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.set(std::move(stack_[top_].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.insert(std::move(stack_[top_].name),std::move(stack_[top_].value));
                 pop_object();
             }
             else
@@ -163,7 +165,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),basic_json<Char,Alloc>(p,length));
+            stack_[top_].value.insert(std::move(stack_[top_].name),basic_json<Char,Alloc>(p,length));
         } 
         else 
         {
@@ -175,7 +177,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),value);
+            stack_[top_].value.insert(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else
         {
@@ -187,7 +189,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),value);
+            stack_[top_].value.insert(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else
         {
@@ -199,7 +201,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),value);
+            stack_[top_].value.insert(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else
         {
@@ -211,7 +213,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),value);
+            stack_[top_].value.insert(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else
         {
@@ -223,7 +225,7 @@ private:
     {
         if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.set(std::move(stack_[top_].name),basic_json<Char,Alloc>::null);
+            stack_[top_].value.insert(std::move(stack_[top_].name),std::move(basic_json<Char,Alloc>(null_type())));
         } 
         else
         {
