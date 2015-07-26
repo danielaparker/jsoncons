@@ -34,6 +34,12 @@ namespace jsoncons {
 #   endif
 #elif defined(__GNUC__)
 #   define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
+#elif defined(_MSC_VER)
+#   if _MSC_VER >= 1900
+#       define JSONCONS_NOEXCEPT noexcept
+#   else
+#       define JSONCONS_NOEXCEPT
+#   endif
 #else
 #   define JSONCONS_NOEXCEPT
 #endif
