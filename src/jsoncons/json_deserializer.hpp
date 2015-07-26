@@ -108,25 +108,23 @@ private:
 
     void do_end_object(const basic_parsing_context<Char>&) override
     {
-        stack_[top_-1].value.end_insert();
+        stack_[top_].value.end_insert();
         if (top_ > 0)
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.insert(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
-                pop_object();
+                stack_[top_-1].value.insert(std::move(stack_[top_].name),std::move(stack_[top_].value));
             }
             else
             {
                 stack_[top_-1].value.add(std::move(stack_[top_].value));
-                pop_array();
             }
         }
         else
         {
             root_.swap(stack_[0].value);
-            --top_;
         }
+        pop_object();
     }
 
     void do_begin_array(const basic_parsing_context<Char>& context) override
@@ -141,19 +139,17 @@ private:
             if (stack_[top_-1].value.is_object())
             {
                 stack_[top_-1].value.insert(std::move(stack_[top_].name),std::move(stack_[top_].value));
-                pop_object();
             }
             else
             {
                 stack_[top_-1].value.add(std::move(stack_[top_].value));
-                pop_array();
             }
         }
         else
         {
             root_.swap(stack_[0].value);
-            --top_;
         }
+        pop_array();
     }
 
     void do_name(const Char* p, size_t length, const basic_parsing_context<Char>&) override
