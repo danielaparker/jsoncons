@@ -30,9 +30,9 @@ The library has a number of features, which are listed below:
 - `json_reader` has been rewritten internally. In addition:
     - The `json_reader` method `read` has been renamed to `read_next`, reflecting that it supports reading a sequence of JSON texts from a stream. The 
 old name has been deprecated but still works.
-    - An `assert_done` method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
+    - An `check_done` method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
 to `read_next`.
-    - The `json` static methods `parse_string`, `parse_file`, and `parse_stream` now make one call to `read_next` followed by one call to `assert_done` 
+    - The `json` static methods `parse_string`, `parse_file`, and `parse_stream` now make one call to `read_next` followed by one call to `check_done` 
     - Getter and setter `max_depth` methods have been added to allow setting the maximum JSON depth supported, if desired, by default
 it is arbitrarily large (limited by heap memory.)
     - Parse error codes have been refined
