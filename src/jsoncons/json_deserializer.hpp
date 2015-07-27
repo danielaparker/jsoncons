@@ -48,7 +48,7 @@ public:
 
 private:
 
-    bool push_object()
+    void push_object()
     {
         ++top_;
         if (top_ >= depth_)
@@ -57,10 +57,9 @@ private:
             stack_.resize(depth_);
         }
         stack_[top_].value = basic_json<Char,Alloc>();
-        return true;
     }
 
-    bool push_array()
+    void push_array()
     {
         ++top_;
         if (top_ >= depth_)
@@ -69,27 +68,18 @@ private:
             stack_.resize(depth_);
         }
         stack_[top_].value = basic_json<Char,Alloc>(basic_json<Char,Alloc>::an_array);
-        return true;
     }
 
-    bool pop_object()
+    void pop_object()
     {
-        if (top_ < 0 /*|| !stack_[top_].value.is_object()*/)
-        {
-            return false;
-        }
+        JSONCONS_ASSERT(top_ >= 0);
         --top_;
-        return true;
     }
 
-    bool pop_array()
+    void pop_array()
     {
-        if (top_ < 0 /*|| !stack_[top_].value.is_array()*/)
-        {
-            return false;
-        }
+        JSONCONS_ASSERT(top_ >= 0);
         --top_;
-        return true;
     }
 
     void do_begin_json() override
