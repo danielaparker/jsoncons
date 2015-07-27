@@ -509,7 +509,7 @@ You must ensure that the input stream and input handler exist as long as does <c
 
 <p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.</p>
 
-<pre><code>void assert_done()
+<pre><code>void check_done()
 </code></pre>
 
 <p>Throws if there are any unconsumed non-whitespace characters in the input.</p>
