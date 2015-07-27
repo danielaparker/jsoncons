@@ -56,7 +56,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].value = json();
+        stack_[top_].value = basic_json<Char,Alloc>();
         return true;
     }
 
@@ -68,7 +68,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].value = json(json::an_array);
+        stack_[top_].value = basic_json<Char,Alloc>(basic_json<Char,Alloc>::an_array);
         return true;
     }
 
