@@ -107,20 +107,32 @@ public:
         parser_.end_parse();
     }
 
-    void assert_done()
+    void check_done()
     {
-        bool err = false;
-        try
+        while (!eof_)
         {
-            read_next();
-        }
-        catch (...)
-        {
-            err = true;
-        }
-        if (err || parser_.state() != state::start)
-        {
-            err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), parser_.parsing_context());
+            if (!(index_ < buffer_length_))
+            {
+                if (!is_->eof())
+                {
+                    is_->read(&buffer_[0], buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    if (buffer_length_ == 0)
+                    {
+                        eof_ = true;
+                    }
+                    index_ = 0;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            if (!eof_)
+            {
+                parser_.check_done(&buffer_[0],index_,buffer_length_);
+                index_ = parser_.index();
+            }
         }
     }
 

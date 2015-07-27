@@ -163,6 +163,26 @@ public:
         state_ = state::start;
     }
 
+    void check_done(Char const* p, size_t start, size_t length)
+    {
+        index_ = start;
+        for (; index_ < length; ++index_)
+        {
+            int next_char = p[index_];
+            switch (next_char)
+            {
+            case '\n':
+            case '\r':
+            case '\t':
+            case ' ':
+                break;
+            default:
+                state_ = state::error;
+                err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), *this);
+            }
+        }
+    }
+
     void parse(Char const* p, size_t start, size_t length)
     {
         index_ = start;
