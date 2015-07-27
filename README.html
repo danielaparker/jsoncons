@@ -507,9 +507,9 @@ vertical-align:1px;
 <ul>
 <li>The <code>json_reader</code> method <code>read</code> has been renamed to <code>read_next</code>, reflecting that it supports reading a sequence of JSON texts from a stream. The 
 old name has been deprecated but still works.</li>
-<li>An <code>assert_done</code> method has been added that throws if there are unconsumed non-whitespace characters after one or more calls
-to <code>read_next</code>.</li>
-<li>The <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> now make one call to <code>read_next</code> followed by one call to <code>assert_done</code> </li>
+<li>A <code>check_done</code> method has been added that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</li>
+<li>The <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> now throw if there are unconsumed non-whitespace characters after reading one JSON text.<br>
+</li>
 <li>Getter and setter <code>max_depth</code> methods have been added to allow setting the maximum JSON depth supported, if desired, by default
 it is arbitrarily large (limited by heap memory.)</li>
 <li>Parse error codes have been refined</li>
