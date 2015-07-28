@@ -1554,7 +1554,7 @@ public:
         Char* p;
     };
 
-    void begin_insert()
+    void begin_bulk_insert()
     {
         switch (type_)
         {
@@ -1575,7 +1575,7 @@ public:
         value_.object_->push_back(std::move(name),std::move(value));
     }
 
-    void end_insert()
+    void end_bulk_insert()
     {
         value_.object_->sort_members();
     }
