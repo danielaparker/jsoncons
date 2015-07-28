@@ -93,12 +93,12 @@ private:
     void do_begin_object(const basic_parsing_context<Char>& context) override
     {
         push_object();
-        stack_[top_].value.begin_insert();
+        stack_[top_].value.begin_bulk_insert();
     }
 
     void do_end_object(const basic_parsing_context<Char>&) override
     {
-        stack_[top_].value.end_insert();
+        stack_[top_].value.end_bulk_insert();
         if (top_ > 0)
         {
             if (stack_[top_-1].value.is_object())
