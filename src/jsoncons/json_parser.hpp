@@ -179,6 +179,7 @@ public:
             default:
                 state_ = state::error;
                 err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), *this);
+                break;
             }
         }
     }
