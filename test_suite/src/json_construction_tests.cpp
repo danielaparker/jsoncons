@@ -153,9 +153,9 @@ BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 
 BOOST_AUTO_TEST_CASE(test_integer_limits)
 {
-    const long long max_value = std::numeric_limits<long long>::max();
+    const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
 
-    const unsigned long long max_uvalue = std::numeric_limits<unsigned long long>::max();
+    const unsigned long long max_uvalue = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
     {
         std::ostringstream os;
 
