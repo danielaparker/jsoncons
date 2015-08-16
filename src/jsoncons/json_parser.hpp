@@ -101,7 +101,7 @@ public:
         line_ = 1;
         column_ = 0;
         prev_char_ = 0;
-        max_depth_ = std::numeric_limits<int>::max();
+        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     basic_parsing_context<Char> const & parsing_context() const
@@ -126,7 +126,7 @@ public:
         line_ = 1;
         column_ = 0;
         prev_char_ = 0;
-        max_depth_ = std::numeric_limits<int>::max();
+        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     ~basic_json_parser()
@@ -140,7 +140,7 @@ public:
 
     void max_depth(size_t max_depth)
     {
-        max_depth_ = static_cast<int>(std::min(max_depth,static_cast<size_t>(std::numeric_limits<int>::max())));
+        max_depth_ = static_cast<int>(std::min(max_depth,static_cast<size_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP())));
         if (depth_ > max_depth_)
         {
             depth_ = max_depth_;
