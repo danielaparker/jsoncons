@@ -1501,8 +1501,8 @@ private:
         return true;
     }
 
-    template<typename Char>
-    unsigned long long string_to_unsigned(const Char *s, size_t length) throw(std::overflow_error)
+    template<typename CharType>
+    unsigned long long string_to_unsigned(const CharType *s, size_t length) throw(std::overflow_error)
     {
         const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
         const unsigned long long max_value_div_10 = max_value / 10;
@@ -1525,8 +1525,8 @@ private:
         return n;
     }
 
-    template<typename Char>
-    long long string_to_integer(bool has_neg, const Char *s, size_t length) throw(std::overflow_error)
+    template<typename CharType>
+    long long string_to_integer(bool has_neg, const CharType *s, size_t length) throw(std::overflow_error)
     {
         const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
         const long long max_value_div_10 = max_value / 10;
