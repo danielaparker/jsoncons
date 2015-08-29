@@ -339,12 +339,13 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->first == name) ? iterator(it) : end();
     }
-
+ 
+    // Fixed by cperthuis
     const_iterator find(const std::basic_string<Char>& name) const
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+        return (it != members_.end() && it->first == name) ? const_iterator(it) : end();
     }
 
     void remove_range(size_t from_index, size_t to_index) 
@@ -354,11 +355,12 @@ public:
         members_.erase(members_.begin()+from_index,members_.begin()+to_index);
     }
 
+    // Fixed by cperthuis
     void remove(const std::basic_string<Char>& name) 
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        if (it != members_.end())
+        if (it != members_.end() && it->first == name)
         {
             members_.erase(it);
         }
