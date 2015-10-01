@@ -1133,7 +1133,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename)
 {
     FILE* fp = std::fopen (filename.c_str(), "rb");
-    if (fp == NULL) 
+    if (fp == nullptr) 
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
