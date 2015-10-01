@@ -475,7 +475,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/parse_error_handler.hpp"
+<pre><code>#include "jsoncons/json_error_handler.hpp"
 </code></pre>
 
 <h3>Member constants</h3>
