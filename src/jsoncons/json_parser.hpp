@@ -18,7 +18,7 @@
 #include <system_error>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/parse_error_handler.hpp"
+#include "jsoncons/json_error_handler.hpp"
 
 namespace jsoncons {
 
@@ -89,7 +89,7 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(default_basic_json_error_handler<Char>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -110,7 +110,7 @@ public:
     }
 
     basic_json_parser(basic_json_input_handler<Char>& handler,
-                      basic_parse_error_handler<Char>& err_handler)
+                      basic_json_error_handler<Char>& err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
@@ -1632,7 +1632,7 @@ private:
     int top_;
     std::vector<mode::mode_t> stack_;
     basic_json_input_handler<Char> *handler_;
-    basic_parse_error_handler<Char> *err_handler_;
+    basic_json_error_handler<Char> *err_handler_;
     unsigned long column_;
     unsigned long line_;
     Char c_;

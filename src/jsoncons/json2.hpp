@@ -1087,7 +1087,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is, 
-                                                       basic_parse_error_handler<Char>& err_handler)
+                                                       basic_json_error_handler<Char>& err_handler)
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);
@@ -1114,7 +1114,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, 
-                                                              basic_parse_error_handler<Char>& err_handler)
+                                                              basic_json_error_handler<Char>& err_handler)
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_parser<Char> parser(handler,err_handler);
@@ -1147,7 +1147,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename, 
-                                                            basic_parse_error_handler<Char>& err_handler)
+                                                            basic_json_error_handler<Char>& err_handler)
 {
     std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
     if (!is.is_open())
