@@ -4,7 +4,7 @@ The enumeration values scoped by `jsoncons::json_parser_errc` define the values 
 
 ### Header
 
-    #include "jsoncons/parse_error_handler.hpp"
+    #include "jsoncons/json_error_handler.hpp"
 
 ### Member constants
 

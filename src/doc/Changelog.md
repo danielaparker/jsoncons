@@ -1,3 +1,23 @@
+Targeting 0.97.3 Release
+------------------------
+
+- Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
+  contributed by Rupert Steel.
+
+- Refines error codes and improves error messages
+
+- Renames `parse_error_handler` to `json_error_handler`, the former name is deprecated but still works.
+
+- Renames `json_reader` method `read` to `read_next`, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The 
+  former name is deprecated but still works.
+
+- Adds `json_reader` method `check_done` that throws if there are unconsumed non-whitespace characters after one or more calls to `read_next`.
+
+- Adds getter and setter `max_depth` methods to allow setting the maximum JSON parse tree depth if desired, by default
+it is arbitrarily large (limited by heap memory.)
+
+- Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
+
 0.97.2 Release
 --------------
 
@@ -56,7 +76,7 @@ General changes
 
 - `json` member function `begin_object` now returns a bidirectional iterator rather than a random access iterator.
 
-- Static singleton `instance` methods have been added to `default_parse_error_handler`
+- Static singleton `instance` methods have been added to `default_json_error_handler`
   and `empty_json_input_handler`. 
 
 - Added to the `json` class overloaded static methods parse, parse_string 

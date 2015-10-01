@@ -53,15 +53,15 @@ Constant json null value
 ### Static member functions
 
     static json parse(std::istream& is)
-    static json parse(std::istream& is, parse_error_handler& err_handler)
+    static json parse(std::istream& is, json_error_handler& err_handler)
 Parses an input stream of JSON text and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception).
 
     static json parse_file(const std::string& filename)
-    static json parse_file(const std::string& filename, parse_error_handler& err_handler)
+    static json parse_file(const std::string& filename, json_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception). This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 
     static json parse_string(const std::string& s)
-    static json parse_string(const std::string& s, parse_error_handler& err_handler)
+    static json parse_string(const std::string& s, json_error_handler& err_handler)
 Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a [json_parse_exception](json_parse_exception).
 
     static json make_array()
