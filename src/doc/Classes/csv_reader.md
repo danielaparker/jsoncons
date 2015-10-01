@@ -1,4 +1,4 @@
-    jsoncons_ext::csv::csv_reader
+    jsoncons::csv::csv_reader
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 

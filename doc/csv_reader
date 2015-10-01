@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons_ext::csv::csv_reader
+<pre><code>jsoncons::csv::csv_reader
 </code></pre>
 
 <p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>

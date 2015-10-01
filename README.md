@@ -43,8 +43,8 @@ The library has a number of features, which are listed below:
 it is arbitrarily large (limited by heap memory.)
 
 - Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
-    
-- `jsoncons` now passes all of the tests in the http://www.json.org/JSON_checker/ test suite 
+
+- Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
 
 ## Using the jsoncons library
 

@@ -19,7 +19,7 @@
 #include "jsoncons/json_error_handler.hpp"
 #include "jsoncons/json.hpp"
 
-namespace jsoncons_ext { namespace csv {
+namespace jsoncons { namespace csv {
 
 template<typename Char,class Alloc>
 class basic_csv_reader : private jsoncons::basic_parsing_context<Char>

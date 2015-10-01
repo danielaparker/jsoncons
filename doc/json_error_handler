@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>csv_serializer</title>
+<title>json_error_handler</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,155 +468,57 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::csv::csv_serializer
+<pre><code>jsoncons::json_error_handler
+
+typedef basic_json_error_handler&lt;char&gt; json_error_handler
 </code></pre>
 
-<p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
+<p>When parsing JSON text with <a href="json_reader">json_reader</a>, if you need to implement<br>
+customized error handling, you must implement this abstract class<br>
+and pass it in the constructor of <a href="json_reader">json_reader</a>. The <code>read</code> method <br>
+will then report all warnings and errors through this interface.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons_ext/csv/csv_serializer.hpp"
+<pre><code>#include "jsoncons/json_error_handler.hpp"
 </code></pre>
-
-<h3>Constructors</h3>
-
-<pre><code>csv_serializer(std::ostream&amp; os)
-</code></pre>
-
-<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
-<code>os</code>. Uses default <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<pre><code>csv_serializer(std::ostream&amp; os,
-               const json&amp; params)
-</code></pre>
-
-<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
-<code>os</code> and <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<h3>Member functions</h3>
 
 <h3>Destructor</h3>
 
-<pre><code>virtual ~json_serializer()
+<pre><code>virtual ~json_error_handler()
 </code></pre>
 
-<h3>Examples</h3>
+<h3>Public interface methods</h3>
 
-<h3>Serializing an array of json values to a comma delimted file</h3>
-
-<h4>JSON input file</h4>
-
-<pre><code>[
-    ["country_code","name"],
-    ["ABW","ARUBA"],
-    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-    ["VUT","VANUATU"],
-    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
-]
+<pre><code>void warning(std::error_code ec,
+             const parsing_context&amp; context) throw (json_parse_exception) = 0
 </code></pre>
 
-<p>Note </p>
+<p>Send a warning event. An <a href="json_parser_errc">error_code</a> indicates the type of error. Contextual information including<br>
+line and column information is provided in the <a href="parsing_context">context</a> parameter. Uses <code>do_warning</code>.</p>
 
-<ul>
-<li>The third array element has a value that contains a comma, in the CSV file this value will be quoted.</li>
-</ul>
-
-<h4>Serializing the comma delimited file with csv_serializer</h4>
-
-<pre><code>std::string in_file = "input/countries.json";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-json_reader reader(is,handler);
-reader.read_next();
-json countries = std::move(handler.root());
-
-csv_serializer serializer(std::cout);
-
-countries.to_stream(serializer);
+<pre><code>void error(std::error_code ec,
+           const parsing_context&amp; context) throw (json_parse_exception) = 0
 </code></pre>
 
-<h4>Output</h4>
+<p>Send an error event, possibly recoverable. An <a href="json_parser_errc">error_code</a> indicates the type of error. Contextual information including<br>
+line and column information is provided in the <a href="parsing_context">context</a> parameter.  Uses <code>do_error</code>.</p>
 
-<pre><code>country_code,name
-ABW,ARUBA
-ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-VUT,VANUATU
-WLF,WALLIS &amp; FUTUNA ISLANDS
+<h3>Private virtual implementation methods</h3>
+
+<pre><code>virtual void do_warning(std::error_code ec,
+                        const parsing_context&amp; context) throw (json_parse_exception) = 0
 </code></pre>
 
-<h3>Serializing an array of json objects to a tab delimted file</h3>
+<p>Receive a warning event. An <a href="json_parser_errc">error_code</a> indicates the type of error. Contextual information including<br>
+line and column information is provided in the <a href="parsing_context">context</a> parameter.</p>
 
-<h4>JSON input file</h4>
-
-<pre><code>[
-    {
-        "dept":"sales",
-        "employee-name":"Smith, Matthew",
-        "employee-no":"00000001",
-        "note":"",
-        "salary":"150,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Brown, Sarah",
-        "employee-no":"00000002",
-        "note":"",
-        "salary":"89,000.00"
-    },
-    {
-        "dept":"finance",
-        "employee-name":"Oberc, Scott",
-        "employee-no":"00000003",
-        "salary":"110,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Scott, Colette",
-        "employee-no":"00000004",
-        "note":"\"Exemplary\" employee\nDependable, trustworthy",
-        "comment":"Team player",
-        "salary":"75,000.00"
-    }
-]
+<pre><code>virtual void do_error(std::error_code ec,
+                      const parsing_context&amp; context) throw (json_parse_exception) = 0
 </code></pre>
 
-<p>Note </p>
-
-<ul>
-<li>The names in the first object in the array will be used for the header row of the CSV file</li>
-<li>The fourth object has a <code>note</code> member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.</li>
-</ul>
-
-<h4>Reading the tab delimited file with csv_serializer</h4>
-
-<pre><code>std::string in_file = "input/employees.json";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-json params;
-params["field_delimiter"] = "\t";
-
-json_reader reader(is,handler);
-reader.read_next();
-json employees = std::move(handler.root());
-
-csv_serializer serializer(std::cout,params);
-
-employees.to_stream(serializer);
-</code></pre>
-
-<h4>Tab delimited output file</h4>
-
-<pre><code>dept    employee-name   employee-no     note    salary
-sales   Smith, Matthew  00000001                150,000.00
-sales   Brown, Sarah    00000002                89,000.00
-finance Oberc, Scott    00000003                110,000.00
-sales   Scott, Colette  00000004        ""Exemplary"" employee
-Dependable, trustworthy 75,000.00
-</code></pre>
+<p>Receive an error event, possibly recoverable. An <a href="json_parser_errc">error_code</a> indicates the type of error. Contextual information including<br>
+line and column information is provided in the <a href="parsing_context">context</a> parameter. </p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
