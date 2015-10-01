@@ -543,19 +543,19 @@ array
 <h3>Static member functions</h3>
 
 <pre><code>static json parse(std::istream&amp; is)
-static json parse(std::istream&amp; is, parse_error_handler&amp; err_handler)
+static json parse(std::istream&amp; is, json_error_handler&amp; err_handler)
 </code></pre>
 
 <p>Parses an input stream of JSON text and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json_parse_exception</a>.</p>
 
 <pre><code>static json parse_file(const std::string&amp; filename)
-static json parse_file(const std::string&amp; filename, parse_error_handler&amp; err_handler)
+static json parse_file(const std::string&amp; filename, json_error_handler&amp; err_handler)
 </code></pre>
 
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json_parse_exception</a>. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.</p>
 
 <pre><code>static json parse_string(const std::string&amp; s)
-static json parse_string(const std::string&amp; s, parse_error_handler&amp; err_handler)
+static json parse_string(const std::string&amp; s, json_error_handler&amp; err_handler)
 </code></pre>
 
 <p>Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json_parse_exception</a>.</p>
