@@ -1653,49 +1653,65 @@ std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_j
 }
 
 template<typename Char, typename Alloc>
-class pretty_printer
+class json_printable
 {
 public:
-    pretty_printer(const basic_json<Char, Alloc>& o)
-       : o_(&o)
+    json_printable(const basic_json<Char, Alloc>& o,
+                   bool is_pretty_print)
+       : o_(&o), is_pretty_print_(is_pretty_print)
     {
     }
 
-    pretty_printer(const basic_json<Char, Alloc>& o,
+    json_printable(const basic_json<Char, Alloc>& o,
+                   bool is_pretty_print,
                    const basic_output_format<Char>& format)
-       : o_(&o), format_(format)
+       : o_(&o), is_pretty_print_(is_pretty_print), format_(format)
     {
         ;
     }
 
     void to_stream(std::basic_ostream<Char>& os) const
     {
-        o_->to_stream(os, format_, true);
+        o_->to_stream(os, format_, is_pretty_print_);
     }
 
-    friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const pretty_printer<Char, Alloc>& o)
+    friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const json_printable<Char, Alloc>& o)
     {
         o.to_stream(os);
         return os;
     }
 
     const basic_json<Char, Alloc> *o_;
+    bool is_pretty_print_;
     basic_output_format<Char> format_;
 private:
-    pretty_printer();
+    json_printable();
 };
 
 template<typename Char, class Alloc>
-pretty_printer<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val)
+json_printable<Char, Alloc> print(const basic_json<Char, Alloc>& val)
 {
-    return pretty_printer<Char, Alloc>(val);
+    return json_printable<Char, Alloc>(val,false);
 }
 
 template<typename Char, class Alloc>
-pretty_printer<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val,
-                                           const basic_output_format<Char>& format)
+json_printable<Char, Alloc> print(const basic_json<Char, Alloc>& val,
+                                  const basic_output_format<Char>& format)
 {
-    return pretty_printer<Char, Alloc>(val, format);
+    return json_printable<Char, Alloc>(val, false, format);
+}
+
+template<typename Char, class Alloc>
+json_printable<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val)
+{
+    return json_printable<Char, Alloc>(val,true);
+}
+
+template<typename Char, class Alloc>
+json_printable<Char, Alloc> pretty_print(const basic_json<Char, Alloc>& val,
+                                         const basic_output_format<Char>& format)
+{
+    return json_printable<Char, Alloc>(val, true, format);
 }
 
 }
