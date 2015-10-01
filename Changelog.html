@@ -468,6 +468,22 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>Targeting 0.98 Release</h2>
+
+<ul>
+<li><p>Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix<br>
+contributed by Rupert Steel.</p></li>
+<li><p>Refines error codes and improves error messages</p></li>
+<li><p>Renames <code>parse_error_handler</code> to <code>json_error_handler</code>, the former name is deprecated but still works.</p></li>
+<li><p>Renames <code>json_reader</code> method <code>read</code> to <code>read_next</code>, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The <br>
+former name is deprecated but still works.</p></li>
+<li><p>Adds <code>json_reader</code> method <code>check_done</code> that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</p></li>
+<li><p>Adds getter and setter <code>max_depth</code> methods to allow setting the maximum JSON parse tree depth if desired, by default<br>
+it is arbitrarily large (limited by heap memory.)</p></li>
+<li><p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  </p></li>
+<li><p>Changes the top level namespace for the extensions from <code>jsoncons_ext</code> to <code>jsoncons</code>, e.g. <code>jsoncons_ext::csv::csv_reader</code> becomes <code>jsoncons::csv::csv_reader</code></p></li>
+</ul>
+
 <h2>0.97.2 Release</h2>
 
 <ul>
@@ -529,7 +545,7 @@ The rationale for this change is to allow different configurations for internal 
 
 <ul>
 <li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
-<li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
+<li><p>Static singleton <code>instance</code> methods have been added to <code>default_json_error_handler</code><br>
 and <code>empty_json_input_handler</code>. </p></li>
 <li><p>Added to the <code>json</code> class overloaded static methods parse, parse_string <br>
 and parse_file that take a <code>parse_error_handler</code> as a parameter. </p></li>
@@ -974,7 +990,7 @@ arr.resize_array(10,0.0);
 <li>Added begin_json and end_json methods to json_output_handler</li>
 <li>json_deserializer should now satisfy basic exception safety (no leak guarantee)</li>
 <li>Moved csv_reader.hpp to jsoncons_ext/csv directory</li>
-<li>Changed csv_reader namespace to jsoncons_ext::csv</li>
+<li>Changed csv_reader namespace to jsoncons::csv</li>
 <li>json::parse_file no longer reads the entire file into memory before parsing
 (it now uses json_reader default buffering)</li>
 </ul>
