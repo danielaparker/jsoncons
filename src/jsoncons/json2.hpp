@@ -8,6 +8,8 @@
 #ifndef JSONCONS_JSON2_HPP
 #define JSONCONS_JSON2_HPP
 
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <exception>
@@ -1130,19 +1132,47 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename)
 {
-    std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
-    if (!is.is_open())
+    FILE* fp = std::fopen (filename.c_str(), "rb");
+    if (fp == NULL) 
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
+    try
+    {
+        // obtain file size:
+        std::fseek (fp , 0 , SEEK_END);
+        long size = std::ftell (fp);
+        std::rewind(fp);
+        basic_json<Char, Alloc> val;
 
-    basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> reader(is, handler);
-    reader.read();
-    reader.check_done();
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+        if (size > 0)
+        {
+            std::vector<Char> buffer(size);
+
+            // copy the file into the buffer:
+            size_t result = std::fread (&buffer[0],1,size,fp);
+            if (result != size)
+            {
+                throw json_exception_1<char>("Error reading file %s", filename);
+            }
+
+            basic_json_deserializer<Char, Alloc> handler;
+            basic_json_parser<Char> parser(handler);
+            parser.begin_parse();
+            parser.parse(&buffer[0],0,buffer.size());
+            parser.end_parse();
+            parser.check_done(&buffer[0],parser.index(),buffer.size());
+            handler.root().swap(val);
+        }
+
+        std::fclose (fp);
+        return val;
+    }
+    catch (...)
+    {
+        std::fclose (fp);
+        throw;
+    }
 }
 
 template<typename Char, typename Alloc>
