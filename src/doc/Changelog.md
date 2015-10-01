@@ -1,4 +1,4 @@
-Targeting 0.97.3 Release
+Targeting 0.98 Release
 ------------------------
 
 - Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
