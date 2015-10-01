@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>csv_reader</title>
+<title>default_json_error_handler</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,191 +468,43 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons_ext::csv::csv_reader
-</code></pre>
+<pre><code>jsoncons::default_json_error_handler
 
-<p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
+typedef default_basic_json_error_handler&lt;char&gt; default_json_error_handler
+</code></pre>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons_ext/csv/csv_reader.hpp"
+<pre><code>#include "jsoncons/json_error_handler.hpp"
 </code></pre>
 
-<h3>Constructors</h3>
+<h3>Base class</h3>
 
-<pre><code>csv_reader(std::istream&amp; is,
-           json_input_handler&amp; handler)
+<p><a href="json_error_handler">json_error_handler</a>  </p>
+
+<h3>Static memebr functions</h3>
+
+<pre><code>static json_error_handler&amp; instance()   
 </code></pre>
 
-<p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
-<code>is</code> of CSV text and a <a href="json_input_handler">json_input_handler</a> that receives<br>
-JSON events. Uses default <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
+<p>Returns a singleton instance of a <code>default_json_error_handler</code>       </p>
 
-<pre><code>csv_reader(std::istream&amp; is,
-           json_input_handler&amp; handler,
-           const json&amp; params)
+<h3>Private virtual implementation methods</h3>
+
+<pre><code>virtual void do_warning(const std::string&amp; error_code,
+                        std::error_code ec,
+                        const parsing_context&amp; context) throw (json_parse_exception)
 </code></pre>
 
-<p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
-<code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
-JSON events, and <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
+<p>Does nothing</p>
 
-<pre><code>csv_reader(std::istream&amp; is,
-           json_input_handler&amp; handler,
-           json_error_handler&amp; err_handler)
+<pre><code>virtual void do_error(const std::string&amp; error_code,
+                      std::error_code ec,
+                      const parsing_context&amp; context) throw (json_parse_exception)
 </code></pre>
 
-<p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
-<code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
-JSON events and the specified <a href="json_error_handler">json_error_handler</a>.<br>
-Uses default <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
-<pre><code>csv_reader(std::istream&amp; is,
-           json_input_handler&amp; handler,
-           json_error_handler&amp; err_handler,
-           const json&amp; params)
-</code></pre>
-
-<p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
-<code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
-JSON events, the specified <a href="json_error_handler">json_error_handler</a>,<br>
-and <a href="csv%20formatting%20parameters">csv formatting parameters</a>.<br>
-You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
-<h3>Member functions</h3>
-
-<pre><code>bool eof() const
-</code></pre>
-
-<p>Returns <code>true</code> when there is no more data to be read from the stream, <code>false</code> otherwise</p>
-
-<pre><code>void read()
-</code></pre>
-
-<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.</p>
-
-<pre><code>size_t buffer_capacity() const
-
-void buffer_capacity(size_t buffer_capacity)
-</code></pre>
-
-<h3>Examples</h3>
-
-<h3>Reading a comma delimted file into an array of json values</h3>
-
-<h4>Comma delimited input file</h4>
-
-<pre><code>country_code,name
-ABW,ARUBA
-ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-VUT,VANUATU
-WLF,WALLIS &amp; FUTUNA ISLANDS
-</code></pre>
-
-<p>Note </p>
-
-<ul>
-<li>The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.</li>
-<li>The third record has a field value that contains an embedded comma, so it must be quoted.</li>
-</ul>
-
-<h4>Reading the comma delimited file with csv_reader</h4>
-
-<pre><code>std::string in_file = "countries.csv";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-
-csv_reader reader(is,handler);
-reader.read();
-json countries = std::move(handler.root());
-
-std::cout &lt;&lt; countries &lt;&lt; std::endl;
-</code></pre>
-
-<h4>Output</h4>
-
-<pre><code>[
-    ["country_code","name"],
-    ["ABW","ARUBA"],
-    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-    ["VUT","VANUATU"],
-    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
-]
-</code></pre>
-
-<h3>Reading a tab delimted file into an array of json objects</h3>
-
-<h4>Tab delimited input file</h4>
-
-<pre><code>employee-no employee-name   dept    salary  note
-00000001    Smith, Matthew  sales   150,000.00  
-00000002    Brown, Sarah    sales   89,000.00   
-00000003    Oberc, Scott    finance 110,000.00  
-00000004    Scott, Colette  sales   75,000.00   """Exemplary"" employee
-Dependable, trustworthy"
-</code></pre>
-
-<p>Note </p>
-
-<ul>
-<li>The first record is a header line, which will be used to associate data values with names</li>
-<li>The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.</li>
-</ul>
-
-<h4>Reading the tab delimited file with csv_reader</h4>
-
-<pre><code>std::string in_file = "employees.txt";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-json params;
-params["field_delimiter"] = "\t";
-params["has_header"] = true;
-
-csv_reader reader(is,handler,params);
-reader.read();
-json employees = std::move(handler.root());
-
-std::cout &lt;&lt; employees &lt;&lt; std::endl;
-</code></pre>
-
-<h4>Output</h4>
-
-<pre><code>[
-    {
-        "dept":"sales",
-        "employee-name":"Smith, Matthew",
-        "employee-no":"00000001",
-        "note":"",
-        "salary":"150,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Brown, Sarah",
-        "employee-no":"00000002",
-        "note":"",
-        "salary":"89,000.00"
-    },
-    {
-        "dept":"finance",
-        "employee-name":"Oberc, Scott",
-        "employee-no":"00000003",
-        "note":"",
-        "salary":"110,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Scott, Colette",
-        "employee-no":"00000004",
-        "note":"\"Exemplary\" employee\nDependable, trustworthy",
-        "salary":"75,000.00"
-    }
-]
-</code></pre>
+<p>Throws a <a href="json_parse_exception">json_parse_exception</a> with the message and the line <br>
+number and column number taken from the <a href="parsing_context">context</a> parameter.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
