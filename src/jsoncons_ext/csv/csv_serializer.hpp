@@ -19,7 +19,7 @@
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
 
-namespace jsoncons_ext { namespace csv {
+namespace jsoncons { namespace csv {
 
 template <typename Char>
 struct csv_char_traits
@@ -216,7 +216,7 @@ private:
                     quote = true;
                     os_->put(quote_char_);
                 }
-                jsoncons_ext::csv::escape_string<Char>(name, length, quote_char_, quote_escape_char_, *os_);
+                jsoncons::csv::escape_string<Char>(name, length, quote_char_, quote_escape_char_, *os_);
                 if (quote)
                 {
                     os_->put(quote_char_);
@@ -346,7 +346,7 @@ private:
             quote = true;
             os.put(quote_char_);
         }
-        jsoncons_ext::csv::escape_string<Char>(val, length, quote_char_, quote_escape_char_, os);
+        jsoncons::csv::escape_string<Char>(val, length, quote_char_, quote_escape_char_, os);
         if (quote)
         {
             os.put(quote_char_);

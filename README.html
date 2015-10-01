@@ -501,21 +501,17 @@ vertical-align:1px;
 <h2>What's new on Master</h2>
 
 <ul>
-<li>
-<p><code>json_reader</code> has been rewritten internally. In addition:</p>
-
-<ul>
-<li>The <code>json_reader</code> method <code>read</code> has been renamed to <code>read_next</code>, reflecting that it supports reading a sequence of JSON texts from a stream. The 
-old name has been deprecated but still works.</li>
-<li>A <code>check_done</code> method has been added that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</li>
-<li>The <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> now throw if there are unconsumed non-whitespace characters after reading one JSON text.<br>
-</li>
-<li>Getter and setter <code>max_depth</code> methods have been added to allow setting the maximum JSON depth supported, if desired, by default
-it is arbitrarily large (limited by heap memory.)</li>
-<li>Parse error codes have been refined</li>
-</ul>
-</li>
-<li><p><code>jsoncons</code> now passes all of the tests in the <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> test suite </p></li>
+<li><p>Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix<br>
+contributed by Rupert Steel.</p></li>
+<li><p>Refines error codes and improves error messages</p></li>
+<li><p>Renames <code>parse_error_handler</code> to <code>json_error_handler</code>, the former name is deprecated but still works.</p></li>
+<li><p>Renames <code>json_reader</code> method <code>read</code> to <code>read_next</code>, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The <br>
+former name is deprecated but still works.</p></li>
+<li><p>Adds <code>json_reader</code> method <code>check_done</code> that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</p></li>
+<li><p>Adds getter and setter <code>max_depth</code> methods to allow setting the maximum JSON parse tree depth if desired, by default<br>
+it is arbitrarily large (limited by heap memory.)</p></li>
+<li><p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  </p></li>
+<li><p>Changes the top level namespace for the extensions from <code>jsoncons_ext</code> to <code>jsoncons</code>, e.g. <code>jsoncons_ext::csv::csv_reader</code> becomes <code>jsoncons::csv::csv_reader</code></p></li>
 </ul>
 
 <h2>Using the jsoncons library</h2>

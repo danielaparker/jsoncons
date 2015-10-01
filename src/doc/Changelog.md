@@ -18,6 +18,8 @@ it is arbitrarily large (limited by heap memory.)
 
 - Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
 
+- Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
+
 0.97.2 Release
 --------------
 
@@ -477,7 +479,7 @@ Release 0.41
 - Added begin_json and end_json methods to json_output_handler
 - json_deserializer should now satisfy basic exception safety (no leak guarantee)
 - Moved csv_reader.hpp to jsoncons_ext/csv directory
-- Changed csv_reader namespace to jsoncons_ext::csv
+- Changed csv_reader namespace to jsoncons::csv
 - json::parse_file no longer reads the entire file into memory before parsing
   (it now uses json_reader default buffering)
 

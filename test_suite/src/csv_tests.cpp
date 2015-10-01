@@ -12,9 +12,9 @@
 #include <ctime>
 
 using jsoncons::json_deserializer;
-using jsoncons_ext::csv::csv_serializer;
+using jsoncons::csv::csv_serializer;
 using jsoncons::json;
-using jsoncons_ext::csv::csv_reader;
+using jsoncons::csv::csv_reader;
 using jsoncons::json_reader;
 using jsoncons::pretty_print;
 using std::string;
