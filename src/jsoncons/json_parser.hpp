@@ -18,7 +18,8 @@
 #include <system_error>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_error_handler.hpp"
+#include "jsoncons/parse_error_handler.hpp"
+#include "jsoncons/json_text_error_category.hpp"
 
 namespace jsoncons {
 
@@ -89,7 +90,7 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_basic_json_error_handler<Char>::instance())),
+         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -100,7 +101,7 @@ public:
         top_ = -1;
         line_ = 1;
         column_ = 0;
-        prev_char_ = 0;
+        cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -110,7 +111,7 @@ public:
     }
 
     basic_json_parser(basic_json_input_handler<Char>& handler,
-                      basic_json_error_handler<Char>& err_handler)
+                      basic_parse_error_handler<Char>& err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
@@ -125,7 +126,7 @@ public:
         top_ = -1;
         line_ = 1;
         column_ = 0;
-        prev_char_ = 0;
+        cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -158,7 +159,7 @@ public:
         if (!push(mode::done))
         {
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
         }
         state_ = state::start;
     }
@@ -178,7 +179,7 @@ public:
                 break;
             default:
                 state_ = state::error;
-                err_handler_->error(std::error_code(json_parser_errc::extra_character, json_parser_category()), *this);
+                err_handler_->error(std::error_code(json_parser_errc::extra_character, json_text_error_category()), *this);
                 break;
             }
         }
@@ -222,18 +223,26 @@ public:
             case 0x1e:
             case 0x1f:
                 state_ = state::error;
-                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_parser_category()), *this);
+                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_text_error_category()), *this);
                 break;
             case '\r':
                 ++line_;
                 column_ = 0;
+                cr_ = true;
                 break;
             case '\n':
-                if (prev_char_ != '\r')
+                if (!cr_)
                 {
                     ++line_;
                     column_ = 0;
                 }
+                else
+                {
+                    cr_ = false;
+                }
+                break;
+            default:
+                cr_ = false;
                 break;
             }
             ++column_;
@@ -251,7 +260,7 @@ public:
                         if (!push(mode::object_member_name))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::object;
                         handler_->begin_object(*this);
@@ -261,7 +270,7 @@ public:
                         if (!push(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::array;
                         handler_->begin_array(*this);
@@ -272,15 +281,15 @@ public:
                         break;
                     case '}':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_text_error_category()), *this);
                         break;
                     case ']':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -296,7 +305,7 @@ public:
                         if (!pop(mode::object_member_value))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -313,7 +322,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -335,7 +344,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -350,7 +359,7 @@ public:
                         if (!pop(mode::object_member_name))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -372,11 +381,11 @@ public:
                         break;
                     case '\'':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -396,15 +405,15 @@ public:
                         break;
                     case '}':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_text_error_category()), *this);
                         break;
                     case '\'':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -425,7 +434,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_colon, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_colon, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -440,7 +449,7 @@ public:
                         if (!push(mode::object_member_name))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::object;
                         handler_->begin_object(*this);
@@ -449,7 +458,7 @@ public:
                         if (!push(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::array;
                         handler_->begin_array(*this);
@@ -516,21 +525,21 @@ public:
                         if (peek() == mode::array_element)
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_text_error_category()), *this);
                         }
                         else
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         }
                         break;
                     case '\'':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -545,7 +554,7 @@ public:
                         if (!push(mode::object_member_name))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::object;
                         handler_->begin_object(*this);
@@ -554,7 +563,7 @@ public:
                         if (!push(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
                         }
                         state_ = state::array;
                         handler_->begin_array(*this);
@@ -563,7 +572,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -636,11 +645,11 @@ public:
                         break;
                     case '\'':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -653,7 +662,7 @@ public:
                     case '\r':
                     case '\t':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_text_error_category()), *this);
                         break;
                     case '\\': 
                         state_ = state::escape;
@@ -714,7 +723,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -728,7 +737,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -773,7 +782,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -791,7 +800,7 @@ public:
                         if (!pop(mode::object_member_value))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -809,7 +818,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -832,11 +841,11 @@ public:
                         break;
                     case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::leading_zero, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::leading_zero, json_text_error_category()), *this);
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -854,7 +863,7 @@ public:
                         if (!pop(mode::object_member_value))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -872,7 +881,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -904,7 +913,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -922,7 +931,7 @@ public:
                         if (!pop(mode::object_member_value))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -940,7 +949,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -968,7 +977,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -991,7 +1000,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1007,7 +1016,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1025,7 +1034,7 @@ public:
                         if (!pop(mode::object_member_value))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_object(*this);
                         if (peek() == mode::done)
@@ -1043,7 +1052,7 @@ public:
                         if (!pop(mode::array_element))
                         {
                             state_ = state::error;
-                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         }
                         handler_->end_array(*this);
                         if (peek() == mode::done)
@@ -1067,7 +1076,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1081,7 +1090,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1095,7 +1104,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1110,7 +1119,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1124,7 +1133,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1138,7 +1147,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1152,7 +1161,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1167,7 +1176,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1181,7 +1190,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1195,7 +1204,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1210,7 +1219,7 @@ public:
                         break;
                     default:
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1227,7 +1236,7 @@ public:
                         break;
                     default:    
                         state_ = state::error;
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         break;
                     }
                 }
@@ -1267,7 +1276,6 @@ public:
                 }
                 break;
             }
-            prev_char_ = next_char;
         }
     }
 
@@ -1276,7 +1284,7 @@ public:
         if (!pop(mode::done))
         {
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_text_error_category()), *this);
         }
     }
 
@@ -1302,7 +1310,7 @@ private:
         catch (...)
         {
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
             handler_->value(null_type(), *this); // recovery
         }
         string_buffer_.clear();
@@ -1329,7 +1337,7 @@ private:
                 catch (...)
                 {
                     state_ = state::error;
-                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                     handler_->value(null_type(), *this);
                 }
             }
@@ -1351,7 +1359,7 @@ private:
                 catch (...)
                 {
                     state_ = state::error;
-                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_parser_category()), *this);
+                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
                     handler_->value(null_type(), *this);
                 }
             }
@@ -1372,7 +1380,7 @@ private:
             break;
         default:
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
             break;
         }
     }
@@ -1389,7 +1397,7 @@ private:
             break;
         default:
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
             break;
         }
     }
@@ -1436,7 +1444,7 @@ private:
             break;
         default:    
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::illegal_escaped_character, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::illegal_escaped_character, json_text_error_category()), *this);
             break;
         }
     }
@@ -1456,7 +1464,7 @@ private:
             break;
         default:
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
             break;
         }
         string_buffer_.clear();
@@ -1471,7 +1479,7 @@ private:
             if (!flip(mode::object_member_value, mode::object_member_name))
             {
                 state_ = state::error;
-                err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+                err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
             }
             state_ = state::expect_member_name;
             break;
@@ -1480,7 +1488,7 @@ private:
             break;
         default:
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
             break;
         }
     }
@@ -1490,7 +1498,7 @@ private:
         if (!flip(mode::object_member_name, mode::object_member_value))
         {
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
         }
         state_ = state::expect_value;
     }
@@ -1513,7 +1521,7 @@ private:
         else
         {
             state_ = state::error;
-            err_handler_->error(std::error_code(json_parser_errc::invalid_hex_escape_sequence, json_parser_category()), *this);
+            err_handler_->error(std::error_code(json_parser_errc::invalid_hex_escape_sequence, json_text_error_category()), *this);
         }
         return cp;
     }
@@ -1632,7 +1640,7 @@ private:
     int top_;
     std::vector<mode::mode_t> stack_;
     basic_json_input_handler<Char> *handler_;
-    basic_json_error_handler<Char> *err_handler_;
+    basic_parse_error_handler<Char> *err_handler_;
     unsigned long column_;
     unsigned long line_;
     Char c_;
@@ -1641,7 +1649,7 @@ private:
     std::basic_string<Char> string_buffer_;
     bool is_negative_;
     state::state_t saved_state_;
-    int prev_char_;
+    bool cr_;
     size_t index_;
     int depth_;
     int max_depth_;

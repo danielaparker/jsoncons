@@ -18,7 +18,7 @@
 #include <system_error>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_error_handler.hpp"
+#include "jsoncons/parse_error_handler.hpp"
 #include "jsoncons/json_parser.hpp"
 
 namespace jsoncons {
@@ -33,7 +33,7 @@ public:
         : parser_(handler),
           is_(std::addressof(is)),
           buffer_capacity_(default_max_buffer_length),
-          err_handler_(std::addressof(default_basic_json_error_handler<Char>::instance())),
+          err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
           eof_(false),
           buffer_length_(0),
           index_(0)
@@ -43,7 +43,7 @@ public:
 
     basic_json_reader(std::basic_istream<Char>& is,
                       basic_json_input_handler<Char>& handler,
-                      basic_json_error_handler<Char>& err_handler)
+                      basic_parse_error_handler<Char>& err_handler)
        : parser_(handler,err_handler),
          is_(std::addressof(is)),
          buffer_capacity_(default_max_buffer_length),
@@ -149,7 +149,7 @@ public:
 private:
     basic_json_parser<Char> parser_;
     std::basic_istream<Char> *is_;
-    basic_json_error_handler<Char> *err_handler_;
+    basic_parse_error_handler<Char> *err_handler_;
     bool eof_;
     std::vector<Char> buffer_;
     size_t buffer_length_;

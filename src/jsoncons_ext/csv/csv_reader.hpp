@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_EXT_CSV_CSV_READER_HPP
-#define JSONCONS_EXT_CSV_CSV_READER_HPP
+#ifndef JSONCONS_CSV_CSV_READER_HPP
+#define JSONCONS_CSV_CSV_READER_HPP
 
 #include <string>
 #include <sstream>
@@ -16,7 +16,8 @@
 #include <stdexcept>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_error_handler.hpp"
+#include "jsoncons/parse_error_handler.hpp"
+#include "jsoncons_ext/csv/csv_text_error_category.hpp"
 #include "jsoncons/json.hpp"
 
 namespace jsoncons { namespace csv {
@@ -56,7 +57,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_basic_json_error_handler<Char>::instance())),
+         err_handler_(std::addressof(jsoncons::default_basic_parse_error_handler<Char>::instance())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -84,7 +85,7 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_basic_json_error_handler<Char>::instance())),
+         err_handler_(std::addressof(jsoncons::default_basic_parse_error_handler<Char>::instance())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
@@ -98,7 +99,7 @@ public:
 
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_json_error_handler<Char>& err_handler)
+                     jsoncons::basic_parse_error_handler<Char>& err_handler)
        :
 
          minimum_structure_capacity_(),
@@ -128,7 +129,7 @@ public:
 
     basic_csv_reader(std::basic_istream<Char>& is,
                      jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_json_error_handler<Char>& err_handler,
+                     jsoncons::basic_parse_error_handler<Char>& err_handler,
                      const jsoncons::basic_json<Char,Alloc>& params)
        :
          minimum_structure_capacity_(),
@@ -322,7 +323,7 @@ private:
     size_t buffer_position_;
     size_t buffer_length_;
     jsoncons::basic_json_input_handler<Char>* handler_;
-    jsoncons::basic_json_error_handler<Char>* err_handler_;
+    jsoncons::basic_parse_error_handler<Char>* err_handler_;
     bool assume_header_;
     Char field_delimiter_;
     Char quote_char_;
@@ -408,7 +409,7 @@ void basic_csv_reader<Char,Alloc>::read_array_of_arrays()
             skip_ch();
             if (eof())
             {
-                err_handler_->error(std::error_code(jsoncons::json_parser_errc::unexpected_eof, jsoncons::json_parser_category()), *this);
+                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
             }
             ignore_single_line_comment();
         }
@@ -605,7 +606,7 @@ void basic_csv_reader<Char,Alloc>::parse_quoted_string()
         Char c = read_ch();
         if (eof())
         {
-            err_handler_->error(std::error_code(jsoncons::json_parser_errc::unexpected_eof, jsoncons::json_parser_category()), *this);
+            err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
         }
         else if (c == quote_escape_char_ && peek() == quote_char_)
         {

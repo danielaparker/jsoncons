@@ -488,7 +488,7 @@ typedef basic_json_filter&lt;char&gt; json_filter
 
 <pre><code>json_filter(json_input_handler&amp; handler)
 json_filter(json_input_handler&amp; handler,
-             json_error_handler&amp; err_handler)
+             parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_input_handler</code> (i.e. another filter.)<br>
@@ -496,7 +496,7 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
 
 <pre><code>json_filter(json_output_handler&amp; handler)
 json_filter(json_output_handler&amp; handler,
-             json_error_handler&amp; err_handler)
+             parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_output_handler</code>.<br>

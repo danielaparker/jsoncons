@@ -474,7 +474,6 @@ vertical-align:1px;
 <li><p>Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix<br>
 contributed by Rupert Steel.</p></li>
 <li><p>Refines error codes and improves error messages</p></li>
-<li><p>Renames <code>parse_error_handler</code> to <code>json_error_handler</code>, the former name is deprecated but still works.</p></li>
 <li><p>Renames <code>json_reader</code> method <code>read</code> to <code>read_next</code>, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The <br>
 former name is deprecated but still works.</p></li>
 <li><p>Adds <code>json_reader</code> method <code>check_done</code> that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</p></li>
@@ -545,7 +544,7 @@ The rationale for this change is to allow different configurations for internal 
 
 <ul>
 <li><p><code>json</code> member function <code>begin_object</code> now returns a bidirectional iterator rather than a random access iterator.</p></li>
-<li><p>Static singleton <code>instance</code> methods have been added to <code>default_json_error_handler</code><br>
+<li><p>Static singleton <code>instance</code> methods have been added to <code>default_parse_error_handler</code><br>
 and <code>empty_json_input_handler</code>. </p></li>
 <li><p>Added to the <code>json</code> class overloaded static methods parse, parse_string <br>
 and parse_file that take a <code>parse_error_handler</code> as a parameter. </p></li>
@@ -562,7 +561,7 @@ and parse_file that take a <code>parse_error_handler</code> as a parameter. </p>
 <li><p>Fixed issue with column number reported by json_reader</p></li>
 <li><p>Where &amp;s[0] and s.length() were passed to methods, &amp;s[0] has been replaced with s.c_str(). <br>
 While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.</p></li>
-<li><p>Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_parser_category_impl name method.</p></li>
+<li><p>Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_text_error_category_impl name method.</p></li>
 <li><p>Fixed a number of typename issues in the 0.96 candidate identifed by Ignatov Serguei.</p></li>
 <li><p>Fixes issues with testsuite cmake and scons reported by Alex Merry and Ignatov Serguei</p></li>
 </ul>

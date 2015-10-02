@@ -12,8 +12,8 @@ A `json_reader` can read a sequence of JSON texts from a stream.
 
     json_reader(std::istream& is,
                 json_input_handler& handler,
-                json_error_handler& err_handler)
-Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler) that receives JSON events, and the specified [json_error_handler](json_error_handler).
+                parse_error_handler& err_handler)
+Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler) that receives JSON events, and the specified [parse_error_handler](parse_error_handler).
 You must ensure that the input stream, input handler, and error handler exist as long as does `json_reader`, as `json_reader` holds pointers to but does not own these objects.
 
     json_reader(std::istream& is,

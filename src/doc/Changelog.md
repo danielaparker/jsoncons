@@ -6,8 +6,6 @@ Targeting 0.98 Release
 
 - Refines error codes and improves error messages
 
-- Renames `parse_error_handler` to `json_error_handler`, the former name is deprecated but still works.
-
 - Renames `json_reader` method `read` to `read_next`, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The 
   former name is deprecated but still works.
 
@@ -41,7 +39,7 @@ it is arbitrarily large (limited by heap memory.)
 - Added a class-specific in-place new to the json class that is implemented in terms of the global version (required to create json objects with placement new operator.)
 - Reorganized header files, removing unnecessary includes. 
 - Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.
-- Incorporates fix contributed by Milan Burda for �Switch case is in protected scope� clang build error
+- Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error
 
 0.97 Release
 ------------
@@ -78,7 +76,7 @@ General changes
 
 - `json` member function `begin_object` now returns a bidirectional iterator rather than a random access iterator.
 
-- Static singleton `instance` methods have been added to `default_json_error_handler`
+- Static singleton `instance` methods have been added to `default_parse_error_handler`
   and `empty_json_input_handler`. 
 
 - Added to the `json` class overloaded static methods parse, parse_string 
@@ -101,7 +99,7 @@ Bug fixes:
 - Where &s[0] and s.length() were passed to methods, &s[0] has been replaced with s.c_str(). 
   While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.
 
-- Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_parser_category_impl name method.
+- Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_text_error_category_impl name method.
 
 - Fixed a number of typename issues in the 0.96 candidate identifed by Ignatov Serguei.
 
@@ -402,7 +400,7 @@ Release 0.71
 Release 0.70
 -------------
 
-- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (‘.’) is now always used as the decimal point, non English locales are ignored.
+- Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.
 
 - The output_format methods that support alternative floating point formatting, e.g. fixed, have been deprecated.
 

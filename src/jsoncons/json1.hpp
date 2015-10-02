@@ -102,7 +102,7 @@ template <typename Char>
 std::basic_string<Char> escape_string(const std::basic_string<Char>& s, const basic_output_format<Char>& format);
 
 template <typename Char>
-class basic_json_error_handler;
+class basic_parse_error_handler;
 
 template <typename Char, typename Alloc, typename T>
 class json_type_traits
@@ -1034,15 +1034,15 @@ public:
 
     static basic_json parse(std::basic_istream<Char>& is);
 
-    static basic_json parse(std::basic_istream<Char>& is, basic_json_error_handler<Char>& err_handler);
+    static basic_json parse(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json parse_string(const std::basic_string<Char>& s);
 
-    static basic_json parse_string(const std::basic_string<Char>& s, basic_json_error_handler<Char>& err_handler);
+    static basic_json parse_string(const std::basic_string<Char>& s, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json parse_file(const std::string& s);
 
-    static basic_json parse_file(const std::string& s, basic_json_error_handler<Char>& err_handler);
+    static basic_json parse_file(const std::string& s, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json<Char,Alloc> make_float(double val)
     {

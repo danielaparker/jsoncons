@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_EXT_CSV_CSV_SERIALIZER_HPP
-#define JSONCONS_EXT_CSV_CSV_SERIALIZER_HPP
+#ifndef JSONCONS_CSV_CSV_SERIALIZER_HPP
+#define JSONCONS_CSV_CSV_SERIALIZER_HPP
 
 #include <string>
 #include <sstream>

@@ -32,8 +32,6 @@ The library has a number of features, which are listed below:
 
 - Refines error codes and improves error messages
 
-- Renames `parse_error_handler` to `json_error_handler`, the former name is deprecated but still works.
-
 - Renames `json_reader` method `read` to `read_next`, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The 
   former name is deprecated but still works.
 

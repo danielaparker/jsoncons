@@ -1,10 +1,10 @@
     jsoncons::json_parser_errc
 
-The enumeration values scoped by `jsoncons::json_parser_errc` define the values for json parser error codes.
+The enumeration values scoped by `jsoncons::json_parser_errc` define the values for json text error codes.
 
 ### Header
 
-    #include "jsoncons/json_error_handler.hpp"
+    #include "jsoncons/json_text_error_category.hpp"
 
 ### Member constants
 
