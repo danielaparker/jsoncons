@@ -18,7 +18,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 
     json_reader(std::istream& is,
                 json_input_handler& handler)
-Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler) that receives JSON events, and a [default_error_handler](default_error_handler).
+Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler) that receives JSON events, and a [default_parse_error_handler](default_parse_error_handler).
 You must ensure that the input stream and input handler exist as long as does `json_reader`, as `json_reader` holds pointers to does not own these objects.
 
 ### Member functions

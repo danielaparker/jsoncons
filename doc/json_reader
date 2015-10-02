@@ -494,7 +494,7 @@ You must ensure that the input stream, input handler, and error handler exist as
             json_input_handler&amp; handler)
 </code></pre>
 
-<p>Constructs a <code>json_reader</code> that is associated with an input stream <code>is</code> of JSON text, a <a href="json_input_handler">json_input_handler</a> that receives JSON events, and a <a href="default_error_handler">default_error_handler</a>.<br>
+<p>Constructs a <code>json_reader</code> that is associated with an input stream <code>is</code> of JSON text, a <a href="json_input_handler">json_input_handler</a> that receives JSON events, and a <a href="default_parse_error_handler">default_parse_error_handler</a>.<br>
 You must ensure that the input stream and input handler exist as long as does <code>json_reader</code>, as <code>json_reader</code> holds pointers to does not own these objects.</p>
 
 <h3>Member functions</h3>
