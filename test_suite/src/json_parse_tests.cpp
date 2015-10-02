@@ -16,9 +16,9 @@ using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
-using jsoncons::json_error_handler;
+using jsoncons::parse_error_handler;
 using jsoncons::json_parse_exception;
-using jsoncons::json_parser_category;
+using jsoncons::json_text_error_category;
 using std::string;
 
 void test_error_code(const std::string& text, int ec)

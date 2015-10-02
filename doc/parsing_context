@@ -485,7 +485,7 @@ typedef basic_parsing_context&lt;char&gt; parsing_context
 <pre><code>unsigned long line_number() const
 </code></pre>
 
-<p>Returns the line number to the end of the text being parsed.<br>
+<p>Returns the line number for the text being parsed.<br>
 Line numbers start at 1.</p>
 
 <pre><code>unsigned long column_number() const 
@@ -504,18 +504,11 @@ Column numbers start at 1.</p>
 
 <p>Returns the last character consumed by the parser</p>
 
-<pre><code>bool eof() const
-</code></pre>
-
-<p>Returns <code>true</code> if the parser has reached end-of-file </p>
-
 <h3>Private virtual implementation methods</h3>
 
 <pre><code>virtual unsigned long do_line_number() const = 0
 
 virtual unsigned long do_column_number() const = 0
-
-virtual bool do_eof() const = 0
 
 virtual size_t do_minimum_structure_capacity() const = 0
 

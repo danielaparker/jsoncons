@@ -6,7 +6,7 @@ Provides contextual information for the element being parsed. This information m
 
 ### Header
 
-    #include "jsoncons/json_error_handler.hpp"
+    #include "jsoncons/parse_error_handler.hpp"
 
 ### Public interface methods
 

@@ -17,14 +17,14 @@ using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::json_reader;
 using jsoncons::json_input_handler;
-using jsoncons::json_error_handler;
+using jsoncons::parse_error_handler;
 using jsoncons::json_parse_exception;
-using jsoncons::json_parser_category;
-using jsoncons::json_error_handler;
-using jsoncons::default_json_error_handler;
+using jsoncons::json_text_error_category;
+using jsoncons::parse_error_handler;
+using jsoncons::default_parse_error_handler;
 using std::string;
 
-class my_json_error_handler : public json_error_handler
+class my_parse_error_handler : public parse_error_handler
 {
 private:
     virtual void do_warning(std::error_code ec,
@@ -35,11 +35,11 @@ private:
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {
-        if (ec.category() == json_parser_category())
+        if (ec.category() == json_text_error_category())
         {
             if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.last_char() == ']' || context.last_char() == '}'))
             {
-                default_json_error_handler::instance().error(ec,context);
+                default_parse_error_handler::instance().error(ec,context);
             }
         }
     }
@@ -47,7 +47,7 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
 {
-    my_json_error_handler err_handler;
+    my_parse_error_handler err_handler;
 
     json val = json::parse_string("[1,2,3,]", err_handler);
 
