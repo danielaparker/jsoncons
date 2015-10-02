@@ -140,10 +140,6 @@ private:
 typedef basic_parse_error_handler<char> parse_error_handler;
 typedef basic_parse_error_handler<wchar_t> wparse_error_handler;
 
-// Deprecated
-typedef basic_parse_error_handler<char> parse_error_handler;
-typedef basic_parse_error_handler<wchar_t> wparse_error_handler;
-
 typedef default_basic_parse_error_handler<char> default_parse_error_handler;
 typedef default_basic_parse_error_handler<wchar_t> wdefault_parse_error_handler;
 
