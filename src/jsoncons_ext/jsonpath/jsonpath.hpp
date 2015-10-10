@@ -21,8 +21,8 @@
 
 namespace jsoncons { namespace jsonpath {
 
-namespace jsonpath_state {
-    enum jsonpath_state_t {
+namespace states {
+    enum states_t {
         start,
         path_separator,
         string
@@ -42,7 +42,7 @@ basic_json<Char,Alloc> jsonpath(const basic_json<Char, Alloc>& root, const Char*
 
     basic_json<Char,Alloc> result(basic_json<Char,Alloc>::an_array);
 
-    jsonpath_state::jsonpath_state_t state = jsoncons::jsonpath_state::start;
+    states::states_t state = jsoncons::states::start;
     std::vector<std::vector<cjson_ptr>> stack;
     std::basic_string<Char> buffer;
 
@@ -51,32 +51,32 @@ basic_json<Char,Alloc> jsonpath(const basic_json<Char, Alloc>& root, const Char*
         Char c = path[i];
         switch (state)
         {
-        case jsonpath_state::start: 
+        case states::start: 
             switch (c)
             {
             case '$':
                 std::vector<cjson_ptr> v(1);
                 v.push_back(&root);
                 stack.push_back(v);
-                state = jsonpath_state::path_separator;
+                state = states::path_separator;
                 break;
             };
             break;
-        case jsonpath_state::path_separator: 
+        case states::path_separator: 
             switch (c)
             {
             case '.':
                 buffer.clear();
-                state = jsonpath_state::string;
+                state = states::string;
                 break;
             };
             break;
-        case jsonpath_state::string: 
+        case states::string: 
             switch (c)
             {
             case '.':
                 buffer.clear();
-                state = jsonpath_state::string;
+                state = states::string;
                 break;
             default:
                 buffer.push_back(c);

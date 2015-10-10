@@ -17,7 +17,9 @@ namespace csv_parser_errc
 {
     enum csv_parser_errc_t 
     {
-        unexpected_eof
+        unexpected_eof,
+        expected_quote,
+        invalid_csv_text
     };
 }
 
@@ -35,6 +37,10 @@ public:
         {
         case csv_parser_errc::unexpected_eof:
             return "Unexpected end of file";
+        case csv_parser_errc::expected_quote:
+            return "Expected quote character";
+        case csv_parser_errc::invalid_csv_text:
+            return "Invalid CSV text";
         default:
             return "Unknown JSON parser error";
         }
