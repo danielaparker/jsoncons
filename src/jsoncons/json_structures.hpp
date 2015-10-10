@@ -167,7 +167,7 @@ private:
 template <typename Char, typename Alloc, bool IsConst = false>
 class object_iterator
 {
-    typedef typename basic_json<Char,Alloc>::member_type value_type;
+    typedef typename basic_json<Char,Alloc>::member_type value_types;
     typedef std::ptrdiff_t difference_type;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
@@ -194,12 +194,12 @@ class object_iterator
             return (it_->it_)->second;
         }
 
-        operator value_type() const
+        operator value_types() const
         {
-            return value_type(name(),value());
+            return value_types(name(),value());
         }
 
-        void operator =(value_type const& value)
+        void operator =(value_types const& value)
         {
           it_->invoke_(value);
         }
@@ -286,7 +286,7 @@ public:
     iterator_impl it_;
     typename basic_json<Char,Alloc>::member_type member_;
 
-    void invoke_(value_type const & value)
+    void invoke_(value_types const & value)
     {
         *it_ = value;
     }

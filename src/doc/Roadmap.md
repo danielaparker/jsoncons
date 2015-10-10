@@ -1,4 +1,4 @@
-Coming next in Release 0.98
+Coming next in Release 0.98.x
 
 - Implement a path specification for selecting values within a `json` document, [JsonPath](http://goessner.net/articles/JsonPath/)
 

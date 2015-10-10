@@ -18,12 +18,13 @@
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/parse_error_handler.hpp"
 #include "jsoncons_ext/csv/csv_text_error_category.hpp"
+#include "jsoncons_ext/csv/csv_parser.hpp"
 #include "jsoncons/json.hpp"
 
 namespace jsoncons { namespace csv {
 
 template<typename Char,class Alloc>
-class basic_csv_reader : private jsoncons::basic_parsing_context<Char>
+class basic_csv_reader : private basic_parsing_context<Char>
 {
     struct stack_item
     {
@@ -43,9 +44,9 @@ public:
     */
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler)
+                     basic_json_input_handler<Char>& handler)
 
-       :
+       : parser_(handler),
          minimum_structure_capacity_(0),
          column_(0),
          line_(0),
@@ -57,23 +58,24 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_basic_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
          comment_symbol_(),
          bof_(true),
-         eof_(false)
+         eof_(false),
+         index_(0)
     {
-        init(jsoncons::json::an_object);
+        init(basic_csv_parameters<Char>());
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     const jsoncons::basic_json<Char,Alloc>& params)
+                     basic_json_input_handler<Char>& handler,
+                     basic_csv_parameters<Char> params)
 
-       :
+       : parser_(handler,params),
          minimum_structure_capacity_(0),
          column_(0),
          line_(0),
@@ -85,23 +87,24 @@ public:
          buffer_position_(0),
          buffer_length_(0),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(jsoncons::default_basic_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
          assume_header_(),
          field_delimiter_(),
          quote_char_(),
          quote_escape_char_(),
          comment_symbol_(),
          bof_(true),
-         eof_(false)
+         eof_(false),
+         index_(0)
     {
         init(params);
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_parse_error_handler<Char>& err_handler)
+                     basic_json_input_handler<Char>& handler,
+                     basic_parse_error_handler<Char>& err_handler)
        :
-
+         parser_(handler,err_handler),
          minimum_structure_capacity_(),
          column_(0),
          line_(0),
@@ -120,18 +123,20 @@ public:
          quote_escape_char_(),
          comment_symbol_(),
          bof_(true),
-         eof_(false)
+         eof_(false),
+         index_(0)
 
 
     {
-        init(jsoncons::json::an_object);
+        init(basic_csv_parameters<Char>());
     }
 
     basic_csv_reader(std::basic_istream<Char>& is,
-                     jsoncons::basic_json_input_handler<Char>& handler,
-                     jsoncons::basic_parse_error_handler<Char>& err_handler,
-                     const jsoncons::basic_json<Char,Alloc>& params)
+                     basic_json_input_handler<Char>& handler,
+                     basic_parse_error_handler<Char>& err_handler,
+                     basic_csv_parameters<Char> params)
        :
+         parser_(handler,err_handler,params),
          minimum_structure_capacity_(),
          column_(0),
          line_(0),
@@ -150,22 +155,23 @@ public:
          quote_escape_char_(),
          comment_symbol_(),
          bof_(true),
-         eof_(false)
+         eof_(false),
+         index_(0)
     {
         init(params);
     }
 
-    void init(const jsoncons::basic_json<Char,Alloc>& params)
+    void init(const basic_csv_parameters<Char>& params)
     {
-        field_delimiter_ = params.get("field_delimiter",",").as_char();
+        field_delimiter_ = params.field_delimiter();
 
-        assume_header_ = params.get("has_header",false).as_bool();
+        assume_header_ = params.assume_header();
 
-        quote_char_ = params.get("quote_char","\"").as_char();
+        quote_char_ = params.quote_char();
 
-        quote_escape_char_ = params.get("quote_escape_char","\"").as_char();
+        quote_escape_char_ = params.quote_escape_char();
 
-        comment_symbol_ = params.get("comment_symbol","\0").as_char();
+        comment_symbol_ = params.comment_symbol();
     }
 
     ~basic_csv_reader()
@@ -322,8 +328,8 @@ private:
     size_t buffer_capacity_;
     size_t buffer_position_;
     size_t buffer_length_;
-    jsoncons::basic_json_input_handler<Char>* handler_;
-    jsoncons::basic_parse_error_handler<Char>* err_handler_;
+    basic_json_input_handler<Char>* handler_;
+    basic_parse_error_handler<Char>* err_handler_;
     bool assume_header_;
     Char field_delimiter_;
     Char quote_char_;
@@ -331,12 +337,42 @@ private:
     Char comment_symbol_;
     bool bof_;
     bool eof_;
+    basic_csv_parser<Char> parser_;
+    size_t index_;
 };
 
 template<typename Char,class Alloc>
 void basic_csv_reader<Char,Alloc>::read()
 {
-    if (is_->bad())
+    parser_.begin_parse();
+    while (!eof_ && !parser_.done())
+    {
+        if (!(index_ < buffer_length_))
+        {
+            if (!is_->eof())
+            {
+                is_->read(&buffer_[0], buffer_capacity_);
+                buffer_length_ = static_cast<size_t>(is_->gcount());
+                if (buffer_length_ == 0)
+                {
+                    eof_ = true;
+                }
+                index_ = 0;
+            }
+            else
+            {
+                eof_ = true;
+            }
+        }
+        if (!eof_)
+        {
+            parser_.parse(&buffer_[0],index_,buffer_length_);
+            index_ = parser_.index();
+        }
+    }
+    parser_.end_parse();
+
+/*    if (is_->bad())
     {
         JSONCONS_THROW_EXCEPTION("Input stream is invalid");
     }
@@ -361,7 +397,7 @@ void basic_csv_reader<Char,Alloc>::read()
     }
     handler_->end_array(*this);
     stack_.pop_back();
-    handler_->end_json();
+    handler_->end_json();*/
 }
 
 template<typename Char,class Alloc>
