@@ -40,8 +40,7 @@ namespace states {
 		quoted_string,
 		unquoted_string,
         escaped_value,
-        done,
-        error
+        done
     };
 };
 
@@ -141,6 +140,11 @@ public:
     {
     }
 
+    const std::vector<std::basic_string<Char>>& column_labels() const
+    {
+        return column_labels_;
+    }
+
     basic_parsing_context<Char> const & parsing_context() const
     {
         return *this;
@@ -159,7 +163,6 @@ public:
         {
             if (!push(modes::header))
             {
-                state_ = states::error;
                 err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
             }
         }
@@ -167,7 +170,6 @@ public:
         {
             if (!push(modes::array))
             {
-                state_ = states::error;
                 err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
             }
         }
@@ -380,21 +382,18 @@ public:
         case modes::array:
             if (!pop(modes::array))
             {
-                state_ = states::error;
                 err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
             }
             break;
         case modes::object:
             if (!pop(modes::object))
             {
-                state_ = states::error;
                 err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
             }
             break;
         case modes::header:
             if (!pop(modes::header))
             {
-                state_ = states::error;
                 err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
             }
             break;
@@ -402,7 +401,6 @@ public:
         handler_->end_array(*this);
         if (!pop(modes::done))
         {
-            state_ = states::error;
             err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
         }
         handler_->end_json();
@@ -440,44 +438,10 @@ private:
             state_ = states::unquoted_string;
             break;
         default:
-            state_ = states::error;
             err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
             break;
         }
         string_buffer_.clear();
-    }
-
-    void begin_member_or_element() 
-    {
-        switch (stack_[top_])
-        {
-        case modes::object_member_value:
-            // A comma causes a flip from object_member_value modes to object_member_name modes.
-            if (!flip(modes::object_member_value, modes::object_member_name))
-            {
-                state_ = states::error;
-                err_handler_->error(std::error_code(csv_parser_errc::invalid_json_text, csv_text_error_category()), *this);
-            }
-            state_ = states::expect_member_name;
-            break;
-        case modes::array_element:
-            state_ = states::expect_value;
-            break;
-        default:
-            state_ = states::error;
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_json_text, csv_text_error_category()), *this);
-            break;
-        }
-    }
-
-    void begin_member_value()
-    {
-        if (!flip(modes::object_member_name, modes::object_member_value))
-        {
-            state_ = states::error;
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_json_text, csv_text_error_category()), *this);
-        }
-        state_ = states::expect_value;
     }
 
     unsigned long do_line_number() const override
