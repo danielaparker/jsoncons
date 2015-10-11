@@ -1,8 +1,14 @@
 Targeting 0.98 Release
-------------------------
+----------------------
+
+Bug fixes:
 
 - Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
   contributed by Rupert Steel.
+- Fixes bug with proxy operator== when comparing object member values,
+  such as in val["field"] == json("abc")
+
+Enhancements:
 
 - Refines error codes and improves error messages
 
@@ -16,7 +22,10 @@ it is arbitrarily large (limited by heap memory.)
 
 - Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
 
+Changes to extensions:
+
 - Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
+- Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a `csv_parameters` object rather than a `json` object.
 
 0.97.2 Release
 --------------
