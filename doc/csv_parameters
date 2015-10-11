@@ -483,6 +483,21 @@ vertical-align:1px;
 <td>false</td>
 </tr>
 <tr>
+<td>header_lines</td>
+<td>Number of header lines in the CSV text</td>
+<td>0</td>
+</tr>
+<tr>
+<td>header</td>
+<td>A string containing delimited names corresponding to the fields in the file</td>
+<td>Empty</td>
+</tr>
+<tr>
+<td>max_lines</td>
+<td>Maximum number of lines to read</td>
+<td>Unlimited</td>
+</tr>
+<tr>
 <td>line_delimiter</td>
 <td>String to write between records</td>
 <td>\n</td>
@@ -508,7 +523,7 @@ vertical-align:1px;
 <td>minimal</td>
 </tr>
 <tr>
-<td>comment_symbol</td>
+<td>comment_starter</td>
 <td>Character to comment out a line, must be at column 1.</td>
 <td>None</td>
 </tr>
