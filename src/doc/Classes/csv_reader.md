@@ -71,7 +71,7 @@ Note
 - The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
 - The third record has a field value that contains an embedded comma, so it must be quoted.
 
-#### Reading the comma delimited file with csv_reader
+#### Reading the comma delimited file as an array of arrays
 
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
@@ -82,7 +82,7 @@ Note
     reader.read();
     json countries = std::move(handler.root());
 
-    std::cout << countries << std::endl;
+    std::cout << pretty_print(countries) << std::endl;
 
 #### Output 
 
@@ -110,7 +110,7 @@ Note
 - The first record is a header line, which will be used to associate data values with names
 - The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
 
-#### Reading the tab delimited file with csv_reader
+#### Reading the tab delimited file as an array of objects
 
     std::string in_file = "employees.txt";
     std::ifstream is(in_file);
@@ -124,7 +124,7 @@ Note
     reader.read();
     json employees = std::move(handler.root());
 
-    std::cout << employees << std::endl;
+    std::cout << pretty_print(employees) << std::endl;
 
 #### Output
 
@@ -156,5 +156,48 @@ Note
             "employee-no":"00000004",
             "note":"\"Exemplary\" employee\nDependable, trustworthy",
             "salary":"75,000.00"
+        }
+    ]
+
+
+#### Reading the comma delimited file as an array of objects with user supplied columns names
+
+Note 
+
+- The first record contains a header line, but we're going to ignore that and use our own names for the fields.
+
+    std::string in_file = "countries.csv";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+
+    csv_parameters params;
+	params.header("Country Code,Name");
+    params.header_lines(1);
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json countries = std::move(handler.root());
+
+    std::cout << pretty_print(countries) << std::endl;
+
+#### Output 
+
+    [
+        {
+            "Country Code":"ABW",
+            "Name":"ARUBA"
+        },
+        {
+            "Country Code":"ATF",
+            "Name":"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+        },
+        {
+            "Country Code":"VUT",
+            "Name":"VANUATU"
+        },
+        {
+            "Country Code":"WLF",
+            "Name":"WALLIS & FUTUNA ISLANDS"
         }
     ]

@@ -68,6 +68,16 @@ public:
         assume_header_ = value;
     }
 
+    std::basic_string<Char> header() const
+    {
+        return header_;
+    }
+
+    void header(std::basic_string<Char> value)
+    {
+        header_ = value;
+    }
+
     Char field_delimiter() const
     {
         return field_delimiter_;
@@ -147,6 +157,7 @@ private:
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
+    std::basic_string<Char> header_;
 };
 
 typedef basic_csv_parameters<char> csv_parameters;

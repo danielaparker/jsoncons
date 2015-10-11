@@ -109,7 +109,36 @@ public:
     {
     }
 
-    void read();
+    void read()
+    {
+        parser_.begin_parse();
+        while (!eof_ && !parser_.done())
+        {
+            if (!(index_ < buffer_length_))
+            {
+                if (!is_->eof())
+                {
+                    is_->read(&buffer_[0], buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    if (buffer_length_ == 0)
+                    {
+                        eof_ = true;
+                    }
+                    index_ = 0;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            if (!eof_)
+            {
+                parser_.parse(&buffer_[0],index_,buffer_length_);
+                index_ = parser_.index();
+            }
+        }
+        parser_.end_parse();
+    }
 
     bool eof() const
     {
@@ -139,38 +168,6 @@ private:
     bool eof_;
     basic_csv_parser<Char> parser_;
 };
-
-template<typename Char,class Alloc>
-void basic_csv_reader<Char,Alloc>::read()
-{
-    parser_.begin_parse();
-    while (!eof_ && !parser_.done())
-    {
-        if (!(index_ < buffer_length_))
-        {
-            if (!is_->eof())
-            {
-                is_->read(&buffer_[0], buffer_capacity_);
-                buffer_length_ = static_cast<size_t>(is_->gcount());
-                if (buffer_length_ == 0)
-                {
-                    eof_ = true;
-                }
-                index_ = 0;
-            }
-            else
-            {
-                eof_ = true;
-            }
-        }
-        if (!eof_)
-        {
-            parser_.parse(&buffer_[0],index_,buffer_length_);
-            index_ = parser_.index();
-        }
-    }
-    parser_.end_parse();
-}
 
 typedef basic_csv_reader<char,std::allocator<void>> csv_reader;
 
