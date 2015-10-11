@@ -30,6 +30,9 @@ The library has a number of features, which are listed below:
 - Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
   contributed by Rupert Steel.
 
+- Fixes bug with proxy operator== when comparing object member values,
+  such as in val["field"] == json("abc")
+
 - Refines error codes and improves error messages
 
 - Renames `json_reader` method `read` to `read_next`, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The 
@@ -43,6 +46,8 @@ it is arbitrarily large (limited by heap memory.)
 - Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
 
 - Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
+
+- Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a `csv_parameters` object rather than a `json` object.
 
 ## Using the jsoncons library
 
