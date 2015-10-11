@@ -10,13 +10,13 @@ The `csv_serializer` class is an instantiation of the `basic_csv_serializer` cla
 
     csv_serializer(std::ostream& os)
 Constructs a `csv_serializer` that is associated with an output stream
-`os`. Uses default [csv formatting parameters](csv formatting parameters).
+`os`. Uses default [csv_parameters](csv_parameters).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     csv_serializer(std::ostream& os,
-                   const json& params)
+                   const csv_parameters& params)
 Constructs a `csv_serializer` that is associated with an output stream
-`os` and [csv formatting parameters](csv formatting parameters).
+`os` and [csv_parameters](csv_parameters).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 ### Member functions
@@ -112,8 +112,8 @@ Note
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params;
-    params["field_delimiter"] = "\t";
+    csv_parameters params;
+    params.field_delimiter = '\t';
 
     json_reader reader(is,handler);
     reader.read_next();

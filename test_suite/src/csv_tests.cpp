@@ -1,6 +1,5 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
-#define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

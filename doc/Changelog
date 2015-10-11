@@ -468,18 +468,51 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h2>Master</h2>
+<h2>Targeting 0.98 Release</h2>
+
+<p>Bug fixes:</p>
+
+<ul>
+<li>Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
+contributed by Rupert Steel.</li>
+<li>Fixes bug with proxy operator== when comparing object member values,
+such as in val["field"] == json("abc")</li>
+</ul>
+
+<p>Enhancements:</p>
+
+<ul>
+<li><p>Refines error codes and improves error messages</p></li>
+<li><p>Renames <code>json_reader</code> method <code>read</code> to <code>read_next</code>, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The <br>
+former name is deprecated but still works.</p></li>
+<li><p>Adds <code>json_reader</code> method <code>check_done</code> that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</p></li>
+<li><p>Adds getter and setter <code>max_depth</code> methods to allow setting the maximum JSON parse tree depth if desired, by default<br>
+it is arbitrarily large (limited by heap memory.)</p></li>
+<li><p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  </p></li>
+</ul>
+
+<p>Changes to extensions:</p>
+
+<ul>
+<li>Changes the top level namespace for the extensions from <code>jsoncons_ext</code> to <code>jsoncons</code>, e.g. <code>jsoncons_ext::csv::csv_reader</code> becomes <code>jsoncons::csv::csv_reader</code>
+</li>
+<li>Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a <code>csv_parameters</code> object rather than a <code>json</code> object.</li>
+</ul>
+
+<h2>0.97.2 Release</h2>
 
 <ul>
 <li>Incorporates test suite files from <a href="http://www.json.org/JSON_checker/">http://www.json.org/JSON_checker/</a> into test suite</li>
+<li>The <code>jsoncons</code> parser accepts all of the JSON_checker files that its supposed to accept.</li>
 <li>Failures to reject incorrect exponential notation (e.g. [0e+-1]) have been fixed.</li>
 <li>
-<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to except ones with stuff after the end of the document, e.g.</p>
+<p>The <code>jsoncons</code> parser now rejects all of the JSON_checker files that its supposed to reject except ones with stuff after the end of the document, e.g.</p>
 
 <p>["Extra close"]]</p>
 
-<p>(Currently the <code>jsoncons</code> parser stops after reading a full <code>json</code> document, and supports reading a sequence of documents.)  </p>
+<p>(Currently the <code>jsoncons</code> parser stops after reading a complete JSON text, and supports reading a sequence of JSON texts.)  </p>
 </li>
+<li><p>Incorporates a fix to operator== on json objects, contributed by Alex Merry</p></li>
 </ul>
 
 <h2>0.97.1 Release</h2>
@@ -543,8 +576,8 @@ and parse_file that take a <code>parse_error_handler</code> as a parameter. </p>
 <ul>
 <li><p>Fixed issue with column number reported by json_reader</p></li>
 <li><p>Where &amp;s[0] and s.length() were passed to methods, &amp;s[0] has been replaced with s.c_str(). <br>
-While this shouldn't be an issue on most implementations, VS throws an exception in debug mode when the string has length zero.</p></li>
-<li><p>Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_parser_category_impl name method.</p></li>
+While this shouldn't be an issue on most implementations, VS throws an exception in debug modes when the string has length zero.</p></li>
+<li><p>Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_text_error_category_impl name method.</p></li>
 <li><p>Fixed a number of typename issues in the 0.96 candidate identifed by Ignatov Serguei.</p></li>
 <li><p>Fixes issues with testsuite cmake and scons reported by Alex Merry and Ignatov Serguei</p></li>
 </ul>
@@ -972,7 +1005,7 @@ arr.resize_array(10,0.0);
 <li>Added begin_json and end_json methods to json_output_handler</li>
 <li>json_deserializer should now satisfy basic exception safety (no leak guarantee)</li>
 <li>Moved csv_reader.hpp to jsoncons_ext/csv directory</li>
-<li>Changed csv_reader namespace to jsoncons_ext::csv</li>
+<li>Changed csv_reader namespace to jsoncons::csv</li>
 <li>json::parse_file no longer reads the entire file into memory before parsing
 (it now uses json_reader default buffering)</li>
 </ul>

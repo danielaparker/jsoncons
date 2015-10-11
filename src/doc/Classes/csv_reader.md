@@ -12,15 +12,15 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
                json_input_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text and a [json_input_handler](json_input_handler) that receives
-JSON events. Uses default [csv formatting parameters](csv formatting parameters).
+JSON events. Uses default [csv_parameters](csv_parameters).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
-               const json& params)
+               const csv_parameters& params)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) that receives
-JSON events, and [csv formatting parameters](csv formatting parameters).
+JSON events, and [csv_parameters](csv_parameters).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
@@ -29,17 +29,17 @@ You must ensure that the input stream and input handler exist as long as does `c
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) that receives
 JSON events and the specified [parse_error_handler](parse_error_handler).
-Uses default [csv formatting parameters](csv formatting parameters).
+Uses default [csv_parameters](csv_parameters).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
                parse_error_handler& err_handler,
-               const json& params)
+               const csv_parameters& params)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler) that receives
 JSON events, the specified [parse_error_handler](parse_error_handler),
-and [csv formatting parameters](csv formatting parameters).
+and [csv_parameters](csv_parameters).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
 ### Member functions
@@ -116,9 +116,9 @@ Note
     std::ifstream is(in_file);
 
     json_deserializer handler;
-    json params;
-    params["field_delimiter"] = "\t";
-    params["has_header"] = true;
+    csv_parameters params;
+    params.field_delimiter = '\t';
+    params.assume_header = true;
 
     csv_reader reader(is,handler,params);
     reader.read();
