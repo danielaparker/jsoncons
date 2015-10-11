@@ -58,7 +58,6 @@ public:
          is_negative_(false),
          cp_(0),
          index_(0)
-
     {
         depth_ = default_depth;
         state_ = states::start;
@@ -66,7 +65,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-		cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -88,7 +86,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -109,7 +106,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -132,7 +128,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        cr_ = false;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -176,6 +171,8 @@ public:
         handler_->begin_array(*this);
         state_ = states::unquoted_string;
         column_index_ = 0;
+        prev_char_ = 0;
+        column_ = 1;
     }
 
     void parse(Char const* p, size_t start, size_t length)
@@ -188,28 +185,15 @@ public:
             switch (next_char)
             {
             case '\r':
-                ++line_;
-                column_ = 0;
-                cr_ = true;
                 is_newline = true;
                 break;
             case '\n':
-                if (!cr_)
+                if (prev_char_ != '\r')
                 {
-                    ++line_;
-                    column_ = 0;
                     is_newline = true;
                 }
-                else
-                {
-                    cr_ = false;
-                }
-                break;
-            default:
-                cr_ = false;
                 break;
             }
-            ++column_;
 
             switch (state_)
             {
@@ -225,7 +209,17 @@ public:
                         handler_->end_object(*this);
                         break;
                     case modes::header:
-                        flip(modes::header, modes::object);
+                        if (line_ > parameters_.header_lines())
+                        {
+                            if (column_labels_.size() > 0)
+                            {
+                                flip(modes::header, modes::object);
+                            }
+                            else
+                            {
+                                flip(modes::header, modes::array);
+                            }
+                        }
                         break;
                     }
                     column_index_ = 0;
@@ -318,7 +312,17 @@ public:
                             handler_->end_object(*this);
                             break;
                         case modes::header:
-                            flip(modes::header, modes::object);
+                            if (line_ > parameters_.header_lines())
+                            {
+                                if (column_labels_.size() > 0)
+                                {
+                                    flip(modes::header, modes::object);
+                                }
+                                else
+                                {
+                                    flip(modes::header, modes::array);
+                                }
+                            }
                             break;
                         }
                         column_index_ = 0;
@@ -356,6 +360,24 @@ public:
             {
                 state_ = states::done;
             }
+            switch (next_char)
+            {
+            case '\r':
+                ++line_;
+                column_ = 1;
+                break;
+            case '\n':
+                if (prev_char_ != '\r')
+                {
+                    ++line_;
+                }
+                column_ = 1;
+                break;
+            default:
+                ++column_;
+                break;
+            }
+            prev_char_ = next_char;
         }
     }
 
@@ -370,9 +392,6 @@ public:
                 break;
             case modes::object:
                 handler_->end_object(*this);
-                break;
-            case modes::header:
-                flip(modes::header, modes::object);
                 break;
             }
             column_index_ = 0;
@@ -422,7 +441,10 @@ private:
         switch (stack_[top_])
         {
         case modes::header:
-            column_labels_.push_back(string_buffer_);
+            if (line_ == 1)
+            {
+                column_labels_.push_back(string_buffer_);
+            }
             state_ = states::unquoted_string;
             break;
         case modes::object:
@@ -456,7 +478,7 @@ private:
 
     Char do_last_char() const override
     {
-        return c_;
+        return (Char)prev_char_;
     }
 
     bool push(modes::modes_t modes)
@@ -561,13 +583,12 @@ private:
     basic_parse_error_handler<Char> *err_handler_;
     unsigned long column_;
     unsigned long line_;
-    Char c_;
+    int prev_char_;
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<Char> string_buffer_;
     bool is_negative_;
     states::states_t saved_state_;
-    bool cr_;
     size_t index_;
     int depth_;
     int max_depth_;
