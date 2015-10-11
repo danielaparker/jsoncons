@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>csv_serializer</title>
+<title>csv_parameters</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,155 +468,52 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::csv::csv_serializer
-</code></pre>
-
-<p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
-
-<h3>Header</h3>
-
-<pre><code>#include "jsoncons_ext/csv/csv_serializer.hpp"
-</code></pre>
-
-<h3>Constructors</h3>
-
-<pre><code>csv_serializer(std::ostream&amp; os)
-</code></pre>
-
-<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
-<code>os</code>. Uses default <a href="csv_parameters">csv_parameters</a>.<br>
-You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<pre><code>csv_serializer(std::ostream&amp; os,
-               const csv_parameters&amp; params)
-</code></pre>
-
-<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
-<code>os</code> and <a href="csv_parameters">csv_parameters</a>.<br>
-You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<h3>Member functions</h3>
-
-<h3>Destructor</h3>
-
-<pre><code>virtual ~json_serializer()
-</code></pre>
-
-<h3>Examples</h3>
-
-<h3>Serializing an array of json values to a comma delimted file</h3>
-
-<h4>JSON input file</h4>
-
-<pre><code>[
-    ["country_code","name"],
-    ["ABW","ARUBA"],
-    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-    ["VUT","VANUATU"],
-    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
-]
-</code></pre>
-
-<p>Note </p>
-
-<ul>
-<li>The third array element has a value that contains a comma, in the CSV file this value will be quoted.</li>
-</ul>
-
-<h4>Serializing the comma delimited file with csv_serializer</h4>
-
-<pre><code>std::string in_file = "input/countries.json";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-json_reader reader(is,handler);
-reader.read_next();
-json countries = std::move(handler.root());
-
-csv_serializer serializer(std::cout);
-
-countries.to_stream(serializer);
-</code></pre>
-
-<h4>Output</h4>
-
-<pre><code>country_code,name
-ABW,ARUBA
-ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-VUT,VANUATU
-WLF,WALLIS &amp; FUTUNA ISLANDS
-</code></pre>
-
-<h3>Serializing an array of json objects to a tab delimted file</h3>
-
-<h4>JSON input file</h4>
-
-<pre><code>[
-    {
-        "dept":"sales",
-        "employee-name":"Smith, Matthew",
-        "employee-no":"00000001",
-        "note":"",
-        "salary":"150,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Brown, Sarah",
-        "employee-no":"00000002",
-        "note":"",
-        "salary":"89,000.00"
-    },
-    {
-        "dept":"finance",
-        "employee-name":"Oberc, Scott",
-        "employee-no":"00000003",
-        "salary":"110,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Scott, Colette",
-        "employee-no":"00000004",
-        "note":"\"Exemplary\" employee\nDependable, trustworthy",
-        "comment":"Team player",
-        "salary":"75,000.00"
-    }
-]
-</code></pre>
-
-<p>Note </p>
-
-<ul>
-<li>The names in the first object in the array will be used for the header row of the CSV file</li>
-<li>The fourth object has a <code>note</code> member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.</li>
-</ul>
-
-<h4>Reading the tab delimited file with csv_serializer</h4>
-
-<pre><code>std::string in_file = "input/employees.json";
-std::ifstream is(in_file);
-
-json_deserializer handler;
-csv_parameters params;
-params.field_delimiter = '\t';
-
-json_reader reader(is,handler);
-reader.read_next();
-json employees = std::move(handler.root());
-
-csv_serializer serializer(std::cout,params);
-
-employees.to_stream(serializer);
-</code></pre>
-
-<h4>Tab delimited output file</h4>
-
-<pre><code>dept    employee-name   employee-no     note    salary
-sales   Smith, Matthew  00000001                150,000.00
-sales   Brown, Sarah    00000002                89,000.00
-finance Oberc, Scott    00000003                110,000.00
-sales   Scott, Colette  00000004        ""Exemplary"" employee
-Dependable, trustworthy 75,000.00
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>assume_header</td>
+<td>Assume first row in file is header, use field names to construct objects</td>
+<td>false</td>
+</tr>
+<tr>
+<td>line_delimiter</td>
+<td>String to write between records</td>
+<td>\n</td>
+</tr>
+<tr>
+<td>field_delimiter</td>
+<td>Field separator</td>
+<td>,</td>
+</tr>
+<tr>
+<td>quote_char</td>
+<td>Quote character</td>
+<td>"</td>
+</tr>
+<tr>
+<td>quote_escape_char</td>
+<td>Character to escape quote character (by default the quote character is doubled)</td>
+<td>"</td>
+</tr>
+<tr>
+<td>quote_style</td>
+<td>all, minimal, none, or nonnumeric</td>
+<td>minimal</td>
+</tr>
+<tr>
+<td>comment_symbol</td>
+<td>Character to comment out a line, must be at column 1.</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
