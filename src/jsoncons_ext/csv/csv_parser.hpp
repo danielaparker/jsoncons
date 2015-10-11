@@ -36,6 +36,7 @@ namespace modes {
 namespace states {
     enum states_t {
         start, 
+        comment,
         expect_value,
         between_fields,
 		quoted_string,
@@ -226,34 +227,48 @@ public:
         index_ = start;
         for (; index_ < length && state_ != states::done; ++index_)
         {
-            int next_char = p[index_];
+            int curr_char = p[index_];
 all_states:
             switch (state_)
             {
-            case states::expect_value:
-                switch (next_char)
+            case states::comment:
+                if (curr_char == '\n')
                 {
-                default:
+                    state_ = states::expect_value;
+                }
+                else if (prev_char_ == '\r')
+                {
+                    state_ = states::expect_value;
+                    goto all_states;
+                }
+                break;
+            case states::expect_value:
+                if (column_ == 1 && curr_char == parameters_.comment_starter())
+                {
+                    state_ = states::comment;
+                }
+                else
+                {
                     state_ = states::unquoted_string;
                     goto all_states;
                 }
                 break;
             case states::between_fields:
-                if (next_char == '\r' || (prev_char_ != '\r' && next_char == '\n'))
+                if (curr_char == '\r' || (prev_char_ != '\r' && curr_char == '\n'))
                 {
                     after_record();
                     state_ = states::expect_value;
                 }
-                else if (next_char == parameters_.field_delimiter())
+                else if (curr_char == parameters_.field_delimiter())
                 {
                     state_ = states::expect_value;
                 }
                 break;
             case states::escaped_value: 
                 {
-                    if (next_char == parameters_.quote_char())
+                    if (curr_char == parameters_.quote_char())
                     {
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::quoted_string;
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
@@ -268,11 +283,11 @@ all_states:
                 break;
             case states::quoted_string: 
                 {
-                    if (next_char == parameters_.quote_escape_char())
+                    if (curr_char == parameters_.quote_escape_char())
                     {
                         state_ = states::escaped_value;
                     }
-                    else if (next_char == parameters_.quote_char())
+                    else if (curr_char == parameters_.quote_char())
                     {
                         before_record();
                         end_string_value();
@@ -281,13 +296,13 @@ all_states:
                     }
                     else
                     {
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                     }
                 }
                 break;
             case states::unquoted_string: 
                 {
-                    if (next_char == '\r' || (prev_char_ != '\r' && next_char == '\n'))
+                    if (curr_char == '\r' || (prev_char_ != '\r' && curr_char == '\n'))
                     {
                         before_record();
                         end_string_value();
@@ -295,7 +310,7 @@ all_states:
                         after_record();
                         state_ = states::expect_value;
                     }
-                    else if (next_char == '\n')
+                    else if (curr_char == '\n')
                     {
                         if (prev_char_ != '\r')
                         {
@@ -306,21 +321,21 @@ all_states:
                             state_ = states::expect_value;
                         }
                     }
-                    else if (next_char == parameters_.field_delimiter())
+                    else if (curr_char == parameters_.field_delimiter())
                     {
                         before_record();
                         end_string_value();
                         after_field();
                         state_ = states::expect_value;
                     }
-                    else if (next_char == parameters_.quote_char())
+                    else if (curr_char == parameters_.quote_char())
                     {
                         string_buffer_.clear();
                         state_ = states::quoted_string;
                     }
                     else
                     {
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                     }
                 }
                 break;
@@ -332,7 +347,7 @@ all_states:
             {
                 state_ = states::done;
             }
-            switch (next_char)
+            switch (curr_char)
             {
             case '\r':
                 ++line_;
@@ -349,7 +364,7 @@ all_states:
                 ++column_;
                 break;
             }
-            prev_char_ = next_char;
+            prev_char_ = curr_char;
         }
     }
 

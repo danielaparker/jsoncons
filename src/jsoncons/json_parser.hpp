@@ -99,7 +99,7 @@ public:
         top_ = -1;
         line_ = 1;
         column_ = 0;
-        cr_ = false;
+        prev_char_ = 0;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -124,7 +124,7 @@ public:
         top_ = -1;
         line_ = 1;
         column_ = 0;
-        cr_ = false;
+        prev_char_ = 0;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
@@ -159,6 +159,9 @@ public:
             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
         }
         state_ = states::start;
+        prev_char_ = 0;
+        line_ = 1;
+        column_ = 1;
     }
 
     void check_done(Char const* p, size_t start, size_t length)
@@ -166,8 +169,8 @@ public:
         index_ = start;
         for (; index_ < length; ++index_)
         {
-            int next_char = p[index_];
-            switch (next_char)
+            int curr_char = p[index_];
+            switch (curr_char)
             {
             case '\n':
             case '\r':
@@ -186,67 +189,21 @@ public:
         index_ = start;
         for (; (index_ < length) & (state_ != states::done); ++index_)
         {
-            int next_char = p[index_];
-            switch (next_char)
+            int curr_char = p[index_];
+            switch (curr_char)
             {
-            case 0x00:
-            case 0x01:
-            case 0x02:
-            case 0x03:
-            case 0x04:
-            case 0x05:
-            case 0x06:
-            case 0x07:
-            case 0x08:
-            case 0x0b:
-            case 0x0c:
-            case 0x0e:
-            case 0x0f:
-            case 0x10:
-            case 0x11:
-            case 0x12:
-            case 0x13:
-            case 0x14:
-            case 0x15:
-            case 0x16:
-            case 0x17:
-            case 0x18:
-            case 0x19:
-            case 0x1a:
-            case 0x1b:
-            case 0x1c:
-            case 0x1d:
-            case 0x1e:
-            case 0x1f:
+            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                 err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_text_error_category()), *this);
                 break;
-            case '\r':
-                ++line_;
-                column_ = 0;
-                cr_ = true;
-                break;
-            case '\n':
-                if (!cr_)
-                {
-                    ++line_;
-                    column_ = 0;
-                }
-                else
-                {
-                    cr_ = false;
-                }
-                break;
-            default:
-                cr_ = false;
-                break;
             }
-            ++column_;
 
             switch (state_)
             {
             case states::start: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break; 
@@ -287,7 +244,7 @@ public:
 
             case states::expect_comma_or_end: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break; 
@@ -338,7 +295,7 @@ public:
                 break;
             case states::object: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break;
@@ -376,7 +333,7 @@ public:
                 break;
             case states::expect_member_name: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break;
@@ -401,7 +358,7 @@ public:
                 break;
             case states::expect_colon: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break;
@@ -421,7 +378,7 @@ public:
                 break;
             case states::expect_value: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break;
@@ -453,11 +410,11 @@ public:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -520,7 +477,7 @@ public:
                 break;
             case states::array: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         break;
@@ -568,11 +525,11 @@ public:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -625,7 +582,7 @@ public:
                 break;
             case states::string: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '\n':
                     case '\r':
@@ -639,37 +596,37 @@ public:
                         end_string_value();
                         break;
                     default:
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         break;
                     }
                 }
                 break;
             case states::escape: 
                 {
-                    escape_next_char(next_char);
+                    escape_next_char(curr_char);
                 }
                 break;
             case states::u1: 
                 {
-                    append_codepoint(next_char);
+                    append_codepoint(curr_char);
                     state_ = states::u2;
                 }
                 break;
             case states::u2: 
                 {
-                    append_codepoint(next_char);
+                    append_codepoint(curr_char);
                     state_ = states::u3;
                 }
                 break;
             case states::u3: 
                 {
-                    append_codepoint(next_char);
+                    append_codepoint(curr_char);
                     state_ = states::u4;
                 }
                 break;
             case states::u4: 
                 {
-                    append_codepoint(next_char);
+                    append_codepoint(curr_char);
                     if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
                     {
                         state_ = states::expect_surrogate_pair1;
@@ -683,7 +640,7 @@ public:
                 break;
             case states::expect_surrogate_pair1: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '\\': 
                         cp2_ = 0;
@@ -697,7 +654,7 @@ public:
                 break;
             case states::expect_surrogate_pair2: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'u':
                         state_ = states::u6;
@@ -710,25 +667,25 @@ public:
                 break;
             case states::u6:
                 {
-                    append_second_codepoint(next_char);
+                    append_second_codepoint(curr_char);
                     state_ = states::u7;
                 }
                 break;
             case states::u7: 
                 {
-                    append_second_codepoint(next_char);
+                    append_second_codepoint(curr_char);
                     state_ = states::u8;
                 }
                 break;
             case states::u8: 
                 {
-                    append_second_codepoint(next_char);
+                    append_second_codepoint(curr_char);
                     state_ = states::u9;
                 }
                 break;
             case states::u9: 
 				{
-                    append_second_codepoint(next_char);
+                    append_second_codepoint(curr_char);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
                     json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
                     state_ = states::string;
@@ -736,14 +693,14 @@ public:
                 break;
             case states::minus:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '0': 
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     default:
@@ -754,7 +711,7 @@ public:
                 break;
             case states::zero:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         end_integer_value();
@@ -795,7 +752,7 @@ public:
                         }
                         break;
                     case '.':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -813,7 +770,7 @@ public:
                 break;
             case states::integer: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         end_integer_value();
@@ -855,11 +812,11 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case '.':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -867,7 +824,7 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp1;
                         break;
                     default:
@@ -878,7 +835,7 @@ public:
                 break;
             case states::fraction: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         end_fraction_value();
@@ -920,7 +877,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -928,7 +885,7 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp1;
                         break;
                     default:
@@ -939,18 +896,18 @@ public:
                 break;
             case states::exp1: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '+':
                         state_ = states::exp2;
                         break;
                     case '-':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp2;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -961,11 +918,11 @@ public:
                 break;
             case states::exp2:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -976,7 +933,7 @@ public:
                 break;
             case states::exp3: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case ' ':case '\n':case '\r':case '\t':
                         end_fraction_value();
@@ -1022,7 +979,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(next_char);
+                        string_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -1033,7 +990,7 @@ public:
                 break;
             case states::t: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'r':
                         state_ = states::tr;
@@ -1046,7 +1003,7 @@ public:
                 break;
             case states::tr: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'u':
                         state_ = states::tru;
@@ -1059,7 +1016,7 @@ public:
                 break;
             case states::tru:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'e': 
                         handler_->value(true, *this);
@@ -1073,7 +1030,7 @@ public:
                 break;
             case states::f:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'a':
                         state_ = states::fa;
@@ -1086,7 +1043,7 @@ public:
                 break;
             case states::fa: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'l': 
                         state_ = states::fal;
@@ -1099,7 +1056,7 @@ public:
                 break;
             case states::fal:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 's':
                         state_ = states::fals;
@@ -1112,7 +1069,7 @@ public:
                 break;
             case states::fals:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'e':
                         handler_->value(false, *this);
@@ -1126,7 +1083,7 @@ public:
                 break;
             case states::n: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'u':
                         state_ = states::nu;
@@ -1139,7 +1096,7 @@ public:
                 break;
             case states::nu:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'l': 
                         state_ = states::nul;
@@ -1152,7 +1109,7 @@ public:
                 break;
             case states::nul:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case 'l': 
                         handler_->value(null_type(), *this);
@@ -1166,7 +1123,7 @@ public:
                 break;
             case states::slash: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '*':
                         state_ = states::slash_star;
@@ -1182,7 +1139,7 @@ public:
                 break;
             case states::slash_star:  
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '*':
                         state_ = states::slash_star_star;
@@ -1192,7 +1149,7 @@ public:
                 break;
             case states::slash_slash: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '\n':
                     case '\r':
@@ -1203,7 +1160,7 @@ public:
                 break;
             case states::slash_star_star: 
                 {
-                    switch (next_char)
+                    switch (curr_char)
                     {
                     case '/':
                         state_ = saved_state_;
@@ -1215,6 +1172,24 @@ public:
                 }
                 break;
             }
+            switch (curr_char)
+            {
+            case '\r':
+                ++line_;
+                column_ = 1;
+                break;
+            case '\n':
+                if (prev_char_ != '\r')
+                {
+                    ++line_;
+                }
+                column_ = 1;
+                break;
+            default:
+                ++column_;
+                break;
+            }
+            prev_char_ = curr_char;
         }
     }
 
@@ -1304,14 +1279,14 @@ private:
         state_ = states::expect_comma_or_end;
     }
 
-    void append_codepoint(int next_char)
+    void append_codepoint(int curr_char)
     {
-        switch (next_char)
+        switch (curr_char)
         {
         case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp_ = append_to_codepoint(cp_, next_char);
+            cp_ = append_to_codepoint(cp_, curr_char);
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
@@ -1319,15 +1294,15 @@ private:
         }
     }
 
-    void append_second_codepoint(int next_char)
+    void append_second_codepoint(int curr_char)
     {
-        switch (next_char)
+        switch (curr_char)
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp2_ = append_to_codepoint(cp2_, next_char);
+            cp2_ = append_to_codepoint(cp2_, curr_char);
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::expected_value, json_text_error_category()), *this);
@@ -1431,20 +1406,20 @@ private:
         state_ = states::expect_value;
     }
  
-    uint32_t append_to_codepoint(uint32_t cp, int next_char)
+    uint32_t append_to_codepoint(uint32_t cp, int curr_char)
     {
         cp *= 16;
-        if (next_char >= '0'  &&  next_char <= '9')
+        if (curr_char >= '0'  &&  curr_char <= '9')
         {
-            cp += next_char - '0';
+            cp += curr_char - '0';
         }
-        else if (next_char >= 'a'  &&  next_char <= 'f')
+        else if (curr_char >= 'a'  &&  curr_char <= 'f')
         {
-            cp += next_char - 'a' + 10;
+            cp += curr_char - 'a' + 10;
         }
-        else if (next_char >= 'A'  &&  next_char <= 'F')
+        else if (curr_char >= 'A'  &&  curr_char <= 'F')
         {
-            cp += next_char - 'A' + 10;
+            cp += curr_char - 'A' + 10;
         }
         else
         {
@@ -1576,7 +1551,7 @@ private:
     std::basic_string<Char> string_buffer_;
     bool is_negative_;
     states::states_t saved_state_;
-    bool cr_;
+    int prev_char_;
     size_t index_;
     int depth_;
     int max_depth_;
