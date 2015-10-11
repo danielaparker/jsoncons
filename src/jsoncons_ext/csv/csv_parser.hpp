@@ -145,6 +145,15 @@ public:
         return column_labels_;
     }
 
+    void column_labels(const std::vector<std::basic_string<Char>>& value)
+    {
+        column_labels_.clear();
+        for (size_t i = 0; i < value.size(); ++i)
+        {
+            column_labels_.push_back(value[i]);
+        }
+    }
+
     basic_parsing_context<Char> const & parsing_context() const
     {
         return *this;
@@ -207,6 +216,20 @@ public:
     {
         push(modes::done);
         handler_->begin_json();
+
+        if (parameters_.header().length() > 0)
+        {
+            empty_basic_json_input_handler<Char> ih;
+            basic_csv_parameters<Char> params;
+            params.field_delimiter(parameters_.field_delimiter());
+			params.assume_header(true);
+            basic_csv_parser<Char> p(ih,params);
+            p.begin_parse();
+            p.parse(&(parameters_.header()[0]),0,parameters_.header().length());
+            p.end_parse();
+            column_labels(p.column_labels());
+
+        }
         if (parameters_.header_lines() > 0)
         {
             push(modes::header);

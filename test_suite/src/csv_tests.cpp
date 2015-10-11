@@ -162,6 +162,32 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols)
     BOOST_CHECK(val[1]["c"]==json("6"));
 }
 
+BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
+{
+    std::string text = "a,b,c\n1,2,3\n4,5,6";
+    std::istringstream is(text);
+
+    json_deserializer handler;
+
+    csv_parameters params;
+	params.header("x,y,z");
+    params.header_lines(1);
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json val = std::move(handler.root());
+
+    BOOST_CHECK(val.size()==2);
+    BOOST_CHECK(val[0].size()==3);
+    BOOST_CHECK(val[1].size()==3);
+    BOOST_CHECK(val[0]["x"]==json("1"));
+    BOOST_CHECK(val[0]["y"]==json("2"));
+    BOOST_CHECK(val[0]["z"]==json("3"));
+    BOOST_CHECK(val[1]["x"]==json("4"));
+    BOOST_CHECK(val[1]["y"]==json("5"));
+    BOOST_CHECK(val[1]["z"]==json("6"));
+}
+
 BOOST_AUTO_TEST_CASE(csv_test1_object_1col_quoted)
 {
     std::string text = "a\n\"1\"\n\"4\"";
@@ -305,7 +331,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
     BOOST_CHECK(val[1]["b"]==json("5"));
     BOOST_CHECK(val[1]["c"]==json("6"));
 }
-#if 0
+
 BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 {
     std::string in_file = "input/countries.csv";
@@ -315,6 +341,24 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 
     csv_parameters params;
 	params.assume_header(true);
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json countries = std::move(handler.root());
+
+    std::cout << pretty_print(countries) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
+{
+    std::string in_file = "input/countries.csv";
+    std::ifstream is(in_file);
+
+    json_deserializer handler;
+
+    csv_parameters params;
+    params.header("Country Code,Name");
+    params.header_lines(1);
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -373,4 +417,3 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     employees.to_stream(serializer);
 }
-#endif
