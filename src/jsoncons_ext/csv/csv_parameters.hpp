@@ -38,7 +38,7 @@ public:
         field_delimiter_(','),
         quote_char_('\"'),
         quote_escape_char_('\"'),
-        comment_symbol_('\0'),
+        comment_starter_('\0'),
         quote_style_(quote_styles::minimal),
         max_lines_(std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP()),
         header_lines_(0)
@@ -108,14 +108,14 @@ public:
         quote_escape_char_ = value;
     }
 
-    Char comment_symbol() const
+    Char comment_starter() const
     {
-        return comment_symbol_;
+        return comment_starter_;
     }
 
-    void comment_symbol(Char value)
+    void comment_starter(Char value)
     {
-        comment_symbol_ = value;
+        comment_starter_ = value;
     }
 
     quote_styles::quote_styles_t quote_style() const
@@ -143,7 +143,7 @@ private:
     std::basic_string<Char> line_delimiter_;
     Char quote_char_;
     Char quote_escape_char_;
-    Char comment_symbol_;
+    Char comment_starter_;
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
