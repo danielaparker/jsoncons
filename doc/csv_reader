@@ -559,7 +559,7 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <li>The third record has a field value that contains an embedded comma, so it must be quoted.</li>
 </ul>
 
-<h4>Reading the comma delimited file with csv_reader</h4>
+<h4>Reading the comma delimited file as an array of arrays</h4>
 
 <pre><code>std::string in_file = "countries.csv";
 std::ifstream is(in_file);
@@ -570,7 +570,7 @@ csv_reader reader(is,handler);
 reader.read();
 json countries = std::move(handler.root());
 
-std::cout &lt;&lt; countries &lt;&lt; std::endl;
+std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
 </code></pre>
 
 <h4>Output</h4>
@@ -603,7 +603,7 @@ Dependable, trustworthy"
 <li>The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.</li>
 </ul>
 
-<h4>Reading the tab delimited file with csv_reader</h4>
+<h4>Reading the tab delimited file as an array of objects</h4>
 
 <pre><code>std::string in_file = "employees.txt";
 std::ifstream is(in_file);
@@ -617,7 +617,7 @@ csv_reader reader(is,handler,params);
 reader.read();
 json employees = std::move(handler.root());
 
-std::cout &lt;&lt; employees &lt;&lt; std::endl;
+std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;
 </code></pre>
 
 <h4>Output</h4>
@@ -650,6 +650,53 @@ std::cout &lt;&lt; employees &lt;&lt; std::endl;
         "employee-no":"00000004",
         "note":"\"Exemplary\" employee\nDependable, trustworthy",
         "salary":"75,000.00"
+    }
+]
+</code></pre>
+
+<h4>Reading the comma delimited file as an array of objects with user supplied columns names</h4>
+
+<p>Note </p>
+
+<ul>
+<li>
+<p>The first record contains a header line, but we're going to ignore that and use our own names for the fields.</p>
+
+<p>std::string in_file = "countries.csv";<br>
+std::ifstream is(in_file);</p>
+
+<p>json_deserializer handler;</p>
+
+<p>csv_parameters params;<br>
+params.header("Country Code,Name");<br>
+params.header_lines(1);</p>
+
+<p>csv_reader reader(is,handler,params);<br>
+reader.read();<br>
+json countries = std::move(handler.root());</p>
+
+<p>std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</p>
+</li>
+</ul>
+
+<h4>Output</h4>
+
+<pre><code>[
+    {
+        "Country Code":"ABW",
+        "Name":"ARUBA"
+    },
+    {
+        "Country Code":"ATF",
+        "Name":"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+    },
+    {
+        "Country Code":"VUT",
+        "Name":"VANUATU"
+    },
+    {
+        "Country Code":"WLF",
+        "Name":"WALLIS &amp; FUTUNA ISLANDS"
     }
 ]
 </code></pre>
