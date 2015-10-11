@@ -36,10 +36,18 @@ namespace modes {
 namespace states {
     enum states_t {
         start, 
+        expect_value,
         between_fields,
 		quoted_string,
 		unquoted_string,
         escaped_value,
+        minus, 
+        zero,  
+        integer,
+        fraction,
+        exp1,
+        exp2,
+        exp3,
         done
     };
 };
@@ -47,7 +55,7 @@ namespace states {
 template<typename Char>
 class basic_csv_parser : private basic_parsing_context<Char>
 {
-    static const int default_depth = 100;
+    static const int default_depth = 3;
 
 public:
     basic_csv_parser(basic_json_input_handler<Char>& handler)
@@ -65,7 +73,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     basic_csv_parser(basic_json_input_handler<Char>& handler,
@@ -86,7 +93,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     basic_csv_parser(basic_json_input_handler<Char>& handler,
@@ -106,7 +112,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     basic_csv_parser(basic_json_input_handler<Char>& handler,
@@ -128,7 +133,6 @@ public:
         line_ = 1;
         column_ = 0;
         column_index_ = 0;
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     ~basic_csv_parser()
@@ -150,26 +154,68 @@ public:
         return state_ == states::done;
     }
 
+    void after_field()
+    {
+        ++column_index_;
+    }
+
+    void before_record()
+    {
+        if (column_index_ == 0)
+        {
+            switch (stack_[top_])
+            {
+            case modes::array:
+                handler_->begin_array(*this);
+                break;
+            case modes::object:
+                handler_->begin_object(*this);
+                break;
+            }
+        }
+    }
+
+    void after_record()
+    {
+        switch (stack_[top_])
+        {
+        case modes::array:
+            handler_->end_array(*this);
+            break;
+        case modes::object:
+            handler_->end_object(*this);
+            break;
+        case modes::header:
+            if (line_ >= parameters_.header_lines())
+            {
+                if (column_labels_.size() > 0)
+                {
+                    flip(modes::header, modes::object);
+                }
+                else
+                {
+                    flip(modes::header, modes::array);
+                }
+            }
+            break;
+        }
+        column_index_ = 0;
+    }
+
     void begin_parse()
     {
         push(modes::done);
         handler_->begin_json();
-        if (parameters_.assume_header())
+        if (parameters_.header_lines() > 0)
         {
-            if (!push(modes::header))
-            {
-                err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
-            }
+            push(modes::header);
         }
         else
         {
-            if (!push(modes::array))
-            {
-                err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
-            }
+            push(modes::array);
         }
         handler_->begin_array(*this);
-        state_ = states::unquoted_string;
+        state_ = states::expect_value;
         column_index_ = 0;
         prev_char_ = 0;
         column_ = 1;
@@ -180,55 +226,27 @@ public:
         index_ = start;
         for (; index_ < length && state_ != states::done; ++index_)
         {
-            bool is_newline = false;
             int next_char = p[index_];
-            switch (next_char)
-            {
-            case '\r':
-                is_newline = true;
-                break;
-            case '\n':
-                if (prev_char_ != '\r')
-                {
-                    is_newline = true;
-                }
-                break;
-            }
-
+all_states:
             switch (state_)
             {
-            case states::between_fields:
-                if (is_newline)
+            case states::expect_value:
+                switch (next_char)
                 {
-                    switch (stack_[top_])
-                    {
-                    case modes::array:
-                        handler_->end_array(*this);
-                        break;
-                    case modes::object:
-                        handler_->end_object(*this);
-                        break;
-                    case modes::header:
-                        if (line_ > parameters_.header_lines())
-                        {
-                            if (column_labels_.size() > 0)
-                            {
-                                flip(modes::header, modes::object);
-                            }
-                            else
-                            {
-                                flip(modes::header, modes::array);
-                            }
-                        }
-                        break;
-                    }
-                    column_index_ = 0;
+                default:
                     state_ = states::unquoted_string;
+                    goto all_states;
+                }
+                break;
+            case states::between_fields:
+                if (next_char == '\r' || (prev_char_ != '\r' && next_char == '\n'))
+                {
+                    after_record();
+                    state_ = states::expect_value;
                 }
                 else if (next_char == parameters_.field_delimiter())
                 {
-                    state_ = states::unquoted_string;
-                    ++column_index_;
+                    state_ = states::expect_value;
                 }
                 break;
             case states::escaped_value: 
@@ -240,20 +258,11 @@ public:
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
-                        if (column_index_ == 0)
-                        {
-                            switch (stack_[top_])
-                            {
-                            case modes::array:
-                                handler_->begin_array(*this);
-                                break;
-                            case modes::object:
-                                handler_->begin_object(*this);
-                                break;
-                            }
-                        }
+                        before_record();
                         end_string_value();
+                        after_field();
                         state_ = states::between_fields;
+                        goto all_states;
                     }
                 }
                 break;
@@ -265,19 +274,9 @@ public:
                     }
                     else if (next_char == parameters_.quote_char())
                     {
-                        if (column_index_ == 0)
-                        {
-                            switch (stack_[top_])
-                            {
-                            case modes::array:
-                                handler_->begin_array(*this);
-                                break;
-                            case modes::object:
-                                handler_->begin_object(*this);
-                                break;
-                            }
-                        }
+                        before_record();
                         end_string_value();
+                        after_field();
                         state_ = states::between_fields;
                     }
                     else
@@ -288,72 +287,45 @@ public:
                 break;
             case states::unquoted_string: 
                 {
-                    if (is_newline)
+                    if (next_char == '\r' || (prev_char_ != '\r' && next_char == '\n'))
                     {
-                        if (column_index_ == 0)
-                        {
-                            switch (stack_[top_])
-                            {
-                            case modes::array:
-                                handler_->begin_array(*this);
-                                break;
-                            case modes::object:
-                                handler_->begin_object(*this);
-                                break;
-                            }
-                        }
+                        before_record();
                         end_string_value();
-                        switch (stack_[top_])
+                        after_field();
+                        after_record();
+                        state_ = states::expect_value;
+                    }
+                    else if (next_char == '\n')
+                    {
+                        if (prev_char_ != '\r')
                         {
-                        case modes::array:
-                            handler_->end_array(*this);
-                            break;
-                        case modes::object:
-                            handler_->end_object(*this);
-                            break;
-                        case modes::header:
-                            if (line_ > parameters_.header_lines())
-                            {
-                                if (column_labels_.size() > 0)
-                                {
-                                    flip(modes::header, modes::object);
-                                }
-                                else
-                                {
-                                    flip(modes::header, modes::array);
-                                }
-                            }
-                            break;
+                            before_record();
+                            end_string_value();
+                            after_field();
+                            after_record();
+                            state_ = states::expect_value;
                         }
-                        column_index_ = 0;
+                    }
+                    else if (next_char == parameters_.field_delimiter())
+                    {
+                        before_record();
+                        end_string_value();
+                        after_field();
+                        state_ = states::expect_value;
                     }
                     else if (next_char == parameters_.quote_char())
                     {
                         string_buffer_.clear();
                         state_ = states::quoted_string;
                     }
-                    else if (next_char == parameters_.field_delimiter())
-                    {
-                        if (column_index_ == 0)
-                        {
-                            switch (stack_[top_])
-                            {
-                            case modes::array:
-                                handler_->begin_array(*this);
-                                break;
-                            case modes::object:
-                                handler_->begin_object(*this);
-                                break;
-                            }
-                        }
-                        end_string_value();
-                        ++column_index_;
-                    }
                     else
                     {
                         string_buffer_.push_back(next_char);
                     }
                 }
+                break;
+            default:
+                err_handler_->error(std::error_code(csv_parser_errc::invalid_state, csv_text_error_category()), *this);
                 break;
             }
             if (line_ > parameters_.max_lines())
@@ -383,19 +355,26 @@ public:
 
     void end_parse()
     {
-		if (column_index_ > 0)
-		{
-            switch (stack_[top_])
+        switch (state_)
+        {
+        case states::unquoted_string: 
+            before_record();
+            end_string_value();
+            after_field();
+            break;
+        case states::escaped_value:
+            if (parameters_.quote_escape_char() == parameters_.quote_char())
             {
-            case modes::array:
-                handler_->end_array(*this);
-                break;
-            case modes::object:
-                handler_->end_object(*this);
-                break;
+                before_record();
+                end_string_value();
+                after_field();
             }
-            column_index_ = 0;
-		}
+            break;
+        }
+        if (column_index_ > 0)
+        {
+            after_record();
+        }
         switch (stack_[top_])
         {
         case modes::array:
@@ -441,11 +420,11 @@ private:
         switch (stack_[top_])
         {
         case modes::header:
-            if (line_ == 1)
+            if (parameters_.assume_header() && line_ == 1)
             {
                 column_labels_.push_back(string_buffer_);
             }
-            state_ = states::unquoted_string;
+            state_ = states::expect_value;
             break;
         case modes::object:
             if (column_index_ < column_labels_.size())
@@ -453,11 +432,11 @@ private:
                 handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
                 handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             }
-            state_ = states::unquoted_string;
+            state_ = states::expect_value;
             break;
         case modes::array:
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-            state_ = states::unquoted_string;
+            state_ = states::expect_value;
             break;
         default:
             err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
@@ -481,20 +460,15 @@ private:
         return (Char)prev_char_;
     }
 
-    bool push(modes::modes_t modes)
+    void push(modes::modes_t modes)
     {
         ++top_;
         if (top_ >= depth_)
         {
-            if (top_ >= max_depth_)
-            {
-                return false;
-            }
             depth_ *= 2;
             stack_.resize(depth_);
         }
         stack_[top_] = modes;
-        return true;
     }
 
     int peek()
@@ -591,7 +565,6 @@ private:
     states::states_t saved_state_;
     size_t index_;
     int depth_;
-    int max_depth_;
     basic_csv_parameters<Char> parameters_;
     std::vector<std::basic_string<Char>> column_labels_;
 	size_t column_index_;

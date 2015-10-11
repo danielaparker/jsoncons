@@ -19,7 +19,8 @@ namespace csv_parser_errc
     {
         unexpected_eof,
         expected_quote,
-        invalid_csv_text
+        invalid_csv_text,
+        invalid_state
     };
 }
 

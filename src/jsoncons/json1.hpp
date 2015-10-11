@@ -844,12 +844,12 @@ public:
 
         bool operator==(const basic_json& val) const
         {
-            return val_ == val;
+            return val_.at(name_) == val;
         }
 
         bool operator!=(const basic_json& val) const
         {
-            return val_ != val;
+            return val_.at(name_) != val;
         }
 
         basic_json<Char,Alloc>& operator[](size_t i)
