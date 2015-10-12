@@ -1,5 +1,5 @@
-Targeting 0.98 Release
-----------------------
+0.98 Release
+------------
 
 Bug fixes:
 
@@ -26,6 +26,7 @@ Changes to extensions:
 
 - Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
 - Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a `csv_parameters` object rather than a `json` object.
+- Adds more options to csv_reader
 
 0.97.2 Release
 --------------
