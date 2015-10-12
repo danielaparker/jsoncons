@@ -71,7 +71,7 @@ Note
 - The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
 - The third record has a field value that contains an embedded comma, so it must be quoted.
 
-#### Reading the comma delimited file as an array of arrays
+#### Code
 
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
@@ -110,7 +110,7 @@ Note
 - The first record is a header line, which will be used to associate data values with names
 - The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
 
-#### Reading the tab delimited file as an array of objects
+#### Code
 
     std::string in_file = "employees.txt";
     std::ifstream is(in_file);
@@ -165,6 +165,8 @@ Note
 Note 
 
 - The first record contains a header line, but we're going to ignore that and use our own names for the fields.
+
+#### Code
 
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
