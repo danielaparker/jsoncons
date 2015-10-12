@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h2>Targeting 0.98 Release</h2>
+<h2>0.98 Release</h2>
 
 <p>Bug fixes:</p>
 
@@ -497,6 +497,7 @@ it is arbitrarily large (limited by heap memory.)</p></li>
 <li>Changes the top level namespace for the extensions from <code>jsoncons_ext</code> to <code>jsoncons</code>, e.g. <code>jsoncons_ext::csv::csv_reader</code> becomes <code>jsoncons::csv::csv_reader</code>
 </li>
 <li>Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a <code>csv_parameters</code> object rather than a <code>json</code> object.</li>
+<li>Adds more options to csv_reader</li>
 </ul>
 
 <h2>0.97.2 Release</h2>
