@@ -25,7 +25,7 @@ The library has a number of features, which are listed below:
 - 100 percent pass of test suite files from http://www.json.org/JSON_checker/
 - Handles JSON texts of arbitrarily large depth, a limit can be set if desired
 
-## What's new on Master
+## What's new in Release 0.98
 
 - Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
   contributed by Rupert Steel.
