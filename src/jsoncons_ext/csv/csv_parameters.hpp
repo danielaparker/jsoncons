@@ -24,6 +24,11 @@ namespace quote_styles
     enum quote_styles_t{all,minimal,none,nonnumeric};
 };
 
+    namespace json_types
+    {
+        enum json_types_t{string_t,number_t,bool_t};
+    }
+
 template <typename Char>
 class basic_csv_parameters
 {
@@ -76,6 +81,16 @@ public:
     void header(std::basic_string<Char> value)
     {
         header_ = value;
+    }
+
+    std::basic_string<Char> data_types() const
+    {
+        return data_types_;
+    }
+
+    void data_types(std::basic_string<Char> value)
+    {
+        data_types_ = value;
     }
 
     Char field_delimiter() const
@@ -158,6 +173,7 @@ private:
     unsigned long max_lines_;
     size_t header_lines_;
     std::basic_string<Char> header_;
+    std::basic_string<Char> data_types_;
 };
 
 typedef basic_csv_parameters<char> csv_parameters;

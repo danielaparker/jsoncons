@@ -24,6 +24,35 @@
 
 namespace jsoncons { namespace csv {
 
+template <typename Char>
+struct json_csv_parser_traits
+{
+};
+
+template <>
+struct json_csv_parser_traits<char>
+{
+    static const std::string string_literal() {return "string";};
+
+    static const std::string integer_literal() {return "integer";};
+
+    static const std::string float_literal() {return "float";};
+
+    static const std::string boolean_literal() {return "boolean";};
+};
+
+template <>
+struct json_csv_parser_traits<wchar_t> // assume utf16
+{
+    static const std::wstring string_literal() {return L"string";};
+
+    static const std::wstring integer_literal() {return L"integer";};
+
+    static const std::wstring float_literal() {return L"float";};
+
+    static const std::wstring boolean_literal() {return L"boolean";};
+};
+
 namespace modes {
     enum modes_t {
         done,
@@ -51,6 +80,11 @@ namespace states {
         exp3,
         done
     };
+};
+
+namespace data_types
+{
+    enum column_types_t{string_t,integer_t,float_t,boolean_t};
 };
 
 template<typename Char>
@@ -147,11 +181,7 @@ public:
 
     void column_labels(const std::vector<std::basic_string<Char>>& value)
     {
-        column_labels_.clear();
-        for (size_t i = 0; i < value.size(); ++i)
-        {
-            column_labels_.push_back(value[i]);
-        }
+        column_labels_ = value;
     }
 
     basic_parsing_context<Char> const & parsing_context() const
@@ -222,13 +252,45 @@ public:
             empty_basic_json_input_handler<Char> ih;
             basic_csv_parameters<Char> params;
             params.field_delimiter(parameters_.field_delimiter());
+            params.quote_char(parameters_.quote_char());
+            params.quote_escape_char(parameters_.quote_escape_char());
 			params.assume_header(true);
             basic_csv_parser<Char> p(ih,params);
             p.begin_parse();
             p.parse(&(parameters_.header()[0]),0,parameters_.header().length());
             p.end_parse();
             column_labels(p.column_labels());
-
+        }
+        if (parameters_.data_types().length() > 0)
+        {
+            empty_basic_json_input_handler<Char> ih;
+            basic_csv_parameters<Char> params;
+            params.field_delimiter(parameters_.field_delimiter());
+            params.assume_header(true);
+            basic_csv_parser<Char> p(ih,params);
+            p.begin_parse();
+            p.parse(&(parameters_.data_types()[0]),0,parameters_.data_types().length());
+            p.end_parse();
+			column_types_.resize(p.column_labels().size());
+            for (size_t i = 0; i < p.column_labels().size(); ++i)
+            {
+                if (p.column_labels()[i] == json_csv_parser_traits<Char>::string_literal())
+                {
+                    column_types_[i] = data_types::string_t;
+                }
+                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::integer_literal())
+                {
+                    column_types_[i] = data_types::integer_t;
+                }
+                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::float_literal())
+                {
+                    column_types_[i] = data_types::float_t;
+                }
+                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::boolean_literal())
+                {
+                    column_types_[i] = data_types::boolean_t;
+                }
+            }
         }
         if (parameters_.header_lines() > 0)
         {
@@ -468,12 +530,41 @@ private:
             if (column_index_ < column_labels_.size())
             {
                 handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
+            }
+            else
+            {
+                handler_->name("", 0, *this);
+            }
+        case modes::array:
+            if (column_index_ < column_types_.size())
+            {
+                switch (column_types_[column_index_])
+                {
+                case data_types::integer_t:
+					{
+						std::istringstream iss(string_buffer_);
+						long long val;
+						iss >> val;
+						handler_->value(val, *this);
+					}
+                    break;
+                case data_types::float_t:
+                    {
+                        std::istringstream iss(string_buffer_);
+                        double val;
+                        iss >> val;
+                        handler_->value(val, *this);
+                    }
+                    break;
+				default:
+	                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+					break;	
+                }
+            }
+            else
+            {
                 handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             }
-            state_ = states::expect_value;
-            break;
-        case modes::array:
-            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             state_ = states::expect_value;
             break;
         default:
@@ -605,6 +696,7 @@ private:
     int depth_;
     basic_csv_parameters<Char> parameters_;
     std::vector<std::basic_string<Char>> column_labels_;
+    std::vector<data_types::column_types_t> column_types_;
 	size_t column_index_;
 };
 
