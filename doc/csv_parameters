@@ -488,8 +488,13 @@ vertical-align:1px;
 <td>0</td>
 </tr>
 <tr>
-<td>header</td>
+<td>column_names</td>
 <td>A string containing delimited names corresponding to the fields in the file</td>
+<td>Empty</td>
+</tr>
+<tr>
+<td>data_types</td>
+<td>A string containing delimited data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean</td>
 <td>Empty</td>
 </tr>
 <tr>
@@ -526,6 +531,26 @@ vertical-align:1px;
 <td>comment_starter</td>
 <td>Character to comment out a line, must be at column 1.</td>
 <td>None</td>
+</tr>
+<tr>
+<td>trim_leading</td>
+<td>Trim leading whitespace</td>
+<td>false</td>
+</tr>
+<tr>
+<td>trim_trailing</td>
+<td>Trim trailing whitespace</td>
+<td>false</td>
+</tr>
+<tr>
+<td>trim</td>
+<td>Trim both leading and trailing whitespace</td>
+<td>false</td>
+</tr>
+<tr>
+<td>replace_empty_field_with_null</td>
+<td>Replace empty field with json null value</td>
+<td>false</td>
 </tr>
 </tbody>
 </table>
