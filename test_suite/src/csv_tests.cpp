@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
     json_deserializer handler;
 
     csv_parameters params;
-	params.field_names("x,y,z");
+	params.column_names("x,y,z");
     params.header_lines(1);
 
     csv_reader reader(is,handler,params);
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
     json_deserializer handler;
 
     csv_parameters params;
-	params.field_names("x,y,z");
+	params.column_names("x,y,z");
 	params.data_types("boolean,boolean,boolean");
     params.header_lines(1);
 
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
     json_deserializer handler;
 
     csv_parameters params;
-    params.field_names("Country Code,Name");
+    params.column_names("Country Code,Name");
     params.header_lines(1);
 
     csv_reader reader(is,handler,params);
