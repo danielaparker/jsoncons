@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
+#include <cctype>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/parse_error_handler.hpp"
@@ -247,7 +248,7 @@ public:
         push(modes::done);
         handler_->begin_json();
 
-        if (parameters_.header().length() > 0)
+        if (parameters_.field_names().length() > 0)
         {
             empty_basic_json_input_handler<Char> ih;
             basic_csv_parameters<Char> params;
@@ -257,7 +258,7 @@ public:
 			params.assume_header(true);
             basic_csv_parser<Char> p(ih,params);
             p.begin_parse();
-            p.parse(&(parameters_.header()[0]),0,parameters_.header().length());
+            p.parse(&(parameters_.field_names()[0]),0,parameters_.field_names().length());
             p.end_parse();
             column_labels(p.column_labels());
         }
@@ -517,59 +518,107 @@ private:
 
     void end_string_value() 
     {
-        switch (stack_[top_])
+        size_t start = 0;
+        size_t length = string_buffer_.length();
+
+        if (parameters_.trim_leading() | parameters_.trim_trailing())
         {
-        case modes::header:
-            if (parameters_.assume_header() && line_ == 1)
+            if (parameters_.trim_leading())
             {
-                column_labels_.push_back(string_buffer_);
-            }
-            state_ = states::expect_value;
-            break;
-        case modes::object:
-            if (column_index_ < column_labels_.size())
-            {
-                handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
-            }
-            else
-            {
-                handler_->name("", 0, *this);
-            }
-        case modes::array:
-            if (column_index_ < column_types_.size())
-            {
-                switch (column_types_[column_index_])
+                bool done = false;
+                while (!done && start < string_buffer_.length())
                 {
-                case data_types::integer_t:
-					{
-						std::istringstream iss(string_buffer_);
-						long long val;
-						iss >> val;
-						handler_->value(val, *this);
-					}
-                    break;
-                case data_types::float_t:
+                    if ((string_buffer_[start] < 256) && std::isspace(string_buffer_[start]))
                     {
-                        std::istringstream iss(string_buffer_);
-                        double val;
-                        iss >> val;
-                        handler_->value(val, *this);
+                        ++start;
                     }
-                    break;
-				default:
-	                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-					break;	
+                    else
+                    {
+                        done = true;
+                    }
                 }
             }
-            else
+            if (parameters_.trim_trailing())
             {
-                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                bool done = false;
+                while (!done && length > 0)
+                {
+                    if ((string_buffer_[length-1] < 256) && std::isspace(string_buffer_[length-1]))
+                    {
+                        --length;
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                }
             }
-            state_ = states::expect_value;
-            break;
-        default:
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
-            break;
+            if (start != 0 || length != string_buffer_.size())
+            {
+                string_buffer_ = string_buffer_.substr(start,length-start);
+            }
+        }
+        if (parameters_.replace_empty_field_with_null() && string_buffer_.length() == 0)
+        {
+            handler_->value(jsoncons::null_type(),*this);
+        }
+        else
+        {
+
+            switch (stack_[top_])
+            {
+            case modes::header:
+                if (parameters_.assume_header() && line_ == 1)
+                {
+                    column_labels_.push_back(string_buffer_);
+                }
+                state_ = states::expect_value;
+                break;
+            case modes::object:
+                if (column_index_ < column_labels_.size())
+                {
+                    handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
+                }
+                else
+                {
+                    handler_->name("", 0, *this);
+                }
+            case modes::array:
+                if (column_index_ < column_types_.size())
+                {
+                    switch (column_types_[column_index_])
+                    {
+                    case data_types::integer_t:
+                        {
+                            std::istringstream iss(string_buffer_);
+                            long long val;
+                            iss >> val;
+                            handler_->value(val, *this);
+                        }
+                        break;
+                    case data_types::float_t:
+                        {
+                            std::istringstream iss(string_buffer_);
+                            double val;
+                            iss >> val;
+                            handler_->value(val, *this);
+                        }
+                        break;
+                    default:
+                        handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                        break;	
+                    }
+                }
+                else
+                {
+                    handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                }
+                state_ = states::expect_value;
+                break;
+            default:
+                err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
+                break;
+            }
         }
         string_buffer_.clear();
     }
@@ -628,55 +677,6 @@ private:
         }
         --top_;
         return true;
-    }
-
-    template<typename CharType>
-    unsigned long long string_to_unsigned(const CharType *s, size_t length) throw(std::overflow_error)
-    {
-        const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
-        const unsigned long long max_value_div_10 = max_value / 10;
-        unsigned long long n = 0;
-        for (size_t i = 0; i < length; ++i)
-        {
-            unsigned long long x = s[i] - '0';
-            if (n > max_value_div_10)
-            {
-                throw std::overflow_error("Unsigned overflow");
-            }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                throw std::overflow_error("Unsigned overflow");
-            }
-
-            n += x;
-        }
-        return n;
-    }
-
-    template<typename CharType>
-    long long string_to_integer(bool has_neg, const CharType *s, size_t length) throw(std::overflow_error)
-    {
-        const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
-        const long long max_value_div_10 = max_value / 10;
-
-        long long n = 0;
-        for (size_t i = 0; i < length; ++i)
-        {
-            long long x = s[i] - '0';
-            if (n > max_value_div_10)
-            {
-                throw std::overflow_error("Integer overflow");
-            }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                throw std::overflow_error("Integer overflow");
-            }
-
-            n += x;
-        }
-        return has_neg ? -n : n;
     }
 
     states::states_t state_;

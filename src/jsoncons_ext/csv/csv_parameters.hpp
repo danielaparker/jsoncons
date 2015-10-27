@@ -39,6 +39,9 @@ public:
 
     basic_csv_parameters()
         :
+        trim_leading_(false),
+        trim_trailing_(false),
+        replace_empty_field_with_null_(false),
         assume_header_(false),
         field_delimiter_(','),
         quote_char_('\"'),
@@ -73,14 +76,55 @@ public:
         assume_header_ = value;
     }
 
-    std::basic_string<Char> header() const
+    bool trim_leading() const
     {
-        return header_;
+        return trim_leading_;
     }
 
-    void header(std::basic_string<Char> value)
+    void trim_leading(bool value)
     {
-        header_ = value;
+        trim_leading_ = value;
+    }
+
+    bool trim_trailing() const
+    {
+        return trim_trailing_;
+    }
+
+    void trim_trailing(bool value)
+    {
+        trim_trailing_ = value;
+    }
+
+    bool trim() const
+    {
+        return trim_leading_ && trim_trailing_;
+    }
+
+    void trim(bool value)
+    {
+        trim_leading_ = value;
+        trim_trailing_ = value;
+    }
+
+    bool replace_empty_field_with_null() const
+    {
+        return replace_empty_field_with_null_;
+    }
+
+    void replace_empty_field_with_null(bool value)
+    {
+        replace_empty_field_with_null_ = value;
+    }
+
+    std::basic_string<Char> field_names() const
+    {
+        return field_names_;
+    }
+
+    void field_names(std::basic_string<Char> value)
+    {
+        field_names_ = value;
     }
 
     std::basic_string<Char> data_types() const
@@ -162,7 +206,21 @@ public:
     {
         max_lines_ = value;
     }
+
+    // Deprecated
+    std::basic_string<Char> header() const
+    {
+        return field_names_;
+    }
+
+    void header(std::basic_string<Char> value)
+    {
+        field_names_ = value;
+    }
 private:
+    bool trim_leading_;
+    bool trim_trailing_;
+    bool replace_empty_field_with_null_;
     bool assume_header_;
     Char field_delimiter_;
     std::basic_string<Char> line_delimiter_;
@@ -172,7 +230,7 @@ private:
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
-    std::basic_string<Char> header_;
+    std::basic_string<Char> field_names_;
     std::basic_string<Char> data_types_;
 };
 
