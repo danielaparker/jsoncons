@@ -174,7 +174,7 @@ Note
     json_deserializer handler;
 
     csv_parameters params;
-	params.header("Country Code,Name");
+	params.column_names("Country Code,Name");
     params.header_lines(1);
 
     csv_reader reader(is,handler,params);
