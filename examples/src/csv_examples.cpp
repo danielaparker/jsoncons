@@ -15,14 +15,15 @@ using std::string;
 
 void read_csv_file()
 {
-    string text = "name,lname,age\nxyz,p,20\nabc,q,25";
+    string text = "employee-no,employee-name,dept,salary\n00000001,\"Smith,Matthew\",sales,150000.00\n00000002,\"Brown,Sarah\",sales,89000.00";
+
     std::istringstream is(text);
 
     json_deserializer handler;
 
     csv_parameters params;
     params.assume_header(true);
-    params.data_types("string,string,integer");
+    params.data_types("string,string,string,float");
     csv_reader reader(is,handler,params);
     reader.read();
     json val = std::move(handler.root());
