@@ -248,7 +248,7 @@ public:
         push(modes::done);
         handler_->begin_json();
 
-        if (parameters_.column_names().length() > 0)
+        if (parameters_.header().length() > 0)
         {
             empty_basic_json_input_handler<Char> ih;
             basic_csv_parameters<Char> params;
@@ -258,7 +258,7 @@ public:
 			params.assume_header(true);
             basic_csv_parser<Char> p(ih,params);
             p.begin_parse();
-            p.parse(&(parameters_.column_names()[0]),0,parameters_.column_names().length());
+            p.parse(&(parameters_.header()[0]),0,parameters_.header().length());
             p.end_parse();
             column_labels(p.column_labels());
         }

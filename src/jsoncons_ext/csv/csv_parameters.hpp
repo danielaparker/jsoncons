@@ -117,19 +117,19 @@ public:
         replace_empty_field_with_null_ = value;
     }
 
-    std::basic_string<Char> column_names() const
-    {
-        return column_names_;
-    }
-
-    void column_names(std::basic_string<Char> value)
-    {
-        column_names_ = value;
-    }
-
     std::basic_string<Char> data_types() const
     {
         return data_types_;
+    }
+
+    std::basic_string<Char> header() const
+    {
+        return header_;
+    }
+
+    void header(std::basic_string<Char> value)
+    {
+        header_ = value;
     }
 
     void data_types(std::basic_string<Char> value)
@@ -206,17 +206,6 @@ public:
     {
         max_lines_ = value;
     }
-
-    // Deprecated
-    std::basic_string<Char> header() const
-    {
-        return column_names_;
-    }
-
-    void header(std::basic_string<Char> value)
-    {
-        column_names_ = value;
-    }
 private:
     bool trim_leading_;
     bool trim_trailing_;
@@ -230,7 +219,7 @@ private:
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
-    std::basic_string<Char> column_names_;
+    std::basic_string<Char> header_;
     std::basic_string<Char> data_types_;
 };
 

@@ -488,7 +488,7 @@ vertical-align:1px;
 <td>0</td>
 </tr>
 <tr>
-<td>column_names</td>
+<td>header</td>
 <td>A string containing delimited names corresponding to the fields in the file</td>
 <td>Empty</td>
 </tr>
