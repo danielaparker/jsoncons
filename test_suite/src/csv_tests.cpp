@@ -276,6 +276,33 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
     BOOST_CHECK(val[1]["z"]==json("6"));
 }
 
+BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
+{
+    std::string text = "a,b,c\n1,0,1\ntrue,FalSe,TrUe";
+    std::istringstream is(text);
+
+    json_deserializer handler;
+
+    csv_parameters params;
+	params.field_names("x,y,z");
+	params.data_types("boolean,boolean,boolean");
+    params.header_lines(1);
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json val = std::move(handler.root());
+
+    BOOST_CHECK(val.size()==2);
+    BOOST_CHECK(val[0].size()==3);
+    BOOST_CHECK(val[1].size()==3);
+    BOOST_CHECK(val[0]["x"]==json(true));
+    BOOST_CHECK(val[0]["y"]==json(false));
+    BOOST_CHECK(val[0]["z"]==json(true));
+    BOOST_CHECK(val[1]["x"]==json(true));
+    BOOST_CHECK(val[1]["y"]==json(false));
+    BOOST_CHECK(val[1]["z"]==json(true));
+}
+
 BOOST_AUTO_TEST_CASE(csv_test1_object_1col_quoted)
 {
     std::string text = "a\n\"1\"\n\"4\"";
