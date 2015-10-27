@@ -2,7 +2,7 @@ Parameter          | Description        | Default
 -------------      | -------------  | ------------- 
 assume_header      | Assume first row in file is header, use field names to construct objects | false         
 header_lines      | Number of header lines in the CSV text | 0         
-column_names      | A string containing delimited names corresponding to the fields in the file | Empty
+header      | A string containing delimited names corresponding to the fields in the file | Empty
 data_types      | A string containing delimited data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean | Empty
 max_lines         | Maximum number of lines to read | Unlimited
 line_delimiter|String to write between records|\n  
