@@ -117,14 +117,14 @@ public:
         replace_empty_field_with_null_ = value;
     }
 
-    std::basic_string<Char> field_names() const
+    std::basic_string<Char> column_names() const
     {
-        return field_names_;
+        return column_names_;
     }
 
-    void field_names(std::basic_string<Char> value)
+    void column_names(std::basic_string<Char> value)
     {
-        field_names_ = value;
+        column_names_ = value;
     }
 
     std::basic_string<Char> data_types() const
@@ -210,12 +210,12 @@ public:
     // Deprecated
     std::basic_string<Char> header() const
     {
-        return field_names_;
+        return column_names_;
     }
 
     void header(std::basic_string<Char> value)
     {
-        field_names_ = value;
+        column_names_ = value;
     }
 private:
     bool trim_leading_;
@@ -230,7 +230,7 @@ private:
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
-    std::basic_string<Char> field_names_;
+    std::basic_string<Char> column_names_;
     std::basic_string<Char> data_types_;
 };
 
