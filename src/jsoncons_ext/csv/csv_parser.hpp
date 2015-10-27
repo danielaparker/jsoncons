@@ -604,6 +604,26 @@ private:
                             handler_->value(val, *this);
                         }
                         break;
+                    case data_types::boolean_t:
+                        {
+                            if (string_buffer_.length() == 1 && string_buffer_[0] == '0')
+                            {
+                                handler_->value(false, *this);
+                            }
+                            else if (string_buffer_.length() == 1 && string_buffer_[0] == '1')
+                            {
+                                handler_->value(true, *this);
+                            }
+                            else if (string_buffer_.length() == 5 && ((string_buffer_[0] == 'f' || string_buffer_[0] == 'F') && (string_buffer_[1] == 'a' || string_buffer_[1] == 'A') && (string_buffer_[2] == 'l' || string_buffer_[2] == 'L') && (string_buffer_[3] == 's' || string_buffer_[3] == 'S') && (string_buffer_[4] == 'e' || string_buffer_[4] == 'E')))
+                            {
+                                handler_->value(false, *this);
+                            }
+                            else if (string_buffer_.length() == 4 && ((string_buffer_[0] == 't' || string_buffer_[0] == 'T') && (string_buffer_[1] == 'r' || string_buffer_[1] == 'R') && (string_buffer_[2] == 'u' || string_buffer_[2] == 'U') && (string_buffer_[3] == 'e' || string_buffer_[3] == 'E')))
+                            {
+                                handler_->value(true, *this);
+                            }
+                        }
+                        break;
                     default:
                         handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
                         break;	
