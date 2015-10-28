@@ -1,7 +1,7 @@
 Parameter          | Description        | Default       
 -------------      | -------------  | ------------- 
 assume_header      | Assume first row in file is header, use field names to construct objects | false         
-header_lines      | Number of header lines in the CSV text | 0         
+header_lines      | Number of header lines in the CSV text | 1 if assume_header is true, otherwise 0         
 header      | A string containing delimited names corresponding to the fields in the file | Empty
 data_types      | A string containing delimited data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean | Empty
 max_lines         | Maximum number of lines to read | Unlimited
@@ -18,5 +18,5 @@ trim_leading_inside_quotes      | Trim leading whitespace inside quote character
 trim_trailing_inside_quotes      | Trim trailing whitespace inside quote characters| false         
 trim_inside_quotes      | Trim both leading and trailing whitespace inside quote characters| false        
 unquoted_empty_value_is_null | Replace empty field with json null value | false         
-ignore_pair_with_empty_value      | Do not output name-value pairs with empty values| false         
+ignore_empty_values      | Do not output name-value pairs with empty values| false         
 

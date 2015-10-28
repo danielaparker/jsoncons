@@ -485,7 +485,7 @@ vertical-align:1px;
 <tr>
 <td>header_lines</td>
 <td>Number of header lines in the CSV text</td>
-<td>0</td>
+<td>1 if assume_header is true, otherwise 0</td>
 </tr>
 <tr>
 <td>header</td>
@@ -548,8 +548,28 @@ vertical-align:1px;
 <td>false</td>
 </tr>
 <tr>
-<td>replace_empty_field_with_null</td>
+<td>trim_leading_inside_quotes</td>
+<td>Trim leading whitespace inside quote characters</td>
+<td>false</td>
+</tr>
+<tr>
+<td>trim_trailing_inside_quotes</td>
+<td>Trim trailing whitespace inside quote characters</td>
+<td>false</td>
+</tr>
+<tr>
+<td>trim_inside_quotes</td>
+<td>Trim both leading and trailing whitespace inside quote characters</td>
+<td>false</td>
+</tr>
+<tr>
+<td>unquoted_empty_value_is_null</td>
 <td>Replace empty field with json null value</td>
+<td>false</td>
+</tr>
+<tr>
+<td>ignore_empty_values</td>
+<td>Do not output name-value pairs with empty values</td>
 <td>false</td>
 </tr>
 </tbody>

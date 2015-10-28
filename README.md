@@ -25,29 +25,9 @@ The library has a number of features, which are listed below:
 - 100 percent pass of test suite files from http://www.json.org/JSON_checker/
 - Handles JSON texts of arbitrarily large depth, a limit can be set if desired
 
-## What's new in Release 0.98
+## What's new on master
 
-- Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix
-  contributed by Rupert Steel.
-
-- Fixes bug with proxy operator== when comparing object member values,
-  such as in val["field"] == json("abc")
-
-- Refines error codes and improves error messages
-
-- Renames `json_reader` method `read` to `read_next`, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The 
-  former name is deprecated but still works.
-
-- Adds `json_reader` method `check_done` that throws if there are unconsumed non-whitespace characters after one or more calls to `read_next`.
-
-- Adds getter and setter `max_depth` methods to allow setting the maximum JSON parse tree depth if desired, by default
-it is arbitrarily large (limited by heap memory.)
-
-- Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
-
-- Changes the top level namespace for the extensions from `jsoncons_ext` to `jsoncons`, e.g. `jsoncons_ext::csv::csv_reader` becomes `jsoncons::csv::csv_reader`
-
-- Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a `csv_parameters` object rather than a `json` object.
+- Enhancements to processing CSV files to output JSON, see example below. 
 
 ## Using the jsoncons library
 
@@ -251,7 +231,70 @@ An example of iterating over the elements of a json array:
         cout << it->as<string>() << endl;
     }
 
-## About jsoncons::json
+### Processing csv files to output json
+
+An example of reading a CSV file (tasks.csv):
+
+    project_id, task_name, task_start, task_finish
+    4001,task1,01/01/2003,01/31/2003
+    4001,task2,02/01/2003,02/28/2003
+    4001,task3,03/01/2003,03/31/2003
+    4002,task1,04/01/2003,04/30/2003
+    4002,task2,05/01/2003,
+
+You can read the `CSV` file into a `json` value like this
+
+    std::fstream is("tasks.csv");
+
+    json_deserializer handler;
+
+    csv_parameters params;
+    params.assume_header(true);
+    params.data_types("integer,string,string,string");
+    params.trim(true);
+    params.ignore_empty_values(true);
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json val = std::move(handler.root());
+
+    std::cout << pretty_print(val) << std::endl;
+
+The output is:
+
+    [
+        {
+            "project_id":4001,
+            "task_finish":"01/31/2003",
+            "task_name":"task1",
+            "task_start":"01/01/2003"
+        },
+        {
+            "project_id":4001,
+            "task_finish":"02/28/2003",
+            "task_name":"task2",
+            "task_start":"02/01/2003"
+        },
+        {
+            "project_id":4001,
+            "task_finish":"03/31/2003",
+            "task_name":"task3",
+            "task_start":"03/01/2003"
+        },
+        {
+            "project_id":4002,
+            "task_finish":"04/30/2003",
+            "task_name":"task1",
+            "task_start":"04/01/2003"
+        },
+        {
+            "project_id":4002,
+            "task_name":"task2",
+            "task_start":"05/01/2003"
+        }
+    ]
+
+### About jsoncons::json
 
 The json class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and `std::allocator<void>` as the allocator type,
@@ -297,7 +340,7 @@ which prints
 
     {"field1":"test","field2":3.9,"field3":true}
 
-## Type extensibility
+### Type extensibility
 
 In the json class, accessors and modifiers are templated, for example,
 
@@ -343,7 +386,7 @@ producing
         ["2013-10-21","2013-10-28"]
     }
 
-## json any
+### json any
 
 jsoncons provides a class `json::any` that can contain a value of any type as long as that type supports copy construction and 
 assignment. This allows you to, for example, insert a boost matrix into a `json` object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in

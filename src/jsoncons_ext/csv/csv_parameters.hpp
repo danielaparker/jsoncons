@@ -40,7 +40,7 @@ public:
     basic_csv_parameters()
         :
         assume_header_(false),
-        ignore_pair_with_empty_value_(false),
+        ignore_empty_values_(false),
         trim_leading_(false),
         trim_trailing_(false),
         trim_leading_inside_quotes_(false),
@@ -79,14 +79,14 @@ public:
         assume_header_ = value;
     }
 
-    bool ignore_pair_with_empty_value() const
+    bool ignore_empty_values() const
     {
-        return ignore_pair_with_empty_value_;
+        return ignore_empty_values_;
     }
 
-    void ignore_pair_with_empty_value(bool value)
+    void ignore_empty_values(bool value)
     {
-        ignore_pair_with_empty_value_ = value;
+        ignore_empty_values_ = value;
     }
 
     bool trim_leading() const
@@ -256,7 +256,7 @@ private:
     bool trim_leading_inside_quotes_;
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
-	bool ignore_pair_with_empty_value_;
+	bool ignore_empty_values_;
     bool assume_header_;
     Char field_delimiter_;
     std::basic_string<Char> line_delimiter_;
