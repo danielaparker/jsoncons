@@ -498,22 +498,10 @@ vertical-align:1px;
 <li>Handles JSON texts of arbitrarily large depth, a limit can be set if desired</li>
 </ul>
 
-<h2>What's new in Release 0.98</h2>
+<h2>What's new on master</h2>
 
 <ul>
-<li><p>Fixes the noexcept specification (required for Visual Studio 2015 and later.) Fix<br>
-contributed by Rupert Steel.</p></li>
-<li><p>Fixes bug with proxy operator== when comparing object member values,<br>
-such as in val["field"] == json("abc")</p></li>
-<li><p>Refines error codes and improves error messages</p></li>
-<li><p>Renames <code>json_reader</code> method <code>read</code> to <code>read_next</code>, reflecting the fact that it supports reading a sequence of JSON texts from a stream. The <br>
-former name is deprecated but still works.</p></li>
-<li><p>Adds <code>json_reader</code> method <code>check_done</code> that throws if there are unconsumed non-whitespace characters after one or more calls to <code>read_next</code>.</p></li>
-<li><p>Adds getter and setter <code>max_depth</code> methods to allow setting the maximum JSON parse tree depth if desired, by default<br>
-it is arbitrarily large (limited by heap memory.)</p></li>
-<li><p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  </p></li>
-<li><p>Changes the top level namespace for the extensions from <code>jsoncons_ext</code> to <code>jsoncons</code>, e.g. <code>jsoncons_ext::csv::csv_reader</code> becomes <code>jsoncons::csv::csv_reader</code></p></li>
-<li><p>Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a <code>csv_parameters</code> object rather than a <code>json</code> object.</p></li>
+<li>Enhancements to processing CSV files to output JSON, see example below. </li>
 </ul>
 
 <h2>Using the jsoncons library</h2>
@@ -742,7 +730,73 @@ for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 }
 </code></pre>
 
-<h2>About jsoncons::json</h2>
+<h3>Processing csv files to output json</h3>
+
+<p>An example of reading a CSV file (tasks.csv):</p>
+
+<pre><code>project_id, task_name, task_start, task_finish
+4001,task1,01/01/2003,01/31/2003
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+</code></pre>
+
+<p>You can read the <code>CSV</code> file into a <code>json</code> value like this</p>
+
+<pre><code>std::fstream is("tasks.csv");
+
+json_deserializer handler;
+
+csv_parameters params;
+params.assume_header(true);
+params.data_types("integer,string,string,string");
+params.trim(true);
+params.ignore_empty_values(true);
+
+csv_reader reader(is,handler,params);
+reader.read();
+json val = std::move(handler.root());
+
+std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
+</code></pre>
+
+<p>The output is:</p>
+
+<pre><code>[
+    {
+        "project_id":4001,
+        "task_finish":"01/31/2003",
+        "task_name":"task1",
+        "task_start":"01/01/2003"
+    },
+    {
+        "project_id":4001,
+        "task_finish":"02/28/2003",
+        "task_name":"task2",
+        "task_start":"02/01/2003"
+    },
+    {
+        "project_id":4001,
+        "task_finish":"03/31/2003",
+        "task_name":"task3",
+        "task_start":"03/01/2003"
+    },
+    {
+        "project_id":4002,
+        "task_finish":"04/30/2003",
+        "task_name":"task1",
+        "task_start":"04/01/2003"
+    },
+    {
+        "project_id":4002,
+        "task_name":"task2",
+        "task_start":"05/01/2003"
+    }
+]
+</code></pre>
+
+<h3>About jsoncons::json</h3>
 
 <p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
 and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
@@ -793,7 +847,7 @@ std::wcout &lt;&lt; root &lt;&lt; L"\n";
 <pre><code>{"field1":"test","field2":3.9,"field3":true}
 </code></pre>
 
-<h2>Type extensibility</h2>
+<h3>Type extensibility</h3>
 
 <p>In the json class, accessors and modifiers are templated, for example,</p>
 
@@ -843,7 +897,7 @@ cout &lt;&lt; deal &lt;&lt; endl;
 }
 </code></pre>
 
-<h2>json any</h2>
+<h3>json any</h3>
 
 <p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and <br>
 assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>

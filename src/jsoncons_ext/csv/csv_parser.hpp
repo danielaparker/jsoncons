@@ -571,7 +571,7 @@ private:
             }
             break;
         case modes::object:
-            if (!(parameters_.ignore_pair_with_empty_value() && string_buffer_.size() == 0))
+            if (!(parameters_.ignore_empty_values() && string_buffer_.size() == 0))
             {
                 if (column_index_ < column_labels_.size())
                 {
@@ -620,7 +620,7 @@ private:
             }
             break;
         case modes::object:
-            if (!(parameters_.ignore_pair_with_empty_value() && string_buffer_.size() == 0))
+            if (!(parameters_.ignore_empty_values() && string_buffer_.size() == 0))
             {
                 if (column_index_ < column_labels_.size())
                 {
