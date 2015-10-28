@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
 
     csv_parameters params;
     params.trim(true);
-    params.replace_empty_field_with_null(true);
+    params.unquoted_empty_value_is_null(true);
 
     csv_reader reader(is,handler,params);
     reader.read();

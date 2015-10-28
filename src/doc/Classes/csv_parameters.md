@@ -14,5 +14,9 @@ comment_starter|Character to comment out a line, must be at column 1.|None
 trim_leading      | Trim leading whitespace | false         
 trim_trailing      | Trim trailing whitespace | false         
 trim      | Trim both leading and trailing whitespace | false        
-replace_empty_field_with_null | Replace empty field with json null value | false         
+trim_leading_inside_quotes      | Trim leading whitespace inside quote characters| false         
+trim_trailing_inside_quotes      | Trim trailing whitespace inside quote characters| false         
+trim_inside_quotes      | Trim both leading and trailing whitespace inside quote characters| false        
+unquoted_empty_value_is_null | Replace empty field with json null value | false         
+ignore_pair_with_empty_value      | Do not output name-value pairs with empty values| false         
 

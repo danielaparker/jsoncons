@@ -39,10 +39,13 @@ public:
 
     basic_csv_parameters()
         :
+        assume_header_(false),
+        ignore_pair_with_empty_value_(false),
         trim_leading_(false),
         trim_trailing_(false),
-        replace_empty_field_with_null_(false),
-        assume_header_(false),
+        trim_leading_inside_quotes_(false),
+        trim_trailing_inside_quotes_(false),
+        unquoted_empty_value_is_null_(false),
         field_delimiter_(','),
         quote_char_('\"'),
         quote_escape_char_('\"'),
@@ -76,6 +79,16 @@ public:
         assume_header_ = value;
     }
 
+    bool ignore_pair_with_empty_value() const
+    {
+        return ignore_pair_with_empty_value_;
+    }
+
+    void ignore_pair_with_empty_value(bool value)
+    {
+        ignore_pair_with_empty_value_ = value;
+    }
+
     bool trim_leading() const
     {
         return trim_leading_;
@@ -96,6 +109,26 @@ public:
         trim_trailing_ = value;
     }
 
+    bool trim_leading_inside_quotes() const
+    {
+        return trim_leading_inside_quotes_;
+    }
+
+    void trim_leading_inside_quotes(bool value)
+    {
+        trim_leading_inside_quotes_ = value;
+    }
+
+    bool trim_trailing_inside_quotes() const
+    {
+        return trim_trailing_inside_quotes_;
+    }
+
+    void trim_trailing_inside_quotes(bool value)
+    {
+        trim_trailing_inside_quotes_ = value;
+    }
+
     bool trim() const
     {
         return trim_leading_ && trim_trailing_;
@@ -107,14 +140,25 @@ public:
         trim_trailing_ = value;
     }
 
-    bool replace_empty_field_with_null() const
+    bool trim_inside_quotes() const
     {
-        return replace_empty_field_with_null_;
+        return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
     }
 
-    void replace_empty_field_with_null(bool value)
+    void trim_inside_quotes(bool value)
     {
-        replace_empty_field_with_null_ = value;
+        trim_leading_inside_quotes_ = value;
+        trim_trailing_inside_quotes_ = value;
+    }
+
+    bool unquoted_empty_value_is_null() const
+    {
+        return unquoted_empty_value_is_null_;
+    }
+
+    void unquoted_empty_value_is_null(bool value)
+    {
+        unquoted_empty_value_is_null_ = value;
     }
 
     std::basic_string<Char> data_types() const
@@ -209,7 +253,10 @@ public:
 private:
     bool trim_leading_;
     bool trim_trailing_;
-    bool replace_empty_field_with_null_;
+    bool trim_leading_inside_quotes_;
+    bool trim_trailing_inside_quotes_;
+    bool unquoted_empty_value_is_null_;
+	bool ignore_pair_with_empty_value_;
     bool assume_header_;
     Char field_delimiter_;
     std::basic_string<Char> line_delimiter_;
