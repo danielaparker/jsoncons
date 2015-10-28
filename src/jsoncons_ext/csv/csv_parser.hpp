@@ -360,7 +360,7 @@ all_states:
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
                         before_record();
-                        end_string_value();
+                        end_quoted_string_value();
                         after_field();
                         state_ = states::between_fields;
                         goto all_states;
@@ -376,7 +376,7 @@ all_states:
                     else if (curr_char == parameters_.quote_char())
                     {
                         before_record();
-                        end_string_value();
+                        end_quoted_string_value();
                         after_field();
                         state_ = states::between_fields;
                     }
@@ -391,7 +391,7 @@ all_states:
                     if (curr_char == '\r' || (prev_char_ != '\r' && curr_char == '\n'))
                     {
                         before_record();
-                        end_string_value();
+                        end_unquoted_string_value();
                         after_field();
                         after_record();
                         state_ = states::expect_value;
@@ -401,7 +401,7 @@ all_states:
                         if (prev_char_ != '\r')
                         {
                             before_record();
-                            end_string_value();
+                            end_unquoted_string_value();
                             after_field();
                             after_record();
                             state_ = states::expect_value;
@@ -410,7 +410,7 @@ all_states:
                     else if (curr_char == parameters_.field_delimiter())
                     {
                         before_record();
-                        end_string_value();
+                        end_unquoted_string_value();
                         after_field();
                         state_ = states::expect_value;
                     }
@@ -460,14 +460,14 @@ all_states:
         {
         case states::unquoted_string: 
             before_record();
-            end_string_value();
+            end_unquoted_string_value();
             after_field();
             break;
         case states::escaped_value:
             if (parameters_.quote_escape_char() == parameters_.quote_char())
             {
                 before_record();
-                end_string_value();
+                end_quoted_string_value();
                 after_field();
             }
             break;
@@ -516,131 +516,181 @@ all_states:
     }
 private:
 
-    void end_string_value() 
+    void trim_string_buffer(bool trim_leading, bool trim_trailing)
     {
         size_t start = 0;
         size_t length = string_buffer_.length();
+        if (trim_leading)
+        {
+            bool done = false;
+            while (!done && start < string_buffer_.length())
+            {
+                if ((string_buffer_[start] < 256) && std::isspace(string_buffer_[start]))
+                {
+                    ++start;
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+        }
+        if (trim_trailing)
+        {
+            bool done = false;
+            while (!done && length > 0)
+            {
+                if ((string_buffer_[length-1] < 256) && std::isspace(string_buffer_[length-1]))
+                {
+                    --length;
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+        }
+        if (start != 0 || length != string_buffer_.size())
+        {
+            string_buffer_ = string_buffer_.substr(start,length-start);
+        }
+    }
 
+    void end_unquoted_string_value() 
+    {
         if (parameters_.trim_leading() | parameters_.trim_trailing())
         {
-            if (parameters_.trim_leading())
-            {
-                bool done = false;
-                while (!done && start < string_buffer_.length())
-                {
-                    if ((string_buffer_[start] < 256) && std::isspace(string_buffer_[start]))
-                    {
-                        ++start;
-                    }
-                    else
-                    {
-                        done = true;
-                    }
-                }
-            }
-            if (parameters_.trim_trailing())
-            {
-                bool done = false;
-                while (!done && length > 0)
-                {
-                    if ((string_buffer_[length-1] < 256) && std::isspace(string_buffer_[length-1]))
-                    {
-                        --length;
-                    }
-                    else
-                    {
-                        done = true;
-                    }
-                }
-            }
-            if (start != 0 || length != string_buffer_.size())
-            {
-                string_buffer_ = string_buffer_.substr(start,length-start);
-            }
+            trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
         }
-        if (parameters_.replace_empty_field_with_null() && string_buffer_.length() == 0)
+        switch (stack_[top_])
         {
-            handler_->value(jsoncons::null_type(),*this);
-        }
-        else
-        {
-
-            switch (stack_[top_])
+        case modes::header:
+            if (parameters_.assume_header() && line_ == 1)
             {
-            case modes::header:
-                if (parameters_.assume_header() && line_ == 1)
-                {
-                    column_labels_.push_back(string_buffer_);
-                }
-                state_ = states::expect_value;
-                break;
-            case modes::object:
+                column_labels_.push_back(string_buffer_);
+            }
+            break;
+        case modes::object:
+            if (!(parameters_.ignore_pair_with_empty_value() && string_buffer_.size() == 0))
+            {
                 if (column_index_ < column_labels_.size())
                 {
                     handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
-                }
-                else
-                {
-                    handler_->name("", 0, *this);
-                }
-            case modes::array:
-                if (column_index_ < column_types_.size())
-                {
-                    switch (column_types_[column_index_])
+                    if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
                     {
-                    case data_types::integer_t:
-                        {
-                            std::istringstream iss(string_buffer_);
-                            long long val;
-                            iss >> val;
-                            handler_->value(val, *this);
-                        }
-                        break;
-                    case data_types::float_t:
-                        {
-                            std::istringstream iss(string_buffer_);
-                            double val;
-                            iss >> val;
-                            handler_->value(val, *this);
-                        }
-                        break;
-                    case data_types::boolean_t:
-                        {
-                            if (string_buffer_.length() == 1 && string_buffer_[0] == '0')
-                            {
-                                handler_->value(false, *this);
-                            }
-                            else if (string_buffer_.length() == 1 && string_buffer_[0] == '1')
-                            {
-                                handler_->value(true, *this);
-                            }
-                            else if (string_buffer_.length() == 5 && ((string_buffer_[0] == 'f' || string_buffer_[0] == 'F') && (string_buffer_[1] == 'a' || string_buffer_[1] == 'A') && (string_buffer_[2] == 'l' || string_buffer_[2] == 'L') && (string_buffer_[3] == 's' || string_buffer_[3] == 'S') && (string_buffer_[4] == 'e' || string_buffer_[4] == 'E')))
-                            {
-                                handler_->value(false, *this);
-                            }
-                            else if (string_buffer_.length() == 4 && ((string_buffer_[0] == 't' || string_buffer_[0] == 'T') && (string_buffer_[1] == 'r' || string_buffer_[1] == 'R') && (string_buffer_[2] == 'u' || string_buffer_[2] == 'U') && (string_buffer_[3] == 'e' || string_buffer_[3] == 'E')))
-                            {
-                                handler_->value(true, *this);
-                            }
-                        }
-                        break;
-                    default:
-                        handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-                        break;	
+                        handler_->value(jsoncons::null_type(),*this);
+                    }
+                    else
+                    {
+                        end_value();
                     }
                 }
-                else
+            }
+            break;
+        case modes::array:
+            if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
+            {
+                handler_->value(jsoncons::null_type(),*this);
+            }
+            else
+            {
+                end_value();
+            }
+            break;
+        default:
+            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
+            break;
+        }
+        state_ = states::expect_value;
+        string_buffer_.clear();
+    }
+
+    void end_quoted_string_value() 
+    {
+        if (parameters_.trim_leading_inside_quotes() | parameters_.trim_trailing_inside_quotes())
+        {
+            trim_string_buffer(parameters_.trim_leading_inside_quotes(),parameters_.trim_trailing_inside_quotes());
+        }
+        switch (stack_[top_])
+        {
+        case modes::header:
+            if (parameters_.assume_header() && line_ == 1)
+            {
+                column_labels_.push_back(string_buffer_);
+            }
+            break;
+        case modes::object:
+            if (!(parameters_.ignore_pair_with_empty_value() && string_buffer_.size() == 0))
+            {
+                if (column_index_ < column_labels_.size())
                 {
-                    handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                    handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
+                    end_value();
                 }
-                state_ = states::expect_value;
+            }
+            break;
+        case modes::array:
+            end_value();
+            break;
+        default:
+            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
+            break;
+        }
+        state_ = states::expect_value;
+        string_buffer_.clear();
+    }
+
+    void end_value()
+    {
+        if (column_index_ < column_types_.size())
+        {
+            switch (column_types_[column_index_])
+            {
+            case data_types::integer_t:
+                {
+                    std::istringstream iss(string_buffer_);
+                    long long val;
+                    iss >> val;
+                    handler_->value(val, *this);
+                }
+                break;
+            case data_types::float_t:
+                {
+                    std::istringstream iss(string_buffer_);
+                    double val;
+                    iss >> val;
+                    handler_->value(val, *this);
+                }
+                break;
+            case data_types::boolean_t:
+                {
+                    if (string_buffer_.length() == 1 && string_buffer_[0] == '0')
+                    {
+                        handler_->value(false, *this);
+                    }
+                    else if (string_buffer_.length() == 1 && string_buffer_[0] == '1')
+                    {
+                        handler_->value(true, *this);
+                    }
+                    else if (string_buffer_.length() == 5 && ((string_buffer_[0] == 'f' || string_buffer_[0] == 'F') && (string_buffer_[1] == 'a' || string_buffer_[1] == 'A') && (string_buffer_[2] == 'l' || string_buffer_[2] == 'L') && (string_buffer_[3] == 's' || string_buffer_[3] == 'S') && (string_buffer_[4] == 'e' || string_buffer_[4] == 'E')))
+                    {
+                        handler_->value(false, *this);
+                    }
+                    else if (string_buffer_.length() == 4 && ((string_buffer_[0] == 't' || string_buffer_[0] == 'T') && (string_buffer_[1] == 'r' || string_buffer_[1] == 'R') && (string_buffer_[2] == 'u' || string_buffer_[2] == 'U') && (string_buffer_[3] == 'e' || string_buffer_[3] == 'E')))
+                    {
+                        handler_->value(true, *this);
+                    }
+                }
                 break;
             default:
-                err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
-                break;
+                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                break;	
             }
         }
-        string_buffer_.clear();
+        else
+        {
+            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+        }
     }
 
     unsigned long do_line_number() const override
