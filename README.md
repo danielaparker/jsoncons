@@ -228,7 +228,7 @@ You can read the `CSV` file into a `json` value like this
     reader.read();
     json val = std::move(handler.root());
 
-    std::cout << pretty_print(val) << std::std::endl;
+    std::cout << pretty_print(val) << std::endl;
 
 The output is:
 
@@ -278,7 +278,8 @@ An example of iterating over the name-value pairs of a json object:
 
     for (auto it = person.begin_members(); it != person.end_members(); ++it)
     {
-        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
+        std::cout << "name=" << it->name() 
+                  << ", value=" << it->value().as<std::string>() << std::endl;
     }
 
 An example of iterating over the elements of a json array:
