@@ -47,6 +47,7 @@ These include and using declarations are for the examples that appear below.
     using jsoncons::json;
     using jsoncons::json_exception;    
     using jsoncons::pretty_print;
+    using jsoncons::json_deserializer;
     using jsoncons::csv::csv_parameters;
     using jsoncons::csv::csv_reader;
 
