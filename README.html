@@ -518,14 +518,13 @@ vertical-align:1px;
 <p>These include and using declarations are for the examples that appear below.</p>
 
 <pre><code>#include "jsoncons/json.hpp"
+#include "jsoncons_ext/csv/json.hpp"
 
-using std::string;
-using std::cout;
-using std::cerr;
-using std::endl;
 using jsoncons::json;
 using jsoncons::json_exception;    
 using jsoncons::pretty_print;
+using jsoncons::csv::csv_parameters;
+using jsoncons::csv::csv_reader;
 </code></pre>
 
 <h3>Reading JSON text from a file</h3>
@@ -562,14 +561,14 @@ using jsoncons::pretty_print;
     try
     {
         json&amp; book = books[i];
-        string author = book["author"].as&lt;string&gt;();
-        string title = book["title"].as&lt;string&gt;();
+        std::string author = book["author"].as&lt;std::string&gt;();
+        std::string title = book["title"].as&lt;std::string&gt;();
         double price = book["price"].as&lt;double&gt;();
-        cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; endl;
+        std::cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; std::endl;
     }
     catch (const json_exception&amp; e)
     {
-        cerr &lt;&lt; e.what() &lt;&lt; endl;
+        std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
 </code></pre>
@@ -592,7 +591,7 @@ book.get("price",default_value) will return default_value if there is no price
 
 <p>So if you want to show "n/a" for the missing price, you can use this accessor</p>
 
-<pre><code>string price = book.get("price","n/a").as&lt;string&gt;();
+<pre><code>std::string price = book.get("price","n/a").as&lt;std::string&gt;();
 </code></pre>
 
 <p>and the output becomes</p>
@@ -607,11 +606,11 @@ Ivan Passer, Cutter's Way, n/a
 <pre><code>if (book.has_member("price"))
 {
     double price = book["price"].as&lt;double&gt;();
-    cout &lt;&lt; price;
+    std::cout &lt;&lt; price;
 }
 else
 {
-    cout &lt;&lt; "n/a";
+    std::cout &lt;&lt; "n/a";
 }
 </code></pre>
 
@@ -624,7 +623,7 @@ else
 
 <p>Serializing it to standard out</p>
 
-<pre><code>cout &lt;&lt; image_sizing &lt;&lt; endl;
+<pre><code>std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;
 </code></pre>
 
 <p>produces</p>
@@ -643,7 +642,7 @@ image_sizing["dimension2"] = json::null;  // a null
 
 <p>Serializing it, this time with pretty print,</p>
 
-<pre><code>cout &lt;&lt; pretty_print(image_sizing) &lt;&lt; endl;
+<pre><code>std::cout &lt;&lt; pretty_print(image_sizing) &lt;&lt; std::endl;
 </code></pre>
 
 <p>produces</p>
@@ -679,7 +678,7 @@ file_export["image_sizing"] = std::move(image_sizing);
 
 <p>and serializing</p>
 
-<pre><code>cout &lt;&lt; pretty_print(file_export) &lt;&lt; endl;
+<pre><code>std::cout &lt;&lt; pretty_print(file_export) &lt;&lt; std::endl;
 </code></pre>
 
 <p>produces</p>
@@ -698,41 +697,9 @@ file_export["image_sizing"] = std::move(image_sizing);
 }
 </code></pre>
 
-<h3>Iterators</h3>
+<h3>Converting CSV files to json</h3>
 
-<p><code>jsoncons::json</code> supports iterators for accessing the members of json objects and the elements of json arrays.</p>
-
-<p>An example of iterating over the name-value pairs of a json object:</p>
-
-<pre><code>json person;
-person["first_name"] = "Jane";
-person["last_name"] = "Roe";
-person["events_attended"] = 10;
-person["accept_waiver_of_liability"] = true;
-
-for (auto it = person.begin_members(); it != person.end_members(); ++it)
-{
-    cout &lt;&lt; "name=" &lt;&lt; it-&gt;name() &lt;&lt; ", value=" &lt;&lt; it-&gt;value().as&lt;string&gt;() &lt;&lt; endl;
-}
-</code></pre>
-
-<p>An example of iterating over the elements of a json array:</p>
-
-<pre><code>json cities(json::an_array);
-cities.add("Montreal");
-cities.add("Toronto");
-cities.add("Ottawa");
-cities.add("Vancouver");
-
-for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
-{
-    cout &lt;&lt; it-&gt;as&lt;string&gt;() &lt;&lt; endl;
-}
-</code></pre>
-
-<h3>Processing csv files to output json</h3>
-
-<p>An example of reading a CSV file (tasks.csv):</p>
+<p>Here is a sample CSV file (tasks.csv):</p>
 
 <pre><code>project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -758,7 +725,7 @@ csv_reader reader(is,handler,params);
 reader.read();
 json val = std::move(handler.root());
 
-std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
+std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::std::endl;
 </code></pre>
 
 <p>The output is:</p>
@@ -794,6 +761,38 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
         "task_start":"05/01/2003"
     }
 ]
+</code></pre>
+
+<h3>Iterators</h3>
+
+<p><code>jsoncons::json</code> supports iterators for accessing the members of json objects and the elements of json arrays.</p>
+
+<p>An example of iterating over the name-value pairs of a json object:</p>
+
+<pre><code>json person;
+person["first_name"] = "Jane";
+person["last_name"] = "Roe";
+person["events_attended"] = 10;
+person["accept_waiver_of_liability"] = true;
+
+for (auto it = person.begin_members(); it != person.end_members(); ++it)
+{
+    std::cout &lt;&lt; "name=" &lt;&lt; it-&gt;name() &lt;&lt; ", value=" &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
+}
+</code></pre>
+
+<p>An example of iterating over the elements of a json array:</p>
+
+<pre><code>json cities(json::an_array);
+cities.add("Montreal");
+cities.add("Toronto");
+cities.add("Ottawa");
+cities.add("Vancouver");
+
+for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
+{
+    std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
+}
 </code></pre>
 
 <h3>About jsoncons::json</h3>
@@ -885,7 +884,7 @@ deal["observation_dates"] = std::move(observation_dates);
 
 boost::gregorian::date maturity = deal["maturity"].as&lt;boost::gregorian::date&gt;();
 
-cout &lt;&lt; deal &lt;&lt; endl;   
+std::cout &lt;&lt; deal &lt;&lt; std::endl; 
 </code></pre>
 
 <p>producing</p>

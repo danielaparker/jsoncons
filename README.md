@@ -42,14 +42,13 @@ The jsoncons classes and functions are in namespace `jsoncons`.  Namespace `json
 These include and using declarations are for the examples that appear below.
 
     #include "jsoncons/json.hpp"
+    #include "jsoncons_ext/csv/json.hpp"
 
-    using std::string;
-    using std::cout;
-    using std::cerr;
-    using std::endl;
     using jsoncons::json;
     using jsoncons::json_exception;    
     using jsoncons::pretty_print;
+    using jsoncons::csv::csv_parameters;
+    using jsoncons::csv::csv_reader;
 
 ### Reading JSON text from a file
 
@@ -83,14 +82,14 @@ You can then loop through the books
         try
         {
             json& book = books[i];
-            string author = book["author"].as<string>();
-            string title = book["title"].as<string>();
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
             double price = book["price"].as<double>();
-            cout << author << ", " << title << ", " << price << endl;
+            std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const json_exception& e)
         {
-            cerr << e.what() << endl;
+            std::cerr << e.what() << std::endl;
         }
     }
 
@@ -110,7 +109,7 @@ You have a choice of accessors:
 
 So if you want to show "n/a" for the missing price, you can use this accessor
 
-    string price = book.get("price","n/a").as<string>();
+    std::string price = book.get("price","n/a").as<std::string>();
 
 and the output becomes
 
@@ -123,11 +122,11 @@ Or you can check if book has a member "price" with the method `has_member`, and 
     if (book.has_member("price"))
     {
         double price = book["price"].as<double>();
-        cout << price;
+        std::cout << price;
     }
     else
     {
-        cout << "n/a";
+        std::cout << "n/a";
     }
 
 ### Constructing json values in C++
@@ -138,7 +137,7 @@ To construct an empty json object, use the default constructor:
 
 Serializing it to standard out
 
-    cout << image_sizing << endl;
+    std::cout << image_sizing << std::endl;
 
 produces
 
@@ -154,7 +153,7 @@ Adding some members,
 
 Serializing it, this time with pretty print,
 
- 	cout << pretty_print(image_sizing) << endl;
+ 	std::cout << pretty_print(image_sizing) << std::endl;
 
 produces
 
@@ -185,7 +184,7 @@ Combining the two
 
 and serializing
 
-    cout << pretty_print(file_export) << endl;
+    std::cout << pretty_print(file_export) << std::endl;
 produces
 
     {
@@ -201,39 +200,9 @@ produces
         }
     }
 
-### Iterators
+### Converting CSV files to json
 
-`jsoncons::json` supports iterators for accessing the members of json objects and the elements of json arrays.
-
-An example of iterating over the name-value pairs of a json object:
-
-    json person;
-    person["first_name"] = "Jane";
-    person["last_name"] = "Roe";
-    person["events_attended"] = 10;
-    person["accept_waiver_of_liability"] = true;
-
-    for (auto it = person.begin_members(); it != person.end_members(); ++it)
-    {
-        cout << "name=" << it->name() << ", value=" << it->value().as<string>() << endl;
-    }
-
-An example of iterating over the elements of a json array:
-
-    json cities(json::an_array);
-    cities.add("Montreal");
-    cities.add("Toronto");
-    cities.add("Ottawa");
-    cities.add("Vancouver");
-
-    for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
-    {
-        cout << it->as<string>() << endl;
-    }
-
-### Processing csv files to output json
-
-An example of reading a CSV file (tasks.csv):
+Here is a sample CSV file (tasks.csv):
 
     project_id, task_name, task_start, task_finish
     4001,task1,01/01/2003,01/31/2003
@@ -258,7 +227,7 @@ You can read the `CSV` file into a `json` value like this
     reader.read();
     json val = std::move(handler.root());
 
-    std::cout << pretty_print(val) << std::endl;
+    std::cout << pretty_print(val) << std::std::endl;
 
 The output is:
 
@@ -293,6 +262,36 @@ The output is:
             "task_start":"05/01/2003"
         }
     ]
+
+### Iterators
+
+`jsoncons::json` supports iterators for accessing the members of json objects and the elements of json arrays.
+
+An example of iterating over the name-value pairs of a json object:
+
+    json person;
+    person["first_name"] = "Jane";
+    person["last_name"] = "Roe";
+    person["events_attended"] = 10;
+    person["accept_waiver_of_liability"] = true;
+
+    for (auto it = person.begin_members(); it != person.end_members(); ++it)
+    {
+        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
+    }
+
+An example of iterating over the elements of a json array:
+
+    json cities(json::an_array);
+    cities.add("Montreal");
+    cities.add("Toronto");
+    cities.add("Ottawa");
+    cities.add("Vancouver");
+
+    for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
+    {
+        std::cout << it->as<std::string>() << std::endl;
+    }
 
 ### About jsoncons::json
 
@@ -376,7 +375,7 @@ This class template is extensible, you as a user can extend `json_type_traits` i
 	
     boost::gregorian::date maturity = deal["maturity"].as<boost::gregorian::date>();
 	
-    cout << deal << endl;	
+    std::cout << deal << std::endl;	
 
 producing
 
