@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_trailing)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_comment)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col_quoted)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     std::cout << pretty_print(val) << std::endl;
 
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_quoted)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     std::cout << pretty_print(val) << std::endl;
 
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_crlf)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_crlf)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col_crlf)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -459,7 +459,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json countries = std::move(handler.root());
+    json countries = std::move(handler.result);
 
     std::cout << pretty_print(countries) << std::endl;
 }
@@ -477,7 +477,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json countries = std::move(handler.root());
+    json countries = std::move(handler.result);
 
     std::cout << pretty_print(countries) << std::endl;
 }
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
     json_deserializer handler;
     json_reader reader(is,handler);
     reader.read_next();
-    json countries = std::move(handler.root());
+    json countries = std::move(handler.result);
 
     csv_serializer serializer(std::cout);
 
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json employees = std::move(handler.root());
+    json employees = std::move(handler.result);
 
     std::cout << pretty_print(employees) << std::endl;
 }
@@ -525,7 +525,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     json_reader reader(is,handler);
     reader.read_next();
-    json employees = std::move(handler.root());
+    json employees = std::move(handler.result);
 
     csv_serializer serializer(std::cout,params);
 

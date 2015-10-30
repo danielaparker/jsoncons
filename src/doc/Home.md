@@ -265,7 +265,7 @@ This is the code that reads them:
         reader.read_next();
         if (!reader.eof())
         {
-            json val = std::move(handler.root());
+            json val = std::move(handler.result);
             std::cout << val << std::endl;
         }
     }

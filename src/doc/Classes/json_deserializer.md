@@ -16,7 +16,12 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
     json_deserializer()
 
-### Accessors
+### Member variable
+
+    json result
+The output json value
+
+### Deprecated methods
 
     json& root()
-Returns a reference to the root of the json value read from the stream
+Use the public member variable `result` instead

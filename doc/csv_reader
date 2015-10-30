@@ -568,7 +568,7 @@ json_deserializer handler;
 
 csv_reader reader(is,handler);
 reader.read();
-json countries = std::move(handler.root());
+json countries = std::move(handler.result);
 
 std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
 </code></pre>
@@ -615,7 +615,7 @@ params.assume_header = true;
 
 csv_reader reader(is,handler,params);
 reader.read();
-json employees = std::move(handler.root());
+json employees = std::move(handler.result);
 
 std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;
 </code></pre>
@@ -675,7 +675,7 @@ params.header_lines(1);
 
 csv_reader reader(is,handler,params);
 reader.read();
-json countries = std::move(handler.root());
+json countries = std::move(handler.result);
 
 std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
 </code></pre>
