@@ -43,8 +43,10 @@ public:
 
     basic_json<Char,Alloc>& root()
     {
-        return root_;
+        return result;
     }
+
+    basic_json<Char,Alloc> result;
 
 private:
 
@@ -112,7 +114,7 @@ private:
         }
         else
         {
-            root_.swap(stack_[0].value);
+            result.swap(stack_[0].value);
         }
         pop_object();
     }
@@ -137,7 +139,7 @@ private:
         }
         else
         {
-            root_.swap(stack_[0].value);
+            result.swap(stack_[0].value);
         }
         pop_array();
     }
@@ -219,7 +221,6 @@ private:
         }
     }
 
-	basic_json<Char,Alloc> root_;
     int top_;
     std::vector<stack_item> stack_;
     int depth_;

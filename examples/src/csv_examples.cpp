@@ -26,7 +26,7 @@ void read_csv_file1()
     params.data_types("string,string,string,float");
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     std::cout << pretty_print(val) << std::endl;
 }
@@ -52,7 +52,7 @@ void read_csv_file2()
     params.data_types("integer,string,string,string");
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     std::cout << pretty_print(val) << std::endl;
 }

@@ -28,6 +28,7 @@ The library has a number of features, which are listed below:
 ## What's new on master
 
 - Enhancements to processing CSV files to output JSON, see example below. 
+- The output of `json_deserializer` is now placed in a public member variable `result`, which replaces the (deprecated but still supported) accessor function `root()` 
 
 ## Using the jsoncons library
 
@@ -226,7 +227,7 @@ You can read the `CSV` file into a `json` value like this
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = std::move(handler.root());
+    json val = std::move(handler.result);
 
     std::cout << pretty_print(val) << std::endl;
 
