@@ -33,17 +33,17 @@ BOOST_AUTO_TEST_CASE(test_small_string)
 {
 	json s("ABCD");
 	BOOST_CHECK(s.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(s.small_string_length_ == 4);
-	BOOST_CHECK(std::string(s.value_.small_string_value_,s.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(s.var_.small_string_length_ == 4);
+	BOOST_CHECK(std::string(s.var_.value_.small_string_value_,s.var_.small_string_length_) == std::string("ABCD"));
 
 	json t(s);
 	BOOST_CHECK(t.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(t.small_string_length_ == 4);
-	BOOST_CHECK(std::string(t.value_.small_string_value_,t.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(t.var_.small_string_length_ == 4);
+	BOOST_CHECK(std::string(t.var_.value_.small_string_value_,t.var_.small_string_length_) == std::string("ABCD"));
 
 	json q;
 	q = s;
 	BOOST_CHECK(q.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(q.small_string_length_ == 4);
-	BOOST_CHECK(std::string(q.value_.small_string_value_,q.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(q.var_.small_string_length_ == 4);
+	BOOST_CHECK(std::string(q.var_.value_.small_string_value_,q.var_.small_string_length_) == std::string("ABCD"));
 }

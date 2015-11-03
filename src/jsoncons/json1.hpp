@@ -209,6 +209,195 @@ public:
 
     	json_any_impl<Char>* content_;
     };
+	
+    struct string_data
+    {
+        size_t length;
+        Char* p;
+    };
+
+    struct variant
+    {
+        static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
+
+        variant()
+            : type_(value_types::empty_object_t)
+        {
+        }
+
+        variant(const variant& var)
+            : type_(var.type_)
+        {
+            switch (var.type_)
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+                break;
+            case value_types::double_t:
+                value_.float_value_ = var.value_.float_value_;
+                break;
+            case value_types::longlong_t:
+                value_.si_value_ = var.value_.si_value_;
+                break;
+            case value_types::ulonglong_t:
+                value_.ui_value_ = var.value_.ui_value_;
+                break;
+            case value_types::bool_t:
+                value_.bool_value_ = var.value_.bool_value_;
+                break;
+            case value_types::small_string_t:
+                small_string_length_ = var.small_string_length_;
+                std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
+                break;
+            case value_types::string_t:
+                value_.string_value_ = create_string_env(var.value_.string_value_);
+                break;
+            case value_types::array_t:
+                value_.array_ = var.value_.array_->clone();
+                break;
+            case value_types::object_t:
+                value_.object_ = var.value_.object_->clone();
+                break;
+            case value_types::any_t:
+                value_.any_value_ = new any(*(var.value_.any_value_));
+                break;
+            default:
+                // throw
+                break;
+            }
+        }
+
+	variant(const std::basic_string<Char>& s)
+        {
+            if (s.length() > variant::small_string_capacity)
+            {
+                type_ = value_types::string_t;
+                value_.string_value_ = create_string_env(s);
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
+                small_string_length_ = (unsigned char)s.length();
+                std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+            }
+        }
+
+        variant(const Char* s)
+        {
+            size_t length = std::char_traits<Char>::length(s);
+            if (length > variant::small_string_capacity)
+            {
+                type_ = value_types::string_t;
+                value_.string_value_ = create_string_env(s);
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
+                small_string_length_ = (unsigned char)length;
+                std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+            }
+        }
+
+        variant(const Char* s, size_t length)
+        {
+            if (length > variant::small_string_capacity)
+            {
+                type_ = value_types::string_t;
+                value_.string_value_ = create_string_env(s,length);
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
+                small_string_length_ = (unsigned char)length;
+                std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+            }
+        }
+
+        template<class InputIterator>
+        variant(InputIterator first, InputIterator last)
+            : type_(value_types::array_t)
+        {
+            value_.array_ = new json_array_impl<Char, Alloc>(first, last);
+        }
+
+        ~variant()
+        {
+            switch (type_)
+            {
+            case value_types::string_t:
+                delete_string_env(value_.string_value_);
+                break;
+            case value_types::array_t:
+                delete value_.array_;
+                break;
+            case value_types::object_t:
+                delete value_.object_;
+                break;
+            case value_types::any_t:
+                delete value_.any_value_;
+                break;
+            }
+        }
+
+        bool is_null() const
+        {
+            return type_ == value_types::null_t;
+        }
+
+        bool is_bool() const
+        {
+            return type_ == value_types::bool_t;
+        }
+
+        bool is_empty() const
+        {
+            switch (type_)
+            {
+            case value_types::small_string_t:
+                return small_string_length_ == 0;
+            case value_types::string_t:
+                return value_.string_value_->length == 0;
+            case value_types::array_t:
+                return value_.array_->size() == 0;
+            case value_types::empty_object_t:
+                return true;
+            case value_types::object_t:
+                return value_.object_->size() == 0;
+            default:
+                return false;
+            }
+        }
+
+        bool is_string() const
+        {
+            return (type_ == value_types::string_t) | (type_ == value_types::small_string_t);
+        }
+
+        void swap(variant& var)
+        {
+            using std::swap;
+
+            swap(type_,var.type_);
+            swap(small_string_length_,var.small_string_length_);
+            swap(value_,var.value_);
+        }
+
+        value_types::value_types_t type_;
+        unsigned char small_string_length_;
+        union
+        {
+            double float_value_;
+            long long si_value_;
+            unsigned long long ui_value_;
+            bool bool_value_;
+            json_object_impl<Char,Alloc>* object_;
+            json_array_impl<Char,Alloc>* array_;
+            any* any_value_;
+            string_data* string_value_;
+            Char small_string_value_[sizeof(long long)/sizeof(Char)];
+        } value_;
+
+    };
 
     // Deprecated
     typedef any json_any_type;
@@ -1048,21 +1237,21 @@ public:
     static basic_json<Char,Alloc> make_float(double val)
     {
         basic_json<Char,Alloc> temp(value_types::double_t);
-        temp.value_.float_value_ = val;
+        temp.var_.value_.float_value_ = val;
         return temp;
     }
 
     static basic_json<Char,Alloc> make_integer(long long val)
     {
         basic_json<Char,Alloc> temp(value_types::longlong_t);
-        temp.value_.si_value_ = val;
+        temp.var_.value_.si_value_ = val;
         return temp;
     }
 
     static basic_json<Char,Alloc> make_unsigned(unsigned long long val)
     {
         basic_json<Char,Alloc> temp(value_types::ulonglong_t);
-        temp.value_.ui_value_ = val;
+        temp.var_.value_.ui_value_ = val;
         return temp;
     }
 
@@ -1211,7 +1400,7 @@ public:
 
     bool is_null() const
     {
-        return type_ == value_types::null_t;
+        return var_.is_null();
     }
 
     bool has_member(const std::basic_string<Char>& name) const;
@@ -1225,54 +1414,54 @@ public:
 
     bool is_string() const
     {
-        return (type_ == value_types::string_t) | (type_ == value_types::small_string_t);
+        return var_.is_string();
     }
 
     bool is_numeric() const
     {
-        return type_ == value_types::double_t || type_ == value_types::longlong_t || type_ == value_types::ulonglong_t;
+        return var_.type_ == value_types::double_t || var_.type_ == value_types::longlong_t || var_.type_ == value_types::ulonglong_t;
     }
 
     bool is_bool() const
     {
-        return type_ == value_types::bool_t;
+        return var_.is_bool();
     }
 
     bool is_object() const
     {
-        return type_ == value_types::object_t || type_ == value_types::empty_object_t;
+        return var_.type_ == value_types::object_t || var_.type_ == value_types::empty_object_t;
     }
 
     bool is_array() const
     {
-        return type_ == value_types::array_t;
+        return var_.type_ == value_types::array_t;
     }
 
     bool is_any() const
     {
-        return type_ == value_types::any_t;
+        return var_.type_ == value_types::any_t;
     }
 
     bool is_longlong() const
     {
-        return type_ == value_types::longlong_t;
+        return var_.type_ == value_types::longlong_t;
     }
 
     bool is_ulonglong() const
     {
-        return type_ == value_types::ulonglong_t;
+        return var_.type_ == value_types::ulonglong_t;
     }
 
     bool is_double() const
     {
-        return type_ == value_types::double_t;
+        return var_.type_ == value_types::double_t;
     }
 
     // Deprecated
 
     bool is_custom() const
     {
-        return type_ == value_types::any_t;
+        return var_.type_ == value_types::any_t;
     }
 
     bool is_empty() const;
@@ -1357,17 +1546,17 @@ public:
     template <typename T>
     void set(const std::basic_string<Char>& name, T value)
     {
-        switch (type_)
+        switch (var_.type_)
         {
         case value_types::empty_object_t:
-            type_ = value_types::object_t;
-            value_.object_ = new json_object_impl<Char,Alloc>();
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object_impl<Char,Alloc>();
         case value_types::object_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> o;
                 adapter.assign(o,value);
-                value_.object_->set(name,o);
+                var_.value_.object_->set(name,o);
             }
             break;
         default:
@@ -1385,14 +1574,14 @@ public:
     template <typename T>
     void add(T val)
     {
-        switch (type_)
+        switch (var_.type_)
         {
         case value_types::array_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
                 adapter.assign(a,val);
-                value_.array_->push_back(std::move(a));
+                var_.value_.array_->push_back(std::move(a));
             }
             break;
         default:
@@ -1405,14 +1594,14 @@ public:
     template <typename T>
     void add(size_t index, T val)
     {
-        switch (type_)
+        switch (var_.type_)
         {
         case value_types::array_t:
             {
                 json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
                 adapter.assign(a,val);
-                value_.array_->add(index, std::move(a));
+                var_.value_.array_->add(index, std::move(a));
             }
             break;
         default:
@@ -1432,18 +1621,14 @@ public:
 
     value_types::value_types_t type() const
     {
-        return type_;
+        return var_.type_;
     }
 
     void to_stream(basic_json_output_handler<Char>& handler) const;
 
     void swap(basic_json<Char,Alloc>& b)
     {
-        using std::swap;
-
-        swap(type_,b.type_);
-        swap(small_string_length_,b.small_string_length_);
-        swap(value_,b.value_);
+        var_.swap(b.var_);
     }
 
     template <class T>
@@ -1474,15 +1659,15 @@ public:
     template <typename T>
     const T& any_cast() const
     {
-        JSONCONS_ASSERT(type_ == value_types::any_t);
-        const T* p = (const T*)value_.any_value_->content_->data();
+        JSONCONS_ASSERT(var_.type_ == value_types::any_t);
+        const T* p = (const T*)var_.value_.any_value_->content_->data();
         return *p;
     }
     template <typename T>
     T& any_cast() 
     {
-        JSONCONS_ASSERT(type_ == value_types::any_t);
-        T* p = (T*)value_.any_value_->content_->data();
+        JSONCONS_ASSERT(var_.type_ == value_types::any_t);
+        T* p = (T*)var_.value_.any_value_->content_->data();
         return *p;
     }
 
@@ -1552,19 +1737,13 @@ public:
         return is_numeric();
     }
 
-    struct string_data
-    {
-        size_t length;
-        Char* p;
-    };
-
     void begin_bulk_insert()
     {
-        switch (type_)
+        switch (var_.type_)
         {
         case value_types::empty_object_t:
-            type_ = value_types::object_t;
-            value_.object_ = new json_object_impl<Char,Alloc>();
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object_impl<Char,Alloc>();
         case value_types::object_t:
             break;
         default:
@@ -1576,12 +1755,12 @@ public:
 
     void insert(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
-        value_.object_->push_back(std::move(name),std::move(value));
+        var_.value_.object_->push_back(std::move(name),std::move(value));
     }
 
     void end_bulk_insert()
     {
-        value_.object_->sort_members();
+        var_.value_.object_->sort_members();
     }
 
 private:
@@ -1699,21 +1878,7 @@ private:
         return create_string_env(&c,1);
     }
 public:
-    value_types::value_types_t type_;
-    unsigned char small_string_length_;
-    static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
-    union
-    {
-        double float_value_;
-        long long si_value_;
-        unsigned long long ui_value_;
-        bool bool_value_;
-        json_object_impl<Char,Alloc>* object_;
-        json_array_impl<Char,Alloc>* array_;
-        any* any_value_;
-        string_data* string_value_;
-        Char small_string_value_[sizeof(long long)/sizeof(Char)];
-    } value_;
+	variant var_;
 };
 
 template <typename Char, typename Alloc>
