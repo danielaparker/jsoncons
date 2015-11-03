@@ -123,6 +123,7 @@ namespace value_types
         empty_object_t,
         object_t,
         array_t,
+        small_string_t,
         string_t,
         double_t,
         longlong_t,
@@ -1224,7 +1225,7 @@ public:
 
     bool is_string() const
     {
-        return type_ == value_types::string_t;
+        return (type_ == value_types::string_t) | (type_ == value_types::small_string_t);
     }
 
     bool is_numeric() const
@@ -1322,6 +1323,8 @@ public:
     std::basic_string<Char> as_string() const;
 
     std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
+
+    const Char* as_c_str() const;
 
     Char as_char() const;
 
@@ -1439,6 +1442,7 @@ public:
         using std::swap;
 
         swap(type_,b.type_);
+        swap(small_string_length_,b.small_string_length_);
         swap(value_,b.value_);
     }
 
@@ -1633,15 +1637,8 @@ private:
         }
     };
 
-    string_data get_string_data() 
-    {
-        //return value_.string_wrapper_->s_;
-        return value_.string_value_;
-    }
-
     static void delete_string_env(const string_data* other)
     {
-        //other->~string_data();
         ::operator delete((void*)other);
     }
 
@@ -1703,6 +1700,8 @@ private:
     }
 public:
     value_types::value_types_t type_;
+    unsigned char small_string_length_;
+    static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
     union
     {
         double float_value_;
@@ -1713,6 +1712,7 @@ public:
         json_array_impl<Char,Alloc>* array_;
         any* any_value_;
         string_data* string_value_;
+        Char small_string_value_[sizeof(long long)/sizeof(Char)];
     } value_;
 };
 

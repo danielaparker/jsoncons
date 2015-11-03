@@ -82,6 +82,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
 {
     type_ = val.type_;
+    small_string_length_ = val.small_string_length_;
     switch (type_)
     {
     case value_types::null_t:
@@ -92,6 +93,10 @@ basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
     case value_types::ulonglong_t:
     case value_types::bool_t:
         value_ = val.value_;
+        break;
+    case value_types::small_string_t:
+        small_string_length_ = val.small_string_length_;
+        std::memcpy(value_.small_string_value_,val.value_.small_string_value_,val.small_string_length_*sizeof(Char));
         break;
     case value_types::string_t:
         value_.string_value_ = create_string_env(val.value_.string_value_);
@@ -197,29 +202,56 @@ basic_json<Char, Alloc>::basic_json(bool val)
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(Char c)
 {
-    type_ = value_types::string_t;
     value_.string_value_ = create_string_env(c);
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
 {
-    type_ = value_types::string_t;
-    value_.string_value_ = create_string_env(s);
+    if (s.length() > small_string_capacity)
+    {
+        type_ = value_types::string_t;
+        value_.string_value_ = create_string_env(s);
+    }
+    else
+    {
+        type_ = value_types::small_string_t;
+        small_string_length_ = (unsigned char)s.length();
+        std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+    }
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s)
 {
-    type_ = value_types::string_t;
-    value_.string_value_ = create_string_env(s);
+    size_t length = std::char_traits<Char>::length(s);
+    if (length > small_string_capacity)
+    {
+        type_ = value_types::string_t;
+        value_.string_value_ = create_string_env(s);
+    }
+    else
+    {
+        type_ = value_types::small_string_t;
+        small_string_length_ = (unsigned char)length;
+        std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+    }
 }
 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
 {
-    type_ = value_types::string_t;
-    value_.string_value_ = create_string_env(s,length);
+    if (length > small_string_capacity)
+    {
+        type_ = value_types::string_t;
+        value_.string_value_ = create_string_env(s);
+    }
+    else
+    {
+        type_ = value_types::small_string_t;
+        small_string_length_ = (unsigned char)length;
+        std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+    }
 }
 
 template<typename Char, typename Alloc>
@@ -234,6 +266,9 @@ basic_json<Char, Alloc>::basic_json(value_types::value_types_t t)
     case value_types::longlong_t:
     case value_types::ulonglong_t:
     case value_types::bool_t:
+        break;
+    case value_types::small_string_t:
+        small_string_length_ = 0;
         break;
     case value_types::string_t:
         value_.string_value_ = create_string_env();
@@ -257,13 +292,13 @@ basic_json<Char, Alloc>::~basic_json()
     {
     case value_types::null_t:
     case value_types::empty_object_t:
+    case value_types::small_string_t:
     case value_types::double_t:
     case value_types::longlong_t:
     case value_types::ulonglong_t:
     case value_types::bool_t:
         break;
     case value_types::string_t:
-        //delete value_.string_wrapper_;
         delete_string_env(value_.string_value_);
         break;
     case value_types::array_t:
@@ -299,21 +334,31 @@ void basic_json<Char, Alloc>::assign_any(const typename basic_json<Char,Alloc>::
 }
 
 template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& rhs)
+void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& s)
 {
     switch (type_)
     {
     case value_types::null_t:
     case value_types::bool_t:
     case value_types::empty_object_t:
+    case value_types::small_string_t:
     case value_types::longlong_t:
     case value_types::ulonglong_t:
     case value_types::double_t:
-        type_ = value_types::string_t;
-        value_.string_value_ = create_string_env(rhs);
+        if (s.length() > small_string_capacity)
+        {
+            type_ = value_types::string_t;
+            value_.string_value_ = create_string_env(s);
+        }
+        else
+        {
+            type_ = value_types::small_string_t;
+            small_string_length_ = (unsigned char)s.length();
+            std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+        }
         break;
     default:
-        basic_json<Char, Alloc>(rhs).swap(*this);
+        basic_json<Char, Alloc>(s).swap(*this);
         break;
     }
 }
@@ -540,6 +585,8 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
     case value_types::null_t:
     case value_types::empty_object_t:
         return true;
+    case value_types::small_string_t:
+        return small_string_length_ == rhs.small_string_length_ ? std::char_traits<Char>::compare(value_.small_string_value_,rhs.value_.small_string_value_,small_string_length_) == 0 : false;
     case value_types::string_t:
         return value_.string_value_->length == rhs.value_.string_value_->length ? std::char_traits<Char>::compare(value_.string_value_->p,rhs.value_.string_value_->p,value_.string_value_->length) == 0 : false;
     case value_types::array_t:
@@ -682,6 +729,7 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc>::basic_json(basic_json&& other){
     type_ = other.type_;
+    small_string_length_ = other.small_string_length_;
     value_ = other.value_;
     other.type_ = value_types::null_t;
 }
@@ -919,6 +967,9 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
 {
     switch (type_)
     {
+    case value_types::small_string_t:
+        handler.value(value_.small_string_value_,small_string_length_);
+        break;
     case value_types::string_t:
         handler.value(value_.string_value_->p,value_.string_value_->length);
         break;
@@ -1314,6 +1365,8 @@ bool basic_json<Char, Alloc>::is_empty() const
 {
     switch (type_)
     {
+    case value_types::small_string_t:
+        return small_string_length_ == 0;
     case value_types::string_t:
         return value_.string_value_->length == 0;
     case value_types::array_t:
@@ -1604,6 +1657,8 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
 {
     switch (type_)
     {
+    case value_types::small_string_t:
+        return std::basic_string<Char>(value_.small_string_value_,small_string_length_);
     case value_types::string_t:
         return std::basic_string<Char>(value_.string_value_->p,value_.string_value_->length);
     default:
@@ -1612,10 +1667,28 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
 }
 
 template<typename Char, typename Alloc>
+const Char* basic_json<Char, Alloc>::as_c_str() const
+{
+    switch (type_)
+    {
+    case value_types::small_string_t:
+        value_.small_string_value_[small_string_length_] = 0;
+        return value_.small_string_value_;
+    case value_types::string_t:
+        value_.string_value_->p[value_.string_value_.length()] = 0;
+        return value_.string_value_->p;
+    default:
+        JSONCONS_THROW_EXCEPTION("Not a string");
+    }
+}
+
+template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_format<Char>& format) const
 {
     switch (type_)
     {
+    case value_types::small_string_t:
+        return std::basic_string<Char>(value_.small_string_value_,small_string_length_);
     case value_types::string_t:
         return std::basic_string<Char>(value_.string_value_->p,value_.string_value_->length);
     default:
@@ -1628,6 +1701,8 @@ Char basic_json<Char, Alloc>::as_char() const
 {
     switch (type_)
     {
+    case value_types::small_string_t:
+        return small_string_length_ > 0 ? value_.small_string_value_[0] : '\0';
     case value_types::string_t:
         return value_.string_value_->length > 0 ? value_.string_value_->p[0] : '\0';
     case value_types::longlong_t:

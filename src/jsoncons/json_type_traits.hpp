@@ -92,8 +92,7 @@ public:
     }
     const Char* as(const basic_json<Char, Alloc>& val) const
     {
-        JSONCONS_ASSERT(val.is_string());
-        return val.second.string_value_.c_str();
+        return val.value.as_c_str();
     }
     void assign(basic_json<Char, Alloc>& self, const Char *val)
     {
