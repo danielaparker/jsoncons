@@ -179,6 +179,7 @@ public:
         {
     		content_ = new typed_json_any<Char,T>(val);
         }
+
     	~any()
     	{
     		delete content_;
@@ -210,7 +211,7 @@ public:
     	json_any_impl<Char>* content_;
     };
 	
-    struct string_data
+    struct string_holder
     {
         size_t length;
         Char* p;
@@ -225,7 +226,59 @@ public:
         {
         }
 
-        variant(const variant& var)
+        explicit variant(json_object_impl<Char, Alloc> *var)
+            : type_(value_types::object_t)
+        {
+            value_.object_ = var;
+        }
+
+        explicit variant(json_array_impl<Char, Alloc> *var)
+            : type_(value_types::array_t)
+        {
+            value_.array_ = var;
+        }
+
+        explicit variant(const any& var)
+            : type_(value_types::any_t)
+        {
+            value_.any_value_ = new any(var);
+        }
+
+        explicit variant(jsoncons::null_type)
+            : type_(value_types::null_t)
+        {
+        }
+
+        explicit variant(bool val)
+            : type_(value_types::bool_t)
+        {
+            value_.bool_value_ = val;
+        }
+
+        explicit variant(double val)
+            : type_(value_types::double_t)
+        {
+            value_.float_value_ = val;
+        }
+
+        explicit variant(long long val)
+            : type_(value_types::longlong_t)
+        {
+            value_.si_value_ = val;
+        }
+
+        explicit variant(unsigned long long val)
+            : type_(value_types::ulonglong_t)
+        {
+            value_.ui_value_ = val;
+        }
+
+        explicit variant(variant&& var)
+        {
+            var.swap(*this);
+        }
+
+        explicit variant(const variant& var)
             : type_(var.type_)
         {
             switch (var.type_)
@@ -250,7 +303,7 @@ public:
                 std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
                 break;
             case value_types::string_t:
-                value_.string_value_ = create_string_env(var.value_.string_value_);
+                value_.string_value_ = make_string_holder(var.value_.string_value_);
                 break;
             case value_types::array_t:
                 value_.array_ = var.value_.array_->clone();
@@ -267,12 +320,12 @@ public:
             }
         }
 
-	variant(const std::basic_string<Char>& s)
+        explicit variant(const std::basic_string<Char>& s)
         {
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_env(s);
+                value_.string_value_ = make_string_holder(s);
             }
             else
             {
@@ -282,13 +335,13 @@ public:
             }
         }
 
-        variant(const Char* s)
+        explicit variant(const Char* s)
         {
             size_t length = std::char_traits<Char>::length(s);
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_env(s);
+                value_.string_value_ = make_string_holder(s);
             }
             else
             {
@@ -298,12 +351,12 @@ public:
             }
         }
 
-        variant(const Char* s, size_t length)
+        explicit variant(const Char* s, size_t length)
         {
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_env(s,length);
+                value_.string_value_ = make_string_holder(s,length);
             }
             else
             {
@@ -337,6 +390,266 @@ public:
                 delete value_.any_value_;
                 break;
             }
+        }
+
+        variant& operator=(variant&& val)
+        {
+            val.swap(this);
+            return *this;
+        }
+
+        variant& operator=(const variant& val)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = val.type_;
+                small_string_length_ = val.small_string_length_;
+                value_ = val.value_;
+                break;
+            default:
+                variant(val).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(const std::basic_string<Char>& s)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                if (s.length() > variant::small_string_capacity)
+                {
+                    type_ = value_types::string_t;
+                    value_.string_value_ = make_string_holder(s);
+                }
+                else
+                {
+                    type_ = value_types::small_string_t;
+                    small_string_length_ = (unsigned char)s.length();
+                    std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+                }
+                break;
+            default:
+                variant(s).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(long long val)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::longlong_t;
+                value_.si_value_ = val;
+                break;
+            default:
+                variant(val).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(unsigned long long val)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::ulonglong_t;
+                value_.ui_value_ = val;
+                break;
+            default:
+                variant(val).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(double val)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::double_t;
+                value_.float_value_ = val;
+                break;
+            default:
+                variant(val).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(bool val)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::bool_t;
+                value_.bool_value_ = val;
+                break;
+            default:
+                variant(val).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(null_type)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::null_t;
+                break;
+            default:
+                variant(null_type()).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(const any& rhs)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+                type_ = value_types::any_t;
+                value_.any_value_ = new any(rhs);
+                break;
+            default:
+                variant(rhs).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        bool operator!=(const variant& rhs) const
+        {
+            return !(*this == rhs);
+        }
+
+        bool operator==(const variant& rhs) const
+        {
+            if (is_numeric() & rhs.is_numeric())
+            {
+                switch (type_)
+                {
+                case value_types::longlong_t:
+                    switch (rhs.type_)
+                    {
+                    case value_types::longlong_t:
+                        return value_.si_value_ == rhs.value_.si_value_;
+                    case value_types::ulonglong_t:
+                        return value_.si_value_ == rhs.value_.ui_value_;
+                    case value_types::double_t:
+                        return value_.si_value_ == rhs.value_.float_value_;
+                    }
+                    break;
+                case value_types::ulonglong_t:
+                    switch (rhs.type_)
+                    {
+                    case value_types::longlong_t:
+                        return value_.ui_value_ == rhs.value_.si_value_;
+                    case value_types::ulonglong_t:
+                        return value_.ui_value_ == rhs.value_.ui_value_;
+                    case value_types::double_t:
+                        return value_.ui_value_ == rhs.value_.float_value_;
+                    }
+                    break;
+                case value_types::double_t:
+                    switch (rhs.type_)
+                    {
+                    case value_types::longlong_t:
+                        return value_.float_value_ == rhs.value_.si_value_;
+                    case value_types::ulonglong_t:
+                        return value_.float_value_ == rhs.value_.ui_value_;
+                    case value_types::double_t:
+                        return value_.float_value_ == rhs.value_.float_value_;
+                    }
+                    break;
+                }
+            }
+
+            if (rhs.type_ != type_)
+            {
+                return false;
+            }
+            switch (type_)
+            {
+            case value_types::bool_t:
+                return value_.bool_value_ == rhs.value_.bool_value_;
+            case value_types::null_t:
+            case value_types::empty_object_t:
+                return true;
+            case value_types::small_string_t:
+                return small_string_length_ == rhs.small_string_length_ ? std::char_traits<Char>::compare(value_.small_string_value_,rhs.value_.small_string_value_,small_string_length_) == 0 : false;
+            case value_types::string_t:
+                return value_.string_value_->length == rhs.value_.string_value_->length ? std::char_traits<Char>::compare(value_.string_value_->p,rhs.value_.string_value_->p,value_.string_value_->length) == 0 : false;
+            case value_types::array_t:
+                return *(value_.array_) == *(rhs.value_.array_);
+                break;
+            case value_types::object_t:
+                return *(value_.object_) == *(rhs.value_.object_);
+                break;
+            case value_types::any_t:
+                break;
+            default:
+                // throw
+                break;
+            }
+            return false;
         }
 
         bool is_null() const
@@ -373,6 +686,11 @@ public:
             return (type_ == value_types::string_t) | (type_ == value_types::small_string_t);
         }
 
+        bool is_numeric() const
+        {
+            return type_ == value_types::double_t || type_ == value_types::longlong_t || type_ == value_types::ulonglong_t;
+        }
+
         void swap(variant& var)
         {
             using std::swap;
@@ -393,7 +711,7 @@ public:
             json_object_impl<Char,Alloc>* object_;
             json_array_impl<Char,Alloc>* array_;
             any* any_value_;
-            string_data* string_value_;
+            string_holder* string_value_;
             Char small_string_value_[sizeof(long long)/sizeof(Char)];
         } value_;
 
@@ -1316,7 +1634,10 @@ public:
 
     basic_json(basic_json&& val);
 
-    explicit basic_json(any val);
+    explicit basic_json(const any& val)
+        : var_(val)
+    {
+    }
 
     explicit basic_json(jsoncons::null_type);
 
@@ -1372,7 +1693,11 @@ public:
     template <class T>
     basic_json& operator=(T val);
 
-    basic_json& operator=(basic_json<Char,Alloc> rhs);
+    basic_json& operator=(basic_json<Char,Alloc> rhs)
+    {
+        rhs.swap(*this);
+        return *this;
+    }
 
     bool operator!=(const basic_json<Char,Alloc>& rhs) const;
 
@@ -1650,9 +1975,6 @@ public:
 
     void assign_any(const any& rhs);
     void assign_string(const std::basic_string<Char>& rhs);
-    void assign_integer(long long rhs);
-    void assign_unsigned(unsigned long long rhs);
-    void assign_float(double rhs);
     void assign_bool(bool rhs);
     void assign_null();
 
@@ -1671,11 +1993,32 @@ public:
         return *p;
     }
 
+    void assign_double(double rhs)
+    {
+        var_ = rhs;
+    }
+    void assign_longlong(long long rhs)
+    {
+        var_ = rhs;
+    }
+    void assign_ulonglong(unsigned long long rhs)
+    {
+        var_ = rhs;
+    }
 
-//  Deprecated
-    void assign_double(double rhs);
-    void assign_longlong(long long rhs);
-    void assign_ulonglong(unsigned long long rhs);
+    // Deprecated
+    void assign_float(double rhs)
+    {
+        var_ = rhs;
+    }
+    void assign_integer(long long rhs)
+    {
+        var_ = rhs;
+    }
+    void assign_unsigned(unsigned long long rhs)
+    {
+        var_ = rhs;
+    }
 
     template <class T>
     void set_custom_data(const std::basic_string<Char>& name, T value);
@@ -1764,8 +2107,6 @@ public:
     }
 
 private:
-	basic_json(value_types::value_types_t t);
-
     template<typename Char2, typename Allocator2, size_t size>
     class build_array
     {};
@@ -1816,66 +2157,66 @@ private:
         }
     };
 
-    static void delete_string_env(const string_data* other)
+    static void delete_string_env(const string_holder* other)
     {
         ::operator delete((void*)other);
     }
 
-    static string_data* create_string_env(const string_data* other)
+    static string_holder* make_string_holder(const string_holder* other)
     {
-        size_t size = sizeof(string_data) + (other->length+1)*sizeof(Char);
+        size_t size = sizeof(string_holder) + (other->length+1)*sizeof(Char);
         char* buffer = (char*)::operator new(size);
-        string_data* env = new(buffer)string_data;
+        string_holder* env = new(buffer)string_holder;
         env->length = other->length;
-        env->p = new(buffer+sizeof(string_data))Char[other->length+1];
+        env->p = new(buffer+sizeof(string_holder))Char[other->length+1];
 		memcpy(env->p,other->p,other->length*sizeof(Char));
 		env->p[env->length] = 0;
         return env;
     }
 
-    static string_data* create_string_env(const std::basic_string<Char>& s)
+    static string_holder* make_string_holder(const std::basic_string<Char>& s)
     {
-        size_t size = sizeof(string_data) + (s.length()+1)*sizeof(Char);
+        size_t size = sizeof(string_holder) + (s.length()+1)*sizeof(Char);
         char* buffer = (char*)::operator new(size);
-        string_data* env = new(buffer)string_data;
+        string_holder* env = new(buffer)string_holder;
         env->length = s.length();
-        env->p = new(buffer+sizeof(string_data))Char[s.length()+1];
+        env->p = new(buffer+sizeof(string_holder))Char[s.length()+1];
         memcpy(env->p,s.c_str(),s.length()*sizeof(Char));
         env->p[env->length] = 0;
         return env;
     }
 
-    static string_data* create_string_env(const Char* p)
+    static string_holder* make_string_holder(const Char* p)
     {
-        return create_string_env(p,std::char_traits<Char>::length(p));
+        return make_string_holder(p,std::char_traits<Char>::length(p));
     }
 
-    static string_data* create_string_env(const Char* p, size_t length)
+    static string_holder* make_string_holder(const Char* p, size_t length)
     {
-        size_t size = sizeof(string_data) + (length+1)*sizeof(Char);
+        size_t size = sizeof(string_holder) + (length+1)*sizeof(Char);
         char* buffer = (char*)::operator new(size);
-        string_data* env = new(buffer)string_data;
+        string_holder* env = new(buffer)string_holder;
         env->length = length;
-        env->p = new(buffer+sizeof(string_data))Char[length+1];
+        env->p = new(buffer+sizeof(string_holder))Char[length+1];
         memcpy(env->p,p,length*sizeof(Char));
         env->p[env->length] = 0;
         return env;
     }
 
-    static string_data* create_string_env()
+    static string_holder* make_string_holder()
     {
-        size_t size = sizeof(string_data) + sizeof(Char);
+        size_t size = sizeof(string_holder) + sizeof(Char);
         char* buffer = (char*)::operator new(size);
-        string_data* env = new(buffer)string_data;
+        string_holder* env = new(buffer)string_holder;
         env->length = 0;
-        env->p = new(buffer+sizeof(string_data))Char[1];
+        env->p = new(buffer+sizeof(string_holder))Char[1];
         env->p[0] = 0;
         return env;
     }
 
-    static string_data* create_string_env(Char c)
+    static string_holder* make_string_holder(Char c)
     {
-        return create_string_env(&c,1);
+        return make_string_holder(&c,1);
     }
 public:
 	variant var_;
