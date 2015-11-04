@@ -142,17 +142,27 @@ public:
     {
     public:
         any()
+            : impl_(nullptr)
         {
         }
         any(const any& val)
         {
-			impl_ = val.impl_;
+			impl_ = val.impl_->clone();
+        }
+        any(any&& val)
+            : impl_(val.impl_)
+        {
+            val.impl_ = nullptr;
+        }
+        ~any()
+        {
+            delete impl_;
         }
 
         template<typename T>
         explicit any(T val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
         {
-    		impl_ = std::make_shared<any_handle_impl<typename type_wrapper<T>::value_type>>(val);
+    		impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
         }
 
         template <typename T>
@@ -193,6 +203,8 @@ public:
             {
             }
 
+            virtual any_handle* clone() const = 0;
+
             virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
         };
 
@@ -205,6 +217,11 @@ public:
             {
             }
 
+            virtual any_handle* clone() const
+            {
+                return new any_handle_impl<T>(value_);
+            }
+
             virtual void to_stream(basic_json_output_handler<Char>& os) const
             {
                 serialize(os,value_);
@@ -213,7 +230,7 @@ public:
             T value_;
         };
 
-    	std::shared_ptr<any_handle> impl_;
+        any_handle* impl_;
     };
 
     struct variant
