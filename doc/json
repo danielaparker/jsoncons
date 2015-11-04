@@ -666,10 +666,11 @@ json(InputIterator first, InputIterator last)
 <pre><code>template &lt;class T&gt;
 json&amp; operator=(T rhs)
 
-json&amp; operator=(json rhs)
+json&amp; operator=(const json&amp; rhs)
+json&amp; operator=(json&amp;&amp; rhs)
 </code></pre>
 
-<p>Supports copy and move assignment</p>
+<p>Assigns a new value to a <code>json</code> variable, replacing it's current contents.</p>
 
 <h3>Iterators</h3>
 
