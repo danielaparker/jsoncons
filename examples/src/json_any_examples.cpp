@@ -10,9 +10,6 @@ using jsoncons::basic_json;
 using jsoncons::pretty_print;
 using std::string;
 
-using jsoncons::json_any_impl;
-using jsoncons::typed_json_any;
-
 void put_any_value_in_object()
 {
     json obj;

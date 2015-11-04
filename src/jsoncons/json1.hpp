@@ -17,68 +17,50 @@
 #include <ostream>
 #include <memory>
 #include <array>
+#include <typeinfo>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
 
 namespace jsoncons {
 
+template <typename T>
+struct type_wrapper
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<const T>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<T&>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<const T&>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
 template <typename Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T&)
 {
     os.do_null_value();
 }
-
-template <typename Char>
-class json_any_impl
-{
-public:
-    virtual ~json_any_impl()
-    {
-    }
-
-    virtual void* data() = 0;
-
-    virtual const void* data() const = 0;
-
-    virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
-
-    virtual json_any_impl<Char>* clone() const = 0;
-};
-
-template <typename Char, class T>
-class typed_json_any : public json_any_impl<Char>
-{
-public:
-    typedef typed_json_any<Char,T>* Ptr;
-
-    typed_json_any(T value)
-        : data_(value)
-    {
-    }
-
-    virtual void* data() 
-    {
-        return &data_;
-    }
-
-    virtual const void* data() const  
-    {
-        return &data_;
-    }
-
-    virtual json_any_impl<Char>* clone() const
-    {
-        return new typed_json_any<Char,T>(data_);
-    }
-
-    virtual void to_stream(basic_json_output_handler<Char>& os) const
-    {
-        serialize(os,data_);
-    }
-
-    T data_;
-};
 
 template <typename Char, class Alloc>
 class basic_json;
@@ -160,61 +142,78 @@ public:
     {
     public:
         any()
-            : content_(nullptr)
         {
         }
         any(const any& val)
-            : content_(nullptr)
         {
-			content_ = val.content_->clone();
-        }
-        any(any&& val)
-            : content_(val.content_)
-        {
-            val.content_ = nullptr;
+			impl_ = val.impl_;
         }
 
         template<typename T>
         explicit any(T val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
         {
-    		content_ = new typed_json_any<Char,T>(val);
+    		impl_ = std::make_shared<any_handle_impl<typename type_wrapper<T>::value_type>>(val);
         }
 
-    	~any()
-    	{
-    		delete content_;
-    	}
         template <typename T>
-        const T& cast() const
+        typename type_wrapper<T>::reference cast() 
         {
-            const T* p = (const T*)content_->data();
-            return *p;
+            if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
+            {
+                JSONCONS_THROW_EXCEPTION("Bad any cast");
+            }
+            return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
+
         template <typename T>
-        T& cast() 
+        typename type_wrapper<T>::const_reference cast() const
         {
-            T* p = (T*)content_->data();
-            return *p;
+            if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
+            {
+                JSONCONS_THROW_EXCEPTION("Bad any cast");
+            }
+            return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
 
         any& operator=(any rhs)
         {
-            std::swap(content_,rhs.content_);
+            std::swap(impl_,rhs.impl_);
             return *this;
         }
 
         void to_stream(basic_json_output_handler<Char>& os) const 
         {
-            content_->to_stream(os);
+            impl_->to_stream(os);
         }
 
-    	json_any_impl<Char>* content_;
-    };
-	
-    struct string_holder
-    {
-        size_t length;
-        Char* p;
+        class any_handle
+        {
+        public:
+            virtual ~any_handle()
+            {
+            }
+
+            virtual void to_stream(basic_json_output_handler<Char>& os) const = 0;
+        };
+
+        template <class T>
+        class any_handle_impl : public any_handle
+        {
+        public:
+            any_handle_impl(T value)
+                : value_(value)
+            {
+            }
+
+            virtual void to_stream(basic_json_output_handler<Char>& os) const
+            {
+                serialize(os,value_);
+            }
+
+            T value_;
+        };
+
+    	std::shared_ptr<any_handle> impl_;
     };
 
     struct variant
@@ -378,7 +377,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                delete_string_env(value_.string_value_);
+                delete_string_holder(value_.string_value_);
                 break;
             case value_types::array_t:
                 delete value_.array_;
@@ -700,6 +699,12 @@ public:
             swap(value_,var.value_);
         }
 
+        struct string_holder
+        {
+            size_t length;
+            Char* p;
+        };
+
         value_types::value_types_t type_;
         unsigned char small_string_length_;
         union
@@ -714,6 +719,68 @@ public:
             string_holder* string_value_;
             Char small_string_value_[sizeof(long long)/sizeof(Char)];
         } value_;
+
+        static void delete_string_holder(const string_holder* other)
+        {
+            ::operator delete((void*)other);
+        }
+
+        static string_holder* make_string_holder(const string_holder* other)
+        {
+            size_t size = sizeof(string_holder) + (other->length+1)*sizeof(Char);
+            char* buffer = (char*)::operator new(size);
+            string_holder* env = new(buffer)string_holder;
+            env->length = other->length;
+            env->p = new(buffer+sizeof(string_holder))Char[other->length+1];
+            memcpy(env->p,other->p,other->length*sizeof(Char));
+            env->p[env->length] = 0;
+            return env;
+        }
+
+        static string_holder* make_string_holder(const std::basic_string<Char>& s)
+        {
+            size_t size = sizeof(string_holder) + (s.length()+1)*sizeof(Char);
+            char* buffer = (char*)::operator new(size);
+            string_holder* env = new(buffer)string_holder;
+            env->length = s.length();
+            env->p = new(buffer+sizeof(string_holder))Char[s.length()+1];
+            memcpy(env->p,s.c_str(),s.length()*sizeof(Char));
+            env->p[env->length] = 0;
+            return env;
+        }
+
+        static string_holder* make_string_holder(const Char* p)
+        {
+            return make_string_holder(p,std::char_traits<Char>::length(p));
+        }
+
+        static string_holder* make_string_holder(const Char* p, size_t length)
+        {
+            size_t size = sizeof(string_holder) + (length+1)*sizeof(Char);
+            char* buffer = (char*)::operator new(size);
+            string_holder* env = new(buffer)string_holder;
+            env->length = length;
+            env->p = new(buffer+sizeof(string_holder))Char[length+1];
+            memcpy(env->p,p,length*sizeof(Char));
+            env->p[env->length] = 0;
+            return env;
+        }
+
+        static string_holder* make_string_holder()
+        {
+            size_t size = sizeof(string_holder) + sizeof(Char);
+            char* buffer = (char*)::operator new(size);
+            string_holder* env = new(buffer)string_holder;
+            env->length = 0;
+            env->p = new(buffer+sizeof(string_holder))Char[1];
+            env->p[0] = 0;
+            return env;
+        }
+
+        static string_holder* make_string_holder(Char c)
+        {
+            return make_string_holder(&c,1);
+        }
 
     };
 
@@ -1982,15 +2049,13 @@ public:
     const T& any_cast() const
     {
         JSONCONS_ASSERT(var_.type_ == value_types::any_t);
-        const T* p = (const T*)var_.value_.any_value_->content_->data();
-        return *p;
+        return var_.value_.any_value_->cast<T>();
     }
     template <typename T>
     T& any_cast() 
     {
         JSONCONS_ASSERT(var_.type_ == value_types::any_t);
-        T* p = (T*)var_.value_.any_value_->content_->data();
-        return *p;
+        return var_.value_.any_value_->cast<T>();
     }
 
     void assign_double(double rhs)
@@ -2157,67 +2222,6 @@ private:
         }
     };
 
-    static void delete_string_env(const string_holder* other)
-    {
-        ::operator delete((void*)other);
-    }
-
-    static string_holder* make_string_holder(const string_holder* other)
-    {
-        size_t size = sizeof(string_holder) + (other->length+1)*sizeof(Char);
-        char* buffer = (char*)::operator new(size);
-        string_holder* env = new(buffer)string_holder;
-        env->length = other->length;
-        env->p = new(buffer+sizeof(string_holder))Char[other->length+1];
-		memcpy(env->p,other->p,other->length*sizeof(Char));
-		env->p[env->length] = 0;
-        return env;
-    }
-
-    static string_holder* make_string_holder(const std::basic_string<Char>& s)
-    {
-        size_t size = sizeof(string_holder) + (s.length()+1)*sizeof(Char);
-        char* buffer = (char*)::operator new(size);
-        string_holder* env = new(buffer)string_holder;
-        env->length = s.length();
-        env->p = new(buffer+sizeof(string_holder))Char[s.length()+1];
-        memcpy(env->p,s.c_str(),s.length()*sizeof(Char));
-        env->p[env->length] = 0;
-        return env;
-    }
-
-    static string_holder* make_string_holder(const Char* p)
-    {
-        return make_string_holder(p,std::char_traits<Char>::length(p));
-    }
-
-    static string_holder* make_string_holder(const Char* p, size_t length)
-    {
-        size_t size = sizeof(string_holder) + (length+1)*sizeof(Char);
-        char* buffer = (char*)::operator new(size);
-        string_holder* env = new(buffer)string_holder;
-        env->length = length;
-        env->p = new(buffer+sizeof(string_holder))Char[length+1];
-        memcpy(env->p,p,length*sizeof(Char));
-        env->p[env->length] = 0;
-        return env;
-    }
-
-    static string_holder* make_string_holder()
-    {
-        size_t size = sizeof(string_holder) + sizeof(Char);
-        char* buffer = (char*)::operator new(size);
-        string_holder* env = new(buffer)string_holder;
-        env->length = 0;
-        env->p = new(buffer+sizeof(string_holder))Char[1];
-        env->p[0] = 0;
-        return env;
-    }
-
-    static string_holder* make_string_holder(Char c)
-    {
-        return make_string_holder(&c,1);
-    }
 public:
 	variant var_;
 };
