@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
 
     json::object_iterator it = val.begin_members();
 
-    BOOST_CHECK(it->value().type() == jsoncons::value_types::string_t);
+    BOOST_CHECK(it->value().is_string());
     ++it;
-    BOOST_CHECK(it->value().type() == jsoncons::value_types::string_t);
+    BOOST_CHECK(it->value().is_string());
     ++it;
     BOOST_CHECK(it->value().type() == jsoncons::value_types::ulonglong_t);
     ++it;
@@ -482,4 +482,3 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
-
