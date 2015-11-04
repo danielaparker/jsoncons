@@ -357,82 +357,21 @@ Inserts json value into stream using specified [output_format](output_format).
     void to_stream(json_output_handler& handler) const
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
-### Non-member overloads
+### Non member functions
 
-    std::wostream& operator<< (std::wostream& os, const json& val)
+    std::ostream& operator<< (std::ostream& os, const json& val)
 Inserts json value into stream.
+
+    std::ostream& print(const json& val)  
+    std::ostream& print(const json& val, const output_format<Char>& format)  
+Inserts json value into stream using the specified [output_format](output_format) if supplied.
+
+    std::ostream& pretty_print(const json& val)  
+    std::ostream& pretty_print(const json& val, const output_format<Char>& format)  
+Inserts json value into stream using the specified [output_format](output_format) if supplied.
 
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
-
-### Deprecated member types
-
-    null_type
-typedefed to `jsoncons::null_type` for backwards compatability, use `jsoncons::null_type` instead
-
-### Deprecated methods
-
-    bool is_custom() const
-
-    template <class T>
-    const T& custom_data() const
-If the value is custom, returns a reference to the custom value, otherwise throws  
-
-    template <class T>
-    T& custom_data() 
-If the value is custom, returns a reference to the custom value, otherwise throws  
-
-    template <class T>
-    void set_custom_data(const std::string& name, const T& value)
-Inserts custom data of type `T` into a json object.
-
-    template <class T>
-    void add_custom_data(const T& val)
-Adds a new custom data element of type `T at the end of a json array. The content of `val` is copied to the new element.
-
-    template <class T>
-    void add_custom_data(size_t index, const T& val)
-Adds a new custom data element of type `T` at the specified index of a json array, shifting all elements currently at or above that index to the right.
-The content of `val` is copied to the new element.
-
-    std::string as_string(const output_format& format) const
-Use `to_string(format)`.
-
-    template <size_t N>
-    static json make_multi_array(size1 ... sizeN)
-    Use `json make_array<N>(size1 ... sizeN)` instead
-
-    template <size_t N,typename T>
-    static json make_multi_array(size1 ... sizeN, T val)
-    Use `json make_array<N>(size1 ... sizeN, T val)` instead
-
-    static json make_2d_array(size_t m, size_t n)
-Use `make_array<2>(m,n)` instead
-
-    template<typename T> 
-    static json make_2d_array(size_t m, size_t n, T val)
-Use `make_array<2>(m,n,val)` instead
-
-    static json make_3d_array(size_t m, size_t n, size_t k)
-Use `make_array<3>(m,n,k)` instead
-
-    template <typename T>
-    static json make_3d_array(size_t m, size_t n, size_t k, T val)
-Use `make_array<3>(m,n,k,val)` instead
-
-    template <class T>
-    std::vector<T> as_vector() const
-If value is array and conversion is possible to the template type, returns a `std::vector` of that type, otherwise throws an `std::exception`. Specializations are provided for `std::string`, `bool`, `char`, `int`, `unsigned int`, `long`, `unsigned long`, `long long`, `unsigned long long`, and `double`.
-Use `as<std::vector<T>>` instead.
-
-    int as_int() const
-Use `as<int>()` instead
-
-    unsigned int as_uint() const
-Use `as<int>()` instead
-
-    char as_char() const
-Use `as<char>()` instead
 
 ### Examples
 

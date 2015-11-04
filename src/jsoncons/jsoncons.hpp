@@ -291,5 +291,37 @@ bool is_non_ascii_character(uint32_t c)
     return c >= 0x80;
 }
 
+template <typename T>
+struct type_wrapper
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<const T>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<T&>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <typename T>
+struct type_wrapper<const T&>
+{
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
 }
 #endif
