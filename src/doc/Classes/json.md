@@ -137,8 +137,9 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
     template <class T>
     json& operator=(T rhs)
 
-    json& operator=(json rhs)
-Supports copy and move assignment
+    json& operator=(const json& rhs)
+    json& operator=(json&& rhs)
+Assigns a new value to a `json` variable, replacing it's current contents.
 
 ### Iterators
 

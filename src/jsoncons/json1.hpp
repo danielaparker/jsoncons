@@ -378,28 +378,34 @@ public:
 
         variant& operator=(variant&& val)
         {
-            val.swap(this);
+            if (this != &val)
+            {
+                val.swap(*this);
+            }
             return *this;
         }
 
         variant& operator=(const variant& val)
         {
-            switch (type_)
+            if (this != &val)
             {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
-            case value_types::double_t:
-                type_ = val.type_;
-                small_string_length_ = val.small_string_length_;
-                value_ = val.value_;
-                break;
-            default:
-                variant(val).swap(*this);
-                break;
+                switch (type_)
+                {
+                case value_types::null_t:
+                case value_types::bool_t:
+                case value_types::empty_object_t:
+                case value_types::small_string_t:
+                case value_types::longlong_t:
+                case value_types::ulonglong_t:
+                case value_types::double_t:
+                    type_ = val.type_;
+                    small_string_length_ = val.small_string_length_;
+                    value_ = val.value_;
+                    break;
+                default:
+                    variant(val).swap(*this);
+                    break;
+                }
             }
             return *this;
         }
@@ -1745,9 +1751,15 @@ public:
     template <class T>
     basic_json& operator=(T val);
 
-    basic_json& operator=(basic_json<Char,Alloc> rhs)
+    basic_json& operator=(basic_json<Char,Alloc>&& rhs)
     {
-        rhs.swap(*this);
+        var_ = std::move(rhs.var_);
+        return *this;
+    }
+
+    basic_json& operator=(const basic_json<Char,Alloc>& rhs)
+    {
+        var_ = rhs.var_;
         return *this;
     }
 
