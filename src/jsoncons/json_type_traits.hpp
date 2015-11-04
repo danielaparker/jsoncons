@@ -364,7 +364,7 @@ public:
     }
     void assign(basic_json<Char, Alloc>& self, long long val)
     {
-        self.assign_integer(val);
+        self.assign_longlong(val);
     }
 };
 
@@ -432,7 +432,7 @@ public:
     }
     void assign(basic_json<Char, Alloc>& self, double val)
     {
-        self.assign_float(val);
+        self.assign_double(val);
     }
 };
 
