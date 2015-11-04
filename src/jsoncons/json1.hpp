@@ -24,38 +24,6 @@
 
 namespace jsoncons {
 
-template <typename T>
-struct type_wrapper
-{
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <typename T>
-struct type_wrapper<const T>
-{
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <typename T>
-struct type_wrapper<T&>
-{
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <typename T>
-struct type_wrapper<const T&>
-{
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
 template <typename Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T&)
 {

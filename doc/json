@@ -988,116 +988,29 @@ The content of <code>val</code> is copied (or moved) to the new element.</p>
 
 <p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json_output_handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>
 
-<h3>Non-member overloads</h3>
+<h3>Non member functions</h3>
 
-<pre><code>std::wostream&amp; operator&lt;&lt; (std::wostream&amp; os, const json&amp; val)
+<pre><code>std::ostream&amp; operator&lt;&lt; (std::ostream&amp; os, const json&amp; val)
 </code></pre>
 
 <p>Inserts json value into stream.</p>
+
+<pre><code>std::ostream&amp; print(const json&amp; val)  
+std::ostream&amp; print(const json&amp; val, const output_format&lt;Char&gt;&amp; format)  
+</code></pre>
+
+<p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
+
+<pre><code>std::ostream&amp; pretty_print(const json&amp; val)  
+std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&gt;&amp; format)  
+</code></pre>
+
+<p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
 
 <pre><code>void swap(json&amp; a, json&amp; b)
 </code></pre>
 
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
-
-<h3>Deprecated member types</h3>
-
-<pre><code>null_type
-</code></pre>
-
-<p>typedefed to <code>jsoncons::null_type</code> for backwards compatability, use <code>jsoncons::null_type</code> instead</p>
-
-<h3>Deprecated methods</h3>
-
-<pre><code>bool is_custom() const
-
-template &lt;class T&gt;
-const T&amp; custom_data() const
-</code></pre>
-
-<p>If the value is custom, returns a reference to the custom value, otherwise throws  </p>
-
-<pre><code>template &lt;class T&gt;
-T&amp; custom_data() 
-</code></pre>
-
-<p>If the value is custom, returns a reference to the custom value, otherwise throws  </p>
-
-<pre><code>template &lt;class T&gt;
-void set_custom_data(const std::string&amp; name, const T&amp; value)
-</code></pre>
-
-<p>Inserts custom data of type <code>T</code> into a json object.</p>
-
-<pre><code>template &lt;class T&gt;
-void add_custom_data(const T&amp; val)
-</code></pre>
-
-<p>Adds a new custom data element of type <code>T at the end of a json array. The content of</code>val` is copied to the new element.</p>
-
-<pre><code>template &lt;class T&gt;
-void add_custom_data(size_t index, const T&amp; val)
-</code></pre>
-
-<p>Adds a new custom data element of type <code>T</code> at the specified index of a json array, shifting all elements currently at or above that index to the right.<br>
-The content of <code>val</code> is copied to the new element.</p>
-
-<pre><code>std::string as_string(const output_format&amp; format) const
-</code></pre>
-
-<p>Use <code>to_string(format)</code>.</p>
-
-<pre><code>template &lt;size_t N&gt;
-static json make_multi_array(size1 ... sizeN)
-Use `json make_array&lt;N&gt;(size1 ... sizeN)` instead
-
-template &lt;size_t N,typename T&gt;
-static json make_multi_array(size1 ... sizeN, T val)
-Use `json make_array&lt;N&gt;(size1 ... sizeN, T val)` instead
-
-static json make_2d_array(size_t m, size_t n)
-</code></pre>
-
-<p>Use <code>make_array&lt;2&gt;(m,n)</code> instead</p>
-
-<pre><code>template&lt;typename T&gt; 
-static json make_2d_array(size_t m, size_t n, T val)
-</code></pre>
-
-<p>Use <code>make_array&lt;2&gt;(m,n,val)</code> instead</p>
-
-<pre><code>static json make_3d_array(size_t m, size_t n, size_t k)
-</code></pre>
-
-<p>Use <code>make_array&lt;3&gt;(m,n,k)</code> instead</p>
-
-<pre><code>template &lt;typename T&gt;
-static json make_3d_array(size_t m, size_t n, size_t k, T val)
-</code></pre>
-
-<p>Use <code>make_array&lt;3&gt;(m,n,k,val)</code> instead</p>
-
-<pre><code>template &lt;class T&gt;
-std::vector&lt;T&gt; as_vector() const
-</code></pre>
-
-<p>If value is array and conversion is possible to the template type, returns a <code>std::vector</code> of that type, otherwise throws an <code>std::exception</code>. Specializations are provided for <code>std::string</code>, <code>bool</code>, <code>char</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code>, and <code>double</code>.<br>
-Use <code>as&lt;std::vector&lt;T&gt;&gt;</code> instead.</p>
-
-<pre><code>int as_int() const
-</code></pre>
-
-<p>Use <code>as&lt;int&gt;()</code> instead</p>
-
-<pre><code>unsigned int as_uint() const
-</code></pre>
-
-<p>Use <code>as&lt;int&gt;()</code> instead</p>
-
-<pre><code>char as_char() const
-</code></pre>
-
-<p>Use <code>as&lt;char&gt;()</code> instead</p>
 
 <h3>Examples</h3>
 
