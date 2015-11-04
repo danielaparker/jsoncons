@@ -92,8 +92,7 @@ public:
     }
     const Char* as(const basic_json<Char, Alloc>& val) const
     {
-        JSONCONS_ASSERT(val.is_string());
-        return val.second.string_value_.c_str();
+        return val.value.as_c_str();
     }
     void assign(basic_json<Char, Alloc>& self, const Char *val)
     {
@@ -365,7 +364,7 @@ public:
     }
     void assign(basic_json<Char, Alloc>& self, long long val)
     {
-        self.assign_integer(val);
+        self.assign_longlong(val);
     }
 };
 
@@ -433,7 +432,7 @@ public:
     }
     void assign(basic_json<Char, Alloc>& self, double val)
     {
-        self.assign_float(val);
+        self.assign_double(val);
     }
 };
 
