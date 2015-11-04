@@ -210,6 +210,56 @@ public:
         {
         }
 
+        explicit variant(variant&& rhs)
+        {
+            type_ = rhs.type_;
+            small_string_length_ = rhs.small_string_length_;
+            value_ = rhs.value_;
+            rhs.type_ = value_types::null_t;
+        }
+
+        explicit variant(const variant& var)
+            : type_(var.type_)
+        {
+            switch (var.type_)
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+                break;
+            case value_types::double_t:
+                value_.float_value_ = var.value_.float_value_;
+                break;
+            case value_types::longlong_t:
+                value_.si_value_ = var.value_.si_value_;
+                break;
+            case value_types::ulonglong_t:
+                value_.ui_value_ = var.value_.ui_value_;
+                break;
+            case value_types::bool_t:
+                value_.bool_value_ = var.value_.bool_value_;
+                break;
+            case value_types::small_string_t:
+                small_string_length_ = var.small_string_length_;
+                std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
+                break;
+            case value_types::string_t:
+                value_.string_value_ = make_string_holder(var.value_.string_value_);
+                break;
+            case value_types::array_t:
+                value_.array_ = var.value_.array_->clone();
+                break;
+            case value_types::object_t:
+                value_.object_ = var.value_.object_->clone();
+                break;
+            case value_types::any_t:
+                value_.any_value_ = new any(*(var.value_.any_value_));
+                break;
+            default:
+                // throw
+                break;
+            }
+        }
+
         explicit variant(json_object_impl<Char, Alloc> *var)
             : type_(value_types::object_t)
         {
@@ -255,53 +305,6 @@ public:
             : type_(value_types::ulonglong_t)
         {
             value_.ui_value_ = val;
-        }
-
-        explicit variant(variant&& var)
-        {
-            var.swap(*this);
-        }
-
-        explicit variant(const variant& var)
-            : type_(var.type_)
-        {
-            switch (var.type_)
-            {
-            case value_types::null_t:
-            case value_types::empty_object_t:
-                break;
-            case value_types::double_t:
-                value_.float_value_ = var.value_.float_value_;
-                break;
-            case value_types::longlong_t:
-                value_.si_value_ = var.value_.si_value_;
-                break;
-            case value_types::ulonglong_t:
-                value_.ui_value_ = var.value_.ui_value_;
-                break;
-            case value_types::bool_t:
-                value_.bool_value_ = var.value_.bool_value_;
-                break;
-            case value_types::small_string_t:
-                small_string_length_ = var.small_string_length_;
-                std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
-                break;
-            case value_types::string_t:
-                value_.string_value_ = make_string_holder(var.value_.string_value_);
-                break;
-            case value_types::array_t:
-                value_.array_ = var.value_.array_->clone();
-                break;
-            case value_types::object_t:
-                value_.object_ = var.value_.object_->clone();
-                break;
-            case value_types::any_t:
-                value_.any_value_ = new any(*(var.value_.any_value_));
-                break;
-            default:
-                // throw
-                break;
-            }
         }
 
         explicit variant(const std::basic_string<Char>& s)
