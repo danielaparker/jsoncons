@@ -502,6 +502,7 @@ vertical-align:1px;
 
 <ul>
 <li>Enhancements to processing CSV files to output JSON, see example below. </li>
+<li>The json value <code>v</code> stored in a <code>json_deserializer</code> is now retrieved by calling the member function <code>get_value</code>, which returns it as <code>std::move(v)</code>. </li>
 </ul>
 
 <h2>Using the jsoncons library</h2>
@@ -724,7 +725,7 @@ params.ignore_empty_values(true);
 
 csv_reader reader(is,handler,params);
 reader.read();
-json val = std::move(handler.result);
+json val = handler.get_value();
 
 std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 </code></pre>

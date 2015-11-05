@@ -41,6 +41,12 @@ public:
     {
     }
 
+    basic_json<Char,Alloc> get_value()
+    {
+        return std::move(result);
+    }
+
+//  Deprecated
     basic_json<Char,Alloc>& root()
     {
         return result;

@@ -1,5 +1,11 @@
+Target 0.98.1 Release
+---------------------
+
+- Enhancements to processing CSV files to output JSON 
+- The json value `v` stored in a `json_deserializer` is now retrieved by calling the member function `get_value`, which returns it as `std::move(v)`. 
+
 0.98 Release
-------------
+--------------
 
 Bug fixes:
 

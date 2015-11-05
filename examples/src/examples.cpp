@@ -172,7 +172,7 @@ void mulitple_json_objects()
         reader.read_next();
         if (!reader.eof())
         {
-            json val = std::move(handler.result);
+            json val = handler.get_value();
             std::cout << val << std::endl;
         }
     }

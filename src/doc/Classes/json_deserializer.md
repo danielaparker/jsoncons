@@ -16,12 +16,12 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
     json_deserializer()
 
-### Member variable
+### Member functions
 
-    json result
-The output json value
+    json get_value()
+Returns the json value `v` stored in the `deserializer` as `std::move(v)`.
 
 ### Deprecated methods
 
     json& root()
-Use the public member variable `result` instead
+Use the public member function `get_value()` instead
