@@ -85,47 +85,44 @@ class basic_json_parser : private basic_parsing_context<Char>
 
 public:
     basic_json_parser(basic_json_input_handler<Char>& handler)
-       : top_(-1),
+       : state_(states::start), 
+         top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
          err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
-         is_negative_(false),
+         column_(0),
+         line_(0),
          cp_(0),
-         index_(0)
+         is_negative_(false),
+         prev_char_(0),
+         index_(0),
+         depth_(default_depth)
+    {
+        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+    }
+
+    basic_json_parser(basic_json_input_handler<Char>& handler,
+                      basic_parse_error_handler<Char>& err_handler)
+       : state_(states::start), 
+         top_(-1),
+         stack_(default_depth),
+         handler_(std::addressof(handler)),
+         err_handler_(std::addressof(err_handler)),
+         column_(0),
+         line_(0),
+         cp_(0),
+         is_negative_(false),
+         prev_char_(0),
+         index_(0),
+         depth_(default_depth)
 
     {
-        depth_ = default_depth;
-        state_ = states::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        prev_char_ = 0;
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     basic_parsing_context<Char> const & parsing_context() const
     {
         return *this;
-    }
-
-    basic_json_parser(basic_json_input_handler<Char>& handler,
-                      basic_parse_error_handler<Char>& err_handler)
-       : top_(-1),
-         stack_(default_depth),
-         handler_(std::addressof(handler)),
-         err_handler_(std::addressof(err_handler)),
-         is_negative_(false),
-         cp_(0),
-         index_(0)
-
-    {
-        depth_ = default_depth;
-        state_ = states::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        prev_char_ = 0;
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
     ~basic_json_parser()

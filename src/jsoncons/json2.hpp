@@ -779,7 +779,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
             // copy the file into the buffer:
             size_t result = std::fread (&buffer[0],1,size,fp);
-            if (result != size)
+            if (result != static_cast<unsigned long long>(size))
             {
                 throw json_exception_1<char>("Error reading file %s", filename);
             }
@@ -824,7 +824,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
             // copy the file into the buffer:
             size_t result = std::fread (&buffer[0],1,size,fp);
-            if (result != size)
+            if (result != static_cast<unsigned long long>(size))
             {
                 throw json_exception_1<char>("Error reading file %s", filename);
             }
