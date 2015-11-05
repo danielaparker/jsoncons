@@ -27,7 +27,7 @@ namespace jsoncons {
 template <typename Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T&)
 {
-    os.do_null_value();
+    os.value(null_type());
 }
 
 template <typename Char, class Alloc>

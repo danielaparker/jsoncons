@@ -911,7 +911,7 @@ a <code>json::any value</code>, like this:</p>
 using jsoncons::json;
 using boost::numeric::ublas::matrix;
 
-json obj;
+json val;
 
 matrix&lt;double&gt; A(2,2);
 A(0,0) = 1;
@@ -919,9 +919,34 @@ A(0,1) = 2;
 A(1,0) = 3;
 A(1,1) = 4;
 
-obj.set("mydata",json::any(A));
+val.set("A",json::any(A));
 
-matrix&lt;double&gt;&amp; B = obj["mydata"].any_cast&lt;matrix&lt;double&gt;&gt;();
+matrix&lt;double&gt;&amp; B = val["A"].any_cast&lt;matrix&lt;double&gt;&gt;();
+</code></pre>
+
+<p>By default, if you print <code>val</code> on a stream, </p>
+
+<pre><code>std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
+</code></pre>
+
+<p>the template function</p>
+
+<pre><code>template &lt;typename Char,class T&gt; inline
+void serialize(basic_json_output_handler&lt;Char&gt;&amp; os, const T&amp;)
+{
+    os.value(null_type());
+}
+</code></pre>
+
+<p>gets called, and produces a <code>null</code> value. You can however implement a specialization of <code>serialize</code> for <code>boost::matrix</code> to produce suitable output, such as</p>
+
+<pre><code>{
+    "A":
+    [
+        [1,2],
+        [3,4]
+    ]
+}
 </code></pre>
 
 <h3>Acknowledgements</h3>

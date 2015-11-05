@@ -400,7 +400,7 @@ a `json::any value`, like this:
     using jsoncons::json;
     using boost::numeric::ublas::matrix;
 
-    json obj;
+    json val;
 
     matrix<double> A(2,2);
     A(0,0) = 1;
@@ -408,9 +408,32 @@ a `json::any value`, like this:
     A(1,0) = 3;
     A(1,1) = 4;
 
-    obj.set("mydata",json::any(A));
+    val.set("A",json::any(A));
 
-    matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
+    matrix<double>& B = val["A"].any_cast<matrix<double>>();
+
+By default, if you print `val` on a stream, 
+
+    std::cout << pretty_print(val) << std::endl;
+
+the template function
+
+    template <typename Char,class T> inline
+    void serialize(basic_json_output_handler<Char>& os, const T&)
+    {
+        os.value(null_type());
+    }
+
+gets called, and produces a `null` value. You can however implement a specialization of `serialize` for `boost::matrix` to produce suitable output, such as
+
+    {
+        "A":
+        [
+            [1,2],
+            [3,4]
+        ]
+    }
+
 
 ### Acknowledgements
 
