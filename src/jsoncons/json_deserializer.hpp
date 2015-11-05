@@ -36,13 +36,20 @@ public:
     basic_json_deserializer()
         : top_(-1),
           stack_(default_depth),
-          depth_(default_depth)
+          depth_(default_depth),
+          is_valid_(true) // initial json value is an empty object
 
     {
     }
 
-    basic_json<Char,Alloc> get_value()
+    bool is_valid() const
     {
+        return is_valid_;
+    }
+
+    basic_json<Char,Alloc> get_result()
+    {
+        is_valid_ = false;
         return std::move(result);
     }
 
@@ -92,10 +99,12 @@ private:
 
     void do_begin_json() override
     {
+        is_valid_ = false;
     }
 
     void do_end_json() override
     {
+        is_valid_ = true;
     }
 
     void do_begin_object(const basic_parsing_context<Char>& context) override
@@ -230,6 +239,7 @@ private:
     int top_;
     std::vector<stack_item> stack_;
     int depth_;
+    bool is_valid_;
 };
 
 typedef basic_json_deserializer<char,std::allocator<void>> json_deserializer;

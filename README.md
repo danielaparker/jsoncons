@@ -28,7 +28,7 @@ The library has a number of features, which are listed below:
 ## What's new on master
 
 - Enhancements to processing CSV files to output JSON, see example below. 
-- The json value `v` stored in a `json_deserializer` is now retrieved by calling the member function `get_value`, which returns it as `std::move(v)`. 
+- The json value `v` stored in a `json_deserializer` is now retrieved by calling the member function `get_result`, which returns it as `std::move(v)`. 
 
 ## Using the jsoncons library
 
