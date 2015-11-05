@@ -950,7 +950,7 @@ void serialize(basic_json_output_handler&lt;Char&gt;&amp; os, const T&amp;)
 }
 </code></pre>
 
-<p>gets called, and produces a <code>null</code> value. You can however implement a specialization of <code>serialize</code> for <code>boost::matrix</code> to produce suitable output, such as</p>
+<p>gets called, and produces a <code>null</code> value for the matrix. You can however implement a specialization of <code>serialize</code> for <code>boost::matrix</code> to produce the output </p>
 
 <pre><code>{
     "A":
