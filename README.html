@@ -725,7 +725,7 @@ params.ignore_empty_values(true);
 
 csv_reader reader(is,handler,params);
 reader.read();
-json val = handler.get_value();
+json val = handler.get_result();
 
 std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 </code></pre>
