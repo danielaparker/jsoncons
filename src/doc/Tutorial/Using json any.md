@@ -23,9 +23,9 @@ a json::any value, like this:
     A(1,0) = 3;
     A(1,1) = 4;
 
-    obj.set("mydata",json::any(A));
+    obj.set("A",json::any(A));
 
-    matrix<double>& B = obj["mydata"].any_cast<matrix<double>>();
+    matrix<double>& B = obj["A"].any_cast<matrix<double>>();
 
 ### Serializing a json `any` value
  
@@ -35,7 +35,7 @@ By default, if you write the json object containing your boost matrix to a strea
 
 the output is
 
-    {"mydata":null}
+    {"A":null}
 
 You can, however, implement a function template specialization of `serialize` in 
 the `jsoncons` namespace, in a header file, like this:
@@ -72,7 +72,7 @@ You'll need to include this header file in every file that inserts a boost matri
 
 Now when you write the json object to the stream, the output is
 
-    {"mydata":[[1,2],[3,4]]}
+    {"A":[[1,2],[3,4]]}
 
 or with pretty printing
 
@@ -81,7 +81,7 @@ or with pretty printing
 the output becomes    
 
     {
-        "mydata":
+        "A":
         [
             [1,2],
             [3,4]

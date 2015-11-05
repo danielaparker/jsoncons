@@ -34,14 +34,14 @@ BOOST_AUTO_TEST_CASE(test_any)
     //std::cout << A << std::endl;
 
     std::cout << "Before set" << std::endl;
-    obj.set("mydata",json::any(A));
+    obj.set("A",json::any(A));
     std::cout << "After set" << std::endl;
 
     obj.to_stream(std::cout);
     std::cout << "After to_stream" << std::endl;
     std::cout << obj << std::endl;
 
-    matrix<double>& B = obj["mydata"].custom_data<matrix<double>>();
+    matrix<double>& B = obj["A"].custom_data<matrix<double>>();
     BOOST_CHECK_EQUAL(A.size1(),B.size1());
     BOOST_CHECK_EQUAL(A.size2(),B.size2());
 
