@@ -915,12 +915,10 @@ std::cout &lt;&lt; deal &lt;&lt; std::endl;
 
 <p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and <br>
 assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>
-a <code>json::any value</code>, like this:</p>
+a <code>json::any</code> value, like this:</p>
 
-<pre><code>#include "jsoncons/json.hpp"
-#include &lt;boost/numeric/ublas/matrix.hpp&gt;
+<pre><code>#include &lt;boost/numeric/ublas/matrix.hpp&gt;
 
-using jsoncons::json;
 using boost::numeric::ublas::matrix;
 
 json val;
