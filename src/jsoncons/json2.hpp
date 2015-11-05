@@ -718,7 +718,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     basic_json_reader<Char> reader(is, handler);
     reader.read_next();
     reader.check_done();
-    return handler.get_value();
+    return handler.get_result();
 }
 
 template<typename Char, typename Alloc>
@@ -729,7 +729,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     basic_json_reader<Char> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
-    return handler.get_value();
+    return handler.get_result();
 }
 
 template<typename Char, typename Alloc>
@@ -741,7 +741,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.parse(s.c_str(),0,s.length());
     parser.end_parse();
     parser.check_done(s.c_str(),parser.index(),s.length());
-    return handler.get_value();
+    return handler.get_result();
 }
 
 template<typename Char, typename Alloc>
@@ -754,7 +754,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.parse(s.c_str(),0,s.length());
     parser.end_parse();
     parser.check_done(s.c_str(),parser.index(),s.length());
-    return handler.get_value();
+    return handler.get_result();
 }
 
 template<typename Char, typename Alloc>
@@ -792,7 +792,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
         }
 
         std::fclose (fp);
-        return handler.get_value();
+        return handler.get_result();
     }
     catch (...)
     {
@@ -837,7 +837,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
         }
 
         std::fclose (fp);
-        return handler.get_value();
+        return handler.get_result();
     }
     catch (...)
     {

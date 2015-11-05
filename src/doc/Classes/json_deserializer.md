@@ -18,10 +18,13 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
 ### Member functions
 
-    json get_value()
-Returns the json value `v` stored in the `deserializer` as `std::move(v)`.
+    bool is_valid() const
+Checks if the `deserializer` contains a valid json value. The initial `is_valid()` is true (the value is an empty object), becomes false when a `do_begin_json` event is received, becomes `true` when a `do_end_json` event is received, and becomes false when `get_result()` is called.
+
+    json get_result()
+Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
 
 ### Deprecated methods
 
     json& root()
-Use the public member function `get_value()` instead
+Use the public member function `get_result()` instead
