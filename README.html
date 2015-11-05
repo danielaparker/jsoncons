@@ -719,9 +719,9 @@ json_deserializer handler;
 
 csv_parameters params;
 params.assume_header(true);
-params.data_types("integer,string,string,string");
 params.trim(true);
 params.ignore_empty_values(true);
+params.data_types("integer,string,string,string");
 
 csv_reader reader(is,handler,params);
 reader.read();
@@ -764,6 +764,18 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
     }
 ]
 </code></pre>
+
+<p>There are a few things to note about the effect of the parameter settings.</p>
+
+<ul>
+<li>
+<code>assume_header</code> <code>true</code> tells the csv parser to parse the first line of the file for column names, which become object member names.</li>
+<li>
+<code>trim</code> <code>true</code> tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.</li>
+<li>
+<code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li>
+<li>The <code>data_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
+</ul>
 
 <h3>Iterators</h3>
 

@@ -221,9 +221,9 @@ You can read the `CSV` file into a `json` value like this
 
     csv_parameters params;
     params.assume_header(true);
-    params.data_types("integer,string,string,string");
     params.trim(true);
     params.ignore_empty_values(true);
+    params.data_types("integer,string,string,string");
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -264,6 +264,12 @@ The output is:
             "task_start":"05/01/2003"
         }
     ]
+
+There are a few things to note about the effect of the parameter settings.
+- `assume_header` `true` tells the csv parser to parse the first line of the file for column names, which become object member names.
+- `trim` `true` tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.
+- `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
+- The `data_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
 ### Iterators
 
