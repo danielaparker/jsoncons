@@ -217,14 +217,14 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = std::move(handler.result);
+        json val = handler.get_value();
         BOOST_CHECK_EQUAL(1,val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = std::move(handler.result);
+        json val = handler.get_value();
         BOOST_CHECK_EQUAL(4,val["a"].as<int>());
     }
 

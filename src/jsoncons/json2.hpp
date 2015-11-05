@@ -336,11 +336,9 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(basic_json&& other){
-    var_.type_ = other.var_.type_;
-    var_.small_string_length_ = other.var_.small_string_length_;
-    var_.value_ = other.var_.value_;
-    other.var_.type_ = value_types::null_t;
+basic_json<Char, Alloc>::basic_json(basic_json&& other)
+    : var_(std::move(other.var_))
+{
 }
 
 template<typename Char, typename Alloc>
@@ -720,9 +718,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     basic_json_reader<Char> reader(is, handler);
     reader.read_next();
     reader.check_done();
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+    return handler.get_value();
 }
 
 template<typename Char, typename Alloc>
@@ -733,9 +729,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     basic_json_reader<Char> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+    return handler.get_value();
 }
 
 template<typename Char, typename Alloc>
@@ -747,9 +741,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.parse(s.c_str(),0,s.length());
     parser.end_parse();
     parser.check_done(s.c_str(),parser.index(),s.length());
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+    return handler.get_value();
 }
 
 template<typename Char, typename Alloc>
@@ -762,9 +754,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.parse(s.c_str(),0,s.length());
     parser.end_parse();
     parser.check_done(s.c_str(),parser.index(),s.length());
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+    return handler.get_value();
 }
 
 template<typename Char, typename Alloc>
@@ -781,7 +771,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
         std::fseek (fp , 0 , SEEK_END);
         long size = std::ftell (fp);
         std::rewind(fp);
-        basic_json<Char, Alloc> val;
+        basic_json_deserializer<Char, Alloc> handler;
 
         if (size > 0)
         {
@@ -794,17 +784,15 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
                 throw json_exception_1<char>("Error reading file %s", filename);
             }
 
-            basic_json_deserializer<Char, Alloc> handler;
             basic_json_parser<Char> parser(handler);
             parser.begin_parse();
             parser.parse(&buffer[0],0,buffer.size());
             parser.end_parse();
             parser.check_done(&buffer[0],parser.index(),buffer.size());
-            handler.root().swap(val);
         }
 
         std::fclose (fp);
-        return val;
+        return handler.get_value();
     }
     catch (...)
     {
@@ -817,19 +805,45 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename, 
                                                             basic_parse_error_handler<Char>& err_handler)
 {
-    std::basic_ifstream<Char> is(filename.c_str(), std::basic_ifstream<Char>::in | std::basic_ifstream<Char>::binary);
-    if (!is.is_open())
+    FILE* fp = std::fopen (filename.c_str(), "rb");
+    if (fp == nullptr) 
     {
         throw json_exception_1<char>("Cannot open file %s", filename);
     }
+    try
+    {
+        // obtain file size:
+        std::fseek (fp , 0 , SEEK_END);
+        long size = std::ftell (fp);
+        std::rewind(fp);
+        basic_json_deserializer<Char, Alloc> handler;
 
-    basic_json_deserializer<Char, Alloc> handler;
-    basic_json_reader<Char> reader(is, handler, err_handler);
-    reader.read();
-    reader.check_done();
-    basic_json<Char, Alloc> val;
-    handler.root().swap(val);
-    return val;
+        if (size > 0)
+        {
+            std::vector<Char> buffer(size);
+
+            // copy the file into the buffer:
+            size_t result = std::fread (&buffer[0],1,size,fp);
+            if (result != size)
+            {
+                throw json_exception_1<char>("Error reading file %s", filename);
+            }
+
+            basic_json_parser<Char> parser(handler,err_handler);
+            parser.begin_parse();
+            parser.parse(&buffer[0],0,buffer.size());
+            parser.end_parse();
+            parser.check_done(&buffer[0],parser.index(),buffer.size());
+        }
+
+        std::fclose (fp);
+        return handler.get_value();
+    }
+    catch (...)
+    {
+        std::fclose (fp);
+        throw;
+    }
 }
 
 template<typename Char, typename Alloc>

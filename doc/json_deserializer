@@ -489,19 +489,19 @@ typedef basic_json_deserializer&lt;char,std::allocator&lt;void&gt;&gt; json_dese
 <pre><code>json_deserializer()
 </code></pre>
 
-<h3>Member variable</h3>
+<h3>Member functions</h3>
 
-<pre><code>json result
+<pre><code>json get_value()
 </code></pre>
 
-<p>The output json value</p>
+<p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>.</p>
 
 <h3>Deprecated methods</h3>
 
 <pre><code>json&amp; root()
 </code></pre>
 
-<p>Use the public member variable <code>result</code> instead</p>
+<p>Use the public member function <code>get_value()</code> instead</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
