@@ -430,7 +430,7 @@ the template function
         os.value(null_type());
     }
 
-gets called, and produces a `null` value for the matrix. You can however implement a specialization of `serialize` for `boost::matrix` to produce the output 
+gets called, and produces a `null` value for the matrix. You can however introduce a specialization of `serialize` for `boost::numeric::ublas::matrix` in the `jsoncons` namespace to produce the output 
 
     {
         "A":
