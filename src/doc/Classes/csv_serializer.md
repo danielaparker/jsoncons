@@ -52,7 +52,7 @@ Note
     json_deserializer handler;
     json_reader reader(is,handler);
     reader.read_next();
-    json countries = handler.get_value();
+    json countries = handler.get_result();
 
     csv_serializer serializer(std::cout);
 
@@ -117,7 +117,7 @@ Note
 
     json_reader reader(is,handler);
     reader.read_next();
-    json employees = handler.get_value();
+    json employees = handler.get_result();
 
     csv_serializer serializer(std::cout,params);
 

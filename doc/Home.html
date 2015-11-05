@@ -749,7 +749,7 @@ while (!reader.eof())
     reader.read_next();
     if (!reader.eof())
     {
-        json val = handler.get_value();
+        json val = handler.get_result();
         std::cout &lt;&lt; val &lt;&lt; std::endl;
     }
 }

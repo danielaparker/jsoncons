@@ -80,7 +80,7 @@ Note
 
     csv_reader reader(is,handler);
     reader.read();
-    json countries = handler.get_value();
+    json countries = handler.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
 
@@ -122,7 +122,7 @@ Note
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json employees = handler.get_value();
+    json employees = handler.get_result();
 
     std::cout << pretty_print(employees) << std::endl;
 
@@ -179,7 +179,7 @@ Note
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json countries = handler.get_value();
+    json countries = handler.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
 

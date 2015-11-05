@@ -227,7 +227,7 @@ You can read the `CSV` file into a `json` value like this
 
     csv_reader reader(is,handler,params);
     reader.read();
-    json val = handler.get_value();
+    json val = handler.get_result();
 
     std::cout << pretty_print(val) << std::endl;
 
