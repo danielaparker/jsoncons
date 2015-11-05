@@ -32,10 +32,10 @@ public:
                       basic_json_input_handler<Char>& handler)
         : parser_(handler),
           is_(std::addressof(is)),
-          buffer_capacity_(default_max_buffer_length),
           err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
           eof_(false),
           buffer_length_(0),
+          buffer_capacity_(default_max_buffer_length),
           index_(0)
     {
         buffer_.resize(buffer_capacity_);
@@ -46,10 +46,10 @@ public:
                       basic_parse_error_handler<Char>& err_handler)
        : parser_(handler,err_handler),
          is_(std::addressof(is)),
-         buffer_capacity_(default_max_buffer_length),
          err_handler_(std::addressof(err_handler)),
          eof_(false),
          buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length),
          index_(0)
     {
         buffer_.resize(buffer_capacity_);
