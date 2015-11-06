@@ -31,21 +31,19 @@ BOOST_AUTO_TEST_CASE(test_any)
     A(1,0) = 3;
     A(1,1) = 4;
 
-    //std::cout << A << std::endl;
-
-    std::cout << "Before set" << std::endl;
     obj.set("A",json::any(A));
-    std::cout << "After set" << std::endl;
 
-    obj.to_stream(std::cout);
-    std::cout << "After to_stream" << std::endl;
-    std::cout << obj << std::endl;
+    matrix<double>& B = obj["A"].any_cast<matrix<double>>();
+    BOOST_CHECK(A.size1() == B.size1());
+    BOOST_CHECK(A.size2() == B.size2());
 
-    matrix<double>& B = obj["A"].custom_data<matrix<double>>();
-    BOOST_CHECK_EQUAL(A.size1(),B.size1());
-    BOOST_CHECK_EQUAL(A.size2(),B.size2());
+    std::ostringstream os;
+    obj.to_stream(os);
+    json obj2 = json::parse_string(os.str());
 
-    //std::cout << B << std::endl;
+    BOOST_CHECK(A.size1() == obj2["A"].size());
+    BOOST_CHECK(A.size2() == obj2["A"][0].size());
+    BOOST_CHECK(A.size2() == obj2["A"][1].size());
 
     for (size_t i = 0; i < B.size1(); ++i)
     {
@@ -59,8 +57,6 @@ BOOST_AUTO_TEST_CASE(test_any)
     BOOST_CHECK_CLOSE(B(0,1),3.0,0.0000001);
     BOOST_CHECK_CLOSE(B(1,0),4.0,0.0000001);
     BOOST_CHECK_CLOSE(B(1,1),5.0,0.0000001);
-
-    //std::cout << pretty_print(obj) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_any_array)
@@ -111,8 +107,6 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     BOOST_CHECK_CLOSE(E(0,1),B(0,1),0.0000001);
     BOOST_CHECK_CLOSE(E(1,0),B(1,0),0.0000001);
     BOOST_CHECK_CLOSE(E(1,1),B(1,1),0.0000001);
-
-    std::cout << pretty_print(arr) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_any_add_custom_data)
