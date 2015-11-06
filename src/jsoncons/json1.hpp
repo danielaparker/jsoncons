@@ -1044,9 +1044,16 @@ public:
         }
 
         template <class T>
+        const T& any_cast() const
+        {
+            return val_.any_cast<T>();
+        }
+
+        // Deprecated
+        template <class T>
         const T& custom_data() const
         {
-            return val_.custom_data<T>();
+            return val_.any_cast<T>();
         }
 
         operator basic_json() const
@@ -1374,17 +1381,31 @@ public:
         }
 
         template <class T>
-        const T& custom_data() const
+        const T& any_cast() const
         {
-            return val_.at(name_).template custom_data<T>();
+            return val_.at(name_).template any_cast<T>();
         }
         // Returns a const reference to the custom data associated with name
 
+        template <class T>
+        T& any_cast() 
+        {
+            return val_.at(name_).template any_cast<T>();
+        }
+        // Returns a reference to the custom data associated with name
+
         // Deprecated
+        template <class T>
+        const T& custom_data() const
+        {
+            return val_.at(name_).template any_cast<T>();
+        }
+        // Returns a const reference to the custom data associated with name
+
         template <class T>
         T& custom_data() 
         {
-            return val_.at(name_).template custom_data<T>();
+            return val_.at(name_).template any_cast<T>();
         }
         // Returns a reference to the custom data associated with name
 
