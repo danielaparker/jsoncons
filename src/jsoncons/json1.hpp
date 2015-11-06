@@ -376,6 +376,8 @@ public:
             case value_types::any_t:
                 delete value_.any_value_;
                 break;
+            default:
+                break; 
             }
         }
 
@@ -2069,14 +2071,20 @@ public:
     template <typename T>
     const T& any_cast() const
     {
-        JSONCONS_ASSERT(var_.type_ == value_types::any_t);
-        return var_.value_.any_value_->cast<T>();
+        if (var_.type_ != value_types::any_t)
+        {
+            JSONCONS_THROW_EXCEPTION("Bad any cast");
+        }
+        return var_.value_.any_value_->template cast<T>();
     }
     template <typename T>
     T& any_cast() 
     {
-        JSONCONS_ASSERT(var_.type_ == value_types::any_t);
-        return var_.value_.any_value_->cast<T>();
+        if (var_.type_ != value_types::any_t)
+        {
+            JSONCONS_THROW_EXCEPTION("Bad any cast");
+        }
+        return var_.value_.any_value_->template cast<T>();
     }
 
     void assign_double(double rhs)
