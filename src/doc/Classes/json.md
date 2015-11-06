@@ -538,8 +538,7 @@ The output is
     format.pos_inf_replacement("1e9999");
     format.neg_inf_replacement("-1e9999");
 
-    obj.to_stream(std::cout,format);
-    std::cout << std::endl;
+    std::cout << print(obj,format) << std::endl;
 
 The output is
 
@@ -556,8 +555,7 @@ The output is
     format.replace_nan(false);
     format.replace_inf(false);
 
-    obj.to_stream(std::cout,format);
-    std::cout << std::endl;
+    std::cout << print(obj,format) << std::endl;
 
 The (illegal) json output produced by Visual Studio 2010 is
 

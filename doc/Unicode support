@@ -289,177 +289,375 @@ img {
   max-width: 100%
 }
 </style>
+<style type="text/css">
+.highlight  { background: #ffffff; }
+.highlight .c { color: #999988; font-style: italic } /* Comment */
+.highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
+.highlight .k { font-weight: bold } /* Keyword */
+.highlight .o { font-weight: bold } /* Operator */
+.highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #999999; font-weight: bold } /* Comment.Preproc */
+.highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
+.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #aa0000 } /* Generic.Error */
+.highlight .gh { color: #999999 } /* Generic.Heading */
+.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
+.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #555555 } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
+.highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kc { font-weight: bold } /* Keyword.Constant */
+.highlight .kd { font-weight: bold } /* Keyword.Declaration */
+.highlight .kp { font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #009999 } /* Literal.Number */
+.highlight .s { color: #d14 } /* Literal.String */
+.highlight .na { color: #008080 } /* Name.Attribute */
+.highlight .nb { color: #0086B3 } /* Name.Builtin */
+.highlight .nc { color: #445588; font-weight: bold } /* Name.Class */
+.highlight .no { color: #008080 } /* Name.Constant */
+.highlight .ni { color: #800080 } /* Name.Entity */
+.highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
+.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nt { color: #000080 } /* Name.Tag */
+.highlight .nv { color: #008080 } /* Name.Variable */
+.highlight .ow { font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #009999 } /* Literal.Number.Float */
+.highlight .mh { color: #009999 } /* Literal.Number.Hex */
+.highlight .mi { color: #009999 } /* Literal.Number.Integer */
+.highlight .mo { color: #009999 } /* Literal.Number.Oct */
+.highlight .sb { color: #d14 } /* Literal.String.Backtick */
+.highlight .sc { color: #d14 } /* Literal.String.Char */
+.highlight .sd { color: #d14 } /* Literal.String.Doc */
+.highlight .s2 { color: #d14 } /* Literal.String.Double */
+.highlight .se { color: #d14 } /* Literal.String.Escape */
+.highlight .sh { color: #d14 } /* Literal.String.Heredoc */
+.highlight .si { color: #d14 } /* Literal.String.Interpol */
+.highlight .sx { color: #d14 } /* Literal.String.Other */
+.highlight .sr { color: #009926 } /* Literal.String.Regex */
+.highlight .s1 { color: #d14 } /* Literal.String.Single */
+.highlight .ss { color: #990073 } /* Literal.String.Symbol */
+.highlight .bp { color: #999999 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #008080 } /* Name.Variable.Class */
+.highlight .vg { color: #008080 } /* Name.Variable.Global */
+.highlight .vi { color: #008080 } /* Name.Variable.Instance */
+.highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
+</style>
 </head>
 <body>
 <h3>Narrow character support for UTF8 encoding</h3>
+
 <p>In the Linux and web worlds, <code>UTF-8</code> is the dominant character encoding.</p>
+
 <p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
+
 <pre><code>std::fstream fs(const char* filename)
 </code></pre>
 
 <p>Instead you need to use the non standard Microsoft extension</p>
+
 <pre><code>std::fstream fs(const wchar_t* filename)
 </code></pre>
 
 <h4>Unicode escaping</h4>
-<pre><code>string inputStr(&quot;[\&quot;\\u0040\\u0040\\u0000\\u0011\&quot;]&quot;);
-std::cout &lt;&lt; &quot;Input:    &quot; &lt;&lt; inputStr &lt;&lt; std::endl;
+
+<pre><code>string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
+std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
 
 json arr = json::parse_string(inputStr);
 std::string str = arr[0].as&lt;std::string&gt;();
-std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; str.size(); ++i)
 {
     unsigned int val = static_cast&lt;unsigned int&gt;(str[i]);
     if (i != 0)
     {
-        std::cout &lt;&lt; &quot; &quot;;
+        std::cout &lt;&lt; " ";
     }
-    std::cout &lt;&lt; &quot;0x&quot; &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; std::hex &lt;&lt; val;
+    std::cout &lt;&lt; "0x" &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; std::hex &lt;&lt; val;
 }
-std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "]" &lt;&lt; std::endl;
 
 std::ostringstream os;
 os &lt;&lt; arr;
-std::cout &lt;&lt; &quot;Output:   &quot; &lt;&lt; os.str() &lt;&lt; std::endl;
+std::cout &lt;&lt; "Output:   " &lt;&lt; os.str() &lt;&lt; std::endl;
 </code></pre>
 
 <p>The output is</p>
-<pre><code>Input:    [&quot;\u0040\u0040\u0000\u0011&quot;]
+
+<pre><code>Input:    ["\u0040\u0040\u0000\u0011"]
 Hex dump: [0x40 0x40 0x00 0x11]
-Output:   [&quot;@@\u0000\u0011&quot;]
+Output:   ["@@\u0000\u0011"]
 </code></pre>
 
 <p>Note that just the two control characters are escaped on output.</p>
+
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode</h4>
-<pre><code>string inputStr(&quot;[\&quot;\\u007F\\u07FF\\u0800\&quot;]&quot;);
-std::cout &lt;&lt; &quot;Input:    &quot; &lt;&lt; inputStr &lt;&lt; std::endl;
+
+<pre><code>string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
+std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
 
 json arr = json::parse_string(inputStr);
 std::string s = arr[0].as&lt;string&gt;();
-std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; s.size(); ++i)
 {
     if (i != 0)
-        std::cout &lt;&lt; &quot; &quot;;
+        std::cout &lt;&lt; " ";
     unsigned int u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
-    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
 }
-std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "]" &lt;&lt; std::endl;
 
 std::ostringstream os;
 output_format format;
 format.escape_all_non_ascii(true);
-arr.to_stream(os,format);
+os &lt;&lt; print(arr,format);
 std::string outputStr = os.str();
-std::cout &lt;&lt; &quot;Output:   &quot; &lt;&lt; os.str() &lt;&lt; std::endl;
+std::cout &lt;&lt; "Output:   " &lt;&lt; os.str() &lt;&lt; std::endl;
 
 json arr2 = json::parse_string(outputStr);
 std::string s2 = arr2[0].as&lt;string&gt;();
-std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; s2.size(); ++i)
 {
     if (i != 0)
-        std::cout &lt;&lt; &quot; &quot;;
+        std::cout &lt;&lt; " ";
     unsigned int u(s2[i] &gt;= 0 ? s2[i] : 256 + s2[i] );
-    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
 }
-std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "]" &lt;&lt; std::endl;
 </code></pre>
 
 <p>The output is</p>
-<pre><code>Input:    [&quot;\u007F\u07FF\u0800&quot;]
+
+<pre><code>Input:    ["\u007F\u07FF\u0800"]
 Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
-Output:   [&quot;\u007F\u07FF\u0800&quot;]
+Output:   ["\u007F\u07FF\u0800"]
 Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 </code></pre>
 
 <p>Since the escaped unicode consists of a control character (0x7f) and non-ascii, we get back the same text as what we started with.</p>
+
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)</h4>
-<pre><code>string input = &quot;[\&quot;\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\&quot;]&quot;;
+
+<pre><code>string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
 json value = json::parse_string(input);
 output_format format;
 format.escape_all_non_ascii(true);
 string output = value.to_string(format);
 
-std::cout &lt;&lt; &quot;Input:&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "Input:" &lt;&lt; std::endl;
 std::cout &lt;&lt; input &lt;&lt; std::endl;
 std::cout &lt;&lt; std::endl;
-std::cout &lt;&lt; &quot;Output:&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "Output:" &lt;&lt; std::endl;
 std::cout &lt;&lt; output &lt;&lt; std::endl;
 </code></pre>
 
 <p>Since all of the escaped unicode is non-ascii, we get back the same text as what we started with.</p>
+
 <pre><code>Input:
-[&quot;\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00&quot;]
+["\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00"]
 
 Output:
-[&quot;\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00&quot;]
+["\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00"]
 </code></pre>
 
 <h3>Wide character support for UTF16 and UTF32 encodings</h3>
+
 <p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It assumes <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4.</p>
+
 <p>It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API. </p>
+
 <p>Even if you choose to use wide character streams and strings to interact with the Windows API, you can still read and write to files in the more widely supported, endiness independent, UTF-8 format. To handle that you need to imbue your streams with the facet <code>std::codecvt_utf8_utf16</code>, which encapsulates the conversion between <code>UTF-8</code> and <code>UTF-16</code>.</p>
+
 <p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
+
 <pre><code>std::wfstream fs(const char* filename)
 </code></pre>
 
 <p>Instead you need to use the non standard Microsoft extension</p>
+
 <pre><code>std::wfstream fs(const wchar_t* filename)
 </code></pre>
 
 <h4>Constructing a wjson value</h4>
+
 <pre><code>using jsoncons::wjson;
 
 wjson root;
-root[L&quot;field1&quot;] = L&quot;test&quot;;
-root[L&quot;field2&quot;] = 3.9;
-root[L&quot;field3&quot;] = true;
-std::wcout &lt;&lt; root &lt;&lt; L&quot;\n&quot;;
+root[L"field1"] = L"test";
+root[L"field2"] = 3.9;
+root[L"field3"] = true;
+std::wcout &lt;&lt; root &lt;&lt; L"\n";
 </code></pre>
 
 <p>The output is</p>
-<pre><code>{&quot;field1&quot;:&quot;test&quot;,&quot;field2&quot;:3.9,&quot;field3&quot;:true}
+
+<pre><code>{"field1":"test","field2":3.9,"field3":true}
 </code></pre>
 
 <h4>Escaped unicode</h4>
-<pre><code>wstring input = L&quot;[\&quot;\\u007F\\u07FF\\u0800\&quot;]&quot;;
+
+<pre><code>wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
 std::wistringstream is(input);
 
 wjson val = wjson::parse(is);
 
 wstring s = val[0].as&lt;wstring&gt;();
-std::cout &lt;&lt; &quot;length=&quot; &lt;&lt; s.length() &lt;&lt; std::endl;
-std::cout &lt;&lt; &quot;Hex dump: [&quot;;
+std::cout &lt;&lt; "length=" &lt;&lt; s.length() &lt;&lt; std::endl;
+std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; s.size(); ++i)
 {
     if (i != 0)
-        std::cout &lt;&lt; &quot; &quot;;
+        std::cout &lt;&lt; " ";
     uint32_t u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
-    std::cout &lt;&lt; &quot;0x&quot;  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
 }
-std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+std::cout &lt;&lt; "]" &lt;&lt; std::endl;
 
-std::wofstream os(&quot;output/xxx.txt&quot;);
+std::wofstream os("output/xxx.txt");
 os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16&lt;wchar_t&gt;));
 
 woutput_format format;
 format.escape_all_non_ascii(true);
 
-os &lt;&lt; pretty_print(val,format) &lt;&lt; L&quot;\n&quot;;
+os &lt;&lt; pretty_print(val,format) &lt;&lt; L"\n";
 </code></pre>
 
 <p>The output is</p>
+
 <pre><code>length=3
 Hex dump: [0x7f 0x7ff 0x800]
 </code></pre>
 
 <p>and the file <code>xxx.txt</code> contains</p>
-<pre><code>[&quot;\u007F\u07FF\u0800&quot;]    
+
+<pre><code>["\u007F\u07FF\u0800"]    
 </code></pre>
-
-
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

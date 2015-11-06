@@ -1193,8 +1193,7 @@ format.nan_replacement("null");
 format.pos_inf_replacement("1e9999");
 format.neg_inf_replacement("-1e9999");
 
-obj.to_stream(std::cout,format);
-std::cout &lt;&lt; std::endl;
+std::cout &lt;&lt; print(obj,format) &lt;&lt; std::endl;
 </code></pre>
 
 <p>The output is</p>
@@ -1213,8 +1212,7 @@ output_format format;
 format.replace_nan(false);
 format.replace_inf(false);
 
-obj.to_stream(std::cout,format);
-std::cout &lt;&lt; std::endl;
+std::cout &lt;&lt; print(obj,format) &lt;&lt; std::endl;
 </code></pre>
 
 <p>The (illegal) json output produced by Visual Studio 2010 is</p>
