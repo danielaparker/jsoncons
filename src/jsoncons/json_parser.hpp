@@ -1168,6 +1168,8 @@ public:
                     }
                 }
                 break;
+            default:
+                break;
             }
             switch (curr_char)
             {
