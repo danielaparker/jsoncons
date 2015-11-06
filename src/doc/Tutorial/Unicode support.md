@@ -61,7 +61,7 @@ Note that just the two control characters are escaped on output.
     std::ostringstream os;
     output_format format;
     format.escape_all_non_ascii(true);
-    arr.to_stream(os,format);
+    os << print(arr,format);
     std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 

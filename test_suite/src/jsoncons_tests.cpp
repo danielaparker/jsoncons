@@ -243,8 +243,7 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
     format.replace_nan(false);
     format.replace_inf(false);
 
-    obj.to_stream(std::cout, format);
-    std::cout << std::endl;
+    std::cout << print(obj,format) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_object_iterator)
