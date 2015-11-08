@@ -468,11 +468,15 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h2>Target 0.98.1 Release</h2>
+<h2>0.98.1 Release</h2>
 
 <ul>
-<li>Enhancements to processing CSV files to output JSON </li>
-<li>The json value <code>v</code> stored in a <code>json_deserializer</code> is now retrieved by calling the member function <code>get_result</code>, which returns it as <code>std::move(v)</code>. </li>
+<li>Enhances parser for CSV files that outputs JSON, see example below. </li>
+<li>Adds <code>get_result</code> member function to <code>json_deserializer</code>, which returns the json value <code>v</code> stored in a <code>json_deserializer</code> as <code>std::move(v)</code>. The <code>root()</code> member function has been deprecated but is still supported.</li>
+<li>Adds <code>is_valid</code> member function to <code>json_deserializer</code>
+</li>
+<li>Enhances json::any class, adds type checks when casting back to original value</li>
+<li>Fixes some warning messages</li>
 </ul>
 
 <h2>0.98 Release</h2>
