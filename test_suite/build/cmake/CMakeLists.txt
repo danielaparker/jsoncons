@@ -21,6 +21,7 @@ add_executable (jsoncons_tests ../../src/csv_tests.cpp
                                ../../src/allocator_tests.cpp
                                ../../src/double_to_string_tests.cpp
                                ../../src/small_string_tests.cpp
+                               ../../src/json_type_traits_tests.cpp
                                ../../src/json_accessor_tests.cpp
                                ../../src/json_extensibility_tests.cpp
                                ../../src/json_array_tests.cpp
