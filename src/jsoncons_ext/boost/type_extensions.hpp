@@ -48,8 +48,7 @@ namespace jsoncons {
 
         static void assign(basic_json<char,Alloc>& lhs, boost::gregorian::date val)
         {
-            std::string s(to_iso_extended_string(val));
-            lhs = s;
+            lhs = to_iso_extended_string(val);
         }
     };
 }

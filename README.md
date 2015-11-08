@@ -27,6 +27,7 @@ The library has a number of features, which are listed below:
 
 ## What's new in Master
 
+- The member `json_type_traits` member functions `is`, `as`, and `assign` have been changed to static functions. if you have implemented your own type specializations, you will also have to change your `is`, `as` and `assign` functions to be static.
 - Removed json deprecated functions custom_data, set_custom_data, add_custom_data
 
 ## Using the jsoncons library
