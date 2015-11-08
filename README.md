@@ -367,9 +367,12 @@ The implementations of these functions and operators make use of the class templ
     class json_type_traits
     {
     public:
-        static bool is(const basic_json& val) {return false;}
-        static T as(const basic_json& val);
-        static void assign(basic_json& lhs, T val);
+        static bool is(const basic_json<Char,Alloc>&)
+        {
+            return false;
+        }
+        static T as(const basic_json<Char,Alloc>& val);
+        static void assign(basic_json<Char,Alloc>& lhs, T rhs);
     };
 
 This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write

@@ -881,9 +881,12 @@ basic_json&amp; operator=(T val)
 class json_type_traits
 {
 public:
-    static bool is(const basic_json&amp; val) {return false;}
-    static T as(const basic_json&amp; val);
-    static void assign(basic_json&amp; lhs, T val);
+    static bool is(const basic_json&lt;Char,Alloc&gt;&amp;)
+    {
+        return false;
+    }
+    static T as(const basic_json&lt;Char,Alloc&gt;&amp; val);
+    static void assign(basic_json&lt;Char,Alloc&gt;&amp; lhs, T rhs);
 };
 </code></pre>
 
