@@ -31,17 +31,17 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, std::basic_string<Char>>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_string();
+        return rhs.is_string();
     }
-    static std::basic_string<Char> as(const basic_json<Char, Alloc>& val)
+    static std::basic_string<Char> as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_string();
+        return rhs.as_string();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, const std::basic_string<Char>& val)
+    static void assign(basic_json<Char, Alloc>& lhs, const std::basic_string<Char>& rhs)
     {
-        lhs.assign_string(val);
+        lhs.assign_string(rhs);
     }
 };
 
@@ -53,13 +53,13 @@ public:
     {
         return lhs.is_any();
     }
-    static typename basic_json<Char, Alloc>::any as(const basic_json<Char, Alloc>& val)
+    static typename basic_json<Char, Alloc>::any as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.any_value();
+        return rhs.any_value();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::any val)
+    static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::any rhs)
     {
-        lhs.assign_any(val);
+        lhs.assign_any(rhs);
     }
 };
 
@@ -67,17 +67,17 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, const Char *>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_string();
+        return rhs.is_string();
     }
-    static const Char* as(const basic_json<Char, Alloc>& val)
+    static const Char* as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.value.as_c_str();
+        return rhs.value.as_c_str();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, const Char *val)
+    static void assign(basic_json<Char, Alloc>& lhs, const Char *rhs)
     {
-        lhs.assign_cstring(val);
+        lhs.assign_cstring(rhs);
     }
 };
 
@@ -85,13 +85,13 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, Char>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_string() && val.as_string().size() == 1;
+        return rhs.is_string() && rhs.as_string().size() == 1;
     }
-    static Char as(const basic_json<Char, Alloc>& val)
+    static Char as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_char();
+        return rhs.as_char();
     }
     static void assign(basic_json<Char, Alloc>& lhs, Char ch)
     {
@@ -105,13 +105,13 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::object>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_object();
+        return rhs.is_object();
     }
-    static typename basic_json<Char, Alloc>::object as(const basic_json<Char, Alloc>& val)
+    static typename basic_json<Char, Alloc>::object as(const basic_json<Char, Alloc>& rhs)
     {
-        return typename basic_json<Char, Alloc>::object(val);
+        return typename basic_json<Char, Alloc>::object(rhs);
     }
 };
 
@@ -119,13 +119,13 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::array>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_array();
+        return rhs.is_array();
     }
-    static typename basic_json<Char, Alloc>::array as(const basic_json<Char, Alloc>& val)
+    static typename basic_json<Char, Alloc>::array as(const basic_json<Char, Alloc>& rhs)
     {
-        return typename basic_json<Char, Alloc>::array(val);
+        return typename basic_json<Char, Alloc>::array(rhs);
     }
 };
 
@@ -133,13 +133,13 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, jsoncons::null_type>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_null();
+        return rhs.is_null();
     }
-    static typename jsoncons::null_type as(const basic_json<Char, Alloc>& val)
+    static typename jsoncons::null_type as(const basic_json<Char, Alloc>& rhs)
     {
-        JSONCONS_ASSERT(val.is_null());
+        JSONCONS_ASSERT(rhs.is_null());
         return jsoncons::null_type();
     }
     static void assign(basic_json<Char, Alloc>& lhs, null_type)
@@ -152,17 +152,17 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, bool>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_bool();
+        return rhs.is_bool();
     }
-    static bool as(const basic_json<Char, Alloc>& val)
+    static bool as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_bool();
+        return rhs.as_bool();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, bool val)
+    static void assign(basic_json<Char, Alloc>& lhs, bool rhs)
     {
-        lhs.assign_bool(val);
+        lhs.assign_bool(rhs);
     }
 };
 
@@ -170,28 +170,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, short>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
             return false;
         }
     }
-    static short as(const basic_json<Char, Alloc>& val)
+    static short as(const basic_json<Char, Alloc>& rhs)
     {
-        return (short)val.as_int();
+        return (short)rhs.as_int();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, short val)
+    static void assign(basic_json<Char, Alloc>& lhs, short rhs)
     {
-        lhs.assign_longlong(val);
+        lhs.assign_longlong(rhs);
     }
 };
 
@@ -199,28 +199,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, unsigned short>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= 0 && static_cast<unsigned long long>(val.as_longlong()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
             return false;
         }
     }
-    static unsigned short as(const basic_json<Char, Alloc>& val)
+    static unsigned short as(const basic_json<Char, Alloc>& rhs)
     {
-        return (unsigned short)val.as_uint();
+        return (unsigned short)rhs.as_uint();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, unsigned short val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned short rhs)
     {
-        lhs.assign_ulonglong(val);
+        lhs.assign_ulonglong(rhs);
     }
 };
 
@@ -228,28 +228,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, int>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
             return false;
         }
     }
-    static int as(const basic_json<Char, Alloc>& val)
+    static int as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_int();
+        return rhs.as_int();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, int val)
+    static void assign(basic_json<Char, Alloc>& lhs, int rhs)
     {
-        lhs.assign_longlong(val);
+        lhs.assign_longlong(rhs);
     }
 };
 
@@ -257,28 +257,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, unsigned int>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= 0 && static_cast<unsigned long long>(val.as_longlong()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
             return false;
         }
     }
-    static unsigned int as(const basic_json<Char, Alloc>& val)
+    static unsigned int as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_uint();
+        return rhs.as_uint();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, unsigned int val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned int rhs)
     {
-        lhs.assign_ulonglong(val);
+        lhs.assign_ulonglong(rhs);
     }
 };
 
@@ -286,28 +286,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, long>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && val.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
             return false;
         }
     }
-    static long as(const basic_json<Char, Alloc>& val)
+    static long as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_long();
+        return rhs.as_long();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, long val)
+    static void assign(basic_json<Char, Alloc>& lhs, long rhs)
     {
-        lhs.assign_longlong(val);
+        lhs.assign_longlong(rhs);
     }
 };
 
@@ -315,28 +315,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, unsigned long>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= 0 && static_cast<unsigned long long>(val.as_longlong()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
             return false;
         }
     }
-    static unsigned long as(const basic_json<Char, Alloc>& val)
+    static unsigned long as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_ulong();
+        return rhs.as_ulong();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, unsigned long val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned long rhs)
     {
-        lhs.assign_ulonglong(val);
+        lhs.assign_ulonglong(rhs);
     }
 };
 
@@ -344,28 +344,28 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, long long>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
             return true;
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
-            return val.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
             return false;
         }
     }
-    static long long as(const basic_json<Char, Alloc>& val)
+    static long long as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_longlong();
+        return rhs.as_longlong();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, long long val)
+    static void assign(basic_json<Char, Alloc>& lhs, long long rhs)
     {
-        lhs.assign_longlong(val);
+        lhs.assign_longlong(rhs);
     }
 };
 
@@ -373,13 +373,13 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, unsigned long long>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (val.is_longlong())
+        if (rhs.is_longlong())
         {
-            return val.as_longlong() >= 0 && static_cast<unsigned long long>(val.as_longlong()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (val.is_ulonglong())
+        else if (rhs.is_ulonglong())
         {
             return true;
         }
@@ -388,13 +388,13 @@ public:
             return false;
         }
     }
-    static unsigned long long as(const basic_json<Char, Alloc>& val)
+    static unsigned long long as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_ulonglong();
+        return rhs.as_ulonglong();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, unsigned long long val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned long long rhs)
     {
-        lhs.assign_ulonglong(val);
+        lhs.assign_ulonglong(rhs);
     }
 };
 
@@ -402,18 +402,18 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, double>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return val.is_double();
+        return rhs.is_double();
     }
 
-    static double as(const basic_json<Char, Alloc>& val)
+    static double as(const basic_json<Char, Alloc>& rhs)
     {
-        return val.as_double();
+        return rhs.as_double();
     }
-    static void assign(basic_json<Char, Alloc>& lhs, double val)
+    static void assign(basic_json<Char, Alloc>& lhs, double rhs)
     {
-        lhs.assign_double(val);
+        lhs.assign_double(rhs);
     }
 };
 
@@ -421,30 +421,30 @@ template<typename Char, typename Alloc, typename T>
 class json_type_traits<Char, Alloc, std::vector<T>>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& val)
+    static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        bool result = val.is_array();
-        for (size_t i = 0; result && i < val.size(); ++i)
+        bool result = rhs.is_array();
+        for (size_t i = 0; result && i < rhs.size(); ++i)
         {
-            if (!val[i].template is<T>())
+            if (!rhs[i].template is<T>())
             {
                 result = false;
             }
         }
         return result;
     }
-    static std::vector<T> as(const basic_json<Char, Alloc>& val)
+    static std::vector<T> as(const basic_json<Char, Alloc>& rhs)
     {
-        std::vector<T> v(val.size());
+        std::vector<T> v(rhs.size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = val[i].template as<T>();
+            v[i] = rhs[i].template as<T>();
         }
         return v;
     }
-    static void assign(basic_json<Char, Alloc>& lhs, const std::vector<T>& val)
+    static void assign(basic_json<Char, Alloc>& lhs, const std::vector<T>& rhs)
     {
-        lhs = basic_json<Char, Alloc>(val.begin(), val.end());
+        lhs = basic_json<Char, Alloc>(rhs.begin(), rhs.end());
     }
 };
 
