@@ -58,12 +58,12 @@ template <typename Char, typename Alloc, typename T>
 class json_type_traits
 {
 public:
-    bool is(const basic_json<Char,Alloc>&) const
+    static bool is(const basic_json<Char,Alloc>&)
     {
         return false;
     }
-    T as(const basic_json<Char,Alloc>& val) const;
-    void assign(basic_json<Char,Alloc>& self, const T val);
+    static T as(const basic_json<Char,Alloc>& val);
+    static void assign(basic_json<Char,Alloc>& lhs, T val);
 };
 
 namespace value_types
@@ -437,6 +437,39 @@ public:
                     small_string_length_ = (unsigned char)s.length();
                     std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
                 }
+                break;
+            default:
+                variant(s).swap(*this);
+                break;
+            }
+            return *this;
+        }
+
+        variant& operator=(const Char* s)
+        {
+            switch (type_)
+            {
+            case value_types::null_t:
+            case value_types::bool_t:
+            case value_types::empty_object_t:
+            case value_types::small_string_t:
+            case value_types::longlong_t:
+            case value_types::ulonglong_t:
+            case value_types::double_t:
+				{
+					size_t length = std::char_traits<Char>::length(s);
+					if (length > variant::small_string_capacity)
+					{
+						type_ = value_types::string_t;
+						value_.string_value_ = make_string_holder(s,length);
+					}
+					else
+					{
+						type_ = value_types::small_string_t;
+						small_string_length_ = length;
+						std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+					}
+				}
                 break;
             default:
                 variant(s).swap(*this);
@@ -2057,10 +2090,30 @@ public:
         a.swap(b);
     }
 
-    void assign_any(const any& rhs);
-    void assign_string(const std::basic_string<Char>& rhs);
-    void assign_bool(bool rhs);
-    void assign_null();
+    void assign_any(const typename basic_json<Char,Alloc>::any& rhs)
+    {
+        var_ = rhs;
+    }
+
+    void assign_string(const std::basic_string<Char>& s)
+    {
+        var_ = s;
+    }
+
+    void assign_cstring(const Char* s)
+    {
+        var_ = s;
+    }
+
+    void assign_bool(bool rhs)
+    {
+        var_ = rhs;
+    }
+
+    void assign_null()
+    {
+        var_ = null_type();
+    }
 
     template <typename T>
     const T& any_cast() const

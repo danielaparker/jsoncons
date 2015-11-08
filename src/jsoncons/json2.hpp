@@ -177,30 +177,6 @@ basic_json<Char, Alloc>::~basic_json()
 {
 }
 
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_any(const typename basic_json<Char,Alloc>::any& rhs)
-{
-    var_ = rhs;
-}
-
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_string(const std::basic_string<Char>& s)
-{
-    var_ = s;
-}
-
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_bool(bool rhs)
-{
-    var_ = rhs;
-}
-
-template<typename Char, class Alloc>
-void basic_json<Char, Alloc>::assign_null()
-{
-    var_ = null_type();
-}
-
 template<typename Char, typename Alloc>
 bool basic_json<Char, Alloc>::operator!=(const basic_json<Char, Alloc>& rhs) const
 {
