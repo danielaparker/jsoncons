@@ -63,7 +63,7 @@ public:
         return false;
     }
     static T as(const basic_json<Char,Alloc>& val);
-    static void assign(basic_json<Char,Alloc>& lhs, T val);
+    static void assign(basic_json<Char,Alloc>& lhs, T rhs);
 };
 
 namespace value_types
@@ -466,7 +466,7 @@ public:
 					else
 					{
 						type_ = value_types::small_string_t;
-						small_string_length_ = length;
+						small_string_length_ = (unsigned char)length;
 						std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
 					}
 				}
