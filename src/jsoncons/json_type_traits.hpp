@@ -39,9 +39,9 @@ public:
     {
         return val.as_string();
     }
-    static void assign(basic_json<Char, Alloc>& self, const std::basic_string<Char>& val)
+    static void assign(basic_json<Char, Alloc>& lhs, const std::basic_string<Char>& val)
     {
-        self.assign_string(val);
+        lhs.assign_string(val);
     }
 };
 
@@ -49,17 +49,17 @@ template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::any>
 {
 public:
-    static bool is(const basic_json<Char, Alloc>& self)
+    static bool is(const basic_json<Char, Alloc>& lhs)
     {
-        return self.is_any();
+        return lhs.is_any();
     }
     static typename basic_json<Char, Alloc>::any as(const basic_json<Char, Alloc>& val)
     {
         return val.any_value();
     }
-    static void assign(basic_json<Char, Alloc>& self, typename basic_json<Char, Alloc>::any val)
+    static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::any val)
     {
-        self.assign_any(val);
+        lhs.assign_any(val);
     }
 };
 
@@ -75,9 +75,29 @@ public:
     {
         return val.value.as_c_str();
     }
-    static void assign(basic_json<Char, Alloc>& self, const Char *val)
+    static void assign(basic_json<Char, Alloc>& lhs, const Char *val)
     {
-        self.assign_string(std::basic_string<Char>(val));
+        lhs.assign_cstring(val);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, Char>
+{
+public:
+    static bool is(const basic_json<Char, Alloc>& val)
+    {
+        return val.is_string() && val.as_string().size() == 1;
+    }
+    static Char as(const basic_json<Char, Alloc>& val)
+    {
+        return val.as_char();
+    }
+    static void assign(basic_json<Char, Alloc>& lhs, Char ch)
+    {
+        std::basic_string<Char> s;
+        s.push_back(ch);
+        lhs.assign_string(s);
     }
 };
 
@@ -122,9 +142,9 @@ public:
         JSONCONS_ASSERT(val.is_null());
         return jsoncons::null_type();
     }
-    static void assign(basic_json<Char, Alloc>& self, null_type)
+    static void assign(basic_json<Char, Alloc>& lhs, null_type)
     {
-        self.assign_null();
+        lhs.assign_null();
     }
 };
 
@@ -140,9 +160,9 @@ public:
     {
         return val.as_bool();
     }
-    static void assign(basic_json<Char, Alloc>& self, bool val)
+    static void assign(basic_json<Char, Alloc>& lhs, bool val)
     {
-        self.assign_bool(val);
+        lhs.assign_bool(val);
     }
 };
 
@@ -169,9 +189,9 @@ public:
     {
         return (short)val.as_int();
     }
-    static void assign(basic_json<Char, Alloc>& self, short val)
+    static void assign(basic_json<Char, Alloc>& lhs, short val)
     {
-        self.assign_longlong(val);
+        lhs.assign_longlong(val);
     }
 };
 
@@ -198,9 +218,9 @@ public:
     {
         return (unsigned short)val.as_uint();
     }
-    static void assign(basic_json<Char, Alloc>& self, unsigned short val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned short val)
     {
-        self.assign_ulonglong(val);
+        lhs.assign_ulonglong(val);
     }
 };
 
@@ -227,9 +247,9 @@ public:
     {
         return val.as_int();
     }
-    static void assign(basic_json<Char, Alloc>& self, int val)
+    static void assign(basic_json<Char, Alloc>& lhs, int val)
     {
-        self.assign_longlong(val);
+        lhs.assign_longlong(val);
     }
 };
 
@@ -256,9 +276,9 @@ public:
     {
         return val.as_uint();
     }
-    static void assign(basic_json<Char, Alloc>& self, unsigned int val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned int val)
     {
-        self.assign_ulonglong(val);
+        lhs.assign_ulonglong(val);
     }
 };
 
@@ -285,9 +305,9 @@ public:
     {
         return val.as_long();
     }
-    static void assign(basic_json<Char, Alloc>& self, long val)
+    static void assign(basic_json<Char, Alloc>& lhs, long val)
     {
-        self.assign_longlong(val);
+        lhs.assign_longlong(val);
     }
 };
 
@@ -314,9 +334,9 @@ public:
     {
         return val.as_ulong();
     }
-    static void assign(basic_json<Char, Alloc>& self, unsigned long val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned long val)
     {
-        self.assign_ulonglong(val);
+        lhs.assign_ulonglong(val);
     }
 };
 
@@ -343,9 +363,9 @@ public:
     {
         return val.as_longlong();
     }
-    static void assign(basic_json<Char, Alloc>& self, long long val)
+    static void assign(basic_json<Char, Alloc>& lhs, long long val)
     {
-        self.assign_longlong(val);
+        lhs.assign_longlong(val);
     }
 };
 
@@ -372,29 +392,9 @@ public:
     {
         return val.as_ulonglong();
     }
-    static void assign(basic_json<Char, Alloc>& self, unsigned long long val)
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned long long val)
     {
-        self.assign_ulonglong(val);
-    }
-};
-
-template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, Char>
-{
-public:
-    static bool is(const basic_json<Char, Alloc>& val)
-    {
-        return val.is_string() && val.as_string().size() == 1;
-    }
-    static Char as(const basic_json<Char, Alloc>& val)
-    {
-        return val.as_char();
-    }
-    static void assign(basic_json<Char, Alloc>& self, Char ch)
-    {
-        std::basic_string<Char> s;
-        s.push_back(ch);
-        self.assign_string(s);
+        lhs.assign_ulonglong(val);
     }
 };
 
@@ -411,9 +411,9 @@ public:
     {
         return val.as_double();
     }
-    static void assign(basic_json<Char, Alloc>& self, double val)
+    static void assign(basic_json<Char, Alloc>& lhs, double val)
     {
-        self.assign_double(val);
+        lhs.assign_double(val);
     }
 };
 
@@ -442,9 +442,9 @@ public:
         }
         return v;
     }
-    static void assign(basic_json<Char, Alloc>& self, const std::vector<T>& val)
+    static void assign(basic_json<Char, Alloc>& lhs, const std::vector<T>& val)
     {
-        self = basic_json<Char, Alloc>(val.begin(), val.end());
+        lhs = basic_json<Char, Alloc>(val.begin(), val.end());
     }
 };
 

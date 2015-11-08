@@ -356,13 +356,13 @@ which prints
 In the json class, accessors and modifiers are templated, for example,
 
     template<typename T>
-    static bool is()
+    bool is() const
 
     template<typename T>
-    static T as() 
+    T as() const
 
     template <typename T>
-    static basic_json& operator=(T val)
+    basic_json& operator=(T val)
 
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
@@ -370,9 +370,9 @@ The implementations of these functions and operators make use of the class templ
     class json_type_traits
     {
     public:
-        bool is(const basic_json& val) const {return false;}
-        T as(const basic_json& val) const;
-        void assign(basic_json& self, const T val);
+        static bool is(const basic_json& val) {return false;}
+        static T as(const basic_json& val);
+        static void assign(basic_json& lhs, T val);
     };
 
 This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write
