@@ -22,6 +22,30 @@ using jsoncons::json_exception;
 using std::string;
 using boost::numeric::ublas::matrix;
 
+bool check_any_exception( jsoncons::json_exception_0 const& ex ) { return true; }
+
+BOOST_AUTO_TEST_CASE(test_any_const_ref)
+{
+    json obj;
+    matrix<double> A(2,2);
+    A(0,0) = 1;
+    A(0,1) = 2;
+    A(1,0) = 3;
+    A(1,1) = 4;
+
+    obj.set("A",json::any(A));
+
+    const matrix<double>& B = obj["A"].any_cast<const matrix<double>&>();
+
+	BOOST_CHECK_CLOSE(B(0,0),1.0,0.0000001);
+
+    const matrix<double> C = obj["A"].any_cast<const matrix<double>>();
+
+	BOOST_CHECK_CLOSE(C(0,0),1.0,0.0000001);
+
+    BOOST_CHECK_EXCEPTION(obj["A"].any_cast<const matrix<int>>(), jsoncons::json_exception_0, check_any_exception);
+}
+
 BOOST_AUTO_TEST_CASE(test_any)
 {
     json obj;

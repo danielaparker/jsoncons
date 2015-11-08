@@ -50,18 +50,17 @@ public:
     basic_json<Char,Alloc> get_result()
     {
         is_valid_ = false;
-        return std::move(result);
+        return std::move(result_);
     }
 
 //  Deprecated
     basic_json<Char,Alloc>& root()
     {
-        return result;
+        return result_;
     }
 
-    basic_json<Char,Alloc> result;
-
 private:
+    basic_json<Char,Alloc> result_;
 
     void push_object()
     {
@@ -129,7 +128,7 @@ private:
         }
         else
         {
-            result.swap(stack_[0].value);
+            result_.swap(stack_[0].value);
         }
         pop_object();
     }
@@ -154,7 +153,7 @@ private:
         }
         else
         {
-            result.swap(stack_[0].value);
+            result_.swap(stack_[0].value);
         }
         pop_array();
     }
