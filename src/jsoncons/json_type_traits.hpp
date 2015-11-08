@@ -77,7 +77,8 @@ public:
     }
     static void assign(basic_json<Char, Alloc>& lhs, const Char *rhs)
     {
-        lhs.assign_cstring(rhs);
+        size_t length = std::char_traits<Char>::length(rhs);
+        lhs.assign_string(rhs,length);
     }
 };
 
@@ -95,9 +96,7 @@ public:
     }
     static void assign(basic_json<Char, Alloc>& lhs, Char ch)
     {
-        std::basic_string<Char> s;
-        s.push_back(ch);
-        lhs.assign_string(s);
+        lhs.assign_string(&ch,1);
     }
 };
 

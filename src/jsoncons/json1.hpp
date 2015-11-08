@@ -381,15 +381,6 @@ public:
             }
         }
 
-        variant& operator=(variant&& val)
-        {
-            if (this != &val)
-            {
-                val.swap(*this);
-            }
-            return *this;
-        }
-
         variant& operator=(const variant& val)
         {
             if (this != &val)
@@ -415,7 +406,16 @@ public:
             return *this;
         }
 
-        variant& operator=(const std::basic_string<Char>& s)
+        variant& operator=(variant&& val)
+        {
+            if (this != &val)
+            {
+                val.swap(*this);
+            }
+            return *this;
+        }
+
+        void assign(const std::basic_string<Char>& s)
         {
             switch (type_)
             {
@@ -442,10 +442,9 @@ public:
                 variant(s).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(const Char* s)
+        void assign_string(const Char* s, size_t length)
         {
             switch (type_)
             {
@@ -457,7 +456,6 @@ public:
             case value_types::ulonglong_t:
             case value_types::double_t:
 				{
-					size_t length = std::char_traits<Char>::length(s);
 					if (length > variant::small_string_capacity)
 					{
 						type_ = value_types::string_t;
@@ -472,13 +470,12 @@ public:
 				}
                 break;
             default:
-                variant(s).swap(*this);
+                variant(s,length).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(long long val)
+        void assign(long long val)
         {
             switch (type_)
             {
@@ -496,10 +493,9 @@ public:
                 variant(val).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(unsigned long long val)
+        void assign(unsigned long long val)
         {
             switch (type_)
             {
@@ -517,10 +513,9 @@ public:
                 variant(val).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(double val)
+        void assign(double val)
         {
             switch (type_)
             {
@@ -538,10 +533,9 @@ public:
                 variant(val).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(bool val)
+        void assign(bool val)
         {
             switch (type_)
             {
@@ -559,10 +553,9 @@ public:
                 variant(val).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(null_type)
+        void assign(null_type)
         {
             switch (type_)
             {
@@ -579,10 +572,9 @@ public:
                 variant(null_type()).swap(*this);
                 break;
             }
-            return *this;
         }
 
-        variant& operator=(const any& rhs)
+        void assign(const any& rhs)
         {
             switch (type_)
             {
@@ -600,7 +592,6 @@ public:
                 variant(rhs).swap(*this);
                 break;
             }
-            return *this;
         }
 
         bool operator!=(const variant& rhs) const
@@ -1084,13 +1075,6 @@ public:
             return val_.any_cast<T>();
         }
 
-        // Deprecated
-        template <class T>
-        const T& custom_data() const
-        {
-            return val_.any_cast<T>();
-        }
-
         operator basic_json() const
         {
             return val_;
@@ -1429,21 +1413,6 @@ public:
         }
         // Returns a reference to the custom data associated with name
 
-        // Deprecated
-        template <class T>
-        const T& custom_data() const
-        {
-            return val_.at(name_).template any_cast<T>();
-        }
-        // Returns a const reference to the custom data associated with name
-
-        template <class T>
-        T& custom_data() 
-        {
-            return val_.at(name_).template any_cast<T>();
-        }
-        // Returns a reference to the custom data associated with name
-
         operator basic_json&()
         {
             return val_.at(name_);
@@ -1585,27 +1554,6 @@ public:
             val_.at(name_).add(index, value);
         }
 
-        // Deprecated
-        template <class T>
-        void set_custom_data(const std::basic_string<Char>& name, T value)
-        {
-            val_.at(name_).set_custom_data(name,value);
-        }
-
-        // Deprecated
-        template <class T>
-        void add_custom_data(T value)
-        {
-            val_.at(name_).add_custom_data(value);
-        }
-
-        // Deprecated
-        template <class T>
-        void add_custom_data(size_t index, T value)
-        {
-            val_.at(name_).add_custom_data(index, value);
-        }
-
         std::basic_string<Char> to_string() const
         {
             return val_.at(name_).to_string();
@@ -1745,51 +1693,104 @@ public:
         return build_array<Char,Alloc,size>()(m, n, k, val);
     }
 
-    explicit basic_json();
+    explicit basic_json<Char, Alloc>::basic_json()
+    {
+    }
 
-    basic_json(const basic_json& val);
+    basic_json(const basic_json<Char, Alloc>& val)
+        : var_(val.var_)
+    {
+    }
 
-    basic_json(basic_json&& val);
+    basic_json(basic_json&& other)
+        : var_(std::move(other.var_))
+    {
+    }
 
-    explicit basic_json(const any& val)
+    template<class InputIterator>
+    basic_json(InputIterator first, InputIterator last)
+        : var_(first,last)
+    {
+    }
+
+    explicit basic_json(json_object_impl<Char, Alloc> *val)
         : var_(val)
     {
     }
 
-    explicit basic_json(jsoncons::null_type);
+    explicit basic_json(json_array_impl<Char, Alloc> *val)
+        : var_(val)
+    {
+    }
 
-    explicit basic_json(Char c);
+    explicit basic_json(jsoncons::null_type)
+        : var_(null_type())
+    {
+    }
 
-    explicit basic_json(double val);
+    explicit basic_json(double val)
+        : var_(val)
+    {
+    }
 
-    explicit basic_json(int val);
+    explicit basic_json(long long val)
+        : var_(val)
+    {
+    }
 
-    explicit basic_json(unsigned int val);
+    explicit basic_json(int val)
+        : var_(static_cast<long long>(val))
+    {
+    }
 
-    explicit basic_json(long val);
+    explicit basic_json(unsigned int val)
+        : var_(static_cast<unsigned long long>(val))
+    {
+    }
 
-    explicit basic_json(unsigned long val);
+    explicit basic_json(long val)
+        : var_(static_cast<long long>(val))
+    {
+    }
 
-    explicit basic_json(long long val);
+    explicit basic_json(unsigned long val)
+        : var_(static_cast<unsigned long long>(val))
+    {
+    }
 
-    explicit basic_json(unsigned long long val);
+    explicit basic_json(unsigned long long val)
+        : var_(val)
+    {
+    }
 
-    explicit basic_json(const Char* val);
+    explicit basic_json(bool val)
+        : var_(val)
+    {
+    }
 
-    explicit basic_json(const Char* val, size_t length);
+    explicit basic_json(Char c)
+        : var_(&c,1)
+    {
+    }
 
-    explicit basic_json(const std::basic_string<Char>& val);
+    explicit basic_json(const std::basic_string<Char>& s)
+        : var_(s)
+    {
+    }
 
-    explicit basic_json(bool val);
+    explicit basic_json(const Char *s)
+        : var_(s)
+    {
+    }
 
-    template <class InputIterator>
-    basic_json(InputIterator name, InputIterator last);
+    basic_json(const Char *s, size_t length)
+        : var_(s, length)
+    {
+    }
 
-    explicit basic_json(json_object_impl<Char,Alloc>* var);
-
-    explicit basic_json(json_array_impl<Char,Alloc>* var);
-
-    ~basic_json();
+    ~basic_json()
+    {
+    }
 
     object_iterator begin_members();
 
@@ -1807,8 +1808,11 @@ public:
 
     const_array_iterator end_elements() const;
 
-    template <class T>
-    basic_json& operator=(T val);
+    basic_json& operator=(const basic_json<Char,Alloc>& rhs)
+    {
+        var_ = rhs.var_;
+        return *this;
+    }
 
     basic_json& operator=(basic_json<Char,Alloc>&& rhs)
     {
@@ -1816,9 +1820,10 @@ public:
         return *this;
     }
 
-    basic_json& operator=(const basic_json<Char,Alloc>& rhs)
+    template <class T>
+    basic_json<Char, Alloc>& operator=(T val)
     {
-        var_ = rhs.var_;
+        json_type_traits<Char,Alloc,T>::assign(*this,val);
         return *this;
     }
 
@@ -1945,15 +1950,6 @@ public:
     long as_long() const;
 
     unsigned long as_ulong() const;
-
-    template <class T>
-    const T& custom_data() const;
-    // Returns a const reference to the custom data associated with name
-
-    // Deprecated
-    template <class T>
-    T& custom_data();
-    // Returns a reference to the custom data associated with name
 
     std::basic_string<Char> as_string() const;
 
@@ -2092,27 +2088,27 @@ public:
 
     void assign_any(const typename basic_json<Char,Alloc>::any& rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
 
-    void assign_string(const std::basic_string<Char>& s)
+    void assign_string(const std::basic_string<Char>& rhs)
     {
-        var_ = s;
+        var_.assign(rhs);
     }
 
-    void assign_cstring(const Char* s)
+    void assign_string(const Char* rhs, size_t length)
     {
-        var_ = s;
+        var_.assign_string(rhs,length);
     }
 
     void assign_bool(bool rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
 
     void assign_null()
     {
-        var_ = null_type();
+        var_.assign(null_type());
     }
 
     template <typename T>
@@ -2136,39 +2132,32 @@ public:
 
     void assign_double(double rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
     void assign_longlong(long long rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
     void assign_ulonglong(unsigned long long rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
 
     // Deprecated
     void assign_float(double rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
+    // Deprecated
     void assign_integer(long long rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
+    // Deprecated
     void assign_unsigned(unsigned long long rhs)
     {
-        var_ = rhs;
+        var_.assign(rhs);
     }
-
-    template <class T>
-    void set_custom_data(const std::basic_string<Char>& name, T value);
-
-    template <class T>
-    void add_custom_data(T value);
-
-    template <class T>
-    void add_custom_data(size_t index, T value);
 
     static basic_json make_2d_array(size_t m, size_t n);
 

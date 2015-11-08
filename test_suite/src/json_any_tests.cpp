@@ -133,23 +133,4 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     BOOST_CHECK_CLOSE(E(1,1),B(1,1),0.0000001);
 }
 
-BOOST_AUTO_TEST_CASE(test_any_add_custom_data)
-{
-    json arr(json::an_array);
-    matrix<double> A(2,2);
-    A(0,0) = 1;
-    A(0,1) = 2;
-    A(1,0) = 3;
-    A(1,1) = 4;
-    matrix<double> B(2,2);
-    B(0,0) = 5;
-    B(0,1) = 6;
-    B(1,0) = 7;
-    B(1,1) = 8;
-
-    arr.add_custom_data(A);
-    arr.add_custom_data(B);
-
-    std::cout << pretty_print(arr) << std::endl;
-}
 
