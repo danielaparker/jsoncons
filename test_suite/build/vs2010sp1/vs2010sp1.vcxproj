@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\src\json_parse_tests.cpp" />
     <ClCompile Include="..\..\src\json_reader_exception_tests.cpp" />
     <ClCompile Include="..\..\src\json_serializer_tests.cpp" />
+    <ClCompile Include="..\..\src\json_trait_type_tests.cpp" />
     <ClCompile Include="..\..\src\small_string_tests.cpp" />
     <ClCompile Include="..\..\src\string_to_double_tests.cpp" />
     <ClCompile Include="..\..\src\unicode_tests.cpp" />

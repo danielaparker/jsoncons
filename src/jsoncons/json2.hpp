@@ -944,8 +944,7 @@ template<typename Char, typename Alloc>
 template <class T>
 basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator=(T val)
 {
-    json_type_traits<Char,Alloc,T> adapter;
-    adapter.assign(*this,val);
+    json_type_traits<Char,Alloc,T>::assign(*this,val);
     return *this;
 }
 
