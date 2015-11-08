@@ -25,13 +25,9 @@ The library has a number of features, which are listed below:
 - 100 percent pass of test suite files from http://www.json.org/JSON_checker/
 - Handles JSON texts of arbitrarily large depth, a limit can be set if desired
 
-## What's new in 0.98.1 Release
+## What's new in Master
 
-- Enhances parser for CSV files that outputs JSON, see example below. 
-- Adds `get_result` member function to `json_deserializer`, which returns the json value `v` stored in a `json_deserializer` as `std::move(v)`. The `root()` member function has been deprecated but is still supported.
-- Adds `is_valid` member function to `json_deserializer`
-- Enhances json::any class, adds type checks when casting back to original value
-- Fixes some warning messages
+- Removed json deprecated functions custom_data, set_custom_data, add_custom_data
 
 ## Using the jsoncons library
 

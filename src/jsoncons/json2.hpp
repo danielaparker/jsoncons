@@ -65,119 +65,6 @@ public:
 };
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json()
-{
-}
-
-template<typename Char, typename Alloc>
-template<class InputIterator>
-basic_json<Char, Alloc>::basic_json(InputIterator first, InputIterator last)
-    : var_(first,last)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const basic_json<Char, Alloc>& val)
-    : var_(val.var_)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(json_object_impl<Char, Alloc> *val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(json_array_impl<Char, Alloc> *val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(jsoncons::null_type)
-    : var_(null_type())
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(double val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(long long val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(int val)
-    : var_(static_cast<long long>(val))
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned int val)
-    : var_(static_cast<unsigned long long>(val))
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(long val)
-    : var_(static_cast<long long>(val))
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned long val)
-    : var_(static_cast<unsigned long long>(val))
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(unsigned long long val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(bool val)
-    : var_(val)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(Char c)
-    : var_(&c,1)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const std::basic_string<Char>& s)
-    : var_(s)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const Char *s)
-    : var_(s)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(const Char *s, size_t length)
-    : var_(s, length)
-{
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::~basic_json()
-{
-}
-
-template<typename Char, typename Alloc>
 bool basic_json<Char, Alloc>::operator!=(const basic_json<Char, Alloc>& rhs) const
 {
     return !(*this == rhs);
@@ -312,12 +199,6 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc>::basic_json(basic_json&& other)
-    : var_(std::move(other.var_))
-{
-}
-
-template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
     switch (var_.type_){
     case value_types::array_t:
@@ -355,26 +236,6 @@ void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Cha
     default:
         {
             JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
-        }
-    }
-}
-
-// Deprecated
-template<typename Char, typename Alloc>
-template<class T>
-void basic_json<Char, Alloc>::set_custom_data(const std::basic_string<Char>& name, T value)
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char, Alloc>();
-    case value_types::object_t:
-        var_.value_.object_->set(name, basic_json<Char, Alloc>(any(value)));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object", name);
         }
     }
 }
@@ -443,42 +304,6 @@ void basic_json<Char, Alloc>::add(size_t index, const basic_json<Char, Alloc>& v
     {
     case value_types::array_t:
         var_.value_.array_->add(index, value);
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-// Deprecated
-template<typename Char, typename Alloc>
-template<class T>
-void basic_json<Char, Alloc>::add_custom_data(T value)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        {
-            add(basic_json<Char, Alloc>(any(value)));
-        }
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-// Deprecated
-template<typename Char, typename Alloc>
-template<class T>
-void basic_json<Char, Alloc>::add_custom_data(size_t index, T value)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->add(index, basic_json<Char, Alloc>(any(value)));
         break;
     default:
         {
@@ -917,14 +742,6 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::end_el
 }
 
 template<typename Char, typename Alloc>
-template <class T>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator=(T val)
-{
-    json_type_traits<Char,Alloc,T>::assign(*this,val);
-    return *this;
-}
-
-template<typename Char, typename Alloc>
 typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::end_elements() const
 {
     switch (var_.type_)
@@ -1149,40 +966,6 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
         return var_.value_.bool_value_ ? 1 : 0;
     default:
         JSONCONS_THROW_EXCEPTION("Not an unsigned long");
-    }
-}
-
-// Deprecated
-template<typename Char, typename Alloc>
-template<class T>
-const T& basic_json<Char, Alloc>::custom_data() const
-{
-    switch (var_.type_)
-    {
-    case value_types::any_t:
-        {
-			const T& p = var_.value_.any_value_->template cast<T>();
-			return p;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not userdata");
-    }
-}
-
-// Deprecated
-template<typename Char, typename Alloc>
-template<class T>
-T& basic_json<Char, Alloc>::custom_data()
-{
-    switch (var_.type_)
-    {
-    case value_types::any_t:
-        {
-			T& p = var_.value_.any_value_->template cast<T>();
-			return p;
-        }
-    default:
-        JSONCONS_THROW_EXCEPTION("Not userdata");
     }
 }
 
