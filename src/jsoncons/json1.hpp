@@ -115,7 +115,7 @@ public:
         }
         any(const any& val)
         {
-			impl_ = val.impl_->clone();
+			impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
         }
         any(any&& val)
             : impl_(val.impl_)
@@ -1823,8 +1823,7 @@ public:
     template<typename T>
     bool is() const
     {
-        json_type_traits<Char,Alloc,T> adapter;
-        return adapter.is(*this);
+        return json_type_traits<Char,Alloc,T>::is(*this);
     }
 
     bool is_string() const
@@ -1893,8 +1892,7 @@ public:
     template<typename T>
     T as() const
     {
-        json_type_traits<Char,Alloc,T> adapter;
-        return adapter.as(*this);
+        return json_type_traits<Char,Alloc,T>::as(*this);
     }
 
     bool as_bool() const;
@@ -1968,9 +1966,8 @@ public:
             var_.value_.object_ = new json_object_impl<Char,Alloc>();
         case value_types::object_t:
             {
-                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> o;
-                adapter.assign(o,value);
+                json_type_traits<Char,Alloc,T>::assign(o,value);
                 var_.value_.object_->set(name,o);
             }
             break;
@@ -1993,9 +1990,8 @@ public:
         {
         case value_types::array_t:
             {
-                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
-                adapter.assign(a,val);
+                json_type_traits<Char,Alloc,T>::assign(a,val);
                 var_.value_.array_->push_back(std::move(a));
             }
             break;
@@ -2013,9 +2009,8 @@ public:
         {
         case value_types::array_t:
             {
-                json_type_traits<Char,Alloc,T> adapter;
                 basic_json<Char,Alloc> a;
-                adapter.assign(a,val);
+                json_type_traits<Char,Alloc,T>::assign(a,val);
                 var_.value_.array_->add(index, std::move(a));
             }
             break;
@@ -2050,10 +2045,9 @@ public:
     std::vector<T> as_vector() const
     {
         std::vector<T> v(size());
-        json_type_traits<Char,Alloc,T> adapter;
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = adapter.as(at(i));
+            v[i] = json_type_traits<Char,Alloc,T>::as(at(i));
         }
         return v;
     }

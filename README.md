@@ -356,13 +356,13 @@ which prints
 In the json class, accessors and modifiers are templated, for example,
 
     template<typename T>
-    bool is() const
+    static bool is()
 
     template<typename T>
-    T as() const
+    static T as() 
 
     template <typename T>
-    basic_json& operator=(T val)
+    static basic_json& operator=(T val)
 
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
