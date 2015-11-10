@@ -38,14 +38,13 @@ template<typename Char, typename Alloc>
 class json_object : public basic_json<Char,Alloc>
 {
 public:
-    json_object(const json_object& o)
-        : basic_json<Char,Alloc>(o)
+    json_object()
     {
+        var_.type_ = value_types::empty_object_t;
     }
-    json_object(const basic_json<Char,Alloc> a)
-        : basic_json<Char,Alloc>(a)
+    json_object(const json_object& val)
     {
-        JSONCONS_ASSERT(this->is_object());
+		var_ = val.var_;
     }
 };
 
@@ -53,14 +52,27 @@ template<typename Char, typename Alloc>
 class json_array : public basic_json<Char,Alloc>
 {
 public:
-    json_array(const json_array& o)
-        : basic_json<Char,Alloc>(o)
+    json_array()
     {
+        var_.type_ = value_types::array_t;
+        var_.value_.array_ = new json_array_impl<Char,Alloc>();
     }
-    json_array(const basic_json<Char,Alloc> a)
-        : basic_json<Char,Alloc>(a)
+    json_array(size_t m)
     {
-        JSONCONS_ASSERT(this->is_array());
+        var_.type_ = value_types::array_t;
+        var_.value_.array_ = new json_array_impl<Char,Alloc>(m);
+    }
+    template <typename T>
+    json_array(size_t m, T val)
+    {
+        basic_json<Char, Alloc> v;
+        v = val;
+        var_.type_ = value_types::array_t;
+        var_.value_.array_ = new json_array_impl<Char,Alloc>(m,v);
+    }
+    json_array(const json_array& val)
+    {
+		var_ = val.var_;
     }
 };
 
@@ -454,10 +466,10 @@ void basic_json<Char, Alloc>::to_stream(std::basic_ostream<Char>& os, const basi
 }
 
 template<typename Char, typename Alloc>
-const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_object(new json_object_impl<Char, Alloc>());
+const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_object = basic_json<Char, Alloc>(value_types::object_t,0);
 
 template<typename Char, typename Alloc>
-const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_array(new json_array_impl<Char, Alloc>());
+const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_array = basic_json<Char, Alloc>(value_types::array_t,0);        
 
 template<typename Char, typename Alloc>
 const basic_json<Char, Alloc> basic_json<Char, Alloc>::null = basic_json<Char, Alloc>(jsoncons::null_type());
@@ -465,7 +477,8 @@ const basic_json<Char, Alloc> basic_json<Char, Alloc>::null = basic_json<Char, A
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(m)));
+    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(json_array<Char,Alloc>()));
+    a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_array(n);
@@ -479,7 +492,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t 
 {
     basic_json<Char, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(m)));
+    basic_json<Char, Alloc> a(basic_json<Char, Alloc>::an_array);
+    a.resize_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_array(n, v);
@@ -490,7 +504,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(m)));
+    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(json_array<Char,Alloc>()));
+    a.resize_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_2d_array(n, k);
@@ -504,7 +519,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t 
 {
     basic_json<Char, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(m)));
+    basic_json<Char, Alloc> a(basic_json<Char, Alloc>::an_array);
+    a.resize_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_2d_array(n, k, v);

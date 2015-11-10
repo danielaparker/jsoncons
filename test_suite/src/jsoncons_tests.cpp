@@ -481,3 +481,4 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
+
