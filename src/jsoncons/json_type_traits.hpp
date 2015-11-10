@@ -131,12 +131,12 @@ public:
 		JSONCONS_ASSERT(rhs.is_object());
         //return static_cast<const typename basic_json<Char, Alloc>::object&>(rhs);
 		typename basic_json<Char, Alloc>::object val;
-		val.swap(rhs);
+		val.assign_object(rhs);
 		return val;
     }
     static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::object rhs)
     {
-        lhs.swap(rhs);
+        lhs.assign_object(rhs);
     }
 };
 
@@ -152,12 +152,12 @@ public:
     {
 		JSONCONS_ASSERT(rhs.is_array());
         typename basic_json<Char, Alloc>::array val;
-        val.swap(rhs);
+        val.assign_array(rhs);
         return val;
     }
     static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::array rhs)
     {
-        lhs.swap(rhs);
+        lhs.assign_array(rhs);
     }
 };
 

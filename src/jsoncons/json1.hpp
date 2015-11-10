@@ -34,12 +34,6 @@ template <typename Char, class Alloc>
 class basic_json;
 
 template <typename Char,class Alloc>
-class json_object_impl;
-
-template <typename Char,class Alloc>
-class json_array_impl;
-
-template <typename Char,class Alloc>
 class json_object;
 
 template <typename Char,class Alloc>
@@ -260,6 +254,32 @@ public:
             }
         }
 
+        variant(const json_object<Char,Alloc>& val)
+            : type_(value_types::object)
+        {
+            value_.object_ = val.clone();
+        }
+
+        variant(const json_array<Char,Alloc>& val)
+            : type_(value_types::array)
+        {
+            value_.array_ = val.clone();
+        }
+
+        void assign(const json_object<Char,Alloc>& val)
+        {
+            destroy();
+            type_ = value_types::object_t;
+            value_.object_ = val.clone();
+        }
+
+        void assign(const json_array<Char,Alloc>& val)
+        {
+            destroy();
+            type_ = value_types::array_t;
+            value_.array_ = val.clone();
+        }
+
         variant(value_types::value_types_t type, size_t size)
             : type_(type)
         {
@@ -283,10 +303,10 @@ public:
                 value_.string_value_ = make_string_holder();
                 break;
             case value_types::array_t:
-                value_.array_ = new json_array_impl<Char,Alloc>(size);
+                value_.array_ = new json_array<Char,Alloc>(size);
                 break;
             case value_types::object_t:
-                value_.object_ = new json_object_impl<Char,Alloc>();
+                value_.object_ = new json_object<Char,Alloc>();
                 break;
             case value_types::any_t:
                 value_.any_value_ = new any();
@@ -382,10 +402,31 @@ public:
         variant(InputIterator first, InputIterator last)
             : type_(value_types::array_t)
         {
-            value_.array_ = new json_array_impl<Char, Alloc>(first, last);
+            value_.array_ = new json_array<Char, Alloc>(first, last);
         }
 
         ~variant()
+        {
+            switch (type_)
+            {
+            case value_types::string_t:
+                delete_string_holder(value_.string_value_);
+                break;
+            case value_types::array_t:
+                delete value_.array_;
+                break;
+            case value_types::object_t:
+                delete value_.object_;
+                break;
+            case value_types::any_t:
+                delete value_.any_value_;
+                break;
+            default:
+                break; 
+            }
+        }
+
+        void destroy()
         {
             switch (type_)
             {
@@ -763,8 +804,8 @@ public:
             long long si_value_;
             unsigned long long ui_value_;
             bool bool_value_;
-            json_object_impl<Char,Alloc>* object_;
-            json_array_impl<Char,Alloc>* array_;
+            json_object<Char,Alloc>* object_;
+            json_array<Char,Alloc>* array_;
             any* any_value_;
             string_holder* string_value_;
             Char small_string_value_[sizeof(long long)/sizeof(Char)];
@@ -896,11 +937,11 @@ public:
     static const basic_json<Char,Alloc> an_array;
     static const basic_json<Char,Alloc> null;
     
-    typedef typename json_object_impl<Char,Alloc>::iterator object_iterator;
-    typedef typename json_object_impl<Char,Alloc>::const_iterator const_object_iterator;
+    typedef typename json_object<Char,Alloc>::iterator object_iterator;
+    typedef typename json_object<Char,Alloc>::const_iterator const_object_iterator;
 
-    typedef typename json_array_impl<Char,Alloc>::iterator array_iterator;
-    typedef typename json_array_impl<Char,Alloc>::const_iterator const_array_iterator;
+    typedef typename json_array<Char,Alloc>::iterator array_iterator;
+    typedef typename json_array<Char,Alloc>::const_iterator const_array_iterator;
 
     class const_val_proxy 
     {
@@ -1945,7 +1986,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_ = new json_object_impl<Char,Alloc>();
+            var_.value_.object_ = new json_object<Char,Alloc>();
         case value_types::object_t:
             {
                 basic_json<Char,Alloc> o;
@@ -2055,6 +2096,16 @@ public:
     }
 
     void assign_bool(bool rhs)
+    {
+        var_.assign(rhs);
+    }
+
+    void assign_object(const json_object<Char,Alloc>& rhs)
+    {
+        var_.assign(rhs);
+    }
+
+    void assign_array(const json_array<Char,Alloc>& rhs)
     {
         var_.assign(rhs);
     }
@@ -2169,7 +2220,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_ = new json_object_impl<Char,Alloc>();
+            var_.value_.object_ = new json_object<Char,Alloc>();
         case value_types::object_t:
             break;
         default:
