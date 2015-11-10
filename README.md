@@ -29,6 +29,7 @@ The library has a number of features, which are listed below:
 
 - The member `json_type_traits` member functions `is`, `as`, and `assign` have been changed to static functions. if you have implemented your own type specializations, you will also have to change your `is`, `as` and `assign` functions to be static.
 - Removed json deprecated functions custom_data, set_custom_data, add_custom_data
+- `json` constructor is now templated, so constructors now allow extended types
 
 ## Using the jsoncons library
 
@@ -350,7 +351,10 @@ which prints
 
 ### Type extensibility
 
-In the json class, accessors and modifiers are templated, for example,
+In the json class, constructors, accessors and modifiers are templated, for example,
+
+    template <typename T>
+    explicit json(T val)
 
     template<typename T>
     bool is() const
@@ -360,6 +364,9 @@ In the json class, accessors and modifiers are templated, for example,
 
     template <typename T>
     basic_json& operator=(T val)
+
+    template <typename T>
+    void add(T val)
 
 The implementations of these functions and operators make use of the class template `json_type_traits`
 

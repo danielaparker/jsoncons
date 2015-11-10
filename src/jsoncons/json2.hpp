@@ -31,50 +31,7 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
-
 namespace jsoncons {
-
-template<typename Char, typename Alloc>
-class json_object : public basic_json<Char,Alloc>
-{
-public:
-    json_object()
-    {
-        var_.type_ = value_types::empty_object_t;
-    }
-    json_object(const json_object& val)
-    {
-		var_ = val.var_;
-    }
-};
-
-template<typename Char, typename Alloc>
-class json_array : public basic_json<Char,Alloc>
-{
-public:
-    json_array()
-    {
-        var_.type_ = value_types::array_t;
-        var_.value_.array_ = new json_array_impl<Char,Alloc>();
-    }
-    json_array(size_t m)
-    {
-        var_.type_ = value_types::array_t;
-        var_.value_.array_ = new json_array_impl<Char,Alloc>(m);
-    }
-    template <typename T>
-    json_array(size_t m, T val)
-    {
-        basic_json<Char, Alloc> v;
-        v = val;
-        var_.type_ = value_types::array_t;
-        var_.value_.array_ = new json_array_impl<Char,Alloc>(m,v);
-    }
-    json_array(const json_array& val)
-    {
-		var_ = val.var_;
-    }
-};
 
 template<typename Char, typename Alloc>
 bool basic_json<Char, Alloc>::operator!=(const basic_json<Char, Alloc>& rhs) const
@@ -199,7 +156,7 @@ void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const bas
     {
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char, Alloc>();
+        var_.value_.object_ = new json_object<Char, Alloc>();
     case value_types::object_t:
         var_.value_.object_->set(name, value);
         break;
@@ -241,7 +198,7 @@ void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Cha
     switch (var_.type_){
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char,Alloc>();
+        var_.value_.object_ = new json_object<Char,Alloc>();
     case value_types::object_t:
         var_.value_.object_->set(name,value);
         break;
@@ -415,7 +372,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     case value_types::object_t:
         {
             handler.begin_object();
-            json_object_impl<Char, Alloc> *o = var_.value_.object_;
+            json_object<Char, Alloc> *o = var_.value_.object_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
                 handler.name((it->name()).c_str(),it->name().length());
@@ -427,7 +384,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
     case value_types::array_t:
         {
             handler.begin_array();
-            json_array_impl<Char, Alloc> *o = var_.value_.array_;
+            json_array<Char, Alloc> *o = var_.value_.array_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);
@@ -670,7 +627,7 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin
     {
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char, Alloc>();
+        var_.value_.object_ = new json_object<Char, Alloc>();
     case value_types::object_t:
         return var_.value_.object_->begin();
     default:
@@ -699,7 +656,7 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_m
     {
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char, Alloc>();
+        var_.value_.object_ = new json_object<Char, Alloc>();
     case value_types::object_t:
         return var_.value_.object_->end();
     default:
@@ -785,7 +742,7 @@ void basic_json<Char, Alloc>::reserve(size_t n)
         break;
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object_impl<Char, Alloc>();
+        var_.value_.object_ = new json_object<Char, Alloc>();
     case value_types::object_t:
         var_.value_.object_->reserve(n);
         break;

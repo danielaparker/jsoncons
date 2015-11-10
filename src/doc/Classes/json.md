@@ -92,43 +92,14 @@ Constructs a copy of val
     json(json&& val)
 Acquires the contents of val, leaving val a `null` value
 
+    template <typename T>
+    explicit json(T val)
+Constructs a `json` value for types supported in `json_type_traits`
+
     template <class InputIterator>
     json(InputIterator first, InputIterator last)
 
 Constructs a json array with the elements in the range [first,last).
-
-    explicit json(null_type)
-Constructs a `null` value
-
-    explicit json(double val)
-Constructs a `double` value
-
-    explicit json(int val)
-Constructs a `integer` value
-
-    explicit json(unsigned int val)
-Constructs a `unsigned integer` value
-
-    explicit json(long val)
-Constructs a `integer` value
-
-    explicit json(unsigned long val)
-Constructs a `unsigned integer` value
-
-    explicit json(long long val)
-Constructs a `integer` value
-
-    explicit json(unsigned long long val)
-Constructs a `unsigned integer` value
-
-    explicit json(const std::string& val)
-Constructs a `string` value
-
-    explicit json(char val)
-Constructs a `string` value that has one character
-
-    explicit json(bool val)
-Constructs a `true` or `false` value
 
 ### Destructor
 
@@ -137,11 +108,11 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
 
 ### Assignment operator
 
-    template <class T>
-    json& operator=(T rhs)
-
     json& operator=(const json& rhs)
     json& operator=(json&& rhs)
+
+    template <class T>
+    json& operator=(T rhs)
 Assigns a new value to a `json` variable, replacing it's current contents.
 
 ### Iterators

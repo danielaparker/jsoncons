@@ -46,44 +46,44 @@ public:
 };
 
 template <typename Char,class Alloc>
-class json_array_impl 
+class json_array 
 {
 public:
     typedef typename std::vector<basic_json<Char,Alloc>>::iterator iterator;
     typedef typename std::vector<basic_json<Char,Alloc>>::const_iterator const_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array_impl>::other().allocate(1); }
-    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array_impl>::other().deallocate(static_cast<json_array_impl*>(ptr), 1); }
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
 
-    json_array_impl()
+    json_array()
     {
     }
 
-    json_array_impl(size_t n)
+    json_array(size_t n)
         : elements_(n)
     {
     }
 
-    json_array_impl(size_t n, const basic_json<Char,Alloc>& val)
+    json_array(size_t n, const basic_json<Char,Alloc>& val)
         : elements_(n,val)
     {
     }
 
-    json_array_impl(std::vector<basic_json<Char,Alloc>> elements)
+    json_array(std::vector<basic_json<Char,Alloc>> elements)
         : elements_(elements)
     {
     }
 
     template <class InputIterator>
-    json_array_impl(InputIterator begin, InputIterator end)
+    json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)
     {
     }
 
-    json_array_impl<Char,Alloc>* clone() 
+    json_array<Char,Alloc>* clone() const
     {
-        return new json_array_impl(elements_);
+        return new json_array(elements_);
     }
 
     size_t size() const {return elements_.size();}
@@ -116,7 +116,7 @@ public:
 
     void add(size_t index, const basic_json<Char,Alloc>& value)
     {
-        json_array_impl<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
@@ -127,7 +127,7 @@ public:
 
     void add(size_t index, basic_json<Char,Alloc>&& value)
     {
-        json_array_impl<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
@@ -139,7 +139,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array_impl<Char,Alloc>& rhs) const
+    bool operator==(const json_array<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -155,13 +155,13 @@ public:
         return true;
     }
 
-    json_array_impl(const json_array_impl<Char,Alloc>& val)
+    json_array(const json_array<Char,Alloc>& val)
         : elements_(val.elements_)
     {
     }
 private:
     std::vector<basic_json<Char,Alloc>> elements_;
-    json_array_impl& operator=(const json_array_impl<Char,Alloc>&);
+    json_array& operator=(const json_array<Char,Alloc>&);
 };
 
 template <typename Char, typename Alloc, bool IsConst = false>
@@ -293,7 +293,7 @@ public:
 };
 
 template <typename Char,class Alloc>
-class json_object_impl
+class json_object
 {
 public:
     typedef object_iterator<Char,Alloc,false> iterator;
@@ -303,26 +303,26 @@ public:
     typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object_impl>::other().allocate(1); }
-    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_object_impl>::other().deallocate(static_cast<json_object_impl*>(ptr), 1); }
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
 
-    json_object_impl()
+    json_object()
     {
     }
 
-    json_object_impl(size_t n)
+    json_object(size_t n)
         : members_(n)
     {
     }
 
-    json_object_impl(std::vector<member_type> members)
+    json_object(std::vector<member_type> members)
         : members_(members)
     {
     }
 
-    json_object_impl<Char,Alloc>* clone() 
+    json_object<Char,Alloc>* clone() const
     {
-        return new json_object_impl(members_);
+        return new json_object(members_);
     }
 
     size_t size() const {return members_.size();}
@@ -443,7 +443,7 @@ public:
 
     const_iterator end() const {return const_iterator(members_.end());}
 
-    bool operator==(const json_object_impl<Char,Alloc>& rhs) const
+    bool operator==(const json_object<Char,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -462,7 +462,7 @@ public:
         return true;
     }
 
-    json_object_impl(const json_object_impl<Char,Alloc>& val)
+    json_object(const json_object<Char,Alloc>& val)
         : members_(val.members_)
     {
     }
@@ -470,7 +470,7 @@ public:
 private:
 
     std::vector<member_type> members_;
-    json_object_impl<Char,Alloc>& operator=(const json_object_impl<Char,Alloc>&);
+    json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 
 
