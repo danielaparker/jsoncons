@@ -503,6 +503,8 @@ vertical-align:1px;
 <ul>
 <li>The member <code>json_type_traits</code> member functions <code>is</code>, <code>as</code>, and <code>assign</code> have been changed to static functions. if you have implemented your own type specializations, you will also have to change your <code>is</code>, <code>as</code> and <code>assign</code> functions to be static.</li>
 <li>Removed json deprecated functions custom_data, set_custom_data, add_custom_data</li>
+<li>
+<code>json</code> constructor is now templated, so constructors now allow extended types</li>
 </ul>
 
 <h2>Using the jsoncons library</h2>
@@ -863,9 +865,12 @@ std::wcout &lt;&lt; root &lt;&lt; L"\n";
 
 <h3>Type extensibility</h3>
 
-<p>In the json class, accessors and modifiers are templated, for example,</p>
+<p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
 
-<pre><code>template&lt;typename T&gt;
+<pre><code>template &lt;typename T&gt;
+explicit json(T val)
+
+template&lt;typename T&gt;
 bool is() const
 
 template&lt;typename T&gt;
@@ -873,6 +878,9 @@ T as() const
 
 template &lt;typename T&gt;
 basic_json&amp; operator=(T val)
+
+template &lt;typename T&gt;
+void add(T val)
 </code></pre>
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
