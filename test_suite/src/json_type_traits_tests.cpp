@@ -21,10 +21,13 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
 {
-    const std::string x = "10";
+    json::object o;
 
-    json val;
-    val = x;
+	json val;
+
+	val = o;
+
+	val.set("A",o);
 }
 
 

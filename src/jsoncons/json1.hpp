@@ -128,9 +128,9 @@ public:
         }
 
         template<typename T>
-        explicit any(T val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
+        explicit any(T val)
         {
-    		impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
+            impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
         }
 
         template <typename T>
@@ -260,16 +260,41 @@ public:
             }
         }
 
-        explicit variant(json_object_impl<Char, Alloc> *var)
-            : type_(value_types::object_t)
+        variant(value_types::value_types_t type, size_t size)
+            : type_(type)
         {
-            value_.object_ = var;
-        }
-
-        explicit variant(json_array_impl<Char, Alloc> *var)
-            : type_(value_types::array_t)
-        {
-            value_.array_ = var;
+            switch (type)
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+                break;
+            case value_types::double_t:
+                break;
+            case value_types::longlong_t:
+                break;
+            case value_types::ulonglong_t:
+                break;
+            case value_types::bool_t:
+                break;
+            case value_types::small_string_t:
+                small_string_length_ = 0;
+                break;
+            case value_types::string_t:
+                value_.string_value_ = make_string_holder();
+                break;
+            case value_types::array_t:
+                value_.array_ = new json_array_impl<Char,Alloc>(size);
+                break;
+            case value_types::object_t:
+                value_.object_ = new json_object_impl<Char,Alloc>();
+                break;
+            case value_types::any_t:
+                value_.any_value_ = new any();
+                break;
+            default:
+                // throw
+                break;
+            }
         }
 
         explicit variant(const any& var)
@@ -413,6 +438,11 @@ public:
                 val.swap(*this);
             }
             return *this;
+        }
+
+        void assign(basic_json<Char,Alloc> val)
+        {
+            swap(val.var_);
         }
 
         void assign(const std::basic_string<Char>& s)
@@ -985,11 +1015,6 @@ public:
 
         // Deprecated
 
-        bool is_custom() const
-        {
-            return val_.is_custom();
-        }
-
         std::basic_string<Char> as_string() const
         {
             return val_.as_string();
@@ -1313,13 +1338,6 @@ public:
             return val_.at(name_).is_double();
         }
 
-        // Deprecated
-
-        bool is_custom() const
-        {
-            return val_.at(name_).is_custom();
-        }
-
         std::basic_string<Char> as_string() const
         {
             return val_.at(name_).as_string();
@@ -1361,8 +1379,6 @@ public:
         {
             return val_.at(name_).template as_vector<T>();
         }
-
-        // Deprecated
 
         double as_double() const
         {
@@ -1638,22 +1654,24 @@ public:
         return temp;
     }
 
-    static basic_json make_array()
+    static basic_json<Char,Alloc> make_array()
     {
-        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>());
+        return basic_json<Char,Alloc>::an_array;
     }
 
-    static basic_json make_array(size_t n)
+    static basic_json<Char,Alloc> make_array(size_t n)
     {
-        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(n));
+        basic_json<Char,Alloc> val(basic_json<Char,Alloc>::an_array);
+        val.resize_array(n);
+        return val;
     }
 
     template <typename T>
-    static basic_json make_array(size_t n, T val)
+    static basic_json<Char,Alloc> make_array(size_t n, T val)
     {
-        basic_json<Char, Alloc> v;
-        v = val;
-        return basic_json<Char, Alloc>(new json_array_impl<Char, Alloc>(n, v));
+        basic_json<Char,Alloc> a(basic_json<Char,Alloc>::an_array);
+        a.resize_array(n,val);
+        return a;
     }
 
     template<int size>
@@ -1707,84 +1725,26 @@ public:
     {
     }
 
-    template<class InputIterator>
-    basic_json(InputIterator first, InputIterator last)
-        : var_(first,last)
+    template <typename T>
+    basic_json(T val)
+        : var_()
     {
-    }
-
-    explicit basic_json(json_object_impl<Char, Alloc> *val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(json_array_impl<Char, Alloc> *val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(jsoncons::null_type)
-        : var_(null_type())
-    {
-    }
-
-    explicit basic_json(double val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(long long val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(int val)
-        : var_(static_cast<long long>(val))
-    {
-    }
-
-    explicit basic_json(unsigned int val)
-        : var_(static_cast<unsigned long long>(val))
-    {
-    }
-
-    explicit basic_json(long val)
-        : var_(static_cast<long long>(val))
-    {
-    }
-
-    explicit basic_json(unsigned long val)
-        : var_(static_cast<unsigned long long>(val))
-    {
-    }
-
-    explicit basic_json(unsigned long long val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(bool val)
-        : var_(val)
-    {
-    }
-
-    explicit basic_json(Char c)
-        : var_(&c,1)
-    {
-    }
-
-    explicit basic_json(const std::basic_string<Char>& s)
-        : var_(s)
-    {
-    }
-
-    explicit basic_json(const Char *s)
-        : var_(s)
-    {
+        json_type_traits<Char,Alloc,T>::assign(*this,val);
     }
 
     basic_json(const Char *s, size_t length)
         : var_(s, length)
+    {
+    }
+
+    basic_json(value_types::value_types_t type, size_t size)
+        : var_(type,size)
+    {
+    }
+
+    template<class InputIterator>
+    basic_json(InputIterator first, InputIterator last)
+        : var_(first,last)
     {
     }
 
@@ -1907,13 +1867,6 @@ public:
     bool is_double() const
     {
         return var_.type_ == value_types::double_t;
-    }
-
-    // Deprecated
-
-    bool is_custom() const
-    {
-        return var_.type_ == value_types::any_t;
     }
 
     bool is_empty() const;
