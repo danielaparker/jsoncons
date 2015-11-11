@@ -34,14 +34,17 @@ The library has a number of features, which are listed below:
 jsoncons supports alternative ways for constructing  `null`, `object`, and `array` values.
 
 null:
+
     json a = jsoncons::null_type();
     json b(json::null);  // From static data member prototype
 
 object:
+
     json a(); // Default is empty object
     json b(json::an_object);  // From static data member prototype
 
 array:
+
     json a = json::array();
     json b = json::make_array();
     json c(json::an_array);  // From static data member prototype
