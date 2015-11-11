@@ -641,7 +641,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        return cobject.begin_members();
+        return cobject().begin_members();
     case value_types::object_t:
         return var_.value_.object_->begin();
     default:
@@ -670,7 +670,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        return cobject.end_members();
+        return cobject().end_members();
     case value_types::object_t:
         return var_.value_.object_->end();
     default:
