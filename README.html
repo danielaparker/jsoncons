@@ -509,18 +509,24 @@ vertical-align:1px;
 
 <p>jsoncons supports alternative ways for constructing  <code>null</code>, <code>object</code>, and <code>array</code> values.</p>
 
-<p>null:<br>
-    json a = jsoncons::null_type();<br>
-    json b(json::null);  // From static data member prototype</p>
+<p>null:</p>
 
-<p>object:<br>
-    json a(); // Default is empty object<br>
-    json b(json::an_object);  // From static data member prototype</p>
+<pre><code>json a = jsoncons::null_type();
+json b(json::null);  // From static data member prototype
+</code></pre>
 
-<p>array:<br>
-    json a = json::array();<br>
-    json b = json::make_array();<br>
-    json c(json::an_array);  // From static data member prototype</p>
+<p>object:</p>
+
+<pre><code>json a(); // Default is empty object
+json b(json::an_object);  // From static data member prototype
+</code></pre>
+
+<p>array:</p>
+
+<pre><code>json a = json::array();
+json b = json::make_array();
+json c(json::an_array);  // From static data member prototype
+</code></pre>
 
 <p>Since C++ has possible order issues with static data memebrs, the jsoncons examples and documentation have been changed to consistently use the other ways, and <code>json::null</code>, <code>json::an_object</code> and <code>json::an_array</code> have been, while still usable, deprecated.</p>
 
