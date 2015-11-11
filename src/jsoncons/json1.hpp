@@ -1753,7 +1753,7 @@ public:
         return build_array<Char,Alloc,size>()(m, n, k, val);
     }
 
-    explicit basic_json<Char, Alloc>::basic_json()
+    basic_json()
     {
     }
 
