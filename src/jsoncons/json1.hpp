@@ -1698,7 +1698,7 @@ public:
 
     static basic_json<Char,Alloc> make_array()
     {
-        return basic_json<Char,Alloc>::array();
+        return typename basic_json<Char,Alloc>::array();
     }
 
     static basic_json<Char,Alloc> make_array(size_t n)
@@ -2252,7 +2252,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return cobject.object_value();
+            return cobject().object_value();
         case value_types::object_t:
             return *(var_.value_.object_);
         default:
@@ -2264,8 +2264,8 @@ public:
 private:
     const basic_json<Char,Alloc>& cobject() const
     {
-        static const basic_json<Char, Alloc> cobject = basic_json<Char, Alloc>(value_types::object_t,0);
-        return cobject;
+        static const basic_json<Char, Alloc> c = basic_json<Char, Alloc>(value_types::object_t,0);
+        return c;
     }
 
     template<typename Char2, typename Allocator2, size_t size>
