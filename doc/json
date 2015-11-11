@@ -523,23 +523,6 @@ array
 
 <p>A random access iterator to <code>const json</code></p>
 
-<h3>Member constants</h3>
-
-<pre><code>an_object
-</code></pre>
-
-<p>Empty constant json object value</p>
-
-<pre><code>an_array
-</code></pre>
-
-<p>Empty constant json array value</p>
-
-<pre><code>null
-</code></pre>
-
-<p>Constant json null value</p>
-
 <h3>Static member functions</h3>
 
 <pre><code>static json parse(std::istream&amp; is)
@@ -798,7 +781,7 @@ const json&amp; at(size_t i) const
 <pre><code>const json&amp; get(const std::string&amp; name) const
 </code></pre>
 
-<p>If <code>name</code> matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to <code>json::null</code>.</p>
+<p>If <code>name</code> matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to a null value.</p>
 
 <pre><code>template &lt;typename T&gt;
 const json get(const std::string&amp; name, T default_val) const
@@ -967,6 +950,25 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
+<p>Deprecated:</p>
+
+<h3>Member constants</h3>
+
+<pre><code>null
+</code></pre>
+
+<p>Constant json null value. Use assignment to <code>jsoncons::null_type()</code> instead.</p>
+
+<pre><code>an_object
+</code></pre>
+
+<p>Empty constant json array value. Use the default constructor <code>json()</code> instead.</p>
+
+<pre><code>an_array
+</code></pre>
+
+<p>Empty constant json array value.  Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</p>
+
 <h3>Examples</h3>
 
 <h3>Accessors and defaults</h3>
@@ -999,7 +1001,7 @@ x4=San Francisco
 <h3>Nulls</h3>
 
 <pre><code>json obj;
-obj["field1"] = json::null;
+obj["field1"] = jsoncons::null_type();
 std::cout &lt;&lt; obj &lt;&lt; std::endl;
 </code></pre>
 
@@ -1010,7 +1012,7 @@ std::cout &lt;&lt; obj &lt;&lt; std::endl;
 
 <h3>Array</h3>
 
-<pre><code>json arr(json::an_array);
+<pre><code>json arr = json::make_array();
 arr.add(10);
 arr.add(20);
 arr.add(30);
@@ -1062,7 +1064,7 @@ province=Ontario
 
 <h3>Array iterator</h3>
 
-<pre><code>json arr(json::an_array);
+<pre><code>json arr = json::make_array();
 arr.add("Toronto");
 arr.add("Vancouver");
 arr.add("Montreal");
@@ -1084,7 +1086,7 @@ Montreal
 
 <pre><code>json root;
 
-root["persons"] = json::an_array;
+root["persons"] = json::make_array();
 
 json person;
 person["first_name"] = "John";

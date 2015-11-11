@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(test_remove_member)
     BOOST_CHECK(o.size() == 0);
 
     json config;
-    json xfile_opt(json::an_object);
+    json xfile_opt = json::object();
     xfile_opt["input-file"] = "config_file";
     config["XFILE_COMPATIBLE"] = std::move(xfile_opt);
     std::cout << "XFILE_COMPATIBLE: " << config << std::endl;

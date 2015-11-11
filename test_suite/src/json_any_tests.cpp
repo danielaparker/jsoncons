@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     B(1,0) = 7;
     B(1,1) = 8;
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add(json::any(A));
     arr.add(json::any(B));
 

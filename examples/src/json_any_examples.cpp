@@ -32,7 +32,7 @@ void put_any_value_in_object()
 
 void put_any_value_in_arry()
 {
-    json arr(json::an_array);
+    json arr = json::make_array();
     std::vector<double> v(4);
     v[0] = 0;
     v[1] = 1;

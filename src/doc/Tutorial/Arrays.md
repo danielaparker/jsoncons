@@ -5,7 +5,7 @@
 
 ### Creating an array of elements 
 
-    json cities(json::an_array);       // an empty array
+    json cities = json::array();       // an empty array
     std::cout << cities << std::endl;  // output is "[]"
 
     cities.add("Toronto");  
@@ -21,7 +21,7 @@ The output is
 
 ### Creating an array of elements with reserved storage 
 
-    json cities(json::an_array);  
+    json cities = json::array();  
     cities.reserve(10);  // storage is reserved
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 

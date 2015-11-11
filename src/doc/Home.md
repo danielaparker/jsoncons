@@ -173,7 +173,7 @@ This time the output is
 
 This example shows how to create the `books.json` file in code.
 
-    json books(json::an_array);
+    json books = json::make_array();
 
     {
         json book;

@@ -123,7 +123,7 @@ void second_example_a()
 {
     try
     {
-        json books(json::an_array);
+        json books = json::make_array();
 
         {
             json book;
@@ -188,7 +188,7 @@ void more_examples()
 	image_sizing["dimension2"] = jsoncons::null_type();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
-    json image_formats(json::an_array);
+    json image_formats = json::make_array();
     image_formats.add("JPEG");
     image_formats.add("PSD");
     image_formats.add("TIFF");

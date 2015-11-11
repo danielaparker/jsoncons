@@ -104,14 +104,16 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_stri
 template<typename Char, typename Alloc>
 const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_string<Char>& name) const
 {
+    static const basic_json<Char, Alloc> a_null = null_type();
+
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        return basic_json<Char, Alloc>::null;
+        return a_null;
     case value_types::object_t:
         {
             const_object_iterator it = var_.value_.object_->find(name);
-            return it != end_members() ? it->value() : basic_json<Char, Alloc>::null;
+            return it != end_members() ? it->value() : a_null;
         }
     default:
         {
@@ -422,12 +424,12 @@ void basic_json<Char, Alloc>::to_stream(std::basic_ostream<Char>& os, const basi
     to_stream(serializer);
 }
 
+
+// Deprecated static data members
 template<typename Char, typename Alloc>
 const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_object = basic_json<Char, Alloc>(value_types::object_t,0);
-
 template<typename Char, typename Alloc>
 const basic_json<Char, Alloc> basic_json<Char, Alloc>::an_array = basic_json<Char, Alloc>(value_types::array_t,0);        
-
 template<typename Char, typename Alloc>
 const basic_json<Char, Alloc> basic_json<Char, Alloc>::null = basic_json<Char, Alloc>(jsoncons::null_type());
 
@@ -449,8 +451,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_2d_array(size_t m, size_t 
 {
     basic_json<Char, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>::an_array);
-    a.resize_array(m);
+    basic_json<Char, Alloc> a = make_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_array(n, v);
@@ -476,8 +477,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t 
 {
     basic_json<Char, Alloc> v;
     v = val;
-    basic_json<Char, Alloc> a(basic_json<Char, Alloc>::an_array);
-    a.resize_array(m);
+    basic_json<Char, Alloc> a = make_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_2d_array(n, k, v);
@@ -641,7 +641,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        return an_object.begin_members();
+        return cobject.begin_members();
     case value_types::object_t:
         return var_.value_.object_->begin();
     default:
@@ -670,7 +670,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        return an_object.end_members();
+        return cobject.end_members();
     case value_types::object_t:
         return var_.value_.object_->end();
     default:

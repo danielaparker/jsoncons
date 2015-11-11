@@ -33,7 +33,7 @@ using jsoncons::json_parse_exception;
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
     boost::optional<jsoncons::json> opt_json;
-    opt_json = jsoncons::json(jsoncons::json::an_object);
+    opt_json = json::object();
 }
 
 BOOST_AUTO_TEST_CASE(test_for_each_value)
