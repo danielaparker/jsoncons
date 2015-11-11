@@ -81,7 +81,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].value = basic_json<Char,Alloc>(basic_json<Char,Alloc>::an_array);
+        stack_[top_].value = basic_json<Char,Alloc>::make_array();
     }
 
     void pop_object()

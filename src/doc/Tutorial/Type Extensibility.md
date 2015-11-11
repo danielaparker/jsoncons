@@ -13,7 +13,7 @@ For example, by including the header file `jsoncons_ext/boost/type_extensions.hp
         json deal;
         deal["Maturity"] = date(2014,10,14);
 
-        json observation_dates(json::an_array);
+        json observation_dates = make_array();
         observation_dates.add(date(2014,2,14));
         observation_dates.add(date(2014,2,21));
 

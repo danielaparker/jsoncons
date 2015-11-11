@@ -35,10 +35,17 @@ BOOST_AUTO_TEST_CASE(test_construction_from_file)
     std::cout << pretty_print(val) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_add_null)
+{
+    json a = json::array();
+    a.add(jsoncons::null_type());
+    BOOST_CHECK(a[0].is_null());
+}
+
 BOOST_AUTO_TEST_CASE(test_construction_in_code)
 {
     // A null value
-    json null_val;
+    json null_val = jsoncons::null_type();
 
     // A boolean value
     json flag(true);
@@ -54,15 +61,14 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add(null_val);
     arr.add(flag);
     arr.add(number);
     arr.add(obj);
 
     output_format format;
-    arr.to_stream(std::cout,format,true);
-    std::cout << std::endl;
+    std::cout << pretty_print(arr) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_from_container)
@@ -139,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");

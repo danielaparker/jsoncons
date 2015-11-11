@@ -933,10 +933,11 @@ public:
 
     typedef member_type name_value_pair;
 
+    // Deprecated static data members
     static const basic_json<Char,Alloc> an_object;
     static const basic_json<Char,Alloc> an_array;
     static const basic_json<Char,Alloc> null;
-    
+
     typedef typename json_object<Char,Alloc>::iterator object_iterator;
     typedef typename json_object<Char,Alloc>::const_iterator const_object_iterator;
 
@@ -1697,12 +1698,12 @@ public:
 
     static basic_json<Char,Alloc> make_array()
     {
-        return basic_json<Char,Alloc>::an_array;
+        return basic_json<Char,Alloc>::array();
     }
 
     static basic_json<Char,Alloc> make_array(size_t n)
     {
-        basic_json<Char,Alloc> val(basic_json<Char,Alloc>::an_array);
+        basic_json<Char,Alloc> val = make_array();
         val.resize_array(n);
         return val;
     }
@@ -1710,7 +1711,7 @@ public:
     template <typename T>
     static basic_json<Char,Alloc> make_array(size_t n, T val)
     {
-        basic_json<Char,Alloc> a(basic_json<Char,Alloc>::an_array);
+        basic_json<Char,Alloc> a = make_array();
         a.resize_array(n,val);
         return a;
     }
@@ -2240,7 +2241,33 @@ public:
         var_.value_.object_->sort_members();
     }
 
+    const array& array_value() const
+    {
+        JSONCONS_ASSERT(is_array());
+        return *(var_.value_.array_);
+    }
+
+    const object& object_value() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return cobject.object_value();
+        case value_types::object_t:
+            return *(var_.value_.object_);
+        default:
+            JSONCONS_THROW_EXCEPTION("Bad object cast");
+            break;
+        }
+    }
+
 private:
+    const basic_json<Char,Alloc>& cobject() const
+    {
+        static const basic_json<Char, Alloc> cobject = basic_json<Char, Alloc>(value_types::object_t,0);
+        return cobject;
+    }
+
     template<typename Char2, typename Allocator2, size_t size>
     class build_array
     {};

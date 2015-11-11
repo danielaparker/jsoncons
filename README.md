@@ -31,6 +31,23 @@ The library has a number of features, which are listed below:
 - Removed json deprecated functions custom_data, set_custom_data, add_custom_data
 - `json` constructor is now templated, so constructors now allow extended types
 
+jsoncons supports alternative ways for constructing  `null`, `object`, and `array` values.
+
+null:
+    json a = jsoncons::null_type();
+    json b(json::null);  // From static data member prototype
+
+object:
+    json a(); // Default is empty object
+    json b(json::an_object);  // From static data member prototype
+
+array:
+    json a = json::array();
+    json b = json::make_array();
+    json c(json::an_array);  // From static data member prototype
+
+Since C++ has possible order issues with static data memebrs, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
+
 ## Using the jsoncons library
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
@@ -107,7 +124,7 @@ Note that the third book is missing a price, which causes an exception to be thr
 You have a choice of accessors:
 
     book["price"] will throw if there is no price
-    book.get("price") will return json::null if there is no price
+    book.get("price") will return a json null value if there is no price
     book.get("price",default_value) will return default_value if there is no price
 
 So if you want to show "n/a" for the missing price, you can use this accessor
@@ -152,7 +169,7 @@ Adding some members,
     image_sizing["resize_unit"] =  "pixels";  // a string
     image_sizing["resize_what"] =  "long_edge";  // a string
     image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = json::null;  // a null
+    image_sizing["dimension2"] = jsoncons::null_type();  // a null
 
 Serializing it, this time with pretty print,
 
@@ -170,7 +187,7 @@ produces
 
 To construct a json array, use the copy constructor with a prototype json array:
 
-    json image_formats(json::an_array);
+    json image_formats= json::array();
 
 Adding some elements,
 
@@ -292,7 +309,7 @@ An example of iterating over the name-value pairs of a json object:
 
 An example of iterating over the elements of a json array:
 
-    json cities(json::an_array);
+    json cities= json::array();
     cities.add("Montreal");
     cities.add("Toronto");
     cities.add("Ottawa");
@@ -384,7 +401,7 @@ This class template is extensible, you as a user can extend `json_type_traits` i
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
 	
-    json observation_dates(json::an_array);
+    json observation_dates = json::array();
     observation_dates.add(boost::gregorian::date(2013,10,21));
     observation_dates.add(boost::gregorian::date(2013,10,28));
     deal["observation_dates"] = std::move(observation_dates);

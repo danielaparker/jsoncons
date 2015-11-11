@@ -570,7 +570,7 @@ void serialize(json_output_handler&amp; os, const boost::numeric::ublas::matrix&
 
 <p>You can also add a json <code>any</code> value to a <code>json</code> array, like this. </p>
 
-<pre><code>json arr(json::an_array);
+<pre><code>json arr = make_array();
 matrix&lt;double&gt; A(2,2);
 A(0,0) = 1;
 A(0,1) = 2;

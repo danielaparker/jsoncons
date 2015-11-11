@@ -39,17 +39,6 @@ A random access iterator to `json`
     const_array_iterator
 A random access iterator to `const json`
 
-### Member constants
-
-    an_object
-Empty constant json object value
-
-    an_array
-Empty constant json array value
-
-    null
-Constant json null value
-
 ### Static member functions
 
     static json parse(std::istream& is)
@@ -231,7 +220,7 @@ If `name` matches the name of a member in the json object, returns a reference t
 Returns a reference to the element at position `i` in a json array.  These have the same behavior as the corresponding `operator[]` functions.
 
     const json& get(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to `json::null`.
+If `name` matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to a null value.
 
     template <typename T>
     const json get(const std::string& name, T default_val) const
@@ -348,6 +337,20 @@ Inserts json value into stream using the specified [output_format](output_format
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
+Deprecated:
+
+### Member constants
+
+    null
+Constant json null value. Use assignment to `jsoncons::null_type()` instead.
+
+    an_object
+Empty constant json array value. Use the default constructor `json()` instead.
+
+    an_array
+Empty constant json array value.  Use assignment to `json::array()` or `json::make_array()` instead.
+
+
 ### Examples
 
 ### Accessors and defaults
@@ -378,7 +381,7 @@ The output is
 ### Nulls
 
     json obj;
-    obj["field1"] = json::null;
+    obj["field1"] = jsoncons::null_type();
     std::cout << obj << std::endl;
 
 The output is 
@@ -387,7 +390,7 @@ The output is
 
 ### Array
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add(10);
     arr.add(20);
     arr.add(30);
@@ -433,7 +436,7 @@ The output is
 
 ### Array iterator
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add("Toronto");
     arr.add("Vancouver");
     arr.add("Montreal");
@@ -453,7 +456,7 @@ The output is
 
 	json root;
 
-    root["persons"] = json::an_array;
+    root["persons"] = json::make_array();
 
     json person;
     person["first_name"] = "John";

@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(test_as)
     obj["field2"] = true;
     obj["char_field"] = 'c';
     obj["string_field"] = "char";
-/*
+
     std::string s = obj["field1"].as<std::string>();
     BOOST_CHECK_EQUAL(s,std::string("10"));
     int int_val = obj["field2"].as<int>();
@@ -56,7 +56,6 @@ BOOST_AUTO_TEST_CASE(test_as)
     BOOST_CHECK(empty.is_object());
     BOOST_CHECK(empty.is_empty());
     json::object y = empty.as<json::object>();
-	*/
 }
 
 BOOST_AUTO_TEST_CASE(test_is)
@@ -123,16 +122,14 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     json obj;
     BOOST_CHECK(obj.is_object());
     BOOST_CHECK(obj.is<json::object>());
-    std::cout << "HERE!!!"  << ", type=" << obj.type() <<  std::endl;
 
     // tests for proxy is_type methods
     obj["string"] = "val1";
-    std::cout << "type=" << obj.type() << std::endl;
 
     BOOST_CHECK(obj.is_object());
     BOOST_CHECK(obj.is<json::object>());
 
-    BOOST_CHECK(obj["string"].is<std::string>());
+    BOOST_CHECK(obj["string"].is_string());
     BOOST_CHECK(obj["string"].is<std::string>());
 
     obj["double"] = 10.7;

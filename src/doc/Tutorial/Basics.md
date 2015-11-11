@@ -85,8 +85,8 @@ Note that the parser accepts and ignores the single line comment that starts wit
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr(json::an_array);
-    arr.add(json::null);
+    json arr = json::make_array();
+    arr.add(jsoncons::null_type());
     arr.add(flag);
     arr.add(number);
     arr.add(obj);
@@ -197,7 +197,7 @@ The output is
 
 ### Iterating over the elements of an array
 
-    json arr(json::an_array);
+    json arr = json::make_array();
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");
