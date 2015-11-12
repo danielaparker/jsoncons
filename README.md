@@ -190,7 +190,7 @@ produces
         "resize_what":"long_edge"
     }
 
-To construct a json array, use the array type default constructor:
+To construct a json array, assign an array object:
 
     json image_formats = json::array();
 
