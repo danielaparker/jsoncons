@@ -255,13 +255,13 @@ public:
         }
 
         variant(const json_object<Char,Alloc>& val)
-            : type_(value_types::object)
+            : type_(value_types::object_t)
         {
             value_.object_ = val.clone();
         }
 
         variant(const json_array<Char,Alloc>& val)
-            : type_(value_types::array)
+            : type_(value_types::array_t)
         {
             value_.array_ = val.clone();
         }
