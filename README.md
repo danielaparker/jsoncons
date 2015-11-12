@@ -51,7 +51,7 @@ array:
     json b = json::make_array(); // Using factory method
     json c(json::an_array);      // From static data member prototype
 
-Since C++ has possible order issues with static data memebrs, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
+Since C++ has possible order issues with static data members, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
 
 ## Using the jsoncons library
 
@@ -190,7 +190,7 @@ produces
         "resize_what":"long_edge"
     }
 
-To construct a json array, assign an array object:
+To construct a json array, use the array type default constructor:
 
     json image_formats = json::array();
 
