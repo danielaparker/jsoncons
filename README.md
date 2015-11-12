@@ -35,21 +35,21 @@ jsoncons supports alternative ways for constructing  `null`, `object`, and `arra
 
 null:
 
-    json a = jsoncons::null_type();
-    json b = json::null_type();  // Using alias
-    json c(json::null);  // From static data member prototype
+    json a = jsoncons::null_type();  // Using type constructor
+    json b = json::null_type();      // Using alias
+    json c(json::null);              // From static data member prototype
 
 object:
 
-    json a(); // Default is empty object
-    json b = json::object();
+    json a();                 // Default is empty object
+    json b = json::object();  // Using type constructor
     json c(json::an_object);  // From static data member prototype
 
 array:
 
-    json a = json::array();
-    json b = json::make_array();
-    json c(json::an_array);  // From static data member prototype
+    json a = json::array();      // Using type constructor
+    json b = json::make_array(); // Using factory method
+    json c(json::an_array);      // From static data member prototype
 
 Since C++ has possible order issues with static data memebrs, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
 
