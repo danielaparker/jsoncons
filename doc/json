@@ -496,10 +496,20 @@ these always use the default allocators.</p>
 
 <p><a href="json%20any">any</a> can contain any value that supports copy construction and assignment.</p>
 
-<pre><code>object
-
-array
+<pre><code>null_type
 </code></pre>
+
+<p>An alias for <code>jsoncons::null_type</code></p>
+
+<pre><code>object
+</code></pre>
+
+<p>Object type</p>
+
+<pre><code>array
+</code></pre>
+
+<p>Array type</p>
 
 <p>Type tags that can be used with <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code></p>
 
@@ -711,7 +721,7 @@ is&lt;unsigned long long&gt;
 
 <p>Returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;null_type&gt;
+<pre><code>is&lt;json::null_type&gt;
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is null, <code>false</code> otherwise.  </p>
@@ -957,7 +967,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 <pre><code>null
 </code></pre>
 
-<p>Constant json null value. Use assignment to <code>jsoncons::null_type()</code> instead.</p>
+<p>Constant json null value. Use assignment to <code>jsoncons::null_type()</code> or <code>json::null_type()</code> instead.</p>
 
 <pre><code>an_object
 </code></pre>
@@ -1001,7 +1011,7 @@ x4=San Francisco
 <h3>Nulls</h3>
 
 <pre><code>json obj;
-obj["field1"] = jsoncons::null_type();
+obj["field1"] = json::null_type();
 std::cout &lt;&lt; obj &lt;&lt; std::endl;
 </code></pre>
 

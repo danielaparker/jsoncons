@@ -563,7 +563,7 @@ obj["accept_waiver_of_liability"] = true;
 
 // An array value with four elements
 json arr = json::make_array();
-arr.add(jsoncons::null_type());
+arr.add(json::null_type());
 arr.add(flag);
 arr.add(number);
 arr.add(obj);
