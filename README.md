@@ -36,12 +36,14 @@ jsoncons supports alternative ways for constructing  `null`, `object`, and `arra
 null:
 
     json a = jsoncons::null_type();
-    json b(json::null);  // From static data member prototype
+    json b = json::null_type();  // Using alias
+    json c(json::null);  // From static data member prototype
 
 object:
 
     json a(); // Default is empty object
-    json b(json::an_object);  // From static data member prototype
+    json b = json::object();
+    json c(json::an_object);  // From static data member prototype
 
 array:
 
@@ -172,7 +174,7 @@ Adding some members,
     image_sizing["resize_unit"] =  "pixels";  // a string
     image_sizing["resize_what"] =  "long_edge";  // a string
     image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = jsoncons::null_type();  // a null
+    image_sizing["dimension2"] = json::null_type();  // a null
 
 Serializing it, this time with pretty print,
 

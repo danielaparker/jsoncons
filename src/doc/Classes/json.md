@@ -21,9 +21,14 @@ these always use the default allocators.
     any
 [any](json%20any) can contain any value that supports copy construction and assignment.
 
+    null_type
+An alias for `jsoncons::null_type`
+
     object
+Object type
 
     array
+Array type
 
 Type tags that can be used with `is<T>` and `as<T>`
 
@@ -174,7 +179,7 @@ Returns `true` if the json value is of string type, `false` otherwise.
     is<bool>
 Returns `true` if the json value is of boolean type, `false` otherwise.  
 
-    is<null_type>
+    is<json::null_type>
 Returns `true` if the json value is null, `false` otherwise.  
 
     is<json::any>
@@ -342,7 +347,7 @@ Deprecated:
 ### Member constants
 
     null
-Constant json null value. Use assignment to `jsoncons::null_type()` instead.
+Constant json null value. Use assignment to `jsoncons::null_type()` or `json::null_type()` instead.
 
     an_object
 Empty constant json array value. Use the default constructor `json()` instead.
@@ -381,7 +386,7 @@ The output is
 ### Nulls
 
     json obj;
-    obj["field1"] = jsoncons::null_type();
+    obj["field1"] = json::null_type();
     std::cout << obj << std::endl;
 
 The output is 
