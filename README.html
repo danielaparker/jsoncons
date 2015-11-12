@@ -511,23 +511,23 @@ vertical-align:1px;
 
 <p>null:</p>
 
-<pre><code>json a = jsoncons::null_type();
-json b = json::null_type();  // Using alias
-json c(json::null);  // From static data member prototype
+<pre><code>json a = jsoncons::null_type();  // Using type constructor
+json b = json::null_type();      // Using alias
+json c(json::null);              // From static data member prototype
 </code></pre>
 
 <p>object:</p>
 
-<pre><code>json a(); // Default is empty object
-json b = json::object();
+<pre><code>json a();                 // Default is empty object
+json b = json::object();  // Using type constructor
 json c(json::an_object);  // From static data member prototype
 </code></pre>
 
 <p>array:</p>
 
-<pre><code>json a = json::array();
-json b = json::make_array();
-json c(json::an_array);  // From static data member prototype
+<pre><code>json a = json::array();      // Using type constructor
+json b = json::make_array(); // Using factory method
+json c(json::an_array);      // From static data member prototype
 </code></pre>
 
 <p>Since C++ has possible order issues with static data memebrs, the jsoncons examples and documentation have been changed to consistently use the other ways, and <code>json::null</code>, <code>json::an_object</code> and <code>json::an_array</code> have been, while still usable, deprecated.</p>
@@ -685,9 +685,9 @@ image_sizing["dimension2"] = json::null_type();  // a null
 }
 </code></pre>
 
-<p>To construct a json array, use the copy constructor with a prototype json array:</p>
+<p>To construct a json array, assign an array object:</p>
 
-<pre><code>json image_formats= json::array();
+<pre><code>json image_formats = json::array();
 </code></pre>
 
 <p>Adding some elements,</p>
