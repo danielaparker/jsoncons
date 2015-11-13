@@ -56,8 +56,6 @@ public:
     {
         return false;
     }
-    static T as(const basic_json<Char,Alloc>& val);
-    static void assign(basic_json<Char,Alloc>& lhs, T rhs);
 };
 
 namespace value_types
@@ -1073,11 +1071,6 @@ public:
             return val_.template as<T>();
         }
 
-        Char as_char() const
-        {
-            return val_.as_char();
-        }
-
         any& any_value()
         {
             return val_.any_value();
@@ -1394,11 +1387,6 @@ public:
         T as() const
         {
             return val_.at(name_).template as<T>();
-        }
-
-        Char as_char() const
-        {
-            return val_.at(name_).as_char();
         }
 
         any& any_value()
@@ -1951,8 +1939,6 @@ public:
     std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
 
     const Char* as_c_str() const;
-
-    Char as_char() const;
 
     any& any_value();
 

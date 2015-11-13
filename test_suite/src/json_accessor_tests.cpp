@@ -216,13 +216,13 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_string)
 
 BOOST_AUTO_TEST_CASE(test_as_vector_of_char)
 {
-    std::string s("[\"H\",\"W\"]");
+    std::string s("[20,30]");
     json val = json::parse_string(s);
 
     std::vector<char> v = val.as<std::vector<char>>(); 
     BOOST_CHECK(v.size() == 2);
-    BOOST_CHECK(v[0] == 'H');
-    BOOST_CHECK(v[1] == 'W');
+    BOOST_CHECK(v[0] == 20);
+    BOOST_CHECK(v[1] == 30);
 }
 
 BOOST_AUTO_TEST_CASE(test_as_vector_of_bool)
