@@ -160,6 +160,10 @@ Returns `true` if a json object has a member named `name`, otherwise `false`.
     bool is() const
 Returns `true` if json value has type `T`, `false` otherwise.  
 
+    is<char>
+    is<signed char>
+    is<unsigned char>
+    is<wchar_t>
     is<short>
     is<unsigned short> 
     is<int> 
@@ -241,6 +245,10 @@ Returns `true` or `false` if value has a boolean type, otherwise throws.
     as<double>
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
 
+    as<char>
+    as<signed char>
+    as<unsigned char>
+    as<wchar_t>
     as<short>
     as<unsigned short> 
     as<int> 
