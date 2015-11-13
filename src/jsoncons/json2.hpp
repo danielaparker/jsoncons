@@ -1015,30 +1015,6 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
 }
 
 template<typename Char, typename Alloc>
-Char basic_json<Char, Alloc>::as_char() const
-{
-    switch (var_.type_)
-    {
-    case value_types::small_string_t:
-        return var_.small_string_length_ > 0 ? var_.value_.small_string_value_[0] : '\0';
-    case value_types::string_t:
-        return var_.value_.string_value_->length > 0 ? var_.value_.string_value_->p[0] : '\0';
-    case value_types::longlong_t:
-        return static_cast<Char>(var_.value_.si_value_);
-    case value_types::ulonglong_t:
-        return static_cast<Char>(var_.value_.ui_value_);
-    case value_types::double_t:
-        return static_cast<Char>(var_.value_.float_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    case value_types::null_t:
-        return 0;
-    default:
-        JSONCONS_THROW_EXCEPTION("Cannot convert to char");
-    }
-}
-
-template<typename Char, typename Alloc>
 std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char, Alloc>& o)
 {
     o.to_stream(os);
