@@ -101,20 +101,118 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, Char>
+class json_type_traits<Char, Alloc, char>
 {
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.is_string() && rhs.as_string().size() == 1;
+        if (rhs.is_longlong())
+        {
+            return rhs.as_longlong() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_ulonglong())
+        {
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
     }
-    static Char as(const basic_json<Char, Alloc>& rhs)
+    static char as(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.as_char();
+        return static_cast<char>(rhs.as_longlong());
     }
-    static void assign(basic_json<Char, Alloc>& lhs, Char ch)
+    static void assign(basic_json<Char, Alloc>& lhs, char ch)
     {
-        lhs.assign_string(&ch,1);
+        lhs.assign_longlong(ch);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, unsigned char>
+{
+public:
+    static bool is(const basic_json<Char, Alloc>& rhs)
+    {
+        if (rhs.is_longlong())
+        {
+            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_ulonglong())
+        {
+            return rhs.as_ulonglong() <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static unsigned char as(const basic_json<Char, Alloc>& rhs)
+    {
+        return static_cast<unsigned char>(rhs.as_ulonglong());
+    }
+    static void assign(basic_json<Char, Alloc>& lhs, unsigned char ch)
+    {
+        lhs.assign_ulonglong(ch);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, signed char>
+{
+public:
+    static bool is(const basic_json<Char, Alloc>& rhs)
+    {
+        if (rhs.is_longlong())
+        {
+            return rhs.as_longlong() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_ulonglong())
+        {
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static signed char as(const basic_json<Char, Alloc>& rhs)
+    {
+        return static_cast<signed char>(rhs.as_longlong());
+    }
+    static void assign(basic_json<Char, Alloc>& lhs, signed char ch)
+    {
+        lhs.assign_longlong(ch);
+    }
+};
+
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, wchar_t>
+{
+public:
+    static bool is(const basic_json<Char, Alloc>& rhs)
+    {
+        if (rhs.is_longlong())
+        {
+            return rhs.as_longlong() >= std::numeric_limits<wchar_t>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_ulonglong())
+        {
+            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static wchar_t as(const basic_json<Char, Alloc>& rhs)
+    {
+        return static_cast<wchar_t>(rhs.as_longlong());
+    }
+    static void assign(basic_json<Char, Alloc>& lhs, wchar_t ch)
+    {
+        lhs.assign_longlong(ch);
     }
 };
 
@@ -214,7 +312,7 @@ public:
     }
     static short as(const basic_json<Char, Alloc>& rhs)
     {
-        return (short)rhs.as_int();
+        return static_cast<short>(rhs.as_int());
     }
     static void assign(basic_json<Char, Alloc>& lhs, short rhs)
     {
