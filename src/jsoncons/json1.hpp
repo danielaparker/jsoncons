@@ -1663,27 +1663,6 @@ public:
 
     static basic_json parse_file(const std::string& s, basic_parse_error_handler<Char>& err_handler);
 
-    static basic_json<Char,Alloc> make_float(double val)
-    {
-        basic_json<Char,Alloc> temp(value_types::double_t);
-        temp.var_.value_.float_value_ = val;
-        return temp;
-    }
-
-    static basic_json<Char,Alloc> make_integer(long long val)
-    {
-        basic_json<Char,Alloc> temp(value_types::longlong_t);
-        temp.var_.value_.si_value_ = val;
-        return temp;
-    }
-
-    static basic_json<Char,Alloc> make_unsigned(unsigned long long val)
-    {
-        basic_json<Char,Alloc> temp(value_types::ulonglong_t);
-        temp.var_.value_.ui_value_ = val;
-        return temp;
-    }
-
     static basic_json<Char,Alloc> make_array()
     {
         return typename basic_json<Char,Alloc>::array();
