@@ -694,7 +694,11 @@ bool is() const
 
 <p>Returns <code>true</code> if json value has type <code>T</code>, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;short&gt;
+<pre><code>is&lt;char&gt;
+is&lt;signed char&gt;
+is&lt;unsigned char&gt;
+is&lt;wchar_t&gt;
+is&lt;short&gt;
 is&lt;unsigned short&gt; 
 is&lt;int&gt; 
 is&lt;unsigned int&gt; 
@@ -815,7 +819,11 @@ T as() const
 
 <p>If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is <code>null</code>, returns <code>NaN</code>, otherwise throws.</p>
 
-<pre><code>as&lt;short&gt;
+<pre><code>as&lt;char&gt;
+as&lt;signed char&gt;
+as&lt;unsigned char&gt;
+as&lt;wchar_t&gt;
+as&lt;short&gt;
 as&lt;unsigned short&gt; 
 as&lt;int&gt; 
 as&lt;unsigned int&gt; 
