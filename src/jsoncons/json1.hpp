@@ -238,10 +238,10 @@ public:
                 value_.string_value_ = make_string_holder(var.value_.string_value_);
                 break;
             case value_types::array_t:
-                value_.array_ = var.value_.array_->clone();
+                value_.array_ = new json_array<Char,Alloc>(*(var.value_.array_));
                 break;
             case value_types::object_t:
-                value_.object_ = var.value_.object_->clone();
+                value_.object_ = new json_object<Char,Alloc>(*(var.value_.object_));
                 break;
             case value_types::any_t:
                 value_.any_value_ = new any(*(var.value_.any_value_));
@@ -255,27 +255,53 @@ public:
         variant(const json_object<Char,Alloc>& val)
             : type_(value_types::object_t)
         {
-            value_.object_ = val.clone();
+            value_.object_ = new json_object<Char,Alloc>(val);
+        }
+
+        variant(json_object<Char,Alloc>&& val)
+            : type_(value_types::object_t)
+        {
+            value_.object_ = new json_object<Char,Alloc>(val);
         }
 
         variant(const json_array<Char,Alloc>& val)
             : type_(value_types::array_t)
         {
-            value_.array_ = val.clone();
+            value_.array_ = new json_array<Char,Alloc>(val);
+        }
+
+        variant(json_array<Char,Alloc>&& val)
+            : type_(value_types::array_t)
+        {
+            value_.array_ = new json_array<Char,Alloc>(val);
         }
 
         void assign(const json_object<Char,Alloc>& val)
         {
             destroy();
             type_ = value_types::object_t;
-            value_.object_ = val.clone();
+            value_.object_ = new json_object<Char,Alloc>(val);
+        }
+
+        void assign(json_object<Char,Alloc>&& val)
+        {
+            destroy();
+            type_ = value_types::object_t;
+            value_.object_ = new json_object<Char,Alloc>(val);
         }
 
         void assign(const json_array<Char,Alloc>& val)
         {
             destroy();
             type_ = value_types::array_t;
-            value_.array_ = val.clone();
+            value_.array_ = new json_array<Char,Alloc>(val);
+        }
+
+        void assign(json_array<Char,Alloc>&& val)
+        {
+            destroy();
+            type_ = value_types::array_t;
+            value_.array_ = new json_array<Char,Alloc>(val);
         }
 
         variant(value_types::value_types_t type, size_t size)
@@ -1729,8 +1755,23 @@ public:
     {
     }
 
-    basic_json(basic_json&& other)
+    basic_json(basic_json<Char,Alloc>&& other)
         : var_(std::move(other.var_))
+    {
+    }
+
+    basic_json(const json_array<Char, Alloc>& val)
+        : var_(val)
+    {
+    }
+
+    basic_json(json_array<Char,Alloc>&& other)
+        : var_(other)
+    {
+    }
+
+    basic_json(json_object<Char,Alloc>&& other)
+        : var_(other)
     {
     }
 

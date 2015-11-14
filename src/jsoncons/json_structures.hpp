@@ -60,6 +60,16 @@ public:
     {
     }
 
+    json_array(const json_array& val)
+        : elements_(val.elements_)
+    {
+    }
+
+    json_array(json_array&& val)
+    {
+        elements_.swap(val.elements_);
+    }
+
     json_array(size_t n)
         : elements_(n)
     {
@@ -79,11 +89,6 @@ public:
     json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)
     {
-    }
-
-    json_array<Char,Alloc>* clone() const
-    {
-        return new json_array(elements_);
     }
 
     size_t size() const {return elements_.size();}
@@ -153,11 +158,6 @@ public:
             }
         }
         return true;
-    }
-
-    json_array(const json_array<Char,Alloc>& val)
-        : elements_(val.elements_)
-    {
     }
 private:
     std::vector<basic_json<Char,Alloc>> elements_;
@@ -310,6 +310,16 @@ public:
     {
     }
 
+    json_object(const json_object& val)
+        : members_(val.members_)
+    {
+    }
+
+    json_object(json_object&& val)
+    {
+        members_.swap(val.members_);
+    }
+
     json_object(size_t n)
         : members_(n)
     {
@@ -318,11 +328,6 @@ public:
     json_object(std::vector<member_type> members)
         : members_(members)
     {
-    }
-
-    json_object<Char,Alloc>* clone() const
-    {
-        return new json_object(members_);
     }
 
     size_t size() const {return members_.size();}
@@ -460,11 +465,6 @@ public:
             }
         }
         return true;
-    }
-
-    json_object(const json_object<Char,Alloc>& val)
-        : members_(val.members_)
-    {
     }
 
 private:
