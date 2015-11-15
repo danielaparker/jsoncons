@@ -155,7 +155,7 @@ public:
         {
             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
         }
-        state_ = states::start;
+        state_ = states::expect_value;
         prev_char_ = 0;
         line_ = 1;
         column_ = 1;
@@ -1367,6 +1367,10 @@ private:
         case modes::object_member_value:
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
             state_ = states::expect_comma_or_end;
+            break;
+        case modes::done:
+            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+            state_ = states::done;
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
