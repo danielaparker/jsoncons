@@ -120,7 +120,7 @@ private:
             {
                 stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
-            else
+            else if (stack_[top_-1].value.is_array()) 
             {
                 stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
             }
@@ -145,7 +145,7 @@ private:
             {
                 stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
-            else
+            else if (stack_[top_-1].value.is_array()) 
             {
                 stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
             }
@@ -164,11 +164,15 @@ private:
 
     void do_string_value(const Char* p, size_t length, const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_string(p,length);
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(p,length));
         } 
-        else 
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(basic_json<Char,Alloc>(p,length));
         }
@@ -176,11 +180,15 @@ private:
 
     void do_longlong_value(long long value, const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_longlong(value);
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
-        else
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -188,11 +196,15 @@ private:
 
     void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_ulonglong(value);
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
-        else
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -200,11 +212,15 @@ private:
 
     void do_double_value(double value, const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_double(value);
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
-        else
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -212,11 +228,15 @@ private:
 
     void do_bool_value(bool value, const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_bool(value);
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
-        else
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -224,11 +244,15 @@ private:
 
     void do_null_value(const basic_parsing_context<Char>&) override
     {
-        if (stack_[top_].value.is_object())
+        if (top_ == -1)
+        {
+            result_.assign_null();
+        }
+        else if (stack_[top_].value.is_object())
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),std::move(basic_json<Char,Alloc>(null_type())));
         } 
-        else
+        else if (stack_[top_].value.is_array()) 
         {
             stack_[top_].value.array_value().push_back(basic_json<Char,Alloc>::null);
         }

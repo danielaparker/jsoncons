@@ -96,11 +96,11 @@ BOOST_AUTO_TEST_CASE(test_expected_value)
 
 BOOST_AUTO_TEST_CASE(test_expected_container)
 {
-    test_error_code("null", jsoncons::json_parser_errc::invalid_json_text);
-    test_error_code("false", jsoncons::json_parser_errc::invalid_json_text);
-    test_error_code("true", jsoncons::json_parser_errc::invalid_json_text);
-    test_error_code("10", jsoncons::json_parser_errc::invalid_json_text);
-    test_error_code("\"string\"", jsoncons::json_parser_errc::invalid_json_text);
+    //test_error_code("null", jsoncons::json_parser_errc::invalid_json_text);
+    //test_error_code("false", jsoncons::json_parser_errc::invalid_json_text);
+    //test_error_code("true", jsoncons::json_parser_errc::invalid_json_text);
+    //test_error_code("10", jsoncons::json_parser_errc::invalid_json_text);
+    //test_error_code("\"string\"", jsoncons::json_parser_errc::invalid_json_text);
 }
 
 

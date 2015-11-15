@@ -41,7 +41,8 @@ BOOST_AUTO_TEST_CASE(test_fail1)
     {
         err = e.code().value();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_json_text);
+    //BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_json_text);
+    // Should pass
 }
 
 BOOST_AUTO_TEST_CASE(test_fail2)
