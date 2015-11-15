@@ -2221,36 +2221,44 @@ public:
         return is_numeric();
     }
 
-    void begin_bulk_insert()
+    array& array_value() 
+    {
+		switch (var_.type_)
+		{
+        case value_types::array_t:
+            return *(var_.value_.array_);
+        default:
+            JSONCONS_THROW_EXCEPTION("Bad array cast");
+            break;
+        }
+    }
+
+    const array& array_value() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            return *(var_.value_.array_);
+        default:
+            JSONCONS_THROW_EXCEPTION("Bad array cast");
+            break;
+        }
+    }
+
+    object& object_value()
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_ = new json_object<Char,Alloc>();
+            return *(var_.value_.object_);
         case value_types::object_t:
-            break;
+            return *(var_.value_.object_);
         default:
-            {
-                JSONCONS_THROW_EXCEPTION("Not an object.");
-            }
+            JSONCONS_THROW_EXCEPTION("Bad object cast");
+            break;
         }
-    }
-
-    void insert(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
-    {
-        var_.value_.object_->push_back(std::move(name),std::move(value));
-    }
-
-    void end_bulk_insert()
-    {
-        var_.value_.object_->sort_members();
-    }
-
-    const array& array_value() const
-    {
-        JSONCONS_ASSERT(is_array());
-        return *(var_.value_.array_);
     }
 
     const object& object_value() const
