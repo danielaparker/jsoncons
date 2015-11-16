@@ -77,7 +77,7 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 
 ### Constructors
 
-    explicit json()
+    json()
 Constructs an empty json object. 
 
     json(const json& val)
@@ -87,7 +87,7 @@ Constructs a copy of val
 Acquires the contents of val, leaving val a `null` value
 
     template <typename T>
-    explicit json(T val)
+    json(T val)
 Constructs a `json` value for types supported in `json_type_traits`
 
     template <class InputIterator>

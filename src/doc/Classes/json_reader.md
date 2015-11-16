@@ -36,13 +36,19 @@ Throws if there are any unconsumed non-whitespace characters in the input.
 
     void buffer_capacity(size_t capacity)
 
-    size_t max_depth() const
+    size_t max_nesting_depth() const
 By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
-    void max_depth(size_t depth)
+    void max_nesting_depth(size_t depth)
 
 ### Deprecated methods
 
     void read()
 Use `read_next` instead. 
+
+    size_t max_depth() const
+Use `max_nesting_depth()` instead
+
+    void max_depth(size_t depth)
+Use `max_nesting_depth(size_t depth)` instead
 

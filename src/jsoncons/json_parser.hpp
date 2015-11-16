@@ -130,14 +130,14 @@ public:
     {
     }
 
-    size_t max_depth() const
+    size_t max_nesting_depth() const
     {
         return static_cast<size_t>(max_depth_);
     }
 
-    void max_depth(size_t max_depth)
+    void max_nesting_depth(size_t max_nesting_depth)
     {
-        max_depth_ = static_cast<int>(std::min(max_depth,static_cast<size_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP())));
+        max_depth_ = static_cast<int>(std::min(max_nesting_depth,static_cast<size_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP())));
         if (depth_ > max_depth_)
         {
             depth_ = max_depth_;
@@ -197,6 +197,7 @@ public:
                 break;
             }
 
+handle_state:
             switch (state_)
             {
             case states::start: 
@@ -208,7 +209,8 @@ public:
                     case '{':
                     case '[':
                         handler_->begin_json();
-                        goto expect_value;
+                        state_ = states::expect_value;
+                        goto handle_state;
                         break;
                     case '\"':
                     case '-':
@@ -220,7 +222,7 @@ public:
                         handler_->begin_json();
                         flip(modes::done, modes::start);
                         state_ = states::expect_value;
-                        goto expect_value;
+                        goto handle_state;
                         break;
                     case '/':
                         saved_state_ = state_;
@@ -374,7 +376,6 @@ public:
                 }
                 break;
             case states::expect_value: 
-expect_value:
                 {
                     switch (curr_char)
                     {
@@ -1493,8 +1494,8 @@ private:
             state_ = states::expect_comma_or_end;
             break;
         case modes::start:
-            flip(modes::start,modes::done);
             handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+            flip(modes::start,modes::done);
             state_ = states::done;
             handler_->end_json();
             break;
