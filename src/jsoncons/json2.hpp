@@ -463,7 +463,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
     basic_json<Char, Alloc> a(basic_json<Char, Alloc>(json_array<Char,Alloc>()));
-    a.resize_array(m);
+    a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
         a[i] = basic_json<Char, Alloc>::make_2d_array(n, k);
@@ -774,7 +774,7 @@ void basic_json<Char, Alloc>::reserve(size_t n)
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::resize_array(size_t n)
+void basic_json<Char, Alloc>::resize(size_t n)
 {
     switch (var_.type_)
     {
@@ -786,7 +786,7 @@ void basic_json<Char, Alloc>::resize_array(size_t n)
 
 template<typename Char, typename Alloc>
 template<typename T>
-void basic_json<Char, Alloc>::resize_array(size_t n, T val)
+void basic_json<Char, Alloc>::resize(size_t n, T val)
 {
     basic_json<Char, Alloc> j;
     j = val;

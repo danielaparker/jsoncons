@@ -145,10 +145,10 @@ Returns the size of the storage space currently allocated for a json object or a
     void reserve(size_t n)
 Increases the capacity of a json object or array to allow at least `n` members or elements. 
 
-    void resize_array(size_t n)
+    void resize(size_t n)
 Resizes a json array so that it contains `n` elements. 
 
-    void resize_array(size_t n, const json& val)
+    void resize(size_t n, const json& val)
 Resizes a json array so that it contains `n` elements that are initialized to `val`. 
 
 ### Accessors
@@ -351,6 +351,12 @@ Inserts json value into stream using the specified [output_format](output_format
 Exchanges the values of `a` and `b`
 
 Deprecated:
+
+    void resize_array(size_t n)
+Use `resize` instead. 
+
+    void resize_array(size_t n, const json& val)
+Use `resize` instead. 
 
 ### Member constants
 

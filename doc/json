@@ -671,12 +671,12 @@ provided this value is a json array, otherwise throws a <code>json_exception</co
 
 <p>Increases the capacity of a json object or array to allow at least <code>n</code> members or elements. </p>
 
-<pre><code>void resize_array(size_t n)
+<pre><code>void resize(size_t n)
 </code></pre>
 
 <p>Resizes a json array so that it contains <code>n</code> elements. </p>
 
-<pre><code>void resize_array(size_t n, const json&amp; val)
+<pre><code>void resize(size_t n, const json&amp; val)
 </code></pre>
 
 <p>Resizes a json array so that it contains <code>n</code> elements that are initialized to <code>val</code>. </p>
@@ -969,6 +969,16 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
 <p>Deprecated:</p>
+
+<pre><code>void resize_array(size_t n)
+</code></pre>
+
+<p>Use <code>resize</code> instead. </p>
+
+<pre><code>void resize_array(size_t n, const json&amp; val)
+</code></pre>
+
+<p>Use <code>resize</code> instead. </p>
 
 <h3>Member constants</h3>
 
