@@ -91,7 +91,7 @@ public:
     }
     static const Char* as(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.value.as_c_str();
+        return rhs.value.as_cstring();
     }
     static void assign(basic_json<Char, Alloc>& lhs, const Char *rhs)
     {

@@ -1958,7 +1958,7 @@ public:
 
     std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
 
-    const Char* as_c_str() const;
+    const Char* as_cstring() const;
 
     any& any_value();
 
@@ -2150,22 +2150,6 @@ public:
         var_.assign(rhs);
     }
     void assign_ulonglong(unsigned long long rhs)
-    {
-        var_.assign(rhs);
-    }
-
-    // Deprecated
-    void assign_float(double rhs)
-    {
-        var_.assign(rhs);
-    }
-    // Deprecated
-    void assign_integer(long long rhs)
-    {
-        var_.assign(rhs);
-    }
-    // Deprecated
-    void assign_unsigned(unsigned long long rhs)
     {
         var_.assign(rhs);
     }
