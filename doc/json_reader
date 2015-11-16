@@ -518,12 +518,12 @@ You must ensure that the input stream and input handler exist as long as does <c
 
 void buffer_capacity(size_t capacity)
 
-size_t max_depth() const
+size_t max_nesting_depth() const
 </code></pre>
 
 <p>By default <code>jsoncons</code> can read a <code>JSON</code> text of arbitrarily large depth.</p>
 
-<pre><code>void max_depth(size_t depth)
+<pre><code>void max_nesting_depth(size_t depth)
 </code></pre>
 
 <h3>Deprecated methods</h3>
@@ -532,6 +532,16 @@ size_t max_depth() const
 </code></pre>
 
 <p>Use <code>read_next</code> instead. </p>
+
+<pre><code>size_t max_depth() const
+</code></pre>
+
+<p>Use <code>max_nesting_depth()</code> instead</p>
+
+<pre><code>void max_depth(size_t depth)
+</code></pre>
+
+<p>Use <code>max_nesting_depth(size_t depth)</code> instead</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
