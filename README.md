@@ -23,7 +23,7 @@ The library has a number of features, which are listed below:
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
-- Handles JSON texts of arbitrarily large depth, a limit can be set if desired
+- Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 
 ## What's new in Master
 
