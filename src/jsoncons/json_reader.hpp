@@ -66,14 +66,14 @@ public:
         buffer_.resize(buffer_capacity_);
     }
 
-    size_t max_depth() const
+    size_t max_nesting_depth() const
     {
-        return parser_.max_depth();
+        return parser_.max_nesting_depth();
     }
 
-    void max_depth(size_t depth)
+    void max_nesting_depth(size_t depth)
     {
-        parser_.max_depth(depth);
+        parser_.max_nesting_depth(depth);
     }
 
     void read_next()
@@ -145,6 +145,16 @@ public:
     void read()
     {
         read_next();
+    }
+
+    size_t max_depth() const
+    {
+        return parser_.max_nesting_depth();
+    }
+
+    void max_depth(size_t depth)
+    {
+        parser_.max_nesting_depth(depth);
     }
 private:
     basic_json_parser<Char> parser_;

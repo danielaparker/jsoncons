@@ -22,14 +22,16 @@ The library has a number of features, which are listed below:
 - Allows extensions to the types accepted by the json class accessors and modifiers
 - Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
-- 100 percent pass of test suite files from http://www.json.org/JSON_checker/
+- Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth, a limit can be set if desired
 
 ## What's new in Master
 
+- Following [RFC7159](http://www.ietf.org/rfc/rfc7159.txt), `json_parser` now accepts any JSON value, removing the constraint that it be an object or array.
 - The member `json_type_traits` member functions `is`, `as`, and `assign` have been changed to static functions. if you have implemented your own type specializations, you will also have to change your `is`, `as` and `assign` functions to be static.
-- Removed json deprecated functions custom_data, set_custom_data, add_custom_data
+- Removed json deprecated functions `custom_data`, `set_custom_data`, `add_custom_data`
 - `json` constructor is now templated, so constructors now allow extended types
+- `json_reader` member function `max_depth` has been renamed to `max_nesting_depth`, the old name is still supported. 
 
 jsoncons supports alternative ways for constructing  `null`, `object`, and `array` values.
 

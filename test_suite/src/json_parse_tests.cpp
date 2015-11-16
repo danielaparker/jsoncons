@@ -109,6 +109,15 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
     val == json("\"string\"");
 }
 
+BOOST_AUTO_TEST_CASE(test_parse_empty_structures)
+{
+    json val;
+    BOOST_CHECK_NO_THROW((val=json::parse_string("{}")));
+    BOOST_CHECK_NO_THROW((val=json::parse_string("[]")));
+    BOOST_CHECK_NO_THROW((val=json::parse_string("{\"object\":{},\"array\":[]}")));
+    BOOST_CHECK_NO_THROW((val=json::parse_string("[[],{}]")));
+}
+
 BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
 {
     json val;
