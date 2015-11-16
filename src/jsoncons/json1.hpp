@@ -1332,6 +1332,17 @@ public:
             val_.at(name_).reserve(n);
         }
 
+        void resize(size_t n)
+        {
+            val_.at(name_).resize(n);
+        }
+
+        template <typename T>
+        void resize(size_t n, T val)
+        {
+            val_.at(name_).resize(n,val);
+        }
+
         void resize_array(size_t n)
         {
             val_.at(name_).resize_array(n);
@@ -1697,7 +1708,7 @@ public:
     static basic_json<Char,Alloc> make_array(size_t n)
     {
         basic_json<Char,Alloc> val = make_array();
-        val.resize_array(n);
+        val.resize(n);
         return val;
     }
 
@@ -1705,7 +1716,7 @@ public:
     static basic_json<Char,Alloc> make_array(size_t n, T val)
     {
         basic_json<Char,Alloc> a = make_array();
-        a.resize_array(n,val);
+        a.resize(n,val);
         return a;
     }
 
@@ -1925,10 +1936,21 @@ public:
 
     void reserve(size_t n);
 
-    void resize_array(size_t n);
+    void resize(size_t n);
+
+    void resize_array(size_t n)
+    {
+        resize(n);
+    }
 
     template <typename T>
-    void resize_array(size_t n, T val);
+    void resize(size_t n, T val);
+
+    template <typename T>
+    void resize_array(size_t n, T val)
+    {
+        resize(n,val);
+    }
 
     template<typename T>
     T as() const

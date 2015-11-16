@@ -27,11 +27,12 @@ The library has a number of features, which are listed below:
 
 ## What's new in Master
 
+- `json` constructor is now templated, so constructors now accept extended types
 - Following [RFC7159](http://www.ietf.org/rfc/rfc7159.txt), `json_parser` now accepts any JSON value, removing the constraint that it be an object or array.
 - The member `json_type_traits` member functions `is`, `as`, and `assign` have been changed to static functions. if you have implemented your own type specializations, you will also have to change your `is`, `as` and `assign` functions to be static.
 - Removed json deprecated functions `custom_data`, `set_custom_data`, `add_custom_data`
-- `json` constructor is now templated, so constructors now allow extended types
-- `json_reader` member function `max_depth` has been renamed to `max_nesting_depth`, the old name is still supported. 
+- `json_reader` member function `max_depth` has been renamed to `max_nesting_depth`, the former name is still supported. 
+- `json` member function `resize_array` has been renamed to `resize`, the former name is still supported. 
 
 jsoncons supports alternative ways for constructing  `null`, `object`, and `array` values.
 
