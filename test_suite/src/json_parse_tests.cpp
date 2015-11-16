@@ -23,12 +23,10 @@ using std::string;
 
 void test_error_code(const std::string& text, int ec)
 {
-    std::istringstream is(text);
-	json_reader reader(is,jsoncons::empty_json_input_handler::instance());
 	try
 	{
-		reader.read_next();
-		BOOST_FAIL("Must throw");
+		json::parse_string(text);
+		BOOST_FAIL(text);
 	}
 	catch (const json_parse_exception& e)
 	{
@@ -89,18 +87,45 @@ BOOST_AUTO_TEST_CASE(test_expected_name)
 
 BOOST_AUTO_TEST_CASE(test_expected_value)
 {
-	test_error_code("[tru]", jsoncons::json_parser_errc::expected_value);
-    test_error_code("[fa]", jsoncons::json_parser_errc::expected_value);
-    test_error_code("[n]", jsoncons::json_parser_errc::expected_value);
+	test_error_code("[tru]", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("[fa]", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("[n]", jsoncons::json_parser_errc::invalid_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_expected_container)
+BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
 {
-    //test_error_code("null", jsoncons::json_parser_errc::invalid_json_text);
-    //test_error_code("false", jsoncons::json_parser_errc::invalid_json_text);
-    //test_error_code("true", jsoncons::json_parser_errc::invalid_json_text);
-    //test_error_code("10", jsoncons::json_parser_errc::invalid_json_text);
-    //test_error_code("\"string\"", jsoncons::json_parser_errc::invalid_json_text);
+    json val;
+    BOOST_CHECK_NO_THROW((val=json::parse_string("null")));
+    val == json::null_type();
+    BOOST_CHECK_NO_THROW((val=json::parse_string("false")));
+    val == json(false);
+    BOOST_CHECK_NO_THROW((val=json::parse_string("true")));
+    val == json(true);
+    BOOST_CHECK_NO_THROW((val=json::parse_string("10")));
+    val == json(10);
+    BOOST_CHECK_NO_THROW((val=json::parse_string("1.999")));
+    val == json(1.999);
+    BOOST_CHECK_NO_THROW((val=json::parse_string("\"string\"")));
+    val == json("\"string\"");
+}
+
+BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
+{
+    json val;
+    test_error_code("null {}", jsoncons::json_parser_errc::extra_character);
+    test_error_code("n ", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("nu ", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("nul ", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("false {}", jsoncons::json_parser_errc::extra_character);
+    test_error_code("fals ", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("true []", jsoncons::json_parser_errc::extra_character);
+    test_error_code("tru ", jsoncons::json_parser_errc::invalid_value);
+    test_error_code("10 {}", jsoncons::json_parser_errc::extra_character);
+    test_error_code("1a ", jsoncons::json_parser_errc::invalid_number);
+    test_error_code("1.999 []", jsoncons::json_parser_errc::extra_character);
+    test_error_code("1e0-1", jsoncons::json_parser_errc::invalid_number);
+    test_error_code("\"string\"{}", jsoncons::json_parser_errc::extra_character);
+    test_error_code("\"string\"[]", jsoncons::json_parser_errc::extra_character);
 }
 
 

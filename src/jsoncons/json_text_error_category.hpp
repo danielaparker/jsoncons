@@ -30,6 +30,7 @@ namespace json_parser_errc
         unexpected_end_of_array,
         expected_name,
         expected_value,
+        invalid_value,
         expected_colon,
         illegal_control_character,
         illegal_escaped_character,
@@ -79,6 +80,8 @@ public:
             return "Expected object member name";
         case json_parser_errc::expected_value:
             return "Expected value";
+        case json_parser_errc::invalid_value:
+            return "Invalid value";
         case json_parser_errc::expected_colon:
             return "Expected name separator ':'";
         case json_parser_errc::illegal_control_character:

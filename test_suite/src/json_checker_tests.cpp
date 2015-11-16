@@ -521,7 +521,7 @@ BOOST_AUTO_TEST_CASE(test_fail23)
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail24)

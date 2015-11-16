@@ -985,7 +985,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
 }
 
 template<typename Char, typename Alloc>
-const Char* basic_json<Char, Alloc>::as_c_str() const
+const Char* basic_json<Char, Alloc>::as_cstring() const
 {
     switch (var_.type_)
     {
