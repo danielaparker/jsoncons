@@ -2338,7 +2338,7 @@ private:
         }
     };
 
-public:
+private:
 	variant var_;
 };
 

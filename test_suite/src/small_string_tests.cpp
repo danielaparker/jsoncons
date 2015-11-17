@@ -33,17 +33,14 @@ BOOST_AUTO_TEST_CASE(test_small_string)
 {
 	json s("ABCD");
 	BOOST_CHECK(s.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(s.var_.small_string_length_ == 4);
-	BOOST_CHECK(std::string(s.var_.value_.small_string_value_,s.var_.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(s.as<std::string>() == std::string("ABCD"));
 
 	json t(s);
 	BOOST_CHECK(t.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(t.var_.small_string_length_ == 4);
-	BOOST_CHECK(std::string(t.var_.value_.small_string_value_,t.var_.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(t.as<std::string>() == std::string("ABCD"));
 
 	json q;
 	q = s;
 	BOOST_CHECK(q.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(q.var_.small_string_length_ == 4);
-	BOOST_CHECK(std::string(q.var_.value_.small_string_value_,q.var_.small_string_length_) == std::string("ABCD"));
+	BOOST_CHECK(q.as<std::string>() == std::string("ABCD"));
 }
