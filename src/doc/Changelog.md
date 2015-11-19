@@ -1,3 +1,35 @@
+0.98.2 Release
+--------------
+
+- `json` constructor is now templated, so constructors now accept extended types
+- Following [RFC7159](http://www.ietf.org/rfc/rfc7159.txt), `json_parser` now accepts any JSON value, removing the constraint that it be an object or array.
+- The member `json_type_traits` member functions `is`, `as`, and `assign` have been changed to static functions. if you have implemented your own type specializations, you will also have to change your `is`, `as` and `assign` functions to be static.
+- Removed json deprecated functions `custom_data`, `set_custom_data`, `add_custom_data`
+- `json_reader` member function `max_depth` has been renamed to `max_nesting_depth`, the former name is still supported. 
+- `json` member function `resize_array` has been renamed to `resize`, the former name is still supported. 
+
+jsoncons supports alternative ways for constructing  `null`, `object`, and `array` values.
+
+null:
+
+    json a = jsoncons::null_type();  // Using type constructor
+    json b = json::null_type();      // Using alias
+    json c(json::null);              // From static data member prototype
+
+object:
+
+    json a();                 // Default is empty object
+    json b = json::object();  // Using type constructor
+    json c(json::an_object);  // From static data member prototype
+
+array:
+
+    json a = json::array();      // Using type constructor
+    json b = json::make_array(); // Using factory method
+    json c(json::an_array);      // From static data member prototype
+
+Since C++ has possible order issues with static data members, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
+
 0.98.1 Release
 --------------
 
