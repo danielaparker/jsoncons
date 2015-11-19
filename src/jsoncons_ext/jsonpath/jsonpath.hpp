@@ -42,7 +42,7 @@ basic_json<Char,Alloc> jsonpath(const basic_json<Char, Alloc>& root, const Char*
 
     basic_json<Char,Alloc> result(basic_json<Char,Alloc>::an_array);
 
-    states::states_t state = jsoncons::states::start;
+    states::states_t state = states::start;
     std::vector<std::vector<cjson_ptr>> stack;
     std::basic_string<Char> buffer;
 
