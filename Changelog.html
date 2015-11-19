@@ -468,6 +468,46 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>0.98.2 Release</h2>
+
+<ul>
+<li>
+<code>json</code> constructor is now templated, so constructors now accept extended types</li>
+<li>Following <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>, <code>json_parser</code> now accepts any JSON value, removing the constraint that it be an object or array.</li>
+<li>The member <code>json_type_traits</code> member functions <code>is</code>, <code>as</code>, and <code>assign</code> have been changed to static functions. if you have implemented your own type specializations, you will also have to change your <code>is</code>, <code>as</code> and <code>assign</code> functions to be static.</li>
+<li>Removed json deprecated functions <code>custom_data</code>, <code>set_custom_data</code>, <code>add_custom_data</code>
+</li>
+<li>
+<code>json_reader</code> member function <code>max_depth</code> has been renamed to <code>max_nesting_depth</code>, the former name is still supported. </li>
+<li>
+<code>json</code> member function <code>resize_array</code> has been renamed to <code>resize</code>, the former name is still supported. </li>
+</ul>
+
+<p>jsoncons supports alternative ways for constructing  <code>null</code>, <code>object</code>, and <code>array</code> values.</p>
+
+<p>null:</p>
+
+<pre><code>json a = jsoncons::null_type();  // Using type constructor
+json b = json::null_type();      // Using alias
+json c(json::null);              // From static data member prototype
+</code></pre>
+
+<p>object:</p>
+
+<pre><code>json a();                 // Default is empty object
+json b = json::object();  // Using type constructor
+json c(json::an_object);  // From static data member prototype
+</code></pre>
+
+<p>array:</p>
+
+<pre><code>json a = json::array();      // Using type constructor
+json b = json::make_array(); // Using factory method
+json c(json::an_array);      // From static data member prototype
+</code></pre>
+
+<p>Since C++ has possible order issues with static data members, the jsoncons examples and documentation have been changed to consistently use the other ways, and <code>json::null</code>, <code>json::an_object</code> and <code>json::an_array</code> have been, while still usable, deprecated.</p>
+
 <h2>0.98.1 Release</h2>
 
 <ul>
