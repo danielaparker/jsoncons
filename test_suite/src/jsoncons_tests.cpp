@@ -30,6 +30,7 @@ using jsoncons::pretty_print;
 using jsoncons::json_deserializer;
 using jsoncons::json_parse_exception;
 
+#if 0
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
     boost::optional<jsoncons::json> opt_json;
@@ -482,3 +483,4 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
 
+#endif
