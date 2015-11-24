@@ -106,7 +106,7 @@ public:
         buffer_.clear();
         index_ = 0;
         index_end_ = 0;
-        index_step_ = 0;
+        index_step_ = 1;
         recursive_descent_ = false;
 
         for (size_t i = 0; i < path_length; ++i)
@@ -180,7 +180,7 @@ handle_state:
                 switch (c)
                 {
                 case ':':
-                    end_element_index2();
+                    index_step_ = 0;
                     state_ = states::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -197,6 +197,7 @@ handle_state:
                 switch (c)
                 {
                 case ':':
+                    index_step_ = 1;
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
@@ -314,7 +315,7 @@ handle_state:
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            for (size_t j = index_; j < index_end_; ++j)
+            for (size_t j = index_; j < index_end_; j += index_step_)
             {
                 if (p->is_array() && j < p->size())
                 {
