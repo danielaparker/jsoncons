@@ -32,7 +32,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
         std::cout << pretty_print(result[i]) << std::endl;
     }
 }
-
 BOOST_AUTO_TEST_CASE(test_jsonpath_1b)
 {
     const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
@@ -45,7 +44,20 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_1b)
         std::cout << pretty_print(result[i]) << std::endl;
     }
 }
+#endif
+BOOST_AUTO_TEST_CASE(test_jsonpath_1b)
+{
+    const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
 
+    json val = json::parse_string(text);
+
+    std::vector<json> result = jsonpath_query(val,"$['store']['book','bicycle']");
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        std::cout << pretty_print(result[i]) << std::endl;
+    }
+}
+#if 0
 BOOST_AUTO_TEST_CASE(test_jsonpath_1c)
 {
     const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
@@ -87,7 +99,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_recursive_descent)
         std::cout << pretty_print(result[i]) << std::endl;
     }
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_alternative_indices)
 {
@@ -104,3 +115,4 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_alternative_indices)
         std::cout << pretty_print(result[i]) << std::endl;
     }
 }
+#endif
