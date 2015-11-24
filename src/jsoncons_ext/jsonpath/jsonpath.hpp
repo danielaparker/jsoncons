@@ -27,12 +27,14 @@ namespace states {
         expect_separator,
         string,
         quoted_string,
-        left_bracket
+        left_bracket,
+        expect_right_bracket,
+        dot
     };
 };
 
 template<typename Char, class Alloc>
-basic_json<Char,Alloc> jsonpath_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
+std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path);
@@ -40,7 +42,7 @@ basic_json<Char,Alloc> jsonpath_query(const basic_json<Char, Alloc>& root, const
 }
 
 template<typename Char, class Alloc>
-basic_json<Char,Alloc> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path)
+std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path);
@@ -48,7 +50,7 @@ basic_json<Char,Alloc> jsonpath_query(const basic_json<Char, Alloc>& root, const
 }
 
 template<typename Char, class Alloc>
-basic_json<Char,Alloc> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
+std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path,length);
@@ -66,15 +68,22 @@ private:
     std::basic_string<Char> buffer_;
     size_t index_;
     std::vector<node_set> stack_;
-    basic_json<Char,Alloc> result_;
+    std::vector<basic_json<Char,Alloc>> result_;
+    bool recursive_descent_;
+    std::vector<cjson_ptr> nodes_;
+
+    void end_nodes()
+    {
+        stack_.push_back(nodes_);
+        nodes_.clear();
+    }
 
 public:
     jsonpath_evaluator()
     {
-        result_ = basic_json<Char,Alloc>::array();
     }
 
-    basic_json<Char,Alloc> get_result()
+    std::vector<basic_json<Char,Alloc>> get_result()
     {
         return std::move(result_);
     }
@@ -92,10 +101,12 @@ public:
         state_ = states::start;
         buffer_.clear();
         index_ = 0;
+        recursive_descent_ = false;
 
         for (size_t i = 0; i < path_length; ++i)
         {
             Char c = path[i];
+handle_state:
             switch (state_)
             {
             case states::start: 
@@ -111,12 +122,24 @@ public:
                     break;
                 };
                 break;
+            case states::dot:
+                switch (c)
+                {
+                case '.':
+                    recursive_descent_ = true;
+                    break;
+                default:
+                    state_ = states::string;
+                    goto handle_state;
+                    break;
+                }
+                break;
             case states::expect_separator: 
                 switch (c)
                 {
                 case '.':
                     buffer_.clear();
-                    state_ = states::string;
+                    state_ = states::dot;
                     break;
                 case '[':
                     index_ = 0;
@@ -124,15 +147,32 @@ public:
                     break;
                 };
                 break;
+            case states::expect_right_bracket:
+                switch (c)
+                {
+                case ']':
+                    state_ = states::string;
+                    break;
+                }
+                break;
             case states::left_bracket:
                 switch (c)
                 {
-                case '0':case 1:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:
+                case ',':
+                    end_element_index();
+					index_ = 0;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     index_ = index_*10 + static_cast<size_t>(c-'0');
                     break;
                 case ']':
                     end_element_index();
+                    end_nodes();
                     state_ = states::string;
+                    break;
+                case '*':
+                    end_all();
+                    state_ = states::expect_right_bracket;
                     break;
                 case '\'':
                     state_ = states::quoted_string;
@@ -148,10 +188,8 @@ public:
                     state_ = states::left_bracket;
                     break;
                 case '.':
-                    {
-                        end_member_name();
-                        state_ = states::string;
-                    }
+                    end_member_name();
+                    state_ = states::dot;
                     break;
                 default:
                     buffer_.push_back(c);
@@ -185,23 +223,47 @@ public:
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
                 cjson_ptr p = stack_.back()[i];
-                result_.add(*p);
+                result_.push_back(*p);
             }
         }
     }
 
-    void end_element_index()
+    void end_all()
     {
         node_set v;
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            if (p->is_array() && index_ < p->size())
+            if (p->is_array())
             {
-                v.push_back(std::addressof((*p)[index_]));
+                for (auto it = p->begin_elements(); it != p->end_elements(); ++it)
+                {
+                    v.push_back(std::addressof(*it));
+                }
             }
+            else if (p->is_object())
+            {
+                for (auto it = p->begin_members(); it != p->end_members(); ++it)
+                {
+                    v.push_back(std::addressof(it->value()));
+                }
+            }
+
         }
         stack_.push_back(v);
+        index_ = 0;
+    }
+
+    void end_element_index()
+    {
+        for (size_t i = 0; i < stack_.back().size(); ++i)
+        {
+            cjson_ptr p = stack_.back()[i];
+            if (p->is_array() && index_ < p->size())
+            {
+                nodes_.push_back(std::addressof((*p)[index_]));
+            }
+        }
         index_ = 0;
     }
 
@@ -209,18 +271,57 @@ public:
     {
 		if (buffer_.length() > 0)
 		{
-			node_set v;
-			for (size_t i = 0; i < stack_.back().size(); ++i)
-			{
-				cjson_ptr p = stack_.back()[i];
-				if (p->has_member(buffer_))
-				{
-					v.push_back(std::addressof(p->get(buffer_)));
-				}
-			}
-			stack_.push_back(v);
+            if (recursive_descent_)
+            {
+                end_member_name2();
+                recursive_descent_ = false;
+            }
+            else
+            {
+                end_member_name1();
+            }
 			buffer_.clear();
 		}
+    }
+
+    void end_member_name1()
+    {
+        node_set v;
+        for (size_t i = 0; i < stack_.back().size(); ++i)
+        {
+            cjson_ptr p = stack_.back()[i];
+            if (p->has_member(buffer_))
+            {
+                v.push_back(std::addressof(p->get(buffer_)));
+            }
+        }
+        stack_.push_back(v);
+    }
+
+    void end_member_name2()
+    {
+        node_set v;
+        for (size_t i = 0; i < stack_.back().size(); ++i)
+        {
+            cjson_ptr p = stack_.back()[i];
+            end_member_name2(*p,v);
+        }
+        stack_.push_back(v);
+    }
+
+    void end_member_name2(const basic_json<Char,Alloc>& val, node_set& v)
+    {
+        if (val.is_object())
+        {
+            if (val.has_member(buffer_))
+            {
+                v.push_back(std::addressof(val.get(buffer_)));
+            }
+            for (auto it = val.begin_members(); it != val.end_members(); ++it)
+            {
+                end_member_name2(it->value(),v);
+            }
+        }
     }
 };
 
