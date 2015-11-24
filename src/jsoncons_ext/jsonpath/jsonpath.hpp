@@ -28,6 +28,8 @@ namespace states {
         string,
         quoted_string,
         left_bracket,
+        left_bracket_end,
+        left_bracket_step,
         expect_right_bracket,
         dot
     };
@@ -67,6 +69,8 @@ private:
     states::states_t state_;
     std::basic_string<Char> buffer_;
     size_t index_;
+    size_t index_end_;
+    size_t index_step_;
     std::vector<node_set> stack_;
     std::vector<basic_json<Char,Alloc>> result_;
     bool recursive_descent_;
@@ -101,6 +105,8 @@ public:
         state_ = states::start;
         buffer_.clear();
         index_ = 0;
+        index_end_ = 0;
+        index_step_ = 0;
         recursive_descent_ = false;
 
         for (size_t i = 0; i < path_length; ++i)
@@ -157,9 +163,42 @@ handle_state:
                     break;
                 }
                 break;
+            case states::left_bracket_step:
+                switch (c)
+                {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    index_step_ = index_step_*10 + static_cast<size_t>(c-'0');
+                    break;
+                case ']':
+                    end_element_index2();
+                    end_nodes();
+                    state_ = states::expect_separator;
+                    break;
+                }
+                break;
+            case states::left_bracket_end:
+                switch (c)
+                {
+                case ':':
+                    end_element_index2();
+                    state_ = states::left_bracket_step;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    index_end_ = index_end_*10 + static_cast<size_t>(c-'0');
+                    break;
+                case ']':
+                    end_element_index2();
+                    end_nodes();
+                    state_ = states::expect_separator;
+                    break;
+                }
+                break;
             case states::left_bracket:
                 switch (c)
                 {
+                case ':':
+                    state_ = states::left_bracket_end;
+                    break;
                 case ',':
                     end_element_index();
                     break;
@@ -170,6 +209,7 @@ handle_state:
                     end_element_index();
                     end_nodes();
                     state_ = states::expect_separator;
+                    break;
                 case '*':
                     end_all();
                     end_nodes();
@@ -267,6 +307,24 @@ handle_state:
             }
         }
         index_ = 0;
+    }
+
+    void end_element_index2()
+    {
+        for (size_t i = 0; i < stack_.back().size(); ++i)
+        {
+            cjson_ptr p = stack_.back()[i];
+            for (size_t j = index_; j < index_end_; ++j)
+            {
+                if (p->is_array() && j < p->size())
+                {
+                    nodes_.push_back(std::addressof((*p)[j]));
+                }
+            }
+        }
+        index_ = 0;
+        index_end_ = 0;
+        index_step_ = 1;
     }
 
     void end_member_name()
