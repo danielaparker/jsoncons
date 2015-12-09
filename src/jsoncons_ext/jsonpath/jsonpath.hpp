@@ -18,6 +18,7 @@
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/json_structures.hpp"
+#include "jsonpath_filter.hpp"
 
 namespace jsoncons { namespace jsonpath {
 
@@ -28,35 +29,38 @@ namespace states {
         string,
         quoted_string,
         left_bracket,
+        left_bracket_start,
         left_bracket_end,
+        left_bracket_end2,
         left_bracket_step,
+        left_bracket_step2,
         expect_right_bracket,
         dot
     };
 };
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
+std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path);
-    return evaluator.get_result();
+    return evaluator.get_values();
 }
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path)
+std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const Char* path)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path);
-    return evaluator.get_result();
+    return evaluator.get_values();
 }
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> jsonpath_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
+std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path,length);
-    return evaluator.get_result();
+    return evaluator.get_values();
 }
 
 template<typename Char, class Alloc>
@@ -68,11 +72,14 @@ private:
 
     states::states_t state_;
     std::basic_string<Char> buffer_;
-    size_t index_;
-    size_t index_end_;
-    size_t index_step_;
+    size_t start_;
+    size_t end_;
+    size_t step_;
+    bool positive_start_;
+    bool positive_end_;
+    bool positive_step_;
+    bool end_undefined_;
     std::vector<node_set> stack_;
-    std::vector<basic_json<Char,Alloc>> result_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
 
@@ -87,9 +94,24 @@ public:
     {
     }
 
-    std::vector<basic_json<Char,Alloc>> get_result()
+    std::vector<basic_json<Char,Alloc>> get_values() const
     {
-        return std::move(result_);
+        std::vector<basic_json<Char,Alloc>> result;
+
+        if (stack_.size() > 0)
+        {
+            for (size_t i = 0; i < stack_.back().size(); ++i)
+            {
+                cjson_ptr p = stack_.back()[i];
+                result.push_back(*p);
+            }
+        }
+        return result;
+    }
+
+    std::vector<const basic_json<Char,Alloc>*> get_value_ptrs() const
+    {
+        return stack_.size() > 0 ? stack_.back() : std::vector<cjson_ptr>();
     }
 
     void evaluate(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
@@ -104,10 +126,14 @@ public:
     {
         state_ = states::start;
         buffer_.clear();
-        index_ = 0;
-        index_end_ = 0;
-        index_step_ = 1;
+        start_ = 0;
+        end_ = 0;
+        step_ = 1;
         recursive_descent_ = false;
+        positive_start_ = true;
+        positive_end_ = true;
+        positive_step_ = true;
+        end_undefined_ = false;
 
         for (size_t i = 0; i < path_length; ++i)
         {
@@ -119,6 +145,7 @@ handle_state:
                 switch (c)
                 {
                 case '$':
+                case '@':
                     {
                         node_set v;
                         v.push_back(std::addressof(root));
@@ -166,11 +193,29 @@ handle_state:
             case states::left_bracket_step:
                 switch (c)
                 {
+                case '-':
+                    positive_step_ = false;
+                    state_ = states::left_bracket_step2;
+                    break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    index_step_ = index_step_*10 + static_cast<size_t>(c-'0');
+                    step_ = static_cast<size_t>(c-'0');
+                    state_ = states::left_bracket_step2;
                     break;
                 case ']':
-                    end_element_index2();
+                    end_array_slice();
+                    end_nodes();
+                    state_ = states::expect_separator;
+                    break;
+                }
+                break;
+            case states::left_bracket_step2:
+                switch (c)
+                {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    step_ = step_*10 + static_cast<size_t>(c-'0');
+                    break;
+                case ']':
+                    end_array_slice();
                     end_nodes();
                     state_ = states::expect_separator;
                     break;
@@ -179,15 +224,60 @@ handle_state:
             case states::left_bracket_end:
                 switch (c)
                 {
+                case '-':
+                    positive_end_ = false;
+                    state_ = states::left_bracket_end2;
+                    break;
                 case ':':
-                    index_step_ = 0;
+                    step_ = 0;
                     state_ = states::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    index_end_ = index_end_*10 + static_cast<size_t>(c-'0');
+                    end_undefined_ = false;
+                    end_ = static_cast<size_t>(c-'0');
+                    state_ = states::left_bracket_end2;
                     break;
                 case ']':
-                    end_element_index2();
+                    end_array_slice();
+                    end_nodes();
+                    state_ = states::expect_separator;
+                    break;
+                }
+                break;
+            case states::left_bracket_end2:
+                switch (c)
+                {
+                case ':':
+                    step_ = 0;
+                    state_ = states::left_bracket_step;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    end_undefined_ = false;
+                    end_ = end_*10 + static_cast<size_t>(c-'0');
+                    break;
+                case ']':
+                    end_array_slice();
+                    end_nodes();
+                    state_ = states::expect_separator;
+                    break;
+                }
+                break;
+            case states::left_bracket_start:
+                switch (c)
+                {
+                case ':':
+                    step_ = 1;
+                    end_undefined_ = true;
+                    state_ = states::left_bracket_end;
+                    break;
+                case ',':
+                    end_element_index();
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    start_ = start_*10 + static_cast<size_t>(c-'0');
+                    break;
+                case ']':
+                    end_element_index();
                     end_nodes();
                     state_ = states::expect_separator;
                     break;
@@ -196,15 +286,35 @@ handle_state:
             case states::left_bracket:
                 switch (c)
                 {
+                case '?':
+					{
+                        jsonpath_filter_parser<Char,Alloc> parser;
+                        parser.parse(path,i,path_length);
+                        jsonpath_filter<Char,Alloc> filter = parser.get_filter();
+                        nodes_.clear();
+						for (size_t j = 0; j < stack_.back().size(); ++j)
+						{
+	                        accept(*(stack_.back()[j]),filter);
+						}
+                        end_nodes();
+						i += parser.index();
+					}
+                    break;
                 case ':':
-                    index_step_ = 1;
+                    step_ = 1;
+                    end_undefined_ = true;
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
                     end_element_index();
                     break;
+                case '-':
+                    positive_start_ = false;
+                    state_ = states::left_bracket_start;
+                    break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    index_ = index_*10 + static_cast<size_t>(c-'0');
+                    start_ = static_cast<size_t>(c-'0');
+                    state_ = states::left_bracket_start;
                     break;
                 case ']':
                     end_element_index();
@@ -227,7 +337,7 @@ handle_state:
                 case '[':
 					end_member_name();
                     end_nodes();
-					index_ = 0;
+					start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
@@ -263,14 +373,6 @@ handle_state:
             }
             break;
         }
-        if (stack_.size() > 0)
-        {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
-            {
-                cjson_ptr p = stack_.back()[i];
-                result_.push_back(*p);
-            }
-        }
     }
 
     void end_all()
@@ -294,7 +396,7 @@ handle_state:
             }
 
         }
-        index_ = 0;
+        start_ = 0;
     }
 
     void end_element_index()
@@ -302,30 +404,85 @@ handle_state:
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            if (p->is_array() && index_ < p->size())
+            if (p->is_array() && start_ < p->size())
             {
-                nodes_.push_back(std::addressof((*p)[index_]));
+                nodes_.push_back(std::addressof((*p)[start_]));
             }
         }
-        index_ = 0;
+        start_ = 0;
     }
 
-    void end_element_index2()
+    void end_array_slice()
+    {
+        if (positive_step_)
+        {
+            end_array_slice1();
+        }
+        else
+        {
+            end_array_slice2();
+        }
+        start_ = 0;
+        end_ = 0;
+        step_ = 1;
+        positive_start_ = positive_end_ = positive_step_ = true;
+        end_undefined_ = true;
+    }
+
+    void end_array_slice1()
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            for (size_t j = index_; j < index_end_; j += index_step_)
+            if (p->is_array())
             {
+                size_t start = positive_start_ ? start_ : p->size() - start_;
+                size_t end;
+                if (!end_undefined_)
+                {
+                    end = positive_end_ ? end_ : p->size() - end_;
+                }
+                else
+                {
+                    end = p->size();
+                }
+                for (size_t j = start; j < end; j += step_)
+                {
+                    if (p->is_array() && j < p->size())
+                    {
+                        nodes_.push_back(std::addressof((*p)[j]));
+                    }
+                }
+            }
+        }
+    }
+
+    void end_array_slice2()
+    {
+        for (size_t i = 0; i < stack_.back().size(); ++i)
+        {
+            cjson_ptr p = stack_.back()[i];
+            size_t start = positive_start_ ? start_ : p->size() - start_;
+            size_t end;
+            if (!end_undefined_)
+            {
+                end = positive_end_ ? end_ : p->size() - end_;
+            }
+            else
+            {
+                end = p->size();
+            }
+
+            size_t j = end + step_ - 1;
+            while (j > (start+step_-1))
+            {
+                j -= step_;
                 if (p->is_array() && j < p->size())
                 {
                     nodes_.push_back(std::addressof((*p)[j]));
                 }
             }
         }
-        index_ = 0;
-        index_end_ = 0;
-        index_step_ = 1;
     }
 
     void end_member_name()
@@ -366,6 +523,32 @@ handle_state:
         }
     }
 
+    void accept(const basic_json<Char,Alloc>& val,
+                jsonpath_filter<Char,Alloc>& filter)
+    {
+        if (val.is_object())
+        {
+            if (recursive_descent_ && val.is_object())
+            {
+                for (auto it = val.begin_members(); it != val.end_members(); ++it)
+                {
+                    accept(it->value(),filter);
+                }
+            }
+            if (filter.accept(val))
+            {
+                nodes_.push_back(std::addressof(val));
+            }
+        }
+        else if (val.is_array())
+        {
+            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
+            {
+                accept(*it,filter);
+            }
+        }
+    }
+
     void end_member_name2(const basic_json<Char,Alloc>& val)
     {
         if (val.is_object())
@@ -379,6 +562,13 @@ handle_state:
                 end_member_name2(it->value());
             }
         }
+		else if (val.is_array())
+		{
+            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
+            {
+                end_member_name2(*it);
+            }
+		}
     }
 };
 

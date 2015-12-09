@@ -208,6 +208,31 @@ std::basic_string<Char> float_to_string(double val, size_t precision)
 }
 #endif
 
+template<typename CharType>
+long long string_to_integer(bool has_neg, const CharType *s, size_t length) throw(std::overflow_error)
+{
+    const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+    const long long max_value_div_10 = max_value / 10;
+
+    long long n = 0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        long long x = s[i] - '0';
+        if (n > max_value_div_10)
+        {
+            throw std::overflow_error("Integer overflow");
+        }
+        n = n * 10;
+        if (n > max_value - x)
+        {
+            throw std::overflow_error("Integer overflow");
+        }
+
+        n += x;
+    }
+    return has_neg ? -n : n;
+}
+
 #ifdef _MSC_VER
 inline
 double string_to_float(const std::string& s)
