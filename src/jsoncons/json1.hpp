@@ -1587,13 +1587,13 @@ public:
             val_.at(name_).remove_member(name);
         }
         // Remove a member from an object 
-
+/*
         template <typename T>
         void set(const std::basic_string<Char>& name, T value)
         {
             val_.at(name_).set(name,value);
         }
-
+*/
         void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
         {
             val_.at(name_).set(name,value);
@@ -1604,7 +1604,7 @@ public:
         {
             val_.at(name_).set(name,value);
         }
-
+/*
         template <typename T>
         void add(T value)
         {
@@ -1616,7 +1616,7 @@ public:
         {
             val_.at(name_).add(index, value);
         }
-
+*/
         void add(basic_json<Char,Alloc>&& value)
         {
             val_.at(name_).add(value);
@@ -2007,7 +2007,7 @@ public:
 
     void remove_member(const std::basic_string<Char>& name);
     // Removes a member from an object value
-
+/*
     template <typename T>
     void set(const std::basic_string<Char>& name, T value)
     {
@@ -2030,11 +2030,11 @@ public:
         }
 
     }
-
+*/
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
 
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value);
-
+/*
     template <typename T>
     void add(T val)
     {
@@ -2072,7 +2072,7 @@ public:
             }
         }
     }
-
+*/
     void add(basic_json<Char,Alloc>&& value);
 
     void add(size_t index, basic_json<Char,Alloc>&& value);

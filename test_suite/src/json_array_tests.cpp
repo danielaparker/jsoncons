@@ -80,17 +80,46 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     json cities = json::make_array();
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
-    cities.reserve(10);  // storage is allocated
-    BOOST_CHECK(cities.capacity() == 10);
+    //cities.reserve(10);  // storage is allocated
+    //BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
     cities.add("Toronto");
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
-    BOOST_CHECK(cities.capacity() == 10);
+    //BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
     cities.add(0,"Montreal");
+	//cities.add("Montreal");
+    //BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_reserve_array_capacity3)
+{
+	json cities = json::array();
+	cities.reserve(2);  
+
+    json t(1);
+    cities.add(t);
+
+    json m("Montreal1"); 
+	cities.add(0, m);
+}
+
+BOOST_AUTO_TEST_CASE(test_reserve_array_capacity2)
+{
+    std::vector<json> cities;
+    cities.reserve(10);
+    BOOST_CHECK(cities.size() == 0);
+
+    cities.push_back("Toronto");
+    BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.size() == 1);
+    cities.push_back("Vancouver");
+    auto it = 0 < cities.size() ? cities.begin() + 0 : cities.end();
+    cities.insert(it, "Montreal");
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }
