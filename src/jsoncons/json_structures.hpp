@@ -53,8 +53,8 @@ public:
     typedef typename std::vector<basic_json<Char,Alloc>>::const_iterator const_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
-    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
+    //static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
+    //static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
 
     json_array()
     {
@@ -66,8 +66,8 @@ public:
     }
 
     json_array(json_array&& val)
+        : elements_(val.elements_)
     {
-        elements_.swap(val.elements_);
     }
 
     json_array(size_t n)
@@ -80,15 +80,20 @@ public:
     {
     }
 
-    json_array(std::vector<basic_json<Char,Alloc>> elements)
+    /*json_array(std::vector<basic_json<Char,Alloc>> elements)
         : elements_(elements)
     {
-    }
+    }*/
 
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end)
         : elements_(begin,end)
     {
+    }
+
+    void swap(json_array<Char,Alloc>& val)
+    {
+        elements_.swap(val.elements_);
     }
 
     size_t size() const {return elements_.size();}
@@ -121,7 +126,7 @@ public:
 
     void add(size_t index, const basic_json<Char,Alloc>& value)
     {
-        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        auto position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
@@ -132,8 +137,8 @@ public:
 
     void add(size_t index, basic_json<Char,Alloc>&& value)
     {
-        json_array<Char,Alloc>::iterator position = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(position, value);
+        auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
+        elements_.insert(it, value);
     }
 
     iterator begin() {return elements_.begin();}
@@ -316,6 +321,11 @@ public:
     }
 
     json_object(json_object&& val)
+        : members_(val.members_)
+    {
+    }
+
+    void swap(json_object& val)
     {
         members_.swap(val.members_);
     }
