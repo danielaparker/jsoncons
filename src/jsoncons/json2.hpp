@@ -350,7 +350,7 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
         handler.value(var_.value_.small_string_value_,var_.small_string_length_);
         break;
     case value_types::string_t:
-        handler.value(var_.value_.string_value_->p,var_.value_.string_value_->length);
+        handler.value(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
         break;
     case value_types::double_t:
         handler.value(var_.value_.float_value_);
@@ -1002,7 +1002,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     case value_types::small_string_t:
         return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
     case value_types::string_t:
-        return std::basic_string<Char>(var_.value_.string_value_->p,var_.value_.string_value_->length);
+        return std::basic_string<Char>(*(var_.value_.string_value_));
     default:
         return to_string();
     }
