@@ -16,7 +16,7 @@ using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::basic_json_reader;
 using std::string;
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_array_constructor)
 {
     json arr = json::array();
@@ -80,104 +80,18 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     json cities = json::make_array();
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
-    //cities.reserve(10);  // storage is allocated
-    //BOOST_CHECK(cities.capacity() == 10);
+    cities.reserve(10);  // storage is allocated
+    BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
     cities.add("Toronto");
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
-    //BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
     cities.add(0,"Montreal");
-	//cities.add("Montreal");
-    //BOOST_CHECK(cities.capacity() == 10);
-    BOOST_CHECK(cities.size() == 3);
-}
-BOOST_AUTO_TEST_CASE(test_reserve_array_capacity3)
-{
-	json cities = json::array();
-	//cities.reserve(2);  
-
-    json t(1);
-    cities.add(t);
-
-    json m("Montreal1"); 
-	cities.add(0, m);
-}
-#endif
-
-BOOST_AUTO_TEST_CASE(test_reserve_array_capacity4)
-{
-	auto cities = new json::array();
-	cities->reserve(2);
-
-	json t(1);
-	cities->push_back(t);
-
-	json m("Montreal1");
-	cities->add(0, m);
-
-	delete cities;
-}
-
-struct Test
-{
-	Test()
-		: s(nullptr)
-	{
-
-	}
-	Test(const Test& t)
-	{
-		s = new std::string(*(t.s));
-	}
-    Test(const char* p)
-    {
-        s = new std::string(p);
-    }
-	Test& operator=(const Test& t)
-	{
-		if (&t != this)
-		{
-			delete s;
-			s = new std::string(*(t.s));
-		}
-		return *this;
-	}
-    ~Test()
-    {
-        delete s;
-    }
-    std::string* s;
-};
-
-BOOST_AUTO_TEST_CASE(test_reserve_array_capacity5)
-{
-	auto cities = new std::vector<Test>();
-	cities->reserve(2);
-
-	cities->push_back(Test("Toronto"));
-	auto it = cities->begin();
-	cities->insert(it, "Montreal");
-
-	delete cities;
-}
-#if 0
-BOOST_AUTO_TEST_CASE(test_reserve_array_capacity2)
-{
-    std::vector<json> cities;
-    cities.reserve(10);
-    BOOST_CHECK(cities.size() == 0);
-
-    cities.push_back("Toronto");
-    BOOST_CHECK(cities.capacity() == 10);
-    BOOST_CHECK(cities.size() == 1);
-    cities.push_back("Vancouver");
-    auto it = 0 < cities.size() ? cities.begin() + 0 : cities.end();
-    cities.insert(it, "Montreal");
-    BOOST_CHECK(cities.capacity() == 10);
+	BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }
 
@@ -253,4 +167,4 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     BOOST_CHECK_EQUAL(val[2].as<std::string>(), std::string("Montreal"));
 
 }
-#endif
+
