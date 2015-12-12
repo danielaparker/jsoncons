@@ -201,14 +201,14 @@ public:
             : type_(value_types::empty_object_t)
         {
         }
-		/*
+		
         explicit variant(variant&& rhs)
         {
             type_ = rhs.type_;
             small_string_length_ = rhs.small_string_length_;
             value_ = rhs.value_;
             rhs.type_ = value_types::null_t;
-        }*/
+        }
 
         explicit variant(const variant& var)
             : type_(var.type_)
@@ -456,16 +456,25 @@ public:
                 case value_types::longlong_t:
                 case value_types::ulonglong_t:
                 case value_types::double_t:
-                    type_ = val.type_;
-                    small_string_length_ = val.small_string_length_;
-                    value_ = val.value_;
+                    switch (val.type_)
+                    {
+                    case value_types::null_t:
+                    case value_types::bool_t:
+                    case value_types::empty_object_t:
+                    case value_types::small_string_t:
+                    case value_types::longlong_t:
+                    case value_types::ulonglong_t:
+                    case value_types::double_t:
+                        type_ = val.type_;
+                        small_string_length_ = val.small_string_length_;
+                        value_ = val.value_;
+                        break;
+                    default:
+                        variant temp(val);
+                        temp.swap(*this);
+                        break;
+                    }
                     break;
-				case value_types::string_t:
-					delete value_.string_value_;
-					value_.string_value_ = make_string_holder(val.value_.string_value_);
-					break;
-
-
                 default:
                     {
                         variant temp(val);
@@ -849,7 +858,7 @@ public:
             Char small_string_value_[sizeof(long long)/sizeof(Char)];
         } value_;
 
-        static void delete_string_holder(const std::basic_string<Char>* other)
+        static void delete_string_holder(std::basic_string<Char>* other)
         {
             delete other;
         }
