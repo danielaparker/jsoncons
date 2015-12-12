@@ -470,15 +470,13 @@ public:
                         value_ = val.value_;
                         break;
                     default:
-                        variant temp(val);
-                        temp.swap(*this);
+                        swap(variant(val));
                         break;
                     }
                     break;
                 default:
                     {
-                        variant temp(val);
-                        temp.swap(*this);
+                        swap(variant(val));
                     }
                     break;
                 }
