@@ -76,7 +76,7 @@ public:
         {
             result = value_.as<long long>() < rhs.as<long long>();
         }
-        else if (value_.is<double>() && rhs.is<double>())
+        else if (value_.is<double>() || rhs.is<double>())
         {
             result = value_.as<double>() < rhs.as<double>();
         }
@@ -99,7 +99,7 @@ public:
         {
             result = value_.as<long long>() > rhs.as<long long>();
         }
-        else if (value_.is<double>() && rhs.is<double>())
+        else if (value_.is<double>() || rhs.is<double>())
         {
             result = value_.as<double>() > rhs.as<double>();
         }
