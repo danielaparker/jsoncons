@@ -26,13 +26,15 @@ class jsonpath_evaluator;
 namespace filter_states {
     enum filter_states_t {
         start,
-        left_grouping,
+        grouping,
         expect_path_or_value,
         string,
-        left_bracket,
-        integer
+        integer,
+        path,
+        value
     };
 }
+
 
 template<typename Char, class Alloc>
 class expression
@@ -43,6 +45,42 @@ public:
     virtual bool lt(const basic_json<Char,Alloc>& parent) const = 0;
     virtual bool gt(const expression& parent) const = 0;
     virtual bool gt(const basic_json<Char,Alloc>& parent) const = 0;
+
+    static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        bool result = false;
+        if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+        {
+            result = lhs.as<unsigned long long>() < rhs.as<unsigned long long>();
+        }
+        else if (lhs.is<long long>() && rhs.is<long long>())
+        {
+            result = lhs.as<long long>() < rhs.as<long long>();
+        }
+        else if (lhs.is<double>() || rhs.is<double>())
+        {
+            result = lhs.as<double>() < rhs.as<double>();
+        }
+        return result;
+    }
+
+    static bool gt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        bool result = false;
+        if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+        {
+            result = lhs.as<unsigned long long>() > rhs.as<unsigned long long>();
+        }
+        else if (lhs.is<long long>() && rhs.is<long long>())
+        {
+            result = lhs.as<long long>() > rhs.as<long long>();
+        }
+        else if ((lhs.is<double>() && rhs.is_number()) || (lhs.is_number() && rhs.is<double>()))
+        {
+            result = lhs.as<double>() > rhs.as<double>();
+        }
+        return result;
+    }
 };
 
 template<typename Char, class Alloc>
@@ -62,48 +100,22 @@ public:
 
     bool lt(const expression<Char,Alloc>& rhs) const override
     {
-        return false;
+        return rhs.gt(value_);
     }
 
     bool lt(const basic_json<Char,Alloc>& rhs) const override
     {
-        bool result = false;
-        if (value_.is<unsigned long long>() && rhs.is<unsigned long long>())
-        {
-            result = value_.as<unsigned long long>() < rhs.as<unsigned long long>();
-        }
-        else if (value_.is<long long>() && rhs.is<long long>())
-        {
-            result = value_.as<long long>() < rhs.as<long long>();
-        }
-        else if (value_.is<double>() || rhs.is<double>())
-        {
-            result = value_.as<double>() < rhs.as<double>();
-        }
-        return result;
+        return expression<Char,Alloc>::lt(value_,rhs);
     }
 
     bool gt(const expression<Char,Alloc>& rhs) const override
     {
-        return false;
+        return rhs.lt(value_);
     }
 
     bool gt(const basic_json<Char,Alloc>& rhs) const override
     {
-        bool result = false;
-        if (value_.is<unsigned long long>() && rhs.is<unsigned long long>())
-        {
-            result = value_.as<unsigned long long>() > rhs.as<unsigned long long>();
-        }
-        else if (value_.is<long long>() && rhs.is<long long>())
-        {
-            result = value_.as<long long>() > rhs.as<long long>();
-        }
-        else if (value_.is<double>() || rhs.is<double>())
-        {
-            result = value_.as<double>() > rhs.as<double>();
-        }
-        return result;
+        return expression<Char,Alloc>::gt(value_,rhs);
     }
 };
 
@@ -133,6 +145,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
+                result = expression<Char,Alloc>::lt(*nodes_[i],rhs);
             }
         }
         return result;
@@ -160,6 +173,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
+                result = expression<Char,Alloc>::gt(*nodes_[i],rhs);
             }
         }
         return result;
@@ -196,6 +210,25 @@ public:
     operators::operators_t operator_;
     std::shared_ptr<expression<Char,Alloc>> rhs_;
 
+    jsonpath_filter()
+    {
+    }
+
+    bool has_lhs() const
+    {
+        return lhs_.get() != nullptr;
+    }
+
+    bool has_rhs() const
+    {
+        return rhs_.get() != nullptr;
+    }
+
+    bool has_operator() const
+    {
+        return operator_ != operators::none;
+    }
+
     bool accept(const basic_json<Char,Alloc>& arg) const
     {
         lhs_->evaluate(arg);
@@ -228,13 +261,14 @@ public:
         for (; !done && index_ < length; ++index_)
         {
             int c = p[index_];
+handler_state:
             switch (state_)
             {
             case filter_states::start:
                 switch (c)
                 {
                 case '(':
-                    state_ = filter_states::left_grouping;
+                    state_ = filter_states::grouping;
                     stack_.push_back(jsonpath_filter<Char,Alloc>());
                     break;
                 case ']':
@@ -246,11 +280,48 @@ public:
                 {
                     switch (c)
                     {
+                    case '<':
+                        {
+							if (buffer_.length() > 0)
+							{
+								auto val = basic_json<Char, Alloc>::parse_string(buffer_);
+								if (!stack_.back().has_lhs())
+								{
+									stack_.back().lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+								}
+								buffer_.clear();
+							}
+                            stack_.back().operator_ = operators::lt;
+                            state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
+                    case '>':
+                        {
+							if (buffer_.length() > 0)
+							{
+								auto val = basic_json<Char, Alloc>::parse_string(buffer_);
+								if (!stack_.back().has_lhs())
+								{
+									stack_.back().lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+								}
+								buffer_.clear();
+							}
+                            stack_.back().operator_ = operators::gt;
+                            state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
                     case ')':
                         if (buffer_.length() > 0)
                         {
-                            auto rhs = basic_json<Char,Alloc>::parse_string(buffer_);
-                            stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(rhs);
+                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            if (!stack_.back().has_lhs())
+                            {
+                                stack_.back().lhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+                            else if (!stack_.back().has_rhs())
+                            {
+                                stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
                             buffer_.clear();
                         }
 						if (stack_.size() == 1)
@@ -260,21 +331,19 @@ public:
                         stack_.pop_back();
                         state_ = filter_states::start;
                         break;
-					case ']':
-                        if (buffer_.length() > 0)
-                        {
-                            auto rhs = basic_json<Char,Alloc>::parse_string(buffer_);
-                            stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(rhs);
-                            buffer_.clear();
-                        }
-                        done = true;
-                        break;
                     case ' ':case '\n':case '\r':case '\t':
                         if (buffer_.length() > 0)
 						{
-                        auto rhs = basic_json<Char,Alloc>::parse_string(buffer_);
-                        stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(rhs);
-                        buffer_.clear();
+                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            if (!stack_.back().has_lhs())
+                            {
+                                stack_.back().lhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+                            else if (!stack_.back().has_rhs())
+                            {
+                                stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+							buffer_.clear();
 						}
                         break; 
                     case '0': 
@@ -289,8 +358,15 @@ public:
                 {
                     if (buffer_.length() > 0)
                     {
-                        auto rhs = basic_json<Char,Alloc>::parse_string(buffer_);
-                        stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(rhs);
+                        auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                        if (!stack_.back().has_lhs())
+                        {
+                            stack_.back().lhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                        }
+                        else if (!stack_.back().has_rhs())
+                        {
+                            stack_.back().rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                        }
                         buffer_.clear();
                     }
                     if (stack_.size() == 1)
@@ -320,35 +396,97 @@ public:
             case filter_states::expect_path_or_value: 
                 switch (c)
                 {
-                case '.':
-                    state_ = filter_states::string;
+                case '@':
                     buffer_.push_back(c);
+                    state_ = filter_states::path;
                     break;
-                case '[':
-                    state_ = filter_states::left_bracket;
-                    buffer_.push_back(c);
-                    break;
-                case '0': 
-                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+				case ' ':case '\n':case '\r':case '\t':
+					break;
+                default: 
                     buffer_.push_back(c);
                     state_ = filter_states::integer;
+                    break;
                 };
                 break;
-            case filter_states::left_grouping:
+            case filter_states::path: 
+                switch (c)
+                {
+                case '<':
+                    if (buffer_.length() > 0)
+                    {
+                        if (!stack_.back().has_lhs())
+                        {
+                            stack_.back().lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        else if (!stack_.back().has_rhs())
+                        {
+                            stack_.back().rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        buffer_.clear();
+                    }
+                    stack_.back().operator_ = operators::lt;
+                    state_ = filter_states::expect_path_or_value;
+                    break;
+                case '>':
+                    if (buffer_.length() > 0)
+                    {
+                        if (!stack_.back().has_lhs())
+                        {
+                            stack_.back().lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        else if (!stack_.back().has_rhs())
+                        {
+                            stack_.back().rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        buffer_.clear();
+                    }
+                    stack_.back().operator_ = operators::gt;
+                    state_ = filter_states::expect_path_or_value;
+                    break;
+                case ')':
+                    if (buffer_.length() > 0)
+                    {
+                        if (!stack_.back().has_lhs())
+                        {
+                            stack_.back().lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        else if (!stack_.back().has_rhs())
+                        {
+                            stack_.back().rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                        }
+                        buffer_.clear();
+                    }
+                    if (stack_.size() == 1)
+                    {
+                        filter_ = stack_[0];
+                    }
+                    stack_.pop_back();
+                    state_ = filter_states::start;
+                    break;
+                default:
+                    buffer_.push_back(c);
+                    break;
+                };
+                break;
+            case filter_states::grouping:
                 switch (c)
                 {
                 case '@':
                     buffer_.push_back(c);
-                    state_ = filter_states::expect_path_or_value;
+                    state_ = filter_states::path;
                     break;
                 case ')':
-                    state_ = filter_states::left_grouping;
+                    state_ = filter_states::grouping;
                     if (stack_.size() == 1)
                     {
                         filter_ = stack_[0];
                         done = true;
                     }
                     stack_.pop_back();
+                    break;
+                default: 
+                    buffer_.push_back(c);
+                    state_ = filter_states::integer;
                     break;
                 }
                 break;
