@@ -31,7 +31,8 @@ namespace filter_states {
         string,
         integer,
         path,
-        value
+        value,
+        oper
     };
 }
 
@@ -198,8 +199,11 @@ namespace operators {
 enum operators_t
 {
     none,
+    eq,
     lt,
-    gt
+    gt,
+    lte,
+    gte
 };}
 
 template<typename Char, class Alloc>
@@ -255,13 +259,14 @@ class jsonpath_filter_parser
 public:
     void parse(const Char* p, size_t start, size_t length)
     {
+        int prev_c = 0;
         index_ = start;
         state_ = filter_states::start;
         bool done = false;
         for (; !done && index_ < length; ++index_)
         {
             int c = p[index_];
-handler_state:
+handle_state:
             switch (state_)
             {
             case filter_states::start:
@@ -276,38 +281,69 @@ handler_state:
                     break;
                 }
                 break;
-            case filter_states::integer: 
+            case filter_states::oper:
+                switch (c)
                 {
-                    switch (c)
+                case '=':
+                    switch (prev_c)
+                    {
+                    case '=':
+                        {
+                            stack_.back().operator_ = operators::eq;
+                            state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
+                    case '>':
+                        {
+                            stack_.back().operator_ = operators::gte;
+                            state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
+                    case '<':
+                        {
+                            stack_.back().operator_ = operators::lte;
+                            state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
+                    }
+                    break;
+                default:
+                    switch (prev_c)
                     {
                     case '<':
                         {
-							if (buffer_.length() > 0)
-							{
-								auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-								if (!stack_.back().has_lhs())
-								{
-									stack_.back().lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
-								}
-								buffer_.clear();
-							}
                             stack_.back().operator_ = operators::lt;
                             state_ = filter_states::expect_path_or_value;
                         }
                         break;
                     case '>':
                         {
-							if (buffer_.length() > 0)
-							{
-								auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-								if (!stack_.back().has_lhs())
-								{
-									stack_.back().lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
-								}
-								buffer_.clear();
-							}
                             stack_.back().operator_ = operators::gt;
                             state_ = filter_states::expect_path_or_value;
+                        }
+                        break;
+                    }
+                    break;
+                }
+                break;
+            case filter_states::integer: 
+                {
+                    switch (c)
+                    {
+                    case '<':
+                    case '>':
+                        {
+                            if (buffer_.length() > 0)
+                            {
+                                auto val = basic_json<Char, Alloc>::parse_string(buffer_);
+                                if (!stack_.back().has_lhs())
+                                {
+                                    stack_.back().lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+                                }
+                                buffer_.clear();
+                            }
+                            state_ = filter_states::oper;
+                            goto handle_state;
                         }
                         break;
                     case ')':
@@ -491,6 +527,7 @@ handler_state:
                 }
                 break;
             }
+            prev_c = c;
         }
     }
 
