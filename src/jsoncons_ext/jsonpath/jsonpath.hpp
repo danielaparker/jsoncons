@@ -40,23 +40,19 @@ namespace states {
 };
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
+basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
 {
-    jsonpath_evaluator<Char,Alloc> evaluator;
-    evaluator.evaluate(root,path);
-    return evaluator.get_values();
+    return json_query(root,path.c_str(),path.length());
 }
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const Char* path)
+basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Char* path)
 {
-    jsonpath_evaluator<Char,Alloc> evaluator;
-    evaluator.evaluate(root,path);
-    return evaluator.get_values();
+    return json_query(root,path,std::char_traits<Char>::length(path));
 }
 
 template<typename Char, class Alloc>
-std::vector<basic_json<Char,Alloc>> json_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
+basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
 {
     jsonpath_evaluator<Char,Alloc> evaluator;
     evaluator.evaluate(root,path,length);
@@ -94,22 +90,22 @@ public:
     {
     }
 
-    std::vector<basic_json<Char,Alloc>> get_values() const
+    basic_json<Char,Alloc> get_values() const
     {
-        std::vector<basic_json<Char,Alloc>> result;
+        basic_json<Char,Alloc> result = basic_json<Char,Alloc>::make_array();
 
         if (stack_.size() > 0)
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
                 cjson_ptr p = stack_.back()[i];
-                result.push_back(*p);
+                result.add(*p);
             }
         }
         return result;
     }
 
-    std::vector<const basic_json<Char,Alloc>*> get_value_ptrs() const
+    std::vector<const basic_json<Char,Alloc>*> get_nodes() const
     {
         return stack_.size() > 0 ? stack_.back() : std::vector<cjson_ptr>();
     }

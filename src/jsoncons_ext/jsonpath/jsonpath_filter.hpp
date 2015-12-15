@@ -177,7 +177,7 @@ public:
     {
         jsonpath_evaluator<Char,Alloc> evaluator;
         evaluator.evaluate(parent,path_);
-        nodes_ = evaluator.get_value_ptrs();
+        nodes_ = evaluator.get_nodes();
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -313,6 +313,7 @@ public:
     std::shared_ptr<expression<Char,Alloc>> rhs_;
 
     jsonpath_filter()
+		: operator_(operators::none)
     {
     }
 
@@ -430,7 +431,6 @@ class jsonpath_filter_parser
 public:
     void parse(const Char* p, size_t start, size_t length)
     {
-        int prev_c = 0;
         index_ = start;
         state_ = filter_states::start;
         bool done = false;
@@ -449,6 +449,27 @@ handle_state:
                     break;
                 case ']':
                     done = true;
+                    break;
+                case ')':
+                    if (stack_.size() == 1)
+                    {
+                        filter_ = stack_.back();
+                        stack_.pop_back();
+                    }
+                    else 
+                    {
+                        auto expr = stack_.back();
+                        stack_.pop_back();
+
+                        if (!stack_.back()->has_lhs())
+                        {
+                            stack_.back()->lhs_ = expr;
+                        }
+                        else if (!stack_.back()->has_rhs())
+                        {
+                            stack_.back()->rhs_ = expr;
+                        }
+                    }
                     break;
                 }
                 break;
@@ -528,6 +549,8 @@ handle_state:
                     case '<':
                     case '>':
                     case '=':
+                    case '&':
+                    case '|':
                         {
                             if (buffer_.length() > 0)
                             {
@@ -559,6 +582,7 @@ handle_state:
 						if (stack_.size() == 1)
 						{
 							filter_ = stack_.back();
+                            state_ = filter_states::start;
                             stack_.pop_back();
 						}
                         else
@@ -574,8 +598,8 @@ handle_state:
                             {
                                 stack_.back()->rhs_ = expr;
                             }
+                            state_ = filter_states::expect_path_or_value;
                         }
-                        state_ = filter_states::start;
                         break;
                     case ' ':case '\n':case '\r':case '\t':
                         if (buffer_.length() > 0)
@@ -605,6 +629,8 @@ handle_state:
                     case '<':
                     case '>':
                     case '=':
+                    case '&':
+                    case '|':
                         {
                             if (buffer_.length() > 0)
                             {
@@ -636,10 +662,23 @@ handle_state:
                         }
                         if (stack_.size() == 1)
                         {
-                            filter_ = stack_[0];
+                            filter_ = stack_.back();
+                            stack_.pop_back();
                         }
-                        stack_.pop_back();
-                        state_ = filter_states::start;
+                        else 
+                        {
+                            auto expr = stack_.back();
+                            stack_.pop_back();
+
+                            if (!stack_.back()->has_lhs())
+                            {
+                                stack_.back()->lhs_ = expr;
+                            }
+                            else if (!stack_.back()->has_rhs())
+                            {
+                                stack_.back()->rhs_ = expr;
+                            }
+                        }
                         break;
                     case ' ':case '\n':case '\r':case '\t':
                         if (buffer_.length() > 0)
@@ -675,9 +714,43 @@ handle_state:
                     buffer_.push_back('\"');
                     state_ = filter_states::quoted_text;
                     break;
+                case '(':
+                    stack_.push_back(std::make_shared<jsonpath_filter<Char,Alloc>>());
+                    break;
+                case ')':
+                    if (stack_.size() == 1)
+                    {
+                        filter_ = stack_.back();
+                        stack_.pop_back();
+                    }
+                    else 
+                    {
+                        auto expr = stack_.back();
+                        stack_.pop_back();
+
+                        if (!stack_.back()->has_lhs())
+                        {
+                            stack_.back()->lhs_ = expr;
+                        }
+                        else if (!stack_.back()->has_rhs())
+                        {
+                            stack_.back()->rhs_ = expr;
+                        }
+                    }
+                    break;
+                case '<':
+                case '>':
+                case '=':
+                case '&':
+                case '|':
+                    {
+                        state_ = filter_states::oper;
+                        goto handle_state;
+                    }
+                    break;
                 default: 
-                    buffer_.push_back(c);
                     state_ = filter_states::unquoted_text;
+                    goto handle_state;
                     break;
                 };
                 break;
@@ -687,16 +760,14 @@ handle_state:
                 case '<':
                 case '>':
                 case '=':
+                case '&':
+                case '|':
                     {
                         if (buffer_.length() > 0)
                         {
                             if (!stack_.back()->has_lhs())
                             {
                                 stack_.back()->lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
-                            }
-                            else if (!stack_.back()->has_rhs())
-                            {
-                                stack_.back()->rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
                             }
                             buffer_.clear();
                         }
@@ -721,6 +792,7 @@ handle_state:
                     {
                         filter_ = stack_.back();
                         stack_.pop_back();
+                        state_ = filter_states::start;
                     }
                     else
                     {
@@ -735,9 +807,9 @@ handle_state:
                         {
                             stack_.back()->rhs_ = expr;
                         }
+                        state_ = filter_states::expect_path_or_value;
                     }
-                    state_ = filter_states::start;
-                    break;
+                     break;
                 default:
                     buffer_.push_back(c);
                     break;
@@ -745,7 +817,6 @@ handle_state:
                 break;
             }
             ++index_;
-            prev_c = c;
         }
     }
 
