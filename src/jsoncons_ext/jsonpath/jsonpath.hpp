@@ -290,11 +290,11 @@ handle_state:
 					{
                         jsonpath_filter_parser<Char,Alloc> parser;
                         parser.parse(path,i,path_length);
-                        jsonpath_filter<Char,Alloc> filter = parser.get_filter();
+                        auto filter = parser.get_filter();
                         nodes_.clear();
 						for (size_t j = 0; j < stack_.back().size(); ++j)
 						{
-	                        accept(*(stack_.back()[j]),filter);
+	                        accept(*(stack_.back()[j]),*filter);
 						}
                         end_nodes();
 						i += parser.index();
@@ -344,6 +344,8 @@ handle_state:
                     end_member_name();
                     end_nodes();
                     state_ = states::dot;
+                    break;
+                case ' ':case '\n':case '\r':case '\t':
                     break;
                 default:
                     buffer_.push_back(c);
