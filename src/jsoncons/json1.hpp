@@ -195,6 +195,7 @@ public:
 
     struct variant
     {
+
         static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
 
         variant()
@@ -235,7 +236,7 @@ public:
                 std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_holder(var.value_.string_value_);
+                value_.string_value_ = make_string_data(var.value_.string_value_);
                 break;
             case value_types::array_t:
                 value_.array_ = new json_array<Char,Alloc>(*(var.value_.array_));
@@ -296,7 +297,7 @@ public:
                 small_string_length_ = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_holder();
+                value_.string_value_ = make_string_data("",0);
                 break;
             case value_types::array_t:
                 value_.array_ = new json_array<Char,Alloc>(size);
@@ -353,7 +354,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_holder(s);
+                value_.string_value_ = make_string_data(s);
             }
             else
             {
@@ -369,7 +370,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_holder(s);
+                value_.string_value_ = make_string_data(s,std::char_traits<Char>::length(s));
             }
             else
             {
@@ -384,7 +385,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_holder(s,length);
+                value_.string_value_ = make_string_data(s,length);
             }
             else
             {
@@ -406,7 +407,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                delete_string_holder(value_.string_value_);
+                delete_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
                 delete value_.array_;
@@ -427,7 +428,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                delete_string_holder(value_.string_value_);
+                delete_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
                 delete value_.array_;
@@ -553,7 +554,7 @@ public:
                 if (s.length() > variant::small_string_capacity)
                 {
                     type_ = value_types::string_t;
-                    value_.string_value_ = make_string_holder(s);
+                    value_.string_value_ = make_string_data(s);
                 }
                 else
                 {
@@ -583,7 +584,7 @@ public:
 					if (length > variant::small_string_capacity)
 					{
 						type_ = value_types::string_t;
-						value_.string_value_ = make_string_holder(s,length);
+						value_.string_value_ = make_string_data(s,length);
 					}
 					else
 					{
@@ -858,40 +859,40 @@ public:
             Char small_string_value_[sizeof(long long)/sizeof(Char)];
         } value_;
 
-        static void delete_string_holder(std::basic_string<Char>* other)
+        static void delete_string_data(std::basic_string<Char>* other)
         {
             delete other;
         }
 
-        static std::basic_string<Char>* make_string_holder(const std::basic_string<Char>* other)
+        static std::basic_string<Char>* make_string_data(const std::basic_string<Char>* other)
         {
             return new std::basic_string<Char>(*other);
         }
 
-        static std::basic_string<Char>* make_string_holder(const std::basic_string<Char>& s)
+        static std::basic_string<Char>* make_string_data(const std::basic_string<Char>& s)
         {
             return new std::basic_string<Char>(s);
         }
 
-        static std::basic_string<Char>* make_string_holder(const Char* p)
-        {
-            return make_string_holder(p,std::char_traits<Char>::length(p));
-        }
+        //static std::basic_string<Char>* make_string_data(const Char* p)
+        //{
+        //    return make_string_data(p,std::char_traits<Char>::length(p));
+        //}
 
-        static std::basic_string<Char>* make_string_holder(const Char* p, size_t length)
+        static std::basic_string<Char>* make_string_data(const Char* p, size_t length)
         {
             return new std::basic_string<Char>(p,length);
         }
 
-        static std::basic_string<Char>* make_string_holder()
-        {
-          return new std::basic_string<Char>();
-        }
+        //static std::basic_string<Char>* make_string_data()
+        //{
+        //  return new std::basic_string<Char>();
+        //}
 
-        static std::basic_string<Char>* make_string_holder(Char c)
-        {
-            return make_string_holder(&c,1);
-        }
+        //static std::basic_string<Char>* make_string_data(Char c)
+        //{
+        //    return make_string_data(&c,1);
+        //}
 
     };
 
