@@ -57,7 +57,7 @@ public:
         case json_parser_errc::unexpected_eof:
             return "Unexpected end of file";
         case json_parser_errc::invalid_json_text:
-            return "A jSON text must be an object or array";
+            return "Invalid JSON text";
         case json_parser_errc::extra_character:
             return "Unexpected non-whitespace character after JSON text";
         case json_parser_errc::max_depth_exceeded:
