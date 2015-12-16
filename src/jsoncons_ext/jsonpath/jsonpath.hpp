@@ -151,8 +151,8 @@ public:
 
         for (size_t i = 0; i < path_length; ++i)
         {
-            Char c = path[i];
 handle_state:
+            Char c = path[i];
             switch (state_)
             {
             case states::start: 
@@ -311,7 +311,8 @@ handle_state:
 	                        accept(*(stack_.back()[j]),*filter);
 						}
                         end_nodes();
-						i += parser.index();
+						i = parser.index();
+                        goto handle_state;
 					}
                     break;
                 case ':':
@@ -331,13 +332,13 @@ handle_state:
                     state_ = states::left_bracket_start;
                     break;
                 case ']':
-                    end_element_index();
-                    end_nodes();
+                    //end_element_index();
+                    //end_nodes();
                     state_ = states::expect_separator;
                     break;
                 case '*':
                     end_all();
-                    end_nodes();
+                    //end_nodes();
                     state_ = states::expect_right_bracket;
                     break;
                 case '\'':

@@ -30,7 +30,7 @@ public:
     basic_output_format()
         :
         indent_(default_indent),
-        precision_(16),
+        precision_(15),
         floatfield_(std::ios_base::fmtflags(0)),
         replace_nan_(true),
         replace_pos_inf_(true),

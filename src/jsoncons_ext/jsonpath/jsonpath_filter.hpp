@@ -40,8 +40,8 @@ template<typename Char, class Alloc>
 class expression
 {
 public:
-    virtual void evaluate(const basic_json<Char,Alloc>& parent) = 0;
-    virtual bool empty() const = 0;
+    virtual void evaluate(const basic_json<Char,Alloc>& context_node) = 0;
+    virtual bool evaluate_single_node() const = 0;
     virtual bool eq(const expression& rhs) const = 0;
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ne(const expression& rhs) const = 0;
@@ -54,6 +54,30 @@ public:
     virtual bool lt(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool gt(const expression& rhs) const = 0;
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
+
+    static bool evaluate_single_node(const basic_json<Char,Alloc>& node)
+    {
+        bool result = false;
+        if (node.is_bool())
+        {
+            result = node.as_bool();
+        }
+        else 
+        {
+            result = node.is_empty();
+        }
+        return result;
+    }
+
+    static bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        return (lhs.is_bool() && lhs.as_bool()) && (rhs.is_bool() && rhs.as_bool());
+    }
+
+    static bool pipepipe(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        return (lhs.is_bool() && lhs.as_bool()) || (rhs.is_bool() && rhs.as_bool());
+    }
 
     static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
@@ -103,13 +127,13 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
     }
 
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return value_.is_empty();
+        return expression<Char, Alloc>::evaluate_single_node(value_);
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -122,29 +146,29 @@ public:
         return value_ == rhs;
     }
 
-    bool ne(const expression& parent) const override
+    bool ne(const expression& rhs) const override
     {
         return false;
     }
-    bool ne(const basic_json<Char,Alloc>& parent) const override
+    bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
         return false;
     }
-    bool ampamp(const expression& parent) const override
+    bool ampamp(const expression& rhs) const override
     {
-        return false;
+        return rhs.ampamp(value_);
     }
-    bool ampamp(const basic_json<Char,Alloc>& parent) const override
+    bool ampamp(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return expression<Char, Alloc>::ampamp(value_,rhs);
     }
-    bool pipepipe(const expression& parent) const override
+    bool pipepipe(const expression& rhs) const override
     {
-        return false;
+        return rhs.pipepipe(value_);
     }
-    bool pipepipe(const basic_json<Char,Alloc>& parent) const override
+    bool pipepipe(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return expression<Char, Alloc>::pipepipe(value_,rhs);
     }
 
     bool lt(const expression<Char,Alloc>& rhs) const override
@@ -179,16 +203,25 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
         jsonpath_evaluator<Char,Alloc> evaluator;
-        evaluator.evaluate(parent,path_);
+        evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_nodes();
     }
 
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return nodes_.size() == 0;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = expression<Char,Alloc>::evaluate_single_node(*nodes_[i]);
+            }
+        }
+        return result;
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -219,27 +252,45 @@ public:
         return result;
     }
 
-    bool ne(const expression& parent) const override
+    bool ne(const expression& rhs) const override
     {
         return false;
     }
-    bool ne(const basic_json<Char,Alloc>& parent) const override
+    bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
         return false;
     }
-    bool ampamp(const expression& parent) const override
+    bool ampamp(const expression& rhs) const override
+    {
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = rhs.ampamp(*nodes_[i]);
+            }
+        }
+        return result;
+    }
+    bool ampamp(const basic_json<Char,Alloc>& rhs) const override
+    {
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = expression<Char,Alloc>::ampamp(*nodes_[i],rhs);
+            }
+        }
+        return result;
+    }
+    bool pipepipe(const expression& rhs) const override
     {
         return false;
     }
-    bool ampamp(const basic_json<Char,Alloc>& parent) const override
-    {
-        return false;
-    }
-    bool pipepipe(const expression& parent) const override
-    {
-        return false;
-    }
-    bool pipepipe(const basic_json<Char,Alloc>& parent) const override
+    bool pipepipe(const basic_json<Char,Alloc>& rhs) const override
     {
         return false;
     }
@@ -328,17 +379,17 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
-        lhs_->evaluate(parent);
+        lhs_->evaluate(context_node);
         if (operator_ != operators::none)
         {
-            rhs_->evaluate(parent);
+            rhs_->evaluate(context_node);
         }
     }
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return false;
+        return lhs_->evaluate_single_node();
     }
     bool eq(const expression& rhs) const override
     {
@@ -437,7 +488,7 @@ public:
         case operators::lte:
             return lhs_->lt(*rhs_) || lhs_->eq(*rhs_);
         case operators::none:
-            return !lhs_->empty();
+            return lhs_->evaluate_single_node();
 			break;
         }
         return false;
@@ -471,14 +522,11 @@ handle_state:
                     state_ = filter_states::expect_path_or_value;
                     stack_.push_back(std::make_shared<jsonpath_filter<Char,Alloc>>());
                     break;
-                case ']':
-                    done = true;
-                    break;
                 case ')':
                     if (stack_.size() == 1)
                     {
                         filter_ = stack_.back();
-                        stack_.pop_back();
+                        done = true;
                     }
                     else 
                     {
@@ -579,10 +627,11 @@ handle_state:
                             if (buffer_.length() > 0)
                             {
                                 auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-                                if (!stack_.back()->has_lhs())
+                                if (stack_.back()->has_lhs())
                                 {
-                                    stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+                                    JSONCONS_THROW_EXCEPTION("Invalid filter.");
                                 }
+                                stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
                                 buffer_.clear();
                             }
                             state_ = filter_states::oper;
@@ -601,6 +650,10 @@ handle_state:
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
                             }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                            }
                             buffer_.clear();
                         }
 						if (stack_.size() == 1)
@@ -608,6 +661,7 @@ handle_state:
 							filter_ = stack_.back();
                             state_ = filter_states::start;
                             stack_.pop_back();
+                            done = true;
 						}
                         else
                         {
@@ -621,6 +675,10 @@ handle_state:
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = expr;
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
                             state_ = filter_states::expect_path_or_value;
                         }
@@ -636,6 +694,10 @@ handle_state:
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
 							buffer_.clear();
 						}
@@ -659,10 +721,11 @@ handle_state:
                             if (buffer_.length() > 0)
                             {
                                 auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-                                if (!stack_.back()->has_lhs())
+                                if (stack_.back()->has_lhs())
                                 {
-                                    stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+                                    JSONCONS_THROW_EXCEPTION("Invalid filter.");
                                 }
+                                stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
                                 buffer_.clear();
                             }
                             state_ = filter_states::oper;
@@ -681,6 +744,10 @@ handle_state:
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
                             buffer_.clear();
                         }
@@ -702,6 +769,10 @@ handle_state:
                             {
                                 stack_.back()->rhs_ = expr;
                             }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                            }
                         }
                         break;
                     case ' ':case '\n':case '\r':case '\t':
@@ -715,6 +786,10 @@ handle_state:
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
                             buffer_.clear();
                         }
@@ -746,6 +821,7 @@ handle_state:
                     {
                         filter_ = stack_.back();
                         stack_.pop_back();
+                        done = true;
                     }
                     else 
                     {
@@ -759,6 +835,10 @@ handle_state:
                         else if (!stack_.back()->has_rhs())
                         {
                             stack_.back()->rhs_ = expr;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
                         }
                     }
                     break;
@@ -789,10 +869,11 @@ handle_state:
                     {
                         if (buffer_.length() > 0)
                         {
-                            if (!stack_.back()->has_lhs())
+                            if (stack_.back()->has_lhs())
                             {
-                                stack_.back()->lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
+                            stack_.back()->lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
                             buffer_.clear();
                         }
                         state_ = filter_states::oper;
@@ -810,6 +891,10 @@ handle_state:
                         {
                             stack_.back()->rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
                         }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
                         buffer_.clear();
                     }
                     if (stack_.size() == 1)
@@ -817,6 +902,7 @@ handle_state:
                         filter_ = stack_.back();
                         stack_.pop_back();
                         state_ = filter_states::start;
+                        done = true;
                     }
                     else
                     {
@@ -830,6 +916,10 @@ handle_state:
                         else if (!stack_.back()->has_rhs())
                         {
                             stack_.back()->rhs_ = expr;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
                         }
                         state_ = filter_states::expect_path_or_value;
                     }
