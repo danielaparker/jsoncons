@@ -22,11 +22,28 @@
 
 namespace jsoncons { namespace jsonpath {
 
+    template <typename Char>
+    struct json_jsonpath_traits
+    {
+    };
+
+    template <>
+    struct json_jsonpath_traits<char>
+    {
+        static const std::string length_literal() {return "length";};
+    };
+
+    template <>
+    struct json_jsonpath_traits<wchar_t> // assume utf16
+    {
+        static const std::wstring length_literal() {return L"length";};
+    };
+
 namespace states {
     enum states_t {
         start,
         expect_separator,
-        string,
+        member_name,
         quoted_string,
         left_bracket,
         left_bracket_start,
@@ -78,6 +95,7 @@ private:
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
+    std::vector<std::shared_ptr<basic_json<Char,Alloc>>> temp_;
 
     void end_nodes()
     {
@@ -158,7 +176,7 @@ handle_state:
                     recursive_descent_ = true;
                     break;
                 default:
-                    state_ = states::string;
+                    state_ = states::member_name;
                     goto handle_state;
                     break;
                 }
@@ -327,7 +345,7 @@ handle_state:
                     break;
                 }
                 break;
-            case states::string: 
+            case states::member_name: 
                 switch (c)
                 {
                 case '[':
@@ -364,7 +382,7 @@ handle_state:
         }
         switch (state_)
         {
-        case states::string: 
+        case states::member_name: 
             {
                 end_member_name();
                 end_nodes();
@@ -505,9 +523,15 @@ handle_state:
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            if (p->has_member(buffer_))
+            if (p->is_object()  && p->has_member(buffer_))
             {
                 nodes_.push_back(std::addressof(p->get(buffer_)));
+            }
+            else if (p->is_array() && buffer_ == json_jsonpath_traits<Char>::length_literal())
+            {
+                auto q = std::make_shared<basic_json<Char,Alloc>>(p->size());
+                temp_.push_back(q);
+                nodes_.push_back(q.get());
             }
         }
     }
