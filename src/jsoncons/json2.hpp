@@ -1002,7 +1002,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
     case value_types::small_string_t:
         return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
     case value_types::string_t:
-        return std::basic_string<Char>(*(var_.value_.string_value_));
+        return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
     default:
         return to_string();
     }
@@ -1017,8 +1017,8 @@ const Char* basic_json<Char, Alloc>::as_cstring() const
         var_.value_.small_string_value_[var_.small_string_length_] = 0;
         return var_.value_.small_string_value_;
     case value_types::string_t:
-        var_.value_.string_value_->p[var_.value_.string_value_.length()] = 0;
-        return var_.value_.string_value_->p;
+        var_.value_.string_value_->c_str()[var_.value_.string_value_.length] = 0;
+        return var_.value_.string_value_->c_str();
     default:
         JSONCONS_THROW_EXCEPTION("Not a string");
     }
@@ -1032,7 +1032,7 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     case value_types::small_string_t:
         return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
     case value_types::string_t:
-        return std::basic_string<Char>(var_.value_.string_value_->p,var_.value_.string_value_->length);
+        return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
     default:
         return to_string(format);
     }
