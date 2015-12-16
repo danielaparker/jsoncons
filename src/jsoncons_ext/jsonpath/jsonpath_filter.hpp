@@ -41,18 +41,19 @@ class expression
 {
 public:
     virtual void evaluate(const basic_json<Char,Alloc>& parent) = 0;
-    virtual bool eq(const expression& parent) const = 0;
-    virtual bool eq(const basic_json<Char,Alloc>& parent) const = 0;
-    virtual bool ne(const expression& parent) const = 0;
-    virtual bool ne(const basic_json<Char,Alloc>& parent) const = 0;
-    virtual bool ampamp(const expression& parent) const = 0;
-    virtual bool ampamp(const basic_json<Char,Alloc>& parent) const = 0;
-    virtual bool pipepipe(const expression& parent) const = 0;
-    virtual bool pipepipe(const basic_json<Char,Alloc>& parent) const = 0;
-    virtual bool lt(const expression& parent) const = 0;
-    virtual bool lt(const basic_json<Char,Alloc>& parent) const = 0;
-    virtual bool gt(const expression& parent) const = 0;
-    virtual bool gt(const basic_json<Char,Alloc>& parent) const = 0;
+    virtual bool empty() const = 0;
+    virtual bool eq(const expression& rhs) const = 0;
+    virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool ne(const expression& rhs) const = 0;
+    virtual bool ne(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool ampamp(const expression& rhs) const = 0;
+    virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool pipepipe(const expression& rhs) const = 0;
+    virtual bool pipepipe(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool lt(const expression& rhs) const = 0;
+    virtual bool lt(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool gt(const expression& rhs) const = 0;
+    virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
 
     static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
@@ -104,6 +105,11 @@ public:
 
     void evaluate(const basic_json<Char,Alloc>& parent) override
     {
+    }
+
+    bool empty() const override
+    {
+        return value_.is_empty();
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -178,6 +184,11 @@ public:
         jsonpath_evaluator<Char,Alloc> evaluator;
         evaluator.evaluate(parent,path_);
         nodes_ = evaluator.get_nodes();
+    }
+
+    bool empty() const override
+    {
+        return nodes_.size() == 0;
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -320,7 +331,14 @@ public:
     void evaluate(const basic_json<Char,Alloc>& parent) override
     {
         lhs_->evaluate(parent);
-        rhs_->evaluate(parent);
+        if (operator_ != operators::none)
+        {
+            rhs_->evaluate(parent);
+        }
+    }
+    bool empty() const override
+    {
+        return false;
     }
     bool eq(const expression& rhs) const override
     {
@@ -391,7 +409,10 @@ public:
     bool accept(const basic_json<Char,Alloc>& arg) const
     {
         lhs_->evaluate(arg);
-        rhs_->evaluate(arg);
+		if (operator_ != operators::none)
+		{
+			rhs_->evaluate(arg);
+		}
         return compare();
     }
 
@@ -415,6 +436,9 @@ public:
             return lhs_->gt(*rhs_) || lhs_->eq(*rhs_);
         case operators::lte:
             return lhs_->lt(*rhs_) || lhs_->eq(*rhs_);
+        case operators::none:
+            return !lhs_->empty();
+			break;
         }
         return false;
     }

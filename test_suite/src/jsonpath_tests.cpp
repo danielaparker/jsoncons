@@ -193,7 +193,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter2)
         std::cout << pretty_print(result[i]) << std::endl;
     }
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
 {
@@ -218,6 +217,82 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
     //std::cout << pretty_print(expected) << std::endl;
 
     BOOST_CHECK_EQUAL(expected,result);
+}
+
+
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
+{
+	jsonpath_fixture fixture;
+
+    json val = json::parse_string(jsonpath_fixture::store_text());
+
+    json books = fixture.books();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        bool has_isbn = books[i].has_member("isbn");
+        if (has_isbn)
+        {
+            json result = json_query(books[i],"@.isbn");
+            std::cout << pretty_print(result) << std::endl;
+        }
+    }
+
+
+    //json result = json_query(val,"$..book[?(@.isbn)]");
+
+    //json books = fixture.books();
+
+    //json expected = json::array();
+    //for (size_t i = 0; i < books.size(); ++i)
+    //{
+    //    double price = books[i]["price"].as<double>();
+    //    if (price > 8 && price < 12)
+    //    {
+    //        expected.add(books[i]);
+    //    }
+    //}
+	//std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(expected) << std::endl;
+
+    //BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
+{
+	jsonpath_fixture fixture;
+
+    json val = json::parse_string(jsonpath_fixture::store_text());
+
+    json result = json_query(val,"$..book[?(@.isbn)]");
+
+    json books = fixture.books();
+
+    //json expected = json::array();
+    //for (size_t i = 0; i < books.size(); ++i)
+    //{
+    //    double price = books[i]["price"].as<double>();
+    //    if (price > 8 && price < 12)
+    //    {
+    //        expected.add(books[i]);
+    //    }
+    //}
+	std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(expected) << std::endl;
+
+    //BOOST_CHECK_EQUAL(expected,result);
+}
+#endif
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
+{
+	jsonpath_fixture fixture;
+
+    json val = json::parse_string(jsonpath_fixture::store_text());
+
+    json result = json_query(val,"$..book.length");
+
+	std::cout << pretty_print(result) << std::endl;
 }
  
 #if 0
