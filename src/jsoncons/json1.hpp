@@ -200,7 +200,7 @@ public:
 			const Char* c_str() const { return p; }
 			size_t length() const { return length_; }
 
-			bool operator==(const string_data& rhs)
+			bool operator==(const string_data& rhs) const
 			{
 				return length() == rhs.length() ? std::char_traits<Char>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
 			}

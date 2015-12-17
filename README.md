@@ -13,7 +13,6 @@ The library has a number of features, which are listed below:
 - Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
 - Correctly handles surrogate pairs in \uXXXX escape sequences
 - Supports event based JSON parsing and serializing with user defined input and output handlers
-- Guarantees basic exception safety (no leaks)
 - Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
 - Supports optional escaping of the solidus (/) character
 - Supports Nan, Inf and -Inf replacement
@@ -24,6 +23,10 @@ The library has a number of features, which are listed below:
 - Supports reading (writing) JSON values from (to) CSV files
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
+
+## What's new on master
+
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).
 
 ## Using the jsoncons library
 
@@ -265,6 +268,48 @@ There are a few things to note about the effect of the parameter settings.
 - `trim` `true` tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `data_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
+
+### jsonpath
+
+[Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
+
+Here is a sample JSON file (store.json):
+
+    { "store": {
+        "book": [ 
+          { "category": "reference",
+            "author": "Nigel Rees",
+            "title": "Sayings of the Century",
+            "price": 8.95
+          },
+          { "category": "fiction",
+            "author": "Evelyn Waugh",
+            "title": "Sword of Honour",
+            "price": 12.99
+          },
+          { "category": "fiction",
+            "author": "Herman Melville",
+            "title": "Moby Dick",
+            "isbn": "0-553-21311-3",
+            "price": 8.99
+          }
+        ],
+      }
+    }
+
+The following code returns all authors whose books are cheaper than $10. 
+    
+    using jsoncons::jsonpath::json_query;
+
+    json root = json::parse_file("store.json");
+
+    json result = json_query(val,"$.store.book[?(@.price < 10)].author");
+
+    std::cout << pretty_print(result) << std::endl;
+
+The result is
+
+    ["Nigel Rees","Herman Melville"]
 
 ### Iterators
 
