@@ -41,8 +41,8 @@ struct jsonpath_fixture
     json bicycle()
     {
         json root = json::parse_string(jsonpath_fixture::store_text());
-        json book = root["store"]["bicycle"];
-        return book;
+        json bicycle = root["store"]["bicycle"];
+        return bicycle;
     }
 };
 
@@ -442,6 +442,22 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests2)
     json result6 = json_query(root,"$.store.book[?('a' == 'b')].author");
     json expected6 = json::array();
     BOOST_CHECK_EQUAL(expected6,result6);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_everything)
+{
+    jsonpath_fixture fixture;
+
+    json root = json::parse_string(jsonpath_fixture::store_text());
+
+    json result = json_query(root,"$.store.*");
+    std::cout << result << std::endl;
+ 
+    json expected = json::array();
+    expected.add(fixture.bicycle());
+    expected.add(fixture.book());
+
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 

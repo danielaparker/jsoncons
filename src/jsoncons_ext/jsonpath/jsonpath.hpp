@@ -175,6 +175,10 @@ handle_state:
                 case '.':
                     recursive_descent_ = true;
                     break;
+				case '*':
+                    end_all();
+                    end_nodes();
+                    break;
                 default:
                     state_ = states::member_name;
                     goto handle_state;
