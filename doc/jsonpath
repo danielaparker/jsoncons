@@ -527,6 +527,51 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 </tr>
 </tbody>
 </table>
+<h3 id="filter-expression">Filter expression</h3>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>==</code></td>
+<td>Left is equal to right </td>
+</tr>
+<tr>
+<td><code>!=</code></td>
+<td>Left is not equal to right</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>Left is less than right</td>
+</tr>
+<tr>
+<td><code>&lt;=</code></td>
+<td>Left is less or equal to right</td>
+</tr>
+<tr>
+<td><code>&gt;</code></td>
+<td>Left is greater than right</td>
+</tr>
+<tr>
+<td><code>&gt;=</code></td>
+<td>Left is greater than or equal to right</td>
+</tr>
+<tr>
+<td><code>&amp;&amp;</code></td>
+<td>Left and right</td>
+</tr>
+<tr>
+<td>`</td>
+<td>`</td>
+<td>Left or right</td>
+</tr>
+</tbody>
+</table>
+<p>In this implementation, binary expressions must appear within parentheses.</p>
 <h3 id="examples">Examples</h3>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner&#39;s JsonPath</a> (store.json).</p>
 <pre><code>{ &quot;store&quot;: {
@@ -586,6 +631,11 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 </thead>
 <tbody>
 <tr>
+<td><code>$..book.length</code></td>
+<td>The number of books</td>
+<td><code>length</code> is a property of an array</td>
+</tr>
+<tr>
 <td><code>$.store.book[*].author</code></td>
 <td>All authors of books in the store</td>
 </tr>
@@ -644,10 +694,6 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <td><code>$..*</code></td>
 <td>Everything in the store.</td>
-</tr>
-<tr>
-<td><code>$..book.length</code></td>
-<td>The number of books</td>
 </tr>
 <tr>
 <td>`$.store.book[ ?((@.author == &#39;Nigel Rees&#39;)</td>

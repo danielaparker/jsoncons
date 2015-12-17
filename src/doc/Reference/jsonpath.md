@@ -25,6 +25,21 @@ JSONPath|	Description
 `?()`	|Applies a filter expression.
 `()`	|Filter expression.
 
+### Filter expression
+
+Operator|	Description
+--------|--------------------------------
+`==`	|Left is equal to right 
+`!=`	|Left is not equal to right
+`<`	    |Left is less than right
+`<=`	|Left is less or equal to right
+`>`	    |Left is greater than right
+`>=`	|Left is greater than or equal to right
+`&&`	|Left and right
+`||`	|Left or right
+
+In this implementation, binary expressions must appear within parentheses.
+
 ### Examples
 
 The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).
@@ -84,6 +99,7 @@ A list of sample JSON paths and results follows.
 
 JSONPath |Result|Notes
 ---------|--------------------------------------------------------|------
+`$..book.length`	|The number of books|`length` is a property of an array
 `$.store.book[*].author`	|All authors of books in the store
 `$..author`	            |All authors
 `$.store.*`	            |Everything in the store, including books and a bicycle.
@@ -98,6 +114,5 @@ JSONPath |Result|Notes
 `$..book[?(@.isbn)]`	    |All books that have isbn number
 `$..book[?(@.price<10)]`	|All books that are cheaper than $10
 `$..*`	                |Everything in the store.
-`$..book.length`	|The number of books
 `$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title`|The titles of all books by Nigel Rees and Evelyn Waugh
 

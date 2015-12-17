@@ -279,9 +279,11 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
     json result = json_query(root,"$..book.length");
 
 	std::cout << pretty_print(result) << std::endl;
+
+    BOOST_CHECK_EQUAL(1,result.size());
+    BOOST_CHECK_EQUAL(root["store"]["book"].size(),result[0].as<size_t>());
 }
  
-
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_category)
 {
     json root = json::parse_string(jsonpath_fixture::book_text());
