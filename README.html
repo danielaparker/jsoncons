@@ -706,9 +706,9 @@ file_export["image_sizing"] = std::move(image_sizing);
 4002,task2,05/01/2003,
 </code></pre>
 
-<p>You can read the <code>CSV</code> file into a <code>json</code> value like this</p>
+<p>You can read the <code>CSV</code> file into a <code>json</code> value with the <code>csv_reader</code>.</p>
 
-<pre><code>#include "jsoncons_ext/csv/json.hpp"
+<pre><code>#include "jsoncons_ext/csv/csv_reader.hpp"
 
 using jsoncons::csv::csv_parameters;
 using jsoncons::csv::csv_reader;
