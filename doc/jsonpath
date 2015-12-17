@@ -486,43 +486,43 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 </thead>
 <tbody>
 <tr>
-<td>&#39;$&#39;</td>
+<td><code>$</code></td>
 <td>The root object</td>
 </tr>
 <tr>
-<td>&#39;@&#39;</td>
+<td><code>@</code></td>
 <td>the current object</td>
 </tr>
 <tr>
-<td>&#39;.&#39; or &#39;[]&#39;</td>
+<td><code>.</code> or <code>[]</code></td>
 <td>Child operator</td>
 </tr>
 <tr>
-<td>&#39;..&#39;</td>
+<td><code>..</code></td>
 <td>Recursive descent. JSONPath borrows this syntax from E4X.</td>
 </tr>
 <tr>
-<td>&#39;*&#39;</td>
+<td><code>*</code></td>
 <td>Wildcard. All objects/elements regardless their names.</td>
 </tr>
 <tr>
-<td>&#39;[]&#39;</td>
+<td><code>[]</code></td>
 <td>Subscript operator. In JSON it is the native array operator.</td>
 </tr>
 <tr>
-<td>&#39;[,]&#39;</td>
+<td><code>[,]</code></td>
 <td>JSONPath allows alternate names or array indices as a set.</td>
 </tr>
 <tr>
-<td>&#39;[start<img src="https://assets-cdn.github.com/images/icons/emoji/end.png" alt=":end:" title=":end:" class="emoji" align="absmiddle" height="20" width="20">step]&#39;</td>
+<td><code>[start:end:step]</code></td>
 <td>Array slice operator borrowed from <a href="http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&amp;s=array+slice">ES4</a>.</td>
 </tr>
 <tr>
-<td>&#39;?()&#39;</td>
+<td><code>?()</code></td>
 <td>Applies a filter expression.</td>
 </tr>
 <tr>
-<td>&#39;()&#39;</td>
+<td><code>()</code></td>
 <td>Filter expression.</td>
 </tr>
 </tbody>

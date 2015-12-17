@@ -14,16 +14,16 @@ Returns a `json` array of `json` values extracted from a root `json` structure.
 
 JSONPath|	Description
 --------|--------------------------------
-'$'|	The root object
-'@'|	the current object
-'.' or '[]'|	Child operator
-'..'	|Recursive descent. JSONPath borrows this syntax from E4X.
-'*' |	Wildcard. All objects/elements regardless their names.
-'[]'	|Subscript operator. In JSON it is the native array operator.
-'[,]'	|JSONPath allows alternate names or array indices as a set.
-'[start:end:step]'	|Array slice operator borrowed from [ES4](http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&s=array+slice).
-'?()'	|Applies a filter expression.
-'()'	|Filter expression.
+`$`|	The root object
+`@`|	the current object
+`.` or `[]`|	Child operator
+`..`	|Recursive descent. JSONPath borrows this syntax from E4X.
+`*` |	Wildcard. All objects/elements regardless their names.
+`[]`	|Subscript operator. In JSON it is the native array operator.
+`[,]`	|JSONPath allows alternate names or array indices as a set.
+`[start:end:step]`	|Array slice operator borrowed from [ES4](http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&s=array+slice).
+`?()`	|Applies a filter expression.
+`()`	|Filter expression.
 
 ### Examples
 
