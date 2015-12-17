@@ -307,7 +307,7 @@ The following code returns all authors whose books are cheaper than $10.
 
     json root = json::parse_file("store.json");
 
-    json result = json_query(val,"$.store.book[?(@.price < 10)].author");
+    json result = json_query(root,"$.store.book[?(@.price < 10)].author");
 
     std::cout << pretty_print(result) << std::endl;
 

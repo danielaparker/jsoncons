@@ -814,7 +814,7 @@ using jsoncons::jsonpath::json_query;
 
 json root = json::parse_file("store.json");
 
-json result = json_query(val,"$.store.book[?(@.price &lt; 10)].author");
+json result = json_query(root,"$.store.book[?(@.price &lt; 10)].author");
 
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 </code></pre>
