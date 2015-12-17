@@ -82,19 +82,19 @@ The result is
 
 A list of sample JSON paths and results follows.
 
-JSONPath |Result
----------|--------------------------------------------------------
+JSONPath |Result|Notes
+---------|--------------------------------------------------------|------
 `$.store.book[*].author`	|All authors of books in the store
 `$..author`	            |All authors
 `$.store.*`	            |Everything in the store, including books and a bicycle.
 `$.store..price`	        |The prices of everything in the store.
 `$..book[2]`	            |The third book
-`$..book[-1:]`	        |The last book in order.
+`$..book[-1:]`	        |The last book in order.|A negative `start` becomes `start` + `length`. A missing `end` defaults to `length`.
 `$..book[0,1]`            |The first two books
-`$..book[:2]`	            |All books from index 0 (inclusive) to index 2 (exclusive)
+`$..book[:2]`	            |All books from index 0 (inclusive) to index 2 (exclusive)|`start` defaults to 0
 `$..book[1:2]`              |All books from index 1 (inclusive) to index 2 (exclusive)
-`$..book[-2:]`	|Last two books
-`$..book[2:]`	|Last two books
+`$..book[-2:]`	|Last two books|The start index `-2` becomes `-2+4=2`, `end` defaults to `length` (`4`).
+`$..book[2:]`	|Last two books|`end` defaults to `length`
 `$..book[?(@.isbn)]`	    |All books that have isbn number
 `$..book[?(@.price<10)]`	|All books that are cheaper than $10
 `$..*`	                |Everything in the store.

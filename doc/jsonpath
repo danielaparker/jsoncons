@@ -581,6 +581,7 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <th>JSONPath</th>
 <th>Result</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
@@ -607,6 +608,7 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <td><code>$..book[-1:]</code></td>
 <td>The last book in order.</td>
+<td>A negative <code>start</code> becomes <code>start</code> + <code>length</code>. A missing <code>end</code> defaults to <code>length</code>.</td>
 </tr>
 <tr>
 <td><code>$..book[0,1]</code></td>
@@ -615,6 +617,7 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <td><code>$..book[:2]</code></td>
 <td>All books from index 0 (inclusive) to index 2 (exclusive)</td>
+<td><code>start</code> defaults to 0</td>
 </tr>
 <tr>
 <td><code>$..book[1:2]</code></td>
@@ -623,10 +626,12 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <td><code>$..book[-2:]</code></td>
 <td>Last two books</td>
+<td>The start index <code>-2</code> becomes <code>-2+4=2</code>, <code>end</code> defaults to <code>length</code> (<code>4</code>).</td>
 </tr>
 <tr>
 <td><code>$..book[2:]</code></td>
 <td>Last two books</td>
+<td><code>end</code> defaults to <code>length</code></td>
 </tr>
 <tr>
 <td><code>$..book[?(@.isbn)]</code></td>
