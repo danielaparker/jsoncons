@@ -208,9 +208,9 @@ Here is a sample CSV file (tasks.csv):
     4002,task1,04/01/2003,04/30/2003
     4002,task2,05/01/2003,
 
-You can read the `CSV` file into a `json` value like this
+You can read the `CSV` file into a `json` value with the `csv_reader`.
 
-    #include "jsoncons_ext/csv/json.hpp"
+    #include "jsoncons_ext/csv/csv_reader.hpp"
 
     using jsoncons::csv::csv_parameters;
     using jsoncons::csv::csv_reader;
