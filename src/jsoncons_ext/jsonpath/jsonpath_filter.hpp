@@ -26,6 +26,8 @@ class jsonpath_evaluator;
 namespace filter_states {
     enum filter_states_t {
         start,
+        expect_right_round_bracket,
+        expect_oper_or_right_round_bracket,
         expect_path_or_value,
         quoted_text,
         unquoted_text,
@@ -35,13 +37,12 @@ namespace filter_states {
     };
 }
 
-
 template<typename Char, class Alloc>
 class expression
 {
 public:
-    virtual void evaluate(const basic_json<Char,Alloc>& parent) = 0;
-    virtual bool empty() const = 0;
+    virtual void evaluate(const basic_json<Char,Alloc>& context_node) = 0;
+    virtual bool evaluate_single_node() const = 0;
     virtual bool eq(const expression& rhs) const = 0;
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ne(const expression& rhs) const = 0;
@@ -54,6 +55,30 @@ public:
     virtual bool lt(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool gt(const expression& rhs) const = 0;
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
+
+    static bool evaluate_single_node(const basic_json<Char,Alloc>& node)
+    {
+        bool result = false;
+        if (node.is_bool())
+        {
+            result = node.as_bool();
+        }
+        else 
+        {
+            result = node.is_empty();
+        }
+        return result;
+    }
+
+    static bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        return evaluate_single_node(lhs) && evaluate_single_node(rhs);
+    }
+
+    static bool pipepipe(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        return evaluate_single_node(lhs) || evaluate_single_node(rhs);
+    }
 
     static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
@@ -70,25 +95,16 @@ public:
         {
             result = lhs.as<double>() < rhs.as<double>();
         }
+        else if (lhs.is_string() && rhs.is_string())
+        {
+            result = lhs.as_string() < rhs.as_string();
+        }
         return result;
     }
 
     static bool gt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
-        bool result = false;
-        if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
-        {
-            result = lhs.as<unsigned long long>() > rhs.as<unsigned long long>();
-        }
-        else if (lhs.is<long long>() && rhs.is<long long>())
-        {
-            result = lhs.as<long long>() > rhs.as<long long>();
-        }
-        else if ((lhs.is<double>() && rhs.is_number()) || (lhs.is_number() && rhs.is<double>()))
-        {
-            result = lhs.as<double>() > rhs.as<double>();
-        }
-        return result;
+        return lt(rhs,lhs);
     }
 };
 
@@ -103,13 +119,13 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
     }
 
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return value_.is_empty();
+        return expression<Char, Alloc>::evaluate_single_node(value_);
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -122,29 +138,29 @@ public:
         return value_ == rhs;
     }
 
-    bool ne(const expression& parent) const override
+    bool ne(const expression<Char,Alloc>& rhs) const override
     {
-        return false;
+        return rhs.ne(value_);
     }
-    bool ne(const basic_json<Char,Alloc>& parent) const override
+    bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return value_ != rhs;
     }
-    bool ampamp(const expression& parent) const override
+    bool ampamp(const expression& rhs) const override
     {
-        return false;
+        return rhs.ampamp(value_);
     }
-    bool ampamp(const basic_json<Char,Alloc>& parent) const override
+    bool ampamp(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return expression<Char, Alloc>::ampamp(value_,rhs);
     }
-    bool pipepipe(const expression& parent) const override
+    bool pipepipe(const expression& rhs) const override
     {
-        return false;
+        return rhs.pipepipe(value_);
     }
-    bool pipepipe(const basic_json<Char,Alloc>& parent) const override
+    bool pipepipe(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return expression<Char, Alloc>::pipepipe(value_,rhs);
     }
 
     bool lt(const expression<Char,Alloc>& rhs) const override
@@ -179,16 +195,25 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
         jsonpath_evaluator<Char,Alloc> evaluator;
-        evaluator.evaluate(parent,path_);
+        evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_nodes();
     }
 
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return nodes_.size() == 0;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = expression<Char,Alloc>::evaluate_single_node(*nodes_[i]);
+            }
+        }
+        return result;
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -219,29 +244,84 @@ public:
         return result;
     }
 
-    bool ne(const expression& parent) const override
+    bool ne(const expression& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = rhs.ne(*nodes_[i]);
+            }
+        }
+        return result;
+
     }
-    bool ne(const basic_json<Char,Alloc>& parent) const override
+    bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = *nodes_[i] != rhs;
+            }
+        }
+        return result;
     }
-    bool ampamp(const expression& parent) const override
+    bool ampamp(const expression& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = rhs.ampamp(*nodes_[i]);
+            }
+        }
+        return result;
     }
-    bool ampamp(const basic_json<Char,Alloc>& parent) const override
+    bool ampamp(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = expression<Char,Alloc>::ampamp(*nodes_[i],rhs);
+            }
+        }
+        return result;
     }
-    bool pipepipe(const expression& parent) const override
+    bool pipepipe(const expression& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = rhs.pipepipe(*nodes_[i]);
+            }
+        }
+        return result;
     }
-    bool pipepipe(const basic_json<Char,Alloc>& parent) const override
+    bool pipepipe(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = expression<Char,Alloc>::pipepipe(*nodes_[i],rhs);
+            }
+        }
+        return result;
     }
 
     bool lt(const basic_json<Char,Alloc>& rhs) const override
@@ -328,17 +408,17 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& parent) override
+    void evaluate(const basic_json<Char,Alloc>& context_node) override
     {
-        lhs_->evaluate(parent);
+        lhs_->evaluate(context_node);
         if (operator_ != operators::none)
         {
-            rhs_->evaluate(parent);
+            rhs_->evaluate(context_node);
         }
     }
-    bool empty() const override
+    bool evaluate_single_node() const override
     {
-        return false;
+        return lhs_->evaluate_single_node();
     }
     bool eq(const expression& rhs) const override
     {
@@ -437,7 +517,7 @@ public:
         case operators::lte:
             return lhs_->lt(*rhs_) || lhs_->eq(*rhs_);
         case operators::none:
-            return !lhs_->empty();
+            return lhs_->evaluate_single_node();
 			break;
         }
         return false;
@@ -471,14 +551,12 @@ handle_state:
                     state_ = filter_states::expect_path_or_value;
                     stack_.push_back(std::make_shared<jsonpath_filter<Char,Alloc>>());
                     break;
-                case ']':
-                    done = true;
-                    break;
                 case ')':
                     if (stack_.size() == 1)
                     {
                         filter_ = stack_.back();
                         stack_.pop_back();
+                        done = true;
                     }
                     else 
                     {
@@ -572,6 +650,7 @@ handle_state:
                     {
                     case '<':
                     case '>':
+                    case '!':
                     case '=':
                     case '&':
                     case '|':
@@ -579,10 +658,11 @@ handle_state:
                             if (buffer_.length() > 0)
                             {
                                 auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-                                if (!stack_.back()->has_lhs())
+                                if (stack_.back()->has_lhs())
                                 {
-                                    stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
+                                    JSONCONS_THROW_EXCEPTION("Invalid filter.");
                                 }
+                                stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
                                 buffer_.clear();
                             }
                             state_ = filter_states::oper;
@@ -601,6 +681,10 @@ handle_state:
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
                             }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                            }
                             buffer_.clear();
                         }
 						if (stack_.size() == 1)
@@ -608,6 +692,7 @@ handle_state:
 							filter_ = stack_.back();
                             state_ = filter_states::start;
                             stack_.pop_back();
+                            done = true;
 						}
                         else
                         {
@@ -621,6 +706,10 @@ handle_state:
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = expr;
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
                             state_ = filter_states::expect_path_or_value;
                         }
@@ -637,6 +726,10 @@ handle_state:
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
                             }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                            }
 							buffer_.clear();
 						}
                         break; 
@@ -649,26 +742,7 @@ handle_state:
             case filter_states::quoted_text: 
                 {
                     switch (c)
-                    {
-                    case '<':
-                    case '>':
-                    case '=':
-                    case '&':
-                    case '|':
-                        {
-                            if (buffer_.length() > 0)
-                            {
-                                auto val = basic_json<Char, Alloc>::parse_string(buffer_);
-                                if (!stack_.back()->has_lhs())
-                                {
-                                    stack_.back()->lhs_ = std::make_shared<value_expression<Char, Alloc>>(val);
-                                }
-                                buffer_.clear();
-                            }
-                            state_ = filter_states::oper;
-                            goto handle_state;
-                        }
-                        break;
+                    {                   
                     case '\'':
                         buffer_.push_back('\"');
                         if (buffer_.length() > 0)
@@ -677,48 +751,21 @@ handle_state:
                             if (!stack_.back()->has_lhs())
                             {
                                 stack_.back()->lhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                                state_ = filter_states::oper;
                             }
                             else if (!stack_.back()->has_rhs())
                             {
                                 stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
+                                state_ = filter_states::expect_right_round_bracket;
+                            }
+                            else
+                            {
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
                             buffer_.clear();
-                        }
-                        if (stack_.size() == 1)
-                        {
-                            filter_ = stack_.back();
-                            stack_.pop_back();
-                        }
-                        else 
-                        {
-                            auto expr = stack_.back();
-                            stack_.pop_back();
-
-                            if (!stack_.back()->has_lhs())
-                            {
-                                stack_.back()->lhs_ = expr;
-                            }
-                            else if (!stack_.back()->has_rhs())
-                            {
-                                stack_.back()->rhs_ = expr;
-                            }
                         }
                         break;
-                    case ' ':case '\n':case '\r':case '\t':
-                        if (buffer_.length() > 0)
-                        {
-                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
-                            if (!stack_.back()->has_lhs())
-                            {
-                                stack_.back()->lhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
-                            }
-                            else if (!stack_.back()->has_rhs())
-                            {
-                                stack_.back()->rhs_ = std::make_shared<value_expression<Char,Alloc>>(val);
-                            }
-                            buffer_.clear();
-                        }
-                        break; 
+
                     default: 
                         buffer_.push_back(c);
                         break;
@@ -746,6 +793,8 @@ handle_state:
                     {
                         filter_ = stack_.back();
                         stack_.pop_back();
+                        done = true;
+                        state_ = filter_states::start;
                     }
                     else 
                     {
@@ -760,10 +809,15 @@ handle_state:
                         {
                             stack_.back()->rhs_ = expr;
                         }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
                     }
                     break;
                 case '<':
                 case '>':
+                case '!':
                 case '=':
                 case '&':
                 case '|':
@@ -778,21 +832,109 @@ handle_state:
                     break;
                 };
                 break;
+            case filter_states::expect_oper_or_right_round_bracket: 
+                switch (c)
+                {
+                case ' ':case '\n':case '\r':case '\t':
+                    break;
+                case ')':
+                    if (stack_.size() == 1)
+                    {
+                        filter_ = stack_.back();
+                        stack_.pop_back();
+                        done = true;
+                        state_ = filter_states::start;
+                    }
+                    else 
+                    {
+                        auto expr = stack_.back();
+                        stack_.pop_back();
+
+                        if (!stack_.back()->has_lhs())
+                        {
+                            stack_.back()->lhs_ = expr;
+                        }
+                        else if (!stack_.back()->has_rhs())
+                        {
+                            stack_.back()->rhs_ = expr;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
+                    }
+                    break;
+                case '<':
+                case '>':
+                case '!':
+                case '=':
+                case '&':
+                case '|':
+                    {
+                        state_ = filter_states::oper;
+                        goto handle_state;
+                    }
+                    break;
+                default: 
+                    JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                    break;
+                };
+                break;
+            case filter_states::expect_right_round_bracket: 
+                switch (c)
+                {
+                case ' ':case '\n':case '\r':case '\t':
+                    break;
+                case ')':
+                    if (stack_.size() == 1)
+                    {
+                        filter_ = stack_.back();
+                        stack_.pop_back();
+                        done = true;
+                        state_ = filter_states::start;
+                    }
+                    else 
+                    {
+                        auto expr = stack_.back();
+                        stack_.pop_back();
+
+                        if (!stack_.back()->has_lhs())
+                        {
+                            stack_.back()->lhs_ = expr;
+                        }
+                        else if (!stack_.back()->has_rhs())
+                        {
+                            stack_.back()->rhs_ = expr;
+                        }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
+                        state_ = filter_states::expect_oper_or_right_round_bracket;
+                    }
+                    break;
+                default: 
+                    JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                    break;
+                };
+                break;
             case filter_states::path: 
                 switch (c)
                 {
                 case '<':
                 case '>':
+                case '!':
                 case '=':
                 case '&':
                 case '|':
                     {
                         if (buffer_.length() > 0)
                         {
-                            if (!stack_.back()->has_lhs())
+                            if (stack_.back()->has_lhs())
                             {
-                                stack_.back()->lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
+                                JSONCONS_THROW_EXCEPTION("Invalid filter.");
                             }
+                            stack_.back()->lhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
                             buffer_.clear();
                         }
                         state_ = filter_states::oper;
@@ -810,6 +952,10 @@ handle_state:
                         {
                             stack_.back()->rhs_ = std::make_shared<path_expression<Char,Alloc>>(buffer_);
                         }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
                         buffer_.clear();
                     }
                     if (stack_.size() == 1)
@@ -817,6 +963,7 @@ handle_state:
                         filter_ = stack_.back();
                         stack_.pop_back();
                         state_ = filter_states::start;
+                        done = true;
                     }
                     else
                     {
@@ -831,6 +978,10 @@ handle_state:
                         {
                             stack_.back()->rhs_ = expr;
                         }
+                        else
+                        {
+                            JSONCONS_THROW_EXCEPTION("Invalid filter.");
+                        }
                         state_ = filter_states::expect_path_or_value;
                     }
                      break;
@@ -841,6 +992,10 @@ handle_state:
                 break;
             }
             ++index_;
+        }
+        if (stack_.size() != 0)
+        {
+            JSONCONS_THROW_EXCEPTION("Invalid filter.");
         }
     }
 
