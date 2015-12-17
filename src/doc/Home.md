@@ -52,6 +52,10 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [csv_serializer](csv_serializer)
 
+#### jsonpath
+
+[jsonpath](jsonpath)
+
 ## Examples
 
 ### First example
