@@ -26,7 +26,7 @@ The library has a number of features, which are listed below:
 
 ## What's new on master
 
-- Supports [Stefan Goessner JsonPath](http://goessner.net/articles/JsonPath/).
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).
 
 ## Using the jsoncons library
 
@@ -271,34 +271,45 @@ There are a few things to note about the effect of the parameter settings.
 
 ### jsonpath
 
+[Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
+
 Here is a sample JSON file (store.json):
 
-   { "store": {
-       "book": [ 
-         { "category": "reference",
-           "author": "Nigel Rees",
-           "title": "Sayings of the Century",
-           "price": 8.95
-         },
-         { "category": "fiction",
-           "author": "Evelyn Waugh",
-           "title": "Sword of Honour",
-           "price": 12.99
-         },
-         { "category": "fiction",
-           "author": "Herman Melville",
-           "title": "Moby Dick",
-           "isbn": "0-553-21311-3",
-           "price": 8.99
-         }
-       ],
-     }
-   }
-   
-   using jsoncons::jsonpath::json_query;
+    { "store": {
+        "book": [ 
+          { "category": "reference",
+            "author": "Nigel Rees",
+            "title": "Sayings of the Century",
+            "price": 8.95
+          },
+          { "category": "fiction",
+            "author": "Evelyn Waugh",
+            "title": "Sword of Honour",
+            "price": 12.99
+          },
+          { "category": "fiction",
+            "author": "Herman Melville",
+            "title": "Moby Dick",
+            "isbn": "0-553-21311-3",
+            "price": 8.99
+          }
+        ],
+      }
+    }
 
-   
+The following code returns all authors whose books are cheaper than $10. 
+    
+    using jsoncons::jsonpath::json_query;
 
+    json root = json::parse_file("store.json");
+
+    json result = json_query(val,"$.store.book[?(@.price < 10)].author");
+
+    std::cout << pretty_print(result) << std::endl;
+
+The result is
+
+    ["Nigel Rees","Herman Melville"]
 
 ### Iterators
 

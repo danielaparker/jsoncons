@@ -45,7 +45,7 @@ struct jsonpath_fixture
         return book;
     }
 };
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_jsonpath)
 {
     jsonpath_fixture fixture;
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false_or_true)
     
     BOOST_CHECK_EQUAL(fixture.book(),result);
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_authors)
 {
     jsonpath_fixture fixture;
@@ -400,11 +400,87 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_authors)
     json val = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(val,"$.store.book[?(@.price < 10)].author");
+
+    json expected = json::array();
+    json book_list = fixture.book();
+    for (size_t i = 0; i < book_list.size(); ++i)
+    {
+        json book = book_list[i];
+        if (book["price"].as<double>() < 10)
+        {
+            expected.add(book["author"]);
+        }
+    }
+
     //json expected = fixture.book();
 
     std::cout << pretty_print(result) << std::endl;
 
-    //BOOST_CHECK_EQUAL(expected,result);
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests)
+{
+    jsonpath_fixture fixture;
+
+    json val = json::parse_string(jsonpath_fixture::store_text());
+
+    json result1 = json_query(val,"$.store.book[ ?(@.category == @.category) ]");
+    BOOST_CHECK_EQUAL(fixture.book(),result1);
+
+    json result2 = json_query(val,"$.store.book[ ?(@.category == @['category']) ]");
+    BOOST_CHECK_EQUAL(fixture.book(),result2);
+
+    json result3 = json_query(val,"$.store.book[ ?(@ == @) ]");
+    BOOST_CHECK_EQUAL(fixture.book(),result3);
+
+    json result4 = json_query(val,"$.store.book[ ?(@.category != @.category) ]");
+    json expected4 = json::array();
+    BOOST_CHECK_EQUAL(expected4,result4);
+
+    json result5 = json_query(val,"$.store.book[ ?(@.category != @) ]");
+    BOOST_CHECK_EQUAL(fixture.book(),result5);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests2)
+{
+    jsonpath_fixture fixture;
+
+    json val = json::parse_string(jsonpath_fixture::store_text());
+
+    json result1 = json_query(val,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].author");
+    json expected1 = json::array();
+    expected1.add("Nigel Rees");
+    expected1.add("Evelyn Waugh");
+    BOOST_CHECK_EQUAL(expected1,result1);
+
+    json result2 = json_query(val,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.price < 15)) ].author");
+    json expected2 = json::array();
+    expected2.add("Nigel Rees");
+    expected2.add("Evelyn Waugh");
+    BOOST_CHECK_EQUAL(expected2,result2);
+
+    json result3 = json_query(val,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category == 'reference')) ].author");
+    json expected3 = json::array();
+    expected3.add("Nigel Rees");
+    BOOST_CHECK_EQUAL(expected3,result3);
+
+    json result4 = json_query(val,"$.store.book[ ?(((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) && (@.category != 'fiction')) ].author");
+    json expected4 = json::array();
+    expected4.add("Nigel Rees");
+    BOOST_CHECK_EQUAL(expected4,result4);
+
+    json result5 = json_query(val,"$.store.book[?('a' == 'a')].author");
+    json expected5 = json::array();
+    expected5.add("Nigel Rees");
+    expected5.add("Evelyn Waugh");
+    expected5.add("Herman Melville");
+    expected5.add("J. R. R. Tolkien");
+    BOOST_CHECK_EQUAL(expected5,result5);
+
+    json result6 = json_query(val,"$.store.book[?('a' == 'b')].author");
+    json expected6 = json::array();
+    BOOST_CHECK_EQUAL(expected6,result6);
 }
 
 

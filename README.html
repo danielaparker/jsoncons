@@ -484,7 +484,6 @@ vertical-align:1px;
 <li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
 <li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
 <li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
-<li>Guarantees basic exception safety (no leaks)</li>
 <li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
 <li>Supports optional escaping of the solidus (/) character</li>
 <li>Supports Nan, Inf and -Inf replacement</li>
@@ -496,6 +495,12 @@ vertical-align:1px;
 <li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>
 </li>
 <li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
+</ul>
+
+<h2>What's new on master</h2>
+
+<ul>
+<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.</li>
 </ul>
 
 <h2>Using the jsoncons library</h2>
@@ -769,6 +774,51 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 <code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li>
 <li>The <code>data_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
 </ul>
+
+<h3>jsonpath</h3>
+
+<p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
+
+<p>Here is a sample JSON file (store.json):</p>
+
+<pre><code>{ "store": {
+    "book": [ 
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      }
+    ],
+  }
+}
+</code></pre>
+
+<p>The following code returns all authors whose books are cheaper than $10. </p>
+
+<pre><code>using jsoncons::jsonpath::json_query;
+
+json root = json::parse_file("store.json");
+
+json result = json_query(val,"$.store.book[?(@.price &lt; 10)].author");
+
+std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+</code></pre>
+
+<p>The result is</p>
+
+<pre><code>["Nigel Rees","Herman Melville"]
+</code></pre>
 
 <h3>Iterators</h3>
 
