@@ -451,11 +451,26 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything)
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$.store.*");
-    std::cout << result << std::endl;
+    //std::cout << result << std::endl;
  
     json expected = json::array();
     expected.add(fixture.bicycle());
     expected.add(fixture.book());
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
+{
+    jsonpath_fixture fixture;
+
+    json root = json::parse_string(jsonpath_fixture::store_text());
+
+    json result = json_query(root,"$..*");
+    std::cout << result << std::endl;
+ 
+    json expected = json::array();
+    expected.add(root["store"]);
 
     BOOST_CHECK_EQUAL(expected,result);
 }
