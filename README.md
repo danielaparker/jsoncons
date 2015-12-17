@@ -26,7 +26,7 @@ The library has a number of features, which are listed below:
 
 ## What's new on master
 
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below.
 
 ## Using the jsoncons library
 
