@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>

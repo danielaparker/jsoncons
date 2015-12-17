@@ -468,252 +468,153 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>jsoncons: a C++ library for json construction</h1>
-
+<h1 id="jsoncons-a-c-library-for-json-construction">jsoncons: a C++ library for json construction</h1>
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
-
 <p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013, clang 3.3 and GCC 4.8. </p>
-
 <p>The <a href="https://github.com/danielaparker/jsoncons">code repository</a> and <a href="https://github.com/danielaparker/jsoncons/releases">releases</a> are on github. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
-
 <p>The library has a number of features, which are listed below:</p>
-
 <ul>
-<li>Uses the standard C++ input/output streams library</li>
-<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
-<li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
-<li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
-<li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
-<li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
-<li>Supports optional escaping of the solidus (/) character</li>
-<li>Supports Nan, Inf and -Inf replacement</li>
-<li>Supports reading a sequence of JSON texts from a stream</li>
-<li>Supports optional escaping of non-ascii UTF-8 octets</li>
-<li>Allows extensions to the types accepted by the json class accessors and modifiers</li>
-<li>Supports storing "any" values in a json object or array, with specialized serialization</li>
-<li>Supports reading (writing) JSON values from (to) CSV files</li>
-<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>
-</li>
-<li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
-</ul>
-
-<h2>What's new on master</h2>
-
+<li>Uses the standard C++ input/output streams library</li><li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li><li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li><li>Correctly handles surrogate pairs in \uXXXX escape sequences</li><li>Supports event based JSON parsing and serializing with user defined input and output handlers</li><li>Accepts and ignores single line comments that start with //, and multi line comments that start with /<em> and end with </em>/</li><li>Supports optional escaping of the solidus (/) character</li><li>Supports Nan, Inf and -Inf replacement</li><li>Supports reading a sequence of JSON texts from a stream</li><li>Supports optional escaping of non-ascii UTF-8 octets</li><li>Allows extensions to the types accepted by the json class accessors and modifiers</li><li>Supports storing &quot;any&quot; values in a json object or array, with specialized serialization</li><li>Supports reading (writing) JSON values from (to) CSV files</li><li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a></li><li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li></ul>
+<h2 id="what-s-new-on-master">What&#39;s new on master</h2>
 <ul>
-<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below.</li>
-</ul>
-
-<h2>Using the jsoncons library</h2>
-
+<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner&#39;s JsonPath</a>. See example below.</li></ul>
+<h2 id="using-the-jsoncons-library">Using the jsoncons library</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
-
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
-
 <p>The jsoncons classes and functions are in namespace <code>jsoncons</code>.  Namespace <code>jsoncons</code> includes a name for a null type defined as an empty struct:</p>
-
 <pre><code>struct null_type{}
-</code></pre>
-
-<p>These include and using declarations are for the examples that appear below.</p>
-
-<pre><code>#include "jsoncons/json.hpp"
+</code></pre><p>These include and using declarations are for the examples that appear below.</p>
+<pre><code>#include &quot;jsoncons/json.hpp&quot;
 
 using jsoncons::json;
 using jsoncons::json_exception;    
 using jsoncons::pretty_print;
 using jsoncons::json_deserializer;
-</code></pre>
-
-<h3>Reading JSON text from a file</h3>
-
+</code></pre><h3 id="reading-json-text-from-a-file">Reading JSON text from a file</h3>
 <p>Here is a sample file (books.json):</p>
-
 <pre><code>[
     {
-        "title" : "Kafka on the Shore",
-        "author" : "Haruki Murakami",
-        "price" : 25.17
+        &quot;title&quot; : &quot;Kafka on the Shore&quot;,
+        &quot;author&quot; : &quot;Haruki Murakami&quot;,
+        &quot;price&quot; : 25.17
     },
     {
-        "title" : "Women: A Novel",
-        "author" : "Charles Bukowski",
-        "price" : 12.00
+        &quot;title&quot; : &quot;Women: A Novel&quot;,
+        &quot;author&quot; : &quot;Charles Bukowski&quot;,
+        &quot;price&quot; : 12.00
     },
     {
-        "title" : "Cutter's Way",
-        "author" : "Ivan Passer"
+        &quot;title&quot; : &quot;Cutter&#39;s Way&quot;,
+        &quot;author&quot; : &quot;Ivan Passer&quot;
     }
 ]
-</code></pre>
-
-<p>You can read the JSON text into a <code>json</code> value like this</p>
-
-<pre><code>json books = json::parse_file("books.json");
-</code></pre>
-
-<p>You can then loop through the books</p>
-
+</code></pre><p>You can read the JSON text into a <code>json</code> value like this</p>
+<pre><code>json books = json::parse_file(&quot;books.json&quot;);
+</code></pre><p>You can then loop through the books</p>
 <pre><code>for (size_t i = 0; i &lt; books.size(); ++i)
 {
     try
     {
         json&amp; book = books[i];
-        std::string author = book["author"].as&lt;std::string&gt;();
-        std::string title = book["title"].as&lt;std::string&gt;();
-        double price = book["price"].as&lt;double&gt;();
-        std::cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; std::endl;
+        std::string author = book[&quot;author&quot;].as&lt;std::string&gt;();
+        std::string title = book[&quot;title&quot;].as&lt;std::string&gt;();
+        double price = book[&quot;price&quot;].as&lt;double&gt;();
+        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
     }
     catch (const json_exception&amp; e)
     {
         std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
-</code></pre>
-
-<p>The output is</p>
-
+</code></pre><p>The output is</p>
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 Member price not found.
-</code></pre>
-
-<p>Note that the third book is missing a price, which causes an exception to be thrown.</p>
-
+</code></pre><p>Note that the third book is missing a price, which causes an exception to be thrown.</p>
 <p>You have a choice of accessors:</p>
-
-<pre><code>book["price"] will throw if there is no price
-book.get("price") will return a json null value if there is no price
-book.get("price",default_value) will return default_value if there is no price
-</code></pre>
-
-<p>So if you want to show "n/a" for the missing price, you can use this accessor</p>
-
-<pre><code>std::string price = book.get("price","n/a").as&lt;std::string&gt;();
-</code></pre>
-
-<p>and the output becomes</p>
-
+<pre><code>book[&quot;price&quot;] will throw if there is no price
+book.get(&quot;price&quot;) will return a json null value if there is no price
+book.get(&quot;price&quot;,default_value) will return default_value if there is no price
+</code></pre><p>So if you want to show &quot;n/a&quot; for the missing price, you can use this accessor</p>
+<pre><code>std::string price = book.get(&quot;price&quot;,&quot;n/a&quot;).as&lt;std::string&gt;();
+</code></pre><p>and the output becomes</p>
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12.0
-Ivan Passer, Cutter's Way, n/a
-</code></pre>
-
-<p>Or you can check if book has a member "price" with the method <code>has_member</code>, and output accordingly,</p>
-
-<pre><code>if (book.has_member("price"))
+Ivan Passer, Cutter&#39;s Way, n/a
+</code></pre><p>Or you can check if book has a member &quot;price&quot; with the method <code>has_member</code>, and output accordingly,</p>
+<pre><code>if (book.has_member(&quot;price&quot;))
 {
-    double price = book["price"].as&lt;double&gt;();
+    double price = book[&quot;price&quot;].as&lt;double&gt;();
     std::cout &lt;&lt; price;
 }
 else
 {
-    std::cout &lt;&lt; "n/a";
+    std::cout &lt;&lt; &quot;n/a&quot;;
 }
-</code></pre>
-
-<h3>Constructing json values in C++</h3>
-
+</code></pre><h3 id="constructing-json-values-in-c-">Constructing json values in C++</h3>
 <p>To construct an empty json object, use the default constructor:</p>
-
 <pre><code> json image_sizing;
-</code></pre>
-
-<p>Serializing it to standard out</p>
-
+</code></pre><p>Serializing it to standard out</p>
 <pre><code>std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;
-</code></pre>
-
-<p>produces</p>
-
+</code></pre><p>produces</p>
 <pre><code>{}
-</code></pre>
-
-<p>Adding some members,</p>
-
-<pre><code>image_sizing["resize_to_fit"] = true;  // a boolean 
-image_sizing["resize_unit"] =  "pixels";  // a string
-image_sizing["resize_what"] =  "long_edge";  // a string
-image_sizing["dimension1"] = 9.84;  // a double
-image_sizing["dimension2"] = json::null_type();  // a null
-</code></pre>
-
-<p>Serializing it, this time with pretty print,</p>
-
-<pre><code>std::cout &lt;&lt; pretty_print(image_sizing) &lt;&lt; std::endl;
-</code></pre>
-
-<p>produces</p>
-
+</code></pre><p>Adding some members,</p>
+<pre><code>image_sizing[&quot;resize_to_fit&quot;] = true;  // a boolean 
+image_sizing[&quot;resize_unit&quot;] =  &quot;pixels&quot;;  // a string
+image_sizing[&quot;resize_what&quot;] =  &quot;long_edge&quot;;  // a string
+image_sizing[&quot;dimension1&quot;] = 9.84;  // a double
+image_sizing[&quot;dimension2&quot;] = json::null_type();  // a null
+</code></pre><p>Serializing it, this time with pretty print,</p>
+<pre><code> std::cout &lt;&lt; pretty_print(image_sizing) &lt;&lt; std::endl;
+</code></pre><p>produces</p>
 <pre><code>{
-    "dimension1":9.84,
-    "dimension2":null,
-    "resize_to_fit":true,
-    "resize_unit":"pixels",
-    "resize_what":"long_edge"
+    &quot;dimension1&quot;:9.84,
+    &quot;dimension2&quot;:null,
+    &quot;resize_to_fit&quot;:true,
+    &quot;resize_unit&quot;:&quot;pixels&quot;,
+    &quot;resize_what&quot;:&quot;long_edge&quot;
 }
-</code></pre>
-
-<p>To construct a json array, use the array type default constructor:</p>
-
+</code></pre><p>To construct a json array, use the array type default constructor:</p>
 <pre><code>json image_formats = json::array();
-</code></pre>
-
-<p>Adding some elements,</p>
-
-<pre><code>image_formats.add("JPEG");
-image_formats.add("PSD");
-image_formats.add("TIFF");
-image_formats.add("DNG");
-</code></pre>
-
-<p>Combining the two</p>
-
+</code></pre><p>Adding some elements,</p>
+<pre><code>image_formats.add(&quot;JPEG&quot;);
+image_formats.add(&quot;PSD&quot;);
+image_formats.add(&quot;TIFF&quot;);
+image_formats.add(&quot;DNG&quot;);
+</code></pre><p>Combining the two</p>
 <pre><code>json file_export;
-file_export["image_formats"] = std::move(image_formats);
-file_export["image_sizing"] = std::move(image_sizing);
-</code></pre>
-
-<p>and serializing</p>
-
+file_export[&quot;image_formats&quot;] = std::move(image_formats);
+file_export[&quot;image_sizing&quot;] = std::move(image_sizing);
+</code></pre><p>and serializing</p>
 <pre><code>std::cout &lt;&lt; pretty_print(file_export) &lt;&lt; std::endl;
-</code></pre>
-
-<p>produces</p>
-
+</code></pre><p>produces</p>
 <pre><code>{
-    "image_formats":
-    ["JPEG","PSD","TIFF","DNG"],
-    "image_sizing":
+    &quot;image_formats&quot;:
+    [&quot;JPEG&quot;,&quot;PSD&quot;,&quot;TIFF&quot;,&quot;DNG&quot;],
+    &quot;image_sizing&quot;:
     {
-        "dimension1":9.84,
-        "dimension2":null,
-        "resize_to_fit":true,
-        "resize_unit":"pixels",
-        "resize_what":"long_edge"
+        &quot;dimension1&quot;:9.84,
+        &quot;dimension2&quot;:null,
+        &quot;resize_to_fit&quot;:true,
+        &quot;resize_unit&quot;:&quot;pixels&quot;,
+        &quot;resize_what&quot;:&quot;long_edge&quot;
     }
 }
-</code></pre>
-
-<h3>Converting CSV files to json</h3>
-
+</code></pre><h3 id="converting-csv-files-to-json">Converting CSV files to json</h3>
 <p>Here is a sample CSV file (tasks.csv):</p>
-
 <pre><code>project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
 4001,task2,02/01/2003,02/28/2003
 4001,task3,03/01/2003,03/31/2003
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
-</code></pre>
-
-<p>You can read the <code>CSV</code> file into a <code>json</code> value with the <code>csv_reader</code>.</p>
-
-<pre><code>#include "jsoncons_ext/csv/csv_reader.hpp"
+</code></pre><p>You can read the <code>CSV</code> file into a <code>json</code> value with the <code>csv_reader</code>.</p>
+<pre><code>#include &quot;jsoncons_ext/csv/csv_reader.hpp&quot;
 
 using jsoncons::csv::csv_parameters;
 using jsoncons::csv::csv_reader;
 
-std::fstream is("tasks.csv");
+std::fstream is(&quot;tasks.csv&quot;);
 
 json_deserializer handler;
 
@@ -721,197 +622,139 @@ csv_parameters params;
 params.assume_header(true);
 params.trim(true);
 params.ignore_empty_values(true);
-params.data_types("integer,string,string,string");
+params.data_types(&quot;integer,string,string,string&quot;);
 
 csv_reader reader(is,handler,params);
 reader.read();
 json val = handler.get_result();
 
 std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
-</code></pre>
-
-<p>The output is:</p>
-
+</code></pre><p>The output is:</p>
 <pre><code>[
     {
-        "project_id":4001,
-        "task_finish":"01/31/2003",
-        "task_name":"task1",
-        "task_start":"01/01/2003"
+        &quot;project_id&quot;:4001,
+        &quot;task_finish&quot;:&quot;01/31/2003&quot;,
+        &quot;task_name&quot;:&quot;task1&quot;,
+        &quot;task_start&quot;:&quot;01/01/2003&quot;
     },
     {
-        "project_id":4001,
-        "task_finish":"02/28/2003",
-        "task_name":"task2",
-        "task_start":"02/01/2003"
+        &quot;project_id&quot;:4001,
+        &quot;task_finish&quot;:&quot;02/28/2003&quot;,
+        &quot;task_name&quot;:&quot;task2&quot;,
+        &quot;task_start&quot;:&quot;02/01/2003&quot;
     },
     {
-        "project_id":4001,
-        "task_finish":"03/31/2003",
-        "task_name":"task3",
-        "task_start":"03/01/2003"
+        &quot;project_id&quot;:4001,
+        &quot;task_finish&quot;:&quot;03/31/2003&quot;,
+        &quot;task_name&quot;:&quot;task3&quot;,
+        &quot;task_start&quot;:&quot;03/01/2003&quot;
     },
     {
-        "project_id":4002,
-        "task_finish":"04/30/2003",
-        "task_name":"task1",
-        "task_start":"04/01/2003"
+        &quot;project_id&quot;:4002,
+        &quot;task_finish&quot;:&quot;04/30/2003&quot;,
+        &quot;task_name&quot;:&quot;task1&quot;,
+        &quot;task_start&quot;:&quot;04/01/2003&quot;
     },
     {
-        "project_id":4002,
-        "task_name":"task2",
-        "task_start":"05/01/2003"
+        &quot;project_id&quot;:4002,
+        &quot;task_name&quot;:&quot;task2&quot;,
+        &quot;task_start&quot;:&quot;05/01/2003&quot;
     }
 ]
-</code></pre>
-
-<p>There are a few things to note about the effect of the parameter settings.</p>
-
+</code></pre><p>There are a few things to note about the effect of the parameter settings.</p>
 <ul>
-<li>
-<code>assume_header</code> <code>true</code> tells the csv parser to parse the first line of the file for column names, which become object member names.</li>
-<li>
-<code>trim</code> <code>true</code> tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.</li>
-<li>
-<code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li>
-<li>The <code>data_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
-</ul>
-
-<h3>jsonpath</h3>
-
-<p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
-
+<li><code>assume_header</code> <code>true</code> tells the csv parser to parse the first line of the file for column names, which become object member names.</li><li><code>trim</code> <code>true</code> tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.</li><li><code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li><li>The <code>data_types</code> setting specifies that column one (&quot;project_id&quot;) contains integers and the remaining columns strings.</li></ul>
+<h3 id="jsonpath">jsonpath</h3>
+<p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner&#39;s JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
 <p>Here is a sample JSON file (store.json):</p>
-
-<pre><code>{ "store": {
-    "book": [ 
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
+<pre><code>{ &quot;store&quot;: {
+    &quot;book&quot;: [ 
+      { &quot;category&quot;: &quot;reference&quot;,
+        &quot;author&quot;: &quot;Nigel Rees&quot;,
+        &quot;title&quot;: &quot;Sayings of the Century&quot;,
+        &quot;price&quot;: 8.95
       },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
+      { &quot;category&quot;: &quot;fiction&quot;,
+        &quot;author&quot;: &quot;Evelyn Waugh&quot;,
+        &quot;title&quot;: &quot;Sword of Honour&quot;,
+        &quot;price&quot;: 12.99
       },
-      { "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
+      { &quot;category&quot;: &quot;fiction&quot;,
+        &quot;author&quot;: &quot;Herman Melville&quot;,
+        &quot;title&quot;: &quot;Moby Dick&quot;,
+        &quot;isbn&quot;: &quot;0-553-21311-3&quot;,
+        &quot;price&quot;: 8.99
       }
     ],
   }
 }
-</code></pre>
-
-<p>The following code returns all authors whose books are cheaper than $10. </p>
-
-<pre><code>#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+</code></pre><p>The following code returns all authors whose books are cheaper than $10. </p>
+<pre><code>#include &quot;jsoncons_ext/jsonpath/jsonpath.hpp&quot;
 
 using jsoncons::jsonpath::json_query;
 
-json root = json::parse_file("store.json");
+json root = json::parse_file(&quot;store.json&quot;);
 
-json result = json_query(root,"$.store.book[?(@.price &lt; 10)].author");
+json result = json_query(root,&quot;$.store.book[?(@.price &lt; 10)].author&quot;);
 
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
-</code></pre>
-
-<p>The result is</p>
-
-<pre><code>["Nigel Rees","Herman Melville"]
-</code></pre>
-
-<h3>Iterators</h3>
-
+</code></pre><p>The result is</p>
+<pre><code>[&quot;Nigel Rees&quot;,&quot;Herman Melville&quot;]
+</code></pre><h3 id="iterators">Iterators</h3>
 <p><code>jsoncons::json</code> supports iterators for accessing the members of json objects and the elements of json arrays.</p>
-
 <p>An example of iterating over the name-value pairs of a json object:</p>
-
 <pre><code>json person;
-person["first_name"] = "Jane";
-person["last_name"] = "Roe";
-person["events_attended"] = 10;
-person["accept_waiver_of_liability"] = true;
+person[&quot;first_name&quot;] = &quot;Jane&quot;;
+person[&quot;last_name&quot;] = &quot;Roe&quot;;
+person[&quot;events_attended&quot;] = 10;
+person[&quot;accept_waiver_of_liability&quot;] = true;
 
 for (auto it = person.begin_members(); it != person.end_members(); ++it)
 {
-    std::cout &lt;&lt; "name=" &lt;&lt; it-&gt;name() 
-              &lt;&lt; ", value=" &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;name=&quot; &lt;&lt; it-&gt;name() 
+              &lt;&lt; &quot;, value=&quot; &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
 }
-</code></pre>
-
-<p>An example of iterating over the elements of a json array:</p>
-
+</code></pre><p>An example of iterating over the elements of a json array:</p>
 <pre><code>json cities= json::array();
-cities.add("Montreal");
-cities.add("Toronto");
-cities.add("Ottawa");
-cities.add("Vancouver");
+cities.add(&quot;Montreal&quot;);
+cities.add(&quot;Toronto&quot;);
+cities.add(&quot;Ottawa&quot;);
+cities.add(&quot;Vancouver&quot;);
 
 for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 {
     std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
 }
-</code></pre>
-
-<h3>About jsoncons::json</h3>
-
-<p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
-and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
-
+</code></pre><h3 id="about-jsoncons-json">About jsoncons::json</h3>
+<p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
 <pre><code>typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
-</code></pre>
-
-<p>The library includes an instantiation for wide characters as well,</p>
-
+</code></pre><p>The library includes an instantiation for wide characters as well,</p>
 <pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
-</code></pre>
-
-<p>Note that the allocator type allows you to supply a custom allocator for dynamically allocated, <br>
-fixed size small objects in the json container, the container rebinds it as necessay. <br>
-For instance, you can use the boost <code>fast_pool_allocator</code>:</p>
-
+</code></pre><p>Note that the allocator type allows you to supply a custom allocator for dynamically allocated,<br>fixed size small objects in the json container, the container rebinds it as necessay.<br>For instance, you can use the boost <code>fast_pool_allocator</code>:</p>
 <pre><code>#include &lt;boost/pool/pool_alloc.hpp&gt;
-#include "jsoncons/json.hpp"
+#include &quot;jsoncons/json.hpp&quot;
 
 typedef jsoncons::basic_json&lt;char, boost::fast_pool_allocator&lt;void&gt;&gt; myjson;
 
 myjson o;
 
-o.set("FirstName","Joe");
-o.set("LastName","Smith");
-</code></pre>
-
-<p>This results in a json object instance being allocated from the boost memory pool. <br>
-The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory, <br>
-these always use the default allocators.</p>
-
-<h2>Wide character support</h2>
-
+o.set(&quot;FirstName&quot;,&quot;Joe&quot;);
+o.set(&quot;LastName&quot;,&quot;Smith&quot;);
+</code></pre><p>This results in a json object instance being allocated from the boost memory pool.<br>The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory,<br>these always use the default allocators.</p>
+<h2 id="wide-character-support">Wide character support</h2>
 <p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It supports <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4. You can construct a <code>wjson</code> value in exactly the same way as a <code>json</code> value, for instance:</p>
-
 <pre><code>using jsoncons::wjson;
 
 wjson root;
-root[L"field1"] = L"test";
-root[L"field2"] = 3.9;
-root[L"field3"] = true;
+root[L&quot;field1&quot;] = L&quot;test&quot;;
+root[L&quot;field2&quot;] = 3.9;
+root[L&quot;field3&quot;] = true;
 
-std::wcout &lt;&lt; root &lt;&lt; L"\n";
-</code></pre>
-
-<p>which prints</p>
-
-<pre><code>{"field1":"test","field2":3.9,"field3":true}
-</code></pre>
-
-<h3>Type extensibility</h3>
-
+std::wcout &lt;&lt; root &lt;&lt; L&quot;\n&quot;;
+</code></pre><p>which prints</p>
+<pre><code>{&quot;field1&quot;:&quot;test&quot;,&quot;field2&quot;:3.9,&quot;field3&quot;:true}
+</code></pre><h3 id="type-extensibility">Type extensibility</h3>
 <p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
-
 <pre><code>template &lt;typename T&gt;
 explicit json(T val)
 
@@ -926,10 +769,7 @@ basic_json&amp; operator=(T val)
 
 template &lt;typename T&gt;
 void add(T val)
-</code></pre>
-
-<p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
-
+</code></pre><p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 <pre><code>template &lt;typename Char, typename Alloc, typename T&gt;
 class json_type_traits
 {
@@ -938,38 +778,26 @@ public:
     static T as(const basic_json&lt;Char,Alloc&gt;&amp; val);
     static void assign(basic_json&lt;Char,Alloc&gt;&amp; lhs, T rhs);
 };
-</code></pre>
-
-<p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. You can, for example, extend <code>json_type_traits</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>, and in your code, write</p>
-
+</code></pre><p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. You can, for example, extend <code>json_type_traits</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>, and in your code, write</p>
 <pre><code>json deal;
-deal["maturity"] = boost::gregorian::date(2015,1,1);
+deal[&quot;maturity&quot;] = boost::gregorian::date(2015,1,1);
 
 json observation_dates = json::array();
 observation_dates.add(boost::gregorian::date(2013,10,21));
 observation_dates.add(boost::gregorian::date(2013,10,28));
-deal["observation_dates"] = std::move(observation_dates);
+deal[&quot;observation_dates&quot;] = std::move(observation_dates);
 
-boost::gregorian::date maturity = deal["maturity"].as&lt;boost::gregorian::date&gt;();
+boost::gregorian::date maturity = deal[&quot;maturity&quot;].as&lt;boost::gregorian::date&gt;();
 
-std::cout &lt;&lt; deal &lt;&lt; std::endl; 
-</code></pre>
-
-<p>producing</p>
-
+std::cout &lt;&lt; deal &lt;&lt; std::endl;    
+</code></pre><p>producing</p>
 <pre><code>{
-    "maturity":"2015-01-01",
-    "observation_dates":
-    ["2013-10-21","2013-10-28"]
+    &quot;maturity&quot;:&quot;2015-01-01&quot;,
+    &quot;observation_dates&quot;:
+    [&quot;2013-10-21&quot;,&quot;2013-10-28&quot;]
 }
-</code></pre>
-
-<h3>json any</h3>
-
-<p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and <br>
-assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>
-a <code>json::any</code> value, like this:</p>
-
+</code></pre><h3 id="json-any">json any</h3>
+<p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and<br>assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>a <code>json::any</code> value, like this:</p>
 <pre><code>#include &lt;boost/numeric/ublas/matrix.hpp&gt;
 
 using boost::numeric::ublas::matrix;
@@ -982,39 +810,28 @@ A(0,1) = 2;
 A(1,0) = 3;
 A(1,1) = 4;
 
-val.set("A",json::any(A));
+val.set(&quot;A&quot;,json::any(A));
 
-matrix&lt;double&gt;&amp; B = val["A"].any_cast&lt;matrix&lt;double&gt;&gt;();
-</code></pre>
-
-<p>By default, if you print <code>val</code> on a stream, </p>
-
+matrix&lt;double&gt;&amp; B = val[&quot;A&quot;].any_cast&lt;matrix&lt;double&gt;&gt;();
+</code></pre><p>By default, if you print <code>val</code> on a stream, </p>
 <pre><code>std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
-</code></pre>
-
-<p>the template function</p>
-
+</code></pre><p>the template function</p>
 <pre><code>template &lt;typename Char,class T&gt; inline
 void serialize(basic_json_output_handler&lt;Char&gt;&amp; os, const T&amp;)
 {
     os.value(null_type());
 }
-</code></pre>
-
-<p>gets called, and produces a <code>null</code> value for the matrix. You can however introduce a specialization of <code>serialize</code> for <code>boost::numeric::ublas::matrix</code> in the <code>jsoncons</code> namespace, to produce the output </p>
-
+</code></pre><p>gets called, and produces a <code>null</code> value for the matrix. You can however introduce a specialization of <code>serialize</code> for <code>boost::numeric::ublas::matrix</code> in the <code>jsoncons</code> namespace, to produce the output </p>
 <pre><code>{
-    "A":
+    &quot;A&quot;:
     [
         [1,2],
         [3,4]
     ]
 }
-</code></pre>
-
-<h3>Acknowledgements</h3>
-
+</code></pre><h3 id="acknowledgements">Acknowledgements</h3>
 <p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p>
+
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
