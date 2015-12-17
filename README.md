@@ -41,14 +41,11 @@ The jsoncons classes and functions are in namespace `jsoncons`.  Namespace `json
 These include and using declarations are for the examples that appear below.
 
     #include "jsoncons/json.hpp"
-    #include "jsoncons_ext/csv/json.hpp"
 
     using jsoncons::json;
     using jsoncons::json_exception;    
     using jsoncons::pretty_print;
     using jsoncons::json_deserializer;
-    using jsoncons::csv::csv_parameters;
-    using jsoncons::csv::csv_reader;
 
 ### Reading JSON text from a file
 
@@ -213,6 +210,11 @@ Here is a sample CSV file (tasks.csv):
 
 You can read the `CSV` file into a `json` value like this
 
+    #include "jsoncons_ext/csv/json.hpp"
+
+    using jsoncons::csv::csv_parameters;
+    using jsoncons::csv::csv_reader;
+
     std::fstream is("tasks.csv");
 
     json_deserializer handler;
@@ -299,6 +301,8 @@ Here is a sample JSON file (store.json):
 
 The following code returns all authors whose books are cheaper than $10. 
     
+    #include "jsoncons_ext/jsonpath/jsonpath.hpp"
+
     using jsoncons::jsonpath::json_query;
 
     json root = json::parse_file("store.json");

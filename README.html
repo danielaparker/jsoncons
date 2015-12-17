@@ -517,14 +517,11 @@ vertical-align:1px;
 <p>These include and using declarations are for the examples that appear below.</p>
 
 <pre><code>#include "jsoncons/json.hpp"
-#include "jsoncons_ext/csv/json.hpp"
 
 using jsoncons::json;
 using jsoncons::json_exception;    
 using jsoncons::pretty_print;
 using jsoncons::json_deserializer;
-using jsoncons::csv::csv_parameters;
-using jsoncons::csv::csv_reader;
 </code></pre>
 
 <h3>Reading JSON text from a file</h3>
@@ -711,7 +708,12 @@ file_export["image_sizing"] = std::move(image_sizing);
 
 <p>You can read the <code>CSV</code> file into a <code>json</code> value like this</p>
 
-<pre><code>std::fstream is("tasks.csv");
+<pre><code>#include "jsoncons_ext/csv/json.hpp"
+
+using jsoncons::csv::csv_parameters;
+using jsoncons::csv::csv_reader;
+
+std::fstream is("tasks.csv");
 
 json_deserializer handler;
 
@@ -806,7 +808,9 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 
 <p>The following code returns all authors whose books are cheaper than $10. </p>
 
-<pre><code>using jsoncons::jsonpath::json_query;
+<pre><code>#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+
+using jsoncons::jsonpath::json_query;
 
 json root = json::parse_file("store.json");
 
