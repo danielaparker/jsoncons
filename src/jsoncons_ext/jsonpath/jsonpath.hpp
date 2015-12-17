@@ -300,7 +300,9 @@ handle_state:
             case states::left_bracket:
                 switch (c)
                 {
-                case '?':
+				case ' ':case '\n':case '\r':case '\t':
+					break;
+				case '?':
 					{
                         jsonpath_filter_parser<Char,Alloc> parser;
                         parser.parse(path,i,path_length);
