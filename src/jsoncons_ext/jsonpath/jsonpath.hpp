@@ -96,6 +96,8 @@ private:
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
     std::vector<std::shared_ptr<basic_json<Char,Alloc>>> temp_;
+    unsigned long column_;
+    unsigned long line_;
 
     void end_nodes()
     {
@@ -138,6 +140,8 @@ public:
     }
     void evaluate(const basic_json<Char, Alloc>& root, const Char* path, size_t path_length)
     {
+        line_ = 1;
+        column_ = 1;
         state_ = states::start;
         buffer_.clear();
         start_ = 0;

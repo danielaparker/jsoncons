@@ -208,10 +208,6 @@ public:
         if (nodes_.size() > 0)
         {
             result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = expression<Char,Alloc>::evaluate_single_node(*nodes_[i]);
-            }
         }
         return result;
     }

@@ -106,10 +106,22 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_star)
 
 BOOST_AUTO_TEST_CASE(test_store_dotdot_price)
 {
+    jsonpath_fixture fixture;
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$.store..price");
-    std::cout << pretty_print(result) << std::endl;
+
+    json expected = json::array();
+    expected.add(fixture.bicycle()["price"]);
+    json book_list = fixture.book();
+    for (size_t i = 0; i < book_list.size(); ++i)
+    {
+        expected.add(book_list[i]["price"]);
+    }
+
+    //std::cout << pretty_print(result) << std::endl;
+
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_recursive_descent)
@@ -150,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_recursive_descent)
     BOOST_CHECK(result6[1] == root["store"]["book"][3]);
 
     json result7 = json_query(root,"$..book[2:]");
-    std::cout << pretty_print(result7) << std::endl;
+    //std::cout << pretty_print(result7) << std::endl;
     BOOST_CHECK(result7.size() == 2);
     BOOST_CHECK(result7[0] == root["store"]["book"][2]);
     BOOST_CHECK(result7[1] == root["store"]["book"][3]);
@@ -158,27 +170,68 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_recursive_descent)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter1)
 {
+    jsonpath_fixture fixture;
+
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$..book[?(@.price<10)]");
-    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
+    json books = fixture.book();
+    json expected = json::array();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        double price = books[i]["price"].as<double>();
+        if (price < 10)
+        {
+            expected.add(books[i]);
+        }
+    }
+    BOOST_CHECK_EQUAL(expected,result);
 }
  
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter2)
 {
+    jsonpath_fixture fixture;
+
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$..book[?(10 > @.price)]");
-    std::cout << pretty_print(result) << std::endl;
+
+    //std::cout << pretty_print(result) << std::endl;
+    json books = fixture.book();
+    json expected = json::array();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        double price = books[i]["price"].as<double>();
+        if (10 > price)
+        {
+            expected.add(books[i]);
+        }
+    }
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
  
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_category_eq_reference)
 {
+    jsonpath_fixture fixture;
+
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$..book[?(@.category == 'reference')]");
-    std::cout << pretty_print(result) << std::endl;
+
+    //std::cout << pretty_print(result) << std::endl;
+    json books = fixture.book();
+    json expected = json::array();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        double price = books[i]["price"].as<double>();
+        if (books[i]["category"].as<std::string>() == "reference")
+        {
+            expected.add(books[i]);
+        }
+    }
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
@@ -221,28 +274,12 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
         if (has_isbn)
         {
             json result = json_query(books[i],"@.isbn");
-            std::cout << pretty_print(result) << std::endl;
+            json expected = json::array();
+            expected.add(books[i]["isbn"]);
+            BOOST_CHECK_EQUAL(expected, result);
+            //std::cout << pretty_print(result) << std::endl;
         }
     }
-
-
-    //json result = json_query(root,"$..book[?(@.isbn)]");
-
-    //json books = fixture.book();
-
-    //json expected = json::array();
-    //for (size_t i = 0; i < books.size(); ++i)
-    //{
-    //    double price = books[i]["price"].as<double>();
-    //    if (price > 8 && price < 12)
-    //    {
-    //        expected.add(books[i]);
-    //    }
-    //}
-	//std::cout << pretty_print(result) << std::endl;
-    //std::cout << pretty_print(expected) << std::endl;
-
-    //BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
@@ -255,19 +292,18 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
 
     json books = fixture.book();
 
-    //json expected = json::array();
-    //for (size_t i = 0; i < books.size(); ++i)
-    //{
-    //    double price = books[i]["price"].as<double>();
-    //    if (price > 8 && price < 12)
-    //    {
-    //        expected.add(books[i]);
-    //    }
-    //}
-	std::cout << pretty_print(result) << std::endl;
+    json expected = json::array();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        if (books[i].has_member("isbn"))
+        {
+            expected.add(books[i]);
+        }
+    }
+	//std::cout << pretty_print(result) << std::endl;
     //std::cout << pretty_print(expected) << std::endl;
 
-    //BOOST_CHECK_EQUAL(expected,result);
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
@@ -476,6 +512,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
 
     BOOST_CHECK_EQUAL(expected,result);
 }
+
 
 
 
