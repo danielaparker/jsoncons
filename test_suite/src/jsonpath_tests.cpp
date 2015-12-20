@@ -308,7 +308,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
 {
-	jsonpath_fixture fixture;
 
     json root = json::parse_string(jsonpath_fixture::store_text());
 
@@ -333,7 +332,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_category)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false)
 {
-    jsonpath_fixture fixture;
 
     json root = json::parse_string(jsonpath_fixture::store_text());
 
@@ -347,7 +345,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false_and_false)
 {
-    jsonpath_fixture fixture;
 
     json root = json::parse_string(jsonpath_fixture::store_text());
 
@@ -361,8 +358,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false_and_false)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false_or_false)
 {
-    jsonpath_fixture fixture;
-
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$..book[?(false || false)]");
@@ -436,8 +431,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests2)
 {
-    jsonpath_fixture fixture;
-
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result1 = json_query(root,"$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].author");
@@ -500,7 +493,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
 {
-    jsonpath_fixture fixture;
 
     json root = json::parse_string(jsonpath_fixture::store_text());
 

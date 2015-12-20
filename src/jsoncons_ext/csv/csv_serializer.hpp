@@ -349,8 +349,7 @@ private:
         }
         else
         {
-            std::basic_string<Char> buf = float_to_string<Char>(val,format_.precision());
-            os << buf;
+            print_float(val,format_.precision(),os);
         }
 
         end_value();

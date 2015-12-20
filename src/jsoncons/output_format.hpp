@@ -154,7 +154,7 @@ public:
         indent_ = value;
     }
 private:
-    size_t indent_;
+    int indent_;
     int precision_;
     std::ios_base::fmtflags floatfield_;
 

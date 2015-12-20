@@ -213,7 +213,6 @@ void print_float(double val, int precision, std::basic_ostream<Char>& os)
             *b++ = '0';
         }
 	}
- done:
      os.write(b0,b-b0);
 }
 
