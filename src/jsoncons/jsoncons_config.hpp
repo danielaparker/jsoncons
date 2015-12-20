@@ -109,7 +109,7 @@ std::basic_string<Char> float_to_string(double val, int precision)
 	return ss.str();
 }
 
-#ifdef _MSC_VER
+#ifdef _MSC_VERxx
 
 template<typename Char>
 void print_float(double val, int precision, std::basic_ostream<Char>& os)
@@ -220,49 +220,31 @@ void print_float(double val, int precision, std::basic_ostream<Char>& os)
 template <typename Char>
 void print_float(double val, int precision, std::basic_ostream<Char>& os)
 {
-    char buf2[100];
-    Char buf3[100];
-    char formatString[100];
-    sprintf(formatString, "%%.%dg", precision);
-    int len = snprintf(buf2, sizeof(buf2), formatString, val);
+    std::basic_ostringstream<Char> ss;
+    ss.imbue(std::locale::classic());
+    ss << std::showpoint << std::setprecision(precision) << val;
+    std::basic_string<Char> s(ss.str());
 
-    char* s = buf2;
-    char* se = buf2 + len; 
-    Char* b = buf3;
-
-    bool dot = false;
-    while (s < se) 
+    typename std::basic_string<Char>::size_type exp_pos= s.find('e');
+    std::basic_string<Char> exp;
+    if (exp_pos != std::basic_string<Char>::npos)
     {
-      if (*s == ',') 
-      {
-          *b = '.';
-      }
-      else
-      {
-          if (*s == '.')
-          {
-              dot = true;
-          }
-          else if (*s == 'e')
-          {
-              if (!dot)
-              {
-                  *b++ = '.';
-                  *b++ = '0';
-                  dot = true;
-              }
-          }
-          *b = *s;
-      }
-      ++s, ++b;
-    }
-    if (!dot)
-    {
-        *b++ = '.';
-        *b++ = '0';
+        exp = s.substr(exp_pos);
+        s.erase(exp_pos);
     }
 
-    os.write(buf3,b-buf3);
+    int len = (int)s.size();
+    while (len >= 2 && s[len - 1] == '0' && s[len - 2] != '.')
+    {
+        --len;
+    }
+    s.erase(len);
+    if (exp_pos != std::basic_string<Char>::npos)
+    {
+        s.append(exp);
+    }
+
+    os.write(s.c_str(),s.length());
 }
 #endif
 

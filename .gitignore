@@ -6,3 +6,5 @@ test_suite/build/vs2015/.vs/vs2015/v14/.suo
 test_suite/build/vs2015/vs2015.vcxproj.user
 test_suite/build/vs2015/x64/Debug
 test_suite/build/vs2015/x64
+
+src/jsoncons/json1f.hpp
