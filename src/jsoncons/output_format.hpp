@@ -45,12 +45,12 @@ public:
 
 //  Accessors
 
-    size_t indent() const
+    int indent() const
     {
         return indent_;
     }
 
-    size_t precision() const
+    int precision() const
     {
         return precision_;
     }
@@ -88,7 +88,7 @@ public:
 
 //  Modifiers
 
-    void precision(size_t prec)
+    void precision(int prec)
     {
         precision_ = prec;
     }
@@ -149,13 +149,13 @@ public:
         floatfield_ = flags;
     }
 
-    void indent(size_t value)
+    void indent(int value)
     {
         indent_ = value;
     }
 private:
     size_t indent_;
-    size_t precision_;
+    int precision_;
     std::ios_base::fmtflags floatfield_;
 
     bool replace_nan_;

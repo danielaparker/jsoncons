@@ -21,6 +21,7 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
 {
     double x = 1.0e100;
     std::string s = jsoncons::float_to_string<char>(x, 16);
+    std::cout << s << std::endl;
     BOOST_CHECK(s == std::string("1.0e+100") || s == std::string("1.0e100"));
 
     x = 1.0e-100;
@@ -37,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
 
     x = 1234563;
     s = jsoncons::float_to_string<char>(x, 6);
-    BOOST_CHECK(s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006"));
+    BOOST_CHECK(s == std::string("1.23456e+6") || s == std::string("1.23456e+06") || s == std::string("1.23456e+006") || s == std::string("1234560"));
 
     x = 0.0000001234563;
     s = jsoncons::float_to_string<char>(x, 6);

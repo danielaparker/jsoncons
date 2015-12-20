@@ -15,7 +15,7 @@ The modifier method `floatfield` supports setting the floatfield format flag to 
 ### Member constants
 
     default_precision
-The default precision is 16
+The default precision is 15
 
     default_indent
 The default indent is 4
@@ -27,10 +27,10 @@ Constructs an `output_format` with default values.
 
 ### Accessors
 
-    size_t indent() const
+    int indent() const
 Returns the level of indentation, the default is 4
 
-    size_t precision() const 
+    int precision() const 
 Returns the maximum number of significant digits.
 
     bool escape_all_non_ascii() const
@@ -62,7 +62,7 @@ Returns the floatfield format flag, which by default is not set. The default flo
 
 ### Modifiers
 
-    void indent(size_t value)
+    void indent(int value)
 
     void escape_all_non_ascii(bool value)
 
