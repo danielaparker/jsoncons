@@ -84,6 +84,24 @@ class basic_json_parser : private basic_parsing_context<Char>
 {
     static const int default_depth = 100;
 
+    states::states_t state_;
+    int top_;
+    std::vector<modes::modes_t> stack_;
+    basic_json_input_handler<Char> *handler_;
+    basic_parse_error_handler<Char> *err_handler_;
+    unsigned long column_;
+    unsigned long line_;
+    Char c_;
+    uint32_t cp_;
+    uint32_t cp2_;
+    std::basic_string<Char> string_buffer_;
+    bool is_negative_;
+    states::states_t saved_state_;
+    int prev_char_;
+    size_t index_;
+    int depth_;
+    int max_depth_;
+
 public:
     basic_json_parser(basic_json_input_handler<Char>& handler)
        : state_(states::start), 
@@ -1634,24 +1652,6 @@ private:
         }
         return n;
     }
-
-    states::states_t state_;
-    int top_;
-    std::vector<modes::modes_t> stack_;
-    basic_json_input_handler<Char> *handler_;
-    basic_parse_error_handler<Char> *err_handler_;
-    unsigned long column_;
-    unsigned long line_;
-    Char c_;
-    uint32_t cp_;
-    uint32_t cp2_;
-    std::basic_string<Char> string_buffer_;
-    bool is_negative_;
-    states::states_t saved_state_;
-    int prev_char_;
-    size_t index_;
-    int depth_;
-    int max_depth_;
 };
 
 typedef basic_json_parser<char> json_parser;
