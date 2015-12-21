@@ -109,7 +109,7 @@ std::basic_string<Char> float_to_string(double val, int precision)
 	return ss.str();
 }
 
-#ifdef _MSC_VERxx
+#ifdef _MSC_VER
 
 template<typename Char>
 void print_float(double val, int precision, std::basic_ostream<Char>& os)
@@ -273,49 +273,97 @@ long long string_to_integer(bool has_neg, const CharType *s, size_t length) thro
     return has_neg ? -n : n;
 }
 
+// string_to_float only requires narrow char
 #ifdef _MSC_VER
-inline
-double string_to_float(const std::string& s)
+class float_reader
 {
-    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
-
-    const char *begin = &s[0];
-    char *end = const_cast<char *>(begin) + s.size();
-    double val = _strtod_l(begin, &end, locale);
-    if (begin == end)
+private:
+    _locale_t locale;
+public:
+    float_reader()
     {
-        throw std::invalid_argument("Invalid float value");
+        locale = _create_locale(LC_NUMERIC, "C");
     }
-    return val;
-}
-inline
-double string_to_float(const std::wstring& s)
-{
-    static _locale_t locale = _create_locale(LC_NUMERIC, "C");
 
-    const wchar_t *begin = &s[0];
-    wchar_t *end = const_cast<wchar_t *>(begin) + s.size();
-    double val = _wcstod_l(begin, &end, locale);
-    if (begin == end)
-    {
-        throw std::invalid_argument("Invalid float value");
-    }
-    return val;
-}
+	double read(const char* s, size_t length)
+	{
+        const char *begin = s;
+        char *end = const_cast<char *>(begin) + length;
+        double val = _strtod_l(begin, &end, locale);
+        if (begin == end)
+        {
+            throw std::invalid_argument("Invalid float value");
+        }
+        return val;
+	}
+};
+
 #else
-template <typename Char> inline
-double string_to_float(const std::basic_string<Char>& s)
+class float_reader
 {
-    std::basic_istringstream<Char> ss(s);
-    ss.imbue(std::locale::classic());
-    double val;
-    ss >> val;
-    if (ss.fail())
+private:
+    std::vector<char> buffer_;
+    std::string decimal_point_;
+	bool is_dot_;
+public:
+    float_reader()
+        : buffer_()
     {
-        throw std::invalid_argument("Invalid float value");
+        struct lconv * lc = localeconv();
+        if (lc != nullptr)
+        {
+            decimal_point_ = std::string(lc->decimal_point);	
+        }
+        else
+        {
+            decimal_point_ = std::string("."); 
+        }
+		buffer_.reserve(100);
+		is_dot_ = decimal_point_ == ".";
     }
-    return val;
-}
+
+	double read(const char* s, size_t length)
+	{
+        double val;
+        if (is_dot_)
+        {
+            const char *begin = s;
+            char *end = const_cast<char *>(begin) + length;
+            val = strtod(begin, &end);
+            if (begin == end)
+            {
+                throw std::invalid_argument("Invalid float value");
+            }
+        }
+        else
+        {
+            buffer_.clear();
+            size_t j = 0;
+            const char* pe = s + length;
+            for (const char* p = s; p < pe; ++p)
+            {
+                if (*p == '.')
+                {
+                    buffer_.insert(buffer_.begin() + j, decimal_point_.begin(), decimal_point_.end());
+                    j += decimal_point_.length();
+                }
+                else
+                {
+                    buffer_.push_back(*p);
+                    ++j;
+                }
+            }
+            char *begin = &buffer_[0];
+            char *end = begin + j;
+            val = strtod(begin, &end);
+            if (begin == end)
+            {
+                throw std::invalid_argument("Invalid float value");
+            }
+        }
+		return val;
+	}
+};
 #endif
 
 }

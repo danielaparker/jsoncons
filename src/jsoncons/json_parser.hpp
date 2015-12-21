@@ -95,12 +95,14 @@ class basic_json_parser : private basic_parsing_context<Char>
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<Char> string_buffer_;
+    std::basic_string<char> number_buffer_;
     bool is_negative_;
     states::states_t saved_state_;
     int prev_char_;
     size_t index_;
     int depth_;
     int max_depth_;
+    float_reader float_reader_;
 
 public:
     basic_json_parser(basic_json_input_handler<Char>& handler)
@@ -428,11 +430,11 @@ handle_state:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -570,11 +572,11 @@ handle_state:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -768,11 +770,11 @@ handle_state:
                     switch (curr_char)
                     {
                     case '0': 
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     default:
@@ -823,7 +825,7 @@ handle_state:
                         }
                         break;
                     case '.':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -882,11 +884,11 @@ handle_state:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::integer;
                         break;
                     case '.':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -894,7 +896,7 @@ handle_state:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp1;
                         break;
                     default:
@@ -946,7 +948,7 @@ handle_state:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -954,7 +956,7 @@ handle_state:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp1;
                         break;
                     default:
@@ -971,12 +973,12 @@ handle_state:
                         state_ = states::exp2;
                         break;
                     case '-':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp2;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -991,7 +993,7 @@ handle_state:
                     {
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -1047,7 +1049,7 @@ handle_state:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(curr_char);
+                        number_buffer_.push_back(curr_char);
                         state_ = states::exp3;
                         break;
                     default:
@@ -1328,7 +1330,7 @@ private:
     {
         try
         {
-            double d = string_to_float(string_buffer_);
+            double d = float_reader_.read(number_buffer_.c_str(), number_buffer_.length());
             if (is_negative_)
                 d = -d;
             handler_->value(d, *this);
@@ -1338,7 +1340,7 @@ private:
             err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_text_error_category()), *this);
             handler_->value(null_type(), *this); // recovery
         }
-        string_buffer_.clear();
+        number_buffer_.clear();
         is_negative_ = false;
         switch (stack_[top_])
         {
@@ -1363,14 +1365,14 @@ private:
         {
             try
             {
-                long long d = string_to_integer(is_negative_, string_buffer_.c_str(), string_buffer_.length());
+                long long d = string_to_integer(is_negative_, number_buffer_.c_str(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
             {
                 try
                 {
-                    double d = string_to_float(string_buffer_);
+                    double d = float_reader_.read(number_buffer_.c_str(), number_buffer_.length());
                     handler_->value(-d, *this);
                 }
                 catch (...)
@@ -1384,14 +1386,14 @@ private:
         {
             try
             {
-                unsigned long long d = string_to_unsigned(string_buffer_.c_str(), string_buffer_.length());
+                unsigned long long d = string_to_unsigned(number_buffer_.c_str(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
             {
                 try
                 {
-                    double d = string_to_float(string_buffer_);
+                    double d = float_reader_.read(number_buffer_.c_str(),number_buffer_.length());
                     handler_->value(d, *this);
                 }
                 catch (...)
@@ -1417,7 +1419,7 @@ private:
             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
             break;
         }
-        string_buffer_.clear();
+        number_buffer_.clear();
         is_negative_ = false;
     }
 
