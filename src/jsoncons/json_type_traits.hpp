@@ -542,6 +542,24 @@ public:
     }
 };
 
+template<typename Char, typename Alloc>
+class json_type_traits<Char, Alloc, float>
+{
+public:
+    static bool is(const basic_json<Char, Alloc>& rhs)
+    {
+        return rhs.is_double();
+    }
+    static double as(const basic_json<Char, Alloc>& rhs)
+    {
+        return static_cast<float>(rhs.as_double());
+    }
+    static void assign(basic_json<Char, Alloc>& lhs, float rhs)
+    {
+        lhs.assign_double(static_cast<double>(rhs));
+    }
+};
+
 template<typename Char, typename Alloc, typename T>
 class json_type_traits<Char, Alloc, std::vector<T>>
 {
