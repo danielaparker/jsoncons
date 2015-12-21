@@ -205,9 +205,9 @@ public:
 				return length() == rhs.length() ? std::char_traits<Char>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
 			}
 
-            friend struct string_dataA;
-		private:
-			string_data()
+            friend string_data* make_string_data(const Char* s, size_t length_);
+
+            string_data()
 				: p(nullptr), length_(0)
 			{
 			}
@@ -221,28 +221,28 @@ public:
         {
         	string_data data;
         	Char c[1];
-
-            static string_data* make_string_data(const Char* s, size_t length_)
-
-            {
-                typedef typename std::aligned_storage<sizeof(string_dataA), alignof(string_dataA)>::type storage_type;
-
-                char* storage = new char[sizeof(storage_type) + length_*sizeof(Char)];
-                string_data* ps = new(storage)string_data();
-                auto psa = reinterpret_cast<string_dataA*>(storage); 
-
-                ps->p = new(&psa->c)Char[length_ + 1];
-                memcpy(ps->p, s, length_*sizeof(Char));
-                ps->p[length_] = 0;
-                ps->length_ = length_;
-                return ps;
-            }
-
-            static void destroy_string_data(string_data* p)
-            {
-                ::operator delete(reinterpret_cast<void*>(p));
-            }
         };
+
+        static string_data* make_string_data(const Char* s, size_t length_)
+
+        {
+            typedef typename std::aligned_storage<sizeof(string_dataA), alignof(string_dataA)>::type storage_type;
+
+            char* storage = new char[sizeof(storage_type) + length_*sizeof(Char)];
+            string_data* ps = new(storage)string_data();
+            auto psa = reinterpret_cast<string_dataA*>(storage); 
+
+            ps->p = new(&psa->c)Char[length_ + 1];
+            memcpy(ps->p, s, length_*sizeof(Char));
+            ps->p[length_] = 0;
+            ps->length_ = length_;
+            return ps;
+        }
+
+        static void destroy_string_data(string_data* p)
+        {
+            ::operator delete(reinterpret_cast<void*>(p));
+        }
 
         static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
 
@@ -284,7 +284,7 @@ public:
                 std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
                 break;
             case value_types::string_t:
-                value_.string_value_ = string_dataA::make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
+                value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
                 break;
             case value_types::array_t:
                 value_.array_ = new json_array<Char,Alloc>(*(var.value_.array_));
@@ -345,7 +345,7 @@ public:
                 small_string_length_ = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = string_dataA::make_string_data("",0);
+                value_.string_value_ = make_string_data("",0);
                 break;
             case value_types::array_t:
                 value_.array_ = new json_array<Char,Alloc>(size);
@@ -402,7 +402,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = string_dataA::make_string_data(s.c_str(),s.length());
+                value_.string_value_ = make_string_data(s.c_str(),s.length());
             }
             else
             {
@@ -418,7 +418,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = string_dataA::make_string_data(s,std::char_traits<Char>::length(s));
+                value_.string_value_ = make_string_data(s,std::char_traits<Char>::length(s));
             }
             else
             {
@@ -433,7 +433,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = string_dataA::make_string_data(s,length);
+                value_.string_value_ = make_string_data(s,length);
             }
             else
             {
@@ -455,7 +455,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                string_dataA::destroy_string_data(value_.string_value_);
+                destroy_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
                 delete value_.array_;
@@ -476,7 +476,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                string_dataA::destroy_string_data(value_.string_value_);
+                destroy_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
                 delete value_.array_;
@@ -600,7 +600,7 @@ public:
                 if (s.length() > variant::small_string_capacity)
                 {
                     type_ = value_types::string_t;
-                    value_.string_value_ = string_dataA::make_string_data(s.c_str(),s.length());
+                    value_.string_value_ = make_string_data(s.c_str(),s.length());
                 }
                 else
                 {
@@ -630,7 +630,7 @@ public:
 					if (length > variant::small_string_capacity)
 					{
 						type_ = value_types::string_t;
-						value_.string_value_ = string_dataA::make_string_data(s,length);
+						value_.string_value_ = make_string_data(s,length);
 					}
 					else
 					{
