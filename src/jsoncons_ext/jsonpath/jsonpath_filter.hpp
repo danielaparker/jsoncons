@@ -41,7 +41,7 @@ template<typename Char, class Alloc>
 class expression
 {
 public:
-    virtual void evaluate(const basic_json<Char,Alloc>& context_node) = 0;
+    virtual void initialize(const basic_json<Char,Alloc>& context_node) = 0;
     virtual bool evaluate_single_node() const = 0;
     virtual bool eq(const expression& rhs) const = 0;
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
@@ -55,6 +55,10 @@ public:
     virtual bool lt(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool gt(const expression& rhs) const = 0;
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual basic_json<Char,Alloc> minus(const expression& rhs) const = 0;
+    virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual basic_json<Char,Alloc> plus(const expression& rhs) const = 0;
+    virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const = 0;
 
     static bool evaluate_single_node(const basic_json<Char,Alloc>& node)
     {
@@ -106,6 +110,56 @@ public:
     {
         return lt(rhs,lhs);
     }
+
+    static basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        basic_json<Char,Alloc> result = jsoncons::null_type();
+        if (lhs.is<long long>() && rhs.is<long long>())
+        {
+            result = ((lhs.as<long long>() - rhs.as<long long>()));
+        }
+        else if (lhs.is<double>() || rhs.is<double>())
+        {
+            result = (lhs.as<double>() - rhs.as<double>());
+        }
+        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>() && lt(rhs,lhs))
+        {
+            result = (lhs.as<unsigned long long>() - rhs.as<unsigned long long>());
+        }
+        return result;
+    }
+
+    static basic_json<Char,Alloc> unary_minus(const basic_json<Char,Alloc>& lhs)
+    {
+        basic_json<Char,Alloc> result = jsoncons::null_type();
+        if (lhs.is<long long>())
+        {
+            result = -lhs.as<long long>();
+        }
+        else if (lhs.is<double>())
+        {
+            result = -lhs.as<double>();
+        }
+        return result;
+    }
+
+    static basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    {
+        basic_json<Char,Alloc> result = jsoncons::null_type();
+        if (lhs.is<long long>() && rhs.is<long long>())
+        {
+            result = ((lhs.as<long long>() + rhs.as<long long>()));
+        }
+        else if (lhs.is<double>() || rhs.is<double>())
+        {
+            result = (lhs.as<double>() + rhs.as<double>());
+        }
+        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+        {
+            result = (lhs.as<unsigned long long>() + rhs.as<unsigned long long>());
+        }
+        return result;
+    }
 };
 
 template<typename Char, class Alloc>
@@ -119,7 +173,7 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& context_node) override
+    void initialize(const basic_json<Char,Alloc>& context_node) override
     {
     }
 
@@ -182,6 +236,26 @@ public:
     {
         return expression<Char,Alloc>::gt(value_,rhs);
     }
+
+    basic_json<Char,Alloc> minus(const expression<Char,Alloc>& rhs) const override
+    {
+        return rhs.minus(value_);
+    }
+
+    basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        return expression<Char,Alloc>::minus(value_,rhs);
+    }
+
+    basic_json<Char,Alloc> plus(const expression<Char,Alloc>& rhs) const override
+    {
+        return rhs.plus(value_);
+    }
+
+    basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        return expression<Char,Alloc>::plus(value_,rhs);
+    }
 };
 
 template<typename Char, class Alloc>
@@ -195,7 +269,7 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& context_node) override
+    void initialize(const basic_json<Char,Alloc>& context_node) override
     {
         jsonpath_evaluator<Char,Alloc> evaluator;
         evaluator.evaluate(context_node,path_);
@@ -375,6 +449,28 @@ public:
         }
         return result;
     }
+
+    basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        return nodes_.size() == 1 ? expression<Char,Alloc>::minus(*nodes_[0],rhs) : jsoncons::null_type();
+    }
+
+    basic_json<Char,Alloc> minus(const expression<Char,Alloc>& rhs) const override
+    {
+        return nodes_.size() == 1 ? rhs.minus(*nodes_[0]) : jsoncons::null_type();
+    }
+
+    basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        static auto a_null = jsoncons::null_type();
+        return nodes_.size() == 1 ? expression<Char,Alloc>::plus(*nodes_[0],rhs) : a_null;
+    }
+
+    basic_json<Char,Alloc> plus(const expression<Char,Alloc>& rhs) const override
+    {
+        static auto a_null = jsoncons::null_type();
+        return nodes_.size() == 1 ? rhs.plus(*nodes_[0]) : a_null;
+    }
 };
 
 namespace operators {
@@ -388,7 +484,9 @@ enum operators_t
     lt,
     gt,
     lte,
-    gte
+    gte,
+    plus,
+    minus
 };}
 
 template<typename Char, class Alloc>
@@ -404,12 +502,12 @@ public:
     {
     }
 
-    void evaluate(const basic_json<Char,Alloc>& context_node) override
+    void initialize(const basic_json<Char,Alloc>& context_node) override
     {
-        lhs_->evaluate(context_node);
+        lhs_->initialize(context_node);
         if (operator_ != operators::none)
         {
-            rhs_->evaluate(context_node);
+            rhs_->initialize(context_node);
         }
     }
     bool evaluate_single_node() const override
@@ -418,20 +516,22 @@ public:
     }
     bool eq(const expression& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return rhs.eq(result);
     }
     bool eq(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return result == rhs;
     }
 
     bool ne(const expression& rhs) const override
     {
-        return false;
+        return !eq(rhs);
     }
     bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        return !eq(rhs);
     }
     bool ampamp(const expression& rhs) const override
     {
@@ -452,19 +552,43 @@ public:
 
     bool lt(const expression& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return rhs.gt(result);
     }
     bool lt(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return expression<Char,Alloc>::lt(result,rhs);
     }
     bool gt(const expression& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return rhs.lt(result);
     }
     bool gt(const basic_json<Char,Alloc>& rhs) const override
     {
-        return false;
+        basic_json<Char,Alloc> result = evaluate();
+        return expression<Char,Alloc>::gt(result,rhs);
+    }
+    basic_json<Char,Alloc> minus(const expression& rhs) const override
+    {
+        basic_json<Char,Alloc> result = evaluate();
+        return rhs.plus(unary_minus(result));
+    }
+    basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        basic_json<Char,Alloc> result = evaluate();
+        return expression<Char,Alloc>::minus(result,rhs);
+    }
+    basic_json<Char,Alloc> plus(const expression& rhs) const override
+    {
+        basic_json<Char,Alloc> result = evaluate();
+        return rhs.plus(result);
+    }
+    basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& rhs) const override
+    {
+        basic_json<Char,Alloc> result = evaluate();
+        return expression<Char,Alloc>::plus(result,rhs);
     }
 
     bool has_lhs() const
@@ -484,12 +608,22 @@ public:
 
     bool accept(const basic_json<Char,Alloc>& arg) const
     {
-        lhs_->evaluate(arg);
+        lhs_->initialize(arg);
 		if (operator_ != operators::none)
 		{
-			rhs_->evaluate(arg);
+			rhs_->initialize(arg);
 		}
         return compare();
+    }
+
+    basic_json<Char,Alloc> evaluate(const basic_json<Char,Alloc>& arg) const
+    {
+        lhs_->initialize(arg);
+        if (operator_ != operators::none)
+        {
+            rhs_->initialize(arg);
+        }
+        return evaluate();
     }
 
     bool compare() const
@@ -515,6 +649,39 @@ public:
         case operators::none:
             return lhs_->evaluate_single_node();
 			break;
+        }
+        return false;
+    }
+
+    basic_json<Char,Alloc> evaluate() const
+    {
+        static auto a_null = jsoncons::null_type();
+
+        switch (operator_)
+        {
+        case operators::eq:
+            return lhs_->eq(*rhs_);
+        case operators::ne:
+            return lhs_->ne(*rhs_);
+        case operators::ampamp:
+            return lhs_->ampamp(*rhs_);
+        case operators::pipepipe:
+            return lhs_->pipepipe(*rhs_);
+        case operators::gt:
+            return lhs_->gt(*rhs_);
+        case operators::lt:
+            return lhs_->lt(*rhs_);
+        case operators::gte:
+            return lhs_->gt(*rhs_) || lhs_->eq(*rhs_);
+        case operators::lte:
+            return lhs_->lt(*rhs_) || lhs_->eq(*rhs_);
+        case operators::plus:
+            return lhs_->plus(*rhs_);
+        case operators::minus:
+            return lhs_->minus(*rhs_);
+        case operators::none:
+            return lhs_->evaluate_single_node();
+            break;
         }
         return false;
     }
@@ -645,6 +812,14 @@ handle_state:
                         state_ = filter_states::expect_path_or_value;
                     }
                     break;
+                case '+':
+                    stack_.back()->operator_ = operators::plus;
+                    state_ = filter_states::expect_path_or_value;
+                    break;
+                case '-':
+                    stack_.back()->operator_ = operators::minus;
+                    state_ = filter_states::expect_path_or_value;
+                    break;
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 default:
@@ -663,6 +838,8 @@ handle_state:
                     case '=':
                     case '&':
                     case '|':
+                    case '+':
+                    case '-':
                         {
                             if (buffer_.length() > 0)
                             {
@@ -830,6 +1007,8 @@ handle_state:
                 case '=':
                 case '&':
                 case '|':
+                case '+':
+                case '-':
                     {
                         state_ = filter_states::oper;
                         goto handle_state;
@@ -879,6 +1058,8 @@ handle_state:
                 case '=':
                 case '&':
                 case '|':
+                case '+':
+                case '-':
                     {
                         state_ = filter_states::oper;
                         goto handle_state;
@@ -936,6 +1117,8 @@ handle_state:
                 case '=':
                 case '&':
                 case '|':
+                case '+':
+                case '-':
                     {
                         if (buffer_.length() > 0)
                         {
