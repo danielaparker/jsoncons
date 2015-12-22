@@ -96,8 +96,8 @@ private:
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
     std::vector<std::shared_ptr<basic_json<Char,Alloc>>> temp_;
-    unsigned long column_;
-    unsigned long line_;
+    size_t line_;
+    size_t column_;
 
     void end_nodes()
     {
@@ -313,7 +313,7 @@ handle_state:
 				case '?':
 					{
                         jsonpath_filter_parser<Char,Alloc> parser;
-                        parser.parse(path,i,path_length);
+                        parser.parse(path,i,path_length,line_,column_);
                         auto filter = parser.get_filter();
                         nodes_.clear();
 						for (size_t j = 0; j < stack_.back().size(); ++j)
@@ -322,6 +322,8 @@ handle_state:
 						}
                         end_nodes();
 						i = parser.index();
+                        line_= parser.line_number();
+                        column_= parser.column_number();
                         goto handle_state;
 					}
                     break;

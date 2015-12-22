@@ -17,8 +17,8 @@ class json_parse_exception : public json_exception
 {
 public:
     json_parse_exception(std::error_code ec,
-                         unsigned long line,
-                         unsigned long column)
+                         size_t line,
+                         size_t column)
         : error_code_(ec),
           line_number_(line),
           column_number_(column)
@@ -43,20 +43,20 @@ public:
         return error_code_;
     }
 
-    unsigned long line_number() const
+    size_t line_number() const
     {
         return line_number_;
     }
 
-    unsigned long column_number() const
+    size_t column_number() const
     {
         return column_number_;
     }
 private:
     std::error_code error_code_;
     std::string buffer_;
-    unsigned long line_number_;
-    unsigned long column_number_;
+    size_t line_number_;
+    size_t column_number_;
 };
 
 template<typename Char>
@@ -65,11 +65,11 @@ class basic_parsing_context
 public:
     virtual ~basic_parsing_context() {}
 
-    unsigned long line_number() const
+    size_t line_number() const
     {
         return do_line_number();
     }
-    unsigned long column_number() const 
+    size_t column_number() const 
     {
         return do_column_number();
     }
@@ -79,8 +79,8 @@ public:
     }
 
 private:
-    virtual unsigned long do_line_number() const = 0;
-    virtual unsigned long do_column_number() const = 0;
+    virtual size_t do_line_number() const = 0;
+    virtual size_t do_column_number() const = 0;
     virtual Char do_last_char() const = 0;
 };
 

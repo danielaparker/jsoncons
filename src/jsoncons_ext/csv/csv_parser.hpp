@@ -693,12 +693,12 @@ private:
         }
     }
 
-    unsigned long do_line_number() const override
+    size_t do_line_number() const override
     {
         return line_;
     }
 
-    unsigned long do_column_number() const override
+    size_t do_column_number() const override
     {
         return column_;
     }

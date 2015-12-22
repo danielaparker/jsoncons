@@ -89,8 +89,8 @@ class basic_json_parser : private basic_parsing_context<Char>
     std::vector<modes::modes_t> stack_;
     basic_json_input_handler<Char> *handler_;
     basic_parse_error_handler<Char> *err_handler_;
-    unsigned long column_;
-    unsigned long line_;
+    size_t column_;
+    size_t line_;
     Char c_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -1574,12 +1574,12 @@ private:
         return cp;
     }
 
-    unsigned long do_line_number() const override
+    size_t do_line_number() const override
     {
         return line_;
     }
 
-    unsigned long do_column_number() const override
+    size_t do_column_number() const override
     {
         return column_;
     }

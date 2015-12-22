@@ -524,14 +524,27 @@ template<typename Char, class Alloc>
 class jsonpath_filter_parser
 {
     size_t index_;
+    size_t line_;
+    size_t column_;
     filter_states::filter_states_t state_;
     std::vector<std::shared_ptr<jsonpath_filter<Char,Alloc>>> stack_;
     std::shared_ptr<jsonpath_filter<Char,Alloc>> filter_;
     std::basic_string<Char> buffer_;
 public:
-    void parse(const Char* p, size_t start, size_t length)
+    size_t line_number() const
+    {
+        return line_;
+    }
+    size_t column_number() const
+    {
+        return column_;
+    }
+
+    void parse(const Char* p, size_t start, size_t length, size_t row, size_t column)
     {
         index_ = start;
+        line_ = row;
+        column_ = column;
         state_ = filter_states::start;
         bool done = false;
         while (!done && index_ < length)
