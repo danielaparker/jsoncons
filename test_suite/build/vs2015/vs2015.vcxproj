@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\jsonpath_filter_tests.cpp" />
+    <ClCompile Include="..\..\src\jsonpath_tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2A86273E-C7C5-4EFA-BA32-16064DD90ED4}</ProjectGuid>

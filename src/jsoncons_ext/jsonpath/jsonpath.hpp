@@ -125,11 +125,6 @@ public:
         return result;
     }
 
-    std::vector<const basic_json<Char,Alloc>*> get_nodes() const
-    {
-        return stack_.size() > 0 ? stack_.back() : std::vector<cjson_ptr>();
-    }
-
     void evaluate(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
     {
         evaluate(root,path.c_str(),path.length());
@@ -310,23 +305,44 @@ handle_state:
                 {
 				case ' ':case '\n':case '\r':case '\t':
 					break;
-				case '?':
-					{
+				case '(':
+                    {
+                        if (stack_.back().size() == 1)
+                        {
+                            jsonpath_filter_parser<Char,Alloc> parser;
+                            parser.parse(path,i,path_length,line_,column_);
+                            auto filter = parser.get_filter();
+                            auto len = filter->evaluate(*(stack_.back()[0]));
+                            if (len.is<size_t>())
+                            {
+                                start_ = len.as<size_t>();
+                                end_element_index();
+                            }
+                            i = parser.index();
+                            line_= parser.line_number();
+                            column_= parser.column_number();
+                            goto handle_state;
+                        }
+                    }
+                    break;
+                case '?':
+                    {
                         jsonpath_filter_parser<Char,Alloc> parser;
                         parser.parse(path,i,path_length,line_,column_);
                         auto filter = parser.get_filter();
                         nodes_.clear();
-						for (size_t j = 0; j < stack_.back().size(); ++j)
-						{
-	                        accept(*(stack_.back()[j]),*filter);
-						}
-                        end_nodes();
-						i = parser.index();
+                        for (size_t j = 0; j < stack_.back().size(); ++j)
+                        {
+                            accept(*(stack_.back()[j]),*filter);
+                        }
+                        //end_nodes();
+                        i = parser.index();
                         line_= parser.line_number();
                         column_= parser.column_number();
                         goto handle_state;
-					}
+                    }
                     break;
+                    
                 case ':':
                     step_ = 1;
                     end_undefined_ = true;
@@ -345,7 +361,7 @@ handle_state:
                     break;
                 case ']':
                     //end_element_index();
-                    //end_nodes();
+                    end_nodes();
                     state_ = states::expect_separator;
                     break;
                 case '*':

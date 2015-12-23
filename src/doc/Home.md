@@ -54,7 +54,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 #### jsonpath
 
-[jsonpath](jsonpath)
+[json_query](json_query)
 
 ## Examples
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>jsonpath</title>
+<title>json_query</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -476,7 +476,15 @@ vertical-align:1px;
 template&lt;typename Char, class Alloc&gt;
 basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; root, 
                                   const std::basic_string&lt;Char&gt;&amp; path);
-</code></pre><h3 id="stefan-goessner-s-jsonpath">Stefan Goessner&#39;s JsonPath</h3>
+</code></pre><p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. </p>
+<p>Stefan Goessner&#39;s javascript implemention returns <code>false</code> in case of no match, but in a note he suggests an alternative is to return an empty array. The <code>jsoncons</code> implementation takes that alternative and returns an empty array in case of no match.</p>
+<h3 id="stefan-goessner-s-jsonpath">Stefan Goessner&#39;s JsonPath</h3>
+<p>Unlike XML, the root of a JSON text is an anonymous object or array or scalar, so JSONPath identifies the outermost level of the text with the symbol $.</p>
+<p>JSONPath expressions can use the dot–notation</p>
+<p>$.store.book[0].title</p>
+<p>or the bracket–notation</p>
+<p>$[&#39;store&#39;][&#39;book&#39;][0][&#39;title&#39;]</p>
+<p>to describe input paths.</p>
 <table>
 <thead>
 <tr>
@@ -527,7 +535,8 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 </tr>
 </tbody>
 </table>
-<h3 id="filter-expression">Filter expression</h3>
+<h3 id="jsoncons-filter-expressions">jsoncons filter expressions</h3>
+<p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner&#39;s JsonPath</a> does not provide any specification about the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. <code>jsoncons</code> expressions support the following comparision and arithmetic operators. </p>
 <table>
 <thead>
 <tr>
@@ -565,13 +574,22 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 <td>Left and right</td>
 </tr>
 <tr>
-<td>`</td>
+<td>`\</td>
+<td>\</td>
 <td>`</td>
 <td>Left or right</td>
 </tr>
+<tr>
+<td><code>+</code></td>
+<td>Left plus right</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>Left minus right</td>
+</tr>
 </tbody>
 </table>
-<p>In this implementation, binary expressions must appear within parentheses.</p>
+<p>Binary expressions must appear within parentheses.</p>
 <h3 id="examples">Examples</h3>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner&#39;s JsonPath</a> (store.json).</p>
 <pre><code>{ &quot;store&quot;: {
@@ -654,6 +672,11 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <tr>
 <td><code>$..book[2]</code></td>
 <td>The third book</td>
+</tr>
+<tr>
+<td><code>$..book[(@.length-1)]</code></td>
+<td>The last book in order.</td>
+<td>Expressions (<expr>) can be used as an alternative to explicit names or indices</td>
 </tr>
 <tr>
 <td><code>$..book[-1:]</code></td>

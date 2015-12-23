@@ -4,8 +4,8 @@
 #ifdef __linux__
 #define BOOST_TEST_DYN_LINK
 #endif
-#define BOOST_TEST_MAIN
 
+#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include <vector>
@@ -51,16 +51,54 @@ struct jsonpath_filter_fixture
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
     jsonpath_filter_parser<char,std::allocator<void>> parser;
-    std::string expr = "(1+1)";
+	json parent = json::array();
+	parent.add(1);
+	parent.add(2);
 
-    parser.parse(expr.c_str(),0,expr.length(),1,1);
-    auto filter = parser.get_filter();
-    json parent;
-    auto result = filter->evaluate(parent);
-    std::cout << result << std::endl;
+	std::string expr1 = "(1 + 1)";
+    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    auto result1 = parser.get_filter()->evaluate(parent);
+    BOOST_CHECK_EQUAL(json(2),result1);
+
+	std::string expr2 = "(1 - 1)";
+	parser.parse(expr2.c_str(), 0, expr2.length(), 1, 1);
+	auto result2 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(0), result2);
+
+	std::string expr3 = "(@.length - 1)";
+	parser.parse(expr3.c_str(), 0, expr3.length(), 1, 1);
+	auto result3 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(1), result3);
 
 }
 
+BOOST_AUTO_TEST_CASE(test_jsonpath_index_expression)
+{
+    jsonpath_filter_fixture fixture;
+
+    json root = json::parse_string(jsonpath_filter_fixture::store_text());
+
+    json result = json_query(root,"$..book[(@.length-1)]");
+
+    BOOST_CHECK_EQUAL(1,result.size());
+    BOOST_CHECK_EQUAL(root["store"]["book"][3],result[0]);
+
+    //    std::cout << pretty_print(result) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
+{
+    jsonpath_filter_parser<char,std::allocator<void>> parser;
+    json parent = json::array();
+    parent.add(1);
+    parent.add(2);
+
+    std::string expr1 = "(-1 + 1)";
+    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    auto result1 = parser.get_filter()->evaluate(parent);
+    BOOST_CHECK_EQUAL(json(0),result1);
+
+}
 
 
 

@@ -57,6 +57,7 @@ public:
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual basic_json<Char,Alloc> minus(const expression& rhs) const = 0;
     virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual basic_json<Char,Alloc>  unary_minus() const = 0;
     virtual basic_json<Char,Alloc> plus(const expression& rhs) const = 0;
     virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const = 0;
 
@@ -95,7 +96,7 @@ public:
         {
             result = lhs.as<long long>() < rhs.as<long long>();
         }
-        else if (lhs.is<double>() || rhs.is<double>())
+        else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
         {
             result = lhs.as<double>() < rhs.as<double>();
         }
@@ -111,20 +112,20 @@ public:
         return lt(rhs,lhs);
     }
 
-    static basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    static basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
         basic_json<Char,Alloc> result = jsoncons::null_type();
         if (lhs.is<long long>() && rhs.is<long long>())
         {
-            result = ((lhs.as<long long>() - rhs.as<long long>()));
+            result = ((lhs.as<long long>() + rhs.as<long long>()));
         }
-        else if (lhs.is<double>() || rhs.is<double>())
+        else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
         {
-            result = (lhs.as<double>() - rhs.as<double>());
+            result = (lhs.as<double>() + rhs.as<double>());
         }
-        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>() && lt(rhs,lhs))
+        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
         {
-            result = (lhs.as<unsigned long long>() - rhs.as<unsigned long long>());
+            result = (lhs.as<unsigned long long>() + rhs.as<unsigned long long>());
         }
         return result;
     }
@@ -143,20 +144,20 @@ public:
         return result;
     }
 
-    static basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+    static basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
         basic_json<Char,Alloc> result = jsoncons::null_type();
         if (lhs.is<long long>() && rhs.is<long long>())
         {
-            result = ((lhs.as<long long>() + rhs.as<long long>()));
+            result = ((lhs.as<long long>() - rhs.as<long long>()));
         }
-        else if (lhs.is<double>() || rhs.is<double>())
+        else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
         {
-            result = (lhs.as<double>() + rhs.as<double>());
+            result = (lhs.as<double>() - rhs.as<double>());
         }
-        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+        else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>() && lt(rhs,lhs))
         {
-            result = (lhs.as<unsigned long long>() + rhs.as<unsigned long long>());
+            result = (lhs.as<unsigned long long>() - rhs.as<unsigned long long>());
         }
         return result;
     }
@@ -239,12 +240,17 @@ public:
 
     basic_json<Char,Alloc> minus(const expression<Char,Alloc>& rhs) const override
     {
-        return rhs.minus(value_);
+        return expression<Char,Alloc>::plus(rhs.unary_minus(),value_);
     }
 
     basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
     {
         return expression<Char,Alloc>::minus(value_,rhs);
+    }
+
+    basic_json<Char,Alloc> unary_minus() const override
+    {
+        return expression<Char,Alloc>::unary_minus(value_);
     }
 
     basic_json<Char,Alloc> plus(const expression<Char,Alloc>& rhs) const override
@@ -262,7 +268,7 @@ template<typename Char, class Alloc>
 class path_expression : public expression<Char,Alloc>
 {
     std::basic_string<Char> path_;
-    std::vector<const basic_json<Char,Alloc>*> nodes_;
+    basic_json<Char,Alloc> nodes_;
 public:
     path_expression(const std::basic_string<Char>& path)
         : path_(path)
@@ -273,7 +279,7 @@ public:
     {
         jsonpath_evaluator<Char,Alloc> evaluator;
         evaluator.evaluate(context_node,path_);
-        nodes_ = evaluator.get_nodes();
+        nodes_ = evaluator.get_values();
     }
 
     bool evaluate_single_node() const override
@@ -294,7 +300,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.eq(*nodes_[i]);
+                result = rhs.eq(nodes_[i]);
             }
         }
         return result;
@@ -308,7 +314,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = *nodes_[i] == rhs;
+                result = nodes_[i] == rhs;
             }
         }
         return result;
@@ -322,7 +328,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.ne(*nodes_[i]);
+                result = rhs.ne(nodes_[i]);
             }
         }
         return result;
@@ -336,7 +342,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = *nodes_[i] != rhs;
+                result = nodes_[i] != rhs;
             }
         }
         return result;
@@ -349,7 +355,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.ampamp(*nodes_[i]);
+                result = rhs.ampamp(nodes_[i]);
             }
         }
         return result;
@@ -362,7 +368,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = expression<Char,Alloc>::ampamp(*nodes_[i],rhs);
+                result = expression<Char,Alloc>::ampamp(nodes_[i],rhs);
             }
         }
         return result;
@@ -375,7 +381,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.pipepipe(*nodes_[i]);
+                result = rhs.pipepipe(nodes_[i]);
             }
         }
         return result;
@@ -388,7 +394,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = expression<Char,Alloc>::pipepipe(*nodes_[i],rhs);
+                result = expression<Char,Alloc>::pipepipe(nodes_[i],rhs);
             }
         }
         return result;
@@ -402,7 +408,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = expression<Char,Alloc>::lt(*nodes_[i],rhs);
+                result = expression<Char,Alloc>::lt(nodes_[i],rhs);
             }
         }
         return result;
@@ -416,7 +422,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.gt(*nodes_[i]);
+                result = rhs.gt(nodes_[i]);
             }
         }
         return result;
@@ -430,7 +436,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = expression<Char,Alloc>::gt(*nodes_[i],rhs);
+                result = expression<Char,Alloc>::gt(nodes_[i],rhs);
             }
         }
         return result;
@@ -444,7 +450,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.lt(*nodes_[i]);
+                result = rhs.lt(nodes_[i]);
             }
         }
         return result;
@@ -452,24 +458,30 @@ public:
 
     basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
     {
-        return nodes_.size() == 1 ? expression<Char,Alloc>::minus(*nodes_[0],rhs) : jsoncons::null_type();
+        return nodes_.size() == 1 ? expression<Char,Alloc>::minus(nodes_[0],rhs) : jsoncons::null_type();
     }
 
     basic_json<Char,Alloc> minus(const expression<Char,Alloc>& rhs) const override
     {
-        return nodes_.size() == 1 ? rhs.minus(*nodes_[0]) : jsoncons::null_type();
+
+        return nodes_.size() == 1 ? expression<Char,Alloc>::plus(rhs.unary_minus(),nodes_[0]) : jsoncons::null_type();
+    }
+
+    basic_json<Char,Alloc> unary_minus() const override
+    {
+        return nodes_.size() == 1 ? expression<Char, Alloc>::unary_minus(nodes_[0]) : jsoncons::null_type();
     }
 
     basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
-        return nodes_.size() == 1 ? expression<Char,Alloc>::plus(*nodes_[0],rhs) : a_null;
+        return nodes_.size() == 1 ? expression<Char,Alloc>::plus(nodes_[0],rhs) : a_null;
     }
 
     basic_json<Char,Alloc> plus(const expression<Char,Alloc>& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
-        return nodes_.size() == 1 ? rhs.plus(*nodes_[0]) : a_null;
+        return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
 };
 
@@ -573,12 +585,17 @@ public:
     basic_json<Char,Alloc> minus(const expression& rhs) const override
     {
         basic_json<Char,Alloc> result = evaluate();
-        return rhs.plus(unary_minus(result));
+        auto val = rhs.unary_minus();
+        return expression<Char, Alloc>::plus(val,result);
     }
     basic_json<Char,Alloc> minus(const basic_json<Char,Alloc>& rhs) const override
     {
         basic_json<Char,Alloc> result = evaluate();
         return expression<Char,Alloc>::minus(result,rhs);
+    }
+    basic_json<Char,Alloc> unary_minus() const override
+    {
+        return expression<Char,Alloc>::unary_minus(evaluate());
     }
     basic_json<Char,Alloc> plus(const expression& rhs) const override
     {
@@ -606,22 +623,22 @@ public:
         return operator_ != operators::none;
     }
 
-    bool accept(const basic_json<Char,Alloc>& arg) const
+    bool accept(const basic_json<Char,Alloc>& context_node) const
     {
-        lhs_->initialize(arg);
+        lhs_->initialize(context_node);
 		if (operator_ != operators::none)
 		{
-			rhs_->initialize(arg);
+			rhs_->initialize(context_node);
 		}
         return compare();
     }
 
-    basic_json<Char,Alloc> evaluate(const basic_json<Char,Alloc>& arg) const
+    basic_json<Char,Alloc> evaluate(const basic_json<Char,Alloc>& context_node) const
     {
-        lhs_->initialize(arg);
+        lhs_->initialize(context_node);
         if (operator_ != operators::none)
         {
-            rhs_->initialize(arg);
+            rhs_->initialize(context_node);
         }
         return evaluate();
     }

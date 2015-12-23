@@ -9,8 +9,24 @@ Returns a `json` array of `json` values extracted from a root `json` structure.
     template<typename Char, class Alloc>
     basic_json<Char,Alloc> json_query(const basic_json<Char,Alloc>& root, 
                                       const std::basic_string<Char>& path);
+
+[JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
+
+Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
     
 ### Stefan Goessner's JsonPath
+
+Unlike XML, the root of a JSON text is an anonymous object or array or scalar, so JSONPath identifies the outermost level of the text with the symbol $.
+
+JSONPath expressions can use the dot–notation
+
+$.store.book[0].title
+
+or the bracket–notation
+
+$['store']['book'][0]['title']
+
+to describe input paths.
 
 JSONPath|	Description
 --------|--------------------------------
@@ -25,20 +41,24 @@ JSONPath|	Description
 `?()`	|Applies a filter expression.
 `()`	|Filter expression.
 
-### Filter expression
+### jsoncons filter expressions
+
+[Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) does not provide any specification about the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
 Operator|	Description
 --------|--------------------------------
 `==`	|Left is equal to right 
 `!=`	|Left is not equal to right
-`<`	    |Left is less than right
+`<`	|Left is less than right
 `<=`	|Left is less or equal to right
-`>`	    |Left is greater than right
+`>`	|Left is greater than right
 `>=`	|Left is greater than or equal to right
 `&&`	|Left and right
 `||`	|Left or right
+`+`     |Left plus right
+`-`     |Left minus right
 
-In this implementation, binary expressions must appear within parentheses.
+Binary expressions must appear within parentheses.
 
 ### Examples
 
@@ -105,6 +125,7 @@ JSONPath |Result|Notes
 `$.store.*`	            |Everything in the store, including books and a bicycle.
 `$.store..price`	        |The prices of everything in the store.
 `$..book[2]`	            |The third book
+`$..book[(@.length-1)]`	        |The last book in order.|Expressions (<expr>) can be used as an alternative to explicit names or indices
 `$..book[-1:]`	        |The last book in order.|A negative `start` becomes `start` + `length`. A missing `end` defaults to `length`.
 `$..book[0,1]`            |The first two books
 `$..book[:2]`	            |All books from index 0 (inclusive) to index 2 (exclusive)|`start` defaults to 0

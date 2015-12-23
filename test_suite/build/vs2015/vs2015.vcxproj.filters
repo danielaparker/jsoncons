@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\src\jsonpath_filter_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\jsonpath_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

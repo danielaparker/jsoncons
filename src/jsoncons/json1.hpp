@@ -205,8 +205,6 @@ public:
 				return length() == rhs.length() ? std::char_traits<Char>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
 			}
 
-            friend string_data* make_string_data(const Char* s, size_t length_);
-
             string_data()
 				: p(nullptr), length_(0)
 			{

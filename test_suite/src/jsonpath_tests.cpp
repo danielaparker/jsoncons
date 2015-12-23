@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
 
     //    std::cout << pretty_print(result) << std::endl;
 }
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book2)
 {
     jsonpath_fixture fixture;
@@ -313,7 +314,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
 
     json result = json_query(root,"$..book.length");
 
-	std::cout << pretty_print(result) << std::endl;
+	//std::cout << pretty_print(result) << std::endl;
 
     BOOST_CHECK_EQUAL(1,result.size());
     BOOST_CHECK_EQUAL(root["store"]["book"].size(),result[0].as<size_t>());
@@ -497,7 +498,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
     json root = json::parse_string(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$..*");
-    std::cout << result << std::endl;
+    //std::cout << result << std::endl;
  
     json expected = json::array();
     expected.add(root["store"]);
