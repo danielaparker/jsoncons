@@ -23,10 +23,11 @@ The library has a number of features, which are listed below:
 - Supports reading (writing) JSON values from (to) CSV files
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
 
 ## What's new on master
 
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below.
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki).
 
 ## Using the jsoncons library
 
@@ -271,6 +272,37 @@ There are a few things to note about the effect of the parameter settings.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `data_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
+### Iterators
+
+`jsoncons::json` supports iterators for accessing the members of json objects and the elements of json arrays.
+
+An example of iterating over the name-value pairs of a json object:
+
+    json person;
+    person["first_name"] = "Jane";
+    person["last_name"] = "Roe";
+    person["events_attended"] = 10;
+    person["accept_waiver_of_liability"] = true;
+
+    for (auto it = person.begin_members(); it != person.end_members(); ++it)
+    {
+        std::cout << "name=" << it->name() 
+                  << ", value=" << it->value().as<std::string>() << std::endl;
+    }
+
+An example of iterating over the elements of a json array:
+
+    json cities= json::array();
+    cities.add("Montreal");
+    cities.add("Toronto");
+    cities.add("Ottawa");
+    cities.add("Vancouver");
+
+    for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
+    {
+        std::cout << it->as<std::string>() << std::endl;
+    }
+
 ### jsonpath
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
@@ -314,37 +346,6 @@ The following code returns all authors whose books are cheaper than $10.
 The result is
 
     ["Nigel Rees","Herman Melville"]
-
-### Iterators
-
-`jsoncons::json` supports iterators for accessing the members of json objects and the elements of json arrays.
-
-An example of iterating over the name-value pairs of a json object:
-
-    json person;
-    person["first_name"] = "Jane";
-    person["last_name"] = "Roe";
-    person["events_attended"] = 10;
-    person["accept_waiver_of_liability"] = true;
-
-    for (auto it = person.begin_members(); it != person.end_members(); ++it)
-    {
-        std::cout << "name=" << it->name() 
-                  << ", value=" << it->value().as<std::string>() << std::endl;
-    }
-
-An example of iterating over the elements of a json array:
-
-    json cities= json::array();
-    cities.add("Montreal");
-    cities.add("Toronto");
-    cities.add("Ottawa");
-    cities.add("Vancouver");
-
-    for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
-    {
-        std::cout << it->as<std::string>() << std::endl;
-    }
 
 ### About jsoncons::json
 

@@ -468,20 +468,11 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>Coming next sometime in Release 0.98.x</p>
-
-<ul>
-<li>Implement a path specification for selecting values within a <code>json</code> document, <a href="http://goessner.net/articles/JsonPath/">JsonPath</a>
-</li>
-</ul>
-
 <p>Coming in later release:</p>
 
 <ul>
 <li><p>Revisit error codes, parsing_context, and opportunities for error recovery. Attempt to support <a href="http://json5.org/">json 5</a> behaviour through an parse_error_handler and a json_filter.</p></li>
 <li><p>Support <a href="http://www.ietf.org/id/draft-newton-json-content-rules-04.txt">JSON Content Rules</a></p></li>
-<li><p>Improve csv_reader </p></li>
-<li><p>Examine other data storage than vectors that could benefit from custom allocators.</p></li>
 <li><p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p></li>
 </ul>
 </body>

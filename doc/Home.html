@@ -469,105 +469,160 @@ vertical-align:1px;
 </head>
 <body>
 <p><code>jsoncons</code> is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a tree structured <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an event-based API for reading and writing JSON documents that are too large to fit into available memory, somewhat analogously to SAX processing in the XML world. </p>
+
 <p>The library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries.</p>
+
 <p>jsoncons uses some features that are new to C++ 11, particularly move semantics, however, it has been written to be compatible with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, Intel C++ Studio XE 2013 and clang 3.3 and GCC 4.8. </p>
+
 <p>The code repository and releases are on <a href="https://github.com/danielaparker/jsoncons">github</a>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
+
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
+
 <p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>. Extensions are in namespace <code>jsoncons_ext</code>. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a>.</p>
-<h3 id="roadmap">Roadmap</h3>
+
+<h3>Roadmap</h3>
+
 <p><a href="Roadmap">Roadmap</a></p>
-<h3 id="tutorial">Tutorial</h3>
+
+<h3>Tutorial</h3>
+
 <p><a href="Basics">Basics</a></p>
+
 <p><a href="Unicode%20support">Unicode support</a></p>
+
 <p><a href="Arrays">Arrays</a></p>
+
 <p><a href="Introspection">Introspection</a></p>
+
 <p><a href="Type%20Extensibility">Type Extensibility</a></p>
+
 <p><a href="Using%20json%20any">Using json any</a></p>
+
 <p><a href="Transforming%20JSON%20with%20filters">Transforming JSON with filters</a></p>
-<h3 id="classes">Classes</h3>
-<p><a href="json">json</a><br><a href="json_serializer">json_serializer</a><br><a href="output_format">output_format</a><br><a href="json_reader">json_reader</a><br><a href="json_deserializer">json_deserializer</a>  </p>
-<p><a href="wjson">wjson</a><br><a href="wjson_serializer">wjson_serializer</a><br><a href="woutput_format">woutput_format</a><br><a href="wjson_reader">wjson_reader</a><br><a href="wjson_deserializer">wjson_deserializer</a>  </p>
-<h3 id="extensions">Extensions</h3>
-<h4 id="csv">csv</h4>
+
+<h3>Classes</h3>
+
+<p><a href="json">json</a><br><br>
+<a href="json_serializer">json_serializer</a><br><br>
+<a href="output_format">output_format</a><br><br>
+<a href="json_reader">json_reader</a><br><br>
+<a href="json_deserializer">json_deserializer</a>  </p>
+
+<p><a href="wjson">wjson</a><br><br>
+<a href="wjson_serializer">wjson_serializer</a><br><br>
+<a href="woutput_format">woutput_format</a><br><br>
+<a href="wjson_reader">wjson_reader</a><br><br>
+<a href="wjson_deserializer">wjson_deserializer</a>  </p>
+
+<h3>Extensions</h3>
+
+<h4>csv</h4>
+
 <p><a href="csv_reader">csv_reader</a></p>
+
 <p><a href="csv_serializer">csv_serializer</a></p>
-<h4 id="jsonpath">jsonpath</h4>
+
+<h4>jsonpath</h4>
+
 <p><a href="json_query">json_query</a></p>
-<h2 id="examples">Examples</h2>
-<h3 id="first-example">First example</h3>
+
+<h2>Examples</h2>
+
+<h3>First example</h3>
+
 <p>Here is a sample json file (<code>books.json</code>):</p>
+
 <pre><code>[
     {
-        &quot;title&quot; : &quot;Kafka on the Shore&quot;,
-        &quot;author&quot; : &quot;Haruki Murakami&quot;,
-        &quot;price&quot; : 25.17
+        "title" : "Kafka on the Shore",
+        "author" : "Haruki Murakami",
+        "price" : 25.17
     },
     {
-        &quot;title&quot; : &quot;Women: A Novel&quot;,
-        &quot;author&quot; : &quot;Charles Bukowski&quot;,
-        &quot;price&quot; : 12.00
+        "title" : "Women: A Novel",
+        "author" : "Charles Bukowski",
+        "price" : 12.00
     },
     {
-        &quot;title&quot; : &quot;Cutter&#39;s Way&quot;,
-        &quot;author&quot; : &quot;Ivan Passer&quot;
+        "title" : "Cutter's Way",
+        "author" : "Ivan Passer"
     }
 ]
-</code></pre><p>This is how to read the document with <code>jsoncons</code>: </p>
+</code></pre>
+
+<p>This is how to read the document with <code>jsoncons</code>: </p>
+
 <pre><code>#include &lt;string&gt;
-#include &quot;jsoncons/json.hpp&quot;
+#include "jsoncons/json.hpp"
 
 using jsoncons::json;
 using jsoncons::output_format;
 using std::string;
 
-json books = json::parse_file(&quot;input/books.json&quot;);
+json books = json::parse_file("input/books.json");
 
 for (size_t i = 0; i &lt; books.size(); ++i)
 {
     try
     {
         json&amp; book = books[i];
-        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
-        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
-        double price = book[&quot;price&quot;].as&lt;double&gt;();
-        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+        string author = book["author"].as&lt;std::string&gt;();
+        string title = book["title"].as&lt;std::string&gt;();
+        double price = book["price"].as&lt;double&gt;();
+        std::cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; std::endl;
     }
     catch (const std::exception&amp; e)
     {
         std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
-</code></pre><p>The output is</p>
+</code></pre>
+
+<p>The output is</p>
+
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 Member price not found.
-</code></pre><p>Note the following:</p>
+</code></pre>
+
+<p>Note the following:</p>
+
 <ul>
-<li>The assignment <code>json&amp; book = books[i]</code> is to a reference, the reference identifies a <a href="json">json</a> object owned by <code>books</code>. </li><li>The book &quot;Cutter&#39;s Way&quot; has no price, so <code>book[&quot;price&quot;]</code> throws a <a href="json_exception">json_exception</a> (&quot;Member price not found&quot;)</li></ul>
-<p>Instead of handling the missing price in a catch clause, let&#39;s use an accessor that evaluates to a string and substitutes &quot;N/A&quot; for the missing price: </p>
-<pre><code>json books = json::parse_file(&quot;input/books.json&quot;);
+<li>The assignment <code>json&amp; book = books[i]</code> is to a reference, the reference identifies a <a href="json">json</a> object owned by <code>books</code>. </li>
+<li>The book "Cutter's Way" has no price, so <code>book["price"]</code> throws a <a href="json_exception">json_exception</a> ("Member price not found")</li>
+</ul>
+
+<p>Instead of handling the missing price in a catch clause, let's use an accessor that evaluates to a string and substitutes "N/A" for the missing price: </p>
+
+<pre><code>json books = json::parse_file("input/books.json");
 
 for (size_t i = 0; i &lt; books.size(); ++i)
 {
     try
     {
         json&amp; book = books[i];
-        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
-        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
-        string price = book.get(&quot;price&quot;, &quot;N/A&quot;).as&lt;std::string&gt;();
-        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+        string author = book["author"].as&lt;std::string&gt;();
+        string title = book["title"].as&lt;std::string&gt;();
+        string price = book.get("price", "N/A").as&lt;std::string&gt;();
+        std::cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; std::endl;
     }
     catch (const std::exception&amp; e)
     {
         std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
-</code></pre><p>Now the output is</p>
+</code></pre>
+
+<p>Now the output is</p>
+
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12.0
-Ivan Passer, Cutter&#39;s Way, N/A
-</code></pre><p>By default, when formatting a floating-point value with <code>as&lt;string&gt;()</code>, <code>jsoncons</code> truncates trailing zeros but keeps one if immediately after a decimal point. Let&#39;s change the floating-point notation to &#39;fixed&#39; and the number of decimal places to 2.</p>
-<pre><code>json books = json::parse_file(&quot;input/books.json&quot;);
+Ivan Passer, Cutter's Way, N/A
+</code></pre>
+
+<p>By default, when formatting a floating-point value with <code>as&lt;string&gt;()</code>, <code>jsoncons</code> truncates trailing zeros but keeps one if immediately after a decimal point. Let's change the floating-point notation to 'fixed' and the number of decimal places to 2.</p>
+
+<pre><code>json books = json::parse_file("input/books.json");
 
 output_format format;
 format.floatfield(std::ios::fixed);
@@ -578,93 +633,116 @@ for (size_t i = 0; i &lt; books.size(); ++i)
     try
     {
         json&amp; book = books[i];
-        string author = book[&quot;author&quot;].as&lt;std::string&gt;();
-        string title = book[&quot;title&quot;].as&lt;std::string&gt;();
-        string price = book.get(&quot;price&quot;, &quot;N/A&quot;).to_string(format);
-        std::cout &lt;&lt; author &lt;&lt; &quot;, &quot; &lt;&lt; title &lt;&lt; &quot;, &quot; &lt;&lt; price &lt;&lt; std::endl;
+        string author = book["author"].as&lt;std::string&gt;();
+        string title = book["title"].as&lt;std::string&gt;();
+        string price = book.get("price", "N/A").to_string(format);
+        std::cout &lt;&lt; author &lt;&lt; ", " &lt;&lt; title &lt;&lt; ", " &lt;&lt; price &lt;&lt; std::endl;
     }
     catch (const std::exception&amp; e)
     {
         std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
-</code></pre><p>This time the output is</p>
+</code></pre>
+
+<p>This time the output is</p>
+
 <pre><code>Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12.00
-Ivan Passer, Cutter&#39;s Way, N/A
-</code></pre><h3 id="second-example">Second example</h3>
+Ivan Passer, Cutter's Way, N/A
+</code></pre>
+
+<h3>Second example</h3>
+
 <p>This example shows how to create the <code>books.json</code> file in code.</p>
+
 <pre><code>json books = json::make_array();
 
 {
     json book;
-    book[&quot;title&quot;] = &quot;Kafka on the Shore&quot;;
-    book[&quot;author&quot;] = &quot;Haruki Murakami&quot;;
-    book[&quot;price&quot;] = 25.17;
+    book["title"] = "Kafka on the Shore";
+    book["author"] = "Haruki Murakami";
+    book["price"] = 25.17;
     books.add(std::move(book));
 }
 
 {
     json book;
-    book[&quot;title&quot;] = &quot;Women: A Novel&quot;;
-    book[&quot;author&quot;] = &quot;Charles Bukowski&quot;;
-    book[&quot;price&quot;] = 12.00;
+    book["title"] = "Women: A Novel";
+    book["author"] = "Charles Bukowski";
+    book["price"] = 12.00;
     books.add(std::move(book));
 }
 
 {
     json book;
-    book[&quot;title&quot;] = &quot;Cutter&#39;s Way&quot;;
-    book[&quot;author&quot;] = &quot;Ivan Passer&quot;;
+    book["title"] = "Cutter's Way";
+    book["author"] = "Ivan Passer";
     books.add(std::move(book));
 }
 
 std::cout &lt;&lt; pretty_print(books) &lt;&lt; std::endl;
-</code></pre><p>The output is</p>
+</code></pre>
+
+<p>The output is</p>
+
 <pre><code>[
     {
-        &quot;author&quot;:&quot;Haruki Murakami&quot;,
-        &quot;price&quot;:25.17,
-        &quot;title&quot;:&quot;Kafka on the Shore&quot;
+        "author":"Haruki Murakami",
+        "price":25.17,
+        "title":"Kafka on the Shore"
     },
     {
-        &quot;author&quot;:&quot;Charles Bukowski&quot;,
-        &quot;price&quot;:12.0,
-        &quot;title&quot;:&quot;Women: A Novel&quot;
+        "author":"Charles Bukowski",
+        "price":12.0,
+        "title":"Women: A Novel"
     },
     {
-        &quot;author&quot;:&quot;Ivan Passer&quot;,
-        &quot;title&quot;:&quot;Cutter&#39;s Way&quot;
+        "author":"Ivan Passer",
+        "title":"Cutter's Way"
     }
 ]
-</code></pre><h3 id="user-specified-nan-inf-and-inf-replacement">User specified <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</h3>
+</code></pre>
+
+<h3>User specified <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</h3>
+
 <pre><code>json obj;
-obj[&quot;field1&quot;] = std::sqrt(-1.0);
-obj[&quot;field2&quot;] = 1.79e308*1000;
-obj[&quot;field3&quot;] = -1.79e308*1000;
+obj["field1"] = std::sqrt(-1.0);
+obj["field2"] = 1.79e308*1000;
+obj["field3"] = -1.79e308*1000;
 
 output_format format;
-format.nan_replacement(&quot;null&quot;);        // default is &quot;null&quot;
-format.pos_inf_replacement(&quot;1e9999&quot;);  // default is &quot;null&quot;
-format.neg_inf_replacement(&quot;-1e9999&quot;); // default is &quot;null&quot;
+format.nan_replacement("null");        // default is "null"
+format.pos_inf_replacement("1e9999");  // default is "null"
+format.neg_inf_replacement("-1e9999"); // default is "null"
 
 std::cout &lt;&lt; pretty_print(obj,format) &lt;&lt; std::endl;
-</code></pre><p>The output is</p>
+</code></pre>
+
+<p>The output is</p>
+
 <pre><code>{
-    &quot;field1&quot;:null,
-    &quot;field2&quot;:1e9999,
-    &quot;field3&quot;:-1e9999
+    "field1":null,
+    "field2":1e9999,
+    "field3":-1e9999
 }
-</code></pre><h3 id="reading-a-sequence-of-json-texts-from-a-stream">Reading a sequence of JSON texts from a stream</h3>
+</code></pre>
+
+<h3>Reading a sequence of JSON texts from a stream</h3>
+
 <p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
-<pre><code>{&quot;a&quot;:1,&quot;b&quot;:2,&quot;c&quot;:3}
-{&quot;a&quot;:4,&quot;b&quot;:5,&quot;c&quot;:6}
-{&quot;a&quot;:7,&quot;b&quot;:8,&quot;c&quot;:9}
-</code></pre><p>This is the code that reads them: </p>
-<pre><code>std::ifstream is(&quot;json-texts.json&quot;);
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+</code></pre>
+
+<p>This is the code that reads them: </p>
+
+<pre><code>std::ifstream is("json-texts.json");
 if (!is.is_open())
 {
-    throw std::exception(&quot;Cannot open file&quot;);
+    throw std::exception("Cannot open file");
 }
 
 json_deserializer handler;
@@ -679,10 +757,13 @@ while (!reader.eof())
         std::cout &lt;&lt; val &lt;&lt; std::endl;
     }
 }
-</code></pre><p>The output is</p>
-<pre><code>{&quot;a&quot;:1,&quot;b&quot;:2,&quot;c&quot;:3}
-{&quot;a&quot;:4,&quot;b&quot;:5,&quot;c&quot;:6}
-{&quot;a&quot;:7,&quot;b&quot;:8,&quot;c&quot;:9}
+</code></pre>
+
+<p>The output is</p>
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
 </code></pre>
 </body>
 </html>
