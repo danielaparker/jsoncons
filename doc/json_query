@@ -492,7 +492,7 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 
 <p>JSONPath expressions can use the dot–notation</p>
 
-<pre><code>$.store.book[0].title
+<pre><code>$.store.book.0.title
 </code></pre>
 
 <p>or the bracket–notation</p>
@@ -690,6 +690,12 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <code>length</code> is a property of an array</td>
 </tr>
 <tr>
+<td><code>$.store.*</code></td>
+<td>Everything in the store, including books and a bicycle.</td>
+<td>
+<code>*</code> is a wildcard symbol</td>
+</tr>
+<tr>
 <td><code>$.store.book[*].author</code></td>
 <td>All authors of books in the store</td>
 <td></td>
@@ -700,15 +706,9 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <td></td>
 </tr>
 <tr>
-<td><code>$.store.*</code></td>
-<td>Everything in the store, including books and a bicycle.</td>
-<td></td>
-</tr>
-<tr>
 <td><code>$.store..price</code></td>
 <td>The prices of everything in the store.</td>
-<td>
-<code>*</code> is a wildcard symbol</td>
+<td></td>
 </tr>
 <tr>
 <td><code>$..book[2]</code></td>

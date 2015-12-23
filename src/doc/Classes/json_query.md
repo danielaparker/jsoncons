@@ -20,7 +20,7 @@ Unlike XML, the root of a JSON text is an anonymous object or array or scalar, s
 
 JSONPath expressions can use the dot–notation
 
-    $.store.book[0].title
+    $.store.book.0.title
 
 or the bracket–notation
 
@@ -122,10 +122,10 @@ A list of sample JSON paths and results follows.
 JSONPath |Result|Notes
 ---------|--------------------------------------------------------|------
 `$..book.length`	|The number of books|`length` is a property of an array
-`$.store.book[*].author`	|All authors of books in the store
+`$.store.*`	            |Everything in the store, including books and a bicycle.|`*` is a wildcard symbol
+`$.store.book[*].author`	|All authors of books in the store|
 `$..author`	            |All authors
-`$.store.*`	            |Everything in the store, including books and a bicycle.|
-`$.store..price`	        |The prices of everything in the store.|`*` is a wildcard symbol
+`$.store..price`	        |The prices of everything in the store.|
 `$..book[2]`	            |The third book|Indices start at `0`
 `$..book.2`	            |The third book|Using the dot notation
 `$..book[(@.length-1)]`	        |The last book in order.|Expressions (<expr>) can be used as an alternative to explicit names or indices
