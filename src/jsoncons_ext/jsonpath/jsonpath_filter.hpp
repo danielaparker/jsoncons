@@ -1025,10 +1025,15 @@ handle_state:
                 case '&':
                 case '|':
                 case '+':
-                case '-':
                     {
                         state_ = filter_states::oper;
                         goto handle_state;
+                    }
+                    break;
+                case '-':
+                    {
+                        buffer_.push_back(c);
+                        state_ = filter_states::unquoted_text;
                     }
                     break;
                 default: 

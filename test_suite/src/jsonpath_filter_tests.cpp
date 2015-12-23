@@ -5,7 +5,6 @@
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include <vector>
@@ -98,6 +97,30 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
     auto result1 = parser.get_filter()->evaluate(parent);
     BOOST_CHECK_EQUAL(json(0),result1);
 
+	std::string expr2 = "(1 + -1)";
+	parser.parse(expr2.c_str(), 0, expr2.length(), 1, 1);
+	auto result2 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(0), result2);
+
+	std::string expr3 = "(-1 - -1)";
+	parser.parse(expr3.c_str(), 0, expr3.length(), 1, 1);
+	auto result3 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(0), result3);
+
+	std::string expr4 = "(-1 - -3)";
+	parser.parse(expr4.c_str(), 0, expr4.length(), 1, 1);
+	auto result4 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(2), result4);
+
+    std::string expr5 = "((-2 < -1) && (-3 > -4))";
+    parser.parse(expr5.c_str(), 0, expr5.length(), 1, 1);
+    auto result5 = parser.get_filter()->evaluate(parent);
+    BOOST_CHECK_EQUAL(json(true), result5);
+
+	std::string expr6 = "((-2 < -1) || (-4 > -3))";
+	parser.parse(expr6.c_str(), 0, expr6.length(), 1, 1);
+	auto result6 = parser.get_filter()->evaluate(parent);
+	BOOST_CHECK_EQUAL(json(true), result6);
 }
 
 
