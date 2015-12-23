@@ -16,7 +16,7 @@ Stefan Goessner's javascript implemention returns `false` in case of no match, b
     
 ### Stefan Goessner's JsonPath
 
-Unlike XML, the root of a JSON text is an anonymous object or array or scalar, so JSONPath identifies the outermost level of the text with the symbol $.
+Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.
 
 JSONPath expressions can use the dot–notation
 
@@ -26,13 +26,11 @@ or the bracket–notation
 
     $['store']['book'][0]['title']
 
-to describe input paths.
-
 Note that only single quotes (not double quotes) are allowed inside of JSONPath expressions.
 
 JSONPath|	Description
 --------|--------------------------------
-`$`|	The root object
+`$`|	The root object or array
 `@`|	the current object
 `.` or `[]`|	Child operator
 `..`	|Recursive descent. JSONPath borrows this syntax from E4X.
@@ -123,8 +121,8 @@ JSONPath |Result|Notes
 ---------|--------------------------------------------------------|------
 `$..book.length`	|The number of books|`length` is a property of an array
 `$.store.*`	            |Everything in the store, including books and a bicycle.|`*` is a wildcard symbol
+`$..author`	            |All authors|Recursive descent starting from root ($) to find all authors
 `$.store.book[*].author`	|All authors of books in the store|
-`$..author`	            |All authors
 `$.store..price`	        |The prices of everything in the store.|
 `$..book[2]`	            |The third book|Indices start at `0`
 `$..book.2`	            |The third book|Using the dot notation
