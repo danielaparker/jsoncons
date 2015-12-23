@@ -475,7 +475,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/jsonpath/jsonpath.hpp"
+<pre><code>#include "jsoncons/jsonpath/json_query.hpp"
 
 template&lt;typename Char, class Alloc&gt;
 basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; root, 
@@ -654,7 +654,7 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 <p>Our first example returns all authors whose books are cheaper than $10. </p>
 
 <pre><code>#include "jsoncons/json.hpp"
-#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using jsoncons::json;
 using jsoncons::pretty_print;
@@ -715,6 +715,11 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <td>The third book</td>
 <td>Indices start at <code>0</code>
 </td>
+</tr>
+<tr>
+<td><code>$..book.2</code></td>
+<td>The third book</td>
+<td>Using the dot notation</td>
 </tr>
 <tr>
 <td><code>$..book[(@.length-1)]</code></td>

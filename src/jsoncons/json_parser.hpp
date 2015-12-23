@@ -1386,7 +1386,7 @@ private:
         {
             try
             {
-                unsigned long long d = string_to_unsigned(number_buffer_.c_str(), number_buffer_.length());
+                unsigned long long d = string_to_unsigned_integer(number_buffer_.c_str(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
@@ -1632,7 +1632,7 @@ private:
     }
 
     template<typename CharType>
-    unsigned long long string_to_unsigned(const CharType *s, size_t length) throw(std::overflow_error)
+    unsigned long long string_to_unsigned_integer(const CharType *s, size_t length) throw(std::overflow_error)
     {
         const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
         const unsigned long long max_value_div_10 = max_value / 10;

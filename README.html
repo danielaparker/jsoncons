@@ -502,7 +502,7 @@ vertical-align:1px;
 <h2>What's new on master</h2>
 
 <ul>
-<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki">documentation</a>.</li>
+<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">documentation</a>.</li>
 </ul>
 
 <h2>Using the jsoncons library</h2>
@@ -843,7 +843,7 @@ for (auto it = cities.begin_elements(); it != cities.end_elements(); ++it)
 
 <p>The following code returns all authors whose books are cheaper than $10. </p>
 
-<pre><code>#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+<pre><code>#include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using jsoncons::jsonpath::json_query;
 

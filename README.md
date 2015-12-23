@@ -27,7 +27,7 @@ The library has a number of features, which are listed below:
 
 ## What's new on master
 
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki).
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
 
 ## Using the jsoncons library
 
@@ -333,7 +333,7 @@ Here is a sample JSON file (store.json):
 
 The following code returns all authors whose books are cheaper than $10. 
     
-    #include "jsoncons_ext/jsonpath/jsonpath.hpp"
+    #include "jsoncons_ext/jsonpath/json_query.hpp"
 
     using jsoncons::jsonpath::json_query;
 

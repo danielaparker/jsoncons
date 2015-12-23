@@ -2232,7 +2232,7 @@ public:
         return is_numeric();
     }
 
-    array& array_value() 
+    array& elements() 
     {
 		switch (var_.type_)
 		{
@@ -2244,7 +2244,7 @@ public:
         }
     }
 
-    const array& array_value() const
+    const array& elements() const
     {
         switch (var_.type_)
         {
@@ -2256,7 +2256,7 @@ public:
         }
     }
 
-    object& object_value()
+    object& members()
     {
         switch (var_.type_)
         {
@@ -2272,12 +2272,12 @@ public:
         }
     }
 
-    const object& object_value() const
+    const object& members() const
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return cobject().object_value();
+            return cobject().members();
         case value_types::object_t:
             return *(var_.value_.object_);
         default:

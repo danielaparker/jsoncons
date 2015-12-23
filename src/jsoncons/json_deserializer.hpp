@@ -113,16 +113,16 @@ private:
 
     void do_end_object(const basic_parsing_context<Char>&) override
     {
-        stack_[top_].value.object_value().sort_members();
+        stack_[top_].value.members().sort_members();
         if (top_ > 0)
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.members().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
             else if (stack_[top_-1].value.is_array()) 
             {
-                stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
+                stack_[top_-1].value.elements().push_back(std::move(stack_[top_].value));
             }
         }
         else
@@ -143,11 +143,11 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
+                stack_[top_-1].value.members().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
             else if (stack_[top_-1].value.is_array()) 
             {
-                stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
+                stack_[top_-1].value.elements().push_back(std::move(stack_[top_].value));
             }
         }
         else
@@ -170,11 +170,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(p,length));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(p,length));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(basic_json<Char,Alloc>(p,length));
+            stack_[top_].value.elements().push_back(basic_json<Char,Alloc>(p,length));
         }
     }
 
@@ -186,11 +186,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.elements().push_back(value);
         }
     }
 
@@ -202,11 +202,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.elements().push_back(value);
         }
     }
 
@@ -218,11 +218,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.elements().push_back(value);
         }
     }
 
@@ -234,11 +234,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),basic_json<Char,Alloc>(value));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.elements().push_back(value);
         }
     }
 
@@ -250,11 +250,11 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),std::move(basic_json<Char,Alloc>(null_type())));
+            stack_[top_].value.members().push_back(std::move(stack_[top_].name),std::move(basic_json<Char,Alloc>(null_type())));
         } 
         else if (stack_[top_].value.is_array()) 
         {
-            stack_[top_].value.array_value().push_back(basic_json<Char,Alloc>::null);
+            stack_[top_].value.elements().push_back(basic_json<Char,Alloc>::null);
         }
     }
 

@@ -5,8 +5,8 @@
 // See https://sourceforge.net/projects/jsoncons/files/ for latest version
 // See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
 
-#ifndef JSONCONS_JSONPATH_JSONPATH_HPP
-#define JSONCONS_JSONPATH_JSONPATH_HPP
+#ifndef JSONCONS_JSONPATH_JSONQUERY_HPP
+#define JSONCONS_JSONPATH_JSONQUERY_HPP
 
 #include <string>
 #include <sstream>
@@ -21,6 +21,43 @@
 #include "jsonpath_filter.hpp"
 
 namespace jsoncons { namespace jsonpath {
+
+    template<typename CharT>
+    bool try_string_to_index(const CharT *s, size_t length, size_t* value)
+    {
+        static const size_t max_value = std::numeric_limits<size_t>::max JSONCONS_NO_MACRO_EXP();
+        static const size_t max_value_div_10 = max_value / 10;
+
+        size_t n = 0;
+        for (size_t i = 0; i < length; ++i)
+        {
+            CharT c = s[i];
+            switch (c)
+            {
+            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                {
+                    size_t x = c - '0';
+                    if (n > max_value_div_10)
+                    {
+                        return false;
+                    }
+                    n = n * 10;
+                    if (n > max_value - x)
+                    {
+                        return false;
+                    }
+
+                    n += x;
+                }
+                break;
+            default:
+                return false;
+                break;
+            }
+        }
+        *value = n;
+        return true;
+    }
 
     template <typename Char>
     struct json_jsonpath_traits
@@ -288,13 +325,13 @@ handle_state:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    end_element_index();
+                    find_elements();
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = start_*10 + static_cast<size_t>(c-'0');
                     break;
                 case ']':
-                    end_element_index();
+                    find_elements();
                     end_nodes();
                     state_ = states::expect_separator;
                     break;
@@ -312,11 +349,15 @@ handle_state:
                             jsonpath_filter_parser<Char,Alloc> parser;
                             parser.parse(path,i,path_length,line_,column_);
                             auto filter = parser.get_filter();
-                            auto len = filter->evaluate(*(stack_.back()[0]));
-                            if (len.is<size_t>())
+                            auto index = filter->evaluate(*(stack_.back()[0]));
+                            if (index.is<size_t>())
                             {
-                                start_ = len.as<size_t>();
-                                end_element_index();
+                                start_ = index.as<size_t>();
+                                find_elements();
+                            }
+                            else if (index.is_string())
+                            {
+                                find_members(index.as_string());
                             }
                             i = parser.index();
                             line_= parser.line_number();
@@ -349,7 +390,7 @@ handle_state:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    end_element_index();
+                    find_elements();
                     break;
                 case '-':
                     positive_start_ = false;
@@ -360,7 +401,7 @@ handle_state:
                     state_ = states::left_bracket_start;
                     break;
                 case ']':
-                    //end_element_index();
+                    //find_elements();
                     end_nodes();
                     state_ = states::expect_separator;
                     break;
@@ -378,13 +419,15 @@ handle_state:
                 switch (c)
                 {
                 case '[':
-					end_member_name();
+					find_members(buffer_);
+                    buffer_.clear();
                     end_nodes();
 					start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
-                    end_member_name();
+                    find_members(buffer_);
+                    buffer_.clear();
                     end_nodes();
                     state_ = states::dot;
                     break;
@@ -399,7 +442,8 @@ handle_state:
                 switch (c)
                 {
                 case '\'':
-                    end_member_name();
+                    find_members(buffer_);
+                    buffer_.clear();
                     state_ = states::expect_right_bracket;
                     break;
                 default:
@@ -413,10 +457,37 @@ handle_state:
         {
         case states::member_name: 
             {
-                end_member_name();
+                find_members(buffer_);
+                buffer_.clear();
                 end_nodes();
             }
             break;
+        }
+    }
+
+    void accept(const basic_json<Char,Alloc>& val,
+                jsonpath_filter<Char,Alloc>& filter)
+    {
+        if (val.is_object())
+        {
+            if (recursive_descent_ && val.is_object())
+            {
+                for (auto it = val.begin_members(); it != val.end_members(); ++it)
+                {
+                    accept(it->value(),filter);
+                }
+            }
+            if (filter.accept(val))
+            {
+                nodes_.push_back(std::addressof(val));
+            }
+        }
+        else if (val.is_array())
+        {
+            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
+            {
+                accept(*it,filter);
+            }
         }
     }
 
@@ -444,7 +515,7 @@ handle_state:
         start_ = 0;
     }
 
-    void end_element_index()
+    void find_elements()
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
@@ -530,97 +601,66 @@ handle_state:
         }
     }
 
-    void end_member_name()
+    void find_members(const std::basic_string<Char>& name)
     {
-		if (buffer_.length() > 0)
+		if (name.length() > 0)
 		{
-            if (recursive_descent_)
+            for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                end_member_name2();
-                recursive_descent_ = false;
+                find_member1(*(stack_.back()[i]), name);
             }
-            else
-            {
-                end_member_name1();
-            }
-			buffer_.clear();
+            recursive_descent_ = false;
 		}
     }
 
-    void end_member_name1()
+    void find_member1(const basic_json<Char,Alloc>& context_val, const std::basic_string<Char>& name)
     {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
+        if (context_val.is_object())
         {
-            cjson_ptr p = stack_.back()[i];
-            if (p->is_object()  && p->has_member(buffer_))
+            if (context_val.has_member(name))
             {
-                nodes_.push_back(std::addressof(p->get(buffer_)));
+                nodes_.push_back(std::addressof(context_val.get(name)));
             }
-            else if (p->is_array() && buffer_ == json_jsonpath_traits<Char>::length_literal())
+            if (recursive_descent_)
             {
-                auto q = std::make_shared<basic_json<Char,Alloc>>(p->size());
+                for (auto it = context_val.begin_members(); it != context_val.end_members(); ++it)
+                {
+                    if (it->value().is_object() || it->value().is_array())
+                    {
+                        find_member1(it->value(), name);
+                    }
+                }
+            }
+        }
+        else if (context_val.is_array())
+        {
+            size_t index = 0;
+            if (try_string_to_index(name.c_str(),name.size(),&index))
+            {
+                if (index < context_val.size())
+                {
+                    nodes_.push_back(std::addressof(context_val[index]));
+                }
+			}
+            else if (name == json_jsonpath_traits<Char>::length_literal() && context_val.size() > 0)
+            {
+                auto q = std::make_shared<basic_json<Char,Alloc>>(context_val.size());
                 temp_.push_back(q);
                 nodes_.push_back(q.get());
             }
-        }
-    }
-
-    void end_member_name2()
-    {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
-        {
-            cjson_ptr p = stack_.back()[i];
-            end_member_name2(*p);
-        }
-    }
-
-    void accept(const basic_json<Char,Alloc>& val,
-                jsonpath_filter<Char,Alloc>& filter)
-    {
-        if (val.is_object())
-        {
-            if (recursive_descent_ && val.is_object())
+            if (recursive_descent_)
             {
-                for (auto it = val.begin_members(); it != val.end_members(); ++it)
+                for (auto it = context_val.begin_elements(); it != context_val.end_elements(); ++it)
                 {
-                    accept(it->value(),filter);
+                    if (it->is_object() || it->is_array())
+                    {
+                        find_member1(*it, name);
+                    }
                 }
             }
-            if (filter.accept(val))
-            {
-                nodes_.push_back(std::addressof(val));
-            }
-        }
-        else if (val.is_array())
-        {
-            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
-            {
-                accept(*it,filter);
-            }
         }
     }
 
-    void end_member_name2(const basic_json<Char,Alloc>& val)
-    {
-        if (val.is_object())
-        {
-            if (val.has_member(buffer_))
-            {
-                nodes_.push_back(std::addressof(val.get(buffer_)));
-            }
-            for (auto it = val.begin_members(); it != val.end_members(); ++it)
-            {
-                end_member_name2(it->value());
-            }
-        }
-		else if (val.is_array())
-		{
-            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
-            {
-                end_member_name2(*it);
-            }
-		}
-    }
 };
 
 }}

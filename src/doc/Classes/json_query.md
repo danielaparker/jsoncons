@@ -4,7 +4,7 @@ Returns a `json` array of `json` values extracted from a root `json` structure.
 
 ### Header
 
-    #include "jsoncons/jsonpath/jsonpath.hpp"
+    #include "jsoncons/jsonpath/json_query.hpp"
 
     template<typename Char, class Alloc>
     basic_json<Char,Alloc> json_query(const basic_json<Char,Alloc>& root, 
@@ -101,7 +101,7 @@ The examples below use the JSON text from [Stefan Goessner's JsonPath](http://go
 Our first example returns all authors whose books are cheaper than $10. 
     
     #include "jsoncons/json.hpp"
-    #include "jsoncons_ext/jsonpath/jsonpath.hpp"
+    #include "jsoncons_ext/jsonpath/json_query.hpp"
 
     using jsoncons::json;
     using jsoncons::pretty_print;
@@ -127,6 +127,7 @@ JSONPath |Result|Notes
 `$.store.*`	            |Everything in the store, including books and a bicycle.|
 `$.store..price`	        |The prices of everything in the store.|`*` is a wildcard symbol
 `$..book[2]`	            |The third book|Indices start at `0`
+`$..book.2`	            |The third book|Using the dot notation
 `$..book[(@.length-1)]`	        |The last book in order.|Expressions (<expr>) can be used as an alternative to explicit names or indices
 `$..book[-1:]`	        |The last book in order.|A negative `start` becomes `start` + `length`. A missing `end` defaults to `length`.
 `$..book[0,1]`            |The first two books

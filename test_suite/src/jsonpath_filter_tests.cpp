@@ -12,7 +12,7 @@
 #include <ctime>
 #include <new>
 #include "jsoncons/json.hpp"
-#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using jsoncons::jsonpath::json_query;
 using jsoncons::jsonpath::jsonpath_filter_parser;

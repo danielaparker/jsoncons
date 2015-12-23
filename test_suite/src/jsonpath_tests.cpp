@@ -12,7 +12,7 @@
 #include <ctime>
 #include <new>
 #include "jsoncons/json.hpp"
-#include "jsoncons_ext/jsonpath/jsonpath.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using jsoncons::jsonpath::json_query;
 using jsoncons::pretty_print;
@@ -133,6 +133,11 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_recursive_descent)
     //std::cout << pretty_print(result1) << std::endl;
     BOOST_CHECK(result1.size() == 1);
     BOOST_CHECK(result1[0] == root["store"]["book"][2]);
+
+    json result1a = json_query(root,"$..book.2");
+    //std::cout << pretty_print(result1a) << std::endl;
+    BOOST_CHECK(result1a.size() == 1);
+    BOOST_CHECK(result1a[0] == root["store"]["book"][2]);
 
     json result2 = json_query(root,"$..book[-1:]");
     //std::cout << pretty_print(result2) << std::endl;
