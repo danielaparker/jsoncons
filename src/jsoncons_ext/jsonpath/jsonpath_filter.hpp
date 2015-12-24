@@ -42,7 +42,8 @@ class expression
 {
 public:
     virtual void initialize(const basic_json<Char,Alloc>& context_node) = 0;
-    virtual bool evaluate_single_node() const = 0;
+    virtual bool accept_single_node() const = 0;
+    virtual basic_json<Char,Alloc> evaluate_single_node() const = 0;
     virtual bool eq(const expression& rhs) const = 0;
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ne(const expression& rhs) const = 0;
@@ -61,7 +62,7 @@ public:
     virtual basic_json<Char,Alloc> plus(const expression& rhs) const = 0;
     virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const = 0;
 
-    static bool evaluate_single_node(const basic_json<Char,Alloc>& node)
+    static bool accept_single_node(const basic_json<Char,Alloc>& node)
     {
         bool result = false;
         if (node.is_bool())
@@ -77,12 +78,12 @@ public:
 
     static bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
-        return evaluate_single_node(lhs) && evaluate_single_node(rhs);
+        return accept_single_node(lhs) && accept_single_node(rhs);
     }
 
     static bool pipepipe(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
-        return evaluate_single_node(lhs) || evaluate_single_node(rhs);
+        return accept_single_node(lhs) || accept_single_node(rhs);
     }
 
     static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
@@ -178,9 +179,14 @@ public:
     {
     }
 
-    bool evaluate_single_node() const override
+    bool accept_single_node() const override
     {
-        return expression<Char, Alloc>::evaluate_single_node(value_);
+        return expression<Char, Alloc>::accept_single_node(value_);
+    }
+
+    basic_json<Char,Alloc> evaluate_single_node() const override
+    {
+        return value_;
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -282,14 +288,14 @@ public:
         nodes_ = evaluator.get_values();
     }
 
-    bool evaluate_single_node() const override
+    bool accept_single_node() const override
     {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-        }
-        return result;
+        return nodes_.size() > 0 ? true : false;
+    }
+
+    basic_json<Char,Alloc> evaluate_single_node() const override
+    {
+        return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
 
     bool eq(const expression<Char,Alloc>& rhs) const override
@@ -522,9 +528,13 @@ public:
             rhs_->initialize(context_node);
         }
     }
-    bool evaluate_single_node() const override
+    basic_json<Char,Alloc> evaluate_single_node() const override
     {
         return lhs_->evaluate_single_node();
+    }
+    bool accept_single_node() const override
+    {
+        return lhs_->accept_single_node();
     }
     bool eq(const expression& rhs) const override
     {
@@ -664,7 +674,7 @@ public:
         case operators::lte:
             return lhs_->lt(*rhs_) || lhs_->eq(*rhs_);
         case operators::none:
-            return lhs_->evaluate_single_node();
+            return lhs_->accept_single_node();
 			break;
         }
         return false;

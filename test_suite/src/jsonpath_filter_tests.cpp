@@ -47,7 +47,7 @@ struct jsonpath_filter_fixture
     }
 };
 
-BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
+/*BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
     jsonpath_filter_parser<char,std::allocator<void>> parser;
 	json parent = json::array();
@@ -121,6 +121,19 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
 	parser.parse(expr6.c_str(), 0, expr6.length(), 1, 1);
 	auto result6 = parser.get_filter()->evaluate(parent);
 	BOOST_CHECK_EQUAL(json(true), result6);
+}*/
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
+{
+    jsonpath_filter_parser<char,std::allocator<void>> parser;
+	json parent = json::array();
+	parent.add(1);
+	parent.add(2);
+
+	std::string expr1 = "(0)";
+    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    auto result1 = parser.get_filter()->evaluate(parent);
+    BOOST_CHECK_EQUAL(json(0),result1);
 }
 
 

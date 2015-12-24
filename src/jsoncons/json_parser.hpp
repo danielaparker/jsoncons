@@ -1634,8 +1634,8 @@ private:
     template<typename CharType>
     unsigned long long string_to_unsigned_integer(const CharType *s, size_t length) throw(std::overflow_error)
     {
-        const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
-        const unsigned long long max_value_div_10 = max_value / 10;
+        static const unsigned long long max_value = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+        static const unsigned long long max_value_div_10 = max_value / 10;
         unsigned long long n = 0;
         for (size_t i = 0; i < length; ++i)
         {
