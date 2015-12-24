@@ -71,7 +71,7 @@ public:
         }
         else 
         {
-            result = node.is_empty();
+            result = !node.is_empty();
         }
         return result;
     }
@@ -290,7 +290,20 @@ public:
 
     bool accept_single_node() const override
     {
-        return nodes_.size() > 0 ? true : false;
+        bool result;
+        if (nodes_.size() == 0)
+        {
+            result = false;
+        }
+        else if (nodes_.size() == 1)
+        {
+            result = expression<Char,Alloc>::accept_single_node(nodes_[0]);
+        }
+        else
+        {
+            result = true;
+        }
+        return result;
     }
 
     basic_json<Char,Alloc> evaluate_single_node() const override

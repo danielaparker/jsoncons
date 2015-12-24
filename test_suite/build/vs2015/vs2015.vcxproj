@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\jsoncons_tests.cpp" />
-    <ClCompile Include="..\..\src\jsonpath_filter_tests.cpp" />
     <ClCompile Include="..\..\src\jsonpath_tests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
