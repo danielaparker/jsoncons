@@ -1,6 +1,6 @@
     jsoncons::jsonpath::json_query
 
-Returns a `json` array of `json` values extracted from a root `json` structure.
+Returns a `json` array of `json` values selected from a root `json` structure.
 
 ### Header
 
