@@ -1112,7 +1112,7 @@ public:
             return val_.any_value();
         }
 
-        bool as_bool() const
+        bool as_bool() const JSONCONS_NOEXCEPT
         {
             return val_.as_bool();
         }
@@ -1441,7 +1441,7 @@ public:
             return val_.at(name_).any_value();
         }
 
-        bool as_bool() const
+        bool as_bool() const JSONCONS_NOEXCEPT
         {
             return val_.at(name_).as_bool();
         }
@@ -1963,7 +1963,35 @@ public:
         return json_type_traits<Char,Alloc,T>::as(*this);
     }
 
-    bool as_bool() const;
+    bool as_bool() const JSONCONS_NOEXCEPT
+    {
+        switch (var_.type_)
+        {
+        case value_types::null_t:
+        case value_types::empty_object_t:
+            return false;
+        case value_types::bool_t:
+            return var_.value_.bool_value_;
+        case value_types::double_t:
+            return var_.value_.float_value_ == 0.0;
+        case value_types::longlong_t:
+            return var_.value_.si_value_ == 0;
+        case value_types::ulonglong_t:
+            return var_.value_.ui_value_ == 0;
+        case value_types::small_string_t:
+            return var_.small_string_length_ == 0;
+        case value_types::string_t:
+            return var_.value_.string_value_->length() == 0;
+        case value_types::array_t:
+            return var_.value_.array_->size() == 0;
+        case value_types::object_t:
+            return var_.value_.object_->size() == 0;
+        case value_types::any_t:
+            return true;
+        default:
+            return false;
+        }
+    }
 
     long long as_longlong() const;
 

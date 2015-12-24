@@ -62,28 +62,14 @@ public:
     virtual basic_json<Char,Alloc> plus(const expression& rhs) const = 0;
     virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const = 0;
 
-    static bool accept_single_node(const basic_json<Char,Alloc>& node)
-    {
-        bool result = false;
-        if (node.is_bool())
-        {
-            result = node.as_bool();
-        }
-        else 
-        {
-            result = !node.is_empty();
-        }
-        return result;
-    }
-
     static bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
-        return accept_single_node(lhs) && accept_single_node(rhs);
+        return lhs.as_bool() && rhs.as_bool();
     }
 
     static bool pipepipe(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
     {
-        return accept_single_node(lhs) || accept_single_node(rhs);
+        return lhs.as_bool() || rhs.as_bool();
     }
 
     static bool lt(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
@@ -181,7 +167,7 @@ public:
 
     bool accept_single_node() const override
     {
-        return expression<Char, Alloc>::accept_single_node(value_);
+        return value_.as_bool();
     }
 
     basic_json<Char,Alloc> evaluate_single_node() const override
@@ -290,20 +276,7 @@ public:
 
     bool accept_single_node() const override
     {
-        bool result;
-        if (nodes_.size() == 0)
-        {
-            result = false;
-        }
-        else if (nodes_.size() == 1)
-        {
-            result = expression<Char,Alloc>::accept_single_node(nodes_[0]);
-        }
-        else
-        {
-            result = true;
-        }
-        return result;
+        return nodes_.size() != 0;
     }
 
     basic_json<Char,Alloc> evaluate_single_node() const override

@@ -829,18 +829,6 @@ bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) co
 }
 
 template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::as_bool() const
-{
-    switch (var_.type_)
-    {
-    case value_types::bool_t:
-        return var_.value_.bool_value_;
-    default:
-        JSONCONS_THROW_EXCEPTION("Not a bool");
-    }
-}
-
-template<typename Char, typename Alloc>
 long long basic_json<Char, Alloc>::as_longlong() const
 {
     switch (var_.type_)

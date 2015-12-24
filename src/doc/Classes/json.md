@@ -239,8 +239,8 @@ If `name` matches the name of a member in the json object, returns a copy of the
     T as() const
 Attempts to coerce the json value to the template type
 
-    as_bool<bool>
-Returns `true` or `false` if value has a boolean type, otherwise throws.
+    as<bool>
+Returns `false` if value is `false` or `null`, if value is a zero length string, or if value is a zero length array or object. Everything else returns `true`.
 
     as<double>
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
@@ -262,7 +262,7 @@ Return integer value if value has integral type, performs cast if value has doub
     as<string>
 If value is string, returns value, otherwise returns result of `to_string`.
 
-    bool as_bool() const
+    bool as_bool() const noexcept
     long long as_longlong() const
     unsigned long long as_ulonglong() const
     double as_double() const

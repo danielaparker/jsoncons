@@ -25,6 +25,11 @@ struct jsonpath_fixture
         static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
         return text;
     }
+    static const char* store_text_empty_isbn()
+    {
+        static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
+        return text;
+    }
     static const char* book_text()
     {
         static const char* text = "{ \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95}";
@@ -45,7 +50,7 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_jsonpath)
 {
     jsonpath_fixture fixture;
@@ -287,7 +292,28 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
         }
     }
 }
-#endif
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_book_empty_isbn)
+{
+	jsonpath_fixture fixture;
+
+    json root = json::parse_string(jsonpath_fixture::store_text_empty_isbn());
+
+    json books = fixture.book();
+    for (size_t i = 0; i < books.size(); ++i)
+    {
+        bool has_isbn = books[i].has_member("isbn");
+        if (has_isbn)
+        {
+            json result = json_query(books[i],"@.isbn");
+            json expected = json::array();
+            expected.add(books[i]["isbn"]);
+            BOOST_CHECK_EQUAL(expected, result);
+            //std::cout << pretty_print(result) << std::endl;
+        }
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
 {
 	jsonpath_fixture fixture;
@@ -311,7 +337,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
 
     BOOST_CHECK_EQUAL(expected,result);
 }
-#if 0
 BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
 {
 
@@ -510,7 +535,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
 
     BOOST_CHECK_EQUAL(expected,result);
 }
-#endif
 
 
 

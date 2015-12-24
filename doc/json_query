@@ -471,7 +471,7 @@ vertical-align:1px;
 <pre><code>jsoncons::jsonpath::json_query
 </code></pre>
 
-<p>Returns a <code>json</code> array of <code>json</code> values extracted from a root <code>json</code> structure.</p>
+<p>Returns a <code>json</code> array of <code>json</code> values selected from a root <code>json</code> structure.</p>
 
 <h3>Header</h3>
 
@@ -488,7 +488,7 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 
 <h3>Stefan Goessner's JsonPath</h3>
 
-<p>Unlike XML, the root of a JSON text is an anonymous object or array or scalar, so JSONPath identifies the outermost level of the text with the symbol $.</p>
+<p>Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.</p>
 
 <p>JSONPath expressions can use the dot–notation</p>
 
@@ -499,8 +499,6 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 
 <pre><code>$['store']['book'][0]['title']
 </code></pre>
-
-<p>to describe input paths.</p>
 
 <p>Note that only single quotes (not double quotes) are allowed inside of JSONPath expressions.</p>
 
@@ -514,7 +512,7 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 <tbody>
 <tr>
 <td><code>$</code></td>
-<td>The root object</td>
+<td>The root object or array</td>
 </tr>
 <tr>
 <td><code>@</code></td>
@@ -696,13 +694,13 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <code>*</code> is a wildcard symbol</td>
 </tr>
 <tr>
-<td><code>$.store.book[*].author</code></td>
-<td>All authors of books in the store</td>
-<td></td>
-</tr>
-<tr>
 <td><code>$..author</code></td>
 <td>All authors</td>
+<td>Recursive descent starting from root ($) to find all authors</td>
+</tr>
+<tr>
+<td><code>$.store.book[*].author</code></td>
+<td>All authors of books in the store</td>
 <td></td>
 </tr>
 <tr>
