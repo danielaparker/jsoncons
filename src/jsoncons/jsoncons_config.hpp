@@ -45,6 +45,15 @@ namespace jsoncons
 #define JSONCONS_NOEXCEPT
 #endif
 
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1900
+#define JSONCONS_ALIGNOF alignof
+#else
+#define JSONCONS_ALIGNOF __alignof
+#endif
+#else
+#define JSONCONS_ALIGNOF alignof
+#endif
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )

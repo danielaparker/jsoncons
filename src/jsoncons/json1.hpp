@@ -211,8 +211,9 @@ public:
 			}
 			Char* p;
 			size_t length_;
-			string_data(const string_data&) = delete;
-			string_data& operator=(const string_data&) = delete;
+        private:
+			string_data(const string_data&);
+			string_data& operator=(const string_data&);
         };
 
         struct string_dataA
@@ -224,7 +225,7 @@ public:
         static string_data* make_string_data(const Char* s, size_t length_)
 
         {
-            typedef typename std::aligned_storage<sizeof(string_dataA), alignof(string_dataA)>::type storage_type;
+            typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
 
             char* storage = new char[sizeof(storage_type) + length_*sizeof(Char)];
             string_data* ps = new(storage)string_data();
