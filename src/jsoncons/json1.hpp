@@ -1974,19 +1974,19 @@ public:
         case value_types::bool_t:
             return var_.value_.bool_value_;
         case value_types::double_t:
-            return var_.value_.float_value_ == 0.0;
+            return var_.value_.float_value_ != 0.0;
         case value_types::longlong_t:
-            return var_.value_.si_value_ == 0;
+            return var_.value_.si_value_ != 0;
         case value_types::ulonglong_t:
-            return var_.value_.ui_value_ == 0;
+            return var_.value_.ui_value_ != 0;
         case value_types::small_string_t:
-            return var_.small_string_length_ == 0;
+            return var_.small_string_length_ != 0;
         case value_types::string_t:
-            return var_.value_.string_value_->length() == 0;
+            return var_.value_.string_value_->length() != 0;
         case value_types::array_t:
-            return var_.value_.array_->size() == 0;
+            return var_.value_.array_->size() != 0;
         case value_types::object_t:
-            return var_.value_.object_->size() == 0;
+            return var_.value_.object_->size() != 0;
         case value_types::any_t:
             return true;
         default:

@@ -52,6 +52,7 @@ namespace token_types {
         gte,
         plus,
         minus,
+        exclaim,
         done
     };
 }
@@ -63,6 +64,7 @@ public:
     virtual void initialize(const basic_json<Char,Alloc>& context_node) = 0;
     virtual bool accept_single_node() const = 0;
     virtual basic_json<Char,Alloc> evaluate_single_node() const = 0;
+    virtual bool exclaim() const = 0;
 	virtual bool eq(const term& rhs) const  = 0;
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ne(const term& rhs) const = 0;
@@ -261,6 +263,11 @@ public:
         return value_;
     }
 
+    bool exclaim() const override
+    {
+        return !value_.as_bool();
+    }
+
     bool eq(const term<Char,Alloc>& rhs) const override
     {
         return rhs.eq(value_);
@@ -368,6 +375,11 @@ public:
     basic_json<Char,Alloc> evaluate_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
+    }
+
+    bool exclaim() const override
+    {
+        return nodes_.size() == 0;
     }
 
     bool eq(const term<Char,Alloc>& rhs) const override
@@ -563,29 +575,6 @@ public:
     }
 };
 
-namespace unary_operators {
-enum unary_operators_t
-{
-    none,
-    exclaim
-};}
-
-namespace operators {
-enum operators_t
-{
-    none,
-    eq,
-    ne,
-    ampamp,
-    pipepipe,
-    lt,
-    gt,
-    lte,
-    gte,
-    plus,
-    minus
-};}
-
 template<typename Char, class Alloc>
 class jsonpath_filter_parser
 {
@@ -653,6 +642,12 @@ public:
 		}
         case token_types::term:
             return t.term();
+        case token_types::exclaim:
+		{
+			basic_json<Char,Alloc> val = primary(ts)->exclaim();
+			auto expr = std::make_shared<value_term<Char, Alloc>>(val);
+            return expr;
+		}
         default:
             JSONCONS_THROW_EXCEPTION("Expected primary");
         }
@@ -813,6 +808,11 @@ handle_state:
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ne));
                     }
+					else
+					{
+						state_ = filter_states::expect_path_or_value;
+						tokens_.push_back(token<Char, Alloc>(token_types::exclaim));
+					}
                     break;
                 case '&':
                     if (index_+1 < length && p[index_+1] == '&')
