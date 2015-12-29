@@ -221,7 +221,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter2)
     }
     BOOST_CHECK_EQUAL(expected,result);
 }
-
  
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_category_eq_reference)
 {

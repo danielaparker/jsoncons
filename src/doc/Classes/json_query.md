@@ -58,8 +58,6 @@ Operator|	Description
 `+`     |Left plus right
 `-`     |Left minus right
 
-Binary expressions must appear within parentheses.
-
 ### Examples
 
 The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).

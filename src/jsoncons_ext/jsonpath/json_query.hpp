@@ -348,8 +348,9 @@ handle_state:
                         {
                             jsonpath_filter_parser<Char,Alloc> parser;
                             parser.parse(path,i,path_length,line_,column_);
-                            auto filter = parser.get_filter();
-                            auto index = filter->evaluate(*(stack_.back()[0]));
+                            //auto filter = parser.get_filter();
+                            //auto index = filter->evaluate(*(stack_.back()[0]));
+                            auto index = parser.eval(*(stack_.back()[0]));
                             if (index.is<size_t>())
                             {
                                 start_ = index.as<size_t>();
@@ -370,13 +371,11 @@ handle_state:
                     {
                         jsonpath_filter_parser<Char,Alloc> parser;
                         parser.parse(path,i,path_length,line_,column_);
-                        auto filter = parser.get_filter();
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {
-                            accept(*(stack_.back()[j]),*filter);
+                            accept(*(stack_.back()[j]),parser);
                         }
-                        //end_nodes();
                         i = parser.index();
                         line_= parser.line_number();
                         column_= parser.column_number();
@@ -464,9 +463,8 @@ handle_state:
             break;
         }
     }
-
     void accept(const basic_json<Char,Alloc>& val,
-                jsonpath_filter<Char,Alloc>& filter)
+                jsonpath_filter_parser<Char,Alloc>& filter)
     {
         if (val.is_object())
         {
@@ -477,7 +475,7 @@ handle_state:
                     accept(it->value(),filter);
                 }
             }
-            if (filter.accept(val))
+            if (filter.exists(val))
             {
                 nodes_.push_back(std::addressof(val));
             }
@@ -490,6 +488,8 @@ handle_state:
             }
         }
     }
+
+   
 
     void end_all()
     {
