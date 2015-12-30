@@ -40,24 +40,45 @@ class basic_json_serializer : public basic_json_output_handler<Char>
         size_t count_;
         bool content_indented_;
     };
+    std::basic_ostream<Char>* os_;
+    basic_output_format<Char> format_;
+    std::vector<stack_item> stack_;
+    int indent_;
+    std::streamsize original_precision_;
+    std::ios_base::fmtflags original_format_flags_;
+    bool indenting_;
+    float_printer<Char> fp_;
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-       : os_(std::addressof(os)), indent_(0), indenting_(false)
+       : os_(std::addressof(os)), 
+         indent_(0), 
+         indenting_(false),
+         fp_(format_.precision())
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
-       : os_(std::addressof(os)), indent_(0), indenting_(indenting)
+       : os_(std::addressof(os)), 
+         indent_(0), 
+         indenting_(indenting),
+         fp_(format_.precision())
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-       : os_(std::addressof(os)), format_(format), indent_(0),
-         indenting_(false) // Deprecated behavior
+       : os_(std::addressof(os)), 
+         format_(format), 
+         indent_(0),
+         indenting_(false),  
+         fp_(format_.precision())
     {
     }
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
-       : os_(std::addressof(os)), format_(format), indent_(0), indenting_(indenting)
+       : os_(std::addressof(os)), 
+         format_(format), 
+         indent_(0), 
+         indenting_(indenting),  
+         fp_(format_.precision())
     {
     }
 
@@ -182,7 +203,7 @@ private:
         }
         else
         {
-            print_float(value,format_.precision(),*os_);
+            fp_.print(value,*os_);
         }
 
         end_value();
@@ -280,15 +301,6 @@ private:
             os_->put(' ');
         }
     }
-
-    std::basic_ostream<Char>* os_;
-    basic_output_format<Char> format_;
-    std::vector<stack_item> stack_;
-    int indent_;
-    std::streamsize original_precision_;
-    std::ios_base::fmtflags original_format_flags_;
-
-    bool indenting_;
 };
 
 typedef basic_json_serializer<char> json_serializer;

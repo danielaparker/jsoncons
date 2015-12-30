@@ -90,6 +90,15 @@ class basic_csv_serializer : public basic_json_output_handler<Char>
         size_t count_;
         bool skip_;
     };
+    std::basic_ostream<Char>* os_;
+    basic_csv_parameters<Char> parameters_;
+    basic_output_format<Char> format_;
+    std::vector<stack_item> stack_;
+    std::streamsize original_precision_;
+    std::ios_base::fmtflags original_format_flags_;
+    std::basic_ostringstream<Char> header_os_;
+    std::map<std::basic_string<Char>,size_t> header_;
+    float_printer<Char> fp_;
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
        :
@@ -99,7 +108,8 @@ public:
        original_precision_(),
        original_format_flags_(),
        header_os_(),
-       header_()
+       header_(),
+       fp_(format_.precision())
     {
     }
 
@@ -113,7 +123,8 @@ public:
        original_precision_(),
        original_format_flags_(),
        header_os_(),
-       header_()
+       header_(),
+	   fp_(format_.precision())
     {
     }
 
@@ -349,7 +360,7 @@ private:
         }
         else
         {
-            print_float(val,format_.precision(),os);
+            fp_.print(val,os);
         }
 
         end_value();
@@ -411,15 +422,6 @@ private:
             ++stack_.back().count_;
         }
     }
-
-    std::basic_ostream<Char>* os_;
-    basic_csv_parameters<Char> parameters_;
-    basic_output_format<Char> format_;
-    std::vector<stack_item> stack_;
-    std::streamsize original_precision_;
-    std::ios_base::fmtflags original_format_flags_;
-    std::basic_ostringstream<Char> header_os_;
-    std::map<std::basic_string<Char>,size_t> header_;
 };
 
 typedef basic_csv_serializer<char,std::allocator<void>> csv_serializer;

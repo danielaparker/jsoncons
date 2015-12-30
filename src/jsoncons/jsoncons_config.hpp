@@ -118,6 +118,22 @@ std::basic_string<Char> float_to_string(double val, int precision)
 	return ss.str();
 }
 
+template <typename Char>
+class float_printer
+{
+    int precision_;
+public:
+    float_printer(int precision)
+        : precision_(precision)
+    {
+    }
+
+    void print(double val, std::basic_ostream<Char>& os)
+    {
+    	print_float(val, precision_, os);
+    }
+};
+
 #ifdef _MSC_VER
 
 template<typename Char>
@@ -297,7 +313,7 @@ public:
 	double read(const char* s, size_t length)
 	{
         const char *begin = s;
-        char *end = const_cast<char *>(begin) + length;
+        char *end = nullptr;
         double val = _strtod_l(begin, &end, locale);
         if (begin == end)
         {
@@ -337,7 +353,7 @@ public:
         if (is_dot_)
         {
             const char *begin = s;
-            char *end = const_cast<char *>(begin) + length;
+            char *end = nullptr;
             val = strtod(begin, &end);
             if (begin == end)
             {
@@ -362,8 +378,8 @@ public:
                     ++j;
                 }
             }
-            char *begin = &buffer_[0];
-            char *end = begin + j;
+            const char *begin = &buffer_[0];
+            char *end = nullptr;
             val = strtod(begin, &end);
             if (begin == end)
             {

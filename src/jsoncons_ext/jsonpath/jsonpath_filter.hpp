@@ -582,9 +582,9 @@ class jsonpath_filter_parser
     size_t line_;
     size_t column_;
     filter_states::filter_states_t state_;
-    std::vector<int> stack_;
     std::basic_string<Char> buffer_;
     std::vector<token<Char,Alloc>> tokens_;
+    int depth_;
 public:
     size_t line_number() const
     {
@@ -648,6 +648,12 @@ public:
 			auto expr = std::make_shared<value_term<Char, Alloc>>(val);
             return expr;
 		}
+        case token_types::minus:
+        {
+            basic_json<Char,Alloc> val = primary(ts)->unary_minus();
+            auto expr = std::make_shared<value_term<Char, Alloc>>(val);
+            return expr;
+        }
         default:
             JSONCONS_THROW_EXCEPTION("Expected primary");
         }
@@ -764,6 +770,7 @@ public:
 
     void parse(const Char* p, size_t start, size_t length, size_t row, size_t column)
     {
+        depth_ = 0;
         tokens_.clear();
         index_ = start;
         line_ = row;
@@ -781,19 +788,14 @@ handle_state:
                 {
                 case '(':
                     state_ = filter_states::expect_path_or_value;
-                    stack_.push_back(0);
+                    ++depth_;
                     tokens_.push_back(token<Char,Alloc>(token_types::left_paren));
                     break;
                 case ')':
                     tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-                    if (stack_.size() == 1)
+                    if (--depth_ == 0)
                     {
-                        stack_.pop_back();
                         done = true;
-                    }
-                    else 
-                    {
-                        stack_.pop_back();
                     }
                     break;
                 }
@@ -911,15 +913,13 @@ handle_state:
                             buffer_.clear();
                         }
                         tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-						if (stack_.size() == 1)
+						if (--depth_ == 0)
 						{
                             state_ = filter_states::start;
-                            stack_.pop_back();
                             done = true;
 						}
                         else
                         {
-                            stack_.pop_back();
                             state_ = filter_states::expect_path_or_value;
                         }
                         break;
@@ -972,20 +972,15 @@ handle_state:
                     state_ = filter_states::quoted_text;
                     break;
                 case '(':
-                    stack_.push_back(0);
+                    ++depth_;
                     tokens_.push_back(token<Char,Alloc>(token_types::left_paren));
                     break;
                 case ')':
                     tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-                    if (stack_.size() == 1)
+                    if (--depth_ == 0)
                     {
-                        stack_.pop_back();
                         done = true;
                         state_ = filter_states::start;
-                    }
-                    else 
-                    {
-                        stack_.pop_back();
                     }
                     break;
                 case '<':
@@ -995,15 +990,10 @@ handle_state:
                 case '&':
                 case '|':
                 case '+':
+                case '-':
                     {
                         state_ = filter_states::oper;
                         goto handle_state;
-                    }
-                    break;
-                case '-':
-                    {
-                        buffer_.push_back(c);
-                        state_ = filter_states::unquoted_text;
                     }
                     break;
                 default: 
@@ -1019,16 +1009,10 @@ handle_state:
                     break;
                 case ')':
                     tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-                    if (stack_.size() == 1)
+                    if (--depth_ == 0)
                     {
-                        stack_.pop_back();
                         done = true;
                         state_ = filter_states::start;
-                    }
-                    else 
-                    {
-                        stack_.pop_back();
-
                     }
                     break;
                 case '<':
@@ -1056,15 +1040,13 @@ handle_state:
                     break;
                 case ')':
                     tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-                    if (stack_.size() == 1)
+                    if (--depth_ == 0)
                     {
-                        stack_.pop_back();
                         done = true;
                         state_ = filter_states::start;
                     }
                     else 
                     {
-                        stack_.pop_back();
                         state_ = filter_states::expect_oper_or_right_round_bracket;
                     }
                     break;
@@ -1101,15 +1083,13 @@ handle_state:
                         tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
                         buffer_.clear();
                     }
-                    if (stack_.size() == 1)
+                    if (--depth_ == 0)
                     {
-                        stack_.pop_back();
                         state_ = filter_states::start;
                         done = true;
                     }
                     else
                     {
-                        stack_.pop_back();
                         state_ = filter_states::expect_path_or_value;
                     }
                      break;
@@ -1121,9 +1101,9 @@ handle_state:
             }
             ++index_;
         }
-        if (stack_.size() != 0)
+        if (depth_ != 0)
         {
-            JSONCONS_THROW_EXCEPTION("Invalid filter 4.");
+            JSONCONS_THROW_EXCEPTION("Unbalanced parenthesis");
         }
     }
 
