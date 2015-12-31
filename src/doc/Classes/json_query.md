@@ -38,8 +38,8 @@ JSONPath|	Description
 `[]`	|Subscript operator. In JSON it is the native array operator.
 `[,]`	|JSONPath allows alternate names or array indices as a set.
 `[start:end:step]`	|Array slice operator borrowed from [ES4](http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&s=array+slice).
-`?()`	|Applies a filter expression.
 `()`	|Filter expression.
+`?()`	|Applies a filter expression.
 
 ### jsoncons filter expressions
 
@@ -143,5 +143,7 @@ JSONPath |Result|Notes
 `$..book[?(@.price<10)]`	|All books that are cheaper than $10
 `$..*`	                |Everything in the store.
 `$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title`|The titles of all books by Nigel Rees and Evelyn Waugh
-`$.store.book[?(@.author =~ /Evelyn.*?/)]`|All books whose author's name start with Evelyn
+`$.store.book[?(@.author =~ /Evelyn.*?/)]`|All books whose author's name starts with Evelyn
+`$.store.book[ ?((@.author =~ /evelyn.*?/i))]`|All books whose author's name starts with Evelyn, evelyn etc.|`i` indicates case insensitive
 `$.store.book[ ?(!(@.author =~ /Evelyn.*?/))]`|All books whose author's name does not start with Evelyn
+

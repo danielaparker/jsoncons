@@ -65,29 +65,97 @@ template<typename Char, class Alloc>
 class term
 {
 public:
-    virtual void initialize(const basic_json<Char,Alloc>& context_node) = 0;
-    virtual bool accept_single_node() const = 0;
-    virtual basic_json<Char,Alloc> evaluate_single_node() const = 0;
-    virtual bool exclaim() const = 0;
-	virtual bool eq(const term& rhs) const  = 0;
-    virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool ne(const term& rhs) const = 0;
-    virtual bool ne(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool regex(const term& rhs) const = 0;
-    virtual bool regex2(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool ampamp(const term& rhs) const = 0;
-    virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool pipepipe(const term& rhs) const = 0;
-    virtual bool pipepipe(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool lt(const term& rhs) const = 0;
-    virtual bool lt(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual bool gt(const term& rhs) const = 0;
-    virtual bool gt(const basic_json<Char,Alloc>& rhs) const = 0;
-	virtual basic_json<Char, Alloc> minus(const term& rhs) const  = 0;
-    virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const = 0;
-    virtual basic_json<Char,Alloc>  unary_minus() const = 0;
-    virtual basic_json<Char,Alloc> plus(const term& rhs) const = 0;
-    virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual void initialize(const basic_json<Char,Alloc>& context_node)
+    {
+    }
+    virtual bool accept_single_node() const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual basic_json<Char,Alloc> evaluate_single_node() const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool exclaim() const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+	virtual bool eq(const term& rhs) const 
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool eq(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool ne(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool ne(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool regex(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool regex2(const std::basic_string<Char>& subject) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool ampamp(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool pipepipe(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool pipepipe(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool lt(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool lt(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool gt(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual bool gt(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+	virtual basic_json<Char, Alloc> minus(const term& rhs) const 
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual basic_json<Char,Alloc>  unary_minus() const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual basic_json<Char,Alloc> plus(const term& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
+    virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const
+    {
+        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+    }
 };
 
 template<typename Char, class Alloc>
@@ -149,14 +217,6 @@ public:
         --index_;
     }
 };
-
-template<typename Char, class Alloc>
-bool regex(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
-{
-    std::basic_regex<Char> pattern(rhs.as_string(),
-                                   std::regex_constants::ECMAScript /*| std::regex_constants::icase*/);
-    return std::regex_match(lhs.as_string(), pattern);
-}
 
 template<typename Char, class Alloc>
 bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
@@ -263,10 +323,6 @@ public:
     {
     }
 
-    void initialize(const basic_json<Char,Alloc>& context_node) override
-    {
-    }
-
     bool accept_single_node() const override
     {
         return value_.as_bool();
@@ -302,11 +358,7 @@ public:
     }
     bool regex(const term& rhs) const override
     {
-        return rhs.regex2(value_);
-    }
-    bool regex2(const basic_json<Char,Alloc>& lhs) const override
-    {
-        return jsoncons::jsonpath::regex(lhs,value_);
+        return rhs.regex2(value_.as_string());
     }
     bool ampamp(const term& rhs) const override
     {
@@ -368,6 +420,25 @@ public:
     basic_json<Char,Alloc> plus(const basic_json<Char,Alloc>& rhs) const override
     {
         return jsoncons::jsonpath::plus(value_,rhs);
+    }
+};
+
+template<typename Char, class Alloc>
+class regex_term : public term<Char,Alloc>
+{
+    std::basic_string<Char> pattern_;
+    std::regex::flag_type flags_;
+public:
+    regex_term(const std::basic_string<Char>& pattern, std::regex::flag_type flags)
+        : pattern_(pattern), flags_(flags)
+    {
+    }
+
+    bool regex2(const std::basic_string<Char>& subject) const override
+    {
+		std::basic_regex<Char> pattern(pattern_,
+                                       flags_);
+        return std::regex_match(subject, pattern);
     }
 };
 
@@ -467,20 +538,7 @@ public:
             result = true;
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
-                result = rhs.regex2(nodes_[i]);
-            }
-        }
-        return result;
-    }
-    bool regex2(const basic_json<Char,Alloc>& lhs) const override
-    {
-        bool result = false;
-        if (nodes_.size() > 0)
-        {
-            result = true;
-            for (size_t i = 0; result && i < nodes_.size(); ++i)
-            {
-                result = jsoncons::jsonpath::regex(lhs,nodes_[i]);
+                result = rhs.regex2(nodes_[i].as_string());
             }
         }
         return result;
@@ -1164,14 +1222,12 @@ handle_state:
                 switch (c)
                 {
                 case '/':
-                    buffer_.push_back('\"');
                     state_ = filter_states::regex;
                     break;
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 default: 
-                    state_ = filter_states::unquoted_text;
-                    goto handle_state;
+                    JSONCONS_THROW_EXCEPTION("Expected '/'");
                     break;
                 };
                 break;
@@ -1180,11 +1236,15 @@ handle_state:
                     switch (c)
                     {                   
                     case '/':
-                        buffer_.push_back('\"');
                         //if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
-                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            std::regex::flag_type flags = std::regex_constants::ECMAScript; 
+                            if (index_+1 < length && p[index_+1] == 'i')
+                            {
+                                ++index_;
+                                flags |= std::regex_constants::icase;
+                            }
+                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<regex_term<Char, Alloc>>(buffer_,flags)));
                             buffer_.clear();
                         }
                         state_ = filter_states::expect_path_or_value;
