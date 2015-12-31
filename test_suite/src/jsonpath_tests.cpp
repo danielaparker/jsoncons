@@ -521,6 +521,13 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_regex)
     expected4.add("Evelyn Waugh");
     BOOST_CHECK_EQUAL(expected4,result4);
 
+    json result5 = json_query(root,"$.store.book[ ?(!(@.author =~ /Evelyn.*?/))].author");
+    json expected5 = json::array();
+    expected5.add("Nigel Rees");
+    expected5.add("Herman Melville");
+    expected5.add("J. R. R. Tolkien");
+    BOOST_CHECK_EQUAL(expected5,result5);
+
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_everything)

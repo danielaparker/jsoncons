@@ -144,3 +144,4 @@ JSONPath |Result|Notes
 `$..*`	                |Everything in the store.
 `$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title`|The titles of all books by Nigel Rees and Evelyn Waugh
 `$.store.book[?(@.author =~ /Evelyn.*?/)]`|All books whose author's name start with Evelyn
+`$.store.book[ ?(!(@.author =~ /Evelyn.*?/))]`|All books whose author's name does not start with Evelyn
