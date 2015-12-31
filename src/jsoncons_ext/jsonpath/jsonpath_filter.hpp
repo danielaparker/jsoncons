@@ -14,6 +14,7 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
+#include <regex>
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json2.hpp"
@@ -44,6 +45,7 @@ namespace token_types {
         term,
         eq,
         ne,
+        regex,
         ampamp,
         pipepipe,
         lt,
@@ -69,6 +71,8 @@ public:
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ne(const term& rhs) const = 0;
     virtual bool ne(const basic_json<Char,Alloc>& rhs) const = 0;
+    virtual bool regex(const term& rhs) const = 0;
+    virtual bool regex2(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool ampamp(const term& rhs) const = 0;
     virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const = 0;
     virtual bool pipepipe(const term& rhs) const = 0;
@@ -143,6 +147,14 @@ public:
         --index_;
     }
 };
+
+template<typename Char, class Alloc>
+bool regex(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
+{
+    std::basic_regex<Char> pattern(rhs.as_string(),
+                                   std::regex_constants::ECMAScript | std::regex_constants::icase);
+    return std::regex_match(lhs.as_string(), pattern);
+}
 
 template<typename Char, class Alloc>
 bool ampamp(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
@@ -285,6 +297,14 @@ public:
     bool ne(const basic_json<Char,Alloc>& rhs) const override
     {
         return value_ != rhs;
+    }
+    bool regex(const term& rhs) const override
+    {
+        return rhs.regex2(value_);
+    }
+    bool regex2(const basic_json<Char,Alloc>& lhs) const override
+    {
+        return jsoncons::jsonpath::regex(lhs,value_);
     }
     bool ampamp(const term& rhs) const override
     {
@@ -433,6 +453,32 @@ public:
             for (size_t i = 0; result && i < nodes_.size(); ++i)
             {
                 result = nodes_[i] != rhs;
+            }
+        }
+        return result;
+    }
+    bool regex(const term& rhs) const override
+    {
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = rhs.regex2(nodes_[i]);
+            }
+        }
+        return result;
+    }
+    bool regex2(const basic_json<Char,Alloc>& lhs) const override
+    {
+        bool result = false;
+        if (nodes_.size() > 0)
+        {
+            result = true;
+            for (size_t i = 0; result && i < nodes_.size(); ++i)
+            {
+                result = jsoncons::jsonpath::regex(lhs,nodes_[i]);
             }
         }
         return result;
@@ -713,6 +759,14 @@ public:
                 t = ts.get();
 			}
                 break;
+            case token_types::regex:
+                {
+                    bool e = left->regex(*(primary(ts)));
+                    basic_json<Char, Alloc> val(e);
+                    left = std::make_shared<value_term<Char, Alloc>>(val);
+                    t = ts.get();
+                }
+                break;
             case token_types::ampamp:
                 {
                     bool e = left->ampamp(*(primary(ts)));
@@ -838,6 +892,12 @@ handle_state:
                         ++index_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::eq));
+                    }
+                    else if (index_+1 < length && p[index_+1] == '~')
+                    {
+                        ++index_;
+                        state_ = filter_states::expect_path_or_value;
+                        tokens_.push_back(token<Char,Alloc>(token_types::regex));
                     }
                     break;
                 case '>':

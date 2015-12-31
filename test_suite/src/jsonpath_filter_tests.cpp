@@ -152,3 +152,17 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(0),result1);
 }
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
+{
+    jsonpath_filter_parser<char,std::allocator<void>> parser;
+	json parent = json::array();
+	parent.add(1);
+	parent.add(2);
+
+	std::string expr1 = "('today I go' =~ 'today.*?')";
+    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    auto result1 = parser.eval(parent);
+    BOOST_CHECK_EQUAL(json(true),result1);
+}
+
