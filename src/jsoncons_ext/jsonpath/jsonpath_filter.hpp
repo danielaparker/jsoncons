@@ -30,6 +30,8 @@ namespace filter_states {
         expect_right_round_bracket,
         expect_oper_or_right_round_bracket,
         expect_path_or_value,
+        expect_regex,
+        regex,
         quoted_text,
         unquoted_text,
         path,
@@ -152,7 +154,7 @@ template<typename Char, class Alloc>
 bool regex(const basic_json<Char,Alloc>& lhs, const basic_json<Char,Alloc>& rhs)
 {
     std::basic_regex<Char> pattern(rhs.as_string(),
-                                   std::regex_constants::ECMAScript | std::regex_constants::icase);
+                                   std::regex_constants::ECMAScript /*| std::regex_constants::icase*/);
     return std::regex_match(lhs.as_string(), pattern);
 }
 
@@ -896,7 +898,7 @@ handle_state:
                     else if (index_+1 < length && p[index_+1] == '~')
                     {
                         ++index_;
-                        state_ = filter_states::expect_path_or_value;
+                        state_ = filter_states::expect_regex;
                         tokens_.push_back(token<Char,Alloc>(token_types::regex));
                     }
                     break;
@@ -1157,6 +1159,42 @@ handle_state:
                     buffer_.push_back(c);
                     break;
                 };
+                break;
+            case filter_states::expect_regex: 
+                switch (c)
+                {
+                case '/':
+                    buffer_.push_back('\"');
+                    state_ = filter_states::regex;
+                    break;
+                case ' ':case '\n':case '\r':case '\t':
+                    break;
+                default: 
+                    state_ = filter_states::unquoted_text;
+                    goto handle_state;
+                    break;
+                };
+                break;
+            case filter_states::regex: 
+                {
+                    switch (c)
+                    {                   
+                    case '/':
+                        buffer_.push_back('\"');
+                        //if (buffer_.length() > 0)
+                        {
+                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            buffer_.clear();
+                        }
+                        state_ = filter_states::expect_path_or_value;
+                        break;
+
+                    default: 
+                        buffer_.push_back(c);
+                        break;
+                    }
+                }
                 break;
             }
             ++index_;

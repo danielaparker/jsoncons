@@ -47,16 +47,24 @@ JSONPath|	Description
 
 Operator|	Description
 --------|--------------------------------
+`+`     |Left plus right
+`-`     |Left minus right
+`&&`	|Left and right
+`||`	|Left or right
 `==`	|Left is equal to right 
 `!=`	|Left is not equal to right
 `<`	|Left is less than right
 `<=`	|Left is less or equal to right
 `>`	|Left is greater than right
 `>=`	|Left is greater than or equal to right
-`&&`	|Left and right
-`||`	|Left or right
-`+`     |Left plus right
-`-`     |Left minus right
+'=~'    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
+
+Unary operators
+
+Operator|	Description
+--------|--------------------------------
+!       |Not right
+-       |Negates right
 
 ### Examples
 
@@ -135,4 +143,4 @@ JSONPath |Result|Notes
 `$..book[?(@.price<10)]`	|All books that are cheaper than $10
 `$..*`	                |Everything in the store.
 `$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title`|The titles of all books by Nigel Rees and Evelyn Waugh
-
+`$.store.book[?(@.author =~ /Evelyn.*?/)]`|All books whose author's name start with Evelyn

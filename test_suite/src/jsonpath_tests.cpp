@@ -509,12 +509,17 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_regex)
 {
     json root = json::parse_string(jsonpath_fixture::store_text());
 
-    json result3 = json_query(root,"$.store.book[ ?(@.category =~ 'fic.*?')].author");
+    json result3 = json_query(root,"$.store.book[ ?(@.category =~ /fic.*?/)].author");
     json expected3 = json::array();
     expected3.add("Evelyn Waugh");
     expected3.add("Herman Melville");
     expected3.add("J. R. R. Tolkien");
     BOOST_CHECK_EQUAL(expected3,result3);
+
+    json result4 = json_query(root,"$.store.book[ ?(@.author =~ /Evelyn.*?/)].author");
+    json expected4 = json::array();
+    expected4.add("Evelyn Waugh");
+    BOOST_CHECK_EQUAL(expected4,result4);
 
 }
 
