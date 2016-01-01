@@ -228,35 +228,73 @@ public:
                     case ' ':case '\n':case '\r':case '\t':
                         break; 
                     case '{':
+                        handler_->begin_json();
+                        if (!push(modes::object_member_name))
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
+                        }
+                        state_ = states::object;
+                        handler_->begin_object(*this);
+                        break;
                     case '[':
                         handler_->begin_json();
-                        state_ = states::expect_value;
-                        goto repeat_state;
+                        if (!push(modes::array_element))
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_text_error_category()), *this);
+                        }
+                        state_ = states::array;
+                        handler_->begin_array(*this);
                         break;
                     case '\"':
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        state_ = states::string;
+                        break;
                     case '-':
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        is_negative_ = true;
+                        state_ = states::minus;
+                        break;
                     case '0': 
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        number_buffer_.push_back(curr_char_);
+                        state_ = states::zero;
+                        break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        number_buffer_.push_back(curr_char_);
+                        state_ = states::integer;
+                        break;
                     case 'f':
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        state_ = states::f;
+                        break;
                     case 'n':
+                        handler_->begin_json();
+                        flip(modes::done, modes::start);
+                        state_ = states::n;
+                        break;
                     case 't':
                         handler_->begin_json();
                         flip(modes::done, modes::start);
-                        state_ = states::expect_value;
-                        goto repeat_state;
+                        state_ = states::t;
                         break;
                     case '/':
                         saved_state_ = state_;
                         state_ = states::slash;
                         break;
                     case '}':
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_object, json_text_error_category()), *this);
+                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_end_of_object, json_text_error_category()), *this);
                         break;
                     case ']':
-                        err_handler_->error(std::error_code(json_parser_errc::unexpected_end_of_array, json_text_error_category()), *this);
+                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_end_of_array, json_text_error_category()), *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
+                        err_handler_->fatal_error(std::error_code(json_parser_errc::invalid_json_text, json_text_error_category()), *this);
                         break;
                     }
                 }
