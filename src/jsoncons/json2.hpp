@@ -1002,10 +1002,8 @@ const Char* basic_json<Char, Alloc>::as_cstring() const
     switch (var_.type_)
     {
     case value_types::small_string_t:
-        var_.value_.small_string_value_[var_.small_string_length_] = 0;
         return var_.value_.small_string_value_;
     case value_types::string_t:
-        var_.value_.string_value_->c_str()[var_.value_.string_value_.length] = 0;
         return var_.value_.string_value_->c_str();
     default:
         JSONCONS_THROW_EXCEPTION("Not a string");

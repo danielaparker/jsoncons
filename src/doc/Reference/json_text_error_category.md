@@ -1,6 +1,6 @@
     jsoncons::json_parser_errc
 
-The enumeration values scoped by `jsoncons::json_parser_errc` define the values for json text error codes.
+The constant integer values scoped by `jsoncons::json_parser_errc` define the values for json text error codes.
 
 ### Header
 

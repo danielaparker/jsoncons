@@ -281,6 +281,7 @@ public:
             case value_types::small_string_t:
                 small_string_length_ = var.small_string_length_;
                 std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(Char));
+                value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
                 value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
@@ -408,6 +409,7 @@ public:
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)s.length();
                 std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+                value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
@@ -424,6 +426,7 @@ public:
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)length;
                 std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+                value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
@@ -439,6 +442,7 @@ public:
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)length;
                 std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+                value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
@@ -606,6 +610,7 @@ public:
                     type_ = value_types::small_string_t;
                     small_string_length_ = (unsigned char)s.length();
                     std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(Char));
+                    value_.small_string_value_[small_string_length_] = 0;
                 }
                 break;
             default:
@@ -636,6 +641,7 @@ public:
 						type_ = value_types::small_string_t;
 						small_string_length_ = (unsigned char)length;
 						std::memcpy(value_.small_string_value_,s,length*sizeof(Char));
+                        value_.small_string_value_[small_string_length_] = 0;
 					}
 				}
                 break;

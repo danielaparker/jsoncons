@@ -15,13 +15,10 @@ namespace jsoncons { namespace csv {
 
 namespace csv_parser_errc 
 {
-    enum csv_parser_errc_t 
-    {
-        unexpected_eof,
-        expected_quote,
-        invalid_csv_text,
-        invalid_state
-    };
+    const int unexpected_eof = 0;
+    const int expected_quote = 1;
+    const int invalid_csv_text = 2;
+    const int invalid_state = 3;
 }
 
 class csv_text_error_category_impl

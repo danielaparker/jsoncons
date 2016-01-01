@@ -202,10 +202,11 @@ public:
         }
     }
 
-    void parse(Char const* p, size_t start, size_t length)
+    void parse(Char const * const  p, size_t start, size_t length)
     {
+        Char const * const pe = p + length;
         index_ = start;
-        for (; (index_ < length) & (state_ != states::done); ++index_)
+        while ((index_ < length) & (state_ != states::done))
         {
             int curr_char = p[index_];
             switch (curr_char)
@@ -217,7 +218,6 @@ public:
                 break;
             }
 
-handle_state:
             switch (state_)
             {
             case states::start: 
@@ -230,7 +230,7 @@ handle_state:
                     case '[':
                         handler_->begin_json();
                         state_ = states::expect_value;
-                        goto handle_state;
+                        goto repeat_state;
                         break;
                     case '\"':
                     case '-':
@@ -242,7 +242,7 @@ handle_state:
                         handler_->begin_json();
                         flip(modes::done, modes::start);
                         state_ = states::expect_value;
-                        goto handle_state;
+                        goto repeat_state;
                         break;
                     case '/':
                         saved_state_ = state_;
@@ -656,22 +656,57 @@ handle_state:
                 break;
             case states::string: 
                 {
-                    switch (curr_char)
+                    Char const * sb = p+index_;
+                    Char const * s = sb;
+                    bool done = false;
+                    while (!done && s < pe)
                     {
-                    case '\n':
-                    case '\r':
-                    case '\t':
-                        err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_text_error_category()), *this);
-                        break;
-                    case '\\': 
-                        state_ = states::escape;
-                        break;
-                    case '\"':
-                        end_string_value();
-                        break;
-                    default:
-                        string_buffer_.push_back(curr_char);
-                        break;
+                        switch (*s)
+                        {
+                        case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+                        case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+                        case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                            string_buffer_.append(sb,s-sb);
+							index_ += (s - sb);
+							column_ += (s - sb);
+							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_text_error_category()), *this);
+                            done = true;
+                            break;
+                        case '\n':case '\r':case '\t':
+						{
+							string_buffer_.append(sb, s - sb);
+							index_ += (s - sb);
+							column_ += (s - sb);
+							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_text_error_category()), *this);
+                            string_buffer_.push_back(*s);
+							done = true;
+						}
+                            break;
+                        case '\\': 
+							string_buffer_.append(sb,s-sb);
+                            index_ += (s - sb + 1);
+							column_ += (s - sb + 1);
+                            prev_char_ = *s;
+                            state_ = states::escape;
+                            goto repeat_state;
+                            break;
+                        case '\"':
+							string_buffer_.append(sb,s-sb);
+                            end_string_value();
+                            index_ += (s - sb + 1);
+                            column_ += (s - sb + 1);
+                            prev_char_ = *s;
+							goto repeat_state;
+							break;
+                        }
+						++s;
+                    }
+                    if (!done)
+                    {
+                        string_buffer_.append(sb,s-sb);
+                        index_ += (s - sb);
+                        column_ += (s - sb);
+                        curr_char = *s;
                     }
                 }
                 break;
@@ -1289,8 +1324,11 @@ handle_state:
                 break;
             }
             prev_char_ = curr_char;
+            ++index_;
+repeat_state:
+			;
         }
-    }
+	}
 
     void end_parse()
     {

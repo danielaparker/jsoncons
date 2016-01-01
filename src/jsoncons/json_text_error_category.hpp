@@ -15,31 +15,28 @@ namespace jsoncons {
 
 namespace json_parser_errc 
 {
-    enum json_parser_errc_t 
-    {
-        unexpected_eof,
-        invalid_json_text,
-        extra_character,
-        max_depth_exceeded,
-        mismatched_parentheses_or_brackets,
-        single_quote,
-        illegal_character_in_string,
-        expected_comma_or_end,
-        extra_comma,
-        unexpected_end_of_object,
-        unexpected_end_of_array,
-        expected_name,
-        expected_value,
-        invalid_value,
-        expected_colon,
-        illegal_control_character,
-        illegal_escaped_character,
-        expected_codepoint_surrogate_pair,
-        invalid_hex_escape_sequence,
-        invalid_unicode_escape_sequence,
-        leading_zero,
-        invalid_number
-    };
+    const int unexpected_eof = 0;
+    const int invalid_json_text = 1;
+    const int extra_character = 2;
+    const int max_depth_exceeded = 3;
+    const int mismatched_parentheses_or_brackets = 4;
+    const int single_quote = 5;
+    const int illegal_character_in_string = 6;
+    const int expected_comma_or_end = 7;
+    const int extra_comma = 8;
+    const int unexpected_end_of_object = 9;
+    const int unexpected_end_of_array = 10;
+    const int expected_name = 11;
+    const int expected_value = 12;
+    const int invalid_value = 13;
+    const int expected_colon = 14;
+    const int illegal_control_character = 15;
+    const int illegal_escaped_character = 16;
+    const int expected_codepoint_surrogate_pair = 17;
+    const int invalid_hex_escape_sequence = 18;
+    const int invalid_unicode_escape_sequence = 19;
+    const int leading_zero = 20;
+    const int invalid_number = 21;
 }
 
 class json_text_error_category_impl
