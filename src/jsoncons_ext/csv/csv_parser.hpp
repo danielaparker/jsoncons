@@ -98,7 +98,7 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -117,7 +117,7 @@ public:
          stack_(default_depth),
          handler_(std::addressof(handler)),
          parameters_(params),
-         err_handler_(std::addressof(default_basic_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -305,6 +305,7 @@ public:
         state_ = states::expect_value;
         column_index_ = 0;
         prev_char_ = 0;
+        curr_char_ = 0;
         column_ = 1;
     }
 
@@ -313,12 +314,12 @@ public:
         index_ = start;
         for (; index_ < length && state_ != states::done; ++index_)
         {
-            int curr_char = p[index_];
+            curr_char_ = p[index_];
 all_states:
             switch (state_)
             {
             case states::comment:
-                if (curr_char == '\n')
+                if (curr_char_ == '\n')
                 {
                     state_ = states::expect_value;
                 }
@@ -329,7 +330,7 @@ all_states:
                 }
                 break;
             case states::expect_value:
-                if (column_ == 1 && curr_char == parameters_.comment_starter())
+                if (column_ == 1 && curr_char_ == parameters_.comment_starter())
                 {
                     state_ = states::comment;
                 }
@@ -340,21 +341,21 @@ all_states:
                 }
                 break;
             case states::between_fields:
-                if (curr_char == '\r' || (prev_char_ != '\r' && curr_char == '\n'))
+                if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
                 {
                     after_record();
                     state_ = states::expect_value;
                 }
-                else if (curr_char == parameters_.field_delimiter())
+                else if (curr_char_ == parameters_.field_delimiter())
                 {
                     state_ = states::expect_value;
                 }
                 break;
             case states::escaped_value: 
                 {
-                    if (curr_char == parameters_.quote_char())
+                    if (curr_char_ == parameters_.quote_char())
                     {
-                        string_buffer_.push_back(curr_char);
+                        string_buffer_.push_back(curr_char_);
                         state_ = states::quoted_string;
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
@@ -369,11 +370,11 @@ all_states:
                 break;
             case states::quoted_string: 
                 {
-                    if (curr_char == parameters_.quote_escape_char())
+                    if (curr_char_ == parameters_.quote_escape_char())
                     {
                         state_ = states::escaped_value;
                     }
-                    else if (curr_char == parameters_.quote_char())
+                    else if (curr_char_ == parameters_.quote_char())
                     {
                         before_record();
                         end_quoted_string_value();
@@ -382,13 +383,13 @@ all_states:
                     }
                     else
                     {
-                        string_buffer_.push_back(curr_char);
+                        string_buffer_.push_back(curr_char_);
                     }
                 }
                 break;
             case states::unquoted_string: 
                 {
-                    if (curr_char == '\r' || (prev_char_ != '\r' && curr_char == '\n'))
+                    if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
                     {
                         before_record();
                         end_unquoted_string_value();
@@ -396,7 +397,7 @@ all_states:
                         after_record();
                         state_ = states::expect_value;
                     }
-                    else if (curr_char == '\n')
+                    else if (curr_char_ == '\n')
                     {
                         if (prev_char_ != '\r')
                         {
@@ -407,21 +408,21 @@ all_states:
                             state_ = states::expect_value;
                         }
                     }
-                    else if (curr_char == parameters_.field_delimiter())
+                    else if (curr_char_ == parameters_.field_delimiter())
                     {
                         before_record();
                         end_unquoted_string_value();
                         after_field();
                         state_ = states::expect_value;
                     }
-                    else if (curr_char == parameters_.quote_char())
+                    else if (curr_char_ == parameters_.quote_char())
                     {
                         string_buffer_.clear();
                         state_ = states::quoted_string;
                     }
                     else
                     {
-                        string_buffer_.push_back(curr_char);
+                        string_buffer_.push_back(curr_char_);
                     }
                 }
                 break;
@@ -433,7 +434,7 @@ all_states:
             {
                 state_ = states::done;
             }
-            switch (curr_char)
+            switch (curr_char_)
             {
             case '\r':
                 ++line_;
@@ -450,7 +451,7 @@ all_states:
                 ++column_;
                 break;
             }
-            prev_char_ = curr_char;
+            prev_char_ = curr_char_;
         }
     }
 
@@ -703,7 +704,7 @@ private:
         return column_;
     }
 
-    Char do_last_char() const override
+    Char do_current_char() const override
     {
         return (Char)prev_char_;
     }
@@ -756,6 +757,7 @@ private:
     basic_parse_error_handler<Char> *err_handler_;
     unsigned long column_;
     unsigned long line_;
+    int curr_char_;
     int prev_char_;
     uint32_t cp_;
     uint32_t cp2_;

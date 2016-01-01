@@ -11,8 +11,8 @@
 ### Constructors
 
     json_parse_exception(std::error_code ec,
-                         unsigned long line,
-                         unsigned long column)
+                         size_t line,
+                         size_t column)
 
     json_parse_exception(const json_parse_exception& other)
 
@@ -21,11 +21,11 @@
     const std::error_code code() const
 Returns a message for this exception
 
-    unsigned long line_number() const
+    size_t line_number() const
 Returns the line number to the end of the text where the exception occurred.
 Line numbers start at 1.
 
-    unsigned long column_number() const
+    size_t column_number() const
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
 

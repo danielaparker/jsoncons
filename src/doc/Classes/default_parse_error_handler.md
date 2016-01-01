@@ -1,6 +1,6 @@
     jsoncons::default_parse_error_handler
 
-    typedef default_basic_parse_error_handler<char> default_parse_error_handler
+    typedef basic_default_parse_error_handler<char> default_parse_error_handler
 
 ### Header
 
