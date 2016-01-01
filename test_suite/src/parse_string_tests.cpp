@@ -1,7 +1,6 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
@@ -55,7 +54,6 @@ private:
     }
 };
 
-#if 0
 BOOST_AUTO_TEST_CASE(test_parse_small_string1)
 {
     std::string input = "\"String\"";
@@ -132,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
         BOOST_CHECK_EQUAL("Big Str\"ing",handler.get_result().as_cstring());
     }
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(test_parse_big_string2)
 {
 	std::string input = "\"Big\t Str\\\"ing\"";
