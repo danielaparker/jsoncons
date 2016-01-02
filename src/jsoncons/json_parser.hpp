@@ -288,10 +288,10 @@ public:
                         state_ = states::slash;
                         break;
                     case '}':
-                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_end_of_object, json_error_category()), *this);
+                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
                         break;
                     case ']':
-                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_end_of_array, json_error_category()), *this);
+                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_bracket, json_error_category()), *this);
                         break;
                     default:
                         err_handler_->fatal_error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
@@ -309,35 +309,51 @@ public:
                     case ' ':case '\n':case '\r':case '\t':
                         break; 
                     case '}':
-                        if (!pop(modes::object_member_value))
+                        if (peek() == modes::object_member_value)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_error_category()), *this);
+                            pop(modes::object_member_value);                        
+                            handler_->end_object(*this);
+                            if (peek() == modes::done)
+                            {
+                                state_ = states::done;
+                                handler_->end_json();
+                            }
+                            else
+                            {
+                                state_ = states::expect_comma_or_end;
+                            }
                         }
-                        handler_->end_object(*this);
-                        if (peek() == modes::done)
+                        else if (peek() == modes::array_element)
                         {
-                            state_ = states::done;
-                            handler_->end_json();
+                            err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
                         }
                         else
                         {
-                            state_ = states::expect_comma_or_end;
+                            err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
                         }
                         break;
                     case ']':
-                        if (!pop(modes::array_element))
+                        if (peek() == modes::array_element)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::mismatched_parentheses_or_brackets, json_error_category()), *this);
+                            pop(modes::array_element);                        
+                            handler_->end_array(*this);
+                            if (peek() == modes::done)
+                            {
+                                state_ = states::done;
+                                handler_->end_json();
+                            }
+                            else
+                            {
+                                state_ = states::expect_comma_or_end;
+                            }
                         }
-                        handler_->end_array(*this);
-                        if (peek() == modes::done)
+                        else if (peek() == modes::object_member_value)
                         {
-                            state_ = states::done;
-                            handler_->end_json();
+                            err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
                         }
                         else
                         {
-                            state_ = states::expect_comma_or_end;
+                            err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_bracket, json_error_category()), *this);
                         }
                         break;
                     case ',':
@@ -348,7 +364,15 @@ public:
                         state_ = states::slash;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_error_category()), *this);
+						if (peek() == modes::array_element)
+						{
+							err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
+						}
+						else
+						{ 
+							err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_error_category()), *this);
+						}
+
                         break;
                     }
                 }

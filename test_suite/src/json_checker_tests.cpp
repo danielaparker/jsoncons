@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(test_fail22)
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_end);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_bracket);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail23)

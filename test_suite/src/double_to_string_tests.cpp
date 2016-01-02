@@ -17,6 +17,8 @@ using jsoncons::wjson;
 using jsoncons::basic_json_reader;
 using std::string;
 
+BOOST_AUTO_TEST_SUITE(double_to_string_test_suite)
+
 BOOST_AUTO_TEST_CASE(test_double_to_string)
 {
     double x = 1.0e100;
@@ -143,4 +145,5 @@ BOOST_AUTO_TEST_CASE(test_double_to_wstring)
     s = jsoncons::float_to_string<wchar_t>(x, 16);
     BOOST_CHECK(s == std::wstring(L"-11.0"));
 }
+BOOST_AUTO_TEST_SUITE_END()
 

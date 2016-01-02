@@ -19,8 +19,8 @@ constant                            |Description
 `illegal_character_in_string`        |Illegal character in string
 `extra_comma`        |Extra comma      
 `expected_comma_or_end`          |Expected comma or end       
-`unexpected_end_of_object`          |Unexpected end of object '}'       
-`unexpected_end_of_array`           |Unexpected end of array ']'        
+`unexpected_right_brace`          |Unexpected end of object '}'       
+`unexpected_right_bracket`           |Unexpected end of array ']'        
 `expected_name`                     |Expected object member name
 `expected_value`                    |Expected value                     
 `expected_colon`           |Expected colon        

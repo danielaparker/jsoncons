@@ -19,13 +19,10 @@ namespace json_parser_errc
     const int invalid_json_text = 1;
     const int extra_character = 2;
     const int max_depth_exceeded = 3;
-    const int mismatched_parentheses_or_brackets = 4;
     const int single_quote = 5;
     const int illegal_character_in_string = 6;
     const int expected_comma_or_end = 7;
     const int extra_comma = 8;
-    const int unexpected_end_of_object = 9;
-    const int unexpected_end_of_array = 10;
     const int expected_name = 11;
     const int expected_value = 12;
     const int invalid_value = 13;
@@ -38,6 +35,10 @@ namespace json_parser_errc
     const int leading_zero = 20;
     const int invalid_number = 21;
     const int bad_state = 22;
+    const int expected_comma_or_right_bracket = 23;
+    const int expected_comma_or_right_brace = 24;
+    const int unexpected_right_bracket = 25;
+    const int unexpected_right_brace = 26;
 }
 
 class json_error_category_impl
@@ -60,8 +61,6 @@ public:
             return "Unexpected non-whitespace character after JSON text";
         case json_parser_errc::max_depth_exceeded:
             return "Maximum JSON depth exceeded";
-        case json_parser_errc::mismatched_parentheses_or_brackets:
-            return "Mismatched parentheses or brackets";
         case json_parser_errc::single_quote:
             return "JSON strings cannot be quoted with single quotes";
         case json_parser_errc::illegal_character_in_string:
@@ -70,10 +69,14 @@ public:
             return "Extra comma";
         case json_parser_errc::expected_comma_or_end:
             return "Expected comma or end";
-        case json_parser_errc::unexpected_end_of_object:
-            return "Unexpected end of object '}'";
-        case json_parser_errc::unexpected_end_of_array:
-            return "Unexpected end of array ']'";
+        case json_parser_errc::expected_comma_or_right_bracket:
+            return "Expected comma or right bracket";
+        case json_parser_errc::expected_comma_or_right_brace:
+            return "Expected comma or right brace";
+        case json_parser_errc::unexpected_right_bracket:
+            return "Unexpected right bracket";
+        case json_parser_errc::unexpected_right_brace:
+            return "Unexpected right bracket";
         case json_parser_errc::expected_name:
             return "Expected object member name";
         case json_parser_errc::expected_value:

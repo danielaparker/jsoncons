@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json.hpp"
@@ -10,13 +14,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_deserializer;
-using jsoncons::json;
-using jsoncons::json_reader;
-using jsoncons::pretty_print;
-using std::string;
-using jsoncons::json_exception;
-using jsoncons::json_parse_exception;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_reader_exception_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_filename_invalid)
 {
@@ -33,6 +33,7 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
     catch (const json_exception&)
     {
     }
+    //BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_left_brace)
@@ -40,64 +41,70 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     std::string in_file = "input/json-exception-1.json";
     std::ifstream is(in_file);
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
+        BOOST_CHECK_EQUAL(json_parser_errc::expected_comma_or_right_bracket,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(), 14);
         BOOST_CHECK_EQUAL(e.column_number(), 30);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
-
 BOOST_AUTO_TEST_CASE(test_exception_right_brace)
 {
     std::string in_file = "input/json-exception-2.json";
     std::ifstream is(in_file);
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
+        //std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::expected_comma_or_right_brace,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),17);
         BOOST_CHECK_EQUAL(e.column_number(), 9);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_array_eof)
 {
     std::istringstream is("[100");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
 {
     std::istringstream is("[\"\\u");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
@@ -105,18 +112,20 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     catch (const json_parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
 {
     std::istringstream is("[tru");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
@@ -124,18 +133,20 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     catch (const json_parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
 {
     std::istringstream is("[fals");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
@@ -143,18 +154,20 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     catch (const json_parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 6);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
 {
     std::istringstream is("[nul");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
@@ -162,65 +175,71 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     catch (const json_parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 5);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_true_eof)
 {
     std::istringstream is("[true");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
-        std::cout << e.what() << std::endl;
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 6);
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(6,e.column_number());
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_false_eof)
 {
     std::istringstream is("[false");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
-        std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 7);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 {
     std::istringstream is("[null");
 
-    try
+	json_deserializer handler;
+	try
     {
-        json_deserializer handler;
         json_reader reader(is,handler);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
-        std::cout << e.what() << std::endl;
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
         BOOST_CHECK_EQUAL(e.line_number(),1);
         BOOST_CHECK_EQUAL(e.column_number(), 6);
     }
+    BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
+BOOST_AUTO_TEST_SUITE_END()
