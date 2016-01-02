@@ -2,7 +2,7 @@
 
 ### Header
 
-    #include "jsoncons/json_exception.hpp"
+    #include "jsoncons/parse_error_handler.hpp"
 
 ### Base class
 

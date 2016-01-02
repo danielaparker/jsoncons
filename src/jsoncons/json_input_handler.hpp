@@ -157,12 +157,12 @@ private:
 
 
 template <typename Char>
-class empty_basic_json_input_handler : public basic_json_input_handler<Char>
+class basic_empty_json_input_handler : public basic_json_input_handler<Char>
 {
 public:
     static basic_json_input_handler<Char>& instance()
     {
-        static empty_basic_json_input_handler<Char> instance;
+        static basic_empty_json_input_handler<Char> instance;
         return instance;
     }
 private:
@@ -222,8 +222,8 @@ private:
 typedef basic_json_input_handler<char> json_input_handler;
 typedef basic_json_input_handler<wchar_t> wjson_input_handler;
 
-typedef empty_basic_json_input_handler<char> empty_json_input_handler;
-typedef empty_basic_json_input_handler<wchar_t> wempty_json_input_handler;
+typedef basic_empty_json_input_handler<char> empty_json_input_handler;
+typedef basic_empty_json_input_handler<wchar_t> wempty_json_input_handler;
 
 }
 

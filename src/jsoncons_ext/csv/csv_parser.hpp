@@ -250,7 +250,7 @@ public:
 
         if (parameters_.header().length() > 0)
         {
-            empty_basic_json_input_handler<Char> ih;
+            basic_empty_json_input_handler<Char> ih;
             basic_csv_parameters<Char> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.quote_char(parameters_.quote_char());
@@ -264,7 +264,7 @@ public:
         }
         if (parameters_.data_types().length() > 0)
         {
-            empty_basic_json_input_handler<Char> ih;
+            basic_empty_json_input_handler<Char> ih;
             basic_csv_parameters<Char> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.assume_header(true);

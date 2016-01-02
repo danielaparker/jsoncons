@@ -20,6 +20,8 @@ using jsoncons::basic_json;
 using std::string;
 typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> myjson;
 
+BOOST_AUTO_TEST_SUITE(allocator_test_suite)
+
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
 	// Works but leaves memory leaks
@@ -36,4 +38,4 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 	*/
     //boost::singleton_pool<boost::pool_allocator_tag, sizeof(myjson::string_wrapper)>::release_memory();
 }
-
+BOOST_AUTO_TEST_SUITE_END()

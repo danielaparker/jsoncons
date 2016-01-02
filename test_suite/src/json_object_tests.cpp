@@ -18,6 +18,8 @@ using jsoncons::basic_json_reader;
 using std::string;
 using jsoncons::json_exception;
 
+BOOST_AUTO_TEST_SUITE(json_object_test_suite)
+
 BOOST_AUTO_TEST_CASE(test_remove_member)
 {
     json o;
@@ -27,11 +29,15 @@ BOOST_AUTO_TEST_CASE(test_remove_member)
     o.remove_member("key");
     BOOST_CHECK(o.size() == 0);
 
-    json config;
-    json xfile_opt = json::object();
-    xfile_opt["input-file"] = "config_file";
-    config["XFILE_COMPATIBLE"] = std::move(xfile_opt);
-    std::cout << "XFILE_COMPATIBLE: " << config << std::endl;
+    json a;
+    json b = json::object();
+    b["input-file"] = "config_file";
+    json b_copy = b;
+
+    a["b"] = std::move(b);
+
+    BOOST_CHECK_EQUAL(true,a["b"].is_object());
+    BOOST_CHECK_EQUAL(a["b"],b_copy);
 }
 
 BOOST_AUTO_TEST_CASE(test_empty_object)
@@ -142,7 +148,7 @@ BOOST_AUTO_TEST_CASE(test_get)
     BOOST_CHECK(s1 == std::string("value1"));
     BOOST_CHECK(s1a == std::string("value1"));
 
-    std::cout << "s2=" << s2 << std::endl;
+    //std::cout << "s2=" << s2 << std::endl;
     BOOST_CHECK_EQUAL(std::string("null"),s2);
 }
 
@@ -157,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     std::string s1a = a["object1"].at("field1").as<std::string>();
     std::string s2 = a["object1"].get("field2").as<std::string>();
     a["object1"].get("field2").is_null();
-    std::cout << s2 << std::endl;
+    //std::cout << s2 << std::endl;
     BOOST_REQUIRE_THROW(a["object1"].at("field2"), json_exception);
 
     BOOST_CHECK(s1 == std::string("value1"));
@@ -301,5 +307,5 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
 
     //*it = member; // Don't want this to compile
 }
-
+BOOST_AUTO_TEST_SUITE_END()
 
