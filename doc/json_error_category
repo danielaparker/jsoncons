@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_text_error_category</title>
+<title>json_error_category</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,112 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_parser_errc
-</code></pre>
-
-<p>The enumeration values scoped by <code>jsoncons::json_parser_errc</code> define the values for json text error codes.</p>
-
-<h3>Header</h3>
-
-<pre><code>#include "jsoncons/json_text_error_category.hpp"
-</code></pre>
-
-<h3>Member constants</h3>
-
-<table>
-<thead>
-<tr>
-<th>constant</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>unexpected_eof</code></td>
-<td>Unexpected end of file</td>
-</tr>
-<tr>
-<td><code>invalid_json_text</code></td>
-<td>A JSON text must be an object or array</td>
-</tr>
-<tr>
-<td><code>extra_character</code></td>
-<td>Unexpected non-whitespace character after JSON text</td>
-</tr>
-<tr>
-<td><code>max_depth_exceeded</code></td>
-<td>Maximum stack depth exceeded</td>
-</tr>
-<tr>
-<td><code>mismatched_parentheses_or_brackets</code></td>
-<td>Mismatched parentheses or brackets</td>
-</tr>
-<tr>
-<td><code>single_quote</code></td>
-<td>JSON strings cannot be quoted with single quotes</td>
-</tr>
-<tr>
-<td><code>illegal_character_in_string</code></td>
-<td>Illegal character in string</td>
-</tr>
-<tr>
-<td><code>extra_comma</code></td>
-<td>Extra comma</td>
-</tr>
-<tr>
-<td><code>expected_comma_or_end</code></td>
-<td>Expected comma or end</td>
-</tr>
-<tr>
-<td><code>unexpected_end_of_object</code></td>
-<td>Unexpected end of object '}'</td>
-</tr>
-<tr>
-<td><code>unexpected_end_of_array</code></td>
-<td>Unexpected end of array ']'</td>
-</tr>
-<tr>
-<td><code>expected_name</code></td>
-<td>Expected object member name</td>
-</tr>
-<tr>
-<td><code>expected_value</code></td>
-<td>Expected value</td>
-</tr>
-<tr>
-<td><code>expected_colon</code></td>
-<td>Expected colon</td>
-</tr>
-<tr>
-<td><code>illegal_control_character</code></td>
-<td>Illegal control character in string</td>
-</tr>
-<tr>
-<td><code>illegal_escaped_character</code></td>
-<td>Illegal escaped character in string</td>
-</tr>
-<tr>
-<td><code>expected_codepoint_surrogate_pair</code></td>
-<td>Invalid codepoint, expected another \u token to begin the second half of a codepoint surrogate pair.</td>
-</tr>
-<tr>
-<td><code>invalid_hex_escape_sequence</code></td>
-<td>Invalid codepoint, expected hexadecimal digit.</td>
-</tr>
-<tr>
-<td><code>invalid_unicode_escape_sequence</code></td>
-<td>Invalid codepoint, expected four hexadecimal digits.</td>
-</tr>
-<tr>
-<td><code>invalid_number</code></td>
-<td>Invalid number</td>
-</tr>
-<tr>
-<td><code>leading_zero</code></td>
-<td>A number cannot have a leading zero</td>
-</tr>
-</tbody>
-</table>
+<p>An error occurred while processing GitHub Flavored Markdown.</p><p><strong>The remote name could not be resolved: 'api.github.com'</strong></p><p>If the problem persists, please report the bug.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
