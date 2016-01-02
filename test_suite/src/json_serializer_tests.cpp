@@ -11,13 +11,10 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
 using boost::numeric::ublas::matrix;
+
+BOOST_AUTO_TEST_SUITE(json_serializer_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_direct_serialization)
 {
@@ -41,5 +38,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     }
     os.end_array();
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

@@ -16,18 +16,9 @@
 #include <new>
 #include <boost/optional.hpp>
 
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::json_output_handler;
-using std::string;
-using jsoncons::json_filter;
-using jsoncons::pretty_print;
-using jsoncons::json_deserializer;
-using jsoncons::json_parse_exception;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(small_string_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_small_string)
 {
@@ -44,3 +35,6 @@ BOOST_AUTO_TEST_CASE(test_small_string)
 	BOOST_CHECK(q.type() == jsoncons::value_types::small_string_t);
 	BOOST_CHECK(q.as<std::string>() == std::string("ABCD"));
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+

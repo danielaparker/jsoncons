@@ -10,12 +10,9 @@
 #include <ctime>
 #include "jsoncons_ext/boost/type_extensions.hpp"
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_extensibility_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_add_extensibility)
 {
@@ -92,4 +89,6 @@ BOOST_AUTO_TEST_CASE(test_example)
 
         std::cout << pretty_print(deal) << std::endl;
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

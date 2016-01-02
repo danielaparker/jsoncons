@@ -10,12 +10,9 @@
 #include <ctime>
 #include <cwchar>
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(string_to_double_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_string_to_double)
 {
@@ -29,4 +26,6 @@ BOOST_AUTO_TEST_CASE(test_string_to_double)
     BOOST_CHECK(value1 == value2);
     BOOST_CHECK(value2 == value3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

@@ -242,4 +242,20 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
 
+BOOST_AUTO_TEST_CASE(test_exception)
+{
+    try
+    {
+        std::string input("{\"field1\":\n\"value}");
+        std::cout << input << std::endl;
+        json obj = json::parse_string(input);
+    }
+    catch (const json_parse_exception& e)
+    {
+        BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
+        BOOST_CHECK_EQUAL(e.line_number(),2);
+        BOOST_CHECK_EQUAL(e.column_number(), 9);
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

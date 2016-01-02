@@ -16,11 +16,11 @@
 #include <ctime>
 #include <boost/pool/pool_alloc.hpp>
 
-using jsoncons::basic_json;
-using std::string;
-typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> myjson;
+using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(allocator_test_suite)
+
+typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> myjson;
 
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     o.set("field2",20.0);
     o.set("field3","Three");
 
-	string s = o["field3"].as<string>();
+	std::string s = o["field3"].as<std::string>();
 
     std::cout << o << std::endl;
 	*/

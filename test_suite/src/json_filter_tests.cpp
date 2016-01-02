@@ -15,13 +15,7 @@
 #include "jsoncons/json_filter.hpp"
 #include "jsoncons/json_reader.hpp"
 
-using std::string;
-
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::json_reader;
-using jsoncons::json_filter;
-using jsoncons::json_output_handler;
+using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_filter_test_suite)
 
@@ -49,7 +43,7 @@ public:
 private:
 	void do_name(const char* p, size_t length, const parsing_context& context) override
 	{
-		property_name_ = string(p, length);
+		property_name_ = std::string(p, length);
 		if (property_name_ != "name")
 		{
 			input_handler().name(p, length, context);
@@ -60,7 +54,7 @@ private:
 	{
 		if (property_name_ == "name")
 		{
-			string value(p, length);
+			std::string value(p, length);
 			size_t end_first = value.find_first_of(" \t");
 			size_t start_last = value.find_first_not_of(" \t", end_first);
 			input_handler().name("first-name", context);

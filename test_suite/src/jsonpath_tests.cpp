@@ -14,9 +14,10 @@
 #include "jsoncons/json.hpp"
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
-using jsoncons::jsonpath::json_query;
-using jsoncons::pretty_print;
-using jsoncons::json;
+using namespace jsoncons;
+using namespace jsoncons::jsonpath;
+
+BOOST_AUTO_TEST_SUITE(jsonpath_test_suite)
 
 struct jsonpath_fixture
 {
@@ -559,6 +560,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
 
     BOOST_CHECK_EQUAL(expected,result);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 
 

@@ -10,16 +10,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
-using jsoncons::json_deserializer;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::parse_error_handler;
-using jsoncons::json_parse_exception;
-using jsoncons::json_error_category;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_parse_test_suite)
 
 void test_error_code(const std::string& text, int ec)
 {
@@ -136,6 +129,8 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
     test_error_code("\"string\"{}", jsoncons::json_parser_errc::extra_character);
     test_error_code("\"string\"[]", jsoncons::json_parser_errc::extra_character);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 
 

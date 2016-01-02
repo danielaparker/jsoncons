@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
@@ -9,11 +13,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::pretty_print;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_equal_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_object_equals_basic)
 {
@@ -101,5 +103,7 @@ BOOST_AUTO_TEST_CASE(test_object_equals_subtle_offsets)
     BOOST_CHECK(o1 != o2);
     BOOST_CHECK(o2 != o1);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

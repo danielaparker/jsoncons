@@ -17,18 +17,9 @@
 #include <new>
 #include <boost/optional.hpp>
 
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::json_output_handler;
-using std::string;
-using jsoncons::json_filter;
-using jsoncons::pretty_print;
-using jsoncons::json_deserializer;
-using jsoncons::json_parse_exception;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(jsoncons_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
@@ -38,7 +29,7 @@ BOOST_AUTO_TEST_CASE(test_boost_optional)
 
 BOOST_AUTO_TEST_CASE(test_for_each_value)
 {
-    string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
+    std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse_string(input);
 
     json::object_iterator it = val.begin_members();
@@ -272,7 +263,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
 
 BOOST_AUTO_TEST_CASE(test_u0000)
 {
-    string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
+    std::string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     std::cout << "Input:    " << inputStr << std::endl;
     json arr = json::parse_string(inputStr);
 
@@ -303,7 +294,7 @@ BOOST_AUTO_TEST_CASE(parse_file)
 
 BOOST_AUTO_TEST_CASE(test_uHHHH)
 {
-    string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
+    std::string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
     std::cout << "Input:    " << inputStr << std::endl;
     json arr = json::parse_string(inputStr);
 
@@ -379,20 +370,6 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     std::cout << "x4=" << x4 << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_exception)
-{
-    try
-    {
-        std::string input("{\"field1\":\n\"value}");
-        std::cout << input << std::endl;
-        json obj = json::parse_string(input);
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-
 BOOST_AUTO_TEST_CASE(test_big_file)
 {
     std::ofstream os("output/test.json", std::ofstream::binary);
@@ -463,14 +440,14 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     handler.end_array();
     os.flush();
     std::clock_t s = std::clock() - t;
-    std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";
+    //std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";
 
     std::ifstream is("output/test.json", std::ofstream::binary);
     t = std::clock();
 
     json root = json::parse(is);
     s = std::clock() - t;
-    std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds.\n";
+    //std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds.\n";
 
 }
 
@@ -481,3 +458,6 @@ BOOST_AUTO_TEST_CASE(test_multiline_comments)
     BOOST_CHECK(obj.is<json::array>());
     BOOST_CHECK_EQUAL(obj.size(), 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+

@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -12,16 +16,11 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_deserializer;
-using jsoncons::json;
-using jsoncons::output_format;
-using jsoncons::json_reader;
-using jsoncons::pretty_print;
-using std::string;
-using jsoncons::json_exception;
-using jsoncons::json_parse_exception;
+using namespace jsoncons;
 
 using namespace boost::filesystem;
+
+BOOST_AUTO_TEST_SUITE(json_checker_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_fail1)
 {
@@ -601,6 +600,7 @@ BOOST_AUTO_TEST_CASE(test_fail33)
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
+    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_bracket);
 }
 
 BOOST_AUTO_TEST_CASE(test_pass1)
@@ -653,5 +653,7 @@ BOOST_AUTO_TEST_CASE(test_pass3)
         throw;
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

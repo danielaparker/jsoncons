@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/json.hpp"
@@ -11,13 +15,10 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
 using boost::numeric::ublas::matrix;
+
+BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_as)
 {
@@ -208,7 +209,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_string)
     std::string s("[\"Hello\",\"World\"]");
     json val = json::parse_string(s);
 
-    std::vector<string> v = val.as<std::vector<std::string>>(); 
+    std::vector<std::string> v = val.as<std::vector<std::string>>(); 
     BOOST_CHECK(v.size() == 2);
     BOOST_CHECK(v[0] == "Hello");
     BOOST_CHECK(v[1] == "World");
@@ -297,4 +298,6 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
     BOOST_CHECK(v[2]==2);
     BOOST_CHECK(v[3]==3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

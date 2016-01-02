@@ -14,27 +14,17 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::woutput_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::json_output_handler;
-using std::string;
-using std::wstring;
-using jsoncons::json_filter;
-using jsoncons::pretty_print;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(unicode_test_suite)
 
 BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 {
-    string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
+    std::string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     json value = json::parse_string(input);
     output_format format;
     format.escape_all_non_ascii(true);
-    string output = value.to_string(format);
+    std::string output = value.to_string(format);
 
     BOOST_CHECK_EQUAL(input,output);
 }
@@ -69,4 +59,6 @@ BOOST_AUTO_TEST_CASE( test1 )
     json copy(root);
 }
 #endif
+
+BOOST_AUTO_TEST_SUITE_END()
 

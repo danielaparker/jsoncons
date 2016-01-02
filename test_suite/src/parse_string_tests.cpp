@@ -10,17 +10,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
-using jsoncons::json_deserializer;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::parse_error_handler;
-using jsoncons::json_parse_exception;
-using jsoncons::json_error_category;
-using jsoncons::json_exception;
-using jsoncons::default_parse_error_handler;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(parse_string_test_suite)
 
 struct jsonpath_filter_fixture
 {
@@ -153,5 +145,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
         BOOST_CHECK_EQUAL("Big\t Str\"ing",handler.get_result().as_cstring());
     //}
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

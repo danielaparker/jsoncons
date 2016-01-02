@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/json.hpp"
@@ -10,12 +14,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::pretty_print;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_array_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_array_constructor)
 {
@@ -167,4 +168,6 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     BOOST_CHECK_EQUAL(val[2].as<std::string>(), std::string("Montreal"));
 
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

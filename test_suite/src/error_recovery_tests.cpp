@@ -2,6 +2,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
@@ -11,18 +15,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
-using jsoncons::json_deserializer;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::parse_error_handler;
-using jsoncons::json_parse_exception;
-using jsoncons::json_error_category;
-using jsoncons::parse_error_handler;
-using jsoncons::default_parse_error_handler;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(error_recovery_test_suite)
 
 class my_parse_error_handler : public parse_error_handler
 {
@@ -54,4 +49,6 @@ BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
     std::cout << val << std::endl;*/
 }
 
+
+BOOST_AUTO_TEST_SUITE_END()
 

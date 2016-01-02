@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons_ext/csv/csv_reader.hpp"
@@ -11,14 +15,10 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_deserializer;
-using jsoncons::csv::csv_serializer;
-using jsoncons::json;
-using jsoncons::csv::csv_reader;
-using jsoncons::csv::csv_parameters;
-using jsoncons::json_reader;
-using jsoncons::pretty_print;
-using std::string;
+using namespace jsoncons;
+using namespace jsoncons::csv;
+
+BOOST_AUTO_TEST_SUITE(csv_test_suite)
 
 BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1)
 {
@@ -530,3 +530,6 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     employees.to_stream(serializer);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+

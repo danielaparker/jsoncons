@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -12,15 +16,10 @@
 #include <ctime>
 #include "my_any_specializations.hpp"
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::pretty_print;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_exception;
-using std::string;
+using namespace jsoncons;
 using boost::numeric::ublas::matrix;
+
+BOOST_AUTO_TEST_SUITE(json_any_test_suite)
 
 bool check_any_exception( jsoncons::json_exception_0 const& ex ) { return true; }
 
@@ -132,5 +131,7 @@ BOOST_AUTO_TEST_CASE(test_any_array)
     BOOST_CHECK_CLOSE(E(1,0),B(1,0),0.0000001);
     BOOST_CHECK_CLOSE(E(1,1),B(1,1),0.0000001);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

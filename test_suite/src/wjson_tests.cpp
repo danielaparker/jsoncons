@@ -14,18 +14,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::parsing_context;
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_input_handler;
-using jsoncons::json_output_handler;
-using std::string;
-using std::wstring;
-using jsoncons::json_filter;
-using jsoncons::pretty_print;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(wjson_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_wjson )
 {
@@ -37,7 +28,7 @@ BOOST_AUTO_TEST_CASE(test_wjson )
     std::wcout << "Wide character test" << std::endl;
     std::wcout << root << std::endl;
 
-    wstring s1 = root[L"field1"].as<wstring>();
+    std::wstring s1 = root[L"field1"].as<std::wstring>();
     BOOST_CHECK_EQUAL( s1.c_str(),  L"test");
 
 }
@@ -53,4 +44,6 @@ BOOST_AUTO_TEST_CASE(test_wjson_escape_u)
     BOOST_CHECK_EQUAL( s.length(), 1 );
     BOOST_CHECK_EQUAL( s[0], 0xABCD );*/
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

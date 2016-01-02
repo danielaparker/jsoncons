@@ -14,10 +14,10 @@
 #include "jsoncons/json.hpp"
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
-using jsoncons::jsonpath::json_query;
-using jsoncons::jsonpath::jsonpath_filter_parser;
-using jsoncons::pretty_print;
-using jsoncons::json;
+using namespace jsoncons;
+using namespace jsoncons::jsonpath;
+
+BOOST_AUTO_TEST_SUITE(jsonpath_filter_test_suite)
 
 struct jsonpath_filter_fixture
 {
@@ -90,8 +90,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_index_expression)
 {
-    jsonpath_filter_fixture fixture;
-
     json root = json::parse_string(jsonpath_filter_fixture::store_text());
 
     json result = json_query(root,"$..book[(@.length-1)]");
@@ -175,4 +173,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
     auto result3 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(true),result3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

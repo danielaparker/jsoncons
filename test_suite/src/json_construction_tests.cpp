@@ -1,6 +1,10 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#ifdef __linux__
+#define BOOST_TEST_DYN_LINK
+#endif
+
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include "jsoncons/json.hpp"
@@ -10,14 +14,9 @@
 #include <utility>
 #include <ctime>
 
-using jsoncons::json_serializer;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::pretty_print;
-using jsoncons::wjson;
-using jsoncons::json_reader;
-using jsoncons::json_exception;
-using std::string;
+using namespace jsoncons;
+
+BOOST_AUTO_TEST_SUITE(json_construction_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
@@ -205,10 +204,10 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         BOOST_CHECK(val["max_ulonglong_overflow"].is_double());
     }
 
-    std::cout << "size json=" << sizeof(json) << std::endl;
-    std::cout << "size string=" << sizeof(string) << std::endl;
-    std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
-    std::cout << "size map=" << sizeof(std::vector<json::member_type>) << std::endl;
+    //std::cout << "size json=" << sizeof(json) << std::endl;
+    //std::cout << "size string=" << sizeof(std::string) << std::endl;
+    //std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
+    //std::cout << "size map=" << sizeof(std::vector<json::member_type>) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple)
@@ -237,4 +236,6 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     }
 
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 

@@ -10,13 +10,7 @@
 #include <ctime>
 #include <map>
 
-using jsoncons::pretty_print;
-using jsoncons::output_format;
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::basic_json_reader;
-using std::string;
-using jsoncons::json_exception;
+using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_test_suite)
 
