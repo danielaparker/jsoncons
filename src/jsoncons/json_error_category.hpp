@@ -19,26 +19,25 @@ namespace json_parser_errc
     const int invalid_json_text = 1;
     const int extra_character = 2;
     const int max_depth_exceeded = 3;
-    const int single_quote = 5;
-    const int illegal_character_in_string = 6;
-    const int expected_comma_or_end = 7;
-    const int extra_comma = 8;
-    const int expected_name = 11;
-    const int expected_value = 12;
-    const int invalid_value = 13;
-    const int expected_colon = 14;
-    const int illegal_control_character = 15;
-    const int illegal_escaped_character = 16;
-    const int expected_codepoint_surrogate_pair = 17;
-    const int invalid_hex_escape_sequence = 18;
-    const int invalid_unicode_escape_sequence = 19;
-    const int leading_zero = 20;
-    const int invalid_number = 21;
+    const int single_quote = 4;
+    const int illegal_character_in_string = 5;
+    const int extra_comma = 6;
+    const int expected_name = 7;
+    const int expected_value = 8;
+    const int invalid_value = 9;
+    const int expected_colon = 10;
+    const int illegal_control_character = 11;
+    const int illegal_escaped_character = 12;
+    const int expected_codepoint_surrogate_pair = 13;
+    const int invalid_hex_escape_sequence = 14;
+    const int invalid_unicode_escape_sequence = 15;
+    const int leading_zero = 16;
+    const int invalid_number = 17;
+    const int expected_comma_or_right_brace = 18;
+    const int expected_comma_or_right_bracket = 19;
+    const int unexpected_right_bracket = 20;
+    const int unexpected_right_brace = 21;
     const int bad_state = 22;
-    const int expected_comma_or_right_bracket = 23;
-    const int expected_comma_or_right_brace = 24;
-    const int unexpected_right_bracket = 25;
-    const int unexpected_right_brace = 26;
 }
 
 class json_error_category_impl
@@ -67,16 +66,6 @@ public:
             return "Illegal character in string";
         case json_parser_errc::extra_comma:
             return "Extra comma";
-        case json_parser_errc::expected_comma_or_end:
-            return "Expected comma or end";
-        case json_parser_errc::expected_comma_or_right_bracket:
-            return "Expected comma or right bracket";
-        case json_parser_errc::expected_comma_or_right_brace:
-            return "Expected comma or right brace";
-        case json_parser_errc::unexpected_right_bracket:
-            return "Unexpected right bracket";
-        case json_parser_errc::unexpected_right_brace:
-            return "Unexpected right bracket";
         case json_parser_errc::expected_name:
             return "Expected object member name";
         case json_parser_errc::expected_value:
@@ -95,12 +84,20 @@ public:
             return "Invalid codepoint, expected hexadecimal digit.";
         case json_parser_errc::invalid_unicode_escape_sequence:
             return "Invalid codepoint, expected four hexadecimal digits.";
-        case json_parser_errc::invalid_number:
-            return "Invalid number";
         case json_parser_errc::leading_zero:
             return "A number cannot have a leading zero";
+        case json_parser_errc::invalid_number:
+            return "Invalid number";
+        case json_parser_errc::expected_comma_or_right_brace:
+            return "Expected comma or right brace ']'";
+        case json_parser_errc::expected_comma_or_right_bracket:
+            return "Expected comma or right bracket ']'";
+        case json_parser_errc::unexpected_right_brace:
+            return "Unexpected right brace '}'";
+        case json_parser_errc::unexpected_right_bracket:
+            return "Unexpected right bracket ']'";
         case json_parser_errc::bad_state:
-            return "Bad state";
+            return "Bad parse state";
         default:
             return "Unknown JSON parser error";
         }

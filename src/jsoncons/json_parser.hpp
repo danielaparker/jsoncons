@@ -368,11 +368,10 @@ public:
 						{
 							err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
 						}
-						else
-						{ 
-							err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_end, json_error_category()), *this);
-						}
-
+                        else if (peek() == modes::object_member_value)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
+                        }
                         break;
                     }
                 }
