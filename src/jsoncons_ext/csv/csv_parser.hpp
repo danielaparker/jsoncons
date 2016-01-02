@@ -20,7 +20,7 @@
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/parse_error_handler.hpp"
-#include "jsoncons_ext/csv/csv_text_error_category.hpp"
+#include "jsoncons_ext/csv/csv_error_category.hpp"
 #include "jsoncons_ext/csv/csv_parameters.hpp"
 
 namespace jsoncons { namespace csv {
@@ -427,7 +427,7 @@ all_states:
                 }
                 break;
             default:
-                err_handler_->error(std::error_code(csv_parser_errc::invalid_state, csv_text_error_category()), *this);
+                err_handler_->error(std::error_code(csv_parser_errc::invalid_state, csv_error_category()), *this);
                 break;
             }
             if (line_ > parameters_.max_lines())
@@ -482,26 +482,26 @@ all_states:
         case modes::array:
             if (!pop(modes::array))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
+                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
             }
             break;
         case modes::object:
             if (!pop(modes::object))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
+                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
             }
             break;
         case modes::header:
             if (!pop(modes::header))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
+                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
             }
             break;
         }
         handler_->end_array(*this);
         if (!pop(modes::done))
         {
-            err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_text_error_category()), *this);
+            err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
         }
         handler_->end_json();
     }
@@ -599,7 +599,7 @@ private:
             }
             break;
         default:
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
+            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_error_category()), *this);
             break;
         }
         state_ = states::expect_value;
@@ -634,7 +634,7 @@ private:
             end_value();
             break;
         default:
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_text_error_category()), *this);
+            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_error_category()), *this);
             break;
         }
         state_ = states::expect_value;

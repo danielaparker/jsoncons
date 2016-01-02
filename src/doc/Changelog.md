@@ -150,7 +150,7 @@ Bug fixes:
 - Where &s[0] and s.length() were passed to methods, &s[0] has been replaced with s.c_str(). 
   While this shouldn't be an issue on most implementations, VS throws an exception in debug modes when the string has length zero.
 
-- Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_text_error_category_impl name method.
+- Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_error_category_impl name method.
 
 - Fixed a number of typename issues in the 0.96 candidate identifed by Ignatov Serguei.
 

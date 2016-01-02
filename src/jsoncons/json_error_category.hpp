@@ -37,9 +37,10 @@ namespace json_parser_errc
     const int invalid_unicode_escape_sequence = 19;
     const int leading_zero = 20;
     const int invalid_number = 21;
+    const int bad_state = 22;
 }
 
-class json_text_error_category_impl
+class json_error_category_impl
    : public std::error_category
 {
 public:
@@ -95,6 +96,8 @@ public:
             return "Invalid number";
         case json_parser_errc::leading_zero:
             return "A number cannot have a leading zero";
+        case json_parser_errc::bad_state:
+            return "Bad state";
         default:
             return "Unknown JSON parser error";
         }
@@ -102,9 +105,9 @@ public:
 };
 
 inline
-const std::error_category& json_text_error_category()
+const std::error_category& json_error_category()
 {
-  static json_text_error_category_impl instance;
+  static json_error_category_impl instance;
   return instance;
 }
 

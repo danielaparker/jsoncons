@@ -19,7 +19,7 @@ using jsoncons::json_reader;
 using jsoncons::json_input_handler;
 using jsoncons::parse_error_handler;
 using jsoncons::json_parse_exception;
-using jsoncons::json_text_error_category;
+using jsoncons::json_error_category;
 using jsoncons::parse_error_handler;
 using jsoncons::default_parse_error_handler;
 using std::string;
@@ -35,7 +35,7 @@ private:
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw(json_parse_exception)
     {
-        if (ec.category() == json_text_error_category())
+        if (ec.category() == json_error_category())
         {
             if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.last_char() == ']' || context.last_char() == '}'))
             {

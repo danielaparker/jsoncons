@@ -21,7 +21,7 @@ namespace csv_parser_errc
     const int invalid_state = 3;
 }
 
-class csv_text_error_category_impl
+class csv_error_category_impl
    : public std::error_category
 {
 public:
@@ -46,9 +46,9 @@ public:
 };
 
 inline
-const std::error_category& csv_text_error_category()
+const std::error_category& csv_error_category()
 {
-  static csv_text_error_category_impl instance;
+  static csv_error_category_impl instance;
   return instance;
 }
 
