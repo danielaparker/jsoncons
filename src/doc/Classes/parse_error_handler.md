@@ -25,7 +25,12 @@ line and column information is provided in the [context](parsing_context) parame
     void error(std::error_code ec,
                const parsing_context& context) throw (json_parse_exception) = 0
 Send an error event, possibly recoverable. An [error_code](json_error_category) indicates the type of error. Contextual information including
-line and column information is provided in the [context](parsing_context) parameter.  Uses `do_error`.
+line and column information is provided in the [context](parsing_context) parameter.  Calls `do_error`.
+
+    void fatal_error(std::error_code ec,
+               const parsing_context& context) throw (json_parse_exception) = 0
+Send an unrecoverable error. An [error_code](json_error_category) indicates the type of error. Contextual information including
+line and column information is provided in the [context](parsing_context) parameter.  Calls `do_fatal_error` and throws a [json_parse_exception](json_parse_exception).
 
 ### Private virtual implementation methods
 
@@ -37,6 +42,11 @@ line and column information is provided in the [context](parsing_context) parame
     virtual void do_error(std::error_code ec,
                           const parsing_context& context) throw (json_parse_exception) = 0
 Receive an error event, possibly recoverable. An [error_code](json_error_category) indicates the type of error. Contextual information including
+line and column information is provided in the [context](parsing_context) parameter. 
+
+    virtual void do_fatal_error(std::error_code ec,
+                                const parsing_context& context) throw (json_parse_exception) = 0
+Receives a non recoverable error. An [error_code](json_error_category) indicates the type of error. Contextual information including
 line and column information is provided in the [context](parsing_context) parameter. 
     
 

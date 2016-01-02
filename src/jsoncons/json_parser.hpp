@@ -259,13 +259,13 @@ public:
                     case '0': 
                         handler_->begin_json();
                         flip(modes::done, modes::start);
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         handler_->begin_json();
                         flip(modes::done, modes::start);
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -502,11 +502,11 @@ public:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -646,11 +646,11 @@ public:
                         state_ = states::minus;
                         break;
                     case '0': 
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::integer;
                         break;
                     case 'f':
@@ -905,11 +905,11 @@ public:
                     switch (curr_char_)
                     {
                     case '0': 
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::integer;
                         break;
                     default:
@@ -962,7 +962,7 @@ public:
                         }
                         break;
                     case '.':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -1023,11 +1023,11 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::integer;
                         break;
                     case '.':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -1035,7 +1035,7 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp1;
                         break;
                     default:
@@ -1089,7 +1089,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::fraction;
                         break;
                     case ',':
@@ -1097,7 +1097,7 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp1;
                         break;
                     default:
@@ -1116,12 +1116,12 @@ public:
                         state_ = states::exp2;
                         break;
                     case '-':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp2;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp3;
                         break;
                     default:
@@ -1138,7 +1138,7 @@ public:
                     {
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp3;
                         break;
                     default:
@@ -1196,7 +1196,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(curr_char_);
+                        number_buffer_.push_back(static_cast<char>(curr_char_));
                         state_ = states::exp3;
                         break;
                     default:
