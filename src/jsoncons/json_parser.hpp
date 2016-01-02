@@ -298,6 +298,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
 
             case states::expect_comma_or_end: 
@@ -350,6 +352,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::object: 
                 {
@@ -388,6 +392,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::expect_member_name: 
                 {
@@ -413,6 +419,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::expect_colon: 
                 {
@@ -433,6 +441,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::expect_value: 
                 {
@@ -560,6 +570,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::array: 
                 {
@@ -692,6 +704,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::string: 
                 {
@@ -706,16 +720,16 @@ public:
                         case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
                         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                             string_buffer_.append(sb,s-sb);
-							index_ += (s - sb);
-							column_ += (s - sb);
+							index_ += (s - sb + 1);
+							column_ += (s - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_text_error_category()), *this);
                             done = true;
                             break;
                         case '\n':case '\r':case '\t':
 						{
 							string_buffer_.append(sb, s - sb);
-							index_ += (s - sb);
-							column_ += (s - sb);
+							index_ += (s - sb + 1);
+							column_ += (s - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_text_error_category()), *this);
                             string_buffer_.push_back(*s);
 							done = true;
@@ -727,7 +741,8 @@ public:
 							column_ += (s - sb + 1);
                             prev_char_ = *s;
                             state_ = states::escape;
-                            goto repeat_state;
+                            //goto repeat_state;
+                            done = true;
                             break;
                         case '\"':
 							string_buffer_.append(sb,s-sb);
@@ -735,7 +750,8 @@ public:
                             index_ += (s - sb + 1);
                             column_ += (s - sb + 1);
                             prev_char_ = *s;
-							goto repeat_state;
+							//goto repeat_state;
+                            done = true;
 							break;
                         }
 						++s;
@@ -743,8 +759,8 @@ public:
                     if (!done)
                     {
                         string_buffer_.append(sb,s-sb);
-                        index_ += (s - sb);
-                        column_ += (s - sb);
+                        index_ += (s - sb + 1);
+                        column_ += (s - sb + 1);
                         curr_char_ = *s;
                     }
                 }
@@ -753,24 +769,32 @@ public:
                 {
                     escape_next_char(curr_char_);
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u1: 
                 {
                     append_codepoint(curr_char_);
                     state_ = states::u2;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u2: 
                 {
                     append_codepoint(curr_char_);
                     state_ = states::u3;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u3: 
                 {
                     append_codepoint(curr_char_);
                     state_ = states::u4;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u4: 
                 {
@@ -785,6 +809,8 @@ public:
                         state_ = states::string;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::expect_surrogate_pair1: 
                 {
@@ -799,6 +825,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::expect_surrogate_pair2: 
                 {
@@ -812,24 +840,32 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u6:
                 {
                     append_second_codepoint(curr_char_);
                     state_ = states::u7;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u7: 
                 {
                     append_second_codepoint(curr_char_);
                     state_ = states::u8;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u8: 
                 {
                     append_second_codepoint(curr_char_);
                     state_ = states::u9;
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::u9: 
 				{
@@ -838,6 +874,8 @@ public:
                     json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
                     state_ = states::string;
 				}
+                ++index_;
+                ++column_;
                 break;
             case states::minus:  
                 {
@@ -856,6 +894,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::zero:  
                 {
@@ -914,6 +954,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::integer: 
                 {
@@ -978,6 +1020,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::fraction: 
                 {
@@ -1038,6 +1082,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::exp1: 
                 {
@@ -1060,6 +1106,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::exp2:  
                 {
@@ -1075,6 +1123,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::exp3: 
                 {
@@ -1131,6 +1181,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::t: 
                 {
@@ -1144,6 +1196,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::tr: 
                 {
@@ -1157,6 +1211,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::tru:  
                 {
@@ -1180,6 +1236,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::f:  
                 {
@@ -1193,6 +1251,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::fa: 
                 {
@@ -1206,6 +1266,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::fal:  
                 {
@@ -1219,6 +1281,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::fals:  
                 {
@@ -1242,6 +1306,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::n: 
                 {
@@ -1255,6 +1321,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::nu:  
                 {
@@ -1268,6 +1336,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::nul:  
                 {
@@ -1291,6 +1361,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::slash: 
                 {
@@ -1307,6 +1379,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::slash_star:  
                 {
@@ -1317,6 +1391,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::slash_slash: 
                 {
@@ -1328,6 +1404,8 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             case states::slash_star_star: 
                 {
@@ -1341,8 +1419,12 @@ public:
                         break;
                     }
                 }
+                ++index_;
+                ++column_;
                 break;
             default:
+                ++index_;
+                ++column_;
                 break;
             }
             switch (curr_char_)
@@ -1359,12 +1441,11 @@ public:
                 column_ = 1;
                 break;
             default:
-                ++column_;
+                //++column_;
                 break;
             }
             prev_char_ = curr_char_;
-            ++index_;
-repeat_state:
+//repeat_state:
 			;
         }
 	}
