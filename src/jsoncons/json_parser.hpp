@@ -209,7 +209,7 @@ public:
         Char const * p = input + start;
 
         index_ = start;
-        while (/*(index_ < length) &*/ (p < end_input) & (state_ != states::done))
+        while ((p < end_input) & (state_ != states::done))
         {
             curr_char_ = *p;
             switch (curr_char_)
@@ -227,7 +227,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                        case '\n':case '\r':
+                            break;
+                        case ' ':case '\t':
+    					{
+    						bool done = false;
+    						while (!done && (p + 1) < end_input)
+    						{
+    							switch (*(p + 1))
+    							{
+    							case ' ':case '\t':
+    								++p;
+    								++index_;
+    								++column_;
+    								break;
+    							default:
+    								done = true;
+    								break;
+    							}
+    						}
+    					}
                         break; 
                     case '{':
                         handler_->begin_json();
@@ -309,7 +328,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break; 
                     case '}':
                         if (peek() == modes::object_member_value)
@@ -386,7 +424,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case '}':
                         if (!pop(modes::object_member_name))
@@ -427,7 +484,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case '\"':
                         state_ = states::string;
@@ -455,7 +531,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case ':':
                         begin_member_value();
@@ -478,7 +573,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case '{':
                         if (!push(modes::object_member_name))
@@ -518,9 +632,9 @@ public:
                         break;
                     case 'f':
                         state_ = states::f;
-                        if ((index_+4) < length)
+                        if ((p+4) < end_input)
                         {
-                            if ((input[index_+1] == 'a') & (input[index_+2] == 'l') & (input[index_+3] == 's') & (input[index_+4] == 'e'))
+                            if ((*(p+1) == 'a') & (*(p+2) == 'l') & (*(p+3) == 's') & (*(p+4) == 'e'))
                             {
                                 p += 4;
                                 index_ += 4;
@@ -541,9 +655,9 @@ public:
                         break;
                     case 'n':
                         state_ = states::n;
-                        if ((index_+3) < length)
+                        if ((p+3) < end_input)
                         {
-                            if ((input[index_+1] == 'u') & (input[index_+2] == 'l') & (input[index_+3] == 'l'))
+                            if ((*(p+1) == 'u') & (*(p+2) == 'l') & (*(p+3) == 'l'))
                             {
                                 p += 3;
                                 index_ += 3;
@@ -564,9 +678,9 @@ public:
                         break;
                     case 't':
                         state_ = states::t;
-                        if ((index_+3) < length)
+                        if ((p+3) < end_input)
                         {
-                            if ((input[index_+1] == 'r') & (input[index_+2] == 'u') & (input[index_+3] == 'e'))
+                            if ((*(p+1) == 'r') & (*(p+2) == 'u') & (*(p+3) == 'e'))
                             {
                                 p += 3;
                                 index_ += 3;
@@ -611,7 +725,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case '{':
                         if (!push(modes::object_member_name))
@@ -666,9 +799,9 @@ public:
                         break;
                     case 'f':
                         state_ = states::f;
-                        if ((index_+4) < length)
+                        if ((p+4) < end_input)
                         {
-                            if ((input[index_+1] == 'a') & (input[index_+2] == 'l') & (input[index_+3] == 's') & (input[index_+4] == 'e'))
+                            if ((*(p+1) == 'a') & (*(p+2) == 'l') & (*(p+3) == 's') & (*(p+4) == 'e'))
                             {
                                 p += 4;
                                 index_ += 4;
@@ -689,9 +822,9 @@ public:
                         break;
                     case 'n':
                         state_ = states::n;
-                        if ((index_+3) < length)
+                        if ((p+3) < end_input)
                         {
-                            if ((input[index_+1] == 'u') & (input[index_+2] == 'l') & (input[index_+3] == 'l'))
+                            if ((*(p+1) == 'u') & (*(p+2) == 'l') & (*(p+3) == 'l'))
                             {
                                 p += 3;
                                 index_ += 3;
@@ -712,9 +845,9 @@ public:
                         break;
                     case 't':
                         state_ = states::t;
-                        if ((index_+3) < length)
+                        if ((p+3) < end_input)
                         {
-                            if ((input[index_+1] == 'r') & (input[index_+2] == 'u') & (input[index_+3] == 'e'))
+                            if ((*(p+1) == 'r') & (*(p+2) == 'u') & (*(p+3) == 'e'))
                             {
                                 p += 3;
                                 index_ += 3;
@@ -760,6 +893,7 @@ public:
 							index_ += (p - sb + 1);
 							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
+                            // recovery - skip
                             done = true;
                             break;
                         case '\n':case '\r':case '\t':
@@ -768,6 +902,7 @@ public:
 							index_ += (p - sb + 1);
 							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
+                            // recovery - keep
                             string_buffer_.push_back(*p);
 							done = true;
 						}
@@ -948,7 +1083,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         end_integer_value();
                         break; // No change
                     case '}':
@@ -1009,7 +1163,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         end_integer_value();
                         break; 
                     case '}':
@@ -1076,7 +1249,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         end_fraction_value();
                         break; 
                     case '}':
@@ -1182,7 +1374,26 @@ public:
                 {
                     switch (curr_char_)
                     {
-                    case ' ':case '\n':case '\r':case '\t':
+                    case '\n':case '\r':
+                        break;
+                    case ' ':case '\t':
+                        {
+                            bool done = false;
+                            while (!done && (p + 1) < end_input)
+                            {
+                                switch (*(p + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p;
+                                    ++index_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         end_fraction_value();
                         break; 
                     case '}':
