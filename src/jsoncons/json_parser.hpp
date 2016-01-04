@@ -206,10 +206,11 @@ public:
     void parse(Char const * const input, size_t start, size_t length)
     {
         Char const * const end_input = input + length;
-        Char const * p = input + start;
+        Char const * const begin_input = input + start;
+        Char const * p = begin_input;
 
         index_ = start;
-        while ((p < end_input) & (state_ != states::done))
+        while ((p < end_input) && (state_ != states::done))
         {
             curr_char_ = *p;
             switch (curr_char_)
@@ -238,7 +239,6 @@ public:
     							{
     							case ' ':case '\t':
     								++p;
-    								++index_;
     								++column_;
     								break;
     							default:
@@ -320,7 +320,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
 
@@ -339,7 +338,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -417,7 +415,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::object: 
@@ -435,7 +432,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -477,7 +473,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::expect_member_name: 
@@ -495,7 +490,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -524,7 +518,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::expect_colon: 
@@ -542,7 +535,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -566,7 +558,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::expect_value: 
@@ -584,7 +575,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -637,7 +627,6 @@ public:
                             if ((*(p+1) == 'a') & (*(p+2) == 'l') & (*(p+3) == 's') & (*(p+4) == 'e'))
                             {
                                 p += 4;
-                                index_ += 4;
                                 column_ += 4;
                                 handler_->value(false, *this);
                                 if (peek() == modes::start)
@@ -660,7 +649,6 @@ public:
                             if ((*(p+1) == 'u') & (*(p+2) == 'l') & (*(p+3) == 'l'))
                             {
                                 p += 3;
-                                index_ += 3;
                                 column_ += 3;
                                 handler_->value(null_type(), *this);
                                 if (peek() == modes::start)
@@ -683,7 +671,6 @@ public:
                             if ((*(p+1) == 'r') & (*(p+2) == 'u') & (*(p+3) == 'e'))
                             {
                                 p += 3;
-                                index_ += 3;
                                 column_ += 3;
                                 handler_->value(true, *this);
                                 if (peek() == modes::start)
@@ -718,7 +705,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::array: 
@@ -736,7 +722,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -804,7 +789,6 @@ public:
                             if ((*(p+1) == 'a') & (*(p+2) == 'l') & (*(p+3) == 's') & (*(p+4) == 'e'))
                             {
                                 p += 4;
-                                index_ += 4;
                                 column_ += 4;
                                 handler_->value(false, *this);
                                 if (peek() == modes::start)
@@ -827,7 +811,6 @@ public:
                             if ((*(p+1) == 'u') & (*(p+2) == 'l') & (*(p+3) == 'l'))
                             {
                                 p += 3;
-                                index_ += 3;
                                 column_ += 3;
                                 handler_->value(null_type(), *this);
                                 if (peek() == modes::start)
@@ -850,7 +833,6 @@ public:
                             if ((*(p+1) == 'r') & (*(p+2) == 'u') & (*(p+3) == 'e'))
                             {
                                 p += 3;
-                                index_ += 3;
                                 column_ += 3;
                                 handler_->value(true, *this);
                                 if (peek() == modes::start)
@@ -875,7 +857,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::string: 
@@ -890,7 +871,6 @@ public:
                         case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
                         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                             string_buffer_.append(sb,p-sb);
-							index_ += (p - sb + 1);
 							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
                             // recovery - skip
@@ -899,7 +879,6 @@ public:
                         case '\n':case '\r':case '\t':
 						{
 							string_buffer_.append(sb, p - sb);
-							index_ += (p - sb + 1);
 							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                             // recovery - keep
@@ -909,16 +888,22 @@ public:
                             break;
                         case '\\': 
 							string_buffer_.append(sb,p-sb);
-                            index_ += (p - sb + 1);
 							column_ += (p - sb + 1);
                             prev_char_ = *p;
                             state_ = states::escape;
                             done = true;
                             break;
                         case '\"':
-							string_buffer_.append(sb,p-sb);
-                            end_string_value();
-                            index_ += (p - sb + 1);
+                            if (string_buffer_.length() == 0)
+                            {
+                                end_string_value(sb,p-sb);
+                            }
+                            else
+                            {
+                                string_buffer_.append(sb,p-sb);
+                                end_string_value(string_buffer_.c_str(),string_buffer_.length());
+                                string_buffer_.clear();
+                            }
                             column_ += (p - sb + 1);
                             prev_char_ = *p;
                             done = true;
@@ -929,7 +914,6 @@ public:
                     if (!done)
                     {
                         string_buffer_.append(sb,p-sb);
-                        index_ += (p - sb + 1);
                         column_ += (p - sb + 1);
                         curr_char_ = *p;
                     }
@@ -940,7 +924,6 @@ public:
                     escape_next_char(curr_char_);
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u1: 
@@ -949,7 +932,6 @@ public:
                     state_ = states::u2;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u2: 
@@ -958,7 +940,6 @@ public:
                     state_ = states::u3;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u3: 
@@ -967,7 +948,6 @@ public:
                     state_ = states::u4;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u4: 
@@ -984,7 +964,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::expect_surrogate_pair1: 
@@ -1001,7 +980,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::expect_surrogate_pair2: 
@@ -1017,7 +995,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u6:
@@ -1026,7 +1003,6 @@ public:
                     state_ = states::u7;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u7: 
@@ -1035,7 +1011,6 @@ public:
                     state_ = states::u8;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u8: 
@@ -1044,7 +1019,6 @@ public:
                     state_ = states::u9;
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::u9: 
@@ -1055,7 +1029,6 @@ public:
                     state_ = states::string;
 				}
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::minus:  
@@ -1076,7 +1049,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::zero:  
@@ -1094,7 +1066,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -1156,7 +1127,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::integer: 
@@ -1174,7 +1144,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -1242,7 +1211,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::fraction: 
@@ -1260,7 +1228,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -1324,7 +1291,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::exp1: 
@@ -1349,7 +1315,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::exp2:  
@@ -1367,7 +1332,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::exp3: 
@@ -1385,7 +1349,6 @@ public:
                                 {
                                 case ' ':case '\t':
                                     ++p;
-                                    ++index_;
                                     ++column_;
                                     break;
                                 default:
@@ -1445,7 +1408,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::t: 
@@ -1461,7 +1423,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::tr: 
@@ -1477,7 +1438,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::tru:  
@@ -1503,7 +1463,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::f:  
@@ -1519,7 +1478,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::fa: 
@@ -1535,7 +1493,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::fal:  
@@ -1551,7 +1508,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::fals:  
@@ -1577,7 +1533,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::n: 
@@ -1593,7 +1548,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::nu:  
@@ -1609,7 +1563,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::nul:  
@@ -1635,7 +1588,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::slash: 
@@ -1654,7 +1606,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::slash_star:  
@@ -1667,7 +1618,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::slash_slash: 
@@ -1681,7 +1631,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             case states::slash_star_star: 
@@ -1697,7 +1646,6 @@ public:
                     }
                 }
                 ++p;
-                ++index_;
                 ++column_;
                 break;
             default:
@@ -1722,6 +1670,7 @@ public:
             }
             prev_char_ = curr_char_;
         }
+        index_ += (p-begin_input);
 	}
 
     void end_parse()
@@ -1932,21 +1881,21 @@ private:
         }
     }
 
-    void end_string_value() 
+    void end_string_value(Char const * p, size_t length) 
     {
         switch (stack_[top_])
         {
         case modes::object_member_name:
-            handler_->name(string_buffer_.c_str(), string_buffer_.length(), *this);
+            handler_->name(p, length, *this);
             state_ = states::expect_colon;
             break;
         case modes::array_element:
         case modes::object_member_value:
-            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+            handler_->value(p, length, *this);
             state_ = states::expect_comma_or_end;
             break;
         case modes::start:
-            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+            handler_->value(p, length, *this);
             flip(modes::start,modes::done);
             state_ = states::done;
             handler_->end_json();
@@ -1955,7 +1904,6 @@ private:
             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
             break;
         }
-        string_buffer_.clear();
     }
 
     void begin_member_or_element() 
