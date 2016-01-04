@@ -203,13 +203,15 @@ public:
         }
     }
 
-    void parse(Char const * const  p, size_t start, size_t length)
+    void parse(Char const * const input, size_t start, size_t length)
     {
-        Char const * const pe = p + length;
+        Char const * const end_input = input + length;
+        Char const * p = input + start;
+
         index_ = start;
-        while ((index_ < length) & (state_ != states::done))
+        while (/*(index_ < length) &*/ (p < end_input) & (state_ != states::done))
         {
-            curr_char_ = p[index_];
+            curr_char_ = *p;
             switch (curr_char_)
             {
             case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
@@ -298,6 +300,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -375,6 +378,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -415,6 +419,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -442,6 +447,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -464,6 +470,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -513,8 +520,9 @@ public:
                         state_ = states::f;
                         if ((index_+4) < length)
                         {
-                            if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
+                            if ((input[index_+1] == 'a') & (input[index_+2] == 'l') & (input[index_+3] == 's') & (input[index_+4] == 'e'))
                             {
+                                p += 4;
                                 index_ += 4;
                                 column_ += 4;
                                 handler_->value(false, *this);
@@ -535,8 +543,9 @@ public:
                         state_ = states::n;
                         if ((index_+3) < length)
                         {
-                            if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
+                            if ((input[index_+1] == 'u') & (input[index_+2] == 'l') & (input[index_+3] == 'l'))
                             {
+                                p += 3;
                                 index_ += 3;
                                 column_ += 3;
                                 handler_->value(null_type(), *this);
@@ -557,8 +566,9 @@ public:
                         state_ = states::t;
                         if ((index_+3) < length)
                         {
-                            if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
+                            if ((input[index_+1] == 'r') & (input[index_+2] == 'u') & (input[index_+3] == 'e'))
                             {
+                                p += 3;
                                 index_ += 3;
                                 column_ += 3;
                                 handler_->value(true, *this);
@@ -593,6 +603,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -657,8 +668,9 @@ public:
                         state_ = states::f;
                         if ((index_+4) < length)
                         {
-                            if ((p[index_+1] == 'a') & (p[index_+2] == 'l') & (p[index_+3] == 's') & (p[index_+4] == 'e'))
+                            if ((input[index_+1] == 'a') & (input[index_+2] == 'l') & (input[index_+3] == 's') & (input[index_+4] == 'e'))
                             {
+                                p += 4;
                                 index_ += 4;
                                 column_ += 4;
                                 handler_->value(false, *this);
@@ -679,8 +691,9 @@ public:
                         state_ = states::n;
                         if ((index_+3) < length)
                         {
-                            if ((p[index_+1] == 'u') & (p[index_+2] == 'l') & (p[index_+3] == 'l'))
+                            if ((input[index_+1] == 'u') & (input[index_+2] == 'l') & (input[index_+3] == 'l'))
                             {
+                                p += 3;
                                 index_ += 3;
                                 column_ += 3;
                                 handler_->value(null_type(), *this);
@@ -701,8 +714,9 @@ public:
                         state_ = states::t;
                         if ((index_+3) < length)
                         {
-                            if ((p[index_+1] == 'r') & (p[index_+2] == 'u') & (p[index_+3] == 'e'))
+                            if ((input[index_+1] == 'r') & (input[index_+2] == 'u') & (input[index_+3] == 'e'))
                             {
+                                p += 3;
                                 index_ += 3;
                                 column_ += 3;
                                 handler_->value(true, *this);
@@ -727,15 +741,16 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
             case states::string: 
                 {
-                    Char const * sb = p+index_;
+                    Char const * sb = p;
                     Char const * s = sb;
                     bool done = false;
-                    while (!done && s < pe)
+                    while (!done && s < end_input)
                     {
                         switch (*s)
                         {
@@ -743,6 +758,7 @@ public:
                         case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
                         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                             string_buffer_.append(sb,s-sb);
+                            p += (s - sb + 1);
 							index_ += (s - sb + 1);
 							column_ += (s - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
@@ -751,6 +767,7 @@ public:
                         case '\n':case '\r':case '\t':
 						{
 							string_buffer_.append(sb, s - sb);
+                            p += (s - sb + 1);
 							index_ += (s - sb + 1);
 							column_ += (s - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
@@ -760,6 +777,7 @@ public:
                             break;
                         case '\\': 
 							string_buffer_.append(sb,s-sb);
+                            p += (s - sb + 1);
                             index_ += (s - sb + 1);
 							column_ += (s - sb + 1);
                             prev_char_ = *s;
@@ -770,6 +788,7 @@ public:
                         case '\"':
 							string_buffer_.append(sb,s-sb);
                             end_string_value();
+                            p += (s - sb + 1);
                             index_ += (s - sb + 1);
                             column_ += (s - sb + 1);
                             prev_char_ = *s;
@@ -782,6 +801,7 @@ public:
                     if (!done)
                     {
                         string_buffer_.append(sb,s-sb);
+                        p += (s - sb + 1);
                         index_ += (s - sb + 1);
                         column_ += (s - sb + 1);
                         curr_char_ = *s;
@@ -792,6 +812,7 @@ public:
                 {
                     escape_next_char(curr_char_);
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -800,6 +821,7 @@ public:
                     append_codepoint(curr_char_);
                     state_ = states::u2;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -808,6 +830,7 @@ public:
                     append_codepoint(curr_char_);
                     state_ = states::u3;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -816,6 +839,7 @@ public:
                     append_codepoint(curr_char_);
                     state_ = states::u4;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -832,6 +856,7 @@ public:
                         state_ = states::string;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -848,6 +873,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -863,6 +889,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -871,6 +898,7 @@ public:
                     append_second_codepoint(curr_char_);
                     state_ = states::u7;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -879,6 +907,7 @@ public:
                     append_second_codepoint(curr_char_);
                     state_ = states::u8;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -887,6 +916,7 @@ public:
                     append_second_codepoint(curr_char_);
                     state_ = states::u9;
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -897,6 +927,7 @@ public:
                     json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
                     state_ = states::string;
 				}
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -917,6 +948,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -977,6 +1009,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1043,6 +1076,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1105,6 +1139,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1129,6 +1164,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1146,6 +1182,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1204,6 +1241,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1219,6 +1257,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1234,6 +1273,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1259,6 +1299,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1274,6 +1315,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1289,6 +1331,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1304,6 +1347,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1329,6 +1373,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1344,6 +1389,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1359,6 +1405,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1384,6 +1431,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1402,6 +1450,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1414,6 +1463,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1427,6 +1477,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
@@ -1442,6 +1493,7 @@ public:
                         break;
                     }
                 }
+                ++p;
                 ++index_;
                 ++column_;
                 break;
