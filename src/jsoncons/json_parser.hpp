@@ -748,63 +748,55 @@ public:
             case states::string: 
                 {
                     Char const * sb = p;
-                    Char const * s = sb;
                     bool done = false;
-                    while (!done && s < end_input)
+                    while (!done && p < end_input)
                     {
-                        switch (*s)
+                        switch (*p)
                         {
                         case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
                         case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
                         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                            string_buffer_.append(sb,s-sb);
-                            p += (s - sb + 1);
-							index_ += (s - sb + 1);
-							column_ += (s - sb + 1);
+                            string_buffer_.append(sb,p-sb);
+							index_ += (p - sb + 1);
+							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
                             done = true;
                             break;
                         case '\n':case '\r':case '\t':
 						{
-							string_buffer_.append(sb, s - sb);
-                            p += (s - sb + 1);
-							index_ += (s - sb + 1);
-							column_ += (s - sb + 1);
+							string_buffer_.append(sb, p - sb);
+							index_ += (p - sb + 1);
+							column_ += (p - sb + 1);
 							err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
-                            string_buffer_.push_back(*s);
+                            string_buffer_.push_back(*p);
 							done = true;
 						}
                             break;
                         case '\\': 
-							string_buffer_.append(sb,s-sb);
-                            p += (s - sb + 1);
-                            index_ += (s - sb + 1);
-							column_ += (s - sb + 1);
-                            prev_char_ = *s;
+							string_buffer_.append(sb,p-sb);
+                            index_ += (p - sb + 1);
+							column_ += (p - sb + 1);
+                            prev_char_ = *p;
                             state_ = states::escape;
-                            //goto repeat_state;
                             done = true;
                             break;
                         case '\"':
-							string_buffer_.append(sb,s-sb);
+							string_buffer_.append(sb,p-sb);
                             end_string_value();
-                            p += (s - sb + 1);
-                            index_ += (s - sb + 1);
-                            column_ += (s - sb + 1);
-                            prev_char_ = *s;
-							//goto repeat_state;
+                            index_ += (p - sb + 1);
+                            column_ += (p - sb + 1);
+                            prev_char_ = *p;
                             done = true;
 							break;
                         }
-						++s;
+                        ++p;
                     }
                     if (!done)
                     {
-                        string_buffer_.append(sb,s-sb);
-                        p += (s - sb + 1);
-                        index_ += (s - sb + 1);
-                        column_ += (s - sb + 1);
-                        curr_char_ = *s;
+                        string_buffer_.append(sb,p-sb);
+                        index_ += (p - sb + 1);
+                        column_ += (p - sb + 1);
+                        curr_char_ = *p;
                     }
                 }
                 break;
