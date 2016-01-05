@@ -37,7 +37,6 @@ namespace json_parser_errc
     const int expected_comma_or_right_bracket = 19;
     const int unexpected_right_bracket = 20;
     const int unexpected_right_brace = 21;
-    const int bad_state = 22;
 }
 
 class json_error_category_impl
@@ -96,8 +95,6 @@ public:
             return "Unexpected right brace '}'";
         case json_parser_errc::unexpected_right_bracket:
             return "Unexpected right bracket ']'";
-        case json_parser_errc::bad_state:
-            return "Bad parse state";
         default:
             return "Unknown JSON parser error";
         }

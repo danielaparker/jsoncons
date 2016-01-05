@@ -32,7 +32,7 @@ constant                            |Description
 `expected_comma_or_right_bracket`          |Expected comma or right bracket '}'       
 `unexpected_right_brace`          |Unexpected right brace '}'       
 `unexpected_right_bracket`           |Unexpected right bracket ']'        
-`bad_state`           |Bad parse state        
+
 
 
 

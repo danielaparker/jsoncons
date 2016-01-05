@@ -788,12 +788,10 @@ template<typename Char, typename Alloc>
 template<typename T>
 void basic_json<Char, Alloc>::resize(size_t n, T val)
 {
-    basic_json<Char, Alloc> j;
-    j = val;
     switch (var_.type_)
     {
     case value_types::array_t:
-        var_.value_.array_->resize(n, j);
+        var_.value_.array_->resize(n, val);
         break;
     }
 }
