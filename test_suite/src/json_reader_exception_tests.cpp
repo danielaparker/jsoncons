@@ -46,13 +46,12 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     {
         json_reader reader(is,handler);
         reader.read_next();
-        BOOST_CHECK(0 != 0);
     }
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(json_parser_errc::expected_comma_or_right_bracket,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(), 14);
-        BOOST_CHECK_EQUAL(e.column_number(), 30);
+        BOOST_CHECK_EQUAL(14,e.line_number());
+        BOOST_CHECK_EQUAL(30,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -72,8 +71,8 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(json_parser_errc::expected_comma_or_right_brace,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),17);
-        BOOST_CHECK_EQUAL(e.column_number(), 9);
+        BOOST_CHECK_EQUAL(17,e.line_number());
+        BOOST_CHECK_EQUAL(9, e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -92,8 +91,8 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 5);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(5,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -113,8 +112,8 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 5);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(5,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -134,8 +133,8 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 5);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(5,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -155,8 +154,8 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 6);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(6,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -176,8 +175,8 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 5);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(5,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -216,8 +215,8 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 7);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(7,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -236,8 +235,8 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),1);
-        BOOST_CHECK_EQUAL(e.column_number(), 6);
+        BOOST_CHECK_EQUAL(1,e.line_number());
+        BOOST_CHECK_EQUAL(6,e.column_number());
     }
     BOOST_CHECK_EQUAL(false,handler.is_valid());
 }
@@ -253,8 +252,8 @@ BOOST_AUTO_TEST_CASE(test_exception)
     catch (const json_parse_exception& e)
     {
         BOOST_CHECK_EQUAL(json_parser_errc::unexpected_eof,e.code().value());
-        BOOST_CHECK_EQUAL(e.line_number(),2);
-        BOOST_CHECK_EQUAL(e.column_number(), 9);
+        BOOST_CHECK_EQUAL(2,e.line_number());
+        BOOST_CHECK_EQUAL(9,e.column_number());
     }
 }
 
