@@ -8,3 +8,4 @@ test_suite/build/vs2015/x64/Debug
 test_suite/build/vs2015/x64
 
 src/jsoncons/json1f.hpp
+examples/build/vs2010sp1/Debug/
