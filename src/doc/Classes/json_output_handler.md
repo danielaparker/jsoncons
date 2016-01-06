@@ -41,10 +41,10 @@ Send a null terminated string event.
 Output character data event. Uses `do_string_value`.
 
     void value(long long value)
-Output signed integer event. Uses `do_longlong_value`.
+Output signed integer event. Uses `do_integer_value`.
 
     void value(unsigned long long value)
-Output non-negative integer event. Uses `do_ulonglong_value`.
+Output non-negative integer event. Uses `do_unsigned_integer_value`.
 
     void value(double value)
 Output floating point value event. Uses `do_double_value`.
@@ -78,10 +78,10 @@ Receive name event for name-value pair
     virtual void do_string_value(const char* p, size_t length)
 Receive character data event
 
-    virtual void do_longlong_value(long long value)
+    virtual void do_integer_value(int64_t value)
 Receive signed integer value event
 
-    virtual void do_ulonglong_value(unsigned long long value)
+    virtual void do_unsigned_integer_value(uint64_t value)
 Receive non-negative integer value event
 
     virtual void do_double_value(double value)

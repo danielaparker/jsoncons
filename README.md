@@ -29,6 +29,9 @@ The library has a number of features, which are listed below:
 
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
 
+- The json internal representation of signed and unsigned integers has been changed from `long long` and `unsigned long long` to `int64_t` and `uint64_t`.
+  This should not impact you unless you've implemented your own `json_input_handler` or `json_output_handler`, refer to the Changelog for more details.
+
 ## Using the jsoncons library
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.

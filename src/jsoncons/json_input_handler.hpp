@@ -79,32 +79,32 @@ public:
 
     void value(int value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(long value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(long long value, const basic_parsing_context<Char>& context) 
     {
-        do_longlong_value(value,context);
+        do_integer_value(value,context);
     }
 
     void value(unsigned int value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(unsigned long value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(unsigned long long value, const basic_parsing_context<Char>& context) 
     {
-        do_ulonglong_value(value,context);
+        do_unsigned_integer_value(value,context);
     }
 
     void value(float value, const basic_parsing_context<Char>& context)
@@ -148,9 +148,9 @@ private:
 
     virtual void do_double_value(double value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_longlong_value(long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_integer_value(int64_t value, const basic_parsing_context<Char>& context) = 0;
 
-    virtual void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>& context) = 0;
+    virtual void do_unsigned_integer_value(uint64_t value, const basic_parsing_context<Char>& context) = 0;
 
     virtual void do_bool_value(bool value, const basic_parsing_context<Char>& context) = 0;
 };
@@ -206,11 +206,11 @@ private:
     {
     }
 
-    void do_longlong_value(long long, const basic_parsing_context<Char>&) override
+    void do_integer_value(long long, const basic_parsing_context<Char>&) override
     {
     }
 
-    void do_ulonglong_value(unsigned long long, const basic_parsing_context<Char>&) override
+    void do_unsigned_integer_value(unsigned long long, const basic_parsing_context<Char>&) override
     {
     }
 

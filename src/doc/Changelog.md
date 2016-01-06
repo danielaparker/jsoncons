@@ -1,3 +1,28 @@
+master
+------
+
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
+
+- The json internal representation of signed and unsigned integers has been changed from `long long` and `unsigned long long` to `int64_t` and `uint64_t`. This should not impact you unless you've implemented your own `json_input_handler` or `json_output_handler`, in which case you'll need to change your `json_input_handler` function signatures
+ 
+    void do_longlong_value(long long value, const basic_parsing_context<Char>& context) override
+    void do_ulonglong_integer_value(unsigned long long value, const basic_parsing_context<Char>& context) override
+
+to
+
+    void do_integer_value(int64_t value, const basic_parsing_context<Char>& context) override
+    void do_unsigned_integer_value(uint64_t value, const basic_parsing_context<Char>& context) override
+  
+and your `json_output_handler` function signatures from     
+
+    void do_longlong_value(long long value) override
+    void do_ulonglong_integer_value(unsigned long long value) override
+
+to
+
+    void do_integer_value(int64_t value) override
+    void do_unsigned_integer_value(uint64_t value) override
+
 0.98.2 Release
 --------------
 
@@ -119,7 +144,7 @@ Breaking changes:
 
 - Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
-- The virtual methods `do_double_value`, `do_longlong_value` and `do_ulonglong_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
+- The virtual methods `do_double_value`, `do_integer_value` and `do_unsigned_integer_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_type`.
   The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)
 

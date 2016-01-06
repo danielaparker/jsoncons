@@ -243,7 +243,7 @@ public:
             ::operator delete(reinterpret_cast<void*>(p));
         }
 
-        static const size_t small_string_capacity = (sizeof(long long)/sizeof(Char)) - 1;
+        static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(Char)) - 1;
 
         variant()
             : type_(value_types::empty_object_t)
@@ -270,10 +270,10 @@ public:
                 value_.float_value_ = var.value_.float_value_;
                 break;
             case value_types::integer_t:
-                value_.si_value_ = var.value_.si_value_;
+                value_.integer_value_ = var.value_.integer_value_;
                 break;
             case value_types::unsigned_integer_t:
-                value_.ui_value_ = var.value_.ui_value_;
+                value_.unsigned_integer_value_ = var.value_.unsigned_integer_value_;
                 break;
             case value_types::bool_t:
                 value_.bool_value_ = var.value_.bool_value_;
@@ -385,16 +385,16 @@ public:
             value_.float_value_ = val;
         }
 
-        explicit variant(long long val)
+        explicit variant(int64_t val)
             : type_(value_types::integer_t)
         {
-            value_.si_value_ = val;
+            value_.integer_value_ = val;
         }
 
-        explicit variant(unsigned long long val)
+        explicit variant(uint64_t val)
             : type_(value_types::unsigned_integer_t)
         {
-            value_.ui_value_ = val;
+            value_.unsigned_integer_value_ = val;
         }
 
         explicit variant(const std::basic_string<Char>& s)
@@ -651,7 +651,7 @@ public:
             }
         }
 
-        void assign(long long val)
+        void assign(int64_t val)
         {
             switch (type_)
             {
@@ -663,7 +663,7 @@ public:
             case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::integer_t;
-                value_.si_value_ = val;
+                value_.integer_value_ = val;
                 break;
             default:
                 variant(val).swap(*this);
@@ -671,7 +671,7 @@ public:
             }
         }
 
-        void assign(unsigned long long val)
+        void assign(uint64_t val)
         {
             switch (type_)
             {
@@ -683,7 +683,7 @@ public:
             case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::unsigned_integer_t;
-                value_.ui_value_ = val;
+                value_.unsigned_integer_value_ = val;
                 break;
             default:
                 variant(val).swap(*this);
@@ -785,31 +785,31 @@ public:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.si_value_ == rhs.value_.si_value_;
+                        return value_.integer_value_ == rhs.value_.integer_value_;
                     case value_types::unsigned_integer_t:
-                        return value_.si_value_ == rhs.value_.ui_value_;
+                        return value_.integer_value_ == rhs.value_.unsigned_integer_value_;
                     case value_types::double_t:
-                        return value_.si_value_ == rhs.value_.float_value_;
+                        return value_.integer_value_ == rhs.value_.float_value_;
                     }
                     break;
                 case value_types::unsigned_integer_t:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.ui_value_ == rhs.value_.si_value_;
+                        return value_.unsigned_integer_value_ == rhs.value_.integer_value_;
                     case value_types::unsigned_integer_t:
-                        return value_.ui_value_ == rhs.value_.ui_value_;
+                        return value_.unsigned_integer_value_ == rhs.value_.unsigned_integer_value_;
                     case value_types::double_t:
-                        return value_.ui_value_ == rhs.value_.float_value_;
+                        return value_.unsigned_integer_value_ == rhs.value_.float_value_;
                     }
                     break;
                 case value_types::double_t:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.float_value_ == rhs.value_.si_value_;
+                        return value_.float_value_ == rhs.value_.integer_value_;
                     case value_types::unsigned_integer_t:
-                        return value_.float_value_ == rhs.value_.ui_value_;
+                        return value_.float_value_ == rhs.value_.unsigned_integer_value_;
                     case value_types::double_t:
                         return value_.float_value_ == rhs.value_.float_value_;
                     }
@@ -900,14 +900,14 @@ public:
         union
         {
             double float_value_;
-            long long si_value_;
-            unsigned long long ui_value_;
+            int64_t integer_value_;
+            uint64_t unsigned_integer_value_;
             bool bool_value_;
             json_object<Char,Alloc>* object_;
             json_array<Char,Alloc>* array_;
             any* any_value_;
             string_data* string_value_;
-            Char small_string_value_[sizeof(long long)/sizeof(Char)];
+            Char small_string_value_[sizeof(int64_t)/sizeof(Char)];
         } value_;
     };
 
@@ -1982,9 +1982,9 @@ public:
         case value_types::double_t:
             return var_.value_.float_value_ != 0.0;
         case value_types::integer_t:
-            return var_.value_.si_value_ != 0;
+            return var_.value_.integer_value_ != 0;
         case value_types::unsigned_integer_t:
-            return var_.value_.ui_value_ != 0;
+            return var_.value_.unsigned_integer_value_ != 0;
         case value_types::small_string_t:
             return var_.small_string_length_ != 0;
         case value_types::string_t:

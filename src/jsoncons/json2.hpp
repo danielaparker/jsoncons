@@ -360,10 +360,10 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
         handler.value(var_.value_.float_value_);
         break;
     case value_types::integer_t:
-        handler.value(var_.value_.si_value_);
+        handler.value(var_.value_.integer_value_);
         break;
     case value_types::unsigned_integer_t:
-        handler.value(var_.value_.ui_value_);
+        handler.value(var_.value_.unsigned_integer_value_);
         break;
     case value_types::bool_t:
         handler.value(var_.value_.bool_value_);
@@ -838,9 +838,9 @@ long long basic_json<Char, Alloc>::as_longlong() const
     case value_types::double_t:
         return static_cast<long long>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<long long>(var_.value_.si_value_);
+        return static_cast<long long>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<long long>(var_.value_.ui_value_);
+        return static_cast<long long>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
@@ -856,9 +856,9 @@ unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
     case value_types::double_t:
         return static_cast<unsigned long long>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<unsigned long long>(var_.value_.si_value_);
+        return static_cast<unsigned long long>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<unsigned long long>(var_.value_.ui_value_);
+        return static_cast<unsigned long long>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
@@ -874,9 +874,9 @@ double basic_json<Char, Alloc>::as_double() const
     case value_types::double_t:
         return var_.value_.float_value_;
     case value_types::integer_t:
-        return static_cast<double>(var_.value_.si_value_);
+        return static_cast<double>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<double>(var_.value_.ui_value_);
+        return static_cast<double>(var_.value_.unsigned_integer_value_);
     case value_types::null_t:
         return std::numeric_limits<double>::quiet_NaN();
     default:
@@ -892,9 +892,9 @@ int basic_json<Char, Alloc>::as_int() const
     case value_types::double_t:
         return static_cast<int>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<int>(var_.value_.si_value_);
+        return static_cast<int>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<int>(var_.value_.ui_value_);
+        return static_cast<int>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
@@ -910,9 +910,9 @@ unsigned int basic_json<Char, Alloc>::as_uint() const
     case value_types::double_t:
         return static_cast<unsigned int>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<unsigned int>(var_.value_.si_value_);
+        return static_cast<unsigned int>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<unsigned int>(var_.value_.ui_value_);
+        return static_cast<unsigned int>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
@@ -928,9 +928,9 @@ long basic_json<Char, Alloc>::as_long() const
     case value_types::double_t:
         return static_cast<long>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<long>(var_.value_.si_value_);
+        return static_cast<long>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<long>(var_.value_.ui_value_);
+        return static_cast<long>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
@@ -946,9 +946,9 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
     case value_types::double_t:
         return static_cast<unsigned long>(var_.value_.float_value_);
     case value_types::integer_t:
-        return static_cast<unsigned long>(var_.value_.si_value_);
+        return static_cast<unsigned long>(var_.value_.integer_value_);
     case value_types::unsigned_integer_t:
-        return static_cast<unsigned long>(var_.value_.ui_value_);
+        return static_cast<unsigned long>(var_.value_.unsigned_integer_value_);
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:

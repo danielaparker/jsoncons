@@ -272,7 +272,7 @@ private:
         }
     }
 
-    void do_longlong_value(long long val) override
+    void do_integer_value(long long val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -287,7 +287,7 @@ private:
         }
     }
 
-    void do_ulonglong_value(unsigned long long val) override
+    void do_unsigned_integer_value(unsigned long long val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {

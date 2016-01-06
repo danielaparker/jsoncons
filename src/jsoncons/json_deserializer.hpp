@@ -178,7 +178,7 @@ private:
         }
     }
 
-    void do_longlong_value(long long value, const basic_parsing_context<Char>&) override
+    void do_integer_value(int64_t value, const basic_parsing_context<Char>&) override
     {
         if (top_ == -1)
         {
@@ -194,7 +194,7 @@ private:
         }
     }
 
-    void do_ulonglong_value(unsigned long long value, const basic_parsing_context<Char>&) override
+    void do_unsigned_integer_value(uint64_t value, const basic_parsing_context<Char>&) override
     {
         if (top_ == -1)
         {

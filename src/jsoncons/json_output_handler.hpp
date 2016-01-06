@@ -78,32 +78,32 @@ public:
 
     void value(int value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(long value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(long long value) 
     {
-        do_longlong_value(value);
+        do_integer_value(value);
     }
 
     void value(unsigned int value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(unsigned long value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(unsigned long long value) 
     {
-        do_ulonglong_value(value);
+        do_unsigned_integer_value(value);
     }
 
     void value(double value)
@@ -143,9 +143,9 @@ private:
 
     virtual void do_double_value(double value) = 0;
 
-    virtual void do_longlong_value(long long value) = 0;
+    virtual void do_integer_value(int64_t value) = 0;
 
-    virtual void do_ulonglong_value(unsigned long long value) = 0;
+    virtual void do_unsigned_integer_value(uint64_t value) = 0;
 
     virtual void do_bool_value(bool value) = 0;
 };
@@ -195,11 +195,11 @@ private:
     {
     }
 
-    void do_longlong_value(long long) override
+    void do_integer_value(long long) override
     {
     }
 
-    void do_ulonglong_value(unsigned long long) override
+    void do_unsigned_integer_value(unsigned long long) override
     {
     }
 

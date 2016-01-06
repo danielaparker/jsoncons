@@ -212,7 +212,7 @@ private:
         end_value();
     }
 
-    void do_longlong_value(long long value) override
+    void do_integer_value(int64_t value) override
     {
         begin_value();
 
@@ -223,7 +223,7 @@ private:
         end_value();
     }
 
-    void do_ulonglong_value(unsigned long long value) override
+    void do_unsigned_integer_value(uint64_t value) override
     {
         begin_value();
 
