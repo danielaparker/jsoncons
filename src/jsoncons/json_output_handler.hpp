@@ -9,73 +9,9 @@
 #define JSONCONS_JSON_OUTPUT_HANDLER_HPP
 
 #include <string>
+#include "jsoncons/jsoncons.hpp"
 
 namespace jsoncons {
-
-template <typename Char>
-class buffered_ostream
-{
-    static const size_t default_buffer_length = 16384;
-
-    std::basic_ostream<Char>* os_;
-    std::vector<Char> buffer_;
-    Char * const begin_buffer_;
-	Char const * const end_buffer_;
-    Char* p_;
-public:
-	buffered_ostream(std::basic_ostream<Char>& os)
-		: os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(&buffer_[0]), end_buffer_(&buffer_[0]+default_buffer_length), p_(&buffer_[0])
-	{
-	}
-	~buffered_ostream()
-	{
-		os_->write(begin_buffer_, (p_ - begin_buffer_));
-		os_->flush();
-	}
-
-    void flush()
-    {
-        os_->write(begin_buffer_, (p_ - begin_buffer_));
-        p_ = begin_buffer_;
-        os_->flush();
-    }
-
-	void write(Char const * s, size_t length)
-	{
-		size_t diff = end_buffer_ - p_;
-		if (diff >= length)
-		{
-			std::memcpy(p_, s, length*sizeof(Char));
-			p_ += length;
-		}
-		else
-		{
-			os_->write(begin_buffer_, (p_ - begin_buffer_));
-			os_->write(s, length);
-			p_ = begin_buffer_;
-		}
-	}
-
-    void write(const std::basic_string<Char>& s)
-    {
-        write(s.c_str(),s.length());
-    }
-
-	void put(Char c)
-	{
-		if (p_ < end_buffer_)
-		{
-			*p_++ = c;
-		}
-		else
-		{
-			os_->write(begin_buffer_, (p_-begin_buffer_));
-			p_ = begin_buffer_;
-			*p_++ = c;
-		}
-	}
-
-};
 
 template <typename Char>
 class basic_json_output_handler

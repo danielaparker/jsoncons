@@ -114,6 +114,7 @@ template<typename Char>
 std::basic_string<Char> float_to_string(double val, int precision)
 {
 	std::basic_ostringstream<Char> ss;
+    ss.imbue(std::locale::classic());
     {
         buffered_ostream<Char> os(ss);
         print_float(val, precision, os);
