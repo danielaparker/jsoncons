@@ -68,8 +68,8 @@ namespace value_types
         small_string_t,
         string_t,
         double_t,
-        longlong_t,
-        ulonglong_t,
+        integer_t,
+        unsigned_integer_t,
         bool_t,
         null_t,
         any_t
@@ -269,10 +269,10 @@ public:
             case value_types::double_t:
                 value_.float_value_ = var.value_.float_value_;
                 break;
-            case value_types::longlong_t:
+            case value_types::integer_t:
                 value_.si_value_ = var.value_.si_value_;
                 break;
-            case value_types::ulonglong_t:
+            case value_types::unsigned_integer_t:
                 value_.ui_value_ = var.value_.ui_value_;
                 break;
             case value_types::bool_t:
@@ -335,9 +335,9 @@ public:
                 break;
             case value_types::double_t:
                 break;
-            case value_types::longlong_t:
+            case value_types::integer_t:
                 break;
-            case value_types::ulonglong_t:
+            case value_types::unsigned_integer_t:
                 break;
             case value_types::bool_t:
                 break;
@@ -386,13 +386,13 @@ public:
         }
 
         explicit variant(long long val)
-            : type_(value_types::longlong_t)
+            : type_(value_types::integer_t)
         {
             value_.si_value_ = val;
         }
 
         explicit variant(unsigned long long val)
-            : type_(value_types::ulonglong_t)
+            : type_(value_types::unsigned_integer_t)
         {
             value_.ui_value_ = val;
         }
@@ -505,8 +505,8 @@ public:
                 case value_types::bool_t:
                 case value_types::empty_object_t:
                 case value_types::small_string_t:
-                case value_types::longlong_t:
-                case value_types::ulonglong_t:
+                case value_types::integer_t:
+                case value_types::unsigned_integer_t:
                 case value_types::double_t:
                     switch (val.type_)
                     {
@@ -514,8 +514,8 @@ public:
                     case value_types::bool_t:
                     case value_types::empty_object_t:
                     case value_types::small_string_t:
-                    case value_types::longlong_t:
-                    case value_types::ulonglong_t:
+                    case value_types::integer_t:
+                    case value_types::unsigned_integer_t:
                     case value_types::double_t:
                         type_ = val.type_;
                         small_string_length_ = val.small_string_length_;
@@ -597,8 +597,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
                 if (s.length() > variant::small_string_capacity)
                 {
@@ -627,8 +627,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
 				{
 					if (length > variant::small_string_capacity)
@@ -659,10 +659,10 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
-                type_ = value_types::longlong_t;
+                type_ = value_types::integer_t;
                 value_.si_value_ = val;
                 break;
             default:
@@ -679,10 +679,10 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
-                type_ = value_types::ulonglong_t;
+                type_ = value_types::unsigned_integer_t;
                 value_.ui_value_ = val;
                 break;
             default:
@@ -699,8 +699,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::double_t;
                 value_.float_value_ = val;
@@ -719,8 +719,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::bool_t;
                 value_.bool_value_ = val;
@@ -739,8 +739,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::null_t;
                 break;
@@ -758,8 +758,8 @@ public:
             case value_types::bool_t:
             case value_types::empty_object_t:
             case value_types::small_string_t:
-            case value_types::longlong_t:
-            case value_types::ulonglong_t:
+            case value_types::integer_t:
+            case value_types::unsigned_integer_t:
             case value_types::double_t:
                 type_ = value_types::any_t;
                 value_.any_value_ = new any(rhs);
@@ -781,23 +781,23 @@ public:
             {
                 switch (type_)
                 {
-                case value_types::longlong_t:
+                case value_types::integer_t:
                     switch (rhs.type_)
                     {
-                    case value_types::longlong_t:
+                    case value_types::integer_t:
                         return value_.si_value_ == rhs.value_.si_value_;
-                    case value_types::ulonglong_t:
+                    case value_types::unsigned_integer_t:
                         return value_.si_value_ == rhs.value_.ui_value_;
                     case value_types::double_t:
                         return value_.si_value_ == rhs.value_.float_value_;
                     }
                     break;
-                case value_types::ulonglong_t:
+                case value_types::unsigned_integer_t:
                     switch (rhs.type_)
                     {
-                    case value_types::longlong_t:
+                    case value_types::integer_t:
                         return value_.ui_value_ == rhs.value_.si_value_;
-                    case value_types::ulonglong_t:
+                    case value_types::unsigned_integer_t:
                         return value_.ui_value_ == rhs.value_.ui_value_;
                     case value_types::double_t:
                         return value_.ui_value_ == rhs.value_.float_value_;
@@ -806,9 +806,9 @@ public:
                 case value_types::double_t:
                     switch (rhs.type_)
                     {
-                    case value_types::longlong_t:
+                    case value_types::integer_t:
                         return value_.float_value_ == rhs.value_.si_value_;
-                    case value_types::ulonglong_t:
+                    case value_types::unsigned_integer_t:
                         return value_.float_value_ == rhs.value_.ui_value_;
                     case value_types::double_t:
                         return value_.float_value_ == rhs.value_.float_value_;
@@ -883,7 +883,7 @@ public:
 
         bool is_numeric() const
         {
-            return type_ == value_types::double_t || type_ == value_types::longlong_t || type_ == value_types::ulonglong_t;
+            return type_ == value_types::double_t || type_ == value_types::integer_t || type_ == value_types::unsigned_integer_t;
         }
 
         void swap(variant& var)
@@ -1904,7 +1904,7 @@ public:
 
     bool is_numeric() const
     {
-        return var_.type_ == value_types::double_t || var_.type_ == value_types::longlong_t || var_.type_ == value_types::ulonglong_t;
+        return var_.type_ == value_types::double_t || var_.type_ == value_types::integer_t || var_.type_ == value_types::unsigned_integer_t;
     }
 
     bool is_bool() const
@@ -1929,12 +1929,12 @@ public:
 
     bool is_longlong() const
     {
-        return var_.type_ == value_types::longlong_t;
+        return var_.type_ == value_types::integer_t;
     }
 
     bool is_ulonglong() const
     {
-        return var_.type_ == value_types::ulonglong_t;
+        return var_.type_ == value_types::unsigned_integer_t;
     }
 
     bool is_double() const
@@ -1981,9 +1981,9 @@ public:
             return var_.value_.bool_value_;
         case value_types::double_t:
             return var_.value_.float_value_ != 0.0;
-        case value_types::longlong_t:
+        case value_types::integer_t:
             return var_.value_.si_value_ != 0;
-        case value_types::ulonglong_t:
+        case value_types::unsigned_integer_t:
             return var_.value_.ui_value_ != 0;
         case value_types::small_string_t:
             return var_.small_string_length_ != 0;

@@ -66,9 +66,9 @@ BOOST_AUTO_TEST_CASE(test_is)
     obj["field2"] = -10;
     obj["field3"] = 10U;
 
-    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::longlong_t);
-    BOOST_CHECK(obj["field2"].type() == jsoncons::value_types::longlong_t);
-    BOOST_CHECK(obj["field3"].type() == jsoncons::value_types::ulonglong_t);
+    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::integer_t);
+    BOOST_CHECK(obj["field2"].type() == jsoncons::value_types::integer_t);
+    BOOST_CHECK(obj["field3"].type() == jsoncons::value_types::unsigned_integer_t);
 
     BOOST_CHECK(!obj["field1"].is<std::string>());
     BOOST_CHECK(obj["field1"].is<short>());
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_is2)
 {
     json obj = json::parse_string("{\"field1\":10}");
 
-    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::ulonglong_t);
+    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::unsigned_integer_t);
 
     BOOST_CHECK(!obj["field1"].is<std::string>());
     BOOST_CHECK(obj["field1"].is<int>());
