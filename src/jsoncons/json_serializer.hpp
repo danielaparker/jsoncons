@@ -164,8 +164,7 @@ private:
     {
         begin_value();
 
-        bos_.write(json_char_traits<Char,sizeof(Char)>::null_literal().c_str(),
-                   json_char_traits<Char,sizeof(Char)>::null_literal().length());
+        bos_.write(json_char_traits<Char,sizeof(Char)>::null_literal());
 
         end_value();
     }
@@ -187,18 +186,15 @@ private:
 
         if (is_nan(value) && format_.replace_nan())
         {
-            bos_.write(format_.nan_replacement().c_str(),
-                       format_.nan_replacement().length());
+            bos_.write(format_.nan_replacement());
         }
         else if (is_pos_inf(value) && format_.replace_pos_inf())
         {
-            bos_.write(format_.pos_inf_replacement().c_str(),
-                       format_.pos_inf_replacement().length());
+            bos_.write(format_.pos_inf_replacement());
         }
         else if (is_neg_inf(value) && format_.replace_neg_inf())
         {
-            bos_.write(format_.neg_inf_replacement().c_str(),
-                       format_.neg_inf_replacement().length());
+            bos_.write(format_.neg_inf_replacement());
         }
         //else if (format_.floatfield() != 0)
         //{
@@ -222,7 +218,7 @@ private:
 
         std::basic_stringstream<Char> os;
         os << value;
-        bos_.write(os.str().c_str(),os.str().length());
+        bos_.write(os.str());
 
         end_value();
     }
@@ -233,7 +229,7 @@ private:
 
         std::basic_stringstream<Char> os;
         os << value;
-        bos_.write(os.str().c_str(),os.str().length());
+        bos_.write(os.str());
 
         end_value();
     }
@@ -244,13 +240,11 @@ private:
 
         if (value)
         {
-            bos_.write(json_char_traits<Char,sizeof(Char)>::true_literal().c_str(),
-                       json_char_traits<Char,sizeof(Char)>::true_literal().length());
+            bos_.write(json_char_traits<Char,sizeof(Char)>::true_literal());
         }
         else
         {
-            bos_.write(json_char_traits<Char,sizeof(Char)>::false_literal().c_str(),
-                       json_char_traits<Char,sizeof(Char)>::false_literal().length());
+            bos_.write(json_char_traits<Char,sizeof(Char)>::false_literal());
         }
 
         end_value();

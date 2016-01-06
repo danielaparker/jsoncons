@@ -163,23 +163,19 @@ void print_float(double val, int precision, buffered_ostream<Char>& os)
     char* s0 = s;
 	char* se = s + precision;
 
-	Char buf2[100];
-	Char* b = buf2;
-	Char* b0 = b;
-
     int i, k;
     int j;
 
     if (sign)
     {
-        *b++ = '-';
+        os.put('-');
     }
     if (decimal_point <= -4 || decimal_point > se - s + 5) 
     {
-        *b++ = *s++;
+        os.put(*s++);
         if (s < se) 
         {
-            *b++ = '.';
+            os.put('.');
             while ((se-1) > s && *(se-1) == '0')
             {
                 --se;
@@ -187,22 +183,22 @@ void print_float(double val, int precision, buffered_ostream<Char>& os)
 			
             while(s < se)
             {
-                *b++ = *s++;
+                os.put(*s++);
             }
         }
-        *b++ = 'e';
+        os.put('e');
         /* sprintf(b, "%+.2d", decimal_point - 1); */
         if (--decimal_point < 0) {
-            *b++ = '-';
+            os.put('-');
             decimal_point = -decimal_point;
             }
         else
-            *b++ = '+';
+            os.put('+');
         for(j = 2, k = 10; 10*k <= decimal_point; j++, k *= 10);
         for(;;) 
 		{
             i = decimal_point / k;
-            *b++ = i + '0';
+            os.put(i + '0');
             if (--j <= 0)
                 break;
             decimal_point -= i*k;
@@ -211,28 +207,28 @@ void print_float(double val, int precision, buffered_ostream<Char>& os)
     }
     else if (decimal_point <= 0) 
     {
-		*b++ = '0';
-        *b++ = '.';
+        os.put('0');
+        os.put('.');
         while ((se-1) > s && *(se-1) == '0')
         {
             --se;
         }
         for(; decimal_point < 0; decimal_point++)
         {
-            *b++ = '0';
+            os.put('0');
         }
 		while(s < se)
         {
-			*b++ = *s++;
+            os.put(*s++);
         }
 	}
     else {
         while(s < se) 
         {
-            *b++ = *s++;
+            os.put(*s++);
 			if ((--decimal_point == 0) && s < se)
 			{
-				*b++ = '.';
+                os.put('.');
 				while ((se-1) > s && *(se-1) == '0')
 				{
 					--se;
@@ -241,10 +237,9 @@ void print_float(double val, int precision, buffered_ostream<Char>& os)
         }
         for(; decimal_point > 0; decimal_point--)
         {
-            *b++ = '0';
+            os.put('0');
         }
 	}
-     os.write(b0,b-b0);
 }
 
 #else
