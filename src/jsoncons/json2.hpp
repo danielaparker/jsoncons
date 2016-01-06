@@ -327,8 +327,10 @@ template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::to_string() const
 {
     std::basic_ostringstream<Char> os;
-    basic_json_serializer<Char> serializer(os);
-    to_stream(serializer);
+    {
+        basic_json_serializer<Char> serializer(os);
+        to_stream(serializer);
+    }
     return os.str();
 }
 
@@ -336,8 +338,10 @@ template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::to_string(const basic_output_format<Char>& format) const
 {
     std::basic_ostringstream<Char> os;
-    basic_json_serializer<Char> serializer(os, format);
-    to_stream(serializer);
+    {
+        basic_json_serializer<Char> serializer(os, format);
+        to_stream(serializer);
+    }
     return os.str();
 }
 

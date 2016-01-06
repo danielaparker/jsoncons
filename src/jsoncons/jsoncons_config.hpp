@@ -113,10 +113,16 @@ inline bool is_neg_inf(double x)
 template<typename Char>
 std::basic_string<Char> float_to_string(double val, int precision)
 {
-	std::basic_stringstream<Char> ss;
-	print_float(val, precision, ss);
+	std::basic_ostringstream<Char> ss;
+    {
+        buffered_ostream<Char> os(ss);
+        print_float(val, precision, os);
+    }
 	return ss.str();
 }
+
+template <typename Char>
+class buffered_ostream;
 
 template <typename Char>
 class float_printer
@@ -128,7 +134,7 @@ public:
     {
     }
 
-    void print(double val, std::basic_ostream<Char>& os)
+    void print(double val, buffered_ostream<Char>& os)
     {
     	print_float(val, precision_, os);
     }
@@ -137,7 +143,7 @@ public:
 #ifdef _MSC_VER
 
 template<typename Char>
-void print_float(double val, int precision, std::basic_ostream<Char>& os)
+void print_float(double val, int precision, buffered_ostream<Char>& os)
 {
     char buf[_CVTBUFSIZE];
     int decimal_point = 0;
@@ -243,7 +249,7 @@ void print_float(double val, int precision, std::basic_ostream<Char>& os)
 
 #else
 template <typename Char>
-void print_float(double val, int precision, std::basic_ostream<Char>& os)
+void print_float(double val, int precision, buffered_ostream<Char>& os)
 {
     std::basic_ostringstream<Char> ss;
     ss.imbue(std::locale::classic());

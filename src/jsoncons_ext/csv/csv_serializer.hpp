@@ -54,7 +54,7 @@ template <typename Char>
 void escape_string(const Char* s,
                    size_t length,
                    Char quote_char, Char quote_escape_char,
-                   std::basic_ostream<Char>& os)
+                   buffered_ostream<Char>& os)
 {
     const Char* begin = s;
     const Char* end = s + length;
@@ -63,11 +63,12 @@ void escape_string(const Char* s,
         Char c = *it;
         if (c == quote_char)
         {
-            os << quote_escape_char << quote_char;
+            os.put(quote_escape_char); 
+            os.put(quote_char);
         }
         else
         {
-            os << c;
+            os.put(c);
         }
     }
 }
@@ -90,24 +91,25 @@ class basic_csv_serializer : public basic_json_output_handler<Char>
         size_t count_;
         bool skip_;
     };
-    std::basic_ostream<Char>* os_;
+    buffered_ostream<Char> os_;
     basic_csv_parameters<Char> parameters_;
     basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-    std::basic_ostringstream<Char> header_os_;
+    std::basic_ostringstream<Char> header_oss_;
+    buffered_ostream<Char> header_os_;
     std::map<std::basic_string<Char>,size_t> header_;
     float_printer<Char> fp_;
 public:
     basic_csv_serializer(std::basic_ostream<Char>& os)
        :
-       os_(std::addressof(os)),
+       os_(os),
        format_(),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       header_os_(),
+       header_os_(header_oss_),
        header_(),
        fp_(format_.precision())
     {
@@ -116,13 +118,13 @@ public:
     basic_csv_serializer(std::basic_ostream<Char>& os,
                          basic_csv_parameters<Char> params)
        :
-       os_(std::addressof(os)),
+       os_(os),
        parameters_(params),
        format_(),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       header_os_(),
+       header_os_(header_oss_),
        header_(),
 	   fp_(format_.precision())
     {
@@ -151,10 +153,11 @@ private:
     {
         if (stack_.size() == 2)
         {
-            *os_ << parameters_.line_delimiter();
+            os_.write(parameters_.line_delimiter());
             if (stack_[0].count_ == 0)
             {
-                *os_ << header_os_.str() << parameters_.line_delimiter();
+                os_.write(header_oss_.str());
+                os_.write(parameters_.line_delimiter());
             }
         }
         stack_.pop_back();
@@ -171,7 +174,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            *os_ << parameters_.line_delimiter();
+            os_.write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -186,19 +189,19 @@ private:
             {
                 if (stack_.back().count_ > 0)
                 {
-                    os_->put(parameters_.field_delimiter());
+                    os_.put(parameters_.field_delimiter());
                 }
                 bool quote = false;
                 if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
                     (parameters_.quote_style() == quote_styles::minimal && std::char_traits<Char>::find(name,length,parameters_.field_delimiter()) != nullptr))
                 {
                     quote = true;
-                    os_->put(parameters_.quote_char());
+                    os_.put(parameters_.quote_char());
                 }
-                jsoncons::csv::escape_string<Char>(name, length, parameters_.quote_char(), parameters_.quote_escape_char(), *os_);
+                jsoncons::csv::escape_string<Char>(name, length, parameters_.quote_char(), parameters_.quote_escape_char(), os_);
                 if (quote)
                 {
-                    os_->put(parameters_.quote_char());
+                    os_.put(parameters_.quote_char());
                 }
                 header_[name] = stack_.back().count_;
             }
@@ -215,7 +218,7 @@ private:
                     stack_.back().skip_ = false;
                     while (stack_.back().count_ < it->second)
                     {
-                        os_->put(parameters_.field_delimiter());
+                        os_.put(parameters_.field_delimiter());
                         ++stack_.back().count_;
                     }
                 //    std::cout << " (" << it->value() << " " << stack_.back().count_ << ") ";
@@ -234,7 +237,7 @@ private:
             }
             else
             {
-                do_null_value(*os_);
+                do_null_value(os_);
             }
         }
     }
@@ -249,7 +252,7 @@ private:
             }
             else
             {
-                value(val,length,*os_);
+                value(val,length,os_);
             }
         }
     }
@@ -264,7 +267,7 @@ private:
             }
             else
             {
-                value(val,*os_);
+                value(val,os_);
             }
         }
     }
@@ -279,7 +282,7 @@ private:
             }
             else
             {
-                value(val,*os_);
+                value(val,os_);
             }
         }
     }
@@ -294,7 +297,7 @@ private:
             }
             else
             {
-                value(val,*os_);
+                value(val,os_);
             }
         }
     }
@@ -309,46 +312,46 @@ private:
             }
             else
             {
-                value(val,*os_);
+                value(val,os_);
             }
         }
     }
 
-    void value(const Char* val, size_t length, std::basic_ostream<Char>& os)
-    {
-        begin_value(os);
+	void value(const Char* val, size_t length, buffered_ostream<Char>& os)
+	{
+		begin_value(os);
 
-        bool quote = false;
-        if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
-            (parameters_.quote_style() == quote_styles::minimal && std::char_traits<Char>::find(val,length,parameters_.field_delimiter()) != nullptr))
-        {
-            quote = true;
-            os.put(parameters_.quote_char());
-        }
-        jsoncons::csv::escape_string<Char>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
-        if (quote)
-        {
-            os.put(parameters_.quote_char());
-        }
+		bool quote = false;
+		if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
+			(parameters_.quote_style() == quote_styles::minimal && std::char_traits<Char>::find(val, length, parameters_.field_delimiter()) != nullptr))
+		{
+			quote = true;
+			os.put(parameters_.quote_char());
+		}
+		jsoncons::csv::escape_string<Char>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
+		if (quote)
+		{
+			os.put(parameters_.quote_char());
+		}
 
-        end_value();
-    }
+		end_value();
+	}
 
-    void value(double val, std::basic_ostream<Char>& os)
+    void value(double val, buffered_ostream<Char>& os)
     {
         begin_value(os);
 
         if (is_nan(val) && format_.replace_nan())
         {
-            os  << format_.nan_replacement();
+            os.write(format_.nan_replacement());
         }
         else if (is_pos_inf(val) && format_.replace_pos_inf())
         {
-            os  << format_.pos_inf_replacement();
+            os.write(format_.pos_inf_replacement());
         }
         else if (is_neg_inf(val) && format_.replace_neg_inf())
         {
-            os  << format_.neg_inf_replacement();
+            os.write(format_.neg_inf_replacement());
         }
         else if (format_.floatfield() != 0)
         {
@@ -356,7 +359,7 @@ private:
             ss.imbue(std::locale::classic());
             ss.setf(format_.floatfield(), std::ios::floatfield);
             ss << std::showpoint << std::setprecision(format_.precision()) << val;
-            os << ss.str();
+            os.write(ss.str());
         }
         else
         {
@@ -367,44 +370,53 @@ private:
 
     }
 
-    void value(long long val, std::basic_ostream<Char>& os)
+    void value(long long val, buffered_ostream<Char>& os)
     {
         begin_value(os);
 
-        os  << val;
+		std::basic_ostringstream<Char> ss;
+		ss << val;
+        os.write(ss.str());
 
         end_value();
     }
 
-    void value(unsigned long long val, std::basic_ostream<Char>& os)
+    void value(unsigned long long val, buffered_ostream<Char>& os)
     {
         begin_value(os);
 
-        os  << val;
+		std::basic_ostringstream<Char> ss;
+		ss << val;
+		os.write(ss.str());
 
         end_value();
     }
 
-    void value(bool val, std::basic_ostream<Char>& os) 
+    void value(bool val, buffered_ostream<Char>& os) 
     {
         begin_value(os);
 
-        os << (val ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
+        if (val)
+        {
+            os.write(json_char_traits<Char,sizeof(Char)>::true_literal());
+        }
+        else
+        {
+            os.write(json_char_traits<Char,sizeof(Char)>::false_literal());
+        }
 
         end_value();
     }
 
-    void do_null_value(std::basic_ostream<Char>& os) 
+    void do_null_value(buffered_ostream<Char>& os) 
     {
         begin_value(os);
-
-        os << json_char_traits<Char,sizeof(Char)>::null_literal();
-
+        os.write(json_char_traits<Char,sizeof(Char)>::null_literal());
         end_value();
 
     }
 
-    void begin_value(std::basic_ostream<Char>& os)
+    void begin_value(buffered_ostream<Char>& os)
     {
         if (!stack_.empty())
         {

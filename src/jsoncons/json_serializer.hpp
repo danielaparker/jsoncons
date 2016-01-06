@@ -25,6 +25,8 @@ namespace jsoncons {
 template<typename Char>
 class basic_json_serializer : public basic_json_output_handler<Char>
 {
+    static const size_t default_buffer_length = 16384;
+
     struct stack_item
     {
         stack_item(bool is_object)
@@ -40,7 +42,6 @@ class basic_json_serializer : public basic_json_output_handler<Char>
         size_t count_;
         bool content_indented_;
     };
-    std::basic_ostream<Char>* os_;
     basic_output_format<Char> format_;
     std::vector<stack_item> stack_;
     int indent_;
@@ -48,37 +49,38 @@ class basic_json_serializer : public basic_json_output_handler<Char>
     std::ios_base::fmtflags original_format_flags_;
     bool indenting_;
     float_printer<Char> fp_;
+    buffered_ostream<Char> bos_;
 public:
     basic_json_serializer(std::basic_ostream<Char>& os)
-       : os_(std::addressof(os)), 
-         indent_(0), 
+       : indent_(0), 
          indenting_(false),
-         fp_(format_.precision())
+         fp_(format_.precision()),
+         bos_(os)
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, bool indenting)
-       : os_(std::addressof(os)), 
-         indent_(0), 
+       : indent_(0), 
          indenting_(indenting),
-         fp_(format_.precision())
+         fp_(format_.precision()),
+         bos_(os)
     {
     }
 
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format)
-       : os_(std::addressof(os)), 
-         format_(format), 
+       : format_(format), 
          indent_(0),
          indenting_(false),  
-         fp_(format_.precision())
+         fp_(format_.precision()),
+         bos_(os)
     {
     }
     basic_json_serializer(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting)
-       : os_(std::addressof(os)), 
-         format_(format), 
+       : format_(format), 
          indent_(0), 
          indenting_(indenting),  
-         fp_(format_.precision())
+         fp_(format_.precision()),
+         bos_(os)
     {
     }
 
@@ -94,6 +96,7 @@ private:
 
     void do_end_json() override
     {
+        bos_.flush();
     }
 
     void do_begin_object() override
@@ -105,7 +108,7 @@ private:
             write_indent();
         }
         stack_.push_back(stack_item(true));
-        os_->put('{');
+        bos_.put('{');
         indent();
     }
 
@@ -117,7 +120,7 @@ private:
             write_indent();
         }
         stack_.pop_back();
-        os_->put('}');
+        bos_.put('}');
 
         end_value();
     }
@@ -131,7 +134,7 @@ private:
             write_indent();
         }
         stack_.push_back(stack_item(false));
-        os_->put('[');
+        bos_.put('[');
         indent();
     }
 
@@ -143,7 +146,7 @@ private:
             write_indent();
         }
         stack_.pop_back();
-        os_->put(']');
+        bos_.put(']');
 
         end_value();
     }
@@ -151,17 +154,18 @@ private:
     void do_name(const Char* name, size_t length) override
     {
         begin_element();
-        os_->put('\"');
-        escape_string<Char>(name, length, format_, *os_);
-        os_->put('\"');
-        os_->put(':');
+        bos_.put('\"');
+        escape_string<Char>(name, length, format_, bos_);
+        bos_.put('\"');
+        bos_.put(':');
     }
 
     void do_null_value() override
     {
         begin_value();
 
-        *os_ << json_char_traits<Char,sizeof(Char)>::null_literal();
+        bos_.write(json_char_traits<Char,sizeof(Char)>::null_literal().c_str(),
+                   json_char_traits<Char,sizeof(Char)>::null_literal().length());
 
         end_value();
     }
@@ -170,9 +174,9 @@ private:
     {
         begin_value();
 
-        os_->put('\"');
-        escape_string<Char>(value, length, format_, *os_);
-        os_->put('\"');
+        bos_. put('\"');
+        escape_string<Char>(value, length, format_, bos_);
+        bos_. put('\"');
 
         end_value();
     }
@@ -183,27 +187,30 @@ private:
 
         if (is_nan(value) && format_.replace_nan())
         {
-            *os_ << format_.nan_replacement();
+            bos_.write(format_.nan_replacement().c_str(),
+                       format_.nan_replacement().length());
         }
         else if (is_pos_inf(value) && format_.replace_pos_inf())
         {
-            *os_ << format_.pos_inf_replacement();
+            bos_.write(format_.pos_inf_replacement().c_str(),
+                       format_.pos_inf_replacement().length());
         }
         else if (is_neg_inf(value) && format_.replace_neg_inf())
         {
-            *os_ << format_.neg_inf_replacement();
+            bos_.write(format_.neg_inf_replacement().c_str(),
+                       format_.neg_inf_replacement().length());
         }
-        else if (format_.floatfield() != 0)
-        {
-            std::basic_ostringstream<Char> os;
-            os.imbue(std::locale::classic());
-            os.setf(format_.floatfield(), std::ios::floatfield);
-            os << std::showpoint << std::setprecision(format_.precision()) << value;
-            *os_ << os.str();
-        }
+        //else if (format_.floatfield() != 0)
+        //{
+            //std::basic_ostringstream<Char> os;
+            //os.imbue(std::locale::classic());
+            //os.setf(format_.floatfield(), std::ios::floatfield);
+            //os << std::showpoint << std::setprecision(format_.precision()) << value;
+            //*os_ << os.str();
+        //}
         else
         {
-            fp_.print(value,*os_);
+            fp_.print(value,bos_);
         }
 
         end_value();
@@ -213,7 +220,9 @@ private:
     {
         begin_value();
 
-        *os_ << value;
+        std::basic_stringstream<Char> os;
+        os << value;
+        bos_.write(os.str().c_str(),os.str().length());
 
         end_value();
     }
@@ -222,7 +231,9 @@ private:
     {
         begin_value();
 
-        *os_ << value;
+        std::basic_stringstream<Char> os;
+        os << value;
+        bos_.write(os.str().c_str(),os.str().length());
 
         end_value();
     }
@@ -231,7 +242,16 @@ private:
     {
         begin_value();
 
-        *os_ << (value ? json_char_traits<Char,sizeof(Char)>::true_literal() :  json_char_traits<Char,sizeof(Char)>::false_literal());
+        if (value)
+        {
+            bos_.write(json_char_traits<Char,sizeof(Char)>::true_literal().c_str(),
+                       json_char_traits<Char,sizeof(Char)>::true_literal().length());
+        }
+        else
+        {
+            bos_.write(json_char_traits<Char,sizeof(Char)>::false_literal().c_str(),
+                       json_char_traits<Char,sizeof(Char)>::false_literal().length());
+        }
 
         end_value();
     }
@@ -242,7 +262,7 @@ private:
         {
             if (stack_.back().count_ > 0)
             {
-                os_->put(',');
+                bos_. put(',');
             }
             if (indenting_)
             {
@@ -258,7 +278,7 @@ private:
             //begin_element();
             if (stack_.back().count_ > 0)
             {
-                os_->put(',');
+                bos_. put(',');
             }
         }
     }
@@ -295,10 +315,10 @@ private:
         {
             stack_.back().content_indented_ = true;
         }
-        os_->put('\n');
+        bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
         {
-            os_->put(' ');
+            bos_. put(' ');
         }
     }
 };

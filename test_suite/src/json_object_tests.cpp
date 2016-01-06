@@ -160,9 +160,9 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     //std::cout << s2 << std::endl;
     BOOST_REQUIRE_THROW(a["object1"].at("field2"), json_exception);
 
-    BOOST_CHECK(s1 == std::string("value1"));
-    BOOST_CHECK(s1a == std::string("value1"));
-    BOOST_CHECK(s2 == std::string("null"));
+    BOOST_CHECK_EQUAL(std::string("value1"),s1);
+    BOOST_CHECK_EQUAL(std::string("value1"),s1a);
+    BOOST_CHECK_EQUAL(std::string("null"),s2);
 }
 
 BOOST_AUTO_TEST_CASE(test_const_member_read)

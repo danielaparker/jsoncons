@@ -402,6 +402,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
 
     std::clock_t t = std::clock();
 
+    handler.begin_json();
     handler.begin_array();
     for (size_t i = 0; i < 100; ++i)
     {
@@ -438,7 +439,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
         handler.end_object();
     }
     handler.end_array();
-    os.flush();
+    handler.end_json();
     std::clock_t s = std::clock() - t;
     //std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds to write.\n";
 
