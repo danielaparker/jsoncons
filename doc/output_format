@@ -471,43 +471,92 @@ vertical-align:1px;
 <pre><code>jsoncons::output_format
 
 typedef basic_output_format&lt;char&gt; output_format
-</code></pre><p>The output_format class is an instantiation of the basic_output_format class template that uses <code>char</code> as the character type.</p>
-<p>The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A <code>precision</code> gives the maximum number of significant digits, the default precision is <code>16</code>. On most modern machines, 17 digits is usually enough to capture a floating-point number&#39;s value exactly, however, if you change precision to 17, there will be less space saving from removing trailing zeros, e.g. 1.1 becomes 1.1000000000000001. </p>
+</code></pre>
+
+<p>The output_format class is an instantiation of the basic_output_format class template that uses <code>char</code> as the character type.</p>
+
+<p>The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A <code>precision</code> gives the maximum number of significant digits, the default precision is <code>16</code>. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, there will be less space saving from removing trailing zeros, e.g. 1.1 becomes 1.1000000000000001. </p>
+
 <p>The modifier method <code>floatfield</code> supports setting the floatfield format flag to <code>fixed</code> or <code>scientific</code> with <code>precision</code> now meaning a specified number of decimal places.</p>
-<h3 id="header">Header</h3>
-<pre><code>#include &quot;jsoncons/output_format.hpp&quot;
-</code></pre><h3 id="member-constants">Member constants</h3>
+
+<h3>Header</h3>
+
+<pre><code>#include "jsoncons/output_format.hpp"
+</code></pre>
+
+<h3>Member constants</h3>
+
 <pre><code>default_precision
-</code></pre><p>The default precision is 15</p>
+</code></pre>
+
+<p>The default precision is 15</p>
+
 <pre><code>default_indent
-</code></pre><p>The default indent is 4</p>
-<h3 id="constructors">Constructors</h3>
+</code></pre>
+
+<p>The default indent is 4</p>
+
+<h3>Constructors</h3>
+
 <pre><code>output_format()
-</code></pre><p>Constructs an <code>output_format</code> with default values. </p>
-<h3 id="accessors">Accessors</h3>
+</code></pre>
+
+<p>Constructs an <code>output_format</code> with default values. </p>
+
+<h3>Accessors</h3>
+
 <pre><code>int indent() const
-</code></pre><p>Returns the level of indentation, the default is 4</p>
+</code></pre>
+
+<p>Returns the level of indentation, the default is 4</p>
+
 <pre><code>int precision() const 
-</code></pre><p>Returns the maximum number of significant digits.</p>
+</code></pre>
+
+<p>Returns the maximum number of significant digits.</p>
+
 <pre><code>bool escape_all_non_ascii() const
-</code></pre><p>The default is false</p>
+</code></pre>
+
+<p>The default is false</p>
+
 <pre><code>bool escape_solidus() const
-</code></pre><p>The default is false</p>
+</code></pre>
+
+<p>The default is false</p>
+
 <pre><code>bool replace_nan() const
-</code></pre><p>The defult is <code>true</code></p>
+</code></pre>
+
+<p>The defult is <code>true</code></p>
+
 <pre><code>bool replace_pos_inf() const
-</code></pre><p>The defult is <code>true</code></p>
+</code></pre>
+
+<p>The defult is <code>true</code></p>
+
 <pre><code>bool replace_neg_inf() const
-</code></pre><p>The defult is <code>true</code></p>
+</code></pre>
+
+<p>The defult is <code>true</code></p>
+
 <pre><code>std::string nan_replacement() const 
-</code></pre><p>The default is &quot;null&quot;</p>
+</code></pre>
+
+<p>The default is "null"</p>
+
 <pre><code>std::string pos_inf_replacement() const 
-</code></pre><p>The default is &quot;null&quot;</p>
+</code></pre>
+
+<p>The default is "null"</p>
+
 <pre><code>std::string neg_inf_replacement() const 
-</code></pre><p>The default is &quot;null&quot;</p>
-<pre><code>std::ios_base::fmtflags floatfield() const
-</code></pre><p>Returns the floatfield format flag, which by default is not set. The default floating point formatting produces digits in decimal notation if possible, otherwise it produces digits in exponential notation, and all trailing zeros are removed except the one immediately following the decimal point. </p>
-<h3 id="modifiers">Modifiers</h3>
+</code></pre>
+
+<p>The default is "null"</p>
+
+<h3>Modifiers</h3>
+
 <pre><code>void indent(int value)
 
 void escape_all_non_ascii(bool value)
@@ -527,12 +576,12 @@ void nan_replacement(const std::string&amp; replacement)
 void pos_inf_replacement(const std::string&amp; replacement)
 
 void neg_inf_replacement(const std::string&amp; replacement)
-</code></pre><p>Sets replacement text for negative infinity.</p>
+</code></pre>
+
+<p>Sets replacement text for negative infinity.</p>
+
 <pre><code>void precision(size_t prec)
-
-void floatfield(std::ios_base::fmtflags flags)
-</code></pre><p>Allows the floatfield format flag to be set to a specific notation (either <code>std::ios::fixed</code> or <code>std::ios::scientific</code>.) In the fixed and scientific notations, the precision field specifies the number of digits to display after the decimal point.</p>
-
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

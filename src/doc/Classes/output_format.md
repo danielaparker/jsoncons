@@ -57,9 +57,6 @@ The default is "null"
     std::string neg_inf_replacement() const 
 The default is "null"
 
-    std::ios_base::fmtflags floatfield() const
-Returns the floatfield format flag, which by default is not set. The default floating point formatting produces digits in decimal notation if possible, otherwise it produces digits in exponential notation, and all trailing zeros are removed except the one immediately following the decimal point. 
-
 ### Modifiers
 
     void indent(int value)
@@ -84,8 +81,5 @@ Returns the floatfield format flag, which by default is not set. The default flo
 Sets replacement text for negative infinity.
 
     void precision(size_t prec)
-
-    void floatfield(std::ios_base::fmtflags flags)
-Allows the floatfield format flag to be set to a specific notation (either `std::ios::fixed` or `std::ios::scientific`.) In the fixed and scientific notations, the precision field specifies the number of digits to display after the decimal point.
 
 

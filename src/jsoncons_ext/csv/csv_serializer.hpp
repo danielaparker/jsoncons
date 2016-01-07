@@ -353,14 +353,14 @@ private:
         {
             os.write(format_.neg_inf_replacement());
         }
-        else if (format_.floatfield() != 0)
-        {
-            std::basic_ostringstream<Char> ss;
-            ss.imbue(std::locale::classic());
-            ss.setf(format_.floatfield(), std::ios::floatfield);
-            ss << std::showpoint << std::setprecision(format_.precision()) << val;
-            os.write(ss.str());
-        }
+        //else if (format_.floatfield() != 0)
+        //{
+        //    std::basic_ostringstream<Char> ss;
+        //    ss.imbue(std::locale::classic());
+        //    ss.setf(format_.floatfield(), std::ios::floatfield);
+        //    ss << std::showpoint << std::setprecision(format_.precision()) << val;
+        //    os.write(ss.str());
+        //}
         else
         {
             fp_.print(val,os);

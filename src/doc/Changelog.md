@@ -2,7 +2,7 @@ master
 ------
 
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
-
+- `output_format` drops support for `floatfield` property
 - The json internal representation of signed and unsigned integers has been changed from `long long` and `unsigned long long` to `int64_t` and `uint64_t`. This should not impact you unless you've implemented your own `json_input_handler` or `json_output_handler`, in which case you'll need to change your `json_input_handler` function signatures
  
     void do_longlong_value(long long value, const basic_parsing_context<Char>& context) override

@@ -25,6 +25,16 @@ class buffered_ostream;
 template <typename Char>
 class basic_output_format
 {
+    int indent_;
+    int precision_;
+    bool replace_nan_;
+    bool replace_pos_inf_;
+    bool replace_neg_inf_;
+    std::basic_string<Char> nan_replacement_;
+    std::basic_string<Char> pos_inf_replacement_;
+    std::basic_string<Char> neg_inf_replacement_;
+    bool escape_all_non_ascii_;
+    bool escape_solidus_;
 public:
     static const size_t default_indent = 4;
 
@@ -34,7 +44,6 @@ public:
         :
         indent_(default_indent),
         precision_(15),
-        floatfield_(std::ios_base::fmtflags(0)),
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
@@ -142,33 +151,10 @@ public:
         neg_inf_replacement_ = replacement;
     }
 
-    std::ios_base::fmtflags floatfield() const
-    {
-        return floatfield_;
-    }
-
-    void floatfield(std::ios_base::fmtflags flags)
-    {
-        floatfield_ = flags;
-    }
-
     void indent(int value)
     {
         indent_ = value;
     }
-private:
-    int indent_;
-    int precision_;
-    std::ios_base::fmtflags floatfield_;
-
-    bool replace_nan_;
-    bool replace_pos_inf_;
-    bool replace_neg_inf_;
-    std::basic_string<Char> nan_replacement_;
-    std::basic_string<Char> pos_inf_replacement_;
-    std::basic_string<Char> neg_inf_replacement_;
-    bool escape_all_non_ascii_;
-    bool escape_solidus_;
 };
 
 template<typename Char>
