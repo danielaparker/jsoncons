@@ -69,7 +69,7 @@ namespace value_types
         string_t,
         double_t,
         integer_t,
-        unsigned_integer_t,
+        uinteger_t,
         bool_t,
         null_t,
         any_t
@@ -272,8 +272,8 @@ public:
             case value_types::integer_t:
                 value_.integer_value_ = var.value_.integer_value_;
                 break;
-            case value_types::unsigned_integer_t:
-                value_.unsigned_integer_value_ = var.value_.unsigned_integer_value_;
+            case value_types::uinteger_t:
+                value_.uinteger_value_ = var.value_.uinteger_value_;
                 break;
             case value_types::bool_t:
                 value_.bool_value_ = var.value_.bool_value_;
@@ -337,7 +337,7 @@ public:
                 break;
             case value_types::integer_t:
                 break;
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
                 break;
             case value_types::bool_t:
                 break;
@@ -392,9 +392,9 @@ public:
         }
 
         explicit variant(uint64_t val)
-            : type_(value_types::unsigned_integer_t)
+            : type_(value_types::uinteger_t)
         {
-            value_.unsigned_integer_value_ = val;
+            value_.uinteger_value_ = val;
         }
 
         explicit variant(const std::basic_string<Char>& s)
@@ -506,7 +506,7 @@ public:
                 case value_types::empty_object_t:
                 case value_types::small_string_t:
                 case value_types::integer_t:
-                case value_types::unsigned_integer_t:
+                case value_types::uinteger_t:
                 case value_types::double_t:
                     switch (val.type_)
                     {
@@ -515,7 +515,7 @@ public:
                     case value_types::empty_object_t:
                     case value_types::small_string_t:
                     case value_types::integer_t:
-                    case value_types::unsigned_integer_t:
+                    case value_types::uinteger_t:
                     case value_types::double_t:
                         type_ = val.type_;
                         small_string_length_ = val.small_string_length_;
@@ -598,7 +598,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 if (s.length() > variant::small_string_capacity)
                 {
@@ -628,7 +628,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
 				{
 					if (length > variant::small_string_capacity)
@@ -660,7 +660,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 type_ = value_types::integer_t;
                 value_.integer_value_ = val;
@@ -680,10 +680,10 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
-                type_ = value_types::unsigned_integer_t;
-                value_.unsigned_integer_value_ = val;
+                type_ = value_types::uinteger_t;
+                value_.uinteger_value_ = val;
                 break;
             default:
                 variant(val).swap(*this);
@@ -700,7 +700,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 type_ = value_types::double_t;
                 value_.float_value_ = val;
@@ -720,7 +720,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 type_ = value_types::bool_t;
                 value_.bool_value_ = val;
@@ -740,7 +740,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 type_ = value_types::null_t;
                 break;
@@ -759,7 +759,7 @@ public:
             case value_types::empty_object_t:
             case value_types::small_string_t:
             case value_types::integer_t:
-            case value_types::unsigned_integer_t:
+            case value_types::uinteger_t:
             case value_types::double_t:
                 type_ = value_types::any_t;
                 value_.any_value_ = new any(rhs);
@@ -786,21 +786,21 @@ public:
                     {
                     case value_types::integer_t:
                         return value_.integer_value_ == rhs.value_.integer_value_;
-                    case value_types::unsigned_integer_t:
-                        return value_.integer_value_ == rhs.value_.unsigned_integer_value_;
+                    case value_types::uinteger_t:
+                        return value_.integer_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
                         return value_.integer_value_ == rhs.value_.float_value_;
                     }
                     break;
-                case value_types::unsigned_integer_t:
+                case value_types::uinteger_t:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.unsigned_integer_value_ == rhs.value_.integer_value_;
-                    case value_types::unsigned_integer_t:
-                        return value_.unsigned_integer_value_ == rhs.value_.unsigned_integer_value_;
+                        return value_.uinteger_value_ == rhs.value_.integer_value_;
+                    case value_types::uinteger_t:
+                        return value_.uinteger_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
-                        return value_.unsigned_integer_value_ == rhs.value_.float_value_;
+                        return value_.uinteger_value_ == rhs.value_.float_value_;
                     }
                     break;
                 case value_types::double_t:
@@ -808,8 +808,8 @@ public:
                     {
                     case value_types::integer_t:
                         return value_.float_value_ == rhs.value_.integer_value_;
-                    case value_types::unsigned_integer_t:
-                        return value_.float_value_ == rhs.value_.unsigned_integer_value_;
+                    case value_types::uinteger_t:
+                        return value_.float_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
                         return value_.float_value_ == rhs.value_.float_value_;
                     }
@@ -883,7 +883,7 @@ public:
 
         bool is_numeric() const
         {
-            return type_ == value_types::double_t || type_ == value_types::integer_t || type_ == value_types::unsigned_integer_t;
+            return type_ == value_types::double_t || type_ == value_types::integer_t || type_ == value_types::uinteger_t;
         }
 
         void swap(variant& var)
@@ -901,7 +901,7 @@ public:
         {
             double float_value_;
             int64_t integer_value_;
-            uint64_t unsigned_integer_value_;
+            uint64_t uinteger_value_;
             bool bool_value_;
             json_object<Char,Alloc>* object_;
             json_array<Char,Alloc>* array_;
@@ -974,7 +974,7 @@ public:
     static const basic_json<Char,Alloc> an_array;
     static const basic_json<Char,Alloc> null;
 
-    typedef typename json_object<Char,Alloc>::iterator object_iterator;
+    typedef typename json_object<Char,Alloc>::iterator member_iterator;
     typedef typename json_object<Char,Alloc>::const_iterator const_object_iterator;
 
     typedef typename json_array<Char,Alloc>::iterator array_iterator;
@@ -1269,7 +1269,7 @@ public:
     public:
         friend class basic_json<Char,Alloc>;
 
-        object_iterator begin_members()
+        member_iterator begin_members()
         {
             return val_.at(name_).begin_members();
         }
@@ -1279,7 +1279,7 @@ public:
             return val_.at(name_).begin_members();
         }
 
-        object_iterator end_members()
+        member_iterator end_members()
         {
             return val_.at(name_).end_members();
         }
@@ -1825,11 +1825,11 @@ public:
     {
     }
 
-    object_iterator begin_members();
+    member_iterator begin_members();
 
     const_object_iterator begin_members() const;
 
-    object_iterator end_members();
+    member_iterator end_members();
 
     const_object_iterator end_members() const;
 
@@ -1904,7 +1904,7 @@ public:
 
     bool is_numeric() const
     {
-        return var_.type_ == value_types::double_t || var_.type_ == value_types::integer_t || var_.type_ == value_types::unsigned_integer_t;
+        return var_.type_ == value_types::double_t || var_.type_ == value_types::integer_t || var_.type_ == value_types::uinteger_t;
     }
 
     bool is_bool() const
@@ -1934,7 +1934,7 @@ public:
 
     bool is_ulonglong() const
     {
-        return var_.type_ == value_types::unsigned_integer_t;
+        return var_.type_ == value_types::uinteger_t;
     }
 
     bool is_double() const
@@ -1983,8 +1983,8 @@ public:
             return var_.value_.float_value_ != 0.0;
         case value_types::integer_t:
             return var_.value_.integer_value_ != 0;
-        case value_types::unsigned_integer_t:
-            return var_.value_.unsigned_integer_value_ != 0;
+        case value_types::uinteger_t:
+            return var_.value_.uinteger_value_ != 0;
         case value_types::small_string_t:
             return var_.small_string_length_ != 0;
         case value_types::string_t:

@@ -1878,7 +1878,7 @@ private:
         {
             try
             {
-                uint64_t d = string_to_unsigned_integer(number_buffer_.c_str(), number_buffer_.length());
+                uint64_t d = string_to_uinteger(number_buffer_.c_str(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
@@ -2120,30 +2120,6 @@ private:
         }
         --top_;
         return true;
-    }
-
-    template<typename CharType>
-    uint64_t string_to_unsigned_integer(const CharType *s, size_t length) throw(std::overflow_error)
-    {
-        static const uint64_t max_value = std::numeric_limits<uint64_t>::max JSONCONS_NO_MACRO_EXP();
-        static const uint64_t max_value_div_10 = max_value / 10;
-        uint64_t n = 0;
-        for (size_t i = 0; i < length; ++i)
-        {
-            uint64_t x = s[i] - '0';
-            if (n > max_value_div_10)
-            {
-                throw std::overflow_error("Unsigned overflow");
-            }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                throw std::overflow_error("Unsigned overflow");
-            }
-
-            n += x;
-        }
-        return n;
     }
 };
 

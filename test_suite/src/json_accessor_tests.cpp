@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(test_as)
     obj["string_field"] = "char";
 
     std::string s = obj["field1"].as<std::string>();
-    BOOST_CHECK_EQUAL(s,std::string("10"));
+    BOOST_CHECK_EQUAL(std::string("10"),s);
     int int_val = obj["field2"].as<int>();
-    BOOST_CHECK_EQUAL(int_val,1);
+    BOOST_CHECK_EQUAL(1,int_val);
     int short_val = obj["field2"].as<short>();
     BOOST_CHECK_EQUAL(short_val,1);
     int ushort_val = obj["field2"].as<unsigned short>();
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_is)
 
     BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::integer_t);
     BOOST_CHECK(obj["field2"].type() == jsoncons::value_types::integer_t);
-    BOOST_CHECK(obj["field3"].type() == jsoncons::value_types::unsigned_integer_t);
+    BOOST_CHECK(obj["field3"].type() == jsoncons::value_types::uinteger_t);
 
     BOOST_CHECK(!obj["field1"].is<std::string>());
     BOOST_CHECK(obj["field1"].is<short>());
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_is2)
 {
     json obj = json::parse_string("{\"field1\":10}");
 
-    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::unsigned_integer_t);
+    BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::uinteger_t);
 
     BOOST_CHECK(!obj["field1"].is<std::string>());
     BOOST_CHECK(obj["field1"].is<int>());

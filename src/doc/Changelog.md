@@ -11,7 +11,7 @@ master
 to
 
     void do_integer_value(int64_t value, const basic_parsing_context<Char>& context) override
-    void do_unsigned_integer_value(uint64_t value, const basic_parsing_context<Char>& context) override
+    void do_uinteger_value(uint64_t value, const basic_parsing_context<Char>& context) override
   
 and your `json_output_handler` function signatures from     
 
@@ -21,7 +21,7 @@ and your `json_output_handler` function signatures from
 to
 
     void do_integer_value(int64_t value) override
-    void do_unsigned_integer_value(uint64_t value) override
+    void do_uinteger_value(uint64_t value) override
 
 0.98.2 Release
 --------------
@@ -144,7 +144,7 @@ Breaking changes:
 
 - Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
-- The virtual methods `do_double_value`, `do_integer_value` and `do_unsigned_integer_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
+- The virtual methods `do_double_value`, `do_integer_value` and `do_uinteger_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_type`.
   The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)
 

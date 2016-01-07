@@ -32,7 +32,7 @@ Array type
 
 Type tags that can be used with `is<T>` and `as<T>`
 
-    object_iterator
+    member_iterator
 A bidirectional iterator to `json::member_type`
 
     const_object_iterator
@@ -111,12 +111,12 @@ Assigns a new value to a `json` variable, replacing it's current contents.
 
 ### Iterators
 
-    object_iterator begin_members()
+    member_iterator begin_members()
     const_object_iterator begin_members() const
 Returns an iterator to the first member of the json object,
 provided this value is a json object, otherwise throws a `json_exception`
 
-    object_iterator end_members()
+    member_iterator end_members()
     const_object_iterator end_members() const
 Returns an iterator to one-past the last member of the json object
 provided this value is a json object, otherwise throws a `json_exception`

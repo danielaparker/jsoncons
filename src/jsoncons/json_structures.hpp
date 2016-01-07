@@ -170,9 +170,9 @@ private:
 };
 
 template <typename Char, typename Alloc, bool IsConst = false>
-class object_iterator
+class member_iterator
 {
-    typedef typename basic_json<Char,Alloc>::member_type value_types;
+    typedef typename basic_json<Char,Alloc>::member_type value_type;
     typedef std::ptrdiff_t difference_type;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
@@ -184,7 +184,7 @@ class object_iterator
     class deref_proxy
     {
     public:
-      deref_proxy(object_iterator const * it)
+      deref_proxy(member_iterator const * it)
         : it_(it)
       {}
 
@@ -199,12 +199,12 @@ class object_iterator
             return (it_->it_)->second;
         }
 
-        operator value_types() const
+        operator value_type() const
         {
-            return value_types(name(),value());
+            return value_type(name(),value());
         }
 
-        void operator =(value_types const& value)
+        void operator =(value_type const& value)
         {
           it_->invoke_(value);
         }
@@ -214,51 +214,51 @@ class object_iterator
             return this;
         }
     private:
-      object_iterator const * const it_;
+      member_iterator const * const it_;
 
     // Not to be implemented
     private:
       void operator =(deref_proxy const &);
     };
 public:
-    object_iterator(iterator_impl it)
+    member_iterator(iterator_impl it)
         : it_(it)
     {
     }
 
-    object_iterator(const object_iterator<Char,Alloc,false>& it)
+    member_iterator(const member_iterator<Char,Alloc,false>& it)
         : it_(it.it_)
     {
     }
 
-    object_iterator& operator=(object_iterator rhs)
+    member_iterator& operator=(member_iterator rhs)
     {
         swap(*this,rhs);
         return *this;
     }
 
-    object_iterator& operator++()
+    member_iterator& operator++()
     {
         ++it_;
         return *this;
     }
 
-    object_iterator operator++(int) // postfix increment
+    member_iterator operator++(int) // postfix increment
     {
-        object_iterator temp(*this);
+        member_iterator temp(*this);
         ++it_;
         return temp;
     }
 
-    object_iterator& operator--()
+    member_iterator& operator--()
     {
         --it_;
         return *this;
     }
 
-    object_iterator operator--(int)
+    member_iterator operator--(int)
     {
-        object_iterator temp(*this);
+        member_iterator temp(*this);
         --it_;
         return temp;
     }
@@ -273,15 +273,15 @@ public:
         return deref_proxy(this);
     }
 
-    friend bool operator==(const object_iterator& it1, const object_iterator& it2)
+    friend bool operator==(const member_iterator& it1, const member_iterator& it2)
     {
         return it1.it_ == it2.it_;
     }
-    friend bool operator!=(const object_iterator& it1, const object_iterator& it2)
+    friend bool operator!=(const member_iterator& it1, const member_iterator& it2)
     {
         return it1.it_ != it2.it_;
     }
-    friend void swap(object_iterator& lhs, object_iterator& rhs)
+    friend void swap(member_iterator& lhs, member_iterator& rhs)
     {
         using std::swap;
         swap(lhs.it_,rhs.it_);
@@ -291,7 +291,7 @@ public:
     iterator_impl it_;
     typename basic_json<Char,Alloc>::member_type member_;
 
-    void invoke_(value_types const & value)
+    void invoke_(value_type const & value)
     {
         *it_ = value;
     }
@@ -301,8 +301,8 @@ template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef object_iterator<Char,Alloc,false> iterator;
-    typedef object_iterator<Char,Alloc,true> const_iterator;
+    typedef member_iterator<Char,Alloc,false> iterator;
+    typedef member_iterator<Char,Alloc,true> const_iterator;
 	typedef std::pair<std::basic_string<Char>,basic_json<Char,Alloc>> member_type;
     typedef typename std::vector<member_type>::iterator internal_iterator;
     typedef typename std::vector<member_type>::const_iterator const_internal_iterator;

@@ -287,7 +287,7 @@ private:
         }
     }
 
-    void do_unsigned_integer_value(unsigned long long val) override
+    void do_uinteger_value(unsigned long long val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {

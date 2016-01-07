@@ -215,22 +215,14 @@ private:
     void do_integer_value(int64_t value) override
     {
         begin_value();
-
-        std::basic_stringstream<Char> os;
-        os << value;
-        bos_.write(os.str());
-
+        print_integer(value,bos_);
         end_value();
     }
 
-    void do_unsigned_integer_value(uint64_t value) override
+    void do_uinteger_value(uint64_t value) override
     {
         begin_value();
-
-        std::basic_stringstream<Char> os;
-        os << value;
-        bos_.write(os.str());
-
+        print_uinteger(value,bos_);
         end_value();
     }
 

@@ -513,7 +513,7 @@ these always use the default allocators.</p>
 
 <p>Type tags that can be used with <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code></p>
 
-<pre><code>object_iterator
+<pre><code>member_iterator
 </code></pre>
 
 <p>A bidirectional iterator to <code>json::member_type</code></p>
@@ -621,14 +621,14 @@ json&amp; operator=(T rhs)
 
 <h3>Iterators</h3>
 
-<pre><code>object_iterator begin_members()
+<pre><code>member_iterator begin_members()
 const_object_iterator begin_members() const
 </code></pre>
 
 <p>Returns an iterator to the first member of the json object,<br>
 provided this value is a json object, otherwise throws a <code>json_exception</code></p>
 
-<pre><code>object_iterator end_members()
+<pre><code>member_iterator end_members()
 const_object_iterator end_members() const
 </code></pre>
 

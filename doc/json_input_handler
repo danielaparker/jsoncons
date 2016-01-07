@@ -556,7 +556,7 @@ line and column information is provided in the <a href="parsing_context">parsing
 </code></pre>
 
 <p>Send non-negative integer event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_unsigned_integer_value</code>.</p>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_uinteger_value</code>.</p>
 
 <pre><code>void value(double value, const parsing_context&amp; context)
 </code></pre>
@@ -632,8 +632,8 @@ line and column information is provided in the <a href="parsing_context">parsing
 <p>Receive signed integer value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 
-<pre><code>virtual void do_unsigned_integer_value(uint64_t value, 
-                                const parsing_context&amp; context)
+<pre><code>virtual void do_uinteger_value(uint64_t value, 
+                               const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive non-negative integer value event. Contextual information including<br>

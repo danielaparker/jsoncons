@@ -483,7 +483,7 @@ void do_ulonglong_integer_value(unsigned long long value, const basic_parsing_co
 <p>to</p>
 
 <pre><code>void do_integer_value(int64_t value, const basic_parsing_context&lt;Char&gt;&amp; context) override
-void do_unsigned_integer_value(uint64_t value, const basic_parsing_context&lt;Char&gt;&amp; context) override
+void do_uinteger_value(uint64_t value, const basic_parsing_context&lt;Char&gt;&amp; context) override
 </code></pre>
 
 <p>and your <code>json_output_handler</code> function signatures from     </p>
@@ -495,7 +495,7 @@ void do_ulonglong_integer_value(unsigned long long value) override
 <p>to</p>
 
 <pre><code>void do_integer_value(int64_t value) override
-void do_unsigned_integer_value(uint64_t value) override
+void do_uinteger_value(uint64_t value) override
 </code></pre>
 
 <h2>0.98.2 Release</h2>
@@ -633,7 +633,7 @@ it is arbitrarily large (limited by heap memory.)</p></li>
 <li><p>Renamed <code>value_adapter</code> to <code>json_type_traits</code>, if you have implemented your own type specializations,<br>
 you will have to rename <code>value_adapter</code> also.</p></li>
 <li><p>Only json arrays now support <code>operator[](size_t)</code> to loop over values, this is no longer supported for <code>json</code> objects. Use a json object iterator instead.</p></li>
-<li><p>The virtual methods <code>do_double_value</code>, <code>do_integer_value</code> and <code>do_unsigned_integer_value</code> of <code>json_input_handler</code> and <code>json_outputhandler</code> have been renamed to <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_value</code>, <br>
+<li><p>The virtual methods <code>do_double_value</code>, <code>do_integer_value</code> and <code>do_uinteger_value</code> of <code>json_input_handler</code> and <code>json_outputhandler</code> have been renamed to <code>do_float_value</code>, <code>do_integer_value</code>, and <code>do_unsigned_value</code>, <br>
 and their parameters have been changed from <code>double</code>, <code>long long</code>, and <code>unsigned long long</code> to typedefs <code>float_type</code>, <code>integer_type</code>, and <code>unsigned_type</code>.<br>
 The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)</p></li>
 </ul>

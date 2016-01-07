@@ -13,6 +13,42 @@
 
 namespace jsoncons {
 
+template<typename CharT> 
+void print_integer(int64_t value, buffered_ostream<CharT>& os)
+{
+    CharT buf[255];
+    uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
+    CharT* p = buf;
+    do
+    {
+        *p++ = static_cast<CharT>(48 + u%10);
+    }
+    while (u /= 10);
+    if (value < 0)
+    {
+        os.put('-');
+    }
+    while (--p >= buf)
+    {
+        os.put(*p);
+    }
+}
+
+template<typename CharT>
+void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
+{
+	CharT buf[255];
+	CharT* p = buf;
+	do
+	{
+		*p++ = static_cast<CharT>(48 + value % 10);
+	} while (value /= 10);
+	while (--p >= buf)
+	{
+		os.put(*p);
+	}
+}
+
 template <typename Char>
 class basic_json_output_handler
 {
@@ -93,17 +129,17 @@ public:
 
     void value(unsigned int value) 
     {
-        do_unsigned_integer_value(value);
+        do_uinteger_value(value);
     }
 
     void value(unsigned long value) 
     {
-        do_unsigned_integer_value(value);
+        do_uinteger_value(value);
     }
 
     void value(unsigned long long value) 
     {
-        do_unsigned_integer_value(value);
+        do_uinteger_value(value);
     }
 
     void value(double value)
@@ -145,7 +181,7 @@ private:
 
     virtual void do_integer_value(int64_t value) = 0;
 
-    virtual void do_unsigned_integer_value(uint64_t value) = 0;
+    virtual void do_uinteger_value(uint64_t value) = 0;
 
     virtual void do_bool_value(bool value) = 0;
 };
@@ -199,7 +235,7 @@ private:
     {
     }
 
-    void do_unsigned_integer_value(unsigned long long) override
+    void do_uinteger_value(unsigned long long) override
     {
     }
 

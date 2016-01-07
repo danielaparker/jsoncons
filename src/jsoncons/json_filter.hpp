@@ -79,7 +79,7 @@ private:
         writer_->value(value);
     }
 
-    void do_unsigned_integer_value(uint64_t value, 
+    void do_uinteger_value(uint64_t value, 
                                  const basic_parsing_context<Char>& context) override
     {
         writer_->value(value);
@@ -195,7 +195,7 @@ private:
         handler_->value(value,context);
     }
 
-    void do_unsigned_integer_value(uint64_t value, const basic_parsing_context<Char>& context) override
+    void do_uinteger_value(uint64_t value, const basic_parsing_context<Char>& context) override
     {
         handler_->value(value,context);
     }

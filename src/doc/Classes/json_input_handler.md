@@ -58,7 +58,7 @@ line and column information is provided in the [parsing_context](parsing_context
 
     void value(unsigned long long value, const parsing_context& context)
 Send non-negative integer event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_unsigned_integer_value`.
+line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_uinteger_value`.
 
     void value(double value, const parsing_context& context)
 Send floating point value event. Contextual information including
@@ -110,8 +110,8 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive signed integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_unsigned_integer_value(uint64_t value, 
-                                    const parsing_context& context)
+    virtual void do_uinteger_value(uint64_t value, 
+                                   const parsing_context& context)
 Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 

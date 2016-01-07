@@ -540,7 +540,7 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 <pre><code>void value(unsigned long long value)
 </code></pre>
 
-<p>Output non-negative integer event. Uses <code>do_unsigned_integer_value</code>.</p>
+<p>Output non-negative integer event. Uses <code>do_uinteger_value</code>.</p>
 
 <pre><code>void value(double value)
 </code></pre>
@@ -599,7 +599,7 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 
 <p>Receive signed integer value event</p>
 
-<pre><code>virtual void do_unsigned_integer_value(uint64_t value)
+<pre><code>virtual void do_uinteger_value(uint64_t value)
 </code></pre>
 
 <p>Receive non-negative integer value event</p>

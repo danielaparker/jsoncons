@@ -32,13 +32,13 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse_string(input);
 
-    json::object_iterator it = val.begin_members();
+    json::member_iterator it = val.begin_members();
 
     BOOST_CHECK(it->value().is_string());
     ++it;
     BOOST_CHECK(it->value().is_string());
     ++it;
-    BOOST_CHECK(it->value().type() == jsoncons::value_types::unsigned_integer_t);
+    BOOST_CHECK(it->value().type() == jsoncons::value_types::uinteger_t);
     ++it;
     BOOST_CHECK(it == val.end_members());
 }
