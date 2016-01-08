@@ -28,24 +28,6 @@
 namespace jsoncons {
 
 template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, typename basic_json<Char, Alloc>::object_key_proxy>
-{
-public:
-    static bool is(const basic_json<Char, Alloc>& rhs)
-    {
-        return true;
-    }
-    static basic_json<Char, Alloc> as(const basic_json<Char, Alloc>& rhs)
-    {
-        return rhs;
-    }
-    static void assign(basic_json<Char, Alloc>& lhs, basic_json<Char, Alloc> rhs)
-    {
-        lhs.swap(rhs);
-    }
-};
-
-template<typename Char, typename Alloc>
 class json_type_traits<Char, Alloc, std::basic_string<Char>>
 {
 public:

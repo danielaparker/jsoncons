@@ -982,6 +982,23 @@ public:
 
     class const_val_proxy 
     {
+    private:
+        const_val_proxy(); // no op
+        const_val_proxy& operator = (const const_val_proxy& other); // noop
+
+        const_val_proxy(const basic_json<Char,Alloc>& val)
+            : val_(val)
+        {
+        }
+
+        template <typename T>
+        const_val_proxy(T val)
+            : val2_(val), val_(val2_)
+        {
+        }
+
+        basic_json<Char,Alloc> val2_;
+        const basic_json<Char,Alloc>& val_;
     public:
         friend class basic_json<Char,Alloc>;
 
@@ -1245,277 +1262,284 @@ public:
             return os;
         }
 
-    private:
-        const_val_proxy(); // no op
-        const_val_proxy& operator = (const const_val_proxy& other); // noop
-
-        const_val_proxy(const basic_json<Char,Alloc>& val)
-            : val_(val)
-        {
-        }
-
-        template <typename T>
-        const_val_proxy(T val)
-            : val2_(val), val_(val2_)
-        {
-        }
-
-        basic_json<Char,Alloc> val2_;
-        const basic_json<Char,Alloc>& val_;
     };
 
     class object_key_proxy 
     {
+    private:
+        object_key_proxy(); // noop
+        object_key_proxy& operator = (const object_key_proxy& other); // noop
+
+        object_key_proxy(basic_json<Char,Alloc>& var, 
+              const std::basic_string<Char>& name)
+            : val_(var), name_(name)
+        {
+        }
+
+        basic_json<Char,Alloc>& val_;
+
+        const std::basic_string<Char>& name_;
+
+        basic_json<Char,Alloc>& evaluate() 
+        {
+            return val_.at(name_);
+        }
+
+        const basic_json<Char,Alloc>& evaluate() const
+        {
+            return val_.at(name_);
+        }
     public:
+
         friend class basic_json<Char,Alloc>;
 
         member_iterator begin_members()
         {
-            return val_.at(name_).begin_members();
+            return evaluate().begin_members();
         }
 
         const_object_iterator begin_members() const
         {
-            return val_.at(name_).begin_members();
+            return evaluate().begin_members();
         }
 
         member_iterator end_members()
         {
-            return val_.at(name_).end_members();
+            return evaluate().end_members();
         }
 
         const_object_iterator end_members() const
         {
-            return val_.at(name_).end_members();
+            return evaluate().end_members();
         }
 
         array_iterator begin_elements()
         {
-            return val_.at(name_).begin_elements();
+            return evaluate().begin_elements();
         }
 
         const_array_iterator begin_elements() const
         {
-            return val_.at(name_).begin_elements();
+            return evaluate().begin_elements();
         }
 
         array_iterator end_elements()
         {
-            return val_.at(name_).end_elements();
+            return evaluate().end_elements();
         }
 
         const_array_iterator end_elements() const
         {
-            return val_.at(name_).end_elements();
+            return evaluate().end_elements();
         }
 
         size_t size() const
         {
-            return val_.at(name_).size();
+            return evaluate().size();
         }
 
         value_types::value_types_t type() const
         {
-            return val_.at(name_).type();
+            return evaluate().type();
         }
 
         bool has_member(const std::basic_string<Char>& name) const
         {
-            return val_.at(name_).has_member(name);
+            return evaluate().has_member(name);
         }
 
         bool is_null() const
         {
-            return val_.at(name_).is_null();
+            return evaluate().is_null();
         }
 
         bool is_empty() const
         {
-            return val_.at(name_).is_empty();
+            return evaluate().is_empty();
         }
 
         size_t capacity() const
         {
-            return val_.at(name_).capacity();
+            return evaluate().capacity();
         }
 
         void reserve(size_t n)
         {
-            val_.at(name_).reserve(n);
+            evaluate().reserve(n);
         }
 
         void resize(size_t n)
         {
-            val_.at(name_).resize(n);
+            evaluate().resize(n);
         }
 
         template <typename T>
         void resize(size_t n, T val)
         {
-            val_.at(name_).resize(n,val);
+            evaluate().resize(n,val);
         }
 
         void resize_array(size_t n)
         {
-            val_.at(name_).resize_array(n);
+            evaluate().resize_array(n);
         }
 
         template <typename T>
         void resize_array(size_t n, T val)
         {
-            val_.at(name_).resize_array(n,val);
+            evaluate().resize_array(n,val);
         }
 
         template<typename T>
         bool is() const
         {
-            return val_.at(name_).template is<T>();
+            return evaluate().template is<T>();
         }
 
         bool is_string() const
         {
-            return val_.at(name_).is_string();
+            return evaluate().is_string();
         }
 
         bool is_number() const
         {
-            return val_.at(name_).is_number();
+            return evaluate().is_number();
         }
 
         bool is_numeric() const
         {
-            return val_.at(name_).is_numeric();
+            return evaluate().is_numeric();
         }
 
         bool is_bool() const
         {
-            return val_.at(name_).is_bool();
+            return evaluate().is_bool();
         }
 
         bool is_object() const
         {
-            return val_.at(name_).is_object();
+            return evaluate().is_object();
         }
 
         bool is_array() const
         {
-            return val_.at(name_).is_array();
+            return evaluate().is_array();
         }
  
         bool is_any() const
         {
-            return val_.at(name_).is_any();
+            return evaluate().is_any();
         }
 
         bool is_longlong() const
         {
-            return val_.at(name_).is_longlong();
+            return evaluate().is_longlong();
         }
 
         bool is_ulonglong() const
         {
-            return val_.at(name_).is_ulonglong();
+            return evaluate().is_ulonglong();
         }
 
         bool is_double() const
         {
-            return val_.at(name_).is_double();
+            return evaluate().is_double();
         }
 
         std::basic_string<Char> as_string() const
         {
-            return val_.at(name_).as_string();
+            return evaluate().as_string();
         }
 
         std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
         {
-            return val_.at(name_).as_string(format);
+            return evaluate().as_string(format);
         }
 
         template<typename T>
         T as() const
         {
-            return val_.at(name_).template as<T>();
+            return evaluate().template as<T>();
         }
 
         any& any_value()
         {
-            return val_.at(name_).any_value();
+            return evaluate().any_value();
         }
 
         const any& any_value() const
         {
-            return val_.at(name_).any_value();
+            return evaluate().any_value();
         }
 
         bool as_bool() const JSONCONS_NOEXCEPT
         {
-            return val_.at(name_).as_bool();
+            return evaluate().as_bool();
         }
 
         template <class T>
         std::vector<T> as_vector() const
         {
-            return val_.at(name_).template as_vector<T>();
+            return evaluate().template as_vector<T>();
         }
 
         double as_double() const
         {
-            return val_.at(name_).as_double();
+            return evaluate().as_double();
         }
 
         int as_int() const
         {
-            return val_.at(name_).as_int();
+            return evaluate().as_int();
         }
 
         unsigned int as_uint() const
         {
-            return val_.at(name_).as_uint();
+            return evaluate().as_uint();
         }
 
         long as_long() const
         {
-            return val_.at(name_).as_long();
+            return evaluate().as_long();
         }
 
         unsigned long as_ulong() const
         {
-            return val_.at(name_).as_ulong();
+            return evaluate().as_ulong();
         }
 
         long long as_longlong() const
         {
-            return val_.at(name_).as_longlong();
+            return evaluate().as_longlong();
         }
 
         unsigned long long as_ulonglong() const
         {
-            return val_.at(name_).as_ulonglong();
+            return evaluate().as_ulonglong();
         }
 
         template <class T>
         const T& any_cast() const
         {
-            return val_.at(name_).template any_cast<T>();
+            return evaluate().template any_cast<T>();
         }
         // Returns a const reference to the custom data associated with name
 
         template <class T>
         T& any_cast() 
         {
-            return val_.at(name_).template any_cast<T>();
+            return evaluate().template any_cast<T>();
         }
         // Returns a reference to the custom data associated with name
 
         operator basic_json&()
         {
-            return val_.at(name_);
+            return evaluate();
         }
 
         operator const basic_json&() const
         {
-            return val_.at(name_);
+            return evaluate();
         }
 
         template <typename T>
@@ -1533,145 +1557,145 @@ public:
 
         bool operator==(const basic_json& val) const
         {
-            return val_.at(name_) == val;
+            return evaluate() == val;
         }
 
         bool operator!=(const basic_json& val) const
         {
-            return val_.at(name_) != val;
+            return evaluate() != val;
         }
 
         basic_json<Char,Alloc>& operator[](size_t i)
         {
-            return val_.at(name_)[i];
+            return evaluate()[i];
         }
 
         const basic_json<Char,Alloc>& operator[](size_t i) const
         {
-            return val_.at(name_)[i];
+            return evaluate()[i];
         }
 
         object_key_proxy operator[](const std::basic_string<Char>& name)
         {
-            return object_key_proxy(val_.at(name_),name);
+            return object_key_proxy(evaluate(),name);
         }
 
         const basic_json<Char,Alloc>& operator[](const std::basic_string<Char>& name) const
         {
-            return val_.at(name_).at(name);
+            return evaluate().at(name);
         }
 
         basic_json<Char,Alloc>& at(const std::basic_string<Char>& name)
         {
-            return val_.at(name_).at(name);
+            return evaluate().at(name);
         }
 
         const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const
         {
-            return val_.at(name_).at(name);
+            return evaluate().at(name);
         }
 
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
         {
-            return val_.at(name_).get(name);
+            return evaluate().get(name);
         }
 
         template <typename T>
         const_val_proxy get(const std::basic_string<Char>& name, T default_val) const
         {
-            return val_.at(name_).get(name,default_val);
+            return evaluate().get(name,default_val);
         }
 
         void clear()
         {
-            val_.at(name_).clear();
+            evaluate().clear();
         }
         // Remove all elements from an array or object
 
         void remove_range(size_t from_index, size_t to_index)
         {
-            val_.at(name_).remove_range(from_index, to_index);
+            evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
 
         void remove_member(const std::basic_string<Char>& name)
         {
-            val_.at(name_).remove_member(name);
+            evaluate().remove_member(name);
         }
         // Remove a member from an object 
 /*
         template <typename T>
         void set(const std::basic_string<Char>& name, T value)
         {
-            val_.at(name_).set(name,value);
+            evaluate().set(name,value);
         }
 */
         void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
         {
-            val_.at(name_).set(name,value);
+            evaluate().set(name,value);
         }
 
         void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
 
         {
-            val_.at(name_).set(name,value);
+            evaluate().set(name,value);
         }
 /*
         template <typename T>
         void add(T value)
         {
-            val_.at(name_).add(value);
+            evaluate().add(value);
         }
 
         template <typename T>
         void add(size_t index, T value)
         {
-            val_.at(name_).add(index, value);
+            evaluate().add(index, value);
         }
 */
         void add(basic_json<Char,Alloc>&& value)
         {
-            val_.at(name_).add(value);
+            evaluate().add(value);
         }
 
         void add(size_t index, basic_json<Char,Alloc>&& value)
         {
-            val_.at(name_).add(index, value);
+            evaluate().add(index, value);
         }
 
         void add(const basic_json<Char,Alloc>& value)
         {
-            val_.at(name_).add(value);
+            evaluate().add(value);
         }
 
         void add(size_t index, const basic_json<Char,Alloc>& value)
         {
-            val_.at(name_).add(index, value);
+            evaluate().add(index, value);
         }
 
         std::basic_string<Char> to_string() const
         {
-            return val_.at(name_).to_string();
+            return evaluate().to_string();
         }
 
         std::basic_string<Char> to_string(const basic_output_format<Char>& format) const
         {
-            return val_.at(name_).to_string(format);
+            return evaluate().to_string(format);
         }
 
         void to_stream(std::basic_ostream<Char>& os) const
         {
-            val_.at(name_).to_stream(os);
+            evaluate().to_stream(os);
         }
 
         void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format) const
         {
-            val_.at(name_).to_stream(os,format);
+            evaluate().to_stream(os,format);
         }
 
         void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const
         {
-            val_.at(name_).to_stream(os,format,indenting);
+            evaluate().to_stream(os,format,indenting);
         }
 
         void swap(basic_json<Char,Alloc>& val)
@@ -1684,20 +1708,6 @@ public:
             o.to_stream(os);
             return os;
         }
-
-    private:
-        object_key_proxy(); // nopop
-        object_key_proxy& operator = (const object_key_proxy& other); // noop
-
-        object_key_proxy(basic_json<Char,Alloc>& var, 
-              const std::basic_string<Char>& name)
-            : val_(var), name_(name)
-        {
-        }
-
-        basic_json<Char,Alloc>& val_;
-
-        const std::basic_string<Char>& name_;
     };
 
     static basic_json parse(std::basic_istream<Char>& is);
@@ -1795,6 +1805,11 @@ public:
 
     basic_json(json_object<Char,Alloc>&& other)
         : var_(other)
+    {
+    }
+
+    basic_json(const object_key_proxy& proxy)
+        : var_(proxy.evaluate().var_)
     {
     }
 
