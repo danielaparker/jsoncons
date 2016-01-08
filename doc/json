@@ -780,6 +780,14 @@ const json&amp; operator[](size_t i) const
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.</p>
 
+<pre><code>object_iterator find_member(const std::string&amp; name)
+object_iterator find_member(const char* name)
+const_object_iterator find_member(const std::string&amp; name) const
+const_object_iterator find_member(const char* name) const
+</code></pre>
+
+<p>Returns an object iterator to a member whose name compares equal to <code>name</code>. If there is no such member, returns <code>end_member()</code>.</p>
+
 <pre><code>json&amp; at(const std::string&amp; name)
 const json&amp; at(const std::string&amp; name) const
 </code></pre>
