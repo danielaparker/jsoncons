@@ -974,9 +974,8 @@ public:
     static const basic_json<Char,Alloc> an_array;
     static const basic_json<Char,Alloc> null;
 
-    typedef typename json_object<Char,Alloc>::iterator member_iterator;
+    typedef typename json_object<Char,Alloc>::iterator object_iterator;
     typedef typename json_object<Char,Alloc>::const_iterator const_object_iterator;
-
     typedef typename json_array<Char,Alloc>::iterator array_iterator;
     typedef typename json_array<Char,Alloc>::const_iterator const_array_iterator;
 
@@ -1220,6 +1219,16 @@ public:
             return val_.at(name);
         }
 
+        object_iterator find_member(const std::basic_string<Char>& name)
+        {
+            return val_.find_member(name);
+        }
+
+        const_object_iterator find_member(const std::basic_string<Char>& name) const
+        {
+            return val_.find_member(name);
+        }
+
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
         {
             return val_.get(name);
@@ -1293,7 +1302,7 @@ public:
 
         friend class basic_json<Char,Alloc>;
 
-        member_iterator begin_members()
+        object_iterator begin_members()
         {
             return evaluate().begin_members();
         }
@@ -1303,7 +1312,7 @@ public:
             return evaluate().begin_members();
         }
 
-        member_iterator end_members()
+        object_iterator end_members()
         {
             return evaluate().end_members();
         }
@@ -1595,6 +1604,16 @@ public:
             return evaluate().at(name);
         }
 
+        object_iterator find_member(const std::basic_string<Char>& name)
+        {
+            return evaluate().find_member(name);
+        }
+
+        const_object_iterator find_member(const std::basic_string<Char>& name) const
+        {
+            return evaluate().find_member(name);
+        }
+
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
         {
             return evaluate().get(name);
@@ -1840,11 +1859,11 @@ public:
     {
     }
 
-    member_iterator begin_members();
+    object_iterator begin_members();
 
     const_object_iterator begin_members() const;
 
-    member_iterator end_members();
+    object_iterator end_members();
 
     const_object_iterator end_members() const;
 
@@ -2043,6 +2062,36 @@ public:
 
     basic_json<Char,Alloc>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const;
+
+    object_iterator find_member(const std::basic_string<Char>& name)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return end_members();
+        case value_types::object_t:
+            return var_.value_.object_->find(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    const_object_iterator find_member(const std::basic_string<Char>& name) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return end_members();
+        case value_types::object_t:
+            return var_.value_.object_->find(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
 
     basic_json<Char,Alloc>& at(size_t i);
     const basic_json<Char,Alloc>& at(size_t i) const;

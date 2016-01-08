@@ -649,7 +649,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 }
 
 template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::member_iterator basic_json<Char, Alloc>::begin_members()
+typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin_members()
 {
     switch (var_.type_)
     {
@@ -678,7 +678,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
 }
 
 template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::member_iterator basic_json<Char, Alloc>::end_members()
+typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_members()
 {
     switch (var_.type_)
     {

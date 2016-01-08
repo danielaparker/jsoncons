@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse_string(input);
 
-    json::member_iterator it = val.begin_members();
+    json::object_iterator it = val.begin_members();
 
     BOOST_CHECK(it->value().is_string());
     ++it;
