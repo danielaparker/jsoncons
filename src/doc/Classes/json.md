@@ -342,6 +342,9 @@ Reports JSON related events for JSON objects, arrays, object members and array e
 
 ### Non member functions
 
+    std::istream& operator>> (std::istream& os, json& val)
+Reads a `json` value from a stream.
+
     std::ostream& operator<< (std::ostream& os, const json& val)
 Inserts json value into stream.
 

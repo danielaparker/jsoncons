@@ -37,7 +37,10 @@ BOOST_AUTO_TEST_CASE(test_fail2)
 
     try
     {
-        json::parse_file(in_file);
+        //json::parse_file(in_file);
+        json val;
+        std::ifstream is(in_file);
+        is >> val;
     }
     catch (const json_parse_exception& e)
     {

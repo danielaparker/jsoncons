@@ -954,6 +954,11 @@ The content of <code>val</code> is copied (or moved) to the new element.</p>
 
 <h3>Non member functions</h3>
 
+<pre><code>std::istream&amp; operator&gt;&gt; (std::istream&amp; os, json&amp; val)
+</code></pre>
+
+<p>Reads a <code>json</code> value from a stream.</p>
+
 <pre><code>std::ostream&amp; operator&lt;&lt; (std::ostream&amp; os, const json&amp; val)
 </code></pre>
 

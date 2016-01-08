@@ -1026,11 +1026,26 @@ std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_fo
     }
 }
 
-template<typename Char, typename Alloc>
+template <typename Char,typename Alloc>
 std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char, Alloc>& o)
 {
     o.to_stream(os);
     return os;
+}
+
+template <typename Char, typename Alloc>
+std::basic_istream<Char>& operator>>(std::basic_istream<Char>& is, basic_json<Char, Alloc>& o)
+{
+    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_reader<Char> reader(is, handler);
+    reader.read_next();
+    reader.check_done();
+    if (!handler.is_valid())
+    {
+        JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+    }
+    o = handler.get_result();
+    return is;
 }
 
 template<typename Char, typename Alloc>
