@@ -1229,6 +1229,16 @@ public:
             return val_.find_member(name);
         }
 
+        object_iterator find_member(const Char* name)
+        {
+            return val_.find_member(name);
+        }
+
+        const_object_iterator find_member(const Char* name) const
+        {
+            return val_.find_member(name);
+        }
+
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
         {
             return val_.get(name);
@@ -1610,6 +1620,16 @@ public:
         }
 
         const_object_iterator find_member(const std::basic_string<Char>& name) const
+        {
+            return evaluate().find_member(name);
+        }
+
+        object_iterator find_member(const Char* name)
+        {
+            return evaluate().find_member(name);
+        }
+
+        const_object_iterator find_member(const Char* name) const
         {
             return evaluate().find_member(name);
         }
@@ -2079,6 +2099,36 @@ public:
     }
 
     const_object_iterator find_member(const std::basic_string<Char>& name) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return end_members();
+        case value_types::object_t:
+            return var_.value_.object_->find(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    object_iterator find_member(const Char* name)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return end_members();
+        case value_types::object_t:
+            return var_.value_.object_->find(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    const_object_iterator find_member(const Char* name) const
     {
         switch (var_.type_)
         {

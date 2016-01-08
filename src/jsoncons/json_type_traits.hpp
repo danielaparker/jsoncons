@@ -64,7 +64,7 @@ public:
 };
 
 template<typename Char, typename Alloc>
-class json_type_traits<Char, Alloc, const Char *>
+class json_type_traits<Char, Alloc, typename type_wrapper<Char>::const_pointer_type>
 {
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
@@ -73,7 +73,7 @@ public:
     }
     static const Char* as(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.value.as_cstring();
+        return rhs.as_cstring();
     }
     static void assign(basic_json<Char, Alloc>& lhs, const Char *rhs)
     {

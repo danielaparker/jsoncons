@@ -35,6 +35,24 @@ public:
 };
 
 template <typename Char,class Alloc>
+class key_compare2
+{
+    size_t length_;
+public:
+    key_compare2(size_t length)
+        : length_(length)
+    {
+    }
+
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& a, 
+                    Char const * b) const
+    {
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.first.length(),length_);
+        return std::char_traits<Char>::compare(a.first.c_str(),b,len) < 0;
+    }
+};
+
+template <typename Char,class Alloc>
 class member_compare
 {
 public:
@@ -348,6 +366,22 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
+    iterator find(Char const * name)
+    {
+        size_t length = std::char_traits<Char>::length(name);
+        key_compare2<Char,Alloc> comp(length);
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && it->first == name) ? iterator(it) : end();
+    }
+
+    const_iterator find(Char const * name) const
+    {
+        size_t length = std::char_traits<Char>::length(name);
+        key_compare2<Char,Alloc> comp(length);
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && it->first == name) ? const_iterator(it) : end();
+    }
+
     iterator find(const std::basic_string<Char>& name)
     {
         key_compare<Char,Alloc> comp;
@@ -435,7 +469,27 @@ public:
         return it->value();
     }
 
+    basic_json<Char,Alloc>& get(Char const * name) 
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+        }
+        return it->value();
+    }
+
     const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+        }
+        return it->second;
+    }
+
+    const basic_json<Char,Alloc>& get(Char const * name) const
     {
         auto it = find(name);
         if (it == end())

@@ -20,6 +20,27 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_find_member)
+{
+    json obj;
+
+    json::object_iterator it = obj.find_member("key");
+    BOOST_CHECK(it == obj.end_members());
+
+    obj["key1"] = 10;
+    obj["key2"] = true;
+    obj["key3"] = 'c';
+    obj["key4"] = "value4";
+
+    json::object_iterator it2 =  obj.find_member("key");
+    BOOST_CHECK(it2 == obj.end_members());
+
+    json::object_iterator it3 =  obj.find_member("key4");
+    BOOST_CHECK(it3 != obj.end_members());
+    BOOST_CHECK_EQUAL("value4",it3->value().as_cstring());
+	BOOST_CHECK_EQUAL("value4", it3->value().as<const char*>());
+}
+
 BOOST_AUTO_TEST_CASE(test_as)
 {
     json obj;

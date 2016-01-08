@@ -220,6 +220,12 @@ Returns a proxy to a keyed value. If written to, inserts or updates with the new
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
+    object_iterator find_member(const std::string& name)
+    object_iterator find_member(const char* name)
+    const_object_iterator find_member(const std::string& name) const
+    const_object_iterator find_member(const char* name) const
+Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
+
     json& at(const std::string& name)
     const json& at(const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.  These have the same behavior as the corresponding `operator[]` functions, but the non-const `at` is more efficient (doesn't have to return a proxy.)

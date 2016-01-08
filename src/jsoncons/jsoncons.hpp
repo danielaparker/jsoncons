@@ -358,6 +358,8 @@ bool is_non_ascii_character(uint32_t c)
 template <typename T>
 struct type_wrapper
 {
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
@@ -366,6 +368,8 @@ struct type_wrapper
 template <typename T>
 struct type_wrapper<const T>
 {
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
@@ -374,6 +378,8 @@ struct type_wrapper<const T>
 template <typename T>
 struct type_wrapper<T&>
 {
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
@@ -382,6 +388,8 @@ struct type_wrapper<T&>
 template <typename T>
 struct type_wrapper<const T&>
 {
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
     typedef T value_type;
     typedef T& reference;
     typedef const T& const_reference;
