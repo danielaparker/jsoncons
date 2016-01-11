@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(unicode_test_suite)
 BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 {
     std::string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-    json value = json::parse_string(input);
+    json value = json::parse(input);
     output_format format;
     format.escape_all_non_ascii(true);
     std::string output = value.to_string(format);

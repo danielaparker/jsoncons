@@ -152,28 +152,10 @@ typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(c
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::set(const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object<Char, Alloc>();
-    case value_types::object_t:
-        var_.value_.object_->set(name, value);
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object", name);
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
     switch (var_.type_){
     case value_types::array_t:
-        var_.value_.array_->push_back(value);
+        var_.value_.array_->push_back(std::move(value));
         break;
     default:
         {
@@ -186,27 +168,11 @@ template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value){
     switch (var_.type_){
     case value_types::array_t:
-        var_.value_.array_->add(index, value);
+        var_.value_.array_->add(index, std::move(value));
         break;
     default:
         {
             JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
-    switch (var_.type_){
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object<Char,Alloc>();
-    case value_types::object_t:
-        var_.value_.object_->set(name,value);
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
         }
     }
 }
@@ -514,6 +480,39 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+    }
+    return handler.get_result();
+}
+
+template<typename Char, typename Alloc>
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<Char>& s)
+{
+    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_parser<Char> parser(handler);
+    parser.begin_parse();
+    parser.parse(s.c_str(),0,s.length());
+    parser.end_parse();
+    parser.check_done(s.c_str(),parser.index(),s.length());
+    if (!handler.is_valid())
+    {
+        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
+    }
+    return handler.get_result();
+}
+
+template<typename Char, typename Alloc>
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<Char>& s, 
+                                                       basic_parse_error_handler<Char>& err_handler)
+{
+    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_parser<Char> parser(handler,err_handler);
+    parser.begin_parse();
+    parser.parse(s.c_str(),0,s.length());
+    parser.end_parse();
+    parser.check_done(s.c_str(),parser.index(),s.length());
+    if (!handler.is_valid())
+    {
+        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
     }
     return handler.get_result();
 }

@@ -12,7 +12,7 @@ using std::string;
 void accessing_a_json_value_as_a_vector()
 {
     std::string s = "{\"my-array\" : [1,2,3,4]}";
-    json val = json::parse_string(s);
+    json val = json::parse(s);
     std::vector<int> v = val["my-array"].as<std::vector<int>>();
     for (size_t i = 0; i < v.size(); ++i)
     {

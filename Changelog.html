@@ -471,7 +471,11 @@ vertical-align:1px;
 <h2>master</h2>
 
 <ul>
-<li><p>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">documentation</a>.</p></li>
+<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">documentation</a>.</li>
+<li>
+<code>json::parse_string</code> has been renamed to <code>json::parse</code>, the old name is deprecated but still works</li>
+<li>
+<code>output_format</code> drops support for <code>floatfield</code> property</li>
 <li>
 <p>The json internal representation of signed and unsigned integers has been changed from <code>long long</code> and <code>unsigned long long</code> to <code>int64_t</code> and <code>uint64_t</code>. This should not impact you unless you've implemented your own <code>json_input_handler</code> or <code>json_output_handler</code>, in which case you'll need to change your <code>json_input_handler</code> function signatures</p>
 

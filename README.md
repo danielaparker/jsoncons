@@ -27,10 +27,12 @@ The library has a number of features, which are listed below:
 
 ## What's new on master
 
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
-
 - The json internal representation of signed and unsigned integers has been changed from `long long` and `unsigned long long` to `int64_t` and `uint64_t`.
   This should not impact you unless you've implemented your own `json_input_handler` or `json_output_handler`, refer to the Changelog for more details.
+- `json::parse_string` has been renamed to `json::parse`, the old name is deprecated but still works
+- `output_format` drops support for `floatfield` property
+
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
 
 ## Benchmarks
 

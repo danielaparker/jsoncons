@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_any)
 
     std::ostringstream os;
     obj.to_stream(os);
-    json obj2 = json::parse_string(os.str());
+    json obj2 = json::parse(os.str());
 
     BOOST_CHECK(A.size1() == obj2["A"].size());
     BOOST_CHECK(A.size2() == obj2["A"][0].size());

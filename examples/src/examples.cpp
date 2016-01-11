@@ -65,7 +65,7 @@ void first_example_c()
     json books = json::parse_file("input/books.json");
 
     output_format format;
-    format.floatfield(std::ios::fixed);
+    //format.floatfield(std::ios::fixed);
     format.precision(2);
 
     for (size_t i = 0; i < books.size(); ++i)
@@ -91,7 +91,7 @@ void first_example_d()
     json books = json::parse_file("input/books.json");
 
     output_format format;
-    format.floatfield(std::ios::fixed);
+    //format.floatfield(std::ios::fixed);
     format.precision(2);
 
     for (size_t i = 0; i < books.size(); ++i)
@@ -230,7 +230,7 @@ void introspection_example()
 void read_and_write_escaped_unicode()
 {
     string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-    json value = json::parse_string(input);
+    json value = json::parse(input);
     output_format format;
     format.escape_all_non_ascii(true);
     string output = value.to_string(format);
@@ -247,7 +247,7 @@ void parse_exception_example()
 	string s = "[1,2,3,4,]";
     try 
 	{
-        jsoncons::json val = jsoncons::json::parse_string(s);
+        jsoncons::json val = jsoncons::json::parse(s);
     } 
 	catch(const jsoncons::json_parse_exception& e) 
 	{

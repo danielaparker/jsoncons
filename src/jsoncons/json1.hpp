@@ -254,7 +254,7 @@ public:
         {
             type_ = rhs.type_;
             small_string_length_ = rhs.small_string_length_;
-            value_ = rhs.value_;
+            value_ = std::move(rhs.value_);
             rhs.type_ = value_types::null_t;
         }
 
@@ -310,7 +310,7 @@ public:
         variant(json_object<Char,Alloc>&& val)
             : type_(value_types::object_t)
         {
-            value_.object_ = new json_object<Char,Alloc>(val);
+            value_.object_ = new json_object<Char,Alloc>(std::move(val));
         }
 
         variant(const json_array<Char,Alloc>& val)
@@ -322,7 +322,7 @@ public:
         variant(json_array<Char,Alloc>&& val)
             : type_(value_types::array_t)
         {
-            value_.array_ = new json_array<Char,Alloc>(val);
+            value_.array_ = new json_array<Char,Alloc>(std::move(val));
         }
 
         variant(value_types::value_types_t type, size_t size)
@@ -562,7 +562,7 @@ public:
 			default:
 				destroy();
 				type_ = value_types::object_t;
-				value_.object_ = new json_object<Char, Alloc>(val);
+				value_.object_ = new json_object<Char, Alloc>(std::move(val));
 				break;
 			}
 		}
@@ -584,7 +584,7 @@ public:
 			default:
 				destroy();
 				type_ = value_types::array_t;
-				value_.array_ = new json_array<Char, Alloc>(val);
+				value_.array_ = new json_array<Char, Alloc>(std::move(val));
 				break;
 			}
 		}
@@ -934,7 +934,13 @@ public:
             : name_(name), value_(value)
         {
         }
+
         member_type(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+            : name_(name), value_(value)
+        {
+        }
+
+        member_type(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
             : name_(name), value_(value)
         {
         }
@@ -1286,27 +1292,26 @@ public:
     class object_key_proxy 
     {
     private:
+        basic_json<Char,Alloc>& parent_;
+        const std::basic_string<Char>& name_;
+
         object_key_proxy(); // noop
         object_key_proxy& operator = (const object_key_proxy& other); // noop
 
-        object_key_proxy(basic_json<Char,Alloc>& var, 
+        object_key_proxy(basic_json<Char,Alloc>& parent, 
               const std::basic_string<Char>& name)
-            : val_(var), name_(name)
+            : parent_(parent), name_(name)
         {
         }
 
-        basic_json<Char,Alloc>& val_;
-
-        const std::basic_string<Char>& name_;
-
         basic_json<Char,Alloc>& evaluate() 
         {
-            return val_.at(name_);
+            return parent_.at(name_);
         }
 
         const basic_json<Char,Alloc>& evaluate() const
         {
-            return val_.at(name_);
+            return parent_.at(name_);
         }
     public:
 
@@ -1564,13 +1569,19 @@ public:
         template <typename T>
         object_key_proxy& operator=(T val)
         {
-            val_.set(name_, val);
+            parent_.set(name_, val);
             return *this;
         }
 
         object_key_proxy& operator=(const basic_json& val)
         {
-            val_.set(name_, val);
+            parent_.set(name_, val);
+            return *this;
+        }
+
+        object_key_proxy& operator=(basic_json<Char,Alloc>&& val)
+        {
+            parent_.set(name_, std::move(val));
             return *this;
         }
 
@@ -1677,7 +1688,13 @@ public:
         void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
 
         {
-            evaluate().set(name,value);
+            evaluate().set(std::move(name),std::move(value));
+        }
+
+        void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+
+        {
+            evaluate().set(name,std::move(value));
         }
 /*
         template <typename T>
@@ -1694,7 +1711,7 @@ public:
 */
         void add(basic_json<Char,Alloc>&& value)
         {
-            evaluate().add(value);
+            evaluate().add(std::move(value));
         }
 
         void add(size_t index, basic_json<Char,Alloc>&& value)
@@ -1739,7 +1756,7 @@ public:
 
         void swap(basic_json<Char,Alloc>& val)
         {
-            val_.swap(val);
+            parent_.swap(val);
         }
 
         friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const object_key_proxy& o)
@@ -1752,6 +1769,10 @@ public:
     static basic_json parse(std::basic_istream<Char>& is);
 
     static basic_json parse(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler);
+
+    static basic_json parse(const std::basic_string<Char>& s);
+
+    static basic_json parse(const std::basic_string<Char>& s, basic_parse_error_handler<Char>& err_handler);
 
     static basic_json parse_string(const std::basic_string<Char>& s);
 
@@ -1903,7 +1924,7 @@ public:
 
     basic_json& operator=(basic_json<Char,Alloc>&& rhs)
     {
-        var_ = std::move(rhs.var_);
+        var_ = rhs.var_;
         return *this;
     }
 
@@ -2185,9 +2206,52 @@ public:
 
     }
 */
-    void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value);
+    void set(const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char, Alloc>();
+        case value_types::object_t:
+            var_.value_.object_->set(name, value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
 
-    void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value);
+    void set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            var_.value_.object_->set(std::move(name),std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
+
+    void set(const std::basic_string<Char>& name, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            var_.value_.object_->set(name,std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
 /*
     template <typename T>
     void add(T val)

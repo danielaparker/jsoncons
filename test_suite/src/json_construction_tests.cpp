@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
     std::string input = "{\"first_name\":\"Jane\",\"last_name\":\"Roe\",\"events_attended\":10}";
 
-    json val = json::parse_string(input);
+    json val = json::parse(input);
 
     std::cout << val << std::endl;
 }
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         //os << max_value;
 
         os << "{\"max_longlong\":-" << max_value << "}";
-        json val = json::parse_string(os.str());
+        json val = json::parse(os.str());
         std::cout << val << std::endl;
         BOOST_CHECK(val["max_longlong"].is_longlong());
     }
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         std::cout << os.str() << std::endl;
 
 
-        json val = json::parse_string(os.str());
+        json val = json::parse(os.str());
         std::cout << val << std::endl;
         BOOST_CHECK(val["max_longlong_overflow"].is_double());
     }
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         std::ostringstream os;
 
         os << "{\"max_ulonglong\":" << max_uvalue << "}";
-        json val = json::parse_string(os.str());
+        json val = json::parse(os.str());
         std::cout << val << std::endl;
         BOOST_CHECK(val["max_ulonglong"].is_ulonglong());
     }
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         std::ostringstream os;
 
         os << "{\"max_ulonglong_overflow\":" << max_uvalue << "0}";
-        json val = json::parse_string(os.str());
+        json val = json::parse(os.str());
         std::cout << val << std::endl;
         BOOST_CHECK(val["max_ulonglong_overflow"].is_double());
     }

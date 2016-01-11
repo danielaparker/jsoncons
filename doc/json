@@ -549,9 +549,9 @@ static json parse_file(const std::string&amp; filename,
 
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json_parse_exception</a>. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.</p>
 
-<pre><code>static json parse_string(const std::string&amp; s)
-static json parse_string(const std::string&amp; s, 
-                         parse_error_handler&amp; err_handler)
+<pre><code>static json parse(const std::string&amp; s)
+static json parse(const std::string&amp; s, 
+                  parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>Parses a string of JSON text and returns a json object or array value. If parsing fails, throws a <a href="json_parse_exception">json_parse_exception</a>.</p>
@@ -982,6 +982,13 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
 <p>Deprecated:</p>
+
+<pre><code>static json parse_string(const std::string&amp; s)
+static json parse_string(const std::string&amp; s, 
+                         parse_error_handler&amp; err_handler)
+</code></pre>
+
+<p>Use <code>parse</code> instead</p>
 
 <pre><code>void resize_array(size_t n)
 </code></pre>

@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
     {
         std::string input("{\"field1\":\n\"value}");
         std::cout << input << std::endl;
-        json obj = json::parse_string(input);
+        json obj = json::parse(input);
     }
     catch (const json_parse_exception& e)
     {

@@ -43,7 +43,7 @@ Constructs an error message, including line and column position
     	string s = "[1,2,3,4,]";
         try 
     	{
-            jsoncons::json val = jsoncons::json::parse_string(s);
+            jsoncons::json val = jsoncons::json::parse(s);
         } 
     	catch(const jsoncons::json_parse_exception& e) 
     	{

@@ -10,7 +10,7 @@
 
     string input = "{\"first_name\":\"Jane\",\"last_name\":\"Roe\",\"events_attended\":10}";
 
-    json val = json::parse_string(input);
+    json val = json::parse(input);
 
     std::cout << val << std::endl;
 

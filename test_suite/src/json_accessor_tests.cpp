@@ -18,7 +18,21 @@
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
+
 BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
+
+BOOST_AUTO_TEST_CASE(test_object_key_proxy)
+{
+    json a;
+    a["key1"] = "value1";
+
+    json b;
+    b["key2"] = json();
+    b["key2"]["key3"] = std::move(a);
+
+	std::cout << a.type() << std::endl;
+    BOOST_CHECK(a.is_null());
+}
 
 BOOST_AUTO_TEST_CASE(test_find_member)
 {
@@ -125,7 +139,7 @@ BOOST_AUTO_TEST_CASE(test_is)
 
 BOOST_AUTO_TEST_CASE(test_is2)
 {
-    json obj = json::parse_string("{\"field1\":10}");
+    json obj = json::parse("{\"field1\":10}");
 
     BOOST_CHECK(obj["field1"].type() == jsoncons::value_types::uinteger_t);
 
@@ -215,7 +229,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_double)
 {
     std::string s("[0,1.1,2,3.1]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
 
     std::vector<double> v = val.as<std::vector<double>>(); 
     BOOST_CHECK(v.size() == 4);
@@ -228,7 +242,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_double)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_string)
 {
     std::string s("[\"Hello\",\"World\"]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
 
     std::vector<std::string> v = val.as<std::vector<std::string>>(); 
     BOOST_CHECK(v.size() == 2);
@@ -239,7 +253,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_string)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_char)
 {
     std::string s("[20,30]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
 
     std::vector<char> v = val.as<std::vector<char>>(); 
     BOOST_CHECK(v.size() == 2);
@@ -250,7 +264,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_char)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_bool)
 {
     std::string s("[true,false]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
 
     std::vector<bool> v = val.as<std::vector<bool>>(); 
     BOOST_CHECK(v.size() == 2);
@@ -261,7 +275,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_bool)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_int)
 {
     std::string s("[0,1,2,3]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
 
     std::vector<int> v = val.as<std::vector<int>>(); 
     BOOST_CHECK(v.size() == 4);
@@ -309,7 +323,7 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int)
 BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
 {
     std::string s("[0,1,2,3]");
-    json val = json::parse_string(s);
+    json val = json::parse(s);
     json root;
     root["val"] = val;
     std::vector<int> v = root["val"].as<std::vector<int>>();
@@ -321,4 +335,3 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

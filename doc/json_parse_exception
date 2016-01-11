@@ -468,7 +468,78 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>An error occurred while processing GitHub Flavored Markdown.</p><p><strong>The remote name could not be resolved: 'api.github.com'</strong></p><p>If the problem persists, please report the bug.</p>
+<pre><code>jsoncons::json_parse_exception
+</code></pre>
+
+<h3>Header</h3>
+
+<pre><code>#include "jsoncons/parse_error_handler.hpp"
+</code></pre>
+
+<h3>Base class</h3>
+
+<p><a href="json_exception">json_exception</a></p>
+
+<h3>Constructors</h3>
+
+<pre><code>json_parse_exception(std::error_code ec,
+                     size_t line,
+                     size_t column)
+
+json_parse_exception(const json_parse_exception&amp; other)
+</code></pre>
+
+<h3>Member functions</h3>
+
+<pre><code>const std::error_code code() const
+</code></pre>
+
+<p>Returns a message for this exception</p>
+
+<pre><code>size_t line_number() const
+</code></pre>
+
+<p>Returns the line number to the end of the text where the exception occurred.<br>
+Line numbers start at 1.</p>
+
+<pre><code>size_t column_number() const
+</code></pre>
+
+<p>Returns the column number to the end of the text where the exception occurred.<br>
+Column numbers start at 1.</p>
+
+<pre><code>const char* what() const
+</code></pre>
+
+<p>Constructs an error message, including line and column position</p>
+
+<h3>Example</h3>
+
+<pre><code>#include "jsoncons/json.hpp"
+
+using jsoncons::json;
+
+int main()
+{
+    string s = "[1,2,3,4,]";
+    try 
+    {
+        jsoncons::json val = jsoncons::json::parse(s);
+    } 
+    catch(const jsoncons::json_parse_exception&amp; e) 
+    {
+        std::cout &lt;&lt; "Caught json_parse_exception with category " 
+                  &lt;&lt; e.code().category().name() 
+                  &lt;&lt; ", code " &lt;&lt; e.code().value() 
+                  &lt;&lt; " and message " &lt;&lt; e.what() &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>Caught json_parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

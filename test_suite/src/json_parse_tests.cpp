@@ -18,7 +18,7 @@ void test_error_code(const std::string& text, int ec)
 {
 	try
 	{
-		json::parse_string(text);
+		json::parse(text);
 		BOOST_FAIL(text);
 	}
 	catch (const json_parse_exception& e)
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(test_escaped_characters)
     std::string input("[\"\\n\\b\\f\\r\\t\"]");
     std::string expected("\n\b\f\r\t");
 
-    json o = json::parse_string(input);
+    json o = json::parse(input);
     BOOST_CHECK(expected == o[0].as<std::string>());
 }
 
@@ -88,27 +88,27 @@ BOOST_AUTO_TEST_CASE(test_expected_value)
 BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
 {
     json val;
-    BOOST_CHECK_NO_THROW((val=json::parse_string("null")));
+    BOOST_CHECK_NO_THROW((val=json::parse("null")));
     val == json::null_type();
-    BOOST_CHECK_NO_THROW((val=json::parse_string("false")));
+    BOOST_CHECK_NO_THROW((val=json::parse("false")));
     val == json(false);
-    BOOST_CHECK_NO_THROW((val=json::parse_string("true")));
+    BOOST_CHECK_NO_THROW((val=json::parse("true")));
     val == json(true);
-    BOOST_CHECK_NO_THROW((val=json::parse_string("10")));
+    BOOST_CHECK_NO_THROW((val=json::parse("10")));
     val == json(10);
-    BOOST_CHECK_NO_THROW((val=json::parse_string("1.999")));
+    BOOST_CHECK_NO_THROW((val=json::parse("1.999")));
     val == json(1.999);
-    BOOST_CHECK_NO_THROW((val=json::parse_string("\"string\"")));
+    BOOST_CHECK_NO_THROW((val=json::parse("\"string\"")));
     val == json("\"string\"");
 }
 
 BOOST_AUTO_TEST_CASE(test_parse_empty_structures)
 {
     json val;
-    BOOST_CHECK_NO_THROW((val=json::parse_string("{}")));
-    BOOST_CHECK_NO_THROW((val=json::parse_string("[]")));
-    BOOST_CHECK_NO_THROW((val=json::parse_string("{\"object\":{},\"array\":[]}")));
-    BOOST_CHECK_NO_THROW((val=json::parse_string("[[],{}]")));
+    BOOST_CHECK_NO_THROW((val=json::parse("{}")));
+    BOOST_CHECK_NO_THROW((val=json::parse("[]")));
+    BOOST_CHECK_NO_THROW((val=json::parse("{\"object\":{},\"array\":[]}")));
+    BOOST_CHECK_NO_THROW((val=json::parse("[[],{}]")));
 }
 
 BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)

@@ -15,7 +15,7 @@ Instead you need to use the non standard Microsoft extension
     string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     std::cout << "Input:    " << inputStr << std::endl;
 
-    json arr = json::parse_string(inputStr);
+    json arr = json::parse(inputStr);
     std::string str = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < str.size(); ++i)
@@ -46,7 +46,7 @@ Note that just the two control characters are escaped on output.
     string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
     std::cout << "Input:    " << inputStr << std::endl;
 
-    json arr = json::parse_string(inputStr);
+    json arr = json::parse(inputStr);
     std::string s = arr[0].as<string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)
@@ -65,7 +65,7 @@ Note that just the two control characters are escaped on output.
     std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 
-    json arr2 = json::parse_string(outputStr);
+    json arr2 = json::parse(outputStr);
     std::string s2 = arr2[0].as<string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)
@@ -89,7 +89,7 @@ Since the escaped unicode consists of a control character (0x7f) and non-ascii, 
 #### Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)
 
     string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-    json value = json::parse_string(input);
+    json value = json::parse(input);
     output_format format;
     format.escape_all_non_ascii(true);
     string output = value.to_string(format);

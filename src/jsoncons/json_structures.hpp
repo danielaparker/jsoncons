@@ -150,13 +150,13 @@ public:
 
     void push_back(basic_json<Char,Alloc>&& value)
     {
-        elements_.push_back(value);
+        elements_.push_back(std::move(value));
     }
 
     void add(size_t index, basic_json<Char,Alloc>&& value)
     {
         auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(it, value);
+        elements_.insert(it, std::move(value));
     }
 
     iterator begin() {return elements_.begin();}
@@ -438,11 +438,24 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->first == name)
         {
-            *it = member_type(name,value);
+            *it = member_type(std::move(name),std::move(value));
         }
         else
         {
-            members_.insert(it,member_type(name,value));
+            members_.insert(it,member_type(std::move(name),std::move(value)));
+        }
+    }
+
+    void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        if (it != members_.end() && it->first == name)
+        {
+            *it = member_type(name,std::move(value));
+        }
+        else
+        {
+            members_.insert(it,member_type(name,std::move(value)));
         }
     }
 
@@ -454,9 +467,10 @@ public:
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
         members_.push_back(member_type());
-        members_.back().first.swap(name);
-        members_.back().second.swap(val);
-        //members_.push_back(typename basic_json<Char,Alloc>::member_type(name,val)); // much slower on VS 2010
+        members_.back().first.swap(std::move(name));
+        members_.back().second.swap(std::move(val));
+        //members_.push_back(std::pair<std::basic_string<Char>, basic_json<Char, Alloc>>(std::move(name),
+        //    std::move(val))); // much slower on VS 2010
     }
 
     basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) 

@@ -517,7 +517,7 @@ capacity=10, size=3
 </h3>
 
 <pre><code>std::string s = "{\"my-array\" : [1,2,3,4]}";
-json val = json::parse_string(s);
+json val = json::parse(s);
 std::vector&lt;int&gt; v = val["my-array"].as&lt;std::vector&lt;int&gt;&gt;();
 for (size_t i = 0; i &lt; v.size(); ++i)
 {

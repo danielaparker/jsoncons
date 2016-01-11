@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_boost_optional)
 BOOST_AUTO_TEST_CASE(test_for_each_value)
 {
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
-    json val = json::parse_string(input);
+    json val = json::parse(input);
 
     json::object_iterator it = val.begin_members();
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     std::cout << os.str() << std::endl;
 
 
-    json root = json::parse_string(os.str());
+    json root = json::parse(os.str());
     std::cout << root << std::endl;
 
     BOOST_CHECK(root["null"].is_null());
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(test_serialize)
 {
     std::string input = "{\"city\":\"Toronto\", \"number\":100.5}";
 
-    json o = json::parse_string(input);
+    json o = json::parse(input);
 
     std::ostringstream os;
 
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(test_u0000)
 {
     std::string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
     std::cout << "Input:    " << inputStr << std::endl;
-    json arr = json::parse_string(inputStr);
+    json arr = json::parse(inputStr);
 
     std::string str = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
 {
     std::string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
     std::cout << "Input:    " << inputStr << std::endl;
-    json arr = json::parse_string(inputStr);
+    json arr = json::parse(inputStr);
 
     std::string s = arr[0].as<std::string>();
     std::cout << "Hex dump: [";
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::string outputStr = os.str();
     std::cout << "Output:   " << os.str() << std::endl;
 
-    json arr2 = json::parse_string(outputStr);
+    json arr2 = json::parse(outputStr);
     std::string s2 = arr2[0].as<std::string>();
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s2.size(); ++i)

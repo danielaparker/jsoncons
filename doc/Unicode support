@@ -487,7 +487,7 @@ vertical-align:1px;
 <pre><code>string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
 std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
 
-json arr = json::parse_string(inputStr);
+json arr = json::parse(inputStr);
 std::string str = arr[0].as&lt;std::string&gt;();
 std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; str.size(); ++i)
@@ -520,7 +520,7 @@ Output:   ["@@\u0000\u0011"]
 <pre><code>string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
 std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
 
-json arr = json::parse_string(inputStr);
+json arr = json::parse(inputStr);
 std::string s = arr[0].as&lt;string&gt;();
 std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; s.size(); ++i)
@@ -539,7 +539,7 @@ os &lt;&lt; print(arr,format);
 std::string outputStr = os.str();
 std::cout &lt;&lt; "Output:   " &lt;&lt; os.str() &lt;&lt; std::endl;
 
-json arr2 = json::parse_string(outputStr);
+json arr2 = json::parse(outputStr);
 std::string s2 = arr2[0].as&lt;string&gt;();
 std::cout &lt;&lt; "Hex dump: [";
 for (size_t i = 0; i &lt; s2.size(); ++i)
@@ -565,7 +565,7 @@ Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)</h4>
 
 <pre><code>string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-json value = json::parse_string(input);
+json value = json::parse(input);
 output_format format;
 format.escape_all_non_ascii(true);
 string output = value.to_string(format);

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
 {
     /*my_parse_error_handler err_handler;
 
-    json val = json::parse_string("[1,2,3,]", err_handler);
+    json val = json::parse("[1,2,3,]", err_handler);
 
     std::cout << val << std::endl;*/
 }
