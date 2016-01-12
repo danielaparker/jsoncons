@@ -50,7 +50,7 @@ Read the JSON text into a `json` value,
 
 Loop through the book array elements, using either a range-based for loop
 
-    for (auto book; books.elements())
+    for (auto book : books.elements())
     {
         std::string author = book["author"].as<std::string>();
         std::string title = book["title"].as<std::string>();

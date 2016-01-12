@@ -60,7 +60,64 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons).
 
-### Acknowledgements
+## Examples
+
+    #include "jsoncons/json.h"
+
+    // For convenience
+    using jsoncons::json;
+
+    // Construct a book object
+    json book1;
+
+    book1["category"] = "Fiction";
+    book1["title"] = "A Wild Sheep Chase: A Novel";
+    book1["author"] = "Haruki Murakami";
+    book1["date"] = "2002-04-09";
+    book1["price"] = 9.01;
+    book1["isbn"] = "037571894X";  
+
+    // Construct another from a string
+    json book2 = json::parse(R"(
+    {
+        "category" : "Fiction",
+        "title" : "Pulp",
+        "author" : "Charles Bukowski",
+        "date" : "2004-07-08",
+        "price" : 22.48,
+        "isbn" : "1852272007"  
+    }
+    )");
+
+    // Construct a booklist array
+    json booklist = json::array();
+
+    // For efficency, tell jsoncons to move the contents 
+    // of the two book objects into the array
+    booklist.add(std::move(book1));    
+    booklist.add(std::move(book2));    
+
+    // See what's left of book1 and book2
+    std::cout << book1 << "," << book2 << std::endl;
+
+    //Loop through the booklist elements using a range-based for loop    
+    for(auto book : booklist.elements())
+    {
+	std::cout << book["title"].as<std::string>()
+		  << ","
+		  << book["price"].as<double>() << std::endl;
+    }
+    
+    // Serialize the booklist to a file
+    std::ofstream os("booklist.json");
+    os << pretty_print(booklist);
+
+    // Deserialize the booklist
+    std::ifstream is("booklist.json");
+    json booklist2;
+    is >> booklist2;
+
+## Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
 
