@@ -62,7 +62,8 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 
 ## Examples
 
-    #include "jsoncons/json.h"
+    #include "jsoncons/json.hpp"
+    #include <fstream>
 
     // For convenience
     using jsoncons::json;
@@ -89,7 +90,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     }
     )");
 
-    // Construct a booklist array
+    // Construct a booklist array (expect null values)
     json booklist = json::array();
 
     // For efficency, tell jsoncons to move the contents 
@@ -97,7 +98,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
 
-    // See what's left of book1 and book2
+    // See what's left of book1 and book2 ()
     std::cout << book1 << "," << book2 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    

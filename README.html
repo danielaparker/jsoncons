@@ -549,7 +549,66 @@ This should not impact you unless you've implemented your own <code>json_input_h
 
 <p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>.</p>
 
-<h3>Acknowledgements</h3>
+<h2>Examples</h2>
+
+<pre><code>#include "jsoncons/json.hpp"
+#include &lt;fstream&gt;
+
+// For convenience
+using jsoncons::json;
+
+// Construct a book object
+json book1;
+
+book1["category"] = "Fiction";
+book1["title"] = "A Wild Sheep Chase: A Novel";
+book1["author"] = "Haruki Murakami";
+book1["date"] = "2002-04-09";
+book1["price"] = 9.01;
+book1["isbn"] = "037571894X";  
+
+// Construct another from a string
+json book2 = json::parse(R"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
+
+// Construct a booklist array (expect null values)
+json booklist = json::array();
+
+// For efficency, tell jsoncons to move the contents 
+// of the two book objects into the array
+booklist.add(std::move(book1));    
+booklist.add(std::move(book2));    
+
+// See what's left of book1 and book2 ()
+std::cout &lt;&lt; book1 &lt;&lt; "," &lt;&lt; book2 &lt;&lt; std::endl;
+
+//Loop through the booklist elements using a range-based for loop    
+for(auto book : booklist.elements())
+{
+std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
+      &lt;&lt; ","
+      &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
+}
+
+// Serialize the booklist to a file
+std::ofstream os("booklist.json");
+os &lt;&lt; pretty_print(booklist);
+
+// Deserialize the booklist
+std::ifstream is("booklist.json");
+json booklist2;
+is &gt;&gt; booklist2;
+</code></pre>
+
+<h2>Acknowledgements</h2>
 
 <p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p>
 </body>
