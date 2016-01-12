@@ -533,6 +533,18 @@ these always use the default allocators.</p>
 
 <p>A random access iterator to <code>const json</code></p>
 
+<pre><code>object_range
+const_object_range
+</code></pre>
+
+<p>An object "range" defined by <code>begin()</code> and <code>end()</code> </p>
+
+<pre><code>array_range
+const_array_range
+</code></pre>
+
+<p>An array "range" defined by <code>begin()</code> and <code>end()</code> </p>
+
 <h3>Static member functions</h3>
 
 <pre><code>static json parse(std::istream&amp; is)
@@ -619,35 +631,19 @@ json&amp; operator=(T rhs)
 
 <p>Assigns a new value to a <code>json</code> variable, replacing it's current contents.</p>
 
-<h3>Iterators</h3>
+<h3>Ranges and Iterators</h3>
 
-<pre><code>object_iterator begin_members()
-const_object_iterator begin_members() const
+<pre><code>object_range members();  
+const_object_range members() const;  
 </code></pre>
 
-<p>Returns an iterator to the first member of the json object,<br>
-provided this value is a json object, otherwise throws a <code>json_exception</code></p>
+<p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the members of a <code>json</code> object      </p>
 
-<pre><code>object_iterator end_members()
-const_object_iterator end_members() const
+<pre><code>array_range elements();
+const_array_range elements() const;
 </code></pre>
 
-<p>Returns an iterator to one-past the last member of the json object<br>
-provided this value is a json object, otherwise throws a <code>json_exception</code></p>
-
-<pre><code>array_iterator begin_elements()
-const_array_iterator begin_elements() const
-</code></pre>
-
-<p>Returns an iterator to the first element of the json array<br>
-provided this value is a json array, otherwise throws a <code>json_exception</code></p>
-
-<pre><code>array_iterator end_elements()
-const_array_iterator end_elements() const
-</code></pre>
-
-<p>Returns an iterator to one-past the last element of the json array<br>
-provided this value is a json array, otherwise throws a <code>json_exception</code></p>
+<p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the elements of a <code>json</code> array      </p>
 
 <h3>Capacity</h3>
 
@@ -656,7 +652,7 @@ provided this value is a json array, otherwise throws a <code>json_exception</co
 
 <p>Returns the number of elements in a json array, or the number of members in a json object, or <code>zero</code></p>
 
-<pre><code>bool is_empty() const
+<pre><code>bool empty() const
 </code></pre>
 
 <p>Returns <code>true</code> if a json string, object or array has no elements, otherwise <code>false</code>.</p>
@@ -683,10 +679,10 @@ provided this value is a json array, otherwise throws a <code>json_exception</co
 
 <h3>Accessors</h3>
 
-<pre><code>bool has_member(const std::string&amp; name) const
+<pre><code>size_t count(const std::string&amp; name) const
 </code></pre>
 
-<p>Returns <code>true</code> if a json object has a member named <code>name</code>, otherwise <code>false</code>.    </p>
+<p>Returns the number of object members that match <code>name</code>.    </p>
 
 <pre><code>template &lt;typename T&gt;
 bool is() const
@@ -780,10 +776,10 @@ const json&amp; operator[](size_t i) const
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.</p>
 
-<pre><code>object_iterator find_member(const std::string&amp; name)
-object_iterator find_member(const char* name)
-const_object_iterator find_member(const std::string&amp; name) const
-const_object_iterator find_member(const char* name) const
+<pre><code>object_iterator find(const std::string&amp; name)
+object_iterator find(const char* name)
+const_object_iterator find(const std::string&amp; name) const
+const_object_iterator find(const char* name) const
 </code></pre>
 
 <p>Returns an object iterator to a member whose name compares equal to <code>name</code>. If there is no such member, returns <code>end_member()</code>.</p>
@@ -799,11 +795,6 @@ const json&amp; at(size_t i) const
 </code></pre>
 
 <p>Returns a reference to the element at position <code>i</code> in a json array.  These have the same behavior as the corresponding <code>operator[]</code> functions.</p>
-
-<pre><code>const json&amp; get(const std::string&amp; name) const
-</code></pre>
-
-<p>If <code>name</code> matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to a null value.</p>
 
 <pre><code>template &lt;typename T&gt;
 const json get(const std::string&amp; name, T default_val) const
@@ -983,6 +974,45 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 
 <p>Deprecated:</p>
 
+<pre><code>const json&amp; get(const std::string&amp; name) const
+</code></pre>
+
+<p>Use the version of <code>get</code> with two parameters and explicitly specify a json null default value </p>
+
+<pre><code>bool has_member(const std::string&amp; name) const
+</code></pre>
+
+<p>Use count(const std::string&amp; name) instead.</p>
+
+<pre><code>object_iterator begin_members()
+const_object_iterator begin_members() const
+</code></pre>
+
+<p>Use members().begin() instead.</p>
+
+<pre><code>object_iterator end_members()
+const_object_iterator end_members() const
+</code></pre>
+
+<p>Use members().end() instead.</p>
+
+<pre><code>array_iterator begin_elements()
+const_array_iterator begin_elements() const
+</code></pre>
+
+<p>Use elements().begin() instead.</p>
+
+<pre><code>array_iterator end_elements()
+const_array_iterator end_elements() const
+</code></pre>
+
+<p>Use elements().end() instead.</p>
+
+<pre><code>bool is_empty() const
+</code></pre>
+
+<p>Use <code>empty</code> instead</p>
+
 <pre><code>static json parse_string(const std::string&amp; s)
 static json parse_string(const std::string&amp; s, 
                          parse_error_handler&amp; err_handler)
@@ -1026,8 +1056,8 @@ static json parse_string(const std::string&amp; s,
 obj["field1"] = 1;
 obj["field3"] = "Toronto";
 
-double x1 = obj.has_member("field1") ? obj["field1"].as&lt;double&gt;() : 10.0;
-double x2 = obj.has_member("field2") ? obj["field2"].as&lt;double&gt;() : 20.0;
+double x1 = obj.count("field1") &gt; 0 ? obj["field1"].as&lt;double&gt;() : 10.0;
+double x2 = obj.count("field2") &gt; 0 ? obj["field2"].as&lt;double&gt;() : 20.0;
 
 std::string x3 = obj.get("field3","Montreal").as&lt;std::string&gt;();
 std::string x4 = obj.get("field4","San Francisco").as&lt;std::string&gt;();
@@ -1097,7 +1127,7 @@ obj["city"] = "Toronto";
 obj["province"] = "Ontario";
 obj["country"] = "Canada";
 
-for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
 {
     std::cout &lt;&lt; it-&gt;name() &lt;&lt; "=" &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
 }
@@ -1117,7 +1147,7 @@ arr.add("Toronto");
 arr.add("Vancouver");
 arr.add("Montreal");
 
-for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
 {
     std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
 }

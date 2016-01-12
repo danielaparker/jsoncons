@@ -94,7 +94,7 @@ public:
             {
                 if (!is_->eof())
                 {
-                    is_->read(&buffer_[0], buffer_capacity_);
+                    is_->read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_->gcount());
                     if (buffer_length_ == 0)
                     {
@@ -109,7 +109,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse(&buffer_[0],index_,buffer_length_);
+                parser_.parse(buffer_.data(),index_,buffer_length_);
                 index_ = parser_.index();
             }
         }
@@ -124,7 +124,7 @@ public:
             {
                 if (!is_->eof())
                 {
-                    is_->read(&buffer_[0], buffer_capacity_);
+                    is_->read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_->gcount());
                     if (buffer_length_ == 0)
                     {
@@ -139,7 +139,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.check_done(&buffer_[0],index_,buffer_length_);
+                parser_.check_done(buffer_.data(),index_,buffer_length_);
                 index_ = parser_.index();
             }
         }

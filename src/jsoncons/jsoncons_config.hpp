@@ -355,7 +355,7 @@ public:
                     ++j;
                 }
             }
-            const char *begin = &buffer_[0];
+            const char *begin = buffer_.data();
             char *end = nullptr;
             val = strtod(begin, &end);
             if (begin == end)

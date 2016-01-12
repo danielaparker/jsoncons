@@ -857,7 +857,13 @@ public:
             return type_ == value_types::bool_t;
         }
 
+        // Deprecated
         bool is_empty() const
+        {
+            return empty();
+        }
+
+        bool empty() const
         {
             switch (type_)
             {
@@ -985,6 +991,101 @@ public:
     typedef typename json_array<Char,Alloc>::iterator array_iterator;
     typedef typename json_array<Char,Alloc>::const_iterator const_array_iterator;
 
+    class object_range
+    {
+        basic_json<Char,Alloc>& val_;
+
+        object_range();
+        object_range& operator = (const object_range& other); // noop
+
+        object_range(basic_json<Char,Alloc>& val)
+            : val_(val)
+        {
+        }
+    public:
+        friend class basic_json<Char, Alloc>;
+
+        object_iterator begin()
+        {
+            return val_.begin_members();
+        }
+        object_iterator end()
+        {
+            return val_.end_members();
+        }
+    };
+
+    class const_object_range
+    {
+        const basic_json<Char,Alloc>& val_;
+
+        const_object_range();
+        const_object_range& operator = (const const_object_range& other); // noop
+
+        const_object_range(const basic_json<Char,Alloc>& val)
+            : val_(val)
+        {
+        }
+    public:
+        friend class basic_json<Char, Alloc>;
+        const_object_iterator begin() const
+        {
+            return val_.begin_members();
+        }
+        const_object_iterator end() const
+        {
+            return val_.end_members();
+        }
+    };
+
+    class array_range
+    {
+        basic_json<Char,Alloc>& val_;
+
+        array_range();
+        array_range& operator = (const array_range& other); // noop
+
+        array_range(basic_json<Char,Alloc>& val)
+            : val_(val)
+        {
+        }
+    public:
+        friend class basic_json<Char, Alloc>;
+
+        array_iterator begin()
+        {
+            return val_.begin_elements();
+        }
+        array_iterator end()
+        {
+            return val_.end_elements();
+        }
+    };
+
+    class const_array_range
+    {
+        const basic_json<Char,Alloc>& val_;
+
+        const_array_range();
+        const_array_range& operator = (const const_array_range& other); // noop
+
+        const_array_range(basic_json<Char,Alloc>& val)
+            : val_(val)
+        {
+        }
+    public:
+        friend class basic_json<Char, Alloc>;
+
+        const_array_iterator begin() const
+        {
+            return val_.begin_elements();
+        }
+        const_array_iterator end() const
+        {
+            return val_.end_elements();
+        }
+    };
+
     class const_val_proxy 
     {
     private:
@@ -1006,6 +1107,26 @@ public:
         const basic_json<Char,Alloc>& val_;
     public:
         friend class basic_json<Char,Alloc>;
+
+        object_range members()
+        {
+            return object_range(val_);
+        }
+
+        const_object_range members() const
+        {
+            return const_object_range(val_);
+        }
+
+        array_range elements()
+        {
+            return array_range(val_);
+        }
+
+        const_array_range elements() const
+        {
+            return const_array_range(val_);
+        }
 
         const_object_iterator begin_members() const
         {
@@ -1037,9 +1158,15 @@ public:
             return val_.type();
         }
 
+        // Deprecated
         bool has_member(const std::basic_string<Char>& name) const
         {
             return val_.has_member(name);
+        }
+
+        size_t count(const std::basic_string<Char>& name) const
+        {
+            return val_.count(name);
         }
 
         template<typename T>
@@ -1053,9 +1180,15 @@ public:
             return val_.is_null();
         }
 
+        // Deprecated
         bool is_empty() const
         {
-            return val_.is_empty();
+            return empty();
+        }
+
+        bool empty() const
+        {
+            return val_.empty();
         }
 
         size_t capacity() const
@@ -1225,24 +1358,24 @@ public:
             return val_.at(name);
         }
 
-        object_iterator find_member(const std::basic_string<Char>& name)
+        object_iterator find(const std::basic_string<Char>& name)
         {
-            return val_.find_member(name);
+            return val_.find(name);
         }
 
-        const_object_iterator find_member(const std::basic_string<Char>& name) const
+        const_object_iterator find(const std::basic_string<Char>& name) const
         {
-            return val_.find_member(name);
+            return val_.find(name);
         }
 
-        object_iterator find_member(const Char* name)
+        object_iterator find(const Char* name)
         {
-            return val_.find_member(name);
+            return val_.find(name);
         }
 
-        const_object_iterator find_member(const Char* name) const
+        const_object_iterator find(const Char* name) const
         {
-            return val_.find_member(name);
+            return val_.find(name);
         }
 
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
@@ -1317,6 +1450,26 @@ public:
 
         friend class basic_json<Char,Alloc>;
 
+        object_range members()
+        {
+            return object_range(evaluate());
+        }
+
+        const_object_range members() const
+        {
+            return const_object_range(evaluate());
+        }
+
+        array_range elements()
+        {
+            return array_range(evaluate());
+        }
+
+        const_array_range elements() const
+        {
+            return const_array_range(evaluate());
+        }
+
         object_iterator begin_members()
         {
             return evaluate().begin_members();
@@ -1367,9 +1520,15 @@ public:
             return evaluate().type();
         }
 
+        // Deprecated
         bool has_member(const std::basic_string<Char>& name) const
         {
             return evaluate().has_member(name);
+        }
+
+        size_t count(const std::basic_string<Char>& name) const
+        {
+            return evaluate().count(name);
         }
 
         bool is_null() const
@@ -1377,9 +1536,15 @@ public:
             return evaluate().is_null();
         }
 
+        // Deprecated
         bool is_empty() const
         {
-            return evaluate().is_empty();
+            return empty();
+        }
+
+        bool empty() const
+        {
+            return evaluate().empty();
         }
 
         size_t capacity() const
@@ -1625,24 +1790,24 @@ public:
             return evaluate().at(name);
         }
 
-        object_iterator find_member(const std::basic_string<Char>& name)
+        object_iterator find(const std::basic_string<Char>& name)
         {
-            return evaluate().find_member(name);
+            return evaluate().find(name);
         }
 
-        const_object_iterator find_member(const std::basic_string<Char>& name) const
+        const_object_iterator find(const std::basic_string<Char>& name) const
         {
-            return evaluate().find_member(name);
+            return evaluate().find(name);
         }
 
-        object_iterator find_member(const Char* name)
+        object_iterator find(const Char* name)
         {
-            return evaluate().find_member(name);
+            return evaluate().find(name);
         }
 
-        const_object_iterator find_member(const Char* name) const
+        const_object_iterator find(const Char* name) const
         {
-            return evaluate().find_member(name);
+            return evaluate().find(name);
         }
 
         const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
@@ -1964,7 +2129,33 @@ public:
         return var_.is_null();
     }
 
+    // Deprecated
     bool has_member(const std::basic_string<Char>& name) const;
+
+    size_t count(const std::basic_string<Char>& name) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::object_t:
+            {
+                auto it = var_.value_.object_->find(name);
+                if (it == end_members())
+                {
+                    return 0;
+                }
+                size_t count = 0;
+                while (it != end_members() && it->name() == name)
+                {
+                    ++count;
+                    ++it;
+                }
+                return count;
+            }
+            break;
+        default:
+            return 0;
+        }
+    }
 
     template<typename T>
     bool is() const
@@ -2017,7 +2208,13 @@ public:
         return var_.type_ == value_types::double_t;
     }
 
-    bool is_empty() const;
+    // Deprecated
+    bool is_empty() const
+    {
+        return empty();
+    }
+
+    bool empty() const;
 
     size_t capacity() const;
 
@@ -2104,7 +2301,7 @@ public:
     basic_json<Char,Alloc>& at(const std::basic_string<Char>& name);
     const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const;
 
-    object_iterator find_member(const std::basic_string<Char>& name)
+    object_iterator find(const std::basic_string<Char>& name)
     {
         switch (var_.type_)
         {
@@ -2119,7 +2316,7 @@ public:
         }
     }
 
-    const_object_iterator find_member(const std::basic_string<Char>& name) const
+    const_object_iterator find(const std::basic_string<Char>& name) const
     {
         switch (var_.type_)
         {
@@ -2134,7 +2331,7 @@ public:
         }
     }
 
-    object_iterator find_member(const Char* name)
+    object_iterator find(const Char* name)
     {
         switch (var_.type_)
         {
@@ -2149,7 +2346,7 @@ public:
         }
     }
 
-    const_object_iterator find_member(const Char* name) const
+    const_object_iterator find(const Char* name) const
     {
         switch (var_.type_)
         {
@@ -2445,7 +2642,27 @@ public:
         return is_numeric();
     }
 
-    array& elements() 
+    object_range members()
+    {
+        return object_range(*this);
+    }
+
+    const_object_range members() const
+    {
+        return const_object_range(*this);
+    }
+
+    array_range elements()
+    {
+        return array_range(*this);
+    }
+
+    const_array_range elements() const
+    {
+        return const_array_range(*this);
+    }
+
+    array& array_value() 
     {
 		switch (var_.type_)
 		{
@@ -2457,7 +2674,7 @@ public:
         }
     }
 
-    const array& elements() const
+    const array& array_value() const
     {
         switch (var_.type_)
         {
@@ -2469,7 +2686,7 @@ public:
         }
     }
 
-    object& members()
+    object& object_value()
     {
         switch (var_.type_)
         {
@@ -2485,12 +2702,12 @@ public:
         }
     }
 
-    const object& members() const
+    const object& object_value() const
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return cobject().members();
+            return cobject().object_value();
         case value_types::object_t:
             return *(var_.value_.object_);
         default:

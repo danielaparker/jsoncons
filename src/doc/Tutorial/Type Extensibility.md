@@ -23,7 +23,7 @@ For example, by including the header file `jsoncons_ext/boost/type_extensions.hp
         std::cout << "Maturity: " << maturity << std::endl << std::endl;
 
         std::cout << "Observation dates: " << std::endl << std::endl;
-        json::array_iterator it = deal["ObservationDates"].begin_elements();
+        json::array_iterator it = deal["ObservationDates"].elements().begin();
         json::array_iterator end = deal["ObservationDates"].end_elements();
 
         while (it != end)

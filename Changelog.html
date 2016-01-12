@@ -470,12 +470,21 @@ vertical-align:1px;
 <body>
 <h2>master</h2>
 
+<p>New features</p>
+
 <ul>
 <li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">documentation</a>.</li>
-<li>
-<code>json::parse_string</code> has been renamed to <code>json::parse</code>, the old name is deprecated but still works</li>
-<li>
-<code>output_format</code> drops support for <code>floatfield</code> property</li>
+<li>json member function <code>find</code> added</li>
+<li>json member function <code>count</code> added</li>
+<li>json array range accessor <code>elements()</code> added, which supports range-based for loops over json arrays, and replaces <code>begin_elements</code> and <code>end_elements</code>
+</li>
+<li>json object range accessor <code>members()</code> added, which supports range-based for loops over json objects, and replaces <code>begin_members</code> and <code>end_members</code>
+</li>
+</ul>
+
+<p>API Changes </p>
+
+<ul>
 <li>
 <p>The json internal representation of signed and unsigned integers has been changed from <code>long long</code> and <code>unsigned long long</code> to <code>int64_t</code> and <code>uint64_t</code>. This should not impact you unless you've implemented your own <code>json_input_handler</code> or <code>json_output_handler</code>, in which case you'll need to change your <code>json_input_handler</code> function signatures</p>
 
@@ -501,6 +510,25 @@ void do_ulonglong_integer_value(unsigned long long value) override
 <pre><code>void do_integer_value(int64_t value) override
 void do_uinteger_value(uint64_t value) override
 </code></pre>
+
+<ul>
+<li>
+<code>output_format</code> drops support for <code>floatfield</code> property</li>
+</ul>
+
+<p>Non-beaking API Changes</p>
+
+<ul>
+<li>
+<code>json::parse_string</code> has been renamed to <code>json::parse</code>, <code>parse_string</code> is deprecated but still works</li>
+<li>
+<code>json member function</code>is_empty<code>has been renamed to</code>empty<code>,</code>is_empty` is deprecated but still works. Rationale: consistency with C++ containers</li>
+<li>json member functions <code>begin_elements</code> and <code>end_elements</code> have been deprecated, instead use <code>elements().begin()</code> and <code>elements.end()</code>
+</li>
+<li>json member functions <code>begin_members</code> and <code>end_members</code> have been deprecated, instead use <code>members().begin()</code> and <code>members.end()</code>
+</li>
+<li>json member function <code>has_member</code> has been deprecated, instead use <code>count</code>. Rationale: consistency with C++ containers</li>
+</ul>
 
 <h2>0.98.2 Release</h2>
 

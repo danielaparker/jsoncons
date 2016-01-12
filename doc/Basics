@@ -647,7 +647,7 @@ catch (const json_exception&amp; e)
     std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
 }
 
-string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as&lt;string&gt;() : "";
+string experience = obj.count("outdoor_experience") &gt; 0 ? obj["outdoor_experience"].as&lt;string&gt;() : "";
 
 bool first_aid_certification = obj.get("first_aid_certification",false).as&lt;bool&gt;();
 
@@ -668,7 +668,7 @@ obj["last_name"] = "Roe";
 obj["events_attended"] = 10;
 obj["accept_waiver_of_liability"] = true;
 
-for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
 {
     std::cout &lt;&lt; "name=" &lt;&lt; it-&gt;name() &lt;&lt; ", value=" &lt;&lt; it-&gt;value().as&lt;string&gt;() &lt;&lt; std::endl;
 }
@@ -690,7 +690,7 @@ arr.add("Toronto");
 arr.add("Ottawa");
 arr.add("Vancouver");
 
-for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
 {
     std::cout &lt;&lt; it-&gt;as&lt;string&gt;() &lt;&lt; std::endl;
 }

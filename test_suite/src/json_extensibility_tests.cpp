@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE(test_example)
         std::cout << "Maturity: " << maturity << std::endl << std::endl;
 
         std::cout << "Observation dates: " << std::endl << std::endl;
-        json::array_iterator it = deal["ObservationDates"].begin_elements();
-        json::array_iterator end = deal["ObservationDates"].end_elements();
+        json::array_iterator it = deal["ObservationDates"].elements().begin();
+        json::array_iterator end = deal["ObservationDates"].elements().end();
 
         while (it != end)
         {

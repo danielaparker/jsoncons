@@ -258,7 +258,7 @@ public:
 			params.assume_header(true);
             basic_csv_parser<Char> p(ih,params);
             p.begin_parse();
-            p.parse(&(parameters_.header()[0]),0,parameters_.header().length());
+            p.parse(parameters_.header().data(),0,parameters_.header().length());
             p.end_parse();
             column_labels(p.column_labels());
         }

@@ -51,7 +51,7 @@
             std::cout << "Is element " << i << " an object? " << elem.is<json::object>() << std::endl;
             if (elem.is<json::object>())
             {
-                for (auto it = elem.begin_members(); it != elem.end_members(); ++it)
+                for (auto it = elem.members().begin(); it != elem.members().end(); ++it)
                 {
                     std::cout << "Is member " << it->name() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->second.is<int>() << std::endl;
 

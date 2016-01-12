@@ -44,6 +44,14 @@ A random access iterator to `json`
     const_array_iterator
 A random access iterator to `const json`
 
+    object_range
+    const_object_range
+An object "range" defined by `begin()` and `end()` 
+
+    array_range
+    const_array_range
+An array "range" defined by `begin()` and `end()` 
+
 ### Static member functions
 
     static json parse(std::istream& is)
@@ -109,34 +117,22 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
     json& operator=(T rhs)
 Assigns a new value to a `json` variable, replacing it's current contents.
 
-### Iterators
+### Ranges and Iterators
 
-    object_iterator begin_members()
-    const_object_iterator begin_members() const
-Returns an iterator to the first member of the json object,
-provided this value is a json object, otherwise throws a `json_exception`
+    object_range members();  
+    const_object_range members() const;  
+Returns a "range" defined by `begin()` and `end()` over the members of a `json` object      
 
-    object_iterator end_members()
-    const_object_iterator end_members() const
-Returns an iterator to one-past the last member of the json object
-provided this value is a json object, otherwise throws a `json_exception`
-
-    array_iterator begin_elements()
-    const_array_iterator begin_elements() const
-Returns an iterator to the first element of the json array
-provided this value is a json array, otherwise throws a `json_exception`
-
-    array_iterator end_elements()
-    const_array_iterator end_elements() const
-Returns an iterator to one-past the last element of the json array
-provided this value is a json array, otherwise throws a `json_exception`
+    array_range elements();
+    const_array_range elements() const;
+Returns a "range" defined by `begin()` and `end()` over the elements of a `json` array      
 
 ### Capacity
 
     size_t size() const
 Returns the number of elements in a json array, or the number of members in a json object, or `zero`
 
-    bool is_empty() const
+    bool empty() const
 Returns `true` if a json string, object or array has no elements, otherwise `false`.
 
     size_t capacity() const
@@ -153,8 +149,8 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    bool has_member(const std::string& name) const
-Returns `true` if a json object has a member named `name`, otherwise `false`.    
+    size_t count(const std::string& name) const
+Returns the number of object members that match `name`.    
 
     template <typename T>
     bool is() const
@@ -220,10 +216,10 @@ Returns a proxy to a keyed value. If written to, inserts or updates with the new
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 
-    object_iterator find_member(const std::string& name)
-    object_iterator find_member(const char* name)
-    const_object_iterator find_member(const std::string& name) const
-    const_object_iterator find_member(const char* name) const
+    object_iterator find(const std::string& name)
+    object_iterator find(const char* name)
+    const_object_iterator find(const std::string& name) const
+    const_object_iterator find(const char* name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
 
     json& at(const std::string& name)
@@ -233,9 +229,6 @@ If `name` matches the name of a member in the json object, returns a reference t
     json& at(size_t i)
     const json& at(size_t i) const
 Returns a reference to the element at position `i` in a json array.  These have the same behavior as the corresponding `operator[]` functions.
-
-    const json& get(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a const reference to the json object, otherwise returns a const reference to a null value.
 
     template <typename T>
     const json get(const std::string& name, T default_val) const
@@ -361,6 +354,31 @@ Exchanges the values of `a` and `b`
 
 Deprecated:
 
+    const json& get(const std::string& name) const
+Use the version of `get` with two parameters and explicitly specify a json null default value 
+
+    bool has_member(const std::string& name) const
+Use count(const std::string& name) instead.
+
+    object_iterator begin_members()
+    const_object_iterator begin_members() const
+Use members().begin() instead.
+
+    object_iterator end_members()
+    const_object_iterator end_members() const
+Use members().end() instead.
+
+    array_iterator begin_elements()
+    const_array_iterator begin_elements() const
+Use elements().begin() instead.
+
+    array_iterator end_elements()
+    const_array_iterator end_elements() const
+Use elements().end() instead.
+
+    bool is_empty() const
+Use `empty` instead
+
     static json parse_string(const std::string& s)
     static json parse_string(const std::string& s, 
                              parse_error_handler& err_handler)
@@ -393,8 +411,8 @@ Empty constant json array value.  Use assignment to `json::array()` or `json::ma
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
 
-    double x1 = obj.has_member("field1") ? obj["field1"].as<double>() : 10.0;
-    double x2 = obj.has_member("field2") ? obj["field2"].as<double>() : 20.0;
+    double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
 
     std::string x3 = obj.get("field3","Montreal").as<std::string>();
     std::string x4 = obj.get("field4","San Francisco").as<std::string>();
@@ -456,7 +474,7 @@ The output is
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+    for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
     {
         std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
@@ -474,7 +492,7 @@ The output is
     arr.add("Vancouver");
     arr.add("Montreal");
 
-    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
         std::cout << it->as<std::string>() << std::endl;
     }

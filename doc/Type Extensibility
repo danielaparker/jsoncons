@@ -493,7 +493,7 @@ namespace my
     std::cout &lt;&lt; "Maturity: " &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
 
     std::cout &lt;&lt; "Observation dates: " &lt;&lt; std::endl &lt;&lt; std::endl;
-    json::array_iterator it = deal["ObservationDates"].begin_elements();
+    json::array_iterator it = deal["ObservationDates"].elements().begin();
     json::array_iterator end = deal["ObservationDates"].end_elements();
 
     while (it != end)

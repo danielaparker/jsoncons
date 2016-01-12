@@ -209,7 +209,7 @@ public:
     static typename basic_json<Char, Alloc>::object as(basic_json<Char, Alloc> rhs)
     {
 		JSONCONS_ASSERT(rhs.is_object());
-		return rhs.members();
+		return rhs.object_value();
     }
     static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::object rhs)
     {
@@ -228,7 +228,7 @@ public:
     static typename basic_json<Char, Alloc>::array as(const basic_json<Char, Alloc>& rhs)
     {
 		JSONCONS_ASSERT(rhs.is_array());
-        return rhs.elements();
+        return rhs.array_value();
     }
     static void assign(basic_json<Char, Alloc>& lhs, typename basic_json<Char, Alloc>::array rhs)
     {

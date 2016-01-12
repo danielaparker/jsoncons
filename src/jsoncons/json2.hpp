@@ -571,7 +571,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             std::vector<Char> buffer(size);
 
             // copy the file into the buffer:
-            size_t result = std::fread (&buffer[0],1,size,fp);
+            size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
                 throw json_exception_1<char>("Error reading file %s", filename);
@@ -579,9 +579,9 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
             basic_json_parser<Char> parser(handler);
             parser.begin_parse();
-            parser.parse(&buffer[0],0,buffer.size());
+            parser.parse(buffer.data(),0,buffer.size());
             parser.end_parse();
-            parser.check_done(&buffer[0],parser.index(),buffer.size());
+            parser.check_done(buffer.data(),parser.index(),buffer.size());
         }
 
         std::fclose (fp);
@@ -620,7 +620,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             std::vector<Char> buffer(size);
 
             // copy the file into the buffer:
-            size_t result = std::fread (&buffer[0],1,size,fp);
+            size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
                 throw json_exception_1<char>("Error reading file %s", filename);
@@ -628,9 +628,9 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
 
             basic_json_parser<Char> parser(handler,err_handler);
             parser.begin_parse();
-            parser.parse(&buffer[0],0,buffer.size());
+            parser.parse(buffer.data(),0,buffer.size());
             parser.end_parse();
-            parser.check_done(&buffer[0],parser.index(),buffer.size());
+            parser.check_done(buffer.data(),parser.index(),buffer.size());
         }
 
         std::fclose (fp);
@@ -754,9 +754,9 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
 }
 
 template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::is_empty() const
+bool basic_json<Char, Alloc>::empty() const
 {
-    return var_.is_empty();
+    return var_.empty();
 }
 
 template<typename Char, typename Alloc>

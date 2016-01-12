@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+    for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
     {
         std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
     }
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_another_array_iterator)
     arr.add("Ottawa");
     arr.add("Vancouver");
 
-    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
         std::cout << it->as<std::string>() << std::endl;
     }

@@ -163,7 +163,7 @@ The output is
         std::cout << e.what() << std::endl;
     }
 
-    string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as<string>() : "";
+    string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<string>() : "";
 
     bool first_aid_certification = obj.get("first_aid_certification",false).as<bool>();
 
@@ -183,7 +183,7 @@ The output is
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    for (auto it = obj.begin_members(); it != obj.end_members(); ++it)
+    for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
     {
         std::cout << "name=" << it->name() << ", value=" << it->value().as<string>() << std::endl;
     }
@@ -203,7 +203,7 @@ The output is
     arr.add("Ottawa");
     arr.add("Vancouver");
 
-    for (auto it = arr.begin_elements(); it != arr.end_elements(); ++it)
+    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
         std::cout << it->as<string>() << std::endl;
     }

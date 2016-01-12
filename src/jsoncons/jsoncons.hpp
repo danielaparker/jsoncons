@@ -31,7 +31,7 @@ class buffered_ostream
     Char* p_;
 public:
 	buffered_ostream(std::basic_ostream<Char>& os)
-		: os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(&buffer_[0]), end_buffer_(&buffer_[0]+default_buffer_length), p_(&buffer_[0])
+		: os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
 	{
 	}
 	~buffered_ostream()
