@@ -62,11 +62,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 
 ## Examples
 
-    #include "jsoncons/json.hpp"
-    #include <fstream>
-
-    // For convenience
-    using jsoncons::json;
+### Example 1. json construction
 
     // Construct a book object
     json book1;
@@ -78,8 +74,18 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     book1["price"] = 9.01;
     book1["isbn"] = "037571894X";  
 
-    // Construct another from a string
-    json book2 = json::parse(R"(
+    // Construct another in a different way
+    json book2;
+
+    book2.set("category", "History");
+    book2.set("title", "Charlie Wilson's War");
+    book2.set("author", "George Crile");
+    book2.set("date", "2007-11-06");
+    book2.set("price", 10.50);
+    book2.set("isbn", "0802143415");  
+
+    // Construct a third from a string
+    json book3 = json::parse(R"(
     {
         "category" : "Fiction",
         "title" : "Pulp",
@@ -90,33 +96,88 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     }
     )");
 
-    // Construct a booklist array (expect null values)
+    // Construct a booklist array
     json booklist = json::array();
 
+    // For efficiency, reserve memory, to avoid reallocations
+    booklist.reserve(3);
+
     // For efficency, tell jsoncons to move the contents 
-    // of the two book objects into the array
+    // of the three book objects into the array
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
+    booklist.add(std::move(book3));    
 
-    // See what's left of book1 and book2 ()
-    std::cout << book1 << "," << book2 << std::endl;
+	// See what's left of book1, 2 and 3 (expect null, null, null)
+	std::cout << book1 << "," << book2 << "," << book3 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
-	std::cout << book["title"].as<std::string>()
-		  << ","
-		  << book["price"].as<double>() << std::endl;
-    }
-    
-    // Serialize the booklist to a file
-    std::ofstream os("booklist.json");
-    os << pretty_print(booklist);
+		std::cout << book["title"].as<std::string>()
+			<< ","
+			<< book["price"].as<double>() << std::endl;
+	}
+	
+	// Serialize the booklist to a file
+	std::ofstream os("booklist.json");
+	os << pretty_print(booklist);
+
+The JSON output `booklist.json`
+
+    [
+        {
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2002-04-09",
+            "isbn":"037571894X",
+            "price":9.01,
+            "title":"A Wild Sheep Chase: A Novel"
+        },
+        {
+            "author":"George Crile",
+            "category":"History",
+            "date":"2007-11-06",
+            "isbn":"0802143415",
+            "price":10.5,
+            "title":"Charlie Wilson's War"
+        },
+        {
+            "author":"Charles Bukowski",
+            "category":"Fiction",
+            "date":"2004-07-08",
+            "isbn":"1852272007",
+            "price":22.48,
+            "title":"Pulp"
+        }
+    ]
+
+
+### Example 2. json query
+
+    #include <fstream>
+    #include "jsoncons/json.hpp"
+    #include "jsoncons_ext/jsonpath/json_query.hpp"
+
+    // For convenience
+    using jsoncons::json;
+    using jsoncons::jsonpath::json_query;
 
     // Deserialize the booklist
-    std::ifstream is("booklist.json");
-    json booklist2;
-    is >> booklist2;
+	std::ifstream is("booklist.json");
+	json booklist2;
+	is >> booklist2;
+	
+	// Use a JsonPath expression to find the authors of 
+	// books that cost less than $12
+	json result = json_query(booklist,"$[*][?(@.price < 12)].author");
+
+	std::cout << pretty_print(result) << std::endl;
+
+The result:
+
+    ["Haruki Murakami","George Crile"]
+       
 
 ## Acknowledgements
 
