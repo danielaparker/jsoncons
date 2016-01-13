@@ -113,20 +113,20 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     booklist.add(std::move(book2));    
     booklist.add(std::move(book3));    
 
-	// See what's left of book1, 2 and 3 (expect null, null, null)
-	std::cout << book1 << "," << book2 << "," << book3 << std::endl;
+    // See what's left of book1, 2 and 3 (expect null, null, null)
+    std::cout << book1 << "," << book2 << "," << book3 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
-		std::cout << book["title"].as<std::string>()
-			<< ","
-			<< book["price"].as<double>() << std::endl;
-	}
+	std::cout << book["title"].as<std::string>()
+	          << ","
+		  << book["price"].as<double>() << std::endl;
+    }
 	
-	// Serialize the booklist to a file
-	std::ofstream os("booklist.json");
-	os << pretty_print(booklist);
+    // Serialize the booklist to a file
+    std::ofstream os("booklist.json");
+    os << pretty_print(booklist);
 
 The JSON output `booklist.json`
 
@@ -157,7 +157,6 @@ The JSON output `booklist.json`
         }
     ]
 
-
 ### Example 2. json query
 
     #include <fstream>
@@ -169,15 +168,15 @@ The JSON output `booklist.json`
     using jsoncons::jsonpath::json_query;
 
     // Deserialize the booklist
-	std::ifstream is("booklist.json");
-	json booklist2;
-	is >> booklist2;
+    std::ifstream is("booklist.json");
+    json booklist2;
+    is >> booklist2;
 	
-	// Select the authors of books that cost less than $12
-        // (using JsonPath)
-	json result = json_query(booklist,"$[*][?(@.price < 12)].author");
+    // Select the authors of books that cost less than $12
+    // (using JsonPath)
+    json result = json_query(booklist,"$[*][?(@.price < 12)].author");
 
-	std::cout << pretty_print(result) << std::endl;
+    std::cout << pretty_print(result) << std::endl;
 
 The result:
 
@@ -212,15 +211,15 @@ The result:
 
     // Construct a third from a string
     wjson book3 = wjson::parse(LR"(
-{
-    "category" : "Fiction",
-    "title" : "Pulp",
-    "author" : "Charles Bukowski",
-    "date" : "2004-07-08",
-    "price" : 22.48,
-    "isbn" : "1852272007"  
-}
-)");
+    {
+        "category" : "Fiction",
+        "title" : "Pulp",
+        "author" : "Charles Bukowski",
+        "date" : "2004-07-08",
+        "price" : 22.48,
+        "isbn" : "1852272007"  
+    }
+    )");
 
     // Construct a booklist array
     wjson booklist = wjson::array();
@@ -277,7 +276,6 @@ The JSON output `booklist2.json`
             "title":"Pulp"
         }
     ]
-
 
 ### Example 4. wjson query
 
