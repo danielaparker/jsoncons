@@ -56,10 +56,10 @@ template <typename Char,class Alloc>
 class member_compare
 {
 public:
-    bool operator()(const typename basic_json<Char,Alloc>::member_type& a, 
-                    const typename basic_json<Char,Alloc>::member_type& b) const
+    bool operator()(const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& a, 
+                    const std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>& b) const
     {
-        return a.name() < b.name();
+        return a.first < b.first;
     }
 };
 
@@ -84,7 +84,7 @@ public:
     }
 
     json_array(json_array&& val)
-        : elements_(std::move(val.elements_))
+        : elements_(val.elements_)
     {
     }
 
@@ -196,7 +196,7 @@ public:
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
     typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
     typedef std::bidirectional_iterator_tag  iterator_category;
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator_impl;
+    typedef std::pair<std::basic_string<Char>,basic_json<Char,Alloc>>* iterator_impl;
 private:
     class deref_proxy;
     friend class deref_proxy;
@@ -211,12 +211,12 @@ private:
     public:
         const std::basic_string<Char>& name() const
         {
-            return (it_->it_)->name();
+            return (it_->it_)->first;
         }
 
         basic_json<Char,Alloc>& value() const
         {
-            return (it_->it_)->value();
+            return (it_->it_)->second;
         }
 
         operator value_type() const
@@ -323,7 +323,7 @@ class json_object
 public:
     typedef member_iterator<Char,Alloc,false> iterator;
     typedef member_iterator<Char,Alloc,true> const_iterator;
-	typedef typename basic_json<Char,Alloc>::member_type member_type;
+	typedef std::pair<std::basic_string<Char>,basic_json<Char,Alloc>> member_type;
     typedef typename std::vector<member_type>::iterator internal_iterator;
     typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
 
@@ -341,7 +341,7 @@ public:
     }
 
     json_object(json_object&& val)
-        : members_(std::move(val.members_))
+        : members_(val.members_)
     {
     }
 
@@ -373,7 +373,7 @@ public:
         size_t length = std::char_traits<Char>::length(name);
         key_compare2<Char,Alloc> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+        return (it != members_.end() && it->first == name) ? iterator(it) : end();
     }
 
     const_iterator find(Char const * name) const
@@ -381,22 +381,22 @@ public:
         size_t length = std::char_traits<Char>::length(name);
         key_compare2<Char,Alloc> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+        return (it != members_.end() && it->first == name) ? const_iterator(it) : end();
     }
 
     iterator find(const std::basic_string<Char>& name)
     {
         key_compare<Char,Alloc> comp;
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+        auto it = std::lower_bound(begin(),end(), name, comp);
+        return (it != end() && it->name() == name) ? it : end();
     }
  
     // Fixed by cperthuis
     const_iterator find(const std::basic_string<Char>& name) const
     {
         key_compare<Char,Alloc> comp;
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+        auto it = std::lower_bound(begin(),end(), name, comp);
+        return (it != end() && it->name() == name) ? it : end();
     }
 
     void remove_range(size_t from_index, size_t to_index) 
@@ -411,7 +411,7 @@ public:
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        if (it != members_.end() && it->name() == name)
+        if (it != members_.end() && it->first == name)
         {
             members_.erase(it);
         }
@@ -425,7 +425,7 @@ public:
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it != members_.end() && it->first == name)
         {
             *it = member_type(name,value);
         }
@@ -438,7 +438,7 @@ public:
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it != members_.end() && it->first == name)
         {
             *it = member_type(std::move(name),std::move(value));
         }
@@ -450,8 +450,8 @@ public:
 
     void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        auto it = std::lower_bound(begin(),end(),name ,key_compare<Char,Alloc>());
+        if (it != end() && it->name() == name)
         {
             *it = member_type(name,std::move(value));
         }
@@ -468,9 +468,9 @@ public:
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
-        members_.push_back(member_type(std::move(name), std::move(val)));
-        //members_.back().name().swap(std::move(name));
-        //members_.back().value().swap(std::move(val));
+        members_.push_back(member_type());
+        members_.back().first.swap(std::move(name));
+        members_.back().second.swap(std::move(val));
         //members_.push_back(std::pair<std::basic_string<Char>, basic_json<Char, Alloc>>(std::move(name),
         //    std::move(val))); // much slower on VS 2010
     }
@@ -502,7 +502,7 @@ public:
         {
             JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
         }
-        return it->value();
+        return it->second;
     }
 
     const basic_json<Char,Alloc>& get(Char const * name) const
@@ -512,7 +512,7 @@ public:
         {
             JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
         }
-        return it->value();
+        return it->second;
     }
 
 	void sort_members()
@@ -520,13 +520,13 @@ public:
 		std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
 	}
 
-    iterator begin() {return iterator(members_.begin());}
+    iterator begin() {return iterator(members_.data());}
 
-    iterator end() {return iterator(members_.end());}
+    iterator end() {return iterator(members_.data() + members_.size());}
 
-    const_iterator begin() const {return const_iterator(members_.begin());}
+    const_iterator begin() const {return const_iterator(members_.data());}
 
-    const_iterator end() const {return const_iterator(members_.end());}
+    const_iterator end() const {return const_iterator(members_.data() + members_.size());}
 
     bool operator==(const json_object<Char,Alloc>& rhs) const
     {
@@ -539,7 +539,7 @@ public:
 
             auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_compare<Char, Alloc>());
             // member_compare actually only compares keys, so we need to check the value separately
-            if (rhs_it == rhs.members_.end() || rhs_it->name() != it->name() || rhs_it->value() != it->value())
+            if (rhs_it == rhs.members_.end() || rhs_it->first != it->first || rhs_it->second != it->second)
             {
                 return false;
             }

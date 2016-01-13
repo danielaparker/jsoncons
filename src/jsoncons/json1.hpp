@@ -110,7 +110,7 @@ public:
 			impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
         }
         any(any&& val)
-            : impl_(val.impl_)
+            : impl_(std::move(val.impl_))
         {
             val.impl_ = nullptr;
         }
@@ -253,11 +253,6 @@ public:
         explicit variant(variant&& rhs)
             : type_(value_types::null_t)
         {
-            //type_ = rhs.type_;
-            //small_string_length_ = rhs.small_string_length_;
-            //value_ = std::move(rhs.value_);
-            //rhs.type_ = value_types::null_t;
-
             swap(rhs);
         }
 
@@ -945,17 +940,17 @@ public:
         }
 
         member_type(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
-            : name_(name), value_(value)
+            : name_(std::move(name)), value_(std::move(value))
         {
         }
 
         member_type(std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
-            : name_(name), value_(value)
+            : name_(std::move(name)), value_(value)
         {
         }
 
         member_type(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
-            : name_(name), value_(std::move(value))
+            : name_(name), value_(std::move(std::move(value)))
         {
         }
 
@@ -982,15 +977,21 @@ public:
 
         member_type& operator=(member_type const & member)
         {
-            name_ = member.name;
-            value_ = member.value;
+            if (this != & member)
+            {
+                name_ = member.name;
+                value_ = member.value;
+            }
             return *this;
         }
 
         member_type& operator=(member_type&& member)
         {
-            name_.swap(member.name_);
-            value_.swap(member.value_);
+            if (this != &member)
+            {
+                name_.swap(member.name_);
+                value_.swap(member.value_);
+            }
             return *this;
         }
 
@@ -1901,7 +1902,7 @@ public:
 
         void add(size_t index, basic_json<Char,Alloc>&& value)
         {
-            evaluate().add(index, value);
+            evaluate().add(index, std::move(value));
         }
 
         void add(const basic_json<Char,Alloc>& value)
@@ -2044,12 +2045,12 @@ public:
     }
 
     basic_json(json_array<Char,Alloc>&& other)
-        : var_(other)
+        : var_(std::move(other))
     {
     }
 
     basic_json(json_object<Char,Alloc>&& other)
-        : var_(other)
+        : var_(std::move(other))
     {
     }
 
@@ -2109,7 +2110,10 @@ public:
 
     basic_json& operator=(basic_json<Char,Alloc>&& rhs)
     {
-        var_ = rhs.var_;
+        if (this != &rhs)
+        {
+            var_ = std::move(rhs.var_);
+        }
         return *this;
     }
 
