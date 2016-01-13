@@ -553,7 +553,12 @@ This should not impact you unless you've implemented your own <code>json_input_h
 
 <h3>Example 1. json construction</h3>
 
-<pre><code>// Construct a book object
+<pre><code>#include "jsoncons/json.hpp"
+
+// For convenience
+using jsoncons::json;
+
+// Construct a book object
 json book1;
 
 book1["category"] = "Fiction";
@@ -658,11 +663,137 @@ std::ifstream is("booklist.json");
 json booklist2;
 is &gt;&gt; booklist2;
 
-// Use a JsonPath expression to find the authors of 
-// books that cost less than $12
+// Select the authors of books that cost less than $12
+    // (using JsonPath)
 json result = json_query(booklist,"$[*][?(@.price &lt; 12)].author");
 
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+</code></pre>
+
+<p>The result:</p>
+
+<pre><code>["Haruki Murakami","George Crile"]
+</code></pre>
+
+<h3>Example 3. wjson construction</h3>
+
+<pre><code>#include "jsoncons/json.hpp"
+
+// For convenience
+using jsoncons::wjson;
+
+// Construct a book object
+wjson book1;
+
+book1[L"category"] = L"Fiction";
+book1[L"title"] = L"A Wild Sheep Chase: A Novel";
+book1[L"author"] = L"Haruki Murakami";
+book1[L"date"] = L"2002-04-09";
+book1[L"price"] = 9.01;
+book1[L"isbn"] = L"037571894X";
+
+// Construct another in a different way
+wjson book2;
+
+book2.set(L"category", L"History");
+book2.set(L"title", L"Charlie Wilson's War");
+book2.set(L"author", L"George Crile");
+book2.set(L"date", L"2007-11-06");
+book2.set(L"price", 10.50);
+book2.set(L"isbn", L"0802143415");
+
+// Construct a third from a string
+wjson book3 = wjson::parse(LR"(
+</code></pre>
+
+<p>{<br>
+    "category" : "Fiction",<br>
+    "title" : "Pulp",<br>
+    "author" : "Charles Bukowski",<br>
+    "date" : "2004-07-08",<br>
+    "price" : 22.48,<br>
+    "isbn" : "1852272007"<br><br>
+}<br>
+)");</p>
+
+<pre><code>// Construct a booklist array
+wjson booklist = wjson::array();
+
+// For efficiency, reserve memory, to avoid reallocations
+booklist.reserve(3);
+
+// For efficency, tell jsoncons to move the contents 
+// of the three book objects into the array
+booklist.add(std::move(book1));
+booklist.add(std::move(book2));
+booklist.add(std::move(book3));
+
+// See what's left of book1, 2 and 3 (expect null, null, null)
+std::wcout &lt;&lt; book1 &lt;&lt; L"," &lt;&lt; book2 &lt;&lt; L"," &lt;&lt; book3 &lt;&lt; std::endl;
+
+//Loop through the booklist elements using a range-based for loop    
+for (auto book : booklist.elements())
+{
+    std::wcout &lt;&lt; book[L"title"].as&lt;std::wstring&gt;()
+        &lt;&lt; L","
+        &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
+}
+
+// Serialize the booklist to a file
+std::wofstream os(L"booklist2.json");
+os &lt;&lt; pretty_print(booklist);
+</code></pre>
+
+<p>The JSON output <code>booklist2.json</code></p>
+
+<pre><code>[
+    {
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2002-04-09",
+        "isbn":"037571894X",
+        "price":9.01,
+        "title":"A Wild Sheep Chase: A Novel"
+    },
+    {
+        "author":"George Crile",
+        "category":"History",
+        "date":"2007-11-06",
+        "isbn":"0802143415",
+        "price":10.5,
+        "title":"Charlie Wilson's War"
+    },
+    {
+        "author":"Charles Bukowski",
+        "category":"Fiction",
+        "date":"2004-07-08",
+        "isbn":"1852272007",
+        "price":22.48,
+        "title":"Pulp"
+    }
+]
+</code></pre>
+
+<h3>Example 4. wjson query</h3>
+
+<pre><code>#include &lt;fstream&gt;
+#include "jsoncons/json.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
+
+// For convenience
+using jsoncons::wjson;
+using jsoncons::jsonpath::json_query;
+
+// Deserialize the booklist
+std::wifstream is("booklist2.json");
+wjson booklist2;
+is &gt;&gt; booklist2;
+
+// Select the authors of books that cost less than $12
+// (using JsonPath)
+wjson result = json_query(booklist, L"$[*][?(@.price &lt; 12)].author");
+
+std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 </code></pre>
 
 <p>The result:</p>

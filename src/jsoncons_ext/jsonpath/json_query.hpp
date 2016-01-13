@@ -94,7 +94,7 @@ namespace states {
 };
 
 template<typename Char, class Alloc>
-basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<char>& path)
+basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
 {
     return json_query(root,path.c_str(),path.length());
 }
