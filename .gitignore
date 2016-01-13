@@ -36,3 +36,6 @@ test_suite/build/vs2010sp1/ipch/vs2010sp1-dd669de8/vs2010sp1-416031ca.ipch
 test_suite/build/vs2010sp1/vs2010sp1.opensdf
 test_suite/build/vs2010sp1/vs2010sp1.sdf
 test_suite/build/vs2010sp1/vs2010sp1.suo
+
+test_suite/build/vs2015/test_suite.sdf
+test_suite/build/vs2015/test_suite.VC.opendb

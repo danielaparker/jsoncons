@@ -187,143 +187,13 @@ private:
     json_array& operator=(const json_array<Char,Alloc>&);
 };
 
-template <typename Char, typename Alloc, bool IsConst = false>
-class member_iterator
-{
-public:
-    typedef typename basic_json<Char,Alloc>::member_type value_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type*, typename basic_json<Char,Alloc>::member_type*>::type pointer;
-    typedef typename std::conditional<IsConst, const typename basic_json<Char,Alloc>::member_type&, typename basic_json<Char,Alloc>::member_type&>::type reference;
-    typedef std::bidirectional_iterator_tag  iterator_category;
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator_impl;
-private:
-    class deref_proxy;
-    friend class deref_proxy;
-
-    class deref_proxy
-    {
-    public:
-      deref_proxy(member_iterator const * it)
-        : it_(it)
-      {}
-
-    public:
-        const std::basic_string<Char>& name() const
-        {
-            return (it_->it_)->name();
-        }
-
-        basic_json<Char,Alloc>& value() const
-        {
-            return (it_->it_)->value();
-        }
-
-        operator value_type() const
-        {
-            return value_type(name(),value());
-        }
-
-        void operator =(value_type const& value)
-        {
-          it_->invoke_(value);
-        }
-
-        deref_proxy const * operator->() const
-        {
-            return this;
-        }
-    private:
-      member_iterator const * const it_;
-
-    // Not to be implemented
-    private:
-      void operator =(deref_proxy const &);
-    };
-public:
-    member_iterator(iterator_impl it)
-        : it_(it)
-    {
-    }
-
-    member_iterator(const member_iterator<Char,Alloc,false>& it)
-        : it_(it.it_)
-    {
-    }
-
-    member_iterator& operator=(member_iterator rhs)
-    {
-        swap(*this,rhs);
-        return *this;
-    }
-
-    member_iterator& operator++()
-    {
-        ++it_;
-        return *this;
-    }
-
-    member_iterator operator++(int) // postfix increment
-    {
-        member_iterator temp(*this);
-        ++it_;
-        return temp;
-    }
-
-    member_iterator& operator--()
-    {
-        --it_;
-        return *this;
-    }
-
-    member_iterator operator--(int)
-    {
-        member_iterator temp(*this);
-        --it_;
-        return temp;
-    }
-
-    deref_proxy operator*() const
-    {
-        return deref_proxy(this);
-    }
-
-    deref_proxy operator->() const
-    {
-        return deref_proxy(this);
-    }
-
-    friend bool operator==(const member_iterator& it1, const member_iterator& it2)
-    {
-        return it1.it_ == it2.it_;
-    }
-    friend bool operator!=(const member_iterator& it1, const member_iterator& it2)
-    {
-        return it1.it_ != it2.it_;
-    }
-    friend void swap(member_iterator& lhs, member_iterator& rhs)
-    {
-        using std::swap;
-        swap(lhs.it_,rhs.it_);
-    }
-//private:
-
-    iterator_impl it_;
-    typename basic_json<Char,Alloc>::member_type member_;
-
-    void invoke_(value_type const & value)
-    {
-        *it_ = value;
-    }
-};
-
 template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef member_iterator<Char,Alloc,false> iterator;
-    typedef member_iterator<Char,Alloc,true> const_iterator;
-	typedef typename basic_json<Char,Alloc>::member_type member_type;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator;
+    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_iterator;
+    typedef typename basic_json<Char,Alloc>::member_type member_type;
     typedef typename std::vector<member_type>::iterator internal_iterator;
     typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
 
@@ -373,7 +243,7 @@ public:
         size_t length = std::char_traits<Char>::length(name);
         key_compare2<Char,Alloc> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+        return (it != members_.end() && it->name() == name) ? it : end();
     }
 
     const_iterator find(Char const * name) const
@@ -381,14 +251,14 @@ public:
         size_t length = std::char_traits<Char>::length(name);
         key_compare2<Char,Alloc> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+        return (it != members_.end() && it->name() == name) ? it : end();
     }
 
     iterator find(const std::basic_string<Char>& name)
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? iterator(it) : end();
+        return (it != members_.end() && it->name() == name) ? it : end();
     }
  
     // Fixed by cperthuis
@@ -396,7 +266,7 @@ public:
     {
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? const_iterator(it) : end();
+        return (it != members_.end() && it->name() == name) ? it : end();
     }
 
     void remove_range(size_t from_index, size_t to_index) 

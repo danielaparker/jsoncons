@@ -222,35 +222,19 @@ public:
         	Char c[1];
         };
 
-        static string_data* make_string_data()
-
-        {
-            size_t length = 0;
-            typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
-
-            char* storage = new char[sizeof(storage_type) + length*sizeof(Char)];
-            string_data* ps = new(storage)string_data();
-            auto psa = reinterpret_cast<string_dataA*>(storage); 
-
-            ps->p = new(&psa->c)Char[length + 1];
-            ps->p[length] = 0;
-            ps->length_ = length;
-            return ps;
-        }
-
-        static string_data* make_string_data(const Char* s, size_t length)
+        static string_data* make_string_data(const Char* s, size_t length_)
 
         {
             typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
 
-            char* storage = new char[sizeof(storage_type) + length*sizeof(Char)];
+            char* storage = new char[sizeof(storage_type) + length_*sizeof(Char)];
             string_data* ps = new(storage)string_data();
             auto psa = reinterpret_cast<string_dataA*>(storage); 
 
-            ps->p = new(&psa->c)Char[length + 1];
-            memcpy(ps->p, s, length*sizeof(Char));
-            ps->p[length] = 0;
-            ps->length_ = length;
+            ps->p = new(&psa->c)Char[length_ + 1];
+            memcpy(ps->p, s, length_*sizeof(Char));
+            ps->p[length_] = 0;
+            ps->length_ = length_;
             return ps;
         }
 
@@ -359,7 +343,7 @@ public:
                 small_string_length_ = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_data();
+                value_.string_value_ = make_string_data("",0);
                 break;
             case value_types::array_t:
                 value_.array_ = new json_array<Char,Alloc>(size);
