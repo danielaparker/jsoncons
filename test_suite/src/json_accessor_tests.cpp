@@ -21,22 +21,6 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
 
-BOOST_AUTO_TEST_CASE(test_count)
-{
-    json a;
-    a["key1"] = "value1";
-    a["key2"] = "value2";
-
-    BOOST_CHECK_EQUAL(1,a.count("key1"));
-    BOOST_CHECK_EQUAL(1,a.count("key2"));
-    BOOST_CHECK_EQUAL(0,a.count("key3"));
-
-    json b = json::parse(
-        "{\"key1\":\"a value\",\"key1\":\"another value\"}"
-    );
-    BOOST_CHECK_EQUAL(2,b.count("key1"));
-}
-
 BOOST_AUTO_TEST_CASE(test_object_key_proxy)
 {
     json a;
@@ -46,8 +30,24 @@ BOOST_AUTO_TEST_CASE(test_object_key_proxy)
     b["key2"] = json();
     b["key2"]["key3"] = std::move(a);
 
-	//std::cout << a.type() << std::endl;
+	std::cout << a.type() << std::endl;
     BOOST_CHECK(a.is_null());
+}
+
+BOOST_AUTO_TEST_CASE(test_count)
+{
+	json a;
+	a["key1"] = "value1";
+	a["key2"] = "value2";
+
+	BOOST_CHECK_EQUAL(1, a.count("key1"));
+	BOOST_CHECK_EQUAL(1, a.count("key2"));
+	BOOST_CHECK_EQUAL(0, a.count("key3"));
+
+	json b = json::parse(
+		"{\"key1\":\"a value\",\"key1\":\"another value\"}"
+		);
+	BOOST_CHECK_EQUAL(2, b.count("key1"));
 }
 
 BOOST_AUTO_TEST_CASE(test_find_member)

@@ -251,11 +251,14 @@ public:
         }
 		
         explicit variant(variant&& rhs)
+            : type_(value_types::null_t)
         {
-            type_ = rhs.type_;
-            small_string_length_ = rhs.small_string_length_;
-            value_ = std::move(rhs.value_);
-            rhs.type_ = value_types::null_t;
+            //type_ = rhs.type_;
+            //small_string_length_ = rhs.small_string_length_;
+            //value_ = std::move(rhs.value_);
+            //rhs.type_ = value_types::null_t;
+
+            swap(rhs);
         }
 
         explicit variant(const variant& var)
@@ -931,10 +934,10 @@ public:
         {
         }
         member_type(member_type&& pair)
-            //: name_(std::move(pair.name_)), value_(std::move(pair.value_))
+            : name_(std::move(pair.name_)), value_(std::move(pair.value_))
         {
-            name_.swap(pair.name_);
-            value_.swap(pair.value_);
+            //name_.swap(pair.name_);
+            //value_.swap(pair.value_);
         }
         member_type(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
             : name_(name), value_(value)
@@ -946,8 +949,13 @@ public:
         {
         }
 
-        member_type(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+        member_type(std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
             : name_(name), value_(value)
+        {
+        }
+
+        member_type(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+            : name_(name), value_(std::move(value))
         {
         }
 
@@ -971,10 +979,22 @@ public:
             name_.swap(pair.name_);
             value_.swap(pair.value_);
         }
-    private:
-        // Not to be implemented
-        void operator=(member_type const &); 
 
+        member_type& operator=(member_type const & member)
+        {
+            name_ = member.name;
+            value_ = member.value;
+            return *this;
+        }
+
+        member_type& operator=(member_type&& member)
+        {
+            name_.swap(member.name_);
+            value_.swap(member.value_);
+            return *this;
+        }
+
+    private:
         std::basic_string<Char> name_;
         basic_json<Char,Alloc> value_;
     };
