@@ -1128,6 +1128,14 @@ public:
     private:
         const_val_proxy(); // no op
         const_val_proxy& operator = (const const_val_proxy& other); // noop
+        const_val_proxy(const const_val_proxy& other)
+          : val2_(other.val2_), val_((&other.val2_ == &other.val_) ? val2_ : other.val_)
+        {
+        }
+        const_val_proxy(const_val_proxy&& other)
+          : val2_(std::move(other.val2_)), val_((&other.val2_ == &other.val_) ? val2_ : other.val_)
+        {
+        }
 
         const_val_proxy(const basic_json<Char,Alloc>& val)
             : val_(val)
