@@ -28,7 +28,7 @@ The library has a number of features, which are listed below:
 ## What's new on master
 
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
-- There are a few API changes, most retaining backwards compatability, refer to the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/src/doc/Changelog.md) for details.
+- There are a few API changes, most retaining backwards compatability, refer to the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/Changelog.md) for details.
 
 ## Benchmarks
 
