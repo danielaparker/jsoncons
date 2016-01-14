@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_count)
 	BOOST_CHECK_EQUAL(2, b.count("key1"));
 }
 
-BOOST_AUTO_TEST_CASE(test_find_member)
+BOOST_AUTO_TEST_CASE(test_find)
 {
     json obj;
 

@@ -357,8 +357,8 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
 
-    double x1 = obj.has_member("field1") ? obj["field1"].as<double>() : 10.0;
-    double x2 = obj.has_member("field2") ? obj["field2"].as<double>() : 20.0;
+    double x1 = obj.count("field1") ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.count("field2") ? obj["field2"].as<double>() : 20.0;
 
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;

@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test_remove_member)
     o["key"] = "Hello";
 
     BOOST_CHECK(o.size() == 1);
-    o.remove_member("key");
+    o.remove("key");
     BOOST_CHECK(o.size() == 0);
 
     json a;

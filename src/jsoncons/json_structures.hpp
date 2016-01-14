@@ -67,6 +67,8 @@ template <typename Char,class Alloc>
 class json_array 
 {
 public:
+    typedef basic_json<Char,Alloc>& reference; 
+    typedef const basic_json<Char,Alloc>& const_reference; 
     typedef typename std::vector<basic_json<Char,Alloc>>::iterator iterator;
     typedef typename std::vector<basic_json<Char,Alloc>>::const_iterator const_iterator;
 
@@ -142,21 +144,31 @@ public:
         elements_.push_back(value);
     }
 
+    void push_back(basic_json<Char,Alloc>&& value)
+    {
+        elements_.push_back(std::move(value));
+    }
+
     void add(size_t index, const basic_json<Char,Alloc>& value)
     {
         auto position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
-    void push_back(basic_json<Char,Alloc>&& value)
-    {
-        elements_.push_back(std::move(value));
-    }
-
     void add(size_t index, basic_json<Char,Alloc>&& value)
     {
         auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(it, std::move(value));
+    }
+
+    void add(const_iterator pos, const basic_json<Char,Alloc>& value)
+    {
+        elements_.insert(pos, value);
+    }
+
+    void add(const_iterator pos, basic_json<Char,Alloc>&& value)
+    {
+        elements_.insert(pos, std::move(value));
     }
 
     iterator begin() {return elements_.begin();}
@@ -191,11 +203,11 @@ template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::iterator iterator;
-    typedef typename std::vector<typename basic_json<Char,Alloc>::member_type>::const_iterator const_iterator;
     typedef typename basic_json<Char,Alloc>::member_type member_type;
-    typedef typename std::vector<member_type>::iterator internal_iterator;
-    typedef typename std::vector<member_type>::const_iterator const_internal_iterator;
+    typedef member_type& reference; 
+    typedef const member_type& const_reference; 
+    typedef typename std::vector<member_type>::iterator iterator;
+    typedef typename std::vector<member_type>::const_iterator const_iterator;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
@@ -305,16 +317,16 @@ public:
         }
     }
 
-    void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+    void set(std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->name() == name)
         {
-            *it = member_type(std::move(name),std::move(value));
+            *it = member_type(std::move(name),value);
         }
         else
         {
-            members_.insert(it,member_type(std::move(name),std::move(value)));
+            members_.insert(it,member_type(std::move(name),value));
         }
     }
 
@@ -328,6 +340,19 @@ public:
         else
         {
             members_.insert(it,member_type(name,std::move(value)));
+        }
+    }
+
+    void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        if (it != members_.end() && it->name() == name)
+        {
+            *it = member_type(std::move(name),std::move(value));
+        }
+        else
+        {
+            members_.insert(it,member_type(std::move(name),std::move(value)));
         }
     }
 

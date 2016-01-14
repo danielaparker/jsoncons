@@ -1028,100 +1028,36 @@ public:
     typedef typename json_array<Char,Alloc>::iterator array_iterator;
     typedef typename json_array<Char,Alloc>::const_iterator const_array_iterator;
 
-    class object_range
+    template <typename structure, bool is_const_iterator = true>
+    class range 
     {
-        basic_json<Char,Alloc>& val_;
+        typedef typename std::conditional<is_const_iterator, typename const structure&, typename structure&>::type structure_ref;
+        typedef typename std::conditional<is_const_iterator, typename structure::const_iterator, typename structure::iterator>::type iterator;
+        structure_ref val_;
 
-        object_range();
-        object_range& operator = (const object_range& other); // noop
-
-        object_range(basic_json<Char,Alloc>& val)
+    public:
+        range(structure_ref val)
             : val_(val)
         {
         }
+
     public:
         friend class basic_json<Char, Alloc>;
 
-        object_iterator begin()
+        iterator begin()
         {
-            return val_.begin_members();
+            return val_.begin();
         }
-        object_iterator end()
+        iterator end()
         {
-            return val_.end_members();
-        }
-    };
-
-    class const_object_range
-    {
-        const basic_json<Char,Alloc>& val_;
-
-        const_object_range();
-        const_object_range& operator = (const const_object_range& other); // noop
-
-        const_object_range(const basic_json<Char,Alloc>& val)
-            : val_(val)
-        {
-        }
-    public:
-        friend class basic_json<Char, Alloc>;
-        const_object_iterator begin() const
-        {
-            return val_.begin_members();
-        }
-        const_object_iterator end() const
-        {
-            return val_.end_members();
+            return val_.end();
         }
     };
 
-    class array_range
-    {
-        basic_json<Char,Alloc>& val_;
-
-        array_range();
-        array_range& operator = (const array_range& other); // noop
-
-        array_range(basic_json<Char,Alloc>& val)
-            : val_(val)
-        {
-        }
-    public:
-        friend class basic_json<Char, Alloc>;
-
-        array_iterator begin()
-        {
-            return val_.begin_elements();
-        }
-        array_iterator end()
-        {
-            return val_.end_elements();
-        }
-    };
-
-    class const_array_range
-    {
-        const basic_json<Char,Alloc>& val_;
-
-        const_array_range();
-        const_array_range& operator = (const const_array_range& other); // noop
-
-        const_array_range(basic_json<Char,Alloc>& val)
-            : val_(val)
-        {
-        }
-    public:
-        friend class basic_json<Char, Alloc>;
-
-        const_array_iterator begin() const
-        {
-            return val_.begin_elements();
-        }
-        const_array_iterator end() const
-        {
-            return val_.end_elements();
-        }
-    };
+    typedef range<object,false> object_range;
+    typedef range<object,true> const_object_range;
+    typedef range<array,false> array_range;
+    typedef range<array,true> const_array_range;
 
     class const_val_proxy 
     {
@@ -1145,24 +1081,14 @@ public:
     public:
         friend class basic_json<Char,Alloc>;
 
-        object_range members()
-        {
-            return object_range(val_);
-        }
-
         const_object_range members() const
         {
-            return const_object_range(val_);
-        }
-
-        array_range elements()
-        {
-            return array_range(val_);
+            return val_.members();
         }
 
         const_array_range elements() const
         {
-            return const_array_range(val_);
+            return val_.members();
         }
 
         const_object_iterator begin_members() const
@@ -1489,22 +1415,22 @@ public:
 
         object_range members()
         {
-            return object_range(evaluate());
+            return evaluate().members();
         }
 
         const_object_range members() const
         {
-            return const_object_range(evaluate());
+            return evaluate().members();
         }
 
         array_range elements()
         {
-            return array_range(evaluate());
+            return evaluate().elements();
         }
 
         const_array_range elements() const
         {
-            return const_array_range(evaluate());
+            return evaluate().elements();
         }
 
         object_iterator begin_members()
@@ -1870,21 +1796,34 @@ public:
         }
         // Remove a range of elements from an array 
 
+        void remove(const std::basic_string<Char>& name)
+        {
+            evaluate().remove(name);
+        }
+
+        // Deprecated
         void remove_member(const std::basic_string<Char>& name)
         {
-            evaluate().remove_member(name);
+            evaluate().remove(name);
         }
-        // Remove a member from an object 
-/*
-        template <typename T>
-        void set(const std::basic_string<Char>& name, T value)
-        {
-            evaluate().set(name,value);
-        }
-*/
+
+       // Remove a member from an object 
+
         void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
         {
             evaluate().set(name,value);
+        }
+
+        void set(std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
+
+        {
+            evaluate().set(std::move(name),value);
+        }
+
+        void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+
+        {
+            evaluate().set(name,std::move(value));
         }
 
         void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
@@ -1893,32 +1832,9 @@ public:
             evaluate().set(std::move(name),std::move(value));
         }
 
-        void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
-
-        {
-            evaluate().set(name,std::move(value));
-        }
-/*
-        template <typename T>
-        void add(T value)
-        {
-            evaluate().add(value);
-        }
-
-        template <typename T>
-        void add(size_t index, T value)
-        {
-            evaluate().add(index, value);
-        }
-*/
         void add(basic_json<Char,Alloc>&& value)
         {
             evaluate().add(std::move(value));
-        }
-
-        void add(size_t index, basic_json<Char,Alloc>&& value)
-        {
-            evaluate().add(index, std::move(value));
         }
 
         void add(const basic_json<Char,Alloc>& value)
@@ -1929,6 +1845,21 @@ public:
         void add(size_t index, const basic_json<Char,Alloc>& value)
         {
             evaluate().add(index, value);
+        }
+
+        void add(size_t index, basic_json<Char,Alloc>&& value)
+        {
+            evaluate().add(index, std::move(value));
+        }
+
+        void add(array_iterator pos, const basic_json<Char,Alloc>& value)
+        {
+            evaluate().add(pos, value);
+        }
+
+        void add(array_iterator pos, basic_json<Char,Alloc>&& value)
+        {
+            evaluate().add(pos, std::move(value));
         }
 
         std::basic_string<Char> to_string() const
@@ -2417,32 +2348,13 @@ public:
     void remove_range(size_t from_index, size_t to_index);
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
+    void remove(const std::basic_string<Char>& name);
+    // Removes a member from an object value
+
+    // Deprecated
     void remove_member(const std::basic_string<Char>& name);
     // Removes a member from an object value
-/*
-    template <typename T>
-    void set(const std::basic_string<Char>& name, T value)
-    {
-        switch (var_.type_)
-        {
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_ = new json_object<Char,Alloc>();
-        case value_types::object_t:
-            {
-                basic_json<Char,Alloc> o;
-                json_type_traits<Char,Alloc,T>::assign(o,value);
-                var_.value_.object_->set(name,o);
-            }
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
-            }
-        }
 
-    }
-*/
     void set(const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)
     {
         switch (var_.type_)
@@ -2460,13 +2372,13 @@ public:
         }
     }
 
-    void set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
+    void set(std::basic_string<Char>&& name, const basic_json<Char, Alloc>& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_ = new json_object<Char,Alloc>();
         case value_types::object_t:
-            var_.value_.object_->set(std::move(name),std::move(value));
+            var_.value_.object_->set(std::move(name),value);
             break;
         default:
             {
@@ -2489,18 +2401,28 @@ public:
             }
         }
     }
-/*
-    template <typename T>
-    void add(T val)
+
+    void set(std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            var_.value_.object_->set(std::move(name),std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
+
+    void add(const basic_json<Char, Alloc>& value)
     {
         switch (var_.type_)
         {
         case value_types::array_t:
-            {
-                basic_json<Char,Alloc> a;
-                json_type_traits<Char,Alloc,T>::assign(a,val);
-                var_.value_.array_->push_back(std::move(a));
-            }
+            var_.value_.array_->push_back(value);
             break;
         default:
             {
@@ -2509,17 +2431,10 @@ public:
         }
     }
 
-    template <typename T>
-    void add(size_t index, T val)
-    {
-        switch (var_.type_)
-        {
+    void add(basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
         case value_types::array_t:
-            {
-                basic_json<Char,Alloc> a;
-                json_type_traits<Char,Alloc,T>::assign(a,val);
-                var_.value_.array_->add(index, std::move(a));
-            }
+            var_.value_.array_->push_back(std::move(value));
             break;
         default:
             {
@@ -2527,14 +2442,58 @@ public:
             }
         }
     }
-*/
-    void add(basic_json<Char,Alloc>&& value);
 
-    void add(size_t index, basic_json<Char,Alloc>&& value);
+    void add(size_t index, const basic_json<Char, Alloc>& value)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->add(index, value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
 
-    void add(const basic_json<Char,Alloc>& value);
+    void add(size_t index, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::array_t:
+            var_.value_.array_->add(index, std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
 
-    void add(size_t index, const basic_json<Char,Alloc>& value);
+    void add(const_array_iterator pos, const basic_json<Char, Alloc>& value)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->add(pos, value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    void add(const_array_iterator pos, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::array_t:
+            var_.value_.array_->add(pos, std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+            }
+        }
+    }
 
     value_types::value_types_t type() const
     {
@@ -2684,22 +2643,52 @@ public:
 
     object_range members()
     {
-        return object_range(*this);
+        static object empty;
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return object_range(empty);
+        case value_types::object_t:
+            return object_range(object_value());
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
     }
 
     const_object_range members() const
     {
-        return const_object_range(*this);
+        static const object empty;
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return const_object_range(empty);
+        case value_types::object_t:
+            return const_object_range(object_value());
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an object");
+        }
     }
 
     array_range elements()
     {
-        return array_range(*this);
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            return array_range(array_value());
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an array");
+        }
     }
 
     const_array_range elements() const
     {
-        return const_array_range(*this);
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            return const_array_range(array_value());
+        default:
+            JSONCONS_THROW_EXCEPTION("Not an array");
+        }
     }
 
     array& array_value() 

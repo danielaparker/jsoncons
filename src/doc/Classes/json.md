@@ -283,22 +283,23 @@ Remove all elements from an array or object value, otherwise do nothing
     void remove_range(size_t from_index, size_t to_index)
 Removes all elements from an array value whose index is between `from_index`, the first element to be removed, and `to_index`, one after the last element to be removed.
 
-    void remove_member(const std::string& name)
+    void remove(const std::string& name)
 Remove a member from a `json` object
 
-    template <typename T>
-    void set(const std::string& name, T val)
-
     void set(const std::string& name, const json& val)
+    void set(std::string&& name, const json& val)
+    void set(const std::string& name, json&& val)
     void set(std::string&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
-
-    template <typename T>
-    void add(T val)
 
     void add(const json& val)
     void add(json&& val)
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
+
+    void add(array_iterator pos, const json& val)
+    void add(array_iterator pos, json&& val)
+Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
+The content of `val` is copied (or moved) to the new element.
 
     void add(size_t index, const json& val)
     void add(size_t index, json&& val)
@@ -353,6 +354,9 @@ Inserts json value into stream using the specified [output_format](output_format
 Exchanges the values of `a` and `b`
 
 Deprecated:
+
+    void remove_member(const std::string& name)
+Use `remove` instead
 
     const json& get(const std::string& name) const
 Use the version of `get` with two parameters and explicitly specify a json null default value 

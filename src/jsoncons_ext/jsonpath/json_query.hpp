@@ -358,7 +358,7 @@ handle_state:
                             }
                             else if (index.is_string())
                             {
-                                find_members(index.as_string());
+                                find(index.as_string());
                             }
                             i = parser.index();
                             line_= parser.line_number();
@@ -418,14 +418,14 @@ handle_state:
                 switch (c)
                 {
                 case '[':
-					find_members(buffer_);
+					find(buffer_);
                     buffer_.clear();
                     end_nodes();
 					start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
-                    find_members(buffer_);
+                    find(buffer_);
                     buffer_.clear();
                     end_nodes();
                     state_ = states::dot;
@@ -441,7 +441,7 @@ handle_state:
                 switch (c)
                 {
                 case '\'':
-                    find_members(buffer_);
+                    find(buffer_);
                     buffer_.clear();
                     state_ = states::expect_right_bracket;
                     break;
@@ -456,7 +456,7 @@ handle_state:
         {
         case states::member_name: 
             {
-                find_members(buffer_);
+                find(buffer_);
                 buffer_.clear();
                 end_nodes();
             }
@@ -601,19 +601,19 @@ handle_state:
         }
     }
 
-    void find_members(const std::basic_string<Char>& name)
+    void find(const std::basic_string<Char>& name)
     {
 		if (name.length() > 0)
 		{
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                find_member1(*(stack_.back()[i]), name);
+                find1(*(stack_.back()[i]), name);
             }
             recursive_descent_ = false;
 		}
     }
 
-    void find_member1(const basic_json<Char,Alloc>& context_val, const std::basic_string<Char>& name)
+    void find1(const basic_json<Char,Alloc>& context_val, const std::basic_string<Char>& name)
     {
         if (context_val.is_object())
         {
@@ -627,7 +627,7 @@ handle_state:
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
-                        find_member1(it->value(), name);
+                        find1(it->value(), name);
                     }
                 }
             }
@@ -654,7 +654,7 @@ handle_state:
                 {
                     if (it->is_object() || it->is_array())
                     {
-                        find_member1(*it, name);
+                        find1(*it, name);
                     }
                 }
             }

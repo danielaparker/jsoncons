@@ -152,32 +152,6 @@ typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(c
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(basic_json<Char, Alloc>&& value){
-    switch (var_.type_){
-    case value_types::array_t:
-        var_.value_.array_->push_back(std::move(value));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(size_t index, basic_json<Char, Alloc>&& value){
-    switch (var_.type_){
-    case value_types::array_t:
-        var_.value_.array_->add(index, std::move(value));
-        break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
 void basic_json<Char, Alloc>::clear()
 {
     switch (var_.type_)
@@ -207,7 +181,7 @@ void basic_json<Char, Alloc>::remove_range(size_t from_index, size_t to_index)
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
+void basic_json<Char, Alloc>::remove(const std::basic_string<Char>& name)
 {
     switch (var_.type_)
     {
@@ -220,32 +194,15 @@ void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(const basic_json<Char, Alloc>& value)
+void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
 {
     switch (var_.type_)
     {
-    case value_types::array_t:
-        var_.value_.array_->push_back(value);
+    case value_types::object_t:
+        var_.value_.object_->remove(name);
         break;
     default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::add(size_t index, const basic_json<Char, Alloc>& value)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->add(index, value);
         break;
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
-        }
     }
 }
 

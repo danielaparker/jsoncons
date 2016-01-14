@@ -111,7 +111,9 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     // of the three book objects into the array
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
-    booklist.add(std::move(book3));    
+
+    // Add this one to the front
+    booklist.add(booklist.elements().begin(),std::move(book3));    
 
     // See what's left of book1, 2 and 3 (expect null, null, null)
     std::cout << book1 << "," << book2 << "," << book3 << std::endl;
@@ -119,9 +121,9 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
-	std::cout << book["title"].as<std::string>()
-	          << ","
-		  << book["price"].as<double>() << std::endl;
+		std::cout << book["title"].as<std::string>()
+		          << ","
+		          << book["price"].as<double>() << std::endl;
     }
 	
     // Serialize the booklist to a file
@@ -131,6 +133,14 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 The JSON output `booklist.json`
 
     [
+        {
+            "author":"Charles Bukowski",
+            "category":"Fiction",
+            "date":"2004-07-08",
+            "isbn":"1852272007",
+            "price":22.48,
+            "title":"Pulp"
+        },
         {
             "author":"Haruki Murakami",
             "category":"Fiction",
@@ -146,14 +156,6 @@ The JSON output `booklist.json`
             "isbn":"0802143415",
             "price":10.5,
             "title":"Charlie Wilson's War"
-        },
-        {
-            "author":"Charles Bukowski",
-            "category":"Fiction",
-            "date":"2004-07-08",
-            "isbn":"1852272007",
-            "price":22.48,
-            "title":"Pulp"
         }
     ]
 
@@ -169,16 +171,16 @@ The JSON output `booklist.json`
 
     // Deserialize the booklist
     std::ifstream is("booklist.json");
-    json booklist2;
-    is >> booklist2;
-	
-    // Select the authors of books that cost less than $12
-    // (using JsonPath)
-    json result = json_query(booklist,"$[*][?(@.price < 12)].author");
+    json booklist;
+    is >> booklist;
+
+    // Use a JsonPath expression to find the authors of 
+    // books that cost less than $12
+    json result = json_query(booklist, "$[*][?(@.price < 12)].author");
 
     std::cout << pretty_print(result) << std::endl;
 
-The result:
+Result:
 
     ["Haruki Murakami","George Crile"]
 
@@ -233,7 +235,9 @@ The result:
     // of the three book objects into the array
     booklist.add(std::move(book1));
     booklist.add(std::move(book2));
-    booklist.add(std::move(book3));
+
+    // Add this one to the front
+    booklist.add(booklist.elements().begin(),std::move(book3));    
 
     // See what's left of book1, 2 and 3 (expect null, null, null)
     std::wcout << book1 << L"," << book2 << L"," << book3 << std::endl;
@@ -254,6 +258,14 @@ The JSON output `booklist2.json`
 
     [
         {
+            "author":"Charles Bukowski",
+            "category":"Fiction",
+            "date":"2004-07-08",
+            "isbn":"1852272007",
+            "price":22.48,
+            "title":"Pulp"
+        },
+        {
             "author":"Haruki Murakami",
             "category":"Fiction",
             "date":"2002-04-09",
@@ -268,41 +280,25 @@ The JSON output `booklist2.json`
             "isbn":"0802143415",
             "price":10.5,
             "title":"Charlie Wilson's War"
-        },
-        {
-            "author":"Charles Bukowski",
-            "category":"Fiction",
-            "date":"2004-07-08",
-            "isbn":"1852272007",
-            "price":22.48,
-            "title":"Pulp"
         }
     ]
 
 ### wjson query
 
-    #include <fstream>
-    #include "jsoncons/json.hpp"
-    #include "jsoncons_ext/jsonpath/json_query.hpp"
-
-    // For convenience
-    using jsoncons::wjson;
-    using jsoncons::jsonpath::json_query;
-
     // Deserialize the booklist
     std::wifstream is("booklist2.json");
-    wjson booklist2;
-    is >> booklist2;
+    wjson booklist;
+    is >> booklist;
 
-    // Select the authors of books that cost less than $12
-    // (using JsonPath)
-    wjson result = json_query(booklist, L"$[*][?(@.price < 12)].author");
+    // Use a JsonPath expression to find the authors of 
+    // books that were published in 2004
+    wjson result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
 
     std::wcout << pretty_print(result) << std::endl;
 
-The result:
+Result:
 
-    ["Haruki Murakami","George Crile"]
+    ["Charles Bukowski"]
        
 
 ## Acknowledgements
