@@ -62,7 +62,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 
 ## Examples
 
-### Example 1. json construction
+### json construction
 
     #include "jsoncons/json.hpp"
 
@@ -157,7 +157,7 @@ The JSON output `booklist.json`
         }
     ]
 
-### Example 2. json query
+### json query
 
     #include <fstream>
     #include "jsoncons/json.hpp"
@@ -182,7 +182,9 @@ The result:
 
     ["Haruki Murakami","George Crile"]
 
-### Example 3. wjson construction
+## Once again, this time with wide characters
+
+### wjson construction
 
     #include "jsoncons/json.hpp"
 
@@ -277,7 +279,7 @@ The JSON output `booklist2.json`
         }
     ]
 
-### Example 4. wjson query
+### wjson query
 
     #include <fstream>
     #include "jsoncons/json.hpp"

@@ -551,7 +551,7 @@ This should not impact you unless you've implemented your own <code>json_input_h
 
 <h2>Examples</h2>
 
-<h3>Example 1. json construction</h3>
+<h3>json construction</h3>
 
 <pre><code>#include "jsoncons/json.hpp"
 
@@ -608,9 +608,9 @@ std::cout &lt;&lt; book1 &lt;&lt; "," &lt;&lt; book2 &lt;&lt; "," &lt;&lt; book3
 //Loop through the booklist elements using a range-based for loop    
 for(auto book : booklist.elements())
 {
-    std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
-        &lt;&lt; ","
-        &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
+std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
+          &lt;&lt; ","
+      &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
 // Serialize the booklist to a file
@@ -648,7 +648,7 @@ os &lt;&lt; pretty_print(booklist);
 ]
 </code></pre>
 
-<h3>Example 2. json query</h3>
+<h3>json query</h3>
 
 <pre><code>#include &lt;fstream&gt;
 #include "jsoncons/json.hpp"
@@ -664,7 +664,7 @@ json booklist2;
 is &gt;&gt; booklist2;
 
 // Select the authors of books that cost less than $12
-    // (using JsonPath)
+// (using JsonPath)
 json result = json_query(booklist,"$[*][?(@.price &lt; 12)].author");
 
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
@@ -675,7 +675,9 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <pre><code>["Haruki Murakami","George Crile"]
 </code></pre>
 
-<h3>Example 3. wjson construction</h3>
+<h2>Once again, this time with wide characters</h2>
+
+<h3>wjson construction</h3>
 
 <pre><code>#include "jsoncons/json.hpp"
 
@@ -704,19 +706,17 @@ book2.set(L"isbn", L"0802143415");
 
 // Construct a third from a string
 wjson book3 = wjson::parse(LR"(
-</code></pre>
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
 
-<p>{<br>
-    "category" : "Fiction",<br>
-    "title" : "Pulp",<br>
-    "author" : "Charles Bukowski",<br>
-    "date" : "2004-07-08",<br>
-    "price" : 22.48,<br>
-    "isbn" : "1852272007"<br><br>
-}<br>
-)");</p>
-
-<pre><code>// Construct a booklist array
+// Construct a booklist array
 wjson booklist = wjson::array();
 
 // For efficiency, reserve memory, to avoid reallocations
@@ -774,7 +774,7 @@ os &lt;&lt; pretty_print(booklist);
 ]
 </code></pre>
 
-<h3>Example 4. wjson query</h3>
+<h3>wjson query</h3>
 
 <pre><code>#include &lt;fstream&gt;
 #include "jsoncons/json.hpp"
