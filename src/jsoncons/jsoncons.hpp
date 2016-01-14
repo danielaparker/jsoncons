@@ -15,6 +15,8 @@
 #include <cstdint> 
 #include <iostream>
 #include <vector>
+#include <locale>
+#include <codecvt>
 #include "jsoncons/jsoncons_config.hpp"
 
 namespace jsoncons {
@@ -116,13 +118,26 @@ private:
     std::string message_;
 };
 
-template <typename Char>
 class json_exception_1 : public std::exception, public virtual json_exception
 {
 public:
-    json_exception_1(const std::string& format, const std::basic_string<Char>& arg1) JSONCONS_NOEXCEPT
+    json_exception_1(const std::string& format, const std::string& arg1) JSONCONS_NOEXCEPT
         : format_(format), arg1_(arg1)
     {
+    }
+    json_exception_1(const std::string& format, const std::wstring& arg1) JSONCONS_NOEXCEPT
+        : format_(format)
+    {
+        try
+        {
+            typedef std::codecvt_utf8<wchar_t> convert_type;
+            std::wstring_convert<convert_type, wchar_t> converter;
+            arg1_ = converter.to_bytes( arg1 );
+        }
+        catch (...)
+        {
+            // Must not throw
+        }
     }
     ~json_exception_1() JSONCONS_NOEXCEPT 
     {
@@ -134,7 +149,7 @@ public:
     }
 private:
     std::string format_;
-    std::basic_string<Char> arg1_;
+    std::string arg1_;
     char message_[255];
 };
 
@@ -142,7 +157,7 @@ private:
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
 #define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0((x))
-#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<Char>((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
 	throw jsoncons::json_exception_0("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }

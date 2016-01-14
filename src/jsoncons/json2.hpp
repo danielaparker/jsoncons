@@ -513,7 +513,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     FILE* fp = std::fopen (filename.c_str(), "rb");
     if (fp == nullptr) 
     {
-        throw json_exception_1<char>("Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1("Cannot open file %s", filename);
     }
     basic_json_deserializer<Char, Alloc> handler;
     try
@@ -531,7 +531,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                throw json_exception_1<char>("Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1("Error reading file %s", filename);
             }
 
             basic_json_parser<Char> parser(handler);
@@ -562,7 +562,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     FILE* fp = std::fopen (filename.c_str(), "rb");
     if (fp == nullptr) 
     {
-        throw json_exception_1<char>("Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1("Cannot open file %s", filename);
     }
     basic_json_deserializer<Char, Alloc> handler;
     try
@@ -580,7 +580,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                throw json_exception_1<char>("Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1("Error reading file %s", filename);
             }
 
             basic_json_parser<Char> parser(handler,err_handler);
