@@ -203,11 +203,11 @@ template <typename Char,class Alloc>
 class json_object
 {
 public:
-    typedef typename basic_json<Char,Alloc>::member_type member_type;
-    typedef member_type& reference; 
-    typedef const member_type& const_reference; 
-    typedef typename std::vector<member_type>::iterator iterator;
-    typedef typename std::vector<member_type>::const_iterator const_iterator;
+    typedef typename basic_json<Char,Alloc>::member_type value_type;
+    typedef value_type& reference; 
+    typedef const value_type& const_reference; 
+    typedef typename std::vector<value_type>::iterator iterator;
+    typedef typename std::vector<value_type>::const_iterator const_iterator;
 
     // Allocation
     static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
@@ -237,7 +237,7 @@ public:
     {
     }
 
-    json_object(std::vector<member_type> members)
+    json_object(std::vector<value_type> members)
         : members_(members)
     {
     }
@@ -309,11 +309,11 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->name() == name)
         {
-            *it = member_type(name,value);
+            *it = value_type(name,value);
         }
         else
         {
-            members_.insert(it,member_type(name,value));
+            members_.insert(it,value_type(name,value));
         }
     }
 
@@ -322,11 +322,11 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->name() == name)
         {
-            *it = member_type(std::move(name),value);
+            *it = value_type(std::move(name),value);
         }
         else
         {
-            members_.insert(it,member_type(std::move(name),value));
+            members_.insert(it,value_type(std::move(name),value));
         }
     }
 
@@ -335,11 +335,11 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->name() == name)
         {
-            *it = member_type(name,std::move(value));
+            *it = value_type(name,std::move(value));
         }
         else
         {
-            members_.insert(it,member_type(name,std::move(value)));
+            members_.insert(it,value_type(name,std::move(value)));
         }
     }
 
@@ -348,22 +348,22 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
         if (it != members_.end() && it->name() == name)
         {
-            *it = member_type(std::move(name),std::move(value));
+            *it = value_type(std::move(name),std::move(value));
         }
         else
         {
-            members_.insert(it,member_type(std::move(name),std::move(value)));
+            members_.insert(it,value_type(std::move(name),std::move(value)));
         }
     }
 
     /*void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
     {
-        members_.push_back(member_type(name,val));
+        members_.push_back(value_type(name,val));
     }*/
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
-        members_.push_back(member_type(std::move(name), std::move(val)));
+        members_.push_back(value_type(std::move(name), std::move(val)));
         //members_.back().name().swap(std::move(name));
         //members_.back().value().swap(std::move(val));
         //members_.push_back(std::pair<std::basic_string<Char>, basic_json<Char, Alloc>>(std::move(name),
@@ -444,7 +444,7 @@ public:
 
 private:
 
-    std::vector<member_type> members_;
+    std::vector<value_type> members_;
     json_object<Char,Alloc>& operator=(const json_object<Char,Alloc>&);
 };
 

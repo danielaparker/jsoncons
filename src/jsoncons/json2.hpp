@@ -124,24 +124,24 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_str
 
 template<typename Char, typename Alloc>
 template<typename T>
-typename basic_json<Char, Alloc>::const_val_proxy basic_json<Char, Alloc>::get(const std::basic_string<Char>& name, T default_val) const
+basic_json<Char, Alloc> basic_json<Char, Alloc>::get(const std::basic_string<Char>& name, const T& default_val) const
 {
     switch (var_.type_)
     {
     case value_types::empty_object_t:
         {
-            return const_val_proxy(default_val);
+            return basic_json<Char,Alloc>(default_val);
         }
     case value_types::object_t:
         {
             const_object_iterator it = var_.value_.object_->find(name);
             if (it != end_members())
             {
-                return const_val_proxy(it->value());
+                return it->value();
             }
             else
             {
-                return const_val_proxy(default_val);
+                return basic_json<Char,Alloc>(default_val);
             }
         }
     default:

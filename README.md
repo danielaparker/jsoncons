@@ -27,26 +27,8 @@ The library has a number of features, which are listed below:
 
 ## What's new on master
 
-New features
-
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
-- json member function `find` added
-- json member function `count` added
-- json array range accessor `elements()` added, which supports range-based for loops over json arrays, and replaces `begin_elements` and `end_elements`
-- json object range accessor `members()` added, which supports range-based for loops over json objects, and replaces `begin_members` and `end_members`
-
-API Changes 
-- The json internal representation of signed and unsigned integers has been changed from `long long` and `unsigned long long` to `int64_t` and `uint64_t`.
-  This should not impact you unless you've implemented your own `json_input_handler` or `json_output_handler`, refer to the Changelog for more details.
-- `output_format` drops support for `floatfield` property
-
-Non-beaking API Changes
-- `json::parse_string` has been renamed to `json::parse`, `parse_string` is deprecated but still works
-- `json member function `is_empty` has been renamed to `empty`, `is_empty` is deprecated but still works. Rationale: consistency with C++ containers
-- json member functions `begin_elements` and `end_elements` have been deprecated, instead use `elements().begin()` and `elements.end()`
-- json member functions `begin_members` and `end_members` have been deprecated, instead use `members().begin()` and `members.end()`
-- json member function `has_member` has been deprecated, instead use `count`. Rationale: consistency with C++ containers
-- json member function `get` that takes one parameter, a `name`, and returns a json null if not found, has been deprecated, use instead the version of `get` that takes the default as a second parameter.
+- There are a few API changes, most retaining backwards compatability, refer to the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/Changelog.html) for details.
 
 ## Benchmarks
 

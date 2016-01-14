@@ -21,6 +21,13 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_get_with_string_default)
+{
+  json example;
+  std::string result = example.get("test", std::string("too long string for short string")).as<std::string>();
+  std::cout << "result:" << result << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(test_object_key_proxy)
 {
     json a;

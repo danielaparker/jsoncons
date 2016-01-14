@@ -19,3 +19,5 @@ fixes for 0.95.)
 Ignatov Serguei (reported issues experienced with gcc for 0.95 and 0.96 candidate and helped fix them)
 
 Milan Burda for fix for clang build error
+
+Peter Tissen, for reporting and suggesting a fix for get(name,default_val)
