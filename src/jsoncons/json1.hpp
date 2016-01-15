@@ -1594,9 +1594,18 @@ public:
         }
     };
 
-    static basic_json parse(std::basic_istream<Char>& is);
+    static basic_json parse_stream(std::basic_istream<Char>& is);
+    static basic_json parse_stream(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler);
 
-    static basic_json parse(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler);
+    // Deprecated
+    static basic_json parse(std::basic_istream<Char>& is)
+    {
+        parse_stream(is);
+    }
+    static basic_json parse(std::basic_istream<Char>& is, basic_parse_error_handler<Char>& err_handler)
+    {
+        parse_stream(is,err_handler);
+    }
 
     static basic_json parse(const std::basic_string<Char>& s);
 

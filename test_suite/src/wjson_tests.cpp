@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_wjson_escape_u)
     std::wstring input = L"[\"\\uABCD\"]";
     std::wistringstream is(input);
 
-    wjson root = wjson::parse(is);
+    wjson root = wjson::parse_stream(is);
 
     std::wstring s = root[0].as<std::wstring>();
     BOOST_CHECK_EQUAL( s.length(), 1 );

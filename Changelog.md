@@ -42,6 +42,7 @@ Non-beaking API Changes
 - json member function `has_member` has been deprecated, instead use `count`. Rationale: consistency with C++ containers
 - json member function `remove_member` has been deprecated, instead use `remove`. Rationale: only member function left with _element or _member suffix 
 - json_parse_exception renamed to parse_exception, json_parse_exception typedef to parse_exception
+- json::parse(std::istream& is) renamed to json::parse_stream. json::parse(std::istream is) is deprecated but still works.
 
 0.98.2 Release
 --------------

@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(example)
     std::cout << in << std::endl;
     std::istringstream is(in);
 
-    json root = json::parse(is);
+    json root = json::parse_stream(is);
 
     std::cout << root << std::endl;
 }
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::ifstream is("output/test.json", std::ofstream::binary);
     t = std::clock();
 
-    json root = json::parse(is);
+    json root = json::parse_stream(is);
     s = std::clock() - t;
     //std::cout << "It took " << (((double)s) / CLOCKS_PER_SEC) << " seconds.\n";
 

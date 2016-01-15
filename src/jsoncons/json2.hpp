@@ -341,7 +341,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t 
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is)
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_stream(std::basic_istream<Char>& is)
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler);
@@ -355,8 +355,8 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>& is, 
-                                                       basic_parse_error_handler<Char>& err_handler)
+basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_stream(std::basic_istream<Char>& is, 
+                                                              basic_parse_error_handler<Char>& err_handler)
 {
     basic_json_deserializer<Char, Alloc> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);

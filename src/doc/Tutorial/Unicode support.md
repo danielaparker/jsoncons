@@ -143,7 +143,7 @@ The output is
     wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
     std::wistringstream is(input);
 
-    wjson val = wjson::parse(is);
+    wjson val = wjson::parse_stream(is);
 
     wstring s = val[0].as<wstring>();
     std::cout << "length=" << s.length() << std::endl;

@@ -60,9 +60,9 @@ An array "range" defined by `begin()` and `end()`
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
 
-    static json parse(std::istream& is)
-    static json parse(std::istream& is, 
-                      parse_error_handler& err_handler)
+    static json parse_stream(std::istream& is)
+    static json parse_stream(std::istream& is, 
+                             parse_error_handler& err_handler)
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
 
@@ -368,6 +368,11 @@ Inserts json value into stream using the specified [output_format](output_format
 Exchanges the values of `a` and `b`
 
 Deprecated:
+    static json parse(std::istream& is)
+    static json parse(std::istream& is, 
+                      parse_error_handler& err_handler)
+Use `parse_stream` instead
+
     long long as_longlong() const
 Use as_integer or as<long long> instead
 
