@@ -119,7 +119,8 @@ private:
     std::string message_;
 };
 
-class json_exception_1 : public std::exception, public virtual json_exception
+template <typename Base>
+class json_exception_1 : public Base, public virtual json_exception
 {
 public:
     json_exception_1(const std::string& format, const std::string& arg1) JSONCONS_NOEXCEPT
@@ -158,7 +159,7 @@ private:
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
 #define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0<std::exception>((x))
-#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<std::exception>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
 	throw jsoncons::json_exception_0<std::exception>("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }
