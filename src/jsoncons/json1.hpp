@@ -130,7 +130,7 @@ public:
         {
             if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
             {
-                JSONCONS_THROW_EXCEPTION("Bad any cast");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
             }
             return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
@@ -140,7 +140,7 @@ public:
         {
             if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
             {
-                JSONCONS_THROW_EXCEPTION("Bad any cast");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
             }
             return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
@@ -1956,7 +1956,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -1971,7 +1971,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -1986,7 +1986,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2001,7 +2001,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2041,7 +2041,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object", name);
             }
         }
     }
@@ -2056,7 +2056,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2071,7 +2071,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2086,7 +2086,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1("Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2100,7 +2100,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2112,7 +2112,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2126,7 +2126,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2138,7 +2138,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2152,7 +2152,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2164,7 +2164,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION("Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2237,7 +2237,7 @@ public:
     {
         if (var_.type_ != value_types::any_t)
         {
-            JSONCONS_THROW_EXCEPTION("Bad any cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
         }
         return var_.value_.any_value_->template cast<T>();
     }
@@ -2246,7 +2246,7 @@ public:
     {
         if (var_.type_ != value_types::any_t)
         {
-            JSONCONS_THROW_EXCEPTION("Bad any cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
         }
         return var_.value_.any_value_->template cast<T>();
     }
@@ -2325,7 +2325,7 @@ public:
         case value_types::object_t:
             return object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
         }
     }
 
@@ -2339,7 +2339,7 @@ public:
         case value_types::object_t:
             return const_object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION("Not an object");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
         }
     }
 
@@ -2350,7 +2350,7 @@ public:
         case value_types::array_t:
             return array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION("Not an array");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
         }
     }
 
@@ -2361,7 +2361,7 @@ public:
         case value_types::array_t:
             return const_array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION("Not an array");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
         }
     }
 
@@ -2372,7 +2372,7 @@ public:
         case value_types::array_t:
             return *(var_.value_.array_);
         default:
-            JSONCONS_THROW_EXCEPTION("Bad array cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad array cast");
             break;
         }
     }
@@ -2384,7 +2384,7 @@ public:
         case value_types::array_t:
             return *(var_.value_.array_);
         default:
-            JSONCONS_THROW_EXCEPTION("Bad array cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad array cast");
             break;
         }
     }
@@ -2400,7 +2400,7 @@ public:
         case value_types::object_t:
             return *(var_.value_.object_);
         default:
-            JSONCONS_THROW_EXCEPTION("Bad object cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad object cast");
             break;
         }
     }
@@ -2414,7 +2414,7 @@ public:
         case value_types::object_t:
             return *(var_.value_.object_);
         default:
-            JSONCONS_THROW_EXCEPTION("Bad object cast");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Bad object cast");
             break;
         }
     }
@@ -2490,7 +2490,7 @@ private:
         reader.check_done();
         if (!handler.is_valid())
         {
-            JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
         }
         o = handler.get_result();
         return is;

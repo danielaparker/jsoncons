@@ -158,8 +158,8 @@ private:
 #define JSONCONS_STR2(x)  #x
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
-#define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0<std::exception>((x))
-#define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1<std::exception>((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION(Base,x) throw jsoncons::json_exception_0<Base>((x))
+#define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
 	throw jsoncons::json_exception_0<std::exception>("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }

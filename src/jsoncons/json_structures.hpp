@@ -375,7 +375,7 @@ public:
         auto it = find(name);
         if (it == end())
         {
-            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
         }
         return it->value();
     }
@@ -385,7 +385,7 @@ public:
         auto it = find(name);
         if (it == end())
         {
-            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
         }
         return it->value();
     }
@@ -395,7 +395,7 @@ public:
         auto it = find(name);
         if (it == end())
         {
-            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
         }
         return it->value();
     }
@@ -405,7 +405,7 @@ public:
         auto it = find(name);
         if (it == end())
         {
-            JSONCONS_THROW_EXCEPTION_1("Member %s not found.",name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
         }
         return it->value();
     }

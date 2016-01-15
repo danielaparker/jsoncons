@@ -53,7 +53,7 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
     case value_types::array_t:
         return var_.value_.array_->at(i);
     default:
-        JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Index on non-array value not supported");
     }
 }
 
@@ -65,7 +65,7 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
     case value_types::array_t:
         return var_.value_.array_->at(i);
     default:
-        JSONCONS_THROW_EXCEPTION("Index on non-array value not supported");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Index on non-array value not supported");
     }
 }
 
@@ -75,12 +75,12 @@ basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Cha
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        JSONCONS_THROW_EXCEPTION_1("%s not found", name);
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"%s not found", name);
     case value_types::object_t:
         return var_.value_.object_->get(name);
     default:
         {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -91,12 +91,12 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_stri
     switch (var_.type_)
     {
     case value_types::empty_object_t:
-        JSONCONS_THROW_EXCEPTION_1("%s not found", name);
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"%s not found", name);
     case value_types::object_t:
         return var_.value_.object_->get(name);
     default:
         {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -117,7 +117,7 @@ const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_str
         }
     default:
         {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -146,7 +146,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::get(const std::basic_string<Cha
         }
     default:
         {
-            JSONCONS_THROW_EXCEPTION_1("Attempting to get %s from a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -421,7 +421,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
     }
     return handler.get_result();
 }
@@ -436,7 +436,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(std::basic_istream<Char>&
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
     }
     return handler.get_result();
 }
@@ -452,7 +452,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<C
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -469,7 +469,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<C
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -485,7 +485,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -502,7 +502,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -513,7 +513,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     FILE* fp = std::fopen (filename.c_str(), "rb");
     if (fp == nullptr) 
     {
-        JSONCONS_THROW_EXCEPTION_1("Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
     }
     basic_json_deserializer<Char, Alloc> handler;
     try
@@ -531,7 +531,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                JSONCONS_THROW_EXCEPTION_1("Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Error reading file %s", filename);
             }
 
             basic_json_parser<Char> parser(handler);
@@ -550,7 +550,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     }
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json file");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json file");
     }
     return handler.get_result();
 }
@@ -562,7 +562,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     FILE* fp = std::fopen (filename.c_str(), "rb");
     if (fp == nullptr) 
     {
-        JSONCONS_THROW_EXCEPTION_1("Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
     }
     basic_json_deserializer<Char, Alloc> handler;
     try
@@ -580,7 +580,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                JSONCONS_THROW_EXCEPTION_1("Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1(std::exception,"Error reading file %s", filename);
             }
 
             basic_json_parser<Char> parser(handler,err_handler);
@@ -599,7 +599,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     }
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json file");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json file");
     }
     return handler.get_result();
 }
@@ -615,7 +615,7 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::begin
     case value_types::object_t:
         return var_.value_.object_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an object");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
     }
 }
 
@@ -629,7 +629,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     case value_types::object_t:
         return var_.value_.object_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an object");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
     }
 }
 
@@ -644,7 +644,7 @@ typename basic_json<Char, Alloc>::object_iterator basic_json<Char, Alloc>::end_m
     case value_types::object_t:
         return var_.value_.object_->end();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an object");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
     }
 }
 
@@ -658,7 +658,7 @@ typename basic_json<Char, Alloc>::const_object_iterator basic_json<Char, Alloc>:
     case value_types::object_t:
         return var_.value_.object_->end();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an object");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
     }
 }
 
@@ -670,7 +670,7 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::begin_
     case value_types::array_t:
         return var_.value_.array_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
     }
 }
 
@@ -682,7 +682,7 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
     case value_types::array_t:
         return var_.value_.array_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
     }
 }
 
@@ -694,7 +694,7 @@ typename basic_json<Char, Alloc>::array_iterator basic_json<Char, Alloc>::end_el
     case value_types::array_t:
         return var_.value_.array_->end();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
     }
 }
 
@@ -706,7 +706,7 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
     case value_types::array_t:
         return var_.value_.array_->end();
     default:
-        JSONCONS_THROW_EXCEPTION("Not an array");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
     }
 }
 
@@ -800,7 +800,7 @@ long long basic_json<Char, Alloc>::as_longlong() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a long long");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a long long");
     }
 }
 
@@ -818,7 +818,7 @@ unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a unsigned long long");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a unsigned long long");
     }
 }
 
@@ -836,7 +836,7 @@ double basic_json<Char, Alloc>::as_double() const
     case value_types::null_t:
         return std::numeric_limits<double>::quiet_NaN();
     default:
-        JSONCONS_THROW_EXCEPTION("Not a double");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a double");
     }
 }
 
@@ -854,7 +854,7 @@ int basic_json<Char, Alloc>::as_int() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a int");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a int");
     }
 }
 
@@ -872,7 +872,7 @@ unsigned int basic_json<Char, Alloc>::as_uint() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a unsigned int");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a unsigned int");
     }
 }
 
@@ -890,7 +890,7 @@ long basic_json<Char, Alloc>::as_long() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not a long");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a long");
     }
 }
 
@@ -908,7 +908,7 @@ unsigned long basic_json<Char, Alloc>::as_ulong() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION("Not an unsigned long");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an unsigned long");
     }
 }
 
@@ -922,7 +922,7 @@ typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value()
 			return *var_.value_.any_value_;
         }
     default:
-        JSONCONS_THROW_EXCEPTION("Not an any value");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an any value");
     }
 }
 
@@ -936,7 +936,7 @@ const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value(
 			return *var_.value_.any_value_;
         }
     default:
-        JSONCONS_THROW_EXCEPTION("Not an any value");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not an any value");
     }
 }
 
@@ -964,7 +964,7 @@ const Char* basic_json<Char, Alloc>::as_cstring() const
     case value_types::string_t:
         return var_.value_.string_value_->c_str();
     default:
-        JSONCONS_THROW_EXCEPTION("Not a string");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Not a string");
     }
 }
 
@@ -998,7 +998,7 @@ std::basic_istream<Char>& operator>>(std::basic_istream<Char>& is, basic_json<Ch
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION("Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
     }
     o = handler.get_result();
     return is;

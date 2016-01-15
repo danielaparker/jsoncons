@@ -70,91 +70,91 @@ public:
     }
     virtual bool accept_single_node() const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual basic_json<Char,Alloc> evaluate_single_node() const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool exclaim() const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
 	virtual bool eq(const term& rhs) const 
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool ne(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool ne(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool regex(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool regex2(const std::basic_string<Char>& subject) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool ampamp(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool pipepipe(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool pipepipe(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool lt(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool lt(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool gt(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
 	virtual basic_json<Char, Alloc> minus(const term& rhs) const 
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual basic_json<Char,Alloc>  unary_minus() const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual basic_json<Char,Alloc> plus(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
     virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION("Unsupported operator");
+        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
     }
 };
 
@@ -742,7 +742,7 @@ public:
 			t = ts.get();
 			if (t.type() != token_types::right_paren)
 			{
-				JSONCONS_THROW_EXCEPTION("Expected '}'");
+				JSONCONS_THROW_EXCEPTION(std::exception,"Expected '}'");
 			}
 			return expr;
 		}
@@ -761,7 +761,7 @@ public:
             return expr;
         }
         default:
-            JSONCONS_THROW_EXCEPTION("Expected primary");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Expected primary");
         }
     }
 
@@ -997,7 +997,7 @@ handle_state:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 default:
-                    JSONCONS_THROW_EXCEPTION("Invalid filter 1.");
+                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 1.");
                     break;
 
                 }
@@ -1149,7 +1149,7 @@ handle_state:
                     }
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION("Invalid filter 2.");
+                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 2.");
                     break;
                 };
                 break;
@@ -1171,7 +1171,7 @@ handle_state:
                     }
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION("Invalid filter 3.");
+                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 3.");
                     break;
                 };
                 break;
@@ -1227,7 +1227,7 @@ handle_state:
                 case ' ':case '\n':case '\r':case '\t':
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION("Expected '/'");
+                    JSONCONS_THROW_EXCEPTION(std::exception,"Expected '/'");
                     break;
                 };
                 break;
@@ -1261,7 +1261,7 @@ handle_state:
         }
         if (depth_ != 0)
         {
-            JSONCONS_THROW_EXCEPTION("Unbalanced parenthesis");
+            JSONCONS_THROW_EXCEPTION(std::exception,"Unbalanced parenthesis");
         }
     }
 
