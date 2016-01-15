@@ -46,62 +46,6 @@ bool basic_json<Char, Alloc>::operator==(const basic_json<Char, Alloc>& rhs) con
 }
 
 template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_->at(i);
-    default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Index on non-array value not supported");
-    }
-}
-
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(size_t i) const
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_->at(i);
-    default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Index on non-array value not supported");
-    }
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Char>& name)
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"%s not found", name);
-    case value_types::object_t:
-        return var_.value_.object_->get(name);
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::at(const std::basic_string<Char>& name) const
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"%s not found", name);
-    case value_types::object_t:
-        return var_.value_.object_->get(name);
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
-        }
-    }
-}
-
-template<typename Char, typename Alloc>
 const basic_json<Char, Alloc>& basic_json<Char, Alloc>::get(const std::basic_string<Char>& name) const
 {
     static const basic_json<Char, Alloc> a_null = null_type();
@@ -203,22 +147,6 @@ void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
         break;
     default:
         break;
-    }
-}
-
-template<typename Char, typename Alloc>
-size_t basic_json<Char, Alloc>::size() const
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        return 0;
-    case value_types::object_t:
-        return var_.value_.object_->size();
-    case value_types::array_t:
-        return var_.value_.array_->size();
-    default:
-        return 0;
     }
 }
 
@@ -711,66 +639,6 @@ typename basic_json<Char, Alloc>::const_array_iterator basic_json<Char, Alloc>::
 }
 
 template<typename Char, typename Alloc>
-bool basic_json<Char, Alloc>::empty() const
-{
-    return var_.empty();
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::reserve(size_t n)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->reserve(n);
-        break;
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_ = new json_object<Char, Alloc>();
-    case value_types::object_t:
-        var_.value_.object_->reserve(n);
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::resize(size_t n)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->resize(n);
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
-template<typename T>
-void basic_json<Char, Alloc>::resize(size_t n, T val)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->resize(n, val);
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
-size_t basic_json<Char, Alloc>::capacity() const
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_->capacity();
-    case value_types::object_t:
-        return var_.value_.object_->capacity();
-    default:
-        return 0;
-    }
-}
-
-template<typename Char, typename Alloc>
 bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) const
 {
     switch (var_.type_)
@@ -783,60 +651,6 @@ bool basic_json<Char, Alloc>::has_member(const std::basic_string<Char>& name) co
         break;
     default:
         return false;
-    }
-}
-
-template<typename Char, typename Alloc>
-long long basic_json<Char, Alloc>::as_longlong() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<long long>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<long long>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<long long>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a long long");
-    }
-}
-
-template<typename Char, typename Alloc>
-unsigned long long basic_json<Char, Alloc>::as_ulonglong() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<unsigned long long>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<unsigned long long>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<unsigned long long>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a unsigned long long");
-    }
-}
-
-template<typename Char, typename Alloc>
-double basic_json<Char, Alloc>::as_double() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return var_.value_.float_value_;
-    case value_types::integer_t:
-        return static_cast<double>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<double>(var_.value_.uinteger_value_);
-    case value_types::null_t:
-        return std::numeric_limits<double>::quiet_NaN();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a double");
     }
 }
 

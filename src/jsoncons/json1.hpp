@@ -791,7 +791,7 @@ public:
 
         bool operator==(const variant& rhs) const
         {
-            if (is_numeric() & rhs.is_numeric())
+            if (is_number() & rhs.is_number())
             {
                 switch (type_)
                 {
@@ -861,23 +861,23 @@ public:
             return false;
         }
 
-        bool is_null() const
+        bool is_null() const JSONCONS_NOEXCEPT
         {
             return type_ == value_types::null_t;
         }
 
-        bool is_bool() const
+        bool is_bool() const JSONCONS_NOEXCEPT
         {
             return type_ == value_types::bool_t;
         }
 
         // Deprecated
-        bool is_empty() const
+        bool is_empty() const JSONCONS_NOEXCEPT
         {
             return empty();
         }
 
-        bool empty() const
+        bool empty() const JSONCONS_NOEXCEPT
         {
             switch (type_)
             {
@@ -896,12 +896,12 @@ public:
             }
         }
 
-        bool is_string() const
+        bool is_string() const JSONCONS_NOEXCEPT
         {
             return (type_ == value_types::string_t) | (type_ == value_types::small_string_t);
         }
 
-        bool is_numeric() const
+        bool is_number() const JSONCONS_NOEXCEPT
         {
             return type_ == value_types::double_t || type_ == value_types::integer_t || type_ == value_types::uinteger_t;
         }
@@ -1147,7 +1147,7 @@ public:
             return evaluate().end_elements();
         }
 
-        size_t size() const
+        size_t size() const JSONCONS_NOEXCEPT
         {
             return evaluate().size();
         }
@@ -1168,13 +1168,13 @@ public:
             return evaluate().count(name);
         }
 
-        bool is_null() const
+        bool is_null() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_null();
         }
 
         // Deprecated
-        bool is_empty() const
+        bool is_empty() const JSONCONS_NOEXCEPT
         {
             return empty();
         }
@@ -1222,52 +1222,63 @@ public:
             return evaluate().template is<T>();
         }
 
-        bool is_string() const
+        bool is_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_string();
         }
 
-        bool is_number() const
+        bool is_number() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_number();
         }
 
-        bool is_numeric() const
+        // Deprecate
+        bool is_numeric() const JSONCONS_NOEXCEPT
         {
-            return evaluate().is_numeric();
+            return is_number();
         }
 
-        bool is_bool() const
+        bool is_bool() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_bool();
         }
 
-        bool is_object() const
+        bool is_object() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_object();
         }
 
-        bool is_array() const
+        bool is_array() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_array();
         }
  
-        bool is_any() const
+        bool is_any() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_any();
         }
 
-        bool is_longlong() const
+        bool is_longlong() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_longlong();
         }
 
-        bool is_ulonglong() const
+        bool is_integer() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_integer();
+        }
+
+        bool is_ulonglong() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_ulonglong();
         }
 
-        bool is_double() const
+        bool is_uinteger() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_uinteger();
+        }
+
+        bool is_double() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_double();
         }
@@ -1339,9 +1350,19 @@ public:
             return evaluate().as_longlong();
         }
 
+        int64_t as_integer() const
+        {
+            return evaluate().as_integer();
+        }
+
         unsigned long long as_ulonglong() const
         {
             return evaluate().as_ulonglong();
+        }
+
+        uint64_t as_uinteger() const
+        {
+            return evaluate().as_uinteger();
         }
 
         template <class T>
@@ -1749,7 +1770,20 @@ public:
 
     bool operator==(const basic_json<Char,Alloc>& rhs) const;
 
-    size_t size() const; 
+    size_t size() const JSONCONS_NOEXCEPT
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return 0;
+        case value_types::object_t:
+            return var_.value_.object_->size();
+        case value_types::array_t:
+            return var_.value_.array_->size();
+        default:
+            return 0;
+        }
+    }
 
     basic_json<Char,Alloc>& operator[](size_t i);
 
@@ -1769,7 +1803,7 @@ public:
 
     void to_stream(std::basic_ostream<Char>& os, const basic_output_format<Char>& format, bool indenting) const;
 
-    bool is_null() const
+    bool is_null() const JSONCONS_NOEXCEPT
     {
         return var_.is_null();
     }
@@ -1808,64 +1842,117 @@ public:
         return json_type_traits<Char,Alloc,T>::is(*this);
     }
 
-    bool is_string() const
+    bool is_string() const JSONCONS_NOEXCEPT
     {
         return var_.is_string();
     }
 
-    bool is_numeric() const
-    {
-        return var_.type_ == value_types::double_t || var_.type_ == value_types::integer_t || var_.type_ == value_types::uinteger_t;
-    }
 
-    bool is_bool() const
+    bool is_bool() const JSONCONS_NOEXCEPT
     {
         return var_.is_bool();
     }
 
-    bool is_object() const
+    bool is_object() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::object_t || var_.type_ == value_types::empty_object_t;
     }
 
-    bool is_array() const
+    bool is_array() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::array_t;
     }
 
-    bool is_any() const
+    bool is_any() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::any_t;
     }
 
-    bool is_longlong() const
+    bool is_longlong() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::integer_t;
     }
 
-    bool is_ulonglong() const
+    bool is_integer() const JSONCONS_NOEXCEPT
+    {
+        return var_.type_ == value_types::integer_t;
+    }
+
+    bool is_ulonglong() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::uinteger_t;
     }
 
-    bool is_double() const
+    bool is_uinteger() const JSONCONS_NOEXCEPT
+    {
+        return var_.type_ == value_types::uinteger_t;
+    }
+
+    bool is_double() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::double_t;
     }
 
+    bool is_number() const JSONCONS_NOEXCEPT
+    {
+        return var_.is_number();
+    }
+
+    // Deprecated 
+    bool is_numeric() const JSONCONS_NOEXCEPT
+    {
+        return is_number();
+    }
+
     // Deprecated
-    bool is_empty() const
+    bool is_empty() const JSONCONS_NOEXCEPT
     {
         return empty();
     }
 
-    bool empty() const;
+    bool empty() const JSONCONS_NOEXCEPT
+    {
+        return var_.empty();
+    }
 
-    size_t capacity() const;
+    size_t capacity() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            return var_.value_.array_->capacity();
+        case value_types::object_t:
+            return var_.value_.object_->capacity();
+        default:
+            return 0;
+        }
+    }
 
-    void reserve(size_t n);
+    void reserve(size_t n)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->reserve(n);
+            break;
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char, Alloc>();
+        case value_types::object_t:
+            var_.value_.object_->reserve(n);
+            break;
+        }
+    }
 
-    void resize(size_t n);
+    void resize(size_t n)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->resize(n);
+            break;
+        }
+    }
 
     void resize_array(size_t n)
     {
@@ -1873,7 +1960,15 @@ public:
     }
 
     template <typename T>
-    void resize(size_t n, T val);
+    void resize(size_t n, T val)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->resize(n, val);
+            break;
+        }
+    }
 
     template <typename T>
     void resize_array(size_t n, T val)
@@ -1917,11 +2012,66 @@ public:
         }
     }
 
-    long long as_longlong() const;
+    long long as_longlong() const
+    {
+        return as_integer();
+    }
 
-    unsigned long long as_ulonglong() const;
+    unsigned long long as_ulonglong() const
+    {
+        return as_uinteger();
+    }
 
-    double as_double() const;
+    int64_t as_integer() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<long long>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<long long>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<long long>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a long long");
+        }
+    }
+
+    uint64_t as_uinteger() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<unsigned long long>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<unsigned long long>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<unsigned long long>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a unsigned long long");
+        }
+    }
+
+    double as_double() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return var_.value_.float_value_;
+        case value_types::integer_t:
+            return static_cast<double>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<double>(var_.value_.uinteger_value_);
+        case value_types::null_t:
+            return std::numeric_limits<double>::quiet_NaN();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a double");
+        }
+    }
 
     // Deprecated
 
@@ -1943,8 +2093,65 @@ public:
 
     const any& any_value() const;
 
-    basic_json<Char,Alloc>& at(const std::basic_string<Char>& name);
-    const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const;
+    basic_json<Char, Alloc>& at(const std::basic_string<Char>& name)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
+        case value_types::object_t:
+            return var_.value_.object_->at(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    const basic_json<Char, Alloc>& at(const std::basic_string<Char>& name) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
+        case value_types::object_t:
+            return var_.value_.object_->at(name);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    basic_json<Char, Alloc>& at(size_t i)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            if (i >= var_.value_.array_->size())
+            {
+                JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            }
+            return var_.value_.array_->at(i);
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Index on non-array value not supported");
+        }
+    }
+
+    const basic_json<Char, Alloc>& at(size_t i) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            if (i >= var_.value_.array_->size())
+            {
+                JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            }
+            return var_.value_.array_->at(i);
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Index on non-array value not supported");
+        }
+    }
 
     object_iterator find(const std::basic_string<Char>& name)
     {
@@ -1956,7 +2163,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -1971,7 +2178,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -1986,7 +2193,7 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2001,13 +2208,10 @@ public:
             return var_.value_.object_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
-
-    basic_json<Char,Alloc>& at(size_t i);
-    const basic_json<Char,Alloc>& at(size_t i) const;
 
     const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const;
 
@@ -2041,7 +2245,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
             }
         }
     }
@@ -2056,7 +2260,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2071,7 +2275,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2086,7 +2290,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2100,7 +2304,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2112,7 +2316,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2126,7 +2330,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2138,7 +2342,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2152,7 +2356,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2164,7 +2368,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2310,11 +2514,6 @@ public:
         return build_array<Char,Alloc,size>()(m, n, k, val);
     }
 
-    bool is_number() const
-    {
-        return is_numeric();
-    }
-
     object_range members()
     {
         static object empty;
@@ -2325,7 +2524,7 @@ public:
         case value_types::object_t:
             return object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
         }
     }
 
@@ -2339,7 +2538,7 @@ public:
         case value_types::object_t:
             return const_object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
         }
     }
 
@@ -2350,7 +2549,7 @@ public:
         case value_types::array_t:
             return array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
         }
     }
 
@@ -2361,7 +2560,7 @@ public:
         case value_types::array_t:
             return const_array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
         }
     }
 

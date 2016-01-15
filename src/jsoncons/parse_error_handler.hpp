@@ -13,7 +13,7 @@
 
 namespace jsoncons {
 
-class json_parse_exception : public json_exception
+class json_parse_exception : public std::exception, public virtual json_exception
 {
 public:
     json_parse_exception(std::error_code ec,

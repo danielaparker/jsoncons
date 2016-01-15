@@ -135,9 +135,9 @@ public:
         elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
-    basic_json<Char,Alloc>& at(size_t i) {return elements_[i];}
+    basic_json<Char,Alloc>& at(size_t i) {return elements_.at(i);}
 
-    const basic_json<Char,Alloc>& at(size_t i) const {return elements_[i];}
+    const basic_json<Char,Alloc>& at(size_t i) const {return elements_.at(i);}
 
     void push_back(const basic_json<Char,Alloc>& value)
     {
@@ -356,51 +356,52 @@ public:
         }
     }
 
-    /*void push_back(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& val)
-    {
-        members_.push_back(value_type(name,val));
-    }*/
-
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
     {
         members_.push_back(value_type(std::move(name), std::move(val)));
-        //members_.back().name().swap(std::move(name));
-        //members_.back().value().swap(std::move(val));
-        //members_.push_back(std::pair<std::basic_string<Char>, basic_json<Char, Alloc>>(std::move(name),
-        //    std::move(val))); // much slower on VS 2010
     }
 
-    basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) 
+    basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) 
     {
         auto it = find(name);
         if (it == end())
         {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
+        }
+        return it->value();
+    }
+
+    const basic_json<Char,Alloc>& at(const std::basic_string<Char>& name) const
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
+        }
+        return it->value();
+    }
+
+    basic_json<Char, Alloc>& get(const std::basic_string<Char>& name)
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::exception, "Member %s not found.", name);
+        }
+        return it->value();
+    }
+
+    const basic_json<Char, Alloc>& get(const std::basic_string<Char>& name) const
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::exception, "Member %s not found.", name);
         }
         return it->value();
     }
 
     basic_json<Char,Alloc>& get(Char const * name) 
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
-        }
-        return it->value();
-    }
-
-    const basic_json<Char,Alloc>& get(const std::basic_string<Char>& name) const
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Member %s not found.",name);
-        }
-        return it->value();
-    }
-
-    const basic_json<Char,Alloc>& get(Char const * name) const
     {
         auto it = find(name);
         if (it == end())

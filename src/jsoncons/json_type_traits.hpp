@@ -88,13 +88,13 @@ class json_type_traits<Char, Alloc, char>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -103,7 +103,7 @@ public:
     }
     static char as(const basic_json<Char, Alloc>& rhs)
     {
-        return static_cast<char>(rhs.as_longlong());
+        return static_cast<char>(rhs.as_integer());
     }
     static void assign(basic_json<Char, Alloc>& lhs, char ch)
     {
@@ -117,13 +117,13 @@ class json_type_traits<Char, Alloc, unsigned char>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -132,7 +132,7 @@ public:
     }
     static unsigned char as(const basic_json<Char, Alloc>& rhs)
     {
-        return static_cast<unsigned char>(rhs.as_ulonglong());
+        return static_cast<unsigned char>(rhs.as_uinteger());
     }
     static void assign(basic_json<Char, Alloc>& lhs, unsigned char ch)
     {
@@ -146,13 +146,13 @@ class json_type_traits<Char, Alloc, signed char>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -161,7 +161,7 @@ public:
     }
     static signed char as(const basic_json<Char, Alloc>& rhs)
     {
-        return static_cast<signed char>(rhs.as_longlong());
+        return static_cast<signed char>(rhs.as_integer());
     }
     static void assign(basic_json<Char, Alloc>& lhs, signed char ch)
     {
@@ -175,13 +175,13 @@ class json_type_traits<Char, Alloc, wchar_t>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<wchar_t>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<wchar_t>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -190,7 +190,7 @@ public:
     }
     static wchar_t as(const basic_json<Char, Alloc>& rhs)
     {
-        return static_cast<wchar_t>(rhs.as_longlong());
+        return static_cast<wchar_t>(rhs.as_integer());
     }
     static void assign(basic_json<Char, Alloc>& lhs, wchar_t ch)
     {
@@ -279,13 +279,13 @@ class json_type_traits<Char, Alloc, short>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -308,13 +308,13 @@ class json_type_traits<Char, Alloc, unsigned short>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -337,13 +337,13 @@ class json_type_traits<Char, Alloc, int>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -366,13 +366,13 @@ class json_type_traits<Char, Alloc, unsigned int>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -395,13 +395,13 @@ class json_type_traits<Char, Alloc, long>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_longlong() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -424,13 +424,13 @@ class json_type_traits<Char, Alloc, unsigned long>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
@@ -453,13 +453,13 @@ class json_type_traits<Char, Alloc, long long>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
             return true;
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
-            return rhs.as_ulonglong() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -468,7 +468,7 @@ public:
     }
     static long long as(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.as_longlong();
+        return rhs.as_integer();
     }
     static void assign(basic_json<Char, Alloc>& lhs, long long rhs)
     {
@@ -482,11 +482,11 @@ class json_type_traits<Char, Alloc, unsigned long long>
 public:
     static bool is(const basic_json<Char, Alloc>& rhs)
     {
-        if (rhs.is_longlong())
+        if (rhs.is_integer())
         {
-            return rhs.as_longlong() >= 0 && static_cast<unsigned long long>(rhs.as_longlong()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_ulonglong())
+        else if (rhs.is_uinteger())
         {
             return true;
         }
@@ -497,7 +497,7 @@ public:
     }
     static unsigned long long as(const basic_json<Char, Alloc>& rhs)
     {
-        return rhs.as_ulonglong();
+        return rhs.as_uinteger();
     }
     static void assign(basic_json<Char, Alloc>& lhs, unsigned long long rhs)
     {

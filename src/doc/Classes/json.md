@@ -122,17 +122,19 @@ Assigns a new value to a `json` variable, replacing it's current contents.
     object_range members();  
     const_object_range members() const;  
 Returns a "range" defined by `begin()` and `end()` over the members of a `json` object      
+Throws `std::domain_error` if not an object.
 
     array_range elements();
     const_array_range elements() const;
 Returns a "range" defined by `begin()` and `end()` over the elements of a `json` array      
+Throws `std::domain_error` if not an array.
 
 ### Capacity
 
-    size_t size() const
+    size_t size() const noexcept
 Returns the number of elements in a json array, or the number of members in a json object, or `zero`
 
-    bool empty() const
+    bool empty() const noexcept
 Returns `true` if a json string, object or array has no elements, otherwise `false`.
 
     size_t capacity() const
@@ -194,16 +196,16 @@ Returns `true` if the json value is an array, `false` otherwise.
     is<json::std::vector<T>>
 Returns `true` if the json value is an array and each element has type `T`, `false` otherwise.
 
-    bool is_null() const
-    bool is_string() const
-    bool is_numeric() const
-    bool is_longlong() const
-    bool is_ulonglong() const
-    bool is_double() const
-    bool is_bool() const
-    bool is_object() const
-    bool is_array() const
-    bool is_any() const
+    bool is_null() const noexcept
+    bool is_string() const noexcept
+    bool is_number() const noexcept
+    bool is_integer() const noexcept
+    bool is_uinteger() const noexcept
+    bool is_double() const noexcept
+    bool is_bool() const noexcept
+    bool is_object() const noexcept
+    bool is_array() const noexcept
+    bool is_any() const noexcept
 Non-generic versions of `is_` methods
 
     json& operator[](size_t i)
@@ -221,14 +223,19 @@ If `name` matches the name of a member in the json object, returns a reference t
     const_object_iterator find(const std::string& name) const
     const_object_iterator find(const char* name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
+Throws `std::domain_error` if not an object.
 
     json& at(const std::string& name)
     const json& at(const std::string& name) const
-If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.  These have the same behavior as the corresponding `operator[]` functions, but the non-const `at` is more efficient (doesn't have to return a proxy.)
+Returns a reference to the value with the specifed name in a json object.
+Throws `std::domain_error` if not an object.
+Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
     json& at(size_t i)
     const json& at(size_t i) const
-Returns a reference to the element at position `i` in a json array.  These have the same behavior as the corresponding `operator[]` functions.
+Returns a reference to the element at index `i` in a json array.  
+Throws `std::domain_error` if not an array.
+Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <typename T>
     const json get(const std::string& name, T default_val) const
@@ -262,8 +269,8 @@ Return integer value if value has integral type, performs cast if value has doub
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const noexcept
-    long long as_longlong() const
-    unsigned long long as_ulonglong() const
+    int64_t as_integer() const
+    uint64_t as_uinteger() const
     double as_double() const
     std::string as_string() const
 Non-generic versions of `as` methods
@@ -291,20 +298,24 @@ Remove a member from a `json` object
     void set(const std::string& name, json&& val)
     void set(std::string&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
+Throws `std::domain_error` if not an object.
 
     void add(const json& val)
     void add(json&& val)
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
+Throws `std::domain_error` if not an array.
 
     void add(array_iterator pos, const json& val)
     void add(array_iterator pos, json&& val)
 Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The content of `val` is copied (or moved) to the new element.
+Throws `std::domain_error` if not an array.
 
     void add(size_t index, const json& val)
     void add(size_t index, json&& val)
 Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.
 The content of `val` is copied (or moved) to the new element.
+Throws `std::domain_error` if not an array.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
@@ -354,6 +365,20 @@ Inserts json value into stream using the specified [output_format](output_format
 Exchanges the values of `a` and `b`
 
 Deprecated:
+    long long as_longlong() const
+Use as_integer or as<long long> instead
+
+    unsigned long long as_ulonglong() const
+Use as_uinteger or as<unsigned long long> instead
+
+    bool is_longlong() const
+Use is_integer instead
+
+    bool is_ulonglong() const
+Use is_uinteger instead
+
+    bool is_numeric() const
+Use `is_number` instead
 
     void remove_member(const std::string& name)
 Use `remove` instead
