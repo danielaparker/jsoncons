@@ -555,9 +555,9 @@ static json parse(const std::string&amp; s,
 <p>Parses a string of JSON text and returns a json object or array value. <br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
-<pre><code>static json parse(std::istream&amp; is)
-static json parse(std::istream&amp; is, 
-                  parse_error_handler&amp; err_handler)
+<pre><code>static json parse_stream(std::istream&amp; is)
+static json parse_stream(std::istream&amp; is, 
+                         parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>Parses an input stream of JSON text and returns a json object or array value. <br>
@@ -990,8 +990,15 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
 <p>Deprecated:<br>
-    long long as_longlong() const<br>
-Use as_integer or as instead</p>
+    static json parse(std::istream&amp; is)<br>
+    static json parse(std::istream&amp; is, <br>
+                      parse_error_handler&amp; err_handler)<br>
+Use <code>parse_stream</code> instead</p>
+
+<pre><code>long long as_longlong() const
+</code></pre>
+
+<p>Use as_integer or as instead</p>
 
 <pre><code>unsigned long long as_ulonglong() const
 </code></pre>

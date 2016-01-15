@@ -531,6 +531,7 @@ void do_uinteger_value(uint64_t value) override
 <li>json member function <code>has_member</code> has been deprecated, instead use <code>count</code>. Rationale: consistency with C++ containers</li>
 <li>json member function <code>remove_member</code> has been deprecated, instead use <code>remove</code>. Rationale: only member function left with _element or _member suffix </li>
 <li>json_parse_exception renamed to parse_exception, json_parse_exception typedef to parse_exception</li>
+<li>json::parse(std::istream&amp; is) renamed to json::parse_stream. json::parse(std::istream is) is deprecated but still works.</li>
 </ul>
 
 <h2>0.98.2 Release</h2>

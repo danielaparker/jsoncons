@@ -625,7 +625,7 @@ std::wcout &lt;&lt; root &lt;&lt; L"\n";
 <pre><code>wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
 std::wistringstream is(input);
 
-wjson val = wjson::parse(is);
+wjson val = wjson::parse_stream(is);
 
 wstring s = val[0].as&lt;wstring&gt;();
 std::cout &lt;&lt; "length=" &lt;&lt; s.length() &lt;&lt; std::endl;
