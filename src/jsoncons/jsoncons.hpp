@@ -100,7 +100,8 @@ public:
     virtual const char* what() const JSONCONS_NOEXCEPT = 0;
 };
 
-class json_exception_0 : public std::exception, public virtual json_exception
+template <typename Base>
+class json_exception_0 : public Base, public virtual json_exception
 {
 public:
     json_exception_0(std::string s) JSONCONS_NOEXCEPT
@@ -156,10 +157,10 @@ private:
 #define JSONCONS_STR2(x)  #x
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
-#define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0((x))
+#define JSONCONS_THROW_EXCEPTION(x) throw jsoncons::json_exception_0<std::exception>((x))
 #define JSONCONS_THROW_EXCEPTION_1(fmt,arg1) throw jsoncons::json_exception_1((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-	throw jsoncons::json_exception_0("assertion '" #x "' failed at " __FILE__ ":" \
+	throw jsoncons::json_exception_0<std::exception>("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }
 
 // json_char_traits

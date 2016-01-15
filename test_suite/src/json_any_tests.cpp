@@ -21,7 +21,7 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_any_test_suite)
 
-bool check_any_exception( jsoncons::json_exception_0 const& ex ) { return true; }
+bool check_any_exception( jsoncons::json_exception const& ex ) { return true; }
 
 BOOST_AUTO_TEST_CASE(test_any_const_ref)
 {
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(test_any_const_ref)
 
 	BOOST_CHECK_CLOSE(C(0,0),1.0,0.0000001);
 
-    BOOST_CHECK_EXCEPTION(obj["A"].any_cast<const matrix<int>>(), jsoncons::json_exception_0, check_any_exception);
+    BOOST_CHECK_EXCEPTION(obj["A"].any_cast<const matrix<int>>(), jsoncons::json_exception, check_any_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_any)
