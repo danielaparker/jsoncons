@@ -13,10 +13,10 @@
 
 namespace jsoncons {
 
-class json_parse_exception : public std::exception, public virtual json_exception
+class parse_exception : public std::exception, public virtual json_exception
 {
 public:
-    json_parse_exception(std::error_code ec,
+    parse_exception(std::error_code ec,
                          size_t line,
                          size_t column)
         : error_code_(ec),
@@ -24,7 +24,7 @@ public:
           column_number_(column)
     {
     }
-    json_parse_exception(const json_parse_exception& other)
+    parse_exception(const parse_exception& other)
         : error_code_(other.error_code_),
           line_number_(other.line_number_),
           column_number_(other.column_number_)
@@ -58,6 +58,8 @@ private:
     size_t line_number_;
     size_t column_number_;
 };
+
+typedef parse_exception json_parse_exception;
 
 template<typename Char>
 class basic_parsing_context
@@ -102,33 +104,33 @@ public:
     }
 
     void warning(std::error_code ec,
-                 const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+                 const basic_parsing_context<Char>& context) throw (parse_exception) 
     {
         do_warning(ec,context);
     }
 
     void error(std::error_code ec,
-               const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+               const basic_parsing_context<Char>& context) throw (parse_exception) 
     {
         do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+                     const basic_parsing_context<Char>& context) throw (parse_exception) 
     {
         do_fatal_error(ec,context);
-        throw json_parse_exception(ec,context.line_number(),context.column_number());
+        throw parse_exception(ec,context.line_number(),context.column_number());
     }
 
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+                            const basic_parsing_context<Char>& context) throw (parse_exception) = 0;
 
     virtual void do_error(std::error_code,
-                          const basic_parsing_context<Char>& context) throw (json_parse_exception) = 0;
+                          const basic_parsing_context<Char>& context) throw (parse_exception) = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<Char>& context) throw (json_parse_exception)
+                                const basic_parsing_context<Char>& context) throw (parse_exception)
     {
     }
 };
@@ -144,14 +146,14 @@ public:
     }
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (json_parse_exception) 
+                            const basic_parsing_context<Char>& context) throw (parse_exception) 
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          const basic_parsing_context<Char>& context) throw (json_parse_exception)
+                          const basic_parsing_context<Char>& context) throw (parse_exception)
     {
-        throw json_parse_exception(ec,context.line_number(),context.column_number());
+        throw parse_exception(ec,context.line_number(),context.column_number());
     }
 };
 

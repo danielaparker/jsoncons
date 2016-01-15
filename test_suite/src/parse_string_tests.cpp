@@ -29,12 +29,12 @@ private:
     int value_;
 
     virtual void do_warning(std::error_code ec,
-                            const parsing_context& context) throw(json_parse_exception)
+                            const parsing_context& context) throw(parse_exception)
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          const parsing_context& context) throw(json_parse_exception)
+                          const parsing_context& context) throw(parse_exception)
     {
         if (ec.category() == json_error_category())
         {

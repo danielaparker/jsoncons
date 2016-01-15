@@ -28,9 +28,11 @@ Returns `true` when there are no more JSON texts to be read from the stream, `fa
 
     void read_next()
 Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_deserializer](json_deserializer).
+Throws [parse_exception](parse_exception) if parsing fails.
 
     void check_done()
 Throws if there are any unconsumed non-whitespace characters in the input.
+Throws [parse_exception](parse_exception) if parsing fails.
 
     size_t buffer_capacity() const
 

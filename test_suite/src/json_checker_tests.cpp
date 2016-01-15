@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(test_fail2)
         std::ifstream is(in_file);
         is >> val;
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(test_fail3)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_fail4)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(test_fail5)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(test_fail6)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_fail7)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_fail8)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_fail9)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(test_fail10)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
     }
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(test_fail11)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(test_fail12)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(test_fail13)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(test_fail14)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE(test_fail15)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(test_fail16)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(test_fail17)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
         reader.read_next();
         reader.check_done();
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
          err = e.code().value();
          //std::cout << in_file << " " << e.what() << std::endl;
@@ -345,7 +345,7 @@ BOOST_AUTO_TEST_CASE(test_fail19)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -363,7 +363,7 @@ BOOST_AUTO_TEST_CASE(test_fail20)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE(test_fail21)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(test_fail22)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE(test_fail23)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -435,7 +435,7 @@ BOOST_AUTO_TEST_CASE(test_fail24)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -454,7 +454,7 @@ BOOST_AUTO_TEST_CASE(test_fail25)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(test_fail26)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(test_fail27)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE(test_fail28)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -526,7 +526,7 @@ BOOST_AUTO_TEST_CASE(test_fail29)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -544,7 +544,7 @@ BOOST_AUTO_TEST_CASE(test_fail30)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -562,7 +562,7 @@ BOOST_AUTO_TEST_CASE(test_fail31)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -580,7 +580,7 @@ BOOST_AUTO_TEST_CASE(test_fail32)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -598,7 +598,7 @@ BOOST_AUTO_TEST_CASE(test_fail33)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         err = e.code().value();
         //std::cout << in_file << " " << e.what() << std::endl;
@@ -616,7 +616,7 @@ BOOST_AUTO_TEST_CASE(test_pass1)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;
@@ -633,7 +633,7 @@ BOOST_AUTO_TEST_CASE(test_pass2)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;
@@ -650,7 +650,7 @@ BOOST_AUTO_TEST_CASE(test_pass3)
     {
         json::parse_file(in_file);
     }
-    catch (const json_parse_exception& e)
+    catch (const parse_exception& e)
     {
         std::cout << in_file << " " << e.what() << std::endl;
         throw;

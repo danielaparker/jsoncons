@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_parse_exception</title>
+<title>parse_exception</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_parse_exception
+<pre><code>jsoncons::parse_exception
 </code></pre>
 
 <h3>Header</h3>
@@ -478,15 +478,15 @@ vertical-align:1px;
 
 <h3>Base class</h3>
 
-<p><a href="json_exception">json_exception</a></p>
+<p>std::exception</p>
 
 <h3>Constructors</h3>
 
-<pre><code>json_parse_exception(std::error_code ec,
-                     size_t line,
-                     size_t column)
+<pre><code>parse_exception(std::error_code ec,
+                size_t line,
+                size_t column)
 
-json_parse_exception(const json_parse_exception&amp; other)
+parse_exception(const parse_exception&amp; other)
 </code></pre>
 
 <h3>Member functions</h3>
@@ -526,9 +526,9 @@ int main()
     {
         jsoncons::json val = jsoncons::json::parse(s);
     } 
-    catch(const jsoncons::json_parse_exception&amp; e) 
+    catch(const jsoncons::parse_exception&amp; e) 
     {
-        std::cout &lt;&lt; "Caught json_parse_exception with category " 
+        std::cout &lt;&lt; "Caught parse_exception with category " 
                   &lt;&lt; e.code().category().name() 
                   &lt;&lt; ", code " &lt;&lt; e.code().value() 
                   &lt;&lt; " and message " &lt;&lt; e.what() &lt;&lt; std::endl;
@@ -538,7 +538,7 @@ int main()
 
 <p>Output:</p>
 
-<pre><code>Caught json_parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+<pre><code>Caught parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
 </code></pre>
 </body>
 </html>

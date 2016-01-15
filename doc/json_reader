@@ -507,12 +507,14 @@ You must ensure that the input stream and input handler exist as long as does <c
 <pre><code>void read_next()
 </code></pre>
 
-<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.</p>
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.<br>
+Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>void check_done()
 </code></pre>
 
-<p>Throws if there are any unconsumed non-whitespace characters in the input.</p>
+<p>Throws if there are any unconsumed non-whitespace characters in the input.<br>
+Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>size_t buffer_capacity() const
 

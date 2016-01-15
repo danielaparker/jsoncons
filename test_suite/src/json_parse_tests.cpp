@@ -21,7 +21,7 @@ void test_error_code(const std::string& text, int ec)
 		json::parse(text);
 		BOOST_FAIL(text);
 	}
-	catch (const json_parse_exception& e)
+	catch (const parse_exception& e)
 	{
 		BOOST_CHECK_MESSAGE(e.code().value() == ec, e.what());
 	}

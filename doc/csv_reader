@@ -532,7 +532,8 @@ You must ensure that the input stream, input handler, and error handler exist as
 <pre><code>void read()
 </code></pre>
 
-<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.</p>
+<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.<br>
+Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>size_t buffer_capacity() const
 

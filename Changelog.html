@@ -480,6 +480,7 @@ vertical-align:1px;
 </li>
 <li>json object range accessor <code>members()</code> added, which supports range-based for loops over json objects, and replaces <code>begin_members</code> and <code>end_members</code>
 </li>
+<li>New version of json <code>add</code> member function that takes a parameter <code>array_iterator</code> </li>
 </ul>
 
 <p>API Changes </p>
@@ -528,6 +529,8 @@ void do_uinteger_value(uint64_t value) override
 <li>json member functions <code>begin_members</code> and <code>end_members</code> have been deprecated, instead use <code>members().begin()</code> and <code>members.end()</code>
 </li>
 <li>json member function <code>has_member</code> has been deprecated, instead use <code>count</code>. Rationale: consistency with C++ containers</li>
+<li>json member function <code>remove_member</code> has been deprecated, instead use <code>remove</code>. Rationale: only member function left with _element or _member suffix </li>
+<li>json_parse_exception renamed to parse_exception, json_parse_exception typedef to parse_exception</li>
 </ul>
 
 <h2>0.98.2 Release</h2>

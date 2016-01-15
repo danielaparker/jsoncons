@@ -468,7 +468,43 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>An error occurred while processing GitHub Flavored Markdown.</p><p><strong>The remote name could not be resolved: 'api.github.com'</strong></p><p>If the problem persists, please report the bug.</p>
+<pre><code>jsoncons::default_parse_error_handler
+
+typedef basic_default_parse_error_handler&lt;char&gt; default_parse_error_handler
+</code></pre>
+
+<h3>Header</h3>
+
+<pre><code>#include "jsoncons/parse_error_handler.hpp"
+</code></pre>
+
+<h3>Base class</h3>
+
+<p><a href="parse_error_handler">parse_error_handler</a>  </p>
+
+<h3>Static memebr functions</h3>
+
+<pre><code>static parse_error_handler&amp; instance()   
+</code></pre>
+
+<p>Returns a singleton instance of a <code>default_parse_error_handler</code>       </p>
+
+<h3>Private virtual implementation methods</h3>
+
+<pre><code>virtual void do_warning(const std::string&amp; error_code,
+                        std::error_code ec,
+                        const parsing_context&amp; context) throw (parse_exception)
+</code></pre>
+
+<p>Does nothing</p>
+
+<pre><code>virtual void do_error(const std::string&amp; error_code,
+                      std::error_code ec,
+                      const parsing_context&amp; context) throw (parse_exception)
+</code></pre>
+
+<p>Throws a <a href="parse_exception">parse_exception</a> with the message and the line <br>
+number and column number taken from the <a href="parsing_context">context</a> parameter.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
