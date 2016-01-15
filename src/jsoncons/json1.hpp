@@ -1794,13 +1794,34 @@ public:
         }
     }
 
-    basic_json<Char,Alloc>& operator[](size_t i);
+    basic_json<Char,Alloc>& operator[](size_t i)
+    {
+        return at(i);
+    }
 
-    const basic_json<Char,Alloc>& operator[](size_t i) const;
+    const basic_json<Char,Alloc>& operator[](size_t i) const
+    {
+        return at(i);
+    }
 
-    object_key_proxy operator[](const std::basic_string<Char>& name);
+    object_key_proxy operator[](const std::basic_string<Char>& name)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+        case value_types::object_t:
+            return object_key_proxy(*this, name);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a long long");
+            break;
+        }
+    }
 
-    const basic_json<Char,Alloc>& operator[](const std::basic_string<Char>& name) const;
+    const basic_json<Char,Alloc>& operator[](const std::basic_string<Char>& name) const
+    {
+        return at(name);
+    }
 
     std::basic_string<Char> to_string() const;
 
@@ -2092,9 +2113,31 @@ public:
 
     unsigned long as_ulong() const;
 
-    std::basic_string<Char> as_string() const;
+    std::basic_string<Char> as_string() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
+        case value_types::string_t:
+            return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+        default:
+            return to_string();
+        }
+    }
 
-    std::basic_string<Char> as_string(const basic_output_format<Char>& format) const;
+    std::basic_string<Char> as_string(const basic_output_format<Char>& format) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
+        case value_types::string_t:
+            return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+        default:
+            return to_string(format);
+        }
+    }
 
     const Char* as_cstring() const;
 

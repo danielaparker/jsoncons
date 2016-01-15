@@ -151,30 +151,6 @@ void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
 }
 
 template<typename Char, typename Alloc>
-typename basic_json<Char, Alloc>::object_key_proxy basic_json<Char, Alloc>::operator[](const std::basic_string<Char>& name)
-{
-    return object_key_proxy(*this, name);
-}
-
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](const std::basic_string<Char>& name) const
-{
-    return at(name);
-}
-
-template<typename Char, typename Alloc>
-basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](size_t i)
-{
-    return at(i);
-}
-
-template<typename Char, typename Alloc>
-const basic_json<Char, Alloc>& basic_json<Char, Alloc>::operator[](size_t i) const
-{
-    return at(i);
-}
-
-template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::to_string() const
 {
     std::basic_ostringstream<Char> os;
@@ -253,7 +229,6 @@ void basic_json<Char, Alloc>::to_stream(basic_json_output_handler<Char>& handler
         var_.value_.any_value_->to_stream(handler);
         break;
     default:
-        // throw
         break;
     }
 }
@@ -438,11 +413,22 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_s
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename)
 {
-    FILE* fp = std::fopen (filename.c_str(), "rb");
-    if (fp == nullptr) 
+    FILE* fp;
+
+
+#if defined(_MSC_VER)
+    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
+    if (err != 0) 
     {
         JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
     }
+#else
+    fp = std::fopen(filename.c_str(), "rb");
+    if (fp == nullptr)
+    {
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+    }
+#endif
     basic_json_deserializer<Char, Alloc> handler;
     try
     {
@@ -487,11 +473,22 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& filename, 
                                                             basic_parse_error_handler<Char>& err_handler)
 {
-    FILE* fp = std::fopen (filename.c_str(), "rb");
-    if (fp == nullptr) 
+    FILE* fp;
+
+#if defined(_MSC_VER)
+    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
+    if (err != 0) 
     {
         JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
     }
+#else
+    fp = std::fopen(filename.c_str(), "rb");
+    if (fp == nullptr)
+    {
+        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+    }
+#endif
+
     basic_json_deserializer<Char, Alloc> handler;
     try
     {
@@ -755,20 +752,6 @@ const typename basic_json<Char, Alloc>::any& basic_json<Char, Alloc>::any_value(
 }
 
 template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::as_string() const
-{
-    switch (var_.type_)
-    {
-    case value_types::small_string_t:
-        return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
-    case value_types::string_t:
-        return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
-    default:
-        return to_string();
-    }
-}
-
-template<typename Char, typename Alloc>
 const Char* basic_json<Char, Alloc>::as_cstring() const
 {
     switch (var_.type_)
@@ -780,27 +763,6 @@ const Char* basic_json<Char, Alloc>::as_cstring() const
     default:
         JSONCONS_THROW_EXCEPTION(std::exception,"Not a string");
     }
-}
-
-template<typename Char, typename Alloc>
-std::basic_string<Char> basic_json<Char, Alloc>::as_string(const basic_output_format<Char>& format) const
-{
-    switch (var_.type_)
-    {
-    case value_types::small_string_t:
-        return std::basic_string<Char>(var_.value_.small_string_value_,var_.small_string_length_);
-    case value_types::string_t:
-        return std::basic_string<Char>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
-    default:
-        return to_string(format);
-    }
-}
-
-template <typename Char,typename Alloc>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os, const basic_json<Char, Alloc>& o)
-{
-    o.to_stream(os);
-    return os;
 }
 
 template <typename Char, typename Alloc>

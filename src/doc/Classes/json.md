@@ -30,8 +30,6 @@ Object type
     array
 Array type
 
-Type tags that can be used with `is<T>` and `as<T>`
-
     object_iterator
 A bidirectional iterator to `json::member_type`
 
@@ -158,10 +156,10 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 Returns the number of object members that match `name`.    
 
     template <typename T>
-    bool is() const
+    bool is() const noexcept
 Returns `true` if json value has type `T`, `false` otherwise.  
 
-    is<char>
+    is<char> 
     is<signed char>
     is<unsigned char>
     is<wchar_t>
@@ -214,12 +212,15 @@ Non-generic versions of `is_` methods
     json& operator[](size_t i)
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.
+Throws `std::domain_error` if not an object.
 
     json& operator[](const std::string& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
+Throws `std::domain_error` if not an object.
 
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
+Throws `std::domain_error` if not an object.
 
     object_iterator find(const std::string& name)
     object_iterator find(const char* name)
