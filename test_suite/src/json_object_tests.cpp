@@ -14,13 +14,13 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_test_suite)
 
-BOOST_AUTO_TEST_CASE(test_remove_member)
+BOOST_AUTO_TEST_CASE(test_erase_member)
 {
     json o;
     o["key"] = "Hello";
 
     BOOST_CHECK(o.size() == 1);
-    o.remove("key");
+    o.erase("key");
     BOOST_CHECK(o.size() == 0);
 
     json a;

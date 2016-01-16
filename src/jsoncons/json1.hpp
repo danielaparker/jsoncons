@@ -1486,11 +1486,6 @@ public:
         }
         // Remove all elements from an array or object
 
-        void erase(size_t from_index, size_t to_index)
-        {
-            evaluate().erase(from_index, to_index);
-        }
-
         void erase(object_iterator first, object_iterator last)
         {
             evaluate().erase(first, last);
@@ -2321,19 +2316,6 @@ public:
     void clear();
     // Remove all elements from an array or object
 
-    void erase(size_t from_index, size_t to_index)
-    {
-        switch (var_.type_)
-        {
-        case value_types::array_t:
-            var_.value_.array_->remove_range(from_index, to_index);
-            break;
-        default:
-            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
-            break;
-        }
-    }
-
     void erase(object_iterator first, object_iterator last)
     {
         switch (var_.type_)
@@ -2344,7 +2326,7 @@ public:
             var_.value_.object_->erase(first, last);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
             break;
         }
     }
@@ -2357,7 +2339,7 @@ public:
             var_.value_.array_->erase(first, last);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
             break;
         }
     }
