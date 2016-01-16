@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<typename Char,class Alloc>
+template<typename Char>
 class basic_csv_reader 
 {
     struct stack_item
@@ -169,7 +169,7 @@ private:
     basic_csv_parser<Char> parser_;
 };
 
-typedef basic_csv_reader<char,std::allocator<void>> csv_reader;
+typedef basic_csv_reader<char> csv_reader;
 
 }}
 

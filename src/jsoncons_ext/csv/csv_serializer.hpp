@@ -73,7 +73,7 @@ void escape_string(const Char* s,
     }
 }
 
-template<typename Char,class Alloc>
+template<typename Char>
 class basic_csv_serializer : public basic_json_output_handler<Char>
 {
     struct stack_item
@@ -436,7 +436,7 @@ private:
     }
 };
 
-typedef basic_csv_serializer<char,std::allocator<void>> csv_serializer;
+typedef basic_csv_serializer<char> csv_serializer;
 
 }}
 
