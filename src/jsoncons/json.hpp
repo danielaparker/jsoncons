@@ -9,6 +9,6 @@
 #define JSONCONS_JSON_HPP
 
 #include "jsoncons/json1.hpp"
-#include "jsoncons/json2.hpp"
+#include "jsoncons/json_type_traits.hpp"
 
 #endif

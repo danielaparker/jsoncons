@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <utility>
 #include <new>
-#include "jsoncons/json1.hpp"
+#include "jsoncons/jsoncons.hpp"
 
 namespace jsoncons {
 
@@ -226,8 +226,8 @@ public:
     typedef typename std::vector<value_type>::const_iterator const_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return allocator_type::template rebind<json_object>::other().allocate(1); }
-    static void operator delete(void* ptr) { return allocator_type::template rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
+    static void* operator new(std::size_t) { return allocator_type::rebind<json_object>::other().allocate(1); }
+    static void operator delete(void* ptr) { return allocator_type::rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
 
     json_object()
     {

@@ -15,9 +15,7 @@
 #include <cstdlib>
 #include <memory>
 #include "jsoncons/jsoncons.hpp"
-#include "jsoncons/json1.hpp"
 #include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_structures.hpp"
 
 namespace jsoncons {
 
@@ -265,9 +263,6 @@ private:
     int depth_;
     bool is_valid_;
 };
-
-typedef basic_json_deserializer<json> json_deserializer;
-typedef basic_json_deserializer<wjson> wjson_deserializer;
 
 }
 

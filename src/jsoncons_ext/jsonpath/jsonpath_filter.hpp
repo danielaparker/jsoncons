@@ -15,9 +15,7 @@
 #include <cstdlib>
 #include <memory>
 #include <regex>
-#include "jsoncons/jsoncons.hpp"
-#include "jsoncons/json1.hpp"
-#include "jsoncons/json2.hpp"
+#include "jsoncons/json.hpp"
 
 namespace jsoncons { namespace jsonpath {
 
