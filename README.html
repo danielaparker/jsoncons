@@ -501,40 +501,9 @@ vertical-align:1px;
 
 <h2>What's new on master</h2>
 
-<p>New features</p>
-
 <ul>
 <li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>. See example below and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">documentation</a>.</li>
-<li>json member function <code>find</code> added</li>
-<li>json member function <code>count</code> added</li>
-<li>json array range accessor <code>elements()</code> added, which supports range-based for loops over json arrays, and replaces <code>begin_elements</code> and <code>end_elements</code>
-</li>
-<li>json object range accessor <code>members()</code> added, which supports range-based for loops over json objects, and replaces <code>begin_members</code> and <code>end_members</code>
-</li>
-</ul>
-
-<p>API Changes </p>
-
-<ul>
-<li>The json internal representation of signed and unsigned integers has been changed from <code>long long</code> and <code>unsigned long long</code> to <code>int64_t</code> and <code>uint64_t</code>.
-This should not impact you unless you've implemented your own <code>json_input_handler</code> or <code>json_output_handler</code>, refer to the Changelog for more details.</li>
-<li>
-<code>output_format</code> drops support for <code>floatfield</code> property</li>
-</ul>
-
-<p>Non-beaking API Changes</p>
-
-<ul>
-<li>
-<code>json::parse_string</code> has been renamed to <code>json::parse</code>, <code>parse_string</code> is deprecated but still works</li>
-<li>
-<code>json member function</code>is_empty<code>has been renamed to</code>empty<code>,</code>is_empty` is deprecated but still works. Rationale: consistency with C++ containers</li>
-<li>json member functions <code>begin_elements</code> and <code>end_elements</code> have been deprecated, instead use <code>elements().begin()</code> and <code>elements.end()</code>
-</li>
-<li>json member functions <code>begin_members</code> and <code>end_members</code> have been deprecated, instead use <code>members().begin()</code> and <code>members.end()</code>
-</li>
-<li>json member function <code>has_member</code> has been deprecated, instead use <code>count</code>. Rationale: consistency with C++ containers</li>
-<li>json member function <code>get</code> that takes one parameter, a <code>name</code>, and returns a json null if not found, has been deprecated, use instead the version of <code>get</code> that takes the default as a second parameter.</li>
+<li>There are a few API changes, most retaining backwards compatability, refer to the <a href="https://github.com/danielaparker/jsoncons/blob/master/Changelog.md">Changelog</a> for details.</li>
 </ul>
 
 <h2>Benchmarks</h2>
@@ -568,7 +537,7 @@ book1["date"] = "2002-04-09";
 book1["price"] = 9.01;
 book1["isbn"] = "037571894X";  
 
-// Construct another in a different way
+// Construct another using the member function set
 json book2;
 
 book2.set("category", "History");
@@ -578,8 +547,24 @@ book2.set("date", "2007-11-06");
 book2.set("price", 10.50);
 book2.set("isbn", "0802143415");  
 
-// Construct a third from a string
-json book3 = json::parse(R"(
+// Use set again, but more efficiently
+json book3;
+
+// Reserve memory, to avoid reallocations
+book3.reserve(6);
+
+// Insert in name alphabetical order
+// Provide a hint to set where to insert the member
+json::object_iterator pos;
+pos = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+pos = book3.set(pos, "category", "Fiction");
+pos = book3.set(pos, "date", "2006-01-03");
+pos = book3.set(pos, "isbn", "1400079276");  
+pos = book3.set(pos, "price", 13.45);
+pos = book3.set(pos, "title", "Kafka on the Shore");
+
+// Construct a fourth from a string
+json book4 = json::parse(R"(
 {
     "category" : "Fiction",
     "title" : "Pulp",
@@ -594,23 +579,26 @@ json book3 = json::parse(R"(
 json booklist = json::array();
 
 // For efficiency, reserve memory, to avoid reallocations
-booklist.reserve(3);
+booklist.reserve(4);
 
 // For efficency, tell jsoncons to move the contents 
-// of the three book objects into the array
+// of the four book objects into the array
 booklist.add(std::move(book1));    
 booklist.add(std::move(book2));    
-booklist.add(std::move(book3));    
+booklist.add(std::move(book3));
 
-// See what's left of book1, 2 and 3 (expect null, null, null)
-std::cout &lt;&lt; book1 &lt;&lt; "," &lt;&lt; book2 &lt;&lt; "," &lt;&lt; book3 &lt;&lt; std::endl;
+// Add the last one to the front
+booklist.add(booklist.elements().begin(),std::move(book4));    
+
+// See what's left of book1, 2, 3 and 4 (expect nulls)
+std::cout &lt;&lt; book1 &lt;&lt; "," &lt;&lt; book2 &lt;&lt; "," &lt;&lt; book3 &lt;&lt; "," &lt;&lt; book4 &lt;&lt; std::endl;
 
 //Loop through the booklist elements using a range-based for loop    
 for(auto book : booklist.elements())
 {
-std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
-          &lt;&lt; ","
-      &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
+        &lt;&lt; ","
+        &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
 // Serialize the booklist to a file
@@ -621,6 +609,14 @@ os &lt;&lt; pretty_print(booklist);
 <p>The JSON output <code>booklist.json</code></p>
 
 <pre><code>[
+    {
+        "author":"Charles Bukowski",
+        "category":"Fiction",
+        "date":"2004-07-08",
+        "isbn":"1852272007",
+        "price":22.48,
+        "title":"Pulp"
+    },
     {
         "author":"Haruki Murakami",
         "category":"Fiction",
@@ -638,12 +634,12 @@ os &lt;&lt; pretty_print(booklist);
         "title":"Charlie Wilson's War"
     },
     {
-        "author":"Charles Bukowski",
+        "author":"Haruki Murakami",
         "category":"Fiction",
-        "date":"2004-07-08",
-        "isbn":"1852272007",
-        "price":22.48,
-        "title":"Pulp"
+        "date":"2006-01-03",
+        "isbn":"1400079276",
+        "price":13.45,
+        "title":"Kafka on the Shore"
     }
 ]
 </code></pre>
@@ -660,17 +656,17 @@ using jsoncons::jsonpath::json_query;
 
 // Deserialize the booklist
 std::ifstream is("booklist.json");
-json booklist2;
-is &gt;&gt; booklist2;
+json booklist;
+is &gt;&gt; booklist;
 
-// Select the authors of books that cost less than $12
-// (using JsonPath)
-json result = json_query(booklist,"$[*][?(@.price &lt; 12)].author");
+// Use a JsonPath expression to find the authors of 
+// books that cost less than $12
+json result = json_query(booklist, "$[*][?(@.price &lt; 12)].author");
 
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 </code></pre>
 
-<p>The result:</p>
+<p>Result:</p>
 
 <pre><code>["Haruki Murakami","George Crile"]
 </code></pre>
@@ -694,7 +690,7 @@ book1[L"date"] = L"2002-04-09";
 book1[L"price"] = 9.01;
 book1[L"isbn"] = L"037571894X";
 
-// Construct another in a different way
+// Construct another using the member function set
 wjson book2;
 
 book2.set(L"category", L"History");
@@ -704,8 +700,24 @@ book2.set(L"date", L"2007-11-06");
 book2.set(L"price", 10.50);
 book2.set(L"isbn", L"0802143415");
 
-// Construct a third from a string
-wjson book3 = wjson::parse(LR"(
+// Use set again, but more efficiently
+wjson book3;
+
+// Reserve memory, to avoid reallocations
+book3.reserve(6);
+
+// Insert in name alphabetical order
+// Provide a hint where to insert the member
+wjson::object_iterator pos;
+pos = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+pos = book3.set(pos, L"category", L"Fiction");
+pos = book3.set(pos, L"date", L"2006-01-03");
+pos = book3.set(pos, L"isbn", L"1400079276");
+pos = book3.set(pos, L"price", 13.45);
+pos = book3.set(pos, L"title", L"Kafka on the Shore");
+
+// Construct a fourth from a string
+wjson book4 = wjson::parse(LR"(
 {
     "category" : "Fiction",
     "title" : "Pulp",
@@ -720,23 +732,26 @@ wjson book3 = wjson::parse(LR"(
 wjson booklist = wjson::array();
 
 // For efficiency, reserve memory, to avoid reallocations
-booklist.reserve(3);
+booklist.reserve(4);
 
 // For efficency, tell jsoncons to move the contents 
-// of the three book objects into the array
+// of the four book objects into the array
 booklist.add(std::move(book1));
 booklist.add(std::move(book2));
 booklist.add(std::move(book3));
 
-// See what's left of book1, 2 and 3 (expect null, null, null)
-std::wcout &lt;&lt; book1 &lt;&lt; L"," &lt;&lt; book2 &lt;&lt; L"," &lt;&lt; book3 &lt;&lt; std::endl;
+// Add the last one to the front
+booklist.add(booklist.elements().begin(),std::move(book4));    
+
+// See what's left of book1, 2, 3 and 4 (expect nulls)
+std::wcout &lt;&lt; book1 &lt;&lt; L"," &lt;&lt; book2 &lt;&lt; L"," &lt;&lt; book3 &lt;&lt; L"," &lt;&lt; book4 &lt;&lt; std::endl;
 
 //Loop through the booklist elements using a range-based for loop    
 for (auto book : booklist.elements())
 {
     std::wcout &lt;&lt; book[L"title"].as&lt;std::wstring&gt;()
-        &lt;&lt; L","
-        &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
+           &lt;&lt; L","
+           &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
 // Serialize the booklist to a file
@@ -744,61 +759,23 @@ std::wofstream os(L"booklist2.json");
 os &lt;&lt; pretty_print(booklist);
 </code></pre>
 
-<p>The JSON output <code>booklist2.json</code></p>
-
-<pre><code>[
-    {
-        "author":"Haruki Murakami",
-        "category":"Fiction",
-        "date":"2002-04-09",
-        "isbn":"037571894X",
-        "price":9.01,
-        "title":"A Wild Sheep Chase: A Novel"
-    },
-    {
-        "author":"George Crile",
-        "category":"History",
-        "date":"2007-11-06",
-        "isbn":"0802143415",
-        "price":10.5,
-        "title":"Charlie Wilson's War"
-    },
-    {
-        "author":"Charles Bukowski",
-        "category":"Fiction",
-        "date":"2004-07-08",
-        "isbn":"1852272007",
-        "price":22.48,
-        "title":"Pulp"
-    }
-]
-</code></pre>
-
 <h3>wjson query</h3>
 
-<pre><code>#include &lt;fstream&gt;
-#include "jsoncons/json.hpp"
-#include "jsoncons_ext/jsonpath/json_query.hpp"
-
-// For convenience
-using jsoncons::wjson;
-using jsoncons::jsonpath::json_query;
-
-// Deserialize the booklist
+<pre><code>// Deserialize the booklist
 std::wifstream is("booklist2.json");
-wjson booklist2;
-is &gt;&gt; booklist2;
+wjson booklist;
+is &gt;&gt; booklist;
 
-// Select the authors of books that cost less than $12
-// (using JsonPath)
-wjson result = json_query(booklist, L"$[*][?(@.price &lt; 12)].author");
+// Use a JsonPath expression to find the authors of 
+// books that were published in 2004
+wjson result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
 
 std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 </code></pre>
 
-<p>The result:</p>
+<p>Result:</p>
 
-<pre><code>["Haruki Murakami","George Crile"]
+<pre><code>["Charles Bukowski"]
 </code></pre>
 
 <h2>Acknowledgements</h2>
