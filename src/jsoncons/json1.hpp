@@ -1486,11 +1486,33 @@ public:
         }
         // Remove all elements from an array or object
 
+        void erase(size_t from_index, size_t to_index)
+        {
+            evaluate().erase(from_index, to_index);
+        }
+
+        void erase(object_iterator first, object_iterator last)
+        {
+            evaluate().erase(first, last);
+        }
+        // Remove a range of elements from an object 
+
+        void erase(array_iterator first, array_iterator last)
+        {
+            evaluate().erase(first, last);
+        }
+        // Remove a range of elements from an array 
+
         void remove_range(size_t from_index, size_t to_index)
         {
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
+
+        void erase(const std::basic_string<Char>& name)
+        {
+            evaluate().erase(name);
+        }
 
         void remove(const std::basic_string<Char>& name)
         {
@@ -2299,14 +2321,87 @@ public:
     void clear();
     // Remove all elements from an array or object
 
-    void remove_range(size_t from_index, size_t to_index);
+    void erase(size_t from_index, size_t to_index)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->remove_range(from_index, to_index);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            break;
+        }
+    }
+
+    void erase(object_iterator first, object_iterator last)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            break;
+        case value_types::object_t:
+            var_.value_.object_->erase(first, last);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            break;
+        }
+    }
+
+    void erase(array_iterator first, array_iterator last)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->erase(first, last);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            break;
+        }
+    }
+
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove(const std::basic_string<Char>& name);
+    void erase(const std::basic_string<Char>& name)
+    {
+        switch (var_.type_)
+        {
+        case value_types::object_t:
+            var_.value_.object_->remove(name);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            break;
+        }
+    }
+    // Removes a member from an object value
+
+    void remove_range(size_t from_index, size_t to_index)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_->remove_range(from_index, to_index);
+            break;
+        default:
+            break;
+        }
+    }
+    // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+
+    void remove(const std::basic_string<Char>& name)
+    {
+        erase(name);
+    }
     // Removes a member from an object value
 
     // Deprecated
-    void remove_member(const std::basic_string<Char>& name);
+    void remove_member(const std::basic_string<Char>& name)
+    {
+        erase(name);
+    }
     // Removes a member from an object value
 
     void set(const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)

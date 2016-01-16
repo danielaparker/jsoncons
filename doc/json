@@ -875,15 +875,23 @@ T&amp; any_cast()
 
 <p>Remove all elements from an array or object value, otherwise do nothing</p>
 
-<pre><code>void remove_range(size_t from_index, size_t to_index)
+<pre><code>void erase(array_iterator first, array_iterator last)
 </code></pre>
 
-<p>Removes all elements from an array value whose index is between <code>from_index</code>, the first element to be removed, and <code>to_index</code>, one after the last element to be removed.</p>
+<p>Remove the elements from an array in the range '[first,last)'.<br>
+Throws <code>std::domain_error</code> if not an object.</p>
 
-<pre><code>void remove(const std::string&amp; name)
+<pre><code>void erase(object_iterator first, object_iterator last)
 </code></pre>
 
-<p>Remove a member from a <code>json</code> object</p>
+<p>Remove the members from an object in the range '[first,last)'.<br>
+Throws <code>std::domain_error</code> if not an object.</p>
+
+<pre><code>void erase(const std::string&amp; name)
+</code></pre>
+
+<p>Remove a member with the specified name from an object<br>
+Throws <code>std::domain_error</code> if not an object.</p>
 
 <pre><code>void set(const std::string&amp; name, const json&amp; val)
 void set(std::string&amp;&amp; name, const json&amp; val)
@@ -1001,11 +1009,24 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
-<p>Deprecated:<br>
-    static json parse(std::istream&amp; is)<br>
-    static json parse(std::istream&amp; is, <br>
-                      parse_error_handler&amp; err_handler)<br>
-Use <code>parse_stream</code> instead</p>
+<p>Deprecated:</p>
+
+<pre><code>void remove_range(size_t from_index, size_t to_index)
+</code></pre>
+
+<p>Use erase instead</p>
+
+<pre><code>void remove(const std::string&amp; name)
+</code></pre>
+
+<p>Use erase instead</p>
+
+<pre><code>static json parse(std::istream&amp; is)
+static json parse(std::istream&amp; is, 
+                  parse_error_handler&amp; err_handler)
+</code></pre>
+
+<p>Use <code>parse_stream</code> instead</p>
 
 <pre><code>long long as_longlong() const
 </code></pre>

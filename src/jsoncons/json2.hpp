@@ -112,45 +112,6 @@ void basic_json<Char, Alloc>::clear()
 }
 
 template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove_range(size_t from_index, size_t to_index)
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_->remove_range(from_index, to_index);
-        break;
-    default:
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove(const std::basic_string<Char>& name)
-{
-    switch (var_.type_)
-    {
-    case value_types::object_t:
-        var_.value_.object_->remove(name);
-        break;
-    default:
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
-void basic_json<Char, Alloc>::remove_member(const std::basic_string<Char>& name)
-{
-    switch (var_.type_)
-    {
-    case value_types::object_t:
-        var_.value_.object_->remove(name);
-        break;
-    default:
-        break;
-    }
-}
-
-template<typename Char, typename Alloc>
 std::basic_string<Char> basic_json<Char, Alloc>::to_string() const
 {
     std::basic_ostringstream<Char> os;

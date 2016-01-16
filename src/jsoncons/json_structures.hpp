@@ -135,6 +135,11 @@ public:
         elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
+    void erase(iterator first, iterator last) 
+    {
+        elements_.erase(first,last);
+    }
+
     basic_json<Char,Alloc>& at(size_t i) {return elements_.at(i);}
 
     const basic_json<Char,Alloc>& at(size_t i) const {return elements_.at(i);}
@@ -309,6 +314,11 @@ public:
         key_compare<Char,Alloc> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->name() == name) ? it : end();
+    }
+
+    void erase(iterator first, iterator last) 
+    {
+        members_.erase(first,last);
     }
 
     void remove_range(size_t from_index, size_t to_index) 

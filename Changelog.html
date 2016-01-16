@@ -520,6 +520,8 @@ void do_uinteger_value(uint64_t value) override
 <p>Non-beaking API Changes</p>
 
 <ul>
+<li>remove_range has been deprecated, use erase(array_iterator first, array_iterator last) instead</li>
+<li>remove has been deprecated, use erase(const std::string&amp; name ) instead</li>
 <li>
 <code>json::parse_string</code> has been renamed to <code>json::parse</code>, <code>parse_string</code> is deprecated but still works</li>
 <li>

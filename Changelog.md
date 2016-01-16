@@ -35,6 +35,8 @@ to
 - `output_format` drops support for `floatfield` property
 
 Non-beaking API Changes
+- remove_range has been deprecated, use erase(array_iterator first, array_iterator last) instead
+- remove has been deprecated, use erase(const std::string& name ) instead
 - `json::parse_string` has been renamed to `json::parse`, `parse_string` is deprecated but still works
 - `json member function `is_empty` has been renamed to `empty`, `is_empty` is deprecated but still works. Rationale: consistency with C++ containers
 - json member functions `begin_elements` and `end_elements` have been deprecated, instead use `elements().begin()` and `elements.end()`

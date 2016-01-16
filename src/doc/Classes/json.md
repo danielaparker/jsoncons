@@ -291,11 +291,17 @@ If the value does not have type `any`, throws, otherwise casts the value back to
     void clear()
 Remove all elements from an array or object value, otherwise do nothing
 
-    void remove_range(size_t from_index, size_t to_index)
-Removes all elements from an array value whose index is between `from_index`, the first element to be removed, and `to_index`, one after the last element to be removed.
+    void erase(array_iterator first, array_iterator last)
+Remove the elements from an array in the range '[first,last)'.
+Throws `std::domain_error` if not an object.
 
-    void remove(const std::string& name)
-Remove a member from a `json` object
+    void erase(object_iterator first, object_iterator last)
+Remove the members from an object in the range '[first,last)'.
+Throws `std::domain_error` if not an object.
+
+    void erase(const std::string& name)
+Remove a member with the specified name from an object
+Throws `std::domain_error` if not an object.
 
     void set(const std::string& name, const json& val)
     void set(std::string&& name, const json& val)
@@ -378,6 +384,13 @@ Inserts json value into stream using the specified [output_format](output_format
 Exchanges the values of `a` and `b`
 
 Deprecated:
+
+    void remove_range(size_t from_index, size_t to_index)
+Use erase instead
+
+    void remove(const std::string& name)
+Use erase instead
+
     static json parse(std::istream& is)
     static json parse(std::istream& is, 
                       parse_error_handler& err_handler)
