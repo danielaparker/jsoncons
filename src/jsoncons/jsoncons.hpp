@@ -8,6 +8,8 @@
 #ifndef JSONCONS_JSONCONS_HPP
 #define JSONCONS_JSONCONS_HPP
 
+#include <locale>
+#include <codecvt>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -117,13 +119,19 @@ private:
     std::string message_;
 };
 
-template <typename Base,typename Char>
+template <typename Base>
 class json_exception_1 : public Base, public virtual json_exception
 {
 public:
-    json_exception_1(const std::string& format, const std::basic_string<Char>& arg1) JSONCONS_NOEXCEPT
+    json_exception_1(const std::string& format, const std::string& arg1) JSONCONS_NOEXCEPT
         : Base(""), format_(format), arg1_(arg1)
     {
+    }
+    json_exception_1(const std::string& format, const std::wstring& arg1) JSONCONS_NOEXCEPT
+        : Base(""), format_(format)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+        arg1_ = converter.to_bytes(arg1);
     }
     ~json_exception_1() JSONCONS_NOEXCEPT
     {
@@ -135,7 +143,7 @@ public:
     }
 private:
     std::string format_;
-    std::basic_string<Char> arg1_;
+    std::string arg1_;
     char message_[255];
 };
 
@@ -143,7 +151,7 @@ private:
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
 #define JSONCONS_THROW_EXCEPTION(Base,x) throw jsoncons::json_exception_0<Base>((x))
-#define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base,Char>((fmt),(arg1))
+#define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
 	throw jsoncons::json_exception_0<std::exception>("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }
