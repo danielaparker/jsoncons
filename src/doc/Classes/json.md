@@ -304,6 +304,15 @@ Remove a member from a `json` object
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::domain_error` if not an object.
 
+    object_iterator set(object_iterator hint, const std::string& name, const json& val)
+    object_iterator set(object_iterator hint, std::string&& name, const json& val)
+    object_iterator set(object_iterator hint, const std::string& name, json&& val)
+    object_iterator set(object_iterator hint, std::string&& name, json&& val)
+Inserts a new member or replaces an existing member in a json object.
+Insertion time is optimized if `hint` points to the member that will precede the inserted member.
+Returns a `member_terator` pointing at the member that was inserted or updated
+Throws `std::domain_error` if not an object.
+
     void add(const json& val)
     void add(json&& val)
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.

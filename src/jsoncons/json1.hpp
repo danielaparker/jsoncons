@@ -1033,6 +1033,7 @@ public:
     {
         typedef typename std::conditional<is_const_iterator, typename const structure&, typename structure&>::type structure_ref;
         typedef typename std::conditional<is_const_iterator, typename structure::const_iterator, typename structure::iterator>::type iterator;
+        typedef typename structure::const_iterator const_iterator;
         structure_ref val_;
 
     public:
@@ -1525,6 +1526,29 @@ public:
 
         {
             evaluate().set(std::move(name),std::move(value));
+        }
+
+        object_iterator set(object_iterator hint, const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
+        {
+            return evaluate().set(hint, name,value);
+        }
+
+        object_iterator set(object_iterator hint, std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
+
+        {
+            return evaluate().set(hint, std::move(name),value);
+        }
+
+        object_iterator set(object_iterator hint, const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+
+        {
+            return evaluate().set(hint, name,std::move(value));
+        }
+
+        object_iterator set(object_iterator hint, std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+
+        {
+            return evaluate().set(hint, std::move(name),std::move(value));
         }
 
         void add(basic_json<Char,Alloc>&& value)
@@ -2339,6 +2363,68 @@ public:
             var_.value_.object_ = new json_object<Char,Alloc>();
         case value_types::object_t:
             var_.value_.object_->set(std::move(name),std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
+
+    object_iterator set(object_iterator hint, const std::basic_string<Char>& name, const basic_json<Char, Alloc>& value)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char, Alloc>();
+        case value_types::object_t:
+            return var_.value_.object_->set(hint, name, value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
+    object_iterator set(object_iterator hint, std::basic_string<Char>&& name, const basic_json<Char, Alloc>& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            return var_.value_.object_->set(hint, std::move(name),value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
+
+    object_iterator set(object_iterator hint, const std::basic_string<Char>& name, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            return var_.value_.object_->set(hint, name,std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+            }
+        }
+    }
+
+    object_iterator set(object_iterator hint, std::basic_string<Char>&& name, basic_json<Char, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::empty_object_t:
+            var_.type_ = value_types::object_t;
+            var_.value_.object_ = new json_object<Char,Alloc>();
+        case value_types::object_t:
+            return var_.value_.object_->set(hint, std::move(name),std::move(value));
             break;
         default:
             {

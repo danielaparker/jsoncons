@@ -61,7 +61,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     book1["price"] = 9.01;
     book1["isbn"] = "037571894X";  
 
-    // Construct another in a different way
+    // Construct another using the member function set
     json book2;
 
     book2.set("category", "History");
@@ -71,8 +71,24 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     book2.set("price", 10.50);
     book2.set("isbn", "0802143415");  
 
-    // Construct a third from a string
-    json book3 = json::parse(R"(
+    // Use set again, but more efficiently
+    json book3;
+
+    // Reserve memory, to avoid reallocations
+    book3.reserve(6);
+
+    // Insert in name alphabetical order
+    // Provide a hint to set where to insert the member
+    json::object_iterator pos;
+    pos = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    pos = book3.set(pos, "category", "Fiction");
+    pos = book3.set(pos, "date", "2006-01-03");
+    pos = book3.set(pos, "isbn", "1400079276");  
+    pos = book3.set(pos, "price", 13.45);
+    pos = book3.set(pos, "title", "Kafka on the Shore");
+
+    // Construct a fourth from a string
+    json book4 = json::parse(R"(
     {
         "category" : "Fiction",
         "title" : "Pulp",
@@ -87,30 +103,31 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     json booklist = json::array();
 
     // For efficiency, reserve memory, to avoid reallocations
-    booklist.reserve(3);
+    booklist.reserve(4);
 
     // For efficency, tell jsoncons to move the contents 
-    // of the three book objects into the array
+    // of the four book objects into the array
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
+    booklist.add(std::move(book3));
 
-    // Add this one to the front
-    booklist.add(booklist.elements().begin(),std::move(book3));    
+    // Add the last one to the front
+    booklist.add(booklist.elements().begin(),std::move(book4));    
 
-    // See what's left of book1, 2 and 3 (expect null, null, null)
-    std::cout << book1 << "," << book2 << "," << book3 << std::endl;
+	// See what's left of book1, 2, 3 and 4 (expect nulls)
+	std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
 		std::cout << book["title"].as<std::string>()
-		          << ","
-		          << book["price"].as<double>() << std::endl;
-    }
+			<< ","
+			<< book["price"].as<double>() << std::endl;
+	}
 	
-    // Serialize the booklist to a file
-    std::ofstream os("booklist.json");
-    os << pretty_print(booklist);
+	// Serialize the booklist to a file
+	std::ofstream os("booklist.json");
+	os << pretty_print(booklist);
 
 The JSON output `booklist.json`
 
@@ -138,6 +155,14 @@ The JSON output `booklist.json`
             "isbn":"0802143415",
             "price":10.5,
             "title":"Charlie Wilson's War"
+        },
+        {
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2006-01-03",
+            "isbn":"1400079276",
+            "price":13.45,
+            "title":"Kafka on the Shore"
         }
     ]
 
@@ -185,7 +210,7 @@ Result:
     book1[L"price"] = 9.01;
     book1[L"isbn"] = L"037571894X";
 
-    // Construct another in a different way
+    // Construct another using the member function set
     wjson book2;
 
     book2.set(L"category", L"History");
@@ -195,8 +220,24 @@ Result:
     book2.set(L"price", 10.50);
     book2.set(L"isbn", L"0802143415");
 
-    // Construct a third from a string
-    wjson book3 = wjson::parse(LR"(
+    // Use set again, but more efficiently
+    wjson book3;
+
+    // Reserve memory, to avoid reallocations
+    book3.reserve(6);
+
+    // Insert in name alphabetical order
+    // Provide a hint where to insert the member
+    wjson::object_iterator pos;
+    pos = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    pos = book3.set(pos, L"category", L"Fiction");
+    pos = book3.set(pos, L"date", L"2006-01-03");
+    pos = book3.set(pos, L"isbn", L"1400079276");
+    pos = book3.set(pos, L"price", 13.45);
+    pos = book3.set(pos, L"title", L"Kafka on the Shore");
+
+    // Construct a fourth from a string
+    wjson book4 = wjson::parse(LR"(
     {
         "category" : "Fiction",
         "title" : "Pulp",
@@ -211,25 +252,26 @@ Result:
     wjson booklist = wjson::array();
 
     // For efficiency, reserve memory, to avoid reallocations
-    booklist.reserve(3);
+    booklist.reserve(4);
 
     // For efficency, tell jsoncons to move the contents 
-    // of the three book objects into the array
+    // of the four book objects into the array
     booklist.add(std::move(book1));
     booklist.add(std::move(book2));
+    booklist.add(std::move(book3));
 
-    // Add this one to the front
-    booklist.add(booklist.elements().begin(),std::move(book3));    
+    // Add the last one to the front
+    booklist.add(booklist.elements().begin(),std::move(book4));    
 
-    // See what's left of book1, 2 and 3 (expect null, null, null)
-    std::wcout << book1 << L"," << book2 << L"," << book3 << std::endl;
+    // See what's left of book1, 2, 3 and 4 (expect nulls)
+    std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
     for (auto book : booklist.elements())
     {
     	std::wcout << book[L"title"].as<std::wstring>()
-    		<< L","
-    		<< book[L"price"].as<double>() << std::endl;
+        	   << L","
+    		   << book[L"price"].as<double>() << std::endl;
     }
 
     // Serialize the booklist to a file
@@ -262,6 +304,14 @@ The JSON output `booklist2.json`
             "isbn":"0802143415",
             "price":10.5,
             "title":"Charlie Wilson's War"
+        },
+        {
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2006-01-03",
+            "isbn":"1400079276",
+            "price":13.45,
+            "title":"Kafka on the Shore"
         }
     ]
 

@@ -227,6 +227,36 @@ public:
     {
     }
 
+    iterator begin()
+    {
+        return members_.begin();
+    }
+
+    iterator end()
+    {
+        return members_.end();
+    }
+
+    const_iterator begin() const
+    {
+        return members_.begin();
+    }
+
+    const_iterator end() const
+    {
+        return members_.end();
+    }
+
+    const_iterator cbegin() const
+    {
+        return members_.begin();
+    }
+
+    const_iterator cend() const
+    {
+        return members_.end();
+    }
+
     void swap(json_object& val)
     {
         members_.swap(val.members_);
@@ -307,7 +337,11 @@ public:
     void set(const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(name, value));
+        }
+        else if (it->name() == name)
         {
             *it = value_type(name,value);
         }
@@ -320,7 +354,11 @@ public:
     void set(std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(std::move(name), value));
+        }
+        else if (it->name() == name)
         {
             *it = value_type(std::move(name),value);
         }
@@ -333,7 +371,11 @@ public:
     void set(const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(name, std::move(value)));
+        }
+        else if (it->name() == name)
         {
             *it = value_type(name,std::move(value));
         }
@@ -346,7 +388,11 @@ public:
     void set(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
-        if (it != members_.end() && it->name() == name)
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(std::move(name), std::move(value)));
+        }
+        else if (it->name() == name)
         {
             *it = value_type(std::move(name),std::move(value));
         }
@@ -354,6 +400,118 @@ public:
         {
             members_.insert(it,value_type(std::move(name),std::move(value)));
         }
+    }
+
+    iterator set(iterator hint, const std::basic_string<Char>& name, const basic_json<Char,Alloc>& value)
+    {
+        iterator it;
+        if (hint != end() && hint->name() <= name)
+        {
+            it = std::lower_bound(hint,end(),name ,key_compare<Char,Alloc>());
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        }
+        
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(name, value));
+            it = members_.end();
+        }
+        else if (it->name() == name)
+        {
+            *it = value_type(name,value);
+        }
+        else
+        {
+           it = members_.insert(it,value_type(name,value));
+        }
+        return it;
+    }
+
+    iterator set(iterator hint, std::basic_string<Char>&& name, const basic_json<Char,Alloc>& value)
+    {
+        iterator it;
+        if (hint != end() && hint->name() <= name)
+        {
+            it = std::lower_bound(hint,end(),name ,key_compare<Char,Alloc>());
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        }
+
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(std::move(name), value));
+            it = members_.end();
+        }
+        else if (it->name() == name)
+        {
+            *it = value_type(std::move(name),value);
+        }
+        else
+        {
+            it = members_.insert(it,value_type(std::move(name),value));
+        }
+        return it;
+    }
+
+    iterator set(iterator hint, const std::basic_string<Char>& name, basic_json<Char,Alloc>&& value)
+    {
+        iterator it;
+        if (hint != end() && hint->name() <= name)
+        {
+            it = std::lower_bound(hint,end(),name ,key_compare<Char,Alloc>());
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        }
+
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(name, std::move(value)));
+            it = members_.end();
+        }
+        else if (it->name() == name)
+        {
+            *it = value_type(name,std::move(value));
+        }
+        else
+        {
+            it = members_.insert(it,value_type(name,std::move(value)));
+        }
+        return it;
+    }
+
+    iterator set(iterator hint, std::basic_string<Char>&& name, basic_json<Char,Alloc>&& value)
+    {
+        iterator it;
+        if (hint != members_.end() && hint->name() <= name)
+        {
+            it = std::lower_bound(hint,end(),name ,key_compare<Char,Alloc>());
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name ,key_compare<Char,Alloc>());
+        }
+
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(std::move(name), std::move(value)));
+            it = members_.end();
+        }
+        else if (it->name() == name)
+        {
+            *it = value_type(std::move(name),std::move(value));
+        }
+        else
+        {
+            it = members_.insert(it,value_type(std::move(name),std::move(value)));
+        }
+        return it;
     }
 
     void push_back(std::basic_string<Char>&& name, basic_json<Char,Alloc>&& val)
@@ -415,14 +573,6 @@ public:
 	{
 		std::sort(members_.begin(),members_.end(),member_compare<Char,Alloc>());
 	}
-
-    iterator begin() {return iterator(members_.begin());}
-
-    iterator end() {return iterator(members_.end());}
-
-    const_iterator begin() const {return const_iterator(members_.begin());}
-
-    const_iterator end() const {return const_iterator(members_.end());}
 
     bool operator==(const json_object<Char,Alloc>& rhs) const
     {
