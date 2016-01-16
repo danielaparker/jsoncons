@@ -81,6 +81,7 @@ class basic_json
 {
 public:
 
+    typedef Char char_type;
     typedef Alloc allocator_type;
 
     typedef json_array<Char,Alloc> array;
@@ -2898,7 +2899,7 @@ private:
 
     friend std::basic_istream<Char>& operator<<(std::basic_istream<Char>& is, basic_json<Char, Alloc>& o)
     {
-        basic_json_deserializer<Char, Alloc> handler;
+        basic_json_deserializer<basic_json<Char, Alloc>> handler;
         basic_json_reader<Char> reader(is, handler);
         reader.read_next();
         reader.check_done();

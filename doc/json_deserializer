@@ -470,10 +470,10 @@ vertical-align:1px;
 <body>
 <pre><code>jsoncons::json_deserializer
 
-typedef basic_json_deserializer&lt;char,std::allocator&lt;void&gt;&gt; json_deserializer
+typedef basic_json_deserializer&lt;json&gt; json_deserializer
 </code></pre>
 
-<p>The <code>json_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses <code>char</code> as the character type.</p>
+<p>The <code>json_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses <code>json</code> as the json type.</p>
 
 <h3>Header</h3>
 
@@ -491,17 +491,22 @@ typedef basic_json_deserializer&lt;char,std::allocator&lt;void&gt;&gt; json_dese
 
 <h3>Member functions</h3>
 
-<pre><code>json get_value()
+<pre><code>bool is_valid() const
 </code></pre>
 
-<p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>.</p>
+<p>Checks if the <code>deserializer</code> contains a valid json value. The initial <code>is_valid()</code> is true (the value is an empty object), becomes false when a <code>do_begin_json</code> event is received, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
+
+<pre><code>json get_result()
+</code></pre>
+
+<p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>. If before calling this function <code>is_valid()</code> is false, the behavior is undefined. After <code>get_result()</code> is called, 'is_valid()' becomes false.</p>
 
 <h3>Deprecated methods</h3>
 
 <pre><code>json&amp; root()
 </code></pre>
 
-<p>Use the public member function <code>get_value()</code> instead</p>
+<p>Use the public member function <code>get_result()</code> instead</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

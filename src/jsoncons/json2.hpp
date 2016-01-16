@@ -279,7 +279,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::make_3d_array(size_t m, size_t 
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_stream(std::basic_istream<Char>& is)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_reader<Char> reader(is, handler);
     reader.read_next();
     reader.check_done();
@@ -294,7 +294,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_stream(std::basic_istream<Char>& is, 
                                                               basic_parse_error_handler<Char>& err_handler)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_reader<Char> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
@@ -308,7 +308,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_stream(std::basic_istream
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<Char>& s)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_parser<Char> parser(handler);
     parser.begin_parse();
     parser.parse(s.c_str(),0,s.length());
@@ -325,7 +325,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<Char>& s, 
                                                        basic_parse_error_handler<Char>& err_handler)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_parser<Char> parser(handler,err_handler);
     parser.begin_parse();
     parser.parse(s.c_str(),0,s.length());
@@ -341,7 +341,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse(const std::basic_string<C
 template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_parser<Char> parser(handler);
     parser.begin_parse();
     parser.parse(s.c_str(),0,s.length());
@@ -358,7 +358,7 @@ template<typename Char, typename Alloc>
 basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_string(const std::basic_string<Char>& s, 
                                                               basic_parse_error_handler<Char>& err_handler)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_parser<Char> parser(handler,err_handler);
     parser.begin_parse();
     parser.parse(s.c_str(),0,s.length());
@@ -390,7 +390,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
         JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
     }
 #endif
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     try
     {
         // obtain file size:
@@ -450,7 +450,7 @@ basic_json<Char, Alloc> basic_json<Char, Alloc>::parse_file(const std::string& f
     }
 #endif
 
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     try
     {
         // obtain file size:
@@ -729,7 +729,7 @@ const Char* basic_json<Char, Alloc>::as_cstring() const
 template <typename Char, typename Alloc>
 std::basic_istream<Char>& operator>>(std::basic_istream<Char>& is, basic_json<Char, Alloc>& o)
 {
-    basic_json_deserializer<Char, Alloc> handler;
+    basic_json_deserializer<basic_json<Char, Alloc>> handler;
     basic_json_reader<Char> reader(is, handler);
     reader.read_next();
     reader.check_done();
