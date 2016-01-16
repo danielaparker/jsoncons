@@ -511,8 +511,6 @@ these always use the default allocators.</p>
 
 <p>Array type</p>
 
-<p>Type tags that can be used with <code>is&lt;T&gt;</code> and <code>as&lt;T&gt;</code></p>
-
 <pre><code>object_iterator
 </code></pre>
 
@@ -568,7 +566,7 @@ static json parse_file(const std::string&amp; filename,
                        parse_error_handler&amp; err_handler)
 </code></pre>
 
-<p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. If parsing fails, throws a <a href="parse_exception">parse_exception</a>. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
+<p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>static json make_array()
@@ -690,12 +688,12 @@ Throws <code>std::domain_error</code> if not an array.</p>
 <p>Returns the number of object members that match <code>name</code>.    </p>
 
 <pre><code>template &lt;typename T&gt;
-bool is() const
+bool is() const noexcept
 </code></pre>
 
 <p>Returns <code>true</code> if json value has type <code>T</code>, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;char&gt;
+<pre><code>is&lt;char&gt; 
 is&lt;signed char&gt;
 is&lt;unsigned char&gt;
 is&lt;wchar_t&gt;
@@ -769,17 +767,20 @@ bool is_any() const noexcept
 const json&amp; operator[](size_t i) const
 </code></pre>
 
-<p>Returns a reference to the value at position i in a json object or array.</p>
+<p>Returns a reference to the value at position i in a json object or array.<br>
+Throws <code>std::domain_error</code> if not an object.</p>
 
 <pre><code>json&amp; operator[](const std::string&amp; name)
 </code></pre>
 
-<p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. </p>
+<p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. <br>
+Throws <code>std::domain_error</code> if not an object.</p>
 
 <pre><code>const json&amp; operator[](const std::string&amp; name) const
 </code></pre>
 
-<p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.</p>
+<p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
+Throws <code>std::domain_error</code> if not an object.</p>
 
 <pre><code>object_iterator find(const std::string&amp; name)
 object_iterator find(const char* name)
@@ -891,6 +892,17 @@ void set(std::string&amp;&amp; name, json&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
+Throws <code>std::domain_error</code> if not an object.</p>
+
+<pre><code>object_iterator set(object_iterator hint, const std::string&amp; name, const json&amp; val)
+object_iterator set(object_iterator hint, std::string&amp;&amp; name, const json&amp; val)
+object_iterator set(object_iterator hint, const std::string&amp; name, json&amp;&amp; val)
+object_iterator set(object_iterator hint, std::string&amp;&amp; name, json&amp;&amp; val)
+</code></pre>
+
+<p>Inserts a new member or replaces an existing member in a json object.<br>
+Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
+Returns a <code>member_terator</code> pointing at the member that was inserted or updated<br>
 Throws <code>std::domain_error</code> if not an object.</p>
 
 <pre><code>void add(const json&amp; val)
