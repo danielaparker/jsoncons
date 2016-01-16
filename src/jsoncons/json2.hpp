@@ -21,7 +21,6 @@
 #include <limits>
 #include "jsoncons/json1.hpp"
 #include "jsoncons/json_type_traits.hpp"
-#include "jsoncons/json_structures.hpp"
 #include "jsoncons/json_reader.hpp"
 #include "jsoncons/json_deserializer.hpp"
 #include "jsoncons/json_serializer.hpp"

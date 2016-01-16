@@ -21,6 +21,7 @@
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
+#include "json_structures.hpp"
 
 namespace jsoncons {
 
