@@ -70,14 +70,15 @@ class json_array
 {
 public:
     typedef typename JsonT::char_type char_type;
+    typedef typename JsonT::allocator_type allocator_type;
     typedef JsonT& reference; 
     typedef const JsonT& const_reference; 
     typedef typename std::vector<JsonT>::iterator iterator;
     typedef typename std::vector<JsonT>::const_iterator const_iterator;
 
     // Allocation
-    //static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
-    //static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
+    static void* operator new(std::size_t) { return allocator_type::rebind<json_array>::other().allocate(1); }
+    static void operator delete(void* ptr) { return allocator_type::rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
 
     json_array()
     {
