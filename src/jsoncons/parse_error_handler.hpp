@@ -17,8 +17,8 @@ class parse_exception : public std::exception, public virtual json_exception
 {
 public:
     parse_exception(std::error_code ec,
-                         size_t line,
-                         size_t column)
+                    size_t line,
+                    size_t column)
         : error_code_(ec),
           line_number_(line),
           column_number_(column)

@@ -24,6 +24,7 @@
     <ClCompile Include="..\..\src\double_to_string_tests.cpp" />
     <ClCompile Include="..\..\src\error_recovery_tests.cpp" />
     <ClCompile Include="..\..\src\jsoncons_tests.cpp" />
+    <ClCompile Include="..\..\src\jsonpath_error_tests.cpp" />
     <ClCompile Include="..\..\src\jsonpath_filter_tests.cpp" />
     <ClCompile Include="..\..\src\jsonpath_tests.cpp" />
     <ClCompile Include="..\..\src\json_accessor_tests.cpp" />

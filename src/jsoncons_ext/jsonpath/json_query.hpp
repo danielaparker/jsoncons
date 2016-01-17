@@ -14,11 +14,9 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include "jsoncons/jsoncons.hpp"
-#include "jsoncons/json1.hpp"
-#include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_structures.hpp"
+#include "jsoncons/json.hpp"
 #include "jsonpath_filter.hpp"
+#include "jsonpath_error_category.hpp"
 
 namespace jsoncons { namespace jsonpath {
 
@@ -114,12 +112,13 @@ basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Cha
 }
 
 template<typename Char, class Alloc>
-class jsonpath_evaluator
+class jsonpath_evaluator : private basic_parsing_context<Char>
 {
 private:
     typedef const basic_json<Char,Alloc>* cjson_ptr;
     typedef std::vector<cjson_ptr> node_set;
 
+    basic_parse_error_handler<Char> *err_handler_;
     states::states_t state_;
     std::basic_string<Char> buffer_;
     size_t start_;
@@ -144,6 +143,7 @@ private:
 
 public:
     jsonpath_evaluator()
+        : err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance()))
     {
     }
 
@@ -203,6 +203,11 @@ handle_state:
                         state_ = states::expect_separator;
                     }
                     break;
+                case ' ':case '\n':case '\r':case '\t':
+                    break;
+                default:
+                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_root, jsonpath_error_category()), *this);
+                    break;
                 };
                 break;
             case states::dot:
@@ -241,6 +246,11 @@ handle_state:
                 case ']':
                     end_nodes();
                     state_ = states::expect_separator;
+                    break;
+                case ' ':case '\n':case '\r':case '\t':
+                    break;
+                default:
+                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_right_bracket, jsonpath_error_category()), *this);
                     break;
                 }
                 break;
@@ -659,6 +669,21 @@ handle_state:
                 }
             }
         }
+    }
+
+    size_t do_line_number() const override
+    {
+        return line_;
+    }
+
+    size_t do_column_number() const override
+    {
+        return column_;
+    }
+
+    Char do_current_char() const override
+    {
+        return 0; //p_ < end_input_? *p_ : 0;
     }
 
 };

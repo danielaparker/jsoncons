@@ -27,7 +27,7 @@ class csv_error_category_impl
 public:
     virtual const char* name() const JSONCONS_NOEXCEPT
     {
-        return "csv text";
+        return "csv";
     }
     virtual std::string message(int ev) const
     {
