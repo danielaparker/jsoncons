@@ -104,9 +104,9 @@ class basic_json_parser : private basic_parsing_context<Char>
     int depth_;
     int max_depth_;
     float_reader float_reader_;
-    Char const * begin_input_;
-    Char const * end_input_;
-    Char const * p_;
+    const Char* begin_input_;
+    const Char* end_input_;
+    const Char* p_;
 
 public:
     basic_json_parser(basic_json_input_handler<Char>& handler)
@@ -183,7 +183,7 @@ public:
         column_ = 1;
     }
 
-    void check_done(Char const* input, size_t start, size_t length)
+    void check_done(const Char* input, size_t start, size_t length)
     {
         index_ = start;
         for (; index_ < length; ++index_)
@@ -205,7 +205,7 @@ public:
 
     void parse_string()
     {
-        Char const * sb = p_;
+        const Char* sb = p_;
         bool done = false;
         while (!done && p_ < end_input_)
         {
@@ -290,7 +290,7 @@ public:
         }
     }
 
-    void parse(Char const * const input, size_t start, size_t length)
+    void parse(const Char* const input, size_t start, size_t length)
     {
         begin_input_ = input + start;
         end_input_ = input + length;
@@ -1992,7 +1992,7 @@ private:
         }
     }
 
-    void end_string_value(Char const * s, size_t length) 
+    void end_string_value(const Char* s, size_t length) 
     {
         switch (stack_[top_])
         {

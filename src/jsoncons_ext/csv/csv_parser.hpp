@@ -309,7 +309,7 @@ public:
         column_ = 1;
     }
 
-    void parse(Char const* p, size_t start, size_t length)
+    void parse(const Char* p, size_t start, size_t length)
     {
         index_ = start;
         for (; index_ < length && state_ != states::done; ++index_)

@@ -29,7 +29,7 @@ class buffered_ostream
     std::basic_ostream<Char>* os_;
     std::vector<Char> buffer_;
     Char * const begin_buffer_;
-	Char const * const end_buffer_;
+	const Char* const end_buffer_;
     Char* p_;
 public:
 	buffered_ostream(std::basic_ostream<Char>& os)
@@ -49,7 +49,7 @@ public:
         os_->flush();
     }
 
-	void write(Char const * s, size_t length)
+	void write(const Char* s, size_t length)
 	{
 		size_t diff = end_buffer_ - p_;
 		if (diff >= length)

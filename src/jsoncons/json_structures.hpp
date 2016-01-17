@@ -48,7 +48,7 @@ public:
     {
     }
 
-    bool operator()(const ValueT& a, char_type const * b) const
+    bool operator()(const ValueT& a, const char_type* b) const
     {
         size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
         return std::char_traits<char_type>::compare(a.name().c_str(),b,len) < 0;
@@ -375,7 +375,7 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
-    iterator find(char_type const * name)
+    iterator find(const char_type* name)
     {
         size_t length = std::char_traits<char_type>::length(name);
         compare_with_cstring<value_type> comp(length);
@@ -383,7 +383,7 @@ public:
         return (it != members_.end() && it->name() == name) ? it : end();
     }
 
-    const_iterator find(char_type const * name) const
+    const_iterator find(const char_type* name) const
     {
         size_t length = std::char_traits<char_type>::length(name);
         compare_with_cstring<value_type> comp(length);
@@ -659,7 +659,7 @@ public:
         return it->value();
     }
 
-    JsonT& get(char_type const * name) 
+    JsonT& get(const char_type* name) 
     {
         auto it = find(name);
         if (it == end())
