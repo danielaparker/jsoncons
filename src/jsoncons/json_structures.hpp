@@ -65,20 +65,20 @@ public:
     }
 };
 
-template <class JsonT>
+template <class JsonT, typename Alloc>
 class json_array 
 {
 public:
     typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::allocator_type allocator_type;
+    typedef Alloc allocator_type;
     typedef JsonT& reference; 
     typedef const JsonT& const_reference; 
     typedef typename std::vector<JsonT>::iterator iterator;
     typedef typename std::vector<JsonT>::const_iterator const_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return allocator_type::rebind<json_array>::other().allocate(1); }
-    static void operator delete(void* ptr) { return allocator_type::rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_array>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_array>::other().deallocate(static_cast<json_array*>(ptr), 1); }
 
     json_array()
     {
@@ -115,7 +115,7 @@ public:
     {
     }
 
-    void swap(json_array<JsonT>& val)
+    void swap(json_array<JsonT,Alloc>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -188,7 +188,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<JsonT>& rhs) const
+    bool operator==(const json_array<JsonT,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -205,7 +205,7 @@ public:
     }
 private:
     std::vector<JsonT> elements_;
-    json_array& operator=(const json_array<JsonT>&);
+    json_array& operator=(const json_array<JsonT,Alloc>&);
 };
 
 template <class JsonT>
@@ -293,21 +293,21 @@ private:
     JsonT value_;
 };
 
-template <class JsonT>
+template <class JsonT,typename Alloc>
 class json_object
 {
 public:
     typedef json_object_member<JsonT> value_type;
     typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::allocator_type allocator_type;
+    typedef Alloc allocator_type;
     typedef value_type& reference; 
     typedef const value_type& const_reference; 
     typedef typename std::vector<value_type>::iterator iterator;
     typedef typename std::vector<value_type>::const_iterator const_iterator;
 
     // Allocation
-    static void* operator new(std::size_t) { return allocator_type::rebind<json_object>::other().allocate(1); }
-    static void operator delete(void* ptr) { return allocator_type::rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
+    static void* operator new(std::size_t) { return typename Alloc::template rebind<json_object>::other().allocate(1); }
+    static void operator delete(void* ptr) { return typename Alloc::template rebind<json_object>::other().deallocate(static_cast<json_object*>(ptr), 1); }
 
     json_object()
     {
@@ -675,7 +675,7 @@ public:
 		std::sort(members_.begin(),members_.end(),member_compare<value_type>());
 	}
 
-    bool operator==(const json_object<JsonT>& rhs) const
+    bool operator==(const json_object<JsonT,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -697,7 +697,7 @@ public:
 private:
 
     std::vector<value_type> members_;
-    json_object<JsonT>& operator=(const json_object<JsonT>&);
+    json_object<JsonT,Alloc>& operator=(const json_object<JsonT,Alloc>&);
 };
 
 
