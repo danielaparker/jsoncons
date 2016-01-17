@@ -23,35 +23,31 @@
 
 namespace jsoncons {
 
-template <class ValueT>
+template <typename Char,class ValueT>
 class compare_with_string
 {
 public:
-    typedef typename ValueT::char_type char_type;
-
     bool operator()(const ValueT& a, 
-                    const std::basic_string<char_type>& b) const
+                    const std::basic_string<Char>& b) const
     {
         return a.name() < b;
     }
 };
 
-template <class ValueT>
+template <typename Char,class ValueT>
 class compare_with_cstring
 {
     size_t length_;
 public:
-    typedef typename ValueT::char_type char_type;
-
     compare_with_cstring(size_t length)
         : length_(length)
     {
     }
 
-    bool operator()(const ValueT& a, const char_type* b) const
+    bool operator()(const ValueT& a, const Char* b) const
     {
         size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        return std::char_traits<char_type>::compare(a.name().c_str(),b,len) < 0;
+        return std::char_traits<Char>::compare(a.name().c_str(),b,len) < 0;
     }
 };
 
@@ -379,7 +375,7 @@ public:
     iterator find(const char_type* name)
     {
         size_t length = std::char_traits<char_type>::length(name);
-        compare_with_cstring<value_type> comp(length);
+        compare_with_cstring<char_type,value_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->name() == name) ? it : end();
     }
@@ -387,14 +383,14 @@ public:
     const_iterator find(const char_type* name) const
     {
         size_t length = std::char_traits<char_type>::length(name);
-        compare_with_cstring<value_type> comp(length);
+        compare_with_cstring<char_type,value_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->name() == name) ? it : end();
     }
 
     iterator find(const std::basic_string<char_type>& name)
     {
-        compare_with_string<value_type> comp;
+        compare_with_string<char_type,value_type> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->name() == name) ? it : end();
     }
@@ -402,7 +398,7 @@ public:
     // Fixed by cperthuis
     const_iterator find(const std::basic_string<char_type>& name) const
     {
-        compare_with_string<value_type> comp;
+        compare_with_string<char_type,value_type> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         return (it != members_.end() && it->name() == name) ? it : end();
     }
@@ -422,7 +418,7 @@ public:
     // Fixed by cperthuis
     void remove(const std::basic_string<char_type>& name) 
     {
-        compare_with_string<value_type> comp;
+        compare_with_string<char_type,value_type> comp;
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         if (it != members_.end() && it->name() == name)
         {
@@ -437,7 +433,7 @@ public:
 
     void set(const std::basic_string<char_type>& name, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         if (it == members_.end())
         {
             members_.push_back(value_type(name, value));
@@ -454,7 +450,7 @@ public:
 
     void set(std::basic_string<char_type>&& name, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), value));
@@ -471,7 +467,7 @@ public:
 
     void set(const std::basic_string<char_type>& name, JsonT&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         if (it == members_.end())
         {
             members_.push_back(value_type(name, std::move(value)));
@@ -488,7 +484,7 @@ public:
 
     void set(std::basic_string<char_type>&& name, JsonT&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+        auto it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), std::move(value)));
@@ -508,11 +504,11 @@ public:
         iterator it;
         if (hint != end() && hint->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(hint,end(),name ,compare_with_string<char_type,value_type>());
         }
         else
         {
-            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         }
         
         if (it == members_.end())
@@ -536,11 +532,11 @@ public:
         iterator it;
         if (hint != end() && hint->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(hint,end(),name ,compare_with_string<char_type,value_type>());
         }
         else
         {
-            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         }
 
         if (it == members_.end())
@@ -564,11 +560,11 @@ public:
         iterator it;
         if (hint != end() && hint->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(hint,end(),name ,compare_with_string<char_type,value_type>());
         }
         else
         {
-            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         }
 
         if (it == members_.end())
@@ -592,11 +588,11 @@ public:
         iterator it;
         if (hint != members_.end() && hint->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(hint,end(),name ,compare_with_string<char_type,value_type>());
         }
         else
         {
-            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<value_type>());
+            it = std::lower_bound(members_.begin(),members_.end(),name ,compare_with_string<char_type,value_type>());
         }
 
         if (it == members_.end())
