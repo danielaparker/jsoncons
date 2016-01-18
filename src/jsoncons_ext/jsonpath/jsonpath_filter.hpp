@@ -1025,7 +1025,6 @@ handle_state:
                                 buffer_.clear();
                             }
                             state_ = filter_states::oper;
-                            goto handle_state;
                         }
                         break;
                     case ')':
@@ -1045,6 +1044,7 @@ handle_state:
                         {
                             state_ = filter_states::expect_path_or_value;
                         }
+                        ++p_;
                         break;
                     case ' ':case '\n':case '\r':case '\t':
                         if (buffer_.length() > 0)
@@ -1053,13 +1053,14 @@ handle_state:
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
 							buffer_.clear();
 						}
+                        ++p_;
                         break; 
                     default: 
                         buffer_.push_back(c);
+                        ++p_;
                         break;
                     }
                 }
-                ++p_;
                 break;
             case filter_states::quoted_text: 
                 {
@@ -1086,28 +1087,6 @@ handle_state:
             case filter_states::expect_path_or_value: 
                 switch (c)
                 {
-                case '@':
-                    buffer_.push_back(c);
-                    state_ = filter_states::path;
-                    break;
-				case ' ':case '\n':case '\r':case '\t':
-					break;
-                case '\'':
-                    buffer_.push_back('\"');
-                    state_ = filter_states::quoted_text;
-                    break;
-                case '(':
-                    ++depth_;
-                    tokens_.push_back(token<Char,Alloc>(token_types::left_paren));
-                    break;
-                case ')':
-                    tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
-                    if (--depth_ == 0)
-                    {
-                        done = true;
-                        state_ = filter_states::start;
-                    }
-                    break;
                 case '<':
                 case '>':
                 case '!':
@@ -1116,17 +1095,41 @@ handle_state:
                 case '|':
                 case '+':
                 case '-':
+                    state_ = filter_states::oper;
+                    // don't increment
+                    break;
+                case '@':
+                    buffer_.push_back(c);
+                    state_ = filter_states::path;
+                    ++p_;
+                    break;
+				case ' ':case '\n':case '\r':case '\t':
+                    ++p_;
+					break;
+                case '\'':
+                    buffer_.push_back('\"');
+                    state_ = filter_states::quoted_text;
+                    ++p_;
+                    break;
+                case '(':
+                    ++depth_;
+                    tokens_.push_back(token<Char,Alloc>(token_types::left_paren));
+                    ++p_;
+                    break;
+                case ')':
+                    tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
+                    if (--depth_ == 0)
                     {
-                        state_ = filter_states::oper;
-                        goto handle_state;
+                        done = true;
+                        state_ = filter_states::start;
                     }
+                    ++p_;
                     break;
                 default: 
+                    // don't increment
                     state_ = filter_states::unquoted_text;
-                    goto handle_state;
                     break;
                 };
-                ++p_;
                 break;
             case filter_states::expect_oper_or_right_round_bracket: 
                 switch (c)
