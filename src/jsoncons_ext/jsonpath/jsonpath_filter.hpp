@@ -23,7 +23,7 @@ template <class Char,class Alloc>
 class jsonpath_evaluator;
 
 namespace filter_states {
-    enum filter_states_t {
+    enum states_t {
         start,
         expect_right_round_bracket,
         expect_oper_or_right_round_bracket,
@@ -682,13 +682,16 @@ public:
 template<typename Char, class Alloc>
 class jsonpath_filter_parser
 {
-    size_t index_;
     size_t& line_;
     size_t& column_;
-    filter_states::filter_states_t state_;
+    filter_states::states_t state_;
     std::basic_string<Char> buffer_;
     std::vector<token<Char,Alloc>> tokens_;
     int depth_;
+    const Char* begin_input_;
+    const Char* end_input_;
+    const Char* p_;
+    filter_states::states_t saved_state2_;
 public:
     jsonpath_filter_parser(size_t& line,size_t& column)
         : line_(line), column_(column)
@@ -876,18 +879,21 @@ public:
         }
     }
 
-    void parse(const Char* p, size_t start, size_t length, size_t row, size_t column)
+    void parse(const Char* expr, size_t start, size_t length, size_t row, size_t column)
     {
+        begin_input_ = expr;
+        end_input_ = expr + length;
+        p_ = begin_input_ + start;
+
         depth_ = 0;
         tokens_.clear();
-        index_ = start;
         line_ = row;
         column_ = column;
         state_ = filter_states::start;
         bool done = false;
-        while (!done && index_ < length)
+        while (!done && p_ < end_input_)
         {
-            int c = p[index_];
+            int c = *p_;
 handle_state:
             switch (state_)
             {
@@ -912,9 +918,9 @@ handle_state:
                 switch (c)
                 {
                 case '!':
-                    if (index_+1 < length && p[index_+1] == '=')
+                    if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ne));
                     }
@@ -925,39 +931,39 @@ handle_state:
 					}
                     break;
                 case '&':
-                    if (index_+1 < length && p[index_+1] == '&')
+                    if (p_+1  < end_input_ && *(p_+1) == '&')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ampamp));
                     }
                     break;
                 case '|':
-                    if (index_+1 < length && p[index_+1] == '|')
+                    if (p_+1  < end_input_ && *(p_+1) == '|')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::pipepipe));
                     }
                     break;
                 case '=':
-                    if (index_+1 < length && p[index_+1] == '=')
+                    if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::eq));
                     }
-                    else if (index_+1 < length && p[index_+1] == '~')
+                    else if (p_+1  < end_input_ && *(p_+1) == '~')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_regex;
                         tokens_.push_back(token<Char,Alloc>(token_types::regex));
                     }
                     break;
                 case '>':
-                    if (index_+1 < length && p[index_+1] == '=')
+                    if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::gte));
                     }
@@ -968,9 +974,9 @@ handle_state:
                     }
                     break;
                 case '<':
-                    if (index_+1 < length && p[index_+1] == '=')
+                    if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
-                        ++index_;
+                        ++p_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::lte));
                     }
@@ -1233,9 +1239,9 @@ handle_state:
                         //if (buffer_.length() > 0)
                         {
                             std::regex::flag_type flags = std::regex_constants::ECMAScript; 
-                            if (index_+1 < length && p[index_+1] == 'i')
+                            if (p_+1  < end_input_ && *(p_+1) == 'i')
                             {
-                                ++index_;
+                                ++p_;
                                 flags |= std::regex_constants::icase;
                             }
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<regex_term<Char, Alloc>>(buffer_,flags)));
@@ -1251,7 +1257,7 @@ handle_state:
                 }
                 break;
             }
-            ++index_;
+            ++p_;
         }
         if (depth_ != 0)
         {
@@ -1261,7 +1267,7 @@ handle_state:
 
     size_t index() const
     {
-        return index_;
+        return p_ - begin_input_;
     }
 };
 
