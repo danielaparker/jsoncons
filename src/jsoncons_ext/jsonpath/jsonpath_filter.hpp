@@ -895,7 +895,6 @@ public:
         while (!done && p_ < end_input_)
         {
             int c = *p_;
-handle_state:
             switch (state_)
             {
             case filter_states::start:
@@ -1154,14 +1153,13 @@ handle_state:
                 case '-':
                     {
                         state_ = filter_states::oper;
-                        goto handle_state;
+                        // don't increment p
                     }
                     break;
                 default: 
                     JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 2.");
                     break;
                 };
-                ++p_;
                 break;
             case filter_states::expect_right_round_bracket: 
                 switch (c)
@@ -1204,7 +1202,7 @@ handle_state:
                             buffer_.clear();
                         }
                         state_ = filter_states::oper;
-                        goto handle_state;
+                        // don't increment
                     }
                     break;
                 case ')':
@@ -1223,12 +1221,13 @@ handle_state:
                     {
                         state_ = filter_states::expect_path_or_value;
                     }
-                     break;
+                    ++p_;
+                    break;
                 default:
                     buffer_.push_back(c);
+                    ++p_;
                     break;
                 };
-                ++p_;
                 break;
             case filter_states::expect_regex: 
                 switch (c)
