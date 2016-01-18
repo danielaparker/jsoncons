@@ -481,7 +481,7 @@ std::cout &lt;&lt; cities &lt;&lt; std::endl;  // output is "[]"
 
 cities.add("Toronto");  
 cities.add("Vancouver");
-cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
+cities.add(cities.elements().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
 std::cout &lt;&lt; cities &lt;&lt; std::endl;
 </code></pre>
@@ -500,7 +500,7 @@ std::cout &lt;&lt; "capacity=" &lt;&lt; cities.capacity() &lt;&lt; ", size=" &lt
 
 cities.add("Toronto");  
 cities.add("Vancouver");
-cities.add(0,"Montreal");
+cities.add(cities.elements().begin(),"Montreal");
 std::cout &lt;&lt; "capacity=" &lt;&lt; cities.capacity() &lt;&lt; ", size=" &lt;&lt; cities.size() &lt;&lt; std::endl;
 
 std::cout &lt;&lt; cities &lt;&lt; std::endl;

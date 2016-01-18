@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
-    arr.add(0,"Montreal");
+    arr.add(arr.elements().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_array_erase_range)
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
-    arr.add(0,"Montreal");
+    arr.add(arr.elements().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
-    cities.add(0,"Montreal");
+    cities.add(cities.elements().begin(),"Montreal");
 	BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }

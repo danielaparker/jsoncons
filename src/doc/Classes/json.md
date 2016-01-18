@@ -330,12 +330,6 @@ Adds a new element at the specified position of a json array, shifting all eleme
 The content of `val` is copied (or moved) to the new element.
 Throws `std::domain_error` if not an array.
 
-    void add(size_t index, const json& val)
-    void add(size_t index, json&& val)
-Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.
-The content of `val` is copied (or moved) to the new element.
-Throws `std::domain_error` if not an array.
-
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
@@ -385,8 +379,12 @@ Exchanges the values of `a` and `b`
 
 Deprecated:
 
+    void add(size_t index, const json& val)
+    void add(size_t index, json&& val)
+Use add with iterator instead
+
     void remove_range(size_t from_index, size_t to_index)
-Use erase instead
+Use erase with iterator instead
 
     void remove(const std::string& name)
 Use erase instead

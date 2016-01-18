@@ -10,7 +10,7 @@
 
     cities.add("Toronto");  
     cities.add("Vancouver");
-    cities.add(0,"Montreal");  // inserts "Montreal" at beginning of array
+    cities.add(cities.elements().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
     std::cout << cities << std::endl;
 
@@ -27,7 +27,7 @@ The output is
 
     cities.add("Toronto");  
     cities.add("Vancouver");
-    cities.add(0,"Montreal");
+    cities.add(cities.elements().begin(),"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
     std::cout << cities << std::endl;

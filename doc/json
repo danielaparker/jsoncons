@@ -928,14 +928,6 @@ void add(array_iterator pos, json&amp;&amp; val)
 The content of <code>val</code> is copied (or moved) to the new element.<br>
 Throws <code>std::domain_error</code> if not an array.</p>
 
-<pre><code>void add(size_t index, const json&amp; val)
-void add(size_t index, json&amp;&amp; val)
-</code></pre>
-
-<p>Adds a new element at the specified index of a json array, shifting all elements currently at or above that index to the right.<br>
-The content of <code>val</code> is copied (or moved) to the new element.<br>
-Throws <code>std::domain_error</code> if not an array.</p>
-
 <pre><code>void swap(json&amp; val)
 </code></pre>
 
@@ -1011,10 +1003,16 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 
 <p>Deprecated:</p>
 
+<pre><code>void add(size_t index, const json&amp; val)
+void add(size_t index, json&amp;&amp; val)
+</code></pre>
+
+<p>Use add with iterator instead</p>
+
 <pre><code>void remove_range(size_t from_index, size_t to_index)
 </code></pre>
 
-<p>Use erase instead</p>
+<p>Use erase with iterator instead</p>
 
 <pre><code>void remove(const std::string&amp; name)
 </code></pre>
