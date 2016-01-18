@@ -233,6 +233,10 @@ public:
                     pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
+                case ' ':case '\t':
+                    ++p_;
+                    ++column_;
+                    break;
                 case '$':
                 case '@':
                     {
@@ -241,8 +245,6 @@ public:
                         stack_.push_back(v);
                         state_ = states::expect_separator;
                     }
-                    break;
-                case ' ':case '\t':
                     break;
                 default:
                     err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_root, jsonpath_error_category()), *this);
@@ -304,11 +306,18 @@ public:
                     pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
+                case ' ':case '\t':
+                    ++p_;
+                    ++column_;
+                    break;
                 case '.':
                     state_ = states::dot;
                     break;
                 case '[':
                     state_ = states::left_bracket;
+                    break;
+                default:
+                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_separator, jsonpath_error_category()), *this);
                     break;
                 };
                 ++p_;
