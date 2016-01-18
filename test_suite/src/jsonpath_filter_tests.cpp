@@ -48,25 +48,26 @@ struct jsonpath_filter_fixture
 };
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
+    std::string expr1 = "(1 + 1)";
     size_t line = 1;
     size_t column = 1;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(line,column);
+    const char* pend;
+    jsonpath_filter_parser<char,std::allocator<void>> parser(pend,line,column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
 
-	std::string expr1 = "(1 + 1)";
-    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length());
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(2),result1);
 
 	std::string expr2 = "(1 - 1)";
-	parser.parse(expr2.c_str(), 0, expr2.length(), 1, 1);
+	parser.parse(expr2.c_str(), expr2.c_str()+ expr2.length());
 	auto result2 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(0), result2);
 
 	std::string expr3 = "(@.length - 1)";
-	parser.parse(expr3.c_str(), 0, expr3.length(), 1, 1);
+	parser.parse(expr3.c_str(), expr3.c_str()+ expr3.length());
 	auto result3 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(1), result3);
 
@@ -76,18 +77,19 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 {
     size_t line = 1;
     size_t column = 1;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(line,column);
+    const char* pend;
+    jsonpath_filter_parser<char,std::allocator<void>> parser(pend,line,column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
 
 	std::string expr1 = "(!(1 + 1))";
-    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length());
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(false),result1);
 
     std::string expr2 = "(!0)";
-    parser.parse(expr2.c_str(),0,expr2.length(),1,1);
+    parser.parse(expr2.c_str(), expr2.c_str()+ expr2.length());
     auto result2= parser.eval(parent);
     BOOST_CHECK_EQUAL(json(true),result2);
 }
@@ -108,38 +110,39 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
 {
     size_t line = 1;
     size_t column = 1;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(line,column);
+    const char* pend;
+    jsonpath_filter_parser<char,std::allocator<void>> parser(pend,line,column);
     json parent = json::array();
     parent.add(1);
     parent.add(2);
 
     std::string expr1 = "(-1 + 1)";
-    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length());
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(0),result1);
 
 	std::string expr2 = "(1 + -1)";
-	parser.parse(expr2.c_str(), 0, expr2.length(), 1, 1);
+	parser.parse(expr2.c_str(), expr2.c_str()+ expr2.length());
 	auto result2 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(0), result2);
 
 	std::string expr3 = "(-1 - -1)";
-	parser.parse(expr3.c_str(), 0, expr3.length(), 1, 1);
+	parser.parse(expr3.c_str(), expr3.c_str()+ expr3.length());
 	auto result3 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(0), result3);
 
 	std::string expr4 = "(-1 - -3)";
-	parser.parse(expr4.c_str(), 0, expr4.length(), 1, 1);
+	parser.parse(expr4.c_str(), expr4.c_str()+ expr4.length());
 	auto result4 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(2), result4);
 
     std::string expr5 = "((-2 < -1) && (-3 > -4))";
-    parser.parse(expr5.c_str(), 0, expr5.length(), 1, 1);
+    parser.parse(expr5.c_str(), expr5.c_str()+ expr5.length());
     auto result5 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(true), result5);
 
 	std::string expr6 = "((-2 < -1) || (-4 > -3))";
-	parser.parse(expr6.c_str(), 0, expr6.length(), 1, 1);
+	parser.parse(expr6.c_str(), expr6.c_str()+ expr6.length());
 	auto result6 = parser.eval(parent);
 	BOOST_CHECK_EQUAL(json(true), result6);
 }
@@ -148,13 +151,14 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
 {
     size_t line = 1;
     size_t column = 1;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(line,column);
+    const char* pend;
+    jsonpath_filter_parser<char,std::allocator<void>> parser(pend,line,column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
 
 	std::string expr1 = "(0)";
-    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length());
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(0),result1);
 }
@@ -163,23 +167,24 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
 {
     size_t line = 1;
     size_t column = 1;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(line,column);
+    const char* pend;
+    jsonpath_filter_parser<char,std::allocator<void>> parser(pend,line,column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
 
 	std::string expr1 = "('today I go' =~ /today.*?/)";
-    parser.parse(expr1.c_str(),0,expr1.length(),1,1);
+    parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length());
     auto result1 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(true),result1);
 
     std::string expr2 = "('today I go' =~ /Today.*?/)";
-    parser.parse(expr2.c_str(),0,expr2.length(),1,1);
+    parser.parse(expr2.c_str(), expr2.c_str()+ expr2.length());
     auto result2 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(false),result2);
 
     std::string expr3 = "('today I go' =~ /Today.*?/i)";
-    parser.parse(expr3.c_str(),0,expr3.length(),1,1);
+    parser.parse(expr3.c_str(), expr3.c_str()+ expr3.length());
     auto result3 = parser.eval(parent);
     BOOST_CHECK_EQUAL(json(true),result3);
 }

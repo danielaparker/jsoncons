@@ -690,11 +690,11 @@ class jsonpath_filter_parser
     int depth_;
     const Char* begin_input_;
     const Char* end_input_;
-    const Char* p_;
+    const Char*& p_;
     filter_states::states_t saved_state2_;
 public:
-    jsonpath_filter_parser(size_t& line,size_t& column)
-        : line_(line), column_(column)
+    jsonpath_filter_parser(const Char*& expr, size_t& line,size_t& column)
+        : p_(expr), line_(line), column_(column)
     {
     }
 
@@ -879,16 +879,12 @@ public:
         }
     }
 
-    void parse(const Char* expr, size_t start, size_t length, size_t row, size_t column)
+    void parse(const Char* expr, const Char* end_expr)
     {
-        begin_input_ = expr;
-        end_input_ = expr + length;
-        p_ = begin_input_ + start;
-
+        p_ = expr;
+        end_input_ = end_expr;
         depth_ = 0;
         tokens_.clear();
-        line_ = row;
-        column_ = column;
         state_ = filter_states::start;
         bool done = false;
         while (!done && p_ < end_input_)
@@ -1263,11 +1259,6 @@ handle_state:
         {
             JSONCONS_THROW_EXCEPTION(std::exception,"Unbalanced parenthesis");
         }
-    }
-
-    size_t index() const
-    {
-        return p_ - begin_input_;
     }
 };
 
