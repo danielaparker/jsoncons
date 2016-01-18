@@ -194,9 +194,8 @@ public:
         positive_step_ = true;
         end_undefined_ = false;
 
-        for (; p_ < end_input_; ++p_)
+        while (p_ < end_input_)
         {
-handle_state:
             Char c = *p_;
             switch (state_)
             {
@@ -218,20 +217,22 @@ handle_state:
                     err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_root, jsonpath_error_category()), *this);
                     break;
                 };
+                ++p_;
                 break;
             case states::dot:
                 switch (c)
                 {
                 case '.':
                     recursive_descent_ = true;
+                    ++p_;
                     break;
 				case '*':
                     end_all();
                     end_nodes();
+                    ++p_;
                     break;
                 default:
                     state_ = states::member_name;
-                    goto handle_state;
                     break;
                 }
                 break;
@@ -245,6 +246,7 @@ handle_state:
                     state_ = states::left_bracket;
                     break;
                 };
+                ++p_;
                 break;
             case states::expect_right_bracket:
                 switch (c)
@@ -262,6 +264,7 @@ handle_state:
                     err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_right_bracket, jsonpath_error_category()), *this);
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket_step:
                 switch (c)
@@ -280,6 +283,7 @@ handle_state:
                     state_ = states::expect_separator;
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket_step2:
                 switch (c)
@@ -293,6 +297,7 @@ handle_state:
                     state_ = states::expect_separator;
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket_end:
                 switch (c)
@@ -316,6 +321,7 @@ handle_state:
                     state_ = states::expect_separator;
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket_end2:
                 switch (c)
@@ -334,6 +340,7 @@ handle_state:
                     state_ = states::expect_separator;
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket_start:
                 switch (c)
@@ -355,11 +362,13 @@ handle_state:
                     state_ = states::expect_separator;
                     break;
                 }
+                ++p_;
                 break;
             case states::left_bracket:
                 switch (c)
                 {
-				case ' ':case '\n':case '\r':case '\t':
+                case ' ':case '\n':case '\r':case '\t':
+                    ++p_;
 					break;
 				case '(':
                     {
@@ -380,7 +389,10 @@ handle_state:
                                 find(index.as_string());
                             }
                             p_ = begin_input_ + parser.index();
-                            goto handle_state;
+                        }
+                        else
+                        {
+                            ++p_;
                         }
                     }
                     break;
@@ -394,7 +406,6 @@ handle_state:
                             accept(*(stack_.back()[j]),parser);
                         }
                         p_ = begin_input_ + parser.index();
-                        goto handle_state;
                     }
                     break;
                     
@@ -402,30 +413,40 @@ handle_state:
                     step_ = 1;
                     end_undefined_ = true;
                     state_ = states::left_bracket_end;
+                    ++p_;
                     break;
                 case ',':
                     find_elements();
+                    ++p_;
                     break;
                 case '-':
                     positive_start_ = false;
                     state_ = states::left_bracket_start;
+                    ++p_;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = static_cast<size_t>(c-'0');
                     state_ = states::left_bracket_start;
+                    ++p_;
                     break;
                 case ']':
                     //find_elements();
                     end_nodes();
                     state_ = states::expect_separator;
+                    ++p_;
                     break;
                 case '*':
                     end_all();
                     //end_nodes();
                     state_ = states::expect_right_bracket;
+                    ++p_;
                     break;
                 case '\'':
                     state_ = states::quoted_string;
+                    ++p_;
+                    break;
+                default:
+                    ++p_;
                     break;
                 }
                 break;
@@ -451,6 +472,7 @@ handle_state:
                     buffer_.push_back(c);
                     break;
                 };
+                ++p_;
                 break;
             case states::quoted_string: 
                 switch (c)
@@ -464,6 +486,10 @@ handle_state:
                     buffer_.push_back(c);
                     break;
                 };
+                ++p_;
+                break;
+            default:
+                ++p_;
                 break;
             }
         }
