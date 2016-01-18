@@ -139,7 +139,7 @@ private:
     const Char* begin_input_;
     const Char* end_input_;
     const Char* p_;
-    states::states_t saved_state2_;
+    states::states_t pre_line_break_state_;
 
     void end_nodes()
     {
@@ -206,29 +206,29 @@ public:
                 switch (*p_)
                 {
                 case '\n':
-                    state_ = saved_state2_;
+                    state_ = pre_line_break_state_;
                     ++p_;
                     ++column_;
                     break;
                 default:
-                    state_ = saved_state2_;
+                    state_ = pre_line_break_state_;
                     break;
                 }
                 break;
             case states::lf:
                 ++line_;
                 column_ = 1;
-                state_ = saved_state2_;
+                state_ = pre_line_break_state_;
                 break;
             case states::start: 
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '$':
@@ -253,11 +253,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '.':
@@ -280,11 +280,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '.':
@@ -301,11 +301,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case ',':
@@ -328,11 +328,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '-':
@@ -356,11 +356,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -379,11 +379,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '-':
@@ -412,11 +412,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case ':':
@@ -440,11 +440,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case ':':
@@ -471,11 +471,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case ' ':case '\t':
@@ -571,11 +571,11 @@ public:
                 switch (c)
                 {
                 case '\r':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::cr;
                     break;
                 case '\n':
-                    saved_state2_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     break;
                 case '[':

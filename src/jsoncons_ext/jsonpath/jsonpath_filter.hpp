@@ -25,6 +25,8 @@ class jsonpath_evaluator;
 namespace filter_states {
     enum states_t {
         start,
+        cr,
+        lf,
         expect_right_round_bracket,
         expect_oper_or_right_round_bracket,
         expect_path_or_value,
@@ -691,7 +693,7 @@ class jsonpath_filter_parser
     const Char* begin_input_;
     const Char* end_input_;
     const Char*& p_;
-    filter_states::states_t saved_state2_;
+    filter_states::states_t pre_line_break_state_;
 public:
     jsonpath_filter_parser(const Char** expr, size_t* line,size_t* column)
         : p_(*expr), line_(*line), column_(*column)
@@ -894,11 +896,30 @@ public:
         bool done = false;
         while (!done && p_ < end_input_)
         {
-            int c = *p_;
             switch (state_)
             {
+            case filter_states::cr:
+                ++line_;
+                column_ = 1;
+                switch (*p_)
+                {
+                case '\n':
+                    state_ = pre_line_break_state_;
+                    ++p_;
+                    ++column_;
+                    break;
+                default:
+                    state_ = pre_line_break_state_;
+                    break;
+                }
+                break;
+            case filter_states::lf:
+                ++line_;
+                column_ = 1;
+                state_ = pre_line_break_state_;
+                break;
             case filter_states::start:
-                switch (c)
+                switch (*p_)
                 {
                 case '(':
                     state_ = filter_states::expect_path_or_value;
@@ -914,27 +935,30 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case filter_states::oper:
-                switch (c)
+                switch (*p_)
                 {
                 case '!':
                     if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ne));
                     }
-		    else
-		    {
-		    	state_ = filter_states::expect_path_or_value;
-		    	tokens_.push_back(token<Char, Alloc>(token_types::exclaim));
-		    }
+        		    else
+        		    {
+        		    	state_ = filter_states::expect_path_or_value;
+        		    	tokens_.push_back(token<Char, Alloc>(token_types::exclaim));
+        		    }
                     break;
                 case '&':
                     if (p_+1  < end_input_ && *(p_+1) == '&')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ampamp));
                     }
@@ -943,6 +967,7 @@ public:
                     if (p_+1  < end_input_ && *(p_+1) == '|')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::pipepipe));
                     }
@@ -951,12 +976,14 @@ public:
                     if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::eq));
                     }
                     else if (p_+1  < end_input_ && *(p_+1) == '~')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_regex;
                         tokens_.push_back(token<Char,Alloc>(token_types::regex));
                     }
@@ -965,6 +992,7 @@ public:
                     if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::gte));
                     }
@@ -978,6 +1006,7 @@ public:
                     if (p_+1  < end_input_ && *(p_+1) == '=')
                     {
                         ++p_;
+                        ++column_;
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::lte));
                     }
@@ -1003,10 +1032,11 @@ public:
 
                 }
                 ++p_;
+                ++column_;
                 break;
             case filter_states::unquoted_text: 
                 {
-                    switch (c)
+                    switch (*p_)
                     {
                     case '<':
                     case '>':
@@ -1044,6 +1074,7 @@ public:
                             state_ = filter_states::expect_path_or_value;
                         }
                         ++p_;
+                        ++column_;
                         break;
                     case ' ':case '\n':case '\r':case '\t':
                         if (buffer_.length() > 0)
@@ -1053,17 +1084,19 @@ public:
 							buffer_.clear();
 						}
                         ++p_;
+                        ++column_;
                         break; 
                     default: 
-                        buffer_.push_back(c);
+                        buffer_.push_back(*p_);
                         ++p_;
+                        ++column_;
                         break;
                     }
                 }
                 break;
             case filter_states::quoted_text: 
                 {
-                    switch (c)
+                    switch (*p_)
                     {                   
                     case '\'':
                         buffer_.push_back('\"');
@@ -1077,14 +1110,15 @@ public:
                         break;
 
                     default: 
-                        buffer_.push_back(c);
+                        buffer_.push_back(*p_);
                         break;
                     }
                 }
                 ++p_;
+                ++column_;
                 break;
             case filter_states::expect_path_or_value: 
-                switch (c)
+                switch (*p_)
                 {
                 case '<':
                 case '>':
@@ -1098,22 +1132,26 @@ public:
                     // don't increment
                     break;
                 case '@':
-                    buffer_.push_back(c);
+                    buffer_.push_back(*p_);
                     state_ = filter_states::path;
                     ++p_;
+                    ++column_;
                     break;
 				case ' ':case '\n':case '\r':case '\t':
                     ++p_;
+                    ++column_;
 					break;
                 case '\'':
                     buffer_.push_back('\"');
                     state_ = filter_states::quoted_text;
                     ++p_;
+                    ++column_;
                     break;
                 case '(':
                     ++depth_;
                     tokens_.push_back(token<Char,Alloc>(token_types::left_paren));
                     ++p_;
+                    ++column_;
                     break;
                 case ')':
                     tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
@@ -1123,6 +1161,7 @@ public:
                         state_ = filter_states::start;
                     }
                     ++p_;
+                    ++column_;
                     break;
                 default: 
                     // don't increment
@@ -1131,7 +1170,7 @@ public:
                 };
                 break;
             case filter_states::expect_oper_or_right_round_bracket: 
-                switch (c)
+                switch (*p_)
                 {
                 case ' ':case '\n':case '\r':case '\t':
                     break;
@@ -1162,7 +1201,7 @@ public:
                 };
                 break;
             case filter_states::expect_right_round_bracket: 
-                switch (c)
+                switch (*p_)
                 {
                 case ' ':case '\n':case '\r':case '\t':
                     break;
@@ -1183,9 +1222,10 @@ public:
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             case filter_states::path: 
-                switch (c)
+                switch (*p_)
                 {
                 case '<':
                 case '>':
@@ -1222,15 +1262,17 @@ public:
                         state_ = filter_states::expect_path_or_value;
                     }
                     ++p_;
+                    ++column_;
                     break;
                 default:
-                    buffer_.push_back(c);
+                    buffer_.push_back(*p_);
                     ++p_;
+                    ++column_;
                     break;
                 };
                 break;
             case filter_states::expect_regex: 
-                switch (c)
+                switch (*p_)
                 {
                 case '/':
                     state_ = filter_states::regex;
@@ -1242,10 +1284,11 @@ public:
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             case filter_states::regex: 
                 {
-                    switch (c)
+                    switch (*p_)
                     {                   
                     case '/':
                         //if (buffer_.length() > 0)
@@ -1254,6 +1297,7 @@ public:
                             if (p_+1  < end_input_ && *(p_+1) == 'i')
                             {
                                 ++p_;
+                                ++column_;
                                 flags |= std::regex_constants::icase;
                             }
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<regex_term<Char, Alloc>>(buffer_,flags)));
@@ -1263,14 +1307,16 @@ public:
                         break;
 
                     default: 
-                        buffer_.push_back(c);
+                        buffer_.push_back(*p_);
                         break;
                     }
                 }
                 ++p_;
+                ++column_;
                 break;
             default:
                 ++p_;
+                ++column_;
                 break;
             }
         }
