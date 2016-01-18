@@ -683,20 +683,16 @@ template<typename Char, class Alloc>
 class jsonpath_filter_parser
 {
     size_t index_;
-    size_t line_;
-    size_t column_;
+    size_t& line_;
+    size_t& column_;
     filter_states::filter_states_t state_;
     std::basic_string<Char> buffer_;
     std::vector<token<Char,Alloc>> tokens_;
     int depth_;
 public:
-    size_t line_number() const
+    jsonpath_filter_parser(size_t& line,size_t& column)
+        : line_(line), column_(column)
     {
-        return line_;
-    }
-    size_t column_number() const
-    {
-        return column_;
     }
 
     bool exists(const basic_json<Char,Alloc>& context_node)

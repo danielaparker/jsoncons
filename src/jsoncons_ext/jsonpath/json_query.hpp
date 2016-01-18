@@ -365,7 +365,7 @@ handle_state:
                     {
                         if (stack_.back().size() == 1)
                         {
-                            jsonpath_filter_parser<Char,Alloc> parser;
+                            jsonpath_filter_parser<Char,Alloc> parser(line_,column_);
                             parser.parse(path,p_ - begin_input_,length,line_,column_);
                             //auto filter = parser.get_filter();
                             //auto index = filter->evaluate(*(stack_.back()[0]));
@@ -380,15 +380,13 @@ handle_state:
                                 find(index.as_string());
                             }
                             p_ = begin_input_ + parser.index();
-                            line_= parser.line_number();
-                            column_= parser.column_number();
                             goto handle_state;
                         }
                     }
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<Char,Alloc> parser;
+                        jsonpath_filter_parser<Char,Alloc> parser(line_,column_);
                         parser.parse(path,p_ - begin_input_,length,line_,column_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
@@ -396,8 +394,6 @@ handle_state:
                             accept(*(stack_.back()[j]),parser);
                         }
                         p_ = begin_input_ + parser.index();
-                        line_= parser.line_number();
-                        column_= parser.column_number();
                         goto handle_state;
                     }
                     break;
