@@ -486,10 +486,8 @@ public:
                     {
                         if (stack_.back().size() == 1)
                         {
-                            jsonpath_filter_parser<Char,Alloc> parser(p_,line_,column_);
+                            jsonpath_filter_parser<Char,Alloc> parser(&p_,&line_,&column_);
                             parser.parse(p_,end_input_);
-                            //auto filter = parser.get_filter();
-                            //auto index = filter->evaluate(*(stack_.back()[0]));
                             auto index = parser.eval(*(stack_.back()[0]));
                             if (index.is<size_t>())
                             {
@@ -500,7 +498,6 @@ public:
                             {
                                 find(index.as_string());
                             }
-                            //p_ = begin_input_ + parser.index();
                         }
                         else
                         {
@@ -511,14 +508,13 @@ public:
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<Char,Alloc> parser(p_,line_,column_);
+                        jsonpath_filter_parser<Char,Alloc> parser(&p_,&line_,&column_);
                         parser.parse(p_,end_input_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {
                             accept(*(stack_.back()[j]),parser);
                         }
-                        //p_ = begin_input_ + parser.index();
                     }
                     break;
                     

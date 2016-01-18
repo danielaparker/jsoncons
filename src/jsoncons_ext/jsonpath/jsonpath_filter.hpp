@@ -693,8 +693,8 @@ class jsonpath_filter_parser
     const Char*& p_;
     filter_states::states_t saved_state2_;
 public:
-    jsonpath_filter_parser(const Char*& expr, size_t& line,size_t& column)
-        : p_(expr), line_(line), column_(column)
+    jsonpath_filter_parser(const Char** expr, size_t* line,size_t* column)
+        : p_(*expr), line_(*line), column_(*column)
     {
     }
 
@@ -879,6 +879,11 @@ public:
         }
     }
 
+    void parse(const Char* expr, size_t length)
+    {
+        parse(expr,expr+length);
+    }
+
     void parse(const Char* expr, const Char* end_expr)
     {
         p_ = expr;
@@ -909,6 +914,7 @@ handle_state:
                     }
                     break;
                 }
+                ++p_;
                 break;
             case filter_states::oper:
                 switch (c)
@@ -920,11 +926,11 @@ handle_state:
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<Char,Alloc>(token_types::ne));
                     }
-					else
-					{
-						state_ = filter_states::expect_path_or_value;
-						tokens_.push_back(token<Char, Alloc>(token_types::exclaim));
-					}
+		    else
+		    {
+		    	state_ = filter_states::expect_path_or_value;
+		    	tokens_.push_back(token<Char, Alloc>(token_types::exclaim));
+		    }
                     break;
                 case '&':
                     if (p_+1  < end_input_ && *(p_+1) == '&')
@@ -997,6 +1003,7 @@ handle_state:
                     break;
 
                 }
+                ++p_;
                 break;
             case filter_states::unquoted_text: 
                 {
@@ -1052,6 +1059,7 @@ handle_state:
                         break;
                     }
                 }
+                ++p_;
                 break;
             case filter_states::quoted_text: 
                 {
@@ -1073,6 +1081,7 @@ handle_state:
                         break;
                     }
                 }
+                ++p_;
                 break;
             case filter_states::expect_path_or_value: 
                 switch (c)
@@ -1117,6 +1126,7 @@ handle_state:
                     goto handle_state;
                     break;
                 };
+                ++p_;
                 break;
             case filter_states::expect_oper_or_right_round_bracket: 
                 switch (c)
@@ -1148,6 +1158,7 @@ handle_state:
                     JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 2.");
                     break;
                 };
+                ++p_;
                 break;
             case filter_states::expect_right_round_bracket: 
                 switch (c)
@@ -1170,6 +1181,7 @@ handle_state:
                     JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 3.");
                     break;
                 };
+                ++p_;
                 break;
             case filter_states::path: 
                 switch (c)
@@ -1213,6 +1225,7 @@ handle_state:
                     buffer_.push_back(c);
                     break;
                 };
+                ++p_;
                 break;
             case filter_states::expect_regex: 
                 switch (c)
@@ -1226,6 +1239,7 @@ handle_state:
                     JSONCONS_THROW_EXCEPTION(std::exception,"Expected '/'");
                     break;
                 };
+                ++p_;
                 break;
             case filter_states::regex: 
                 {
@@ -1251,9 +1265,12 @@ handle_state:
                         break;
                     }
                 }
+                ++p_;
+                break;
+            default:
+                ++p_;
                 break;
             }
-            ++p_;
         }
         if (depth_ != 0)
         {
