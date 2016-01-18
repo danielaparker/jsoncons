@@ -74,23 +74,6 @@ namespace jsoncons { namespace jsonpath {
         static const std::wstring length_literal() {return L"length";};
     };
 
-namespace states {
-    enum states_t {
-        start,
-        expect_separator,
-        member_name,
-        quoted_string,
-        left_bracket,
-        left_bracket_start,
-        left_bracket_end,
-        left_bracket_end2,
-        left_bracket_step,
-        left_bracket_step2,
-        expect_right_bracket,
-        dot
-    };
-};
-
 template<typename Char, class Alloc>
 basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
 {
@@ -110,6 +93,25 @@ basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Cha
     evaluator.evaluate(root,path,length);
     return evaluator.get_values();
 }
+
+namespace states {
+    enum states_t {
+        start,
+        cr,
+        lf,
+        expect_separator,
+        member_name,
+        quoted_string,
+        left_bracket,
+        left_bracket_start,
+        left_bracket_end,
+        left_bracket_end2,
+        left_bracket_step,
+        left_bracket_step2,
+        expect_right_bracket,
+        dot
+    };
+};
 
 template<typename Char, class Alloc>
 class jsonpath_evaluator : private basic_parsing_context<Char>
@@ -134,6 +136,9 @@ private:
     std::vector<std::shared_ptr<basic_json<Char,Alloc>>> temp_;
     size_t line_;
     size_t column_;
+    const Char* begin_input_;
+    const Char* end_input_;
+    const Char* p_;
 
     void end_nodes()
     {
@@ -170,8 +175,12 @@ public:
     {
         evaluate(root,path,std::char_traits<Char>::length(path));
     }
-    void evaluate(const basic_json<Char, Alloc>& root, const Char* path, size_t path_length)
+    void evaluate(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
     {
+        begin_input_ = path;
+        end_input_ = path + length;
+        p_ = begin_input_;
+
         line_ = 1;
         column_ = 1;
         state_ = states::start;
@@ -185,10 +194,10 @@ public:
         positive_step_ = true;
         end_undefined_ = false;
 
-        for (size_t i = 0; i < path_length; ++i)
+        for (; p_ < end_input_; ++p_)
         {
 handle_state:
-            Char c = path[i];
+            Char c = *p_;
             switch (state_)
             {
             case states::start: 
@@ -357,7 +366,7 @@ handle_state:
                         if (stack_.back().size() == 1)
                         {
                             jsonpath_filter_parser<Char,Alloc> parser;
-                            parser.parse(path,i,path_length,line_,column_);
+                            parser.parse(path,p_ - begin_input_,length,line_,column_);
                             //auto filter = parser.get_filter();
                             //auto index = filter->evaluate(*(stack_.back()[0]));
                             auto index = parser.eval(*(stack_.back()[0]));
@@ -370,7 +379,7 @@ handle_state:
                             {
                                 find(index.as_string());
                             }
-                            i = parser.index();
+                            p_ = begin_input_ + parser.index();
                             line_= parser.line_number();
                             column_= parser.column_number();
                             goto handle_state;
@@ -380,13 +389,13 @@ handle_state:
                 case '?':
                     {
                         jsonpath_filter_parser<Char,Alloc> parser;
-                        parser.parse(path,i,path_length,line_,column_);
+                        parser.parse(path,p_ - begin_input_,length,line_,column_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {
                             accept(*(stack_.back()[j]),parser);
                         }
-                        i = parser.index();
+                        p_ = begin_input_ + parser.index();
                         line_= parser.line_number();
                         column_= parser.column_number();
                         goto handle_state;
