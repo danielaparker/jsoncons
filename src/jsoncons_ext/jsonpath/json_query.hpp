@@ -139,6 +139,7 @@ private:
     const Char* begin_input_;
     const Char* end_input_;
     const Char* p_;
+    states::states_t saved_state2_;
 
     void end_nodes()
     {
@@ -199,9 +200,37 @@ public:
             Char c = *p_;
             switch (state_)
             {
+            case states::cr:
+                ++line_;
+                column_ = 1;
+                switch (*p_)
+                {
+                case '\n':
+                    state_ = saved_state2_;
+                    ++p_;
+                    ++column_;
+                    break;
+                default:
+                    state_ = saved_state2_;
+                    break;
+                }
+                break;
+            case states::lf:
+                ++line_;
+                column_ = 1;
+                state_ = saved_state2_;
+                break;
             case states::start: 
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '$':
                 case '@':
                     {
@@ -211,25 +240,36 @@ public:
                         state_ = states::expect_separator;
                     }
                     break;
-                case ' ':case '\n':case '\r':case '\t':
+                case ' ':case '\t':
                     break;
                 default:
                     err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_root, jsonpath_error_category()), *this);
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             case states::dot:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '.':
                     recursive_descent_ = true;
                     ++p_;
+                    ++column_;
                     break;
 				case '*':
                     end_all();
                     end_nodes();
                     ++p_;
+                    ++column_;
                     break;
                 default:
                     state_ = states::member_name;
@@ -239,6 +279,14 @@ public:
             case states::expect_separator: 
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '.':
                     state_ = states::dot;
                     break;
@@ -247,10 +295,19 @@ public:
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             case states::expect_right_bracket:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case ',':
                     state_ = states::left_bracket;
                     break;
@@ -258,17 +315,26 @@ public:
                     end_nodes();
                     state_ = states::expect_separator;
                     break;
-                case ' ':case '\n':case '\r':case '\t':
+                case ' ':case '\t':
                     break;
                 default:
                     err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_right_bracket, jsonpath_error_category()), *this);
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket_step:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '-':
                     positive_step_ = false;
                     state_ = states::left_bracket_step2;
@@ -284,10 +350,19 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket_step2:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     step_ = step_*10 + static_cast<size_t>(c-'0');
                     break;
@@ -298,10 +373,19 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket_end:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '-':
                     positive_end_ = false;
                     state_ = states::left_bracket_end2;
@@ -322,10 +406,19 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket_end2:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case ':':
                     step_ = 0;
                     state_ = states::left_bracket_step;
@@ -341,10 +434,19 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket_start:
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case ':':
                     step_ = 1;
                     end_undefined_ = true;
@@ -363,12 +465,22 @@ public:
                     break;
                 }
                 ++p_;
+                ++column_;
                 break;
             case states::left_bracket:
                 switch (c)
                 {
-                case ' ':case '\n':case '\r':case '\t':
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
+                case ' ':case '\t':
                     ++p_;
+                    ++column_;
 					break;
 				case '(':
                     {
@@ -393,6 +505,7 @@ public:
                         else
                         {
                             ++p_;
+                            ++column_;
                         }
                     }
                     break;
@@ -414,45 +527,61 @@ public:
                     end_undefined_ = true;
                     state_ = states::left_bracket_end;
                     ++p_;
+                    ++column_;
                     break;
                 case ',':
                     find_elements();
                     ++p_;
+                    ++column_;
                     break;
                 case '-':
                     positive_start_ = false;
                     state_ = states::left_bracket_start;
                     ++p_;
+                    ++column_;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = static_cast<size_t>(c-'0');
                     state_ = states::left_bracket_start;
                     ++p_;
+                    ++column_;
                     break;
                 case ']':
                     //find_elements();
                     end_nodes();
                     state_ = states::expect_separator;
                     ++p_;
+                    ++column_;
                     break;
                 case '*':
                     end_all();
                     //end_nodes();
                     state_ = states::expect_right_bracket;
                     ++p_;
+                    ++column_;
                     break;
                 case '\'':
                     state_ = states::quoted_string;
                     ++p_;
+                    ++column_;
                     break;
                 default:
                     ++p_;
+                    ++column_;
                     break;
                 }
                 break;
             case states::member_name: 
                 switch (c)
                 {
+                case '\r':
+                    saved_state2_ = state_;
+                    state_ = states::cr;
+                    break;
+                case '\n':
+                    saved_state2_ = state_;
+                    state_ = states::lf;
+                    break;
                 case '[':
 					find(buffer_);
                     buffer_.clear();
@@ -466,13 +595,14 @@ public:
                     end_nodes();
                     state_ = states::dot;
                     break;
-                case ' ':case '\n':case '\r':case '\t':
+                case ' ':case '\t':
                     break;
                 default:
                     buffer_.push_back(c);
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             case states::quoted_string: 
                 switch (c)
@@ -487,9 +617,11 @@ public:
                     break;
                 };
                 ++p_;
+                ++column_;
                 break;
             default:
                 ++p_;
+                ++column_;
                 break;
             }
         }
