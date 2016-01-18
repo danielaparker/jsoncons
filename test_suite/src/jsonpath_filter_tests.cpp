@@ -34,14 +34,14 @@ struct jsonpath_filter_fixture
 
     json book()
     {
-        json root = json::parse_string(jsonpath_filter_fixture::store_text());
+        json root = json::parse(jsonpath_filter_fixture::store_text());
         json book = root["store"]["book"];
         return book;
     }
 
     json bicycle()
     {
-        json root = json::parse_string(jsonpath_filter_fixture::store_text());
+        json root = json::parse(jsonpath_filter_fixture::store_text());
         json bicycle = root["store"]["bicycle"];
         return bicycle;
     }
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_index_expression)
 {
-    json root = json::parse_string(jsonpath_filter_fixture::store_text());
+    json root = json::parse(jsonpath_filter_fixture::store_text());
 
     json result = json_query(root,"$..book[(@.length-1)]");
 

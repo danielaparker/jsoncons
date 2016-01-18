@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
 {
     wstring input = L"[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-    wjson value = wjson::parse_string(input);
+    wjson value = wjson::parse(input);
     woutput_format format;
     format.escape_all_non_ascii(true);
     wstring output = value.to_string(format);

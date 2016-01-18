@@ -17,6 +17,7 @@ namespace jsonpath_parser_errc
 {
     const int expected_root = 0;
     const int expected_right_bracket = 1;
+    const int expected_name = 2;
 }
 
 class jsonpath_error_category_impl
@@ -35,6 +36,8 @@ public:
             return "Expected $";
         case jsonpath_parser_errc::expected_right_bracket:
             return "Expected ]";
+        case jsonpath_parser_errc::expected_name:
+            return "Expected a name following a dot";
         default:
             return "Unknown JSON parser error";
         }

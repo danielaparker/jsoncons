@@ -52,44 +52,40 @@ struct jsonpath_fixture
     }
 };
 
+void test_error_code(const json& root, const std::string& path, int ec, size_t line, size_t column)
+{
+	try
+	{
+        json result = json_query(root,path);
+		BOOST_FAIL(path);
+	}
+	catch (const parse_exception& e)
+	{
+		BOOST_CHECK_MESSAGE(e.code().value() == ec, e.what());
+        BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());
+        BOOST_CHECK_MESSAGE(e.column_number() == column, e.what());
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_root_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-
-    try
-    {
-        json result = json_query(root,"..*");
-    }
-    catch (parse_exception& e)
-    {
-        std::cerr << "parse_exception: " << e.what() << std::endl;
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "std::exception: " << e.what() << std::endl;
-    }
-    //std::cout << result << std::endl;
+    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,1,1);
 }
 
 BOOST_AUTO_TEST_CASE(test_right_bracket_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
+    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,1,18);
+}
 
-    try
-    {
-        json result = json_query(root,"$['store']['book'[*]");
-    }
-    catch (parse_exception& e)
-    {
-        std::cerr << "parse_exception: " << e.what() << std::endl;
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "std::exception: " << e.what() << std::endl;
-    }
-    //std::cout << result << std::endl;
+BOOST_AUTO_TEST_CASE(test_dot_dot_dot)
+{
+
+    json root = json::parse(jsonpath_fixture::store_text());
+    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,1,10);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

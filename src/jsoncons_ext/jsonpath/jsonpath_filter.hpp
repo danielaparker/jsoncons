@@ -1097,7 +1097,7 @@ public:
                         {
                             if (buffer_.length() > 0)
                             {
-                                auto val = basic_json<Char, Alloc>::parse_string(buffer_);
+                                auto val = basic_json<Char, Alloc>::parse(buffer_);
                                 tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
                                 buffer_.clear();
                             }
@@ -1107,7 +1107,7 @@ public:
                     case ')':
                         if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            auto val = basic_json<Char,Alloc>::parse(buffer_);
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
                             buffer_.clear();
                         }
@@ -1127,7 +1127,7 @@ public:
                     case ' ':case '\t':
                         if (buffer_.length() > 0)
 						{
-                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            auto val = basic_json<Char,Alloc>::parse(buffer_);
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
 							buffer_.clear();
 						}
@@ -1170,7 +1170,7 @@ public:
                         buffer_.push_back('\"');
                         //if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse_string(buffer_);
+                            auto val = basic_json<Char,Alloc>::parse(buffer_);
                             tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
                             buffer_.clear();
                         }

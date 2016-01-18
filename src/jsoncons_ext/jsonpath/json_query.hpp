@@ -100,8 +100,10 @@ namespace states {
         cr,
         lf,
         expect_separator,
-        member_name,
-        quoted_string,
+        expect_unquoted_name,
+        unquoted_name,
+        single_quoted_name,
+        double_quoted_name,
         left_bracket,
         left_bracket_start,
         left_bracket_end,
@@ -141,7 +143,7 @@ private:
     const Char* p_;
     states::states_t pre_line_break_state_;
 
-    void end_nodes()
+    void transfer_nodes()
     {
         stack_.push_back(nodes_);
         nodes_.clear();
@@ -252,6 +254,20 @@ public:
             case states::dot:
                 switch (c)
                 {
+                case '.':
+                    recursive_descent_ = true;
+                    ++p_;
+                    ++column_;
+                    state_ = states::expect_unquoted_name;
+                    break;
+                default:
+                    state_ = states::expect_unquoted_name;
+                    break;
+                }
+                break;
+            case states::expect_unquoted_name:
+                switch (c)
+                {
                 case '\r':
                     pre_line_break_state_ = state_;
                     state_ = states::cr;
@@ -261,18 +277,19 @@ public:
                     state_ = states::lf;
                     break;
                 case '.':
-                    recursive_descent_ = true;
+                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_name, jsonpath_error_category()), *this);
                     ++p_;
                     ++column_;
                     break;
-				case '*':
+                case '*':
                     end_all();
-                    end_nodes();
+                    transfer_nodes();
+                    state_ = states::expect_separator;
                     ++p_;
                     ++column_;
                     break;
                 default:
-                    state_ = states::member_name;
+                    state_ = states::unquoted_name;
                     break;
                 }
                 break;
@@ -312,7 +329,7 @@ public:
                     state_ = states::left_bracket;
                     break;
                 case ']':
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 case ' ':case '\t':
@@ -345,7 +362,7 @@ public:
                     break;
                 case ']':
                     end_array_slice();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 }
@@ -368,7 +385,7 @@ public:
                     break;
                 case ']':
                     end_array_slice();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 }
@@ -401,7 +418,7 @@ public:
                     break;
                 case ']':
                     end_array_slice();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 }
@@ -429,7 +446,7 @@ public:
                     break;
                 case ']':
                     end_array_slice();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 }
@@ -460,7 +477,7 @@ public:
                     break;
                 case ']':
                     find_elements();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     break;
                 }
@@ -544,20 +561,20 @@ public:
                     break;
                 case ']':
                     //find_elements();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::expect_separator;
                     ++p_;
                     ++column_;
                     break;
                 case '*':
                     end_all();
-                    //end_nodes();
+                    //transfer_nodes();
                     state_ = states::expect_right_bracket;
                     ++p_;
                     ++column_;
                     break;
                 case '\'':
-                    state_ = states::quoted_string;
+                    state_ = states::single_quoted_name;
                     ++p_;
                     ++column_;
                     break;
@@ -567,7 +584,7 @@ public:
                     break;
                 }
                 break;
-            case states::member_name: 
+            case states::unquoted_name: 
                 switch (c)
                 {
                 case '\r':
@@ -581,14 +598,14 @@ public:
                 case '[':
 					find(buffer_);
                     buffer_.clear();
-                    end_nodes();
+                    transfer_nodes();
 					start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
                     find(buffer_);
                     buffer_.clear();
-                    end_nodes();
+                    transfer_nodes();
                     state_ = states::dot;
                     break;
                 case ' ':case '\t':
@@ -600,7 +617,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::quoted_string: 
+            case states::single_quoted_name: 
                 switch (c)
                 {
                 case '\'':
@@ -623,11 +640,11 @@ public:
         }
         switch (state_)
         {
-        case states::member_name: 
+        case states::unquoted_name: 
             {
                 find(buffer_);
                 buffer_.clear();
-                end_nodes();
+                transfer_nodes();
             }
             break;
         }
