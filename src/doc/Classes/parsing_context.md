@@ -20,10 +20,6 @@ Column numbers start at 1.
 
     char current_char() const
 Returns the current character in the input stream
-
-Deprecated method
-    char last_char() const 
-Returns the last character consumed by the parser
     
 ### Private virtual implementation methods
     
@@ -33,5 +29,9 @@ Returns the last character consumed by the parser
 
     virtual char do_current_char() const = 0
     
+### Deprecated methods
+
+    char last_char() const 
+Returns the last character consumed by the parser
 
 

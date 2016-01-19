@@ -357,88 +357,9 @@ Inserts json value into stream using the specified [output_format](output_format
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
-Deprecated:
+### Deprecated names
 
-    void add(size_t index, const json& val)
-    void add(size_t index, json&& val)
-Use add with iterator instead
-
-    void remove_range(size_t from_index, size_t to_index)
-Use erase with iterator instead
-
-    void remove(const std::string& name)
-Use erase instead
-
-    static json parse(std::istream& is)
-    static json parse(std::istream& is, 
-                      parse_error_handler& err_handler)
-Use `parse_stream` instead
-
-    long long as_longlong() const
-Use as_integer or as<long long> instead
-
-    unsigned long long as_ulonglong() const
-Use as_uinteger or as<unsigned long long> instead
-
-    bool is_longlong() const
-Use is_integer instead
-
-    bool is_ulonglong() const
-Use is_uinteger instead
-
-    bool is_numeric() const
-Use `is_number` instead
-
-    void remove_member(const std::string& name)
-Use `remove` instead
-
-    const json& get(const std::string& name) const
-Use the version of `get` with two parameters and explicitly specify a json null default value 
-
-    bool has_member(const std::string& name) const
-Use count(const std::string& name) instead.
-
-    object_iterator begin_members()
-    const_object_iterator begin_members() const
-Use members().begin() instead.
-
-    object_iterator end_members()
-    const_object_iterator end_members() const
-Use members().end() instead.
-
-    array_iterator begin_elements()
-    const_array_iterator begin_elements() const
-Use elements().begin() instead.
-
-    array_iterator end_elements()
-    const_array_iterator end_elements() const
-Use elements().end() instead.
-
-    bool is_empty() const
-Use `empty` instead
-
-    static json parse_string(const std::string& s)
-    static json parse_string(const std::string& s, 
-                             parse_error_handler& err_handler)
-Use `parse` instead
-
-    void resize_array(size_t n)
-Use `resize` instead. 
-
-    void resize_array(size_t n, const json& val)
-Use `resize` instead. 
-
-### Member constants
-
-    null
-Constant json null value. Use assignment to `jsoncons::null_type()` or `json::null_type()` instead.
-
-    an_object
-Empty constant json array value. Use the default constructor `json()` instead.
-
-    an_array
-Empty constant json array value.  Use assignment to `json::array()` or `json::make_array()` instead.
-
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names.
 
 ### Examples
 
