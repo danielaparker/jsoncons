@@ -71,91 +71,91 @@ public:
     }
     virtual bool accept_single_node() const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual basic_json<Char,Alloc> evaluate_single_node() const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool exclaim() const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
 	virtual bool eq(const term& rhs) const 
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool eq(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool ne(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool ne(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool regex(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool regex2(const std::basic_string<Char>& subject) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool ampamp(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool ampamp(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool pipepipe(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool pipepipe(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool lt(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool lt(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool gt(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual bool gt(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
 	virtual basic_json<Char, Alloc> minus(const term& rhs) const 
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual basic_json<Char,Alloc>  minus(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual basic_json<Char,Alloc>  unary_minus() const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual basic_json<Char,Alloc> plus(const term& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
     virtual basic_json<Char,Alloc>  plus(const basic_json<Char,Alloc>& rhs) const
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Unsupported operator");
+        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
 };
 
@@ -749,7 +749,7 @@ public:
 			t = ts.get();
 			if (t.type() != token_types::right_paren)
 			{
-				JSONCONS_THROW_EXCEPTION(std::exception,"Expected '}'");
+                throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_right_brace, jsonpath_error_category()),line_,column_);
 			}
 			return expr;
 		}
@@ -768,7 +768,7 @@ public:
             return expr;
         }
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Expected primary");
+            throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_primary, jsonpath_error_category()),line_,column_);
         }
     }
 
@@ -1063,7 +1063,7 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 1.");
+                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
                     break;
 
                 }
@@ -1414,7 +1414,7 @@ public:
                     }
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 2.");
+                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
                     break;
                 };
                 break;
@@ -1456,7 +1456,7 @@ public:
                     }
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION(std::exception,"Invalid filter 3.");
+                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
                     break;
                 };
                 ++p_;
@@ -1558,7 +1558,7 @@ public:
                 case ' ':case '\t':
                     break;
                 default: 
-                    JSONCONS_THROW_EXCEPTION(std::exception,"Expected '/'");
+                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_slash, jsonpath_error_category()),line_,column_);
                     break;
                 };
                 ++p_;
@@ -1620,7 +1620,7 @@ public:
         }
         if (depth_ != 0)
         {
-            JSONCONS_THROW_EXCEPTION(std::exception,"Unbalanced parenthesis");
+            throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unbalanced_paren, jsonpath_error_category()),line_,column_);
         }
     }
 };

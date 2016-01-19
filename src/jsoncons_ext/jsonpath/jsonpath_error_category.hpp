@@ -19,6 +19,12 @@ namespace jsonpath_parser_errc
     const int expected_right_bracket = 1;
     const int expected_name = 2;
     const int expected_separator = 3;
+    const int invalid_filter = 4;
+    const int invalid_filter_expected_slash = 5;
+    const int invalid_filter_unbalanced_paren = 6;
+    const int invalid_filter_unsupported_operator = 7;
+    const int invalid_filter_expected_right_brace = 8;
+    const int invalid_filter_expected_primary = 9;
 }
 
 class jsonpath_error_category_impl
@@ -41,8 +47,20 @@ public:
             return "Expected a name following a dot";
         case jsonpath_parser_errc::expected_separator:
             return "Expected dot or left bracket separator";
+        case jsonpath_parser_errc::invalid_filter:
+            return "Invalid path filter";
+        case jsonpath_parser_errc::invalid_filter_expected_slash:
+            return "Invalid path filter, expected '/'";
+        case jsonpath_parser_errc::invalid_filter_unbalanced_paren:
+            return "Invalid path filter, unbalanced parenthesis";
+        case jsonpath_parser_errc::invalid_filter_unsupported_operator:
+            return "Unsupported operator";
+        case jsonpath_parser_errc::invalid_filter_expected_right_brace:
+            return "Invalid path filter, expected right brace }";
+        case jsonpath_parser_errc::invalid_filter_expected_primary:
+            return "Invalid path filter, expected primary expression.";
         default:
-            return "Unknown JSON parser error";
+            return "Unknown jsonpath parser error";
         }
     }
 };
