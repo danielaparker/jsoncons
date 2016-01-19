@@ -486,62 +486,76 @@ these always use the default allocators.</p>
 
 <h3>Member types</h3>
 
-<pre><code>member_type
-</code></pre>
-
-<p><a href="json_member_type">member_type</a> stores a name and a json value</p>
-
-<pre><code>any
-</code></pre>
-
-<p><a href="json%20any">any</a> can contain any value that supports copy construction and assignment.</p>
-
-<pre><code>null_type
-</code></pre>
-
-<p>An alias for <code>jsoncons::null_type</code></p>
-
-<pre><code>object
-</code></pre>
-
-<p>Object type</p>
-
-<pre><code>array
-</code></pre>
-
-<p>Array type</p>
-
-<pre><code>object_iterator
-</code></pre>
-
-<p>A bidirectional iterator to <code>json::member_type</code></p>
-
-<pre><code>const_object_iterator
-</code></pre>
-
-<p>A bidirectional iterator to <code>const json::member_type</code></p>
-
-<pre><code>array_iterator
-</code></pre>
-
-<p>A random access iterator to <code>json</code></p>
-
-<pre><code>const_array_iterator
-</code></pre>
-
-<p>A random access iterator to <code>const json</code></p>
-
-<pre><code>object_range
-const_object_range
-</code></pre>
-
-<p>An object "range" defined by <code>begin()</code> and <code>end()</code> </p>
-
-<pre><code>array_range
-const_array_range
-</code></pre>
-
-<p>An array "range" defined by <code>begin()</code> and <code>end()</code> </p>
+<table>
+<thead>
+<tr>
+<th>Member type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>member_type</code></td>
+<td>
+<a href="json_member_type">member_type</a> is a class that stores a name and a json value</td>
+</tr>
+<tr>
+<td><code>any</code></td>
+<td>
+<a href="json%20any">any</a> can contain any value that supports copy construction and assignment.</td>
+</tr>
+<tr>
+<td><code>null_type</code></td>
+<td>An alias for <code>jsoncons::null_type</code>
+</td>
+</tr>
+<tr>
+<td><code>object</code></td>
+<td>json object type</td>
+</tr>
+<tr>
+<td><code>array</code></td>
+<td>json array type</td>
+</tr>
+<tr>
+<td><code>object_iterator</code></td>
+<td>A bidirectional iterator to <code>json::member_type</code>
+</td>
+</tr>
+<tr>
+<td><code>const_object_iterator</code></td>
+<td>A bidirectional iterator to <code>const json::member_type</code>
+</td>
+</tr>
+<tr>
+<td><code>array_iterator</code></td>
+<td>A random access iterator to <code>json</code>
+</td>
+</tr>
+<tr>
+<td><code>const_array_iterator</code></td>
+<td>A random access iterator to <code>const json</code>
+</td>
+</tr>
+<tr>
+<td><code>object_range</code></td>
+<td>An <code>object_range</code> provides a pair of bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object. An <code>object_range</code> supports range-based for loops over the members.</td>
+</tr>
+<tr>
+<td><code>const_object_range</code></td>
+<td>A <code>const_object_range</code> provides a pair of const bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object An object "range" defined by <code>begin()</code> and <code>end()</code>
+</td>
+</tr>
+<tr>
+<td><code>array_range</code></td>
+<td>An <code>array_range</code> provides a pair of random access iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the elements of a json array. An <code>array_range</code> supports range-based for loops over the elements.</td>
+</tr>
+<tr>
+<td><code>const_array_range</code></td>
+<td>A <code>const_array_range</code> provides a pair of const random access iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the elements of a json array.</td>
+</tr>
+</tbody>
+</table>
 
 <h3>Static member functions</h3>
 

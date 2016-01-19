@@ -14,41 +14,21 @@ these always use the default allocators.
 
 ### Member types
 
-    member_type
-
-[member_type](json_member_type) stores a name and a json value
-
-    any
-[any](json%20any) can contain any value that supports copy construction and assignment.
-
-    null_type
-An alias for `jsoncons::null_type`
-
-    object
-Object type
-
-    array
-Array type
-
-    object_iterator
-A bidirectional iterator to `json::member_type`
-
-    const_object_iterator
-A bidirectional iterator to `const json::member_type`
-
-    array_iterator
-A random access iterator to `json`
-
-    const_array_iterator
-A random access iterator to `const json`
-
-    object_range
-    const_object_range
-An object "range" defined by `begin()` and `end()` 
-
-    array_range
-    const_array_range
-An array "range" defined by `begin()` and `end()` 
+Member type                         |Definition
+------------------------------------|------------------------------
+`member_type`|[member_type](json_member_type) is a class that stores a name and a json value
+`any`|[any](json%20any) can contain any value that supports copy construction and assignment.
+`null_type`|An alias for `jsoncons::null_type`
+`object`|json object type
+`array`|json array type
+`object_iterator`|A bidirectional iterator to `json::member_type`
+`const_object_iterator`|A bidirectional iterator to `const json::member_type`
+`array_iterator`|A random access iterator to `json`
+`const_array_iterator`|A random access iterator to `const json`
+`object_range`|An `object_range` provides a pair of bidirectional iterators, defined by `begin()` and `end()`, for accessing the members of a json object. An `object_range` supports range-based for loops over the members.
+`const_object_range`|A `const_object_range` provides a pair of const bidirectional iterators, defined by `begin()` and `end()`, for accessing the members of a json object An object "range" defined by `begin()` and `end()` 
+`array_range`|An `array_range` provides a pair of random access iterators, defined by `begin()` and `end()`, for accessing the elements of a json array. An `array_range` supports range-based for loops over the elements.
+`const_array_range`|A `const_array_range` provides a pair of const random access iterators, defined by `begin()` and `end()`, for accessing the elements of a json array. 
 
 ### Static member functions
 
