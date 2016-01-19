@@ -543,8 +543,7 @@ these always use the default allocators.</p>
 </tr>
 <tr>
 <td><code>const_object_range</code></td>
-<td>A <code>const_object_range</code> provides a pair of const bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object An object "range" defined by <code>begin()</code> and <code>end()</code>
-</td>
+<td>A <code>const_object_range</code> provides a pair of const bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object.</td>
 </tr>
 <tr>
 <td><code>array_range</code></td>
