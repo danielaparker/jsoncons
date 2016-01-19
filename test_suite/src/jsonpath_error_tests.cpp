@@ -5,6 +5,7 @@
 #define BOOST_TEST_DYN_LINK
 #endif
 
+#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include <vector>
@@ -52,7 +53,7 @@ struct jsonpath_fixture
     }
 };
 
-void test_error_code(const json& root, const std::string& path, int ec, size_t line, size_t column)
+void test_error_code(const json& root, const std::string& path, int value, const std::error_category& category, size_t line, size_t column)
 {
 	try
 	{
@@ -61,7 +62,7 @@ void test_error_code(const json& root, const std::string& path, int ec, size_t l
 	}
 	catch (const parse_exception& e)
 	{
-		BOOST_CHECK_MESSAGE(e.code().value() == ec, e.what());
+		BOOST_CHECK_MESSAGE(e.code().value() == value && e.code().category() == category, e.what());
         BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());
         BOOST_CHECK_MESSAGE(e.column_number() == column, e.what());
     }
@@ -71,29 +72,36 @@ BOOST_AUTO_TEST_CASE(test_root_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,1,1);
+    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,jsonpath_error_category(),1,1);
 }
 
 BOOST_AUTO_TEST_CASE(test_right_bracket_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,1,18);
+    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,jsonpath_error_category(),1,18);
 }
 
 BOOST_AUTO_TEST_CASE(test_dot_dot_dot)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,1,10);
+    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,jsonpath_error_category(),1,10);
 }
 
 BOOST_AUTO_TEST_CASE(test_dot_star_name)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store.*price", jsonpath_parser_errc::expected_separator,1,10);
+    test_error_code(root, "$.store.*price", jsonpath_parser_errc::expected_separator, jsonpath_error_category(),1,10);
 }
+
+BOOST_AUTO_TEST_CASE(test_filter_error)
+{
+    json root = json::parse(jsonpath_fixture::store_text());
+    test_error_code(root, "$..book[?(.price<10)]", json_parser_errc::invalid_json_text,json_error_category(),1,17);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

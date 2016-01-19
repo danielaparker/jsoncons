@@ -718,16 +718,23 @@ public:
 
     basic_json<Char,Alloc> eval(const basic_json<Char,Alloc>& context_node)
     {
-        for (auto it=tokens_.begin(); it != tokens_.end(); ++it)
+        try
         {
-            it->initialize(context_node);
-        }
+            for (auto it=tokens_.begin(); it != tokens_.end(); ++it)
+            {
+                it->initialize(context_node);
+            }
        
-        token_stream<Char,Alloc> ts(tokens_);
-        auto e = expression(ts);
-		basic_json<Char, Alloc> result = e->evaluate_single_node();
+            token_stream<Char,Alloc> ts(tokens_);
+            auto e = expression(ts);
+    		basic_json<Char, Alloc> result = e->evaluate_single_node();
 
-        return result;
+            return result;
+        }
+        catch (const parse_exception& e)
+        {
+            throw parse_exception(e.code(),line_,column_);
+        }
     }
 
     std::shared_ptr<term<Char,Alloc>> primary(token_stream<Char,Alloc>& ts)
@@ -1098,8 +1105,15 @@ public:
                         {
                             if (buffer_.length() > 0)
                             {
-                                auto val = basic_json<Char, Alloc>::parse(buffer_);
-                                tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                                try
+                                {
+                                    auto val = basic_json<Char, Alloc>::parse(buffer_);
+                                    tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                                }
+                                catch (const parse_exception& e)
+                                {
+                                    throw parse_exception(e.code(),line_,column_);
+                                }
                                 buffer_.clear();
                             }
                             state_ = filter_states::oper;
@@ -1108,8 +1122,15 @@ public:
                     case ')':
                         if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse(buffer_);
-                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            try
+                            {
+                                auto val = basic_json<Char,Alloc>::parse(buffer_);
+                                tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            }
+                            catch (const parse_exception& e)
+                            {
+                                throw parse_exception(e.code(),line_,column_);
+                            }
                             buffer_.clear();
                         }
                         tokens_.push_back(token<Char,Alloc>(token_types::right_paren));
@@ -1128,8 +1149,15 @@ public:
                     case ' ':case '\t':
                         if (buffer_.length() > 0)
 						{
-                            auto val = basic_json<Char,Alloc>::parse(buffer_);
-                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            try
+                            {
+                                auto val = basic_json<Char,Alloc>::parse(buffer_);
+                                tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            }
+                            catch (const parse_exception& e)
+                            {
+                                throw parse_exception(e.code(),line_,column_);
+                            }
 							buffer_.clear();
 						}
                         ++p_;
@@ -1180,8 +1208,15 @@ public:
                         buffer_.push_back('\"');
                         //if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse(buffer_);
-                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            try
+                            {
+                                auto val = basic_json<Char,Alloc>::parse(buffer_);
+                                tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            }
+                            catch (const parse_exception& e)
+                            {
+                                throw parse_exception(e.code(),line_,column_);
+                            }
                             buffer_.clear();
                         }
 						state_ = filter_states::expect_path_or_value;
@@ -1232,8 +1267,15 @@ public:
                         buffer_.push_back(*p_);
                         //if (buffer_.length() > 0)
                         {
-                            auto val = basic_json<Char,Alloc>::parse(buffer_);
-                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            try
+                            {
+                                auto val = basic_json<Char,Alloc>::parse(buffer_);
+                                tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            }
+                            catch (const parse_exception& e)
+                            {
+                                throw parse_exception(e.code(),line_,column_);
+                            }
                             buffer_.clear();
                         }
                         state_ = filter_states::expect_path_or_value;
