@@ -178,6 +178,7 @@ public:
     {
         evaluate(root,path,std::char_traits<Char>::length(path));
     }
+
     void evaluate(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
     {
         begin_input_ = path;
@@ -199,7 +200,6 @@ public:
 
         while (p_ < end_input_)
         {
-            Char c = *p_;
             switch (state_)
             {
             case states::cr:
@@ -223,7 +223,7 @@ public:
                 state_ = pre_line_break_state_;
                 break;
             case states::start: 
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -254,7 +254,7 @@ public:
                 ++column_;
                 break;
             case states::dot:
-                switch (c)
+                switch (*p_)
                 {
                 case '.':
                     recursive_descent_ = true;
@@ -268,7 +268,7 @@ public:
                 }
                 break;
             case states::expect_unquoted_name:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -296,7 +296,7 @@ public:
                 }
                 break;
             case states::expect_separator: 
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -324,7 +324,7 @@ public:
                 ++column_;
                 break;
             case states::expect_right_bracket:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -351,7 +351,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket_step:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -366,7 +366,7 @@ public:
                     state_ = states::left_bracket_step2;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = static_cast<size_t>(c-'0');
+                    step_ = static_cast<size_t>(*p_-'0');
                     state_ = states::left_bracket_step2;
                     break;
                 case ']':
@@ -379,7 +379,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket_step2:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -390,7 +390,7 @@ public:
                     state_ = states::lf;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = step_*10 + static_cast<size_t>(c-'0');
+                    step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ']':
                     end_array_slice();
@@ -402,7 +402,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket_end:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -422,7 +422,7 @@ public:
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     end_undefined_ = false;
-                    end_ = static_cast<size_t>(c-'0');
+                    end_ = static_cast<size_t>(*p_-'0');
                     state_ = states::left_bracket_end2;
                     break;
                 case ']':
@@ -435,7 +435,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket_end2:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -451,7 +451,7 @@ public:
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     end_undefined_ = false;
-                    end_ = end_*10 + static_cast<size_t>(c-'0');
+                    end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ']':
                     end_array_slice();
@@ -463,7 +463,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket_start:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -482,7 +482,7 @@ public:
                     find_elements();
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    start_ = start_*10 + static_cast<size_t>(c-'0');
+                    start_ = start_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ']':
                     find_elements();
@@ -494,7 +494,7 @@ public:
                 ++column_;
                 break;
             case states::left_bracket:
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -563,7 +563,7 @@ public:
                     ++column_;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    start_ = static_cast<size_t>(c-'0');
+                    start_ = static_cast<size_t>(*p_-'0');
                     state_ = states::left_bracket_start;
                     ++p_;
                     ++column_;
@@ -587,6 +587,11 @@ public:
                     ++p_;
                     ++column_;
                     break;
+                case '\"':
+                    state_ = states::double_quoted_name;
+                    ++p_;
+                    ++column_;
+                    break;
                 default:
                     ++p_;
                     ++column_;
@@ -594,7 +599,7 @@ public:
                 }
                 break;
             case states::unquoted_name: 
-                switch (c)
+                switch (*p_)
                 {
                 case '\r':
                     pre_line_break_state_ = state_;
@@ -620,22 +625,55 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    buffer_.push_back(c);
+                    buffer_.push_back(*p_);
                     break;
                 };
                 ++p_;
                 ++column_;
                 break;
             case states::single_quoted_name: 
-                switch (c)
+                switch (*p_)
                 {
                 case '\'':
                     find(buffer_);
                     buffer_.clear();
                     state_ = states::expect_right_bracket;
                     break;
+                case '\\':
+                    buffer_.push_back(*p_);
+                    if (p_+1 < end_input_)
+                    {
+                        ++p_;
+                        ++column_;
+                        buffer_.push_back(*p_);
+                    }
+                    break;
                 default:
-                    buffer_.push_back(c);
+                    buffer_.push_back(*p_);
+                    break;
+                };
+                ++p_;
+                ++column_;
+                break;
+            case states::double_quoted_name: 
+                switch (*p_)
+                {
+                case '\"':
+                    find(buffer_);
+                    buffer_.clear();
+                    state_ = states::expect_right_bracket;
+                    break;
+                case '\\':
+                    buffer_.push_back(*p_);
+                    if (p_+1 < end_input_)
+                    {
+                        ++p_;
+                        ++column_;
+                        buffer_.push_back(*p_);
+                    }
+                    break;
+                default:
+                    buffer_.push_back(*p_);
                     break;
                 };
                 ++p_;
