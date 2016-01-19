@@ -82,6 +82,22 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book2)
     BOOST_CHECK_EQUAL(expected,result);
     //    std::c/out << pretty_print(result) << std::endl;
 }
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_bracket_with_double_quotes)
+{
+    jsonpath_fixture fixture;
+
+    json root = json::parse(jsonpath_fixture::store_text());
+
+    json result = json_query(root,"$[\"store\"][\"book\"]");
+
+    json expected = json::array();
+    expected.add(fixture.book());
+
+    BOOST_CHECK_EQUAL(expected,result);
+    //    std::c/out << pretty_print(result) << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle)
 {
     jsonpath_fixture fixture;

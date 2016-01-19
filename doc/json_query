@@ -495,12 +495,17 @@ basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; 
 <pre><code>$.store.book.0.title
 </code></pre>
 
-<p>or the bracket–notation</p>
+<p>or the bracket–notation </p>
 
 <pre><code>$['store']['book'][0]['title']
 </code></pre>
 
-<p>Note that only single quotes (not double quotes) are allowed inside of JSONPath expressions.</p>
+<p>or </p>
+
+<pre><code>$["store"]["book"][0]["title"]
+</code></pre>
+
+<p>Note that Stefan Goessner's original implementation only supports single quotes inside of JSONPath expressions, the jsoncons implementation supports both single quotes and double quotes.</p>
 
 <table>
 <thead>

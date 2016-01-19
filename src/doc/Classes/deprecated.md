@@ -41,9 +41,9 @@ class json_reader|read()|<em>&#x2713;</em>|Use read_next()
     |max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
     |max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const
     |json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
-json_input_handler class|do_longlong_value(|value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)
-    |do_ulonglong_value(|value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
-json_output_handler class|do_longlong_value(|value)||Removed, override do_integer_value(int64_t value)
-    |do_ulonglong_value(|value)||Override do_uinteger_value(uint64_t value)
+json_input_handler class|do_longlong_value(long long value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)
+    |do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
+json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)
+    |do_ulonglong_value(unsigned long long value)||Override do_uinteger_value(uint64_t value)
 
 
