@@ -32,7 +32,8 @@ namespace filter_states {
         expect_path_or_value,
         expect_regex,
         regex,
-        quoted_text,
+        single_quoted_text,
+        double_quoted_text,
         unquoted_text,
         path,
         value,
@@ -1142,7 +1143,7 @@ public:
                     }
                 }
                 break;
-            case filter_states::quoted_text: 
+            case filter_states::single_quoted_text: 
                 {
                     switch (*p_)
                     {                   
@@ -1166,6 +1167,15 @@ public:
                         column_ = 1;
                         state_ = pre_line_break_state_;
                         break;
+                    case '\\':
+                        buffer_.push_back(*p_);
+                        if (p_+1 < end_input_)
+                        {
+                            ++p_;
+                            ++column_;
+                            buffer_.push_back(*p_);
+                        }
+                        break;
                     case '\'':
                         buffer_.push_back('\"');
                         //if (buffer_.length() > 0)
@@ -1175,6 +1185,58 @@ public:
                             buffer_.clear();
                         }
 						state_ = filter_states::expect_path_or_value;
+                        break;
+
+                    default: 
+                        buffer_.push_back(*p_);
+                        break;
+                    }
+                }
+                ++p_;
+                ++column_;
+                break;
+            case filter_states::double_quoted_text: 
+                {
+                    switch (*p_)
+                    {                   
+                    case filter_states::cr:
+                        ++line_;
+                        column_ = 1;
+                        switch (*p_)
+                        {
+                        case '\n':
+                            state_ = pre_line_break_state_;
+                            ++p_;
+                            ++column_;
+                            break;
+                        default:
+                            state_ = pre_line_break_state_;
+                            break;
+                        }
+                        break;
+                    case filter_states::lf:
+                        ++line_;
+                        column_ = 1;
+                        state_ = pre_line_break_state_;
+                        break;
+                    case '\\':
+                        buffer_.push_back(*p_);
+                        if (p_+1 < end_input_)
+                        {
+                            ++p_;
+                            ++column_;
+                            buffer_.push_back(*p_);
+                        }
+                        break;
+                    case '\"':
+                        buffer_.push_back(*p_);
+                        //if (buffer_.length() > 0)
+                        {
+                            auto val = basic_json<Char,Alloc>::parse(buffer_);
+                            tokens_.push_back(token<Char,Alloc>(token_types::term,std::make_shared<value_term<Char, Alloc>>(val)));
+                            buffer_.clear();
+                        }
+                        state_ = filter_states::expect_path_or_value;
                         break;
 
                     default: 
@@ -1231,7 +1293,13 @@ public:
 					break;
                 case '\'':
                     buffer_.push_back('\"');
-                    state_ = filter_states::quoted_text;
+                    state_ = filter_states::single_quoted_text;
+                    ++p_;
+                    ++column_;
+                    break;
+                case '\"':
+                    buffer_.push_back(*p_);
+                    state_ = filter_states::double_quoted_text;
                     ++p_;
                     ++column_;
                     break;
