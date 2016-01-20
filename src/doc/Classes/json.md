@@ -361,8 +361,26 @@ Exchanges the values of `a` and `b`
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names.
 
-### Examples
+## Examples
 
+### Range-based for loop over members of an object
+
+    json book = json::parse(R"(
+    {
+        "category" : "Fiction",
+        "title" : "Pulp",
+        "author" : "Charles Bukowski",
+        "date" : "2004-07-08",
+        "price" : 22.48,
+        "isbn" : "1852272007"  
+    }
+    )");
+
+    for (auto member: book.members())
+    {
+        std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
+    } 
+    
 ### Accessors and defaults
 
     json obj;

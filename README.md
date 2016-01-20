@@ -120,14 +120,14 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
-		std::cout << book["title"].as<std::string>()
-			<< ","
-			<< book["price"].as<double>() << std::endl;
-	}
-	
-	// Serialize the booklist to a file
-	std::ofstream os("booklist.json");
-	os << pretty_print(booklist);
+	std::cout << book["title"].as<std::string>()
+		  << ","
+		  << book["price"].as<double>() << std::endl;
+    }
+
+    // Serialize the booklist to a file
+    std::ofstream os("booklist.json");
+    os << pretty_print(booklist);
 
 The JSON output `booklist.json`
 

@@ -307,6 +307,7 @@ public:
                 value_.object_ = new json_object<basic_json<Char,Alloc>,Alloc>(*(var.value_.object_));
                 break;
             case value_types::any_t:
+                //value_.any_value_ = new any(*(var.value_.any_value_));
                 value_.any_value_ = new any(*(var.value_.any_value_));
                 break;
             default:
