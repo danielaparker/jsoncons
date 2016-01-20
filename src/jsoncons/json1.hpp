@@ -197,6 +197,55 @@ public:
             return *this;
         }
 
+        void destroy_array(array* p)
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
+            alloc.deallocate(p,1);
+        }
+
+        array* create_array()
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            array* p = alloc.allocate(1);
+            std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p);
+            return p;
+        }
+
+        array* create_array(const array& val)
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            array* p = alloc.allocate(1);
+            //alloc.construct(value_.array_,*(var.value_.array_));
+            std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val);
+            return p;
+        }
+
+        array* create_array(array&& val)
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            array* p = alloc.allocate(1);
+            std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val));
+            return p;
+        }
+
+        array* create_array(size_t size)
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            array* p = alloc.allocate(1);
+            std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, size);
+            return p;
+        }
+
+        template<class InputIterator>
+        array* create_array(InputIterator first, InputIterator last)
+        {
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            array* p = alloc.allocate(1);
+            std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, first, last);
+            return p;
+        }
+
         struct string_data
         {
 			const Char* c_str() const { return p; }
@@ -303,13 +352,7 @@ public:
                 value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
                 break;
             case value_types::array_t:
-                {
-                    std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
-                    value_.array_ = alloc.allocate(1);
-                    //alloc.construct(value_.array_,*(var.value_.array_));
-                    std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, value_.array_, *(var.value_.array_));
-                    //value_.array_ = new json_array<basic_json<Char, Alloc>, Alloc>(*(var.value_.array_));
-                }
+                value_.array_ = create_array(*(var.value_.array_));
                 break;
             case value_types::object_t:
                 value_.object_ = new json_object<basic_json<Char,Alloc>,Alloc>(*(var.value_.object_));
@@ -339,13 +382,13 @@ public:
         variant(const Alloc& a, const json_array<basic_json<Char,Alloc>,Alloc>& val)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(val);
+            value_.array_ = create_array(val);
         }
 
         variant(const Alloc& a, json_array<basic_json<Char,Alloc>,Alloc>&& val)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(std::move(val));
+            value_.array_ = create_array(std::move(val));
         }
 
         variant(const Alloc& a, value_types::value_types_t type, size_t size)
@@ -371,7 +414,7 @@ public:
                 value_.string_value_ = make_string_data();
                 break;
             case value_types::array_t:
-                value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(size);
+                value_.array_ = create_array(size);
                 break;
             case value_types::object_t:
                 value_.object_ = new json_object<basic_json<Char,Alloc>,Alloc>();
@@ -476,7 +519,7 @@ public:
         variant(const Alloc& a, InputIterator first, InputIterator last)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(first, last);
+            value_.array_ = create_array(first, last);
         }
 
         ~variant()
@@ -487,7 +530,7 @@ public:
                 destroy_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
-                delete value_.array_;
+                destroy_array(value_.array_);
                 break;
             case value_types::object_t:
                 delete value_.object_;
@@ -508,7 +551,7 @@ public:
                 destroy_string_data(value_.string_value_);
                 break;
             case value_types::array_t:
-                delete value_.array_;
+                destroy_array(value_.array_);
                 break;
             case value_types::object_t:
                 delete value_.object_;
@@ -597,7 +640,7 @@ public:
         {
             destroy();
             type_ = value_types::array_t;
-            value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(val);
+            value_.array_ = create_array(val);
         }
 
         void assign(json_array<basic_json<Char,Alloc>,Alloc>&& val)
@@ -610,7 +653,7 @@ public:
 			default:
 				destroy();
 				type_ = value_types::array_t;
-				value_.array_ = new json_array<basic_json<Char,Alloc>,Alloc>(std::move(val));
+				value_.array_ = create_array(std::move(val));
 				break;
 			}
 		}
