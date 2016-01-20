@@ -185,6 +185,11 @@ public:
         any_handle* impl_;
     };
 
+    Alloc& get_allocator()
+    {
+        return var_.get_allocator();
+    }
+
     struct variant : public Alloc
     {
         Alloc& get_allocator()
@@ -298,10 +303,13 @@ public:
                 value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
                 break;
             case value_types::array_t:
-            {
-                std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
-                value_.array_ = new json_array<basic_json<Char, Alloc>, Alloc>(*(var.value_.array_));
-            }
+                {
+                    std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+                    value_.array_ = alloc.allocate(1);
+                    //alloc.construct(value_.array_,*(var.value_.array_));
+                    std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, value_.array_, *(var.value_.array_));
+                    //value_.array_ = new json_array<basic_json<Char, Alloc>, Alloc>(*(var.value_.array_));
+                }
                 break;
             case value_types::object_t:
                 value_.object_ = new json_object<basic_json<Char,Alloc>,Alloc>(*(var.value_.object_));
