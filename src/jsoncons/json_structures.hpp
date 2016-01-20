@@ -286,16 +286,17 @@ public:
     typedef typename std::vector<value_type>::const_iterator const_iterator;
 public:
     json_object(const Alloc& allocator = Alloc())
+        : members_(allocator)
     {
     }
 
     json_object(const json_object& val, const Alloc& allocator = Alloc())
-        : members_(val.members_)
+        : members_(val.members_,allocator)
     {
     }
 
     json_object(json_object&& val,const Alloc& allocator = Alloc())
-        : members_(std::move(val.members_))
+        : members_(std::move(val.members_),allocator)
     {
     }
     iterator begin()

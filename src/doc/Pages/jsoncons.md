@@ -338,9 +338,7 @@ The library includes an instantiation for wide characters as well,
 
     typedef basic_json<wchar_t,std::allocator<void>> wjson
 
-Note that the allocator type allows you to supply a custom allocator for dynamically allocated, 
-fixed size small objects in the json container, the container rebinds it as necessay. 
-For instance, you can use the boost `fast_pool_allocator`:
+Note that the allocator type allows you to supply a custom allocator. For instance, you can use the boost `fast_pool_allocator`:
 
     #include <boost/pool/pool_alloc.hpp>
     #include "jsoncons/json.hpp"
