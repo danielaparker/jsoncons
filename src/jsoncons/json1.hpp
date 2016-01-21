@@ -70,8 +70,12 @@ string_data<Char>* make_string_data(const Alloc& allocator)
     typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
     size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
 
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
     char* storage = alloc.allocate(mem_size);
+#else
+    char* storage = new char[mem_size];
+#endif
 
     string_data<Char>* ps = new(storage)string_data<Char>();
     auto psa = reinterpret_cast<string_dataA<Char>*>(storage); 
@@ -465,7 +469,7 @@ public:
             }
             return p;
 #else
-            return new array(first,last);
+            return new object(val);
 #endif
         }
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(Char)) - 1;

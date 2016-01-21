@@ -40,12 +40,12 @@ public:
     }
 
     json_array(const json_array& val,const Alloc& allocator = Alloc())
-        : elements_(val.elements_,allocator)
+        : elements_(val.elements_)
     {
     }
 
     json_array(json_array&& val, const Alloc& allocator = Alloc())
-        : elements_(std::move(val.elements_),allocator)
+        : elements_(std::move(val.elements_))
     {
     }
 
@@ -273,8 +273,6 @@ private:
 template <class JsonT,typename Alloc>
 class json_object
 {
-private:
-    std::vector<json_object_member<JsonT,Alloc>,Alloc> members_;
     json_object<JsonT,Alloc>& operator=(const json_object<JsonT,Alloc>&);
 public:
     typedef json_object_member<JsonT,Alloc> value_type;
@@ -282,21 +280,23 @@ public:
     typedef Alloc allocator_type;
     typedef value_type& reference; 
     typedef const value_type& const_reference; 
-    typedef typename std::vector<value_type>::iterator iterator;
-    typedef typename std::vector<value_type>::const_iterator const_iterator;
+    typedef typename std::vector<value_type,Alloc>::iterator iterator;
+    typedef typename std::vector<value_type,Alloc>::const_iterator const_iterator;
+private:
+    std::vector<value_type,Alloc> members_;
 public:
     json_object(const Alloc& allocator = Alloc())
         : members_(allocator)
     {
     }
 
-    json_object(const json_object& val, const Alloc& allocator = Alloc())
-        : members_(val.members_,allocator)
+    json_object(const json_object<JsonT,Alloc>& val, const Alloc& allocator = Alloc())
+        : members_(val.members_)
     {
     }
 
     json_object(json_object&& val,const Alloc& allocator = Alloc())
-        : members_(std::move(val.members_),allocator)
+        : members_(std::move(val.members_))
     {
     }
     iterator begin()
