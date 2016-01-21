@@ -33,6 +33,91 @@
 
 namespace jsoncons {
 
+template <typename Char>
+struct string_data
+{
+	const Char* c_str() const { return p_; }
+	size_t length() const { return length_; }
+
+	bool operator==(const string_data& rhs) const
+	{
+		return length() == rhs.length() ? std::char_traits<Char>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
+	}
+
+    string_data()
+        : p_(nullptr), length_(0)
+    {
+    }
+
+    Char* p_;
+	size_t length_;
+private:
+	string_data(const string_data&);
+	string_data& operator=(const string_data&);
+};
+
+template <typename Char>
+struct string_dataA
+{
+	string_data<Char> data;
+	Char c[1];
+};
+
+template <typename Char, class Alloc>
+string_data<Char>* make_string_data(const Alloc& allocator)
+{
+    size_t length = 0;
+    typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
+    size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
+
+    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    char* storage = alloc.allocate(mem_size);
+
+    string_data<Char>* ps = new(storage)string_data<Char>();
+    auto psa = reinterpret_cast<string_dataA<Char>*>(storage); 
+
+    ps->p_ = new(&psa->c)Char[length + 1];
+    ps->p_[length] = 0;
+    ps->length_ = length;
+    return ps;
+}
+
+template <typename Char, class Alloc>
+string_data<Char>* make_string_data(const Char* s, size_t length, const Alloc& allocator)
+{
+    typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
+    size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
+
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    char* storage = alloc.allocate(mem_size);
+#else
+    char* storage = new char[mem_size];
+#endif
+
+    string_data<Char>* ps = new(storage)string_data<Char>();
+    auto psa = reinterpret_cast<string_dataA<Char>*>(storage); 
+
+    ps->p_ = new(&psa->c)Char[length + 1];
+    memcpy(ps->p_, s, length*sizeof(Char));
+    ps->p_[length] = 0;
+    ps->length_ = length;
+    return ps;
+}
+
+template <typename Char, class Alloc>
+void destroy_string_data(string_data<Char>* p, const Alloc& allocator)
+{
+    typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
+    size_t mem_size = sizeof(storage_type) + p->length_*sizeof(Char);
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
+#else
+    ::operator delete(reinterpret_cast<void*>(p));
+#endif
+}
+
 template <typename Char,class T> inline
 void serialize(basic_json_output_handler<Char>& os, const T&)
 {
@@ -199,20 +284,29 @@ public:
 
         void delete_array(array* p)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
             alloc.deallocate(p,1);
-        }
+#else
+            delete p;
+#endif
+       }
 
         void delete_object(object* p)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
             std::allocator_traits<Alloc>::rebind_traits<object>::destroy(alloc, p);
             alloc.deallocate(p,1);
+#else
+            delete p;
+#endif
         }
 
         array* create_array()
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             array* p = alloc.allocate(1);
             try
@@ -225,10 +319,14 @@ public:
                 throw;
             }
             return p;
+#else
+            return new array();
+#endif
         }
 
         array* create_array(const array& val)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             array* p = alloc.allocate(1);
             //alloc.construct(value_.array_value_,*(var.value_.array_value_));
@@ -242,10 +340,14 @@ public:
                 throw;
             }
             return p;
+#else
+            return new array(val);
+#endif
         }
 
         array* create_array(array&& val)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             array* p = alloc.allocate(1);
             try
@@ -258,10 +360,14 @@ public:
                 throw;
             }
             return p;
+#else
+            return new array(std::move(val));
+#endif
         }
 
         array* create_array(size_t size)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             array* p = alloc.allocate(1);
             try
@@ -274,11 +380,15 @@ public:
                 throw;
             }
             return p;
+#else
+            return new array(size);
+#endif
         }
 
         template<class InputIterator>
         array* create_array(InputIterator first, InputIterator last)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             array* p = alloc.allocate(1);
             try
@@ -292,10 +402,14 @@ public:
             }
 
             return p;
+#else
+            return new array(first,last);
+#endif
         }
 
         object* create_object()
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
             object* p = alloc.allocate(1);
             try
@@ -308,10 +422,14 @@ public:
                 throw;
             }
             return p;
-        }
+#else
+            return new object();
+#endif
+       }
 
         object* create_object(const object& val)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
             object* p = alloc.allocate(1);
 
@@ -326,10 +444,14 @@ public:
                 throw;
             }
             return p;
+#else
+            return new object(val);
+#endif
         }
 
         object* create_object(object&& val)
         {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
             object* p = alloc.allocate(1);
             try
@@ -342,79 +464,10 @@ public:
                 throw;
             }
             return p;
+#else
+            return new array(first,last);
+#endif
         }
-
-        struct string_data
-        {
-			const Char* c_str() const { return p; }
-			size_t length() const { return length_; }
-
-			bool operator==(const string_data& rhs) const
-			{
-				return length() == rhs.length() ? std::char_traits<Char>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
-			}
-
-            string_data()
-				: p(nullptr), length_(0)
-			{
-			}
-			Char* p;
-			size_t length_;
-        private:
-			string_data(const string_data&);
-			string_data& operator=(const string_data&);
-        };
-
-        struct string_dataA
-        {
-        	string_data data;
-        	Char c[1];
-        };
-
-        string_data* make_string_data()
-        {
-            size_t length = 0;
-            typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
-            size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
-
-            std::allocator_traits<Alloc>::rebind_alloc<char> alloc(get_allocator());
-            char* storage = alloc.allocate(mem_size);
-
-            string_data* ps = new(storage)string_data();
-            auto psa = reinterpret_cast<string_dataA*>(storage); 
-
-            ps->p = new(&psa->c)Char[length + 1];
-            ps->p[length] = 0;
-            ps->length_ = length;
-            return ps;
-        }
-
-        string_data* make_string_data(const Char* s, size_t length)
-        {
-            typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
-            size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
-
-            std::allocator_traits<Alloc>::rebind_alloc<char> alloc(get_allocator());
-            char* storage = alloc.allocate(mem_size);
-
-            string_data* ps = new(storage)string_data();
-            auto psa = reinterpret_cast<string_dataA*>(storage); 
-
-            ps->p = new(&psa->c)Char[length + 1];
-            memcpy(ps->p, s, length*sizeof(Char));
-            ps->p[length] = 0;
-            ps->length_ = length;
-            return ps;
-        }
-
-        void destroy_string_data(string_data* p)
-        {
-            typedef typename std::aligned_storage<sizeof(string_dataA), JSONCONS_ALIGNOF(string_dataA)>::type storage_type;
-            std::allocator_traits<Alloc>::rebind_alloc<char> alloc(get_allocator());
-            size_t mem_size = sizeof(storage_type) + p->length_*sizeof(Char);
-            alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
-        }
-
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(Char)) - 1;
 
         variant(const Alloc& a)
@@ -454,7 +507,7 @@ public:
                 value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length());
+                value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
                 break;
             case value_types::array_t:
                 value_.array_value_ = create_array(*(var.value_.array_value_));
@@ -515,7 +568,7 @@ public:
                 small_string_length_ = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_data();
+                value_.string_value_ = make_string_data<Char>(get_allocator());
                 break;
             case value_types::array_t:
                 value_.array_value_ = create_array(size);
@@ -573,7 +626,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s.c_str(),s.length());
+                value_.string_value_ = make_string_data(s.c_str(),s.length(),get_allocator());
             }
             else
             {
@@ -591,7 +644,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s,std::char_traits<Char>::length(s));
+                value_.string_value_ = make_string_data(s,std::char_traits<Char>::length(s),get_allocator());
             }
             else
             {
@@ -608,7 +661,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s,length);
+                value_.string_value_ = make_string_data(s,length,get_allocator());
             }
             else
             {
@@ -636,7 +689,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                destroy_string_data(value_.string_value_);
+                destroy_string_data(value_.string_value_,get_allocator());
                 break;
             case value_types::array_t:
                 delete_array(value_.array_value_);
@@ -760,7 +813,7 @@ public:
                 if (s.length() > variant::small_string_capacity)
                 {
                     type_ = value_types::string_t;
-                    value_.string_value_ = make_string_data(s.c_str(),s.length());
+                    value_.string_value_ = make_string_data(s.c_str(),s.length(),get_allocator());
                 }
                 else
                 {
@@ -791,7 +844,7 @@ public:
 					if (length > variant::small_string_capacity)
 					{
 						type_ = value_types::string_t;
-						value_.string_value_ = make_string_data(s,length);
+						value_.string_value_ = make_string_data(s,length,get_allocator());
 					}
 					else
 					{
@@ -1069,7 +1122,7 @@ public:
             object* object_value_;
             array* array_value_;
             any* any_value_;
-            string_data* string_value_;
+            string_data<Char>* string_value_;
             Char small_string_value_[sizeof(int64_t)/sizeof(Char)];
         } value_;
     };

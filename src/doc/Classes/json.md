@@ -377,6 +377,27 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     {
         std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
     } 
+
+### Range-based for loop over elements of an array
+
+    json books = json::make_array(3);
+
+    books[0]["category"] = "Fiction";
+    books[0]["title"] = "A Wild Sheep Chase: A Novel";
+    books[0]["author"] = "Haruki Murakami";
+
+    books[1]["category"] = "History";
+    books[1]["title"] = "Charlie Wilson's War";
+    books[1]["author"] = "George Crile";
+
+    books[2]["category"] = "Fiction";
+    books[2]["title"] = "Kafka on the Shore";
+    books[2]["author"] = "Haruki Murakami";
+
+    for (auto book: books.elements())
+    {
+        std::cout << book["title"].as<std::string>() << std::end;
+    } 
     
 ### Accessors and defaults
 

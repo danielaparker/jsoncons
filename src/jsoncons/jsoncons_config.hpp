@@ -27,6 +27,12 @@ namespace jsoncons
 
 // Follow boost
 
+#if defined(_MSC_VER)
+#if _MSC_VER < 1800
+JSONCONS_NO_CXX11_ALLOCATOR
+#endif
+#endif
+
 #if defined (__clang__)
 #if defined(_GLIBCXX_USE_NOEXCEPT)
 #define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
