@@ -293,7 +293,9 @@ public:
             std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
             alloc.deallocate(p,1);
 #else
-            delete p;
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            alloc.deallocate(p,1);
+            //delete p;
 #endif
        }
 
