@@ -64,7 +64,7 @@ struct string_dataA
 };
 
 template <typename Char, class Alloc>
-string_data<Char>* make_string_data(const Alloc& allocator)
+string_data<Char>* create_string_data(const Alloc& allocator)
 {
     size_t length = 0;
     typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
@@ -87,7 +87,7 @@ string_data<Char>* make_string_data(const Alloc& allocator)
 }
 
 template <typename Char, class Alloc>
-string_data<Char>* make_string_data(const Char* s, size_t length, const Alloc& allocator)
+string_data<Char>* create_string_data(const Char* s, size_t length, const Alloc& allocator)
 {
     typedef typename std::aligned_storage<sizeof(string_dataA<Char>), JSONCONS_ALIGNOF(string_dataA<Char>)>::type storage_type;
     size_t mem_size = sizeof(storage_type) + length*sizeof(Char);
@@ -289,13 +289,12 @@ public:
         void delete_array(array* p)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
             alloc.deallocate(p,1);
 #else
             typename Alloc:: template rebind<array>::other alloc(*this);
-            alloc.deallocate(p,1);
-            //delete p;
+            delete p;
 #endif
        }
 
@@ -326,19 +325,7 @@ public:
             }
             return p;
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
-            array* p = alloc.allocate(1);
-            try
-            {
-                alloc.construct(p, get_allocator());
-            }
-            catch (...)
-            {
-                alloc.deallocate(p,1);
-                throw;
-            }
-            return p;
-            //return new array(get_allocator());
+            return new array(get_allocator());
 #endif
         }
 
@@ -363,22 +350,11 @@ public:
             }
             return p;
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
-            array* p = alloc.allocate(1);
-            try
-            {
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-                alloc.construct(p, val, get_allocator());
+            return new array(val, get_allocator());
 #else
-                alloc.construct(p, val);
+            return new array(val);
 #endif
-            }
-            catch (...)
-            {
-                alloc.deallocate(p,1);
-                throw;
-            }
-            return p;
 #endif
         }
 
@@ -402,22 +378,11 @@ public:
             }
             return p;
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
-            array* p = alloc.allocate(1);
-            try
-            {
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-                alloc.construct(p, std::move(val), get_allocator());
+            return new array(std::move(val), get_allocator());
 #else
-                alloc.construct(p, std::move(val));
+            return new array(std::move(val));
 #endif
-            }
-            catch (...)
-            {
-                alloc.deallocate(p,1);
-                throw;
-            }
-            return p;
 #endif
         }
 
@@ -437,18 +402,7 @@ public:
             }
             return p;
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
-            array* p = alloc.allocate(1);
-            try
-            {
-                alloc.construct(p, size, get_allocator());
-            }
-            catch (...)
-            {
-                alloc.deallocate(p,1);
-                throw;
-            }
-            return p;
+            return new array(size,get_allocator());
 #endif
         }
 
@@ -470,18 +424,7 @@ public:
 
             return p;
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
-            array* p = alloc.allocate(1);
-            try
-            {
-                alloc.construct(p, first, last, get_allocator());
-            }
-            catch (...)
-            {
-                alloc.deallocate(p,1);
-                throw;
-            }
-            return p;
+            return new array(first,last,get_allocator());
 #endif
         }
 
@@ -601,7 +544,7 @@ public:
                 value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
+                value_.string_value_ = create_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
                 break;
             case value_types::array_t:
                 value_.array_value_ = create_array(*(var.value_.array_value_));
@@ -662,7 +605,7 @@ public:
                 small_string_length_ = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = make_string_data<Char>(get_allocator());
+                value_.string_value_ = create_string_data<Char>(get_allocator());
                 break;
             case value_types::array_t:
                 value_.array_value_ = create_array(size);
@@ -720,7 +663,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s.c_str(),s.length(),get_allocator());
+                value_.string_value_ = create_string_data(s.c_str(),s.length(),get_allocator());
             }
             else
             {
@@ -738,7 +681,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s,std::char_traits<Char>::length(s),get_allocator());
+                value_.string_value_ = create_string_data(s,std::char_traits<Char>::length(s),get_allocator());
             }
             else
             {
@@ -755,7 +698,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = make_string_data(s,length,get_allocator());
+                value_.string_value_ = create_string_data(s,length,get_allocator());
             }
             else
             {
@@ -907,7 +850,7 @@ public:
                 if (s.length() > variant::small_string_capacity)
                 {
                     type_ = value_types::string_t;
-                    value_.string_value_ = make_string_data(s.c_str(),s.length(),get_allocator());
+                    value_.string_value_ = create_string_data(s.c_str(),s.length(),get_allocator());
                 }
                 else
                 {
@@ -938,7 +881,7 @@ public:
 					if (length > variant::small_string_capacity)
 					{
 						type_ = value_types::string_t;
-						value_.string_value_ = make_string_data(s,length,get_allocator());
+						value_.string_value_ = create_string_data(s,length,get_allocator());
 					}
 					else
 					{
@@ -2066,7 +2009,7 @@ public:
             return object_key_proxy(*this, name);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long long");
             break;
         }
     }
@@ -2318,7 +2261,7 @@ public:
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long long");
         }
     }
 
@@ -2335,7 +2278,7 @@ public:
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a unsigned long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a unsigned long long");
         }
     }
 
@@ -2352,7 +2295,7 @@ public:
         case value_types::null_t:
             return std::numeric_limits<double>::quiet_NaN();
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not a double");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
         }
     }
 
@@ -2408,7 +2351,7 @@ public:
             return var_.value_.object_value_->at(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2423,7 +2366,7 @@ public:
             return var_.value_.object_value_->at(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2439,7 +2382,7 @@ public:
             }
             return var_.value_.array_value_->at(i);
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Index on non-array value not supported");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
     }
 
@@ -2454,7 +2397,7 @@ public:
             }
             return var_.value_.array_value_->at(i);
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Index on non-array value not supported");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
     }
 
@@ -2468,7 +2411,7 @@ public:
             return var_.value_.object_value_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2483,7 +2426,7 @@ public:
             return var_.value_.object_value_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2498,7 +2441,7 @@ public:
             return var_.value_.object_value_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2513,7 +2456,7 @@ public:
             return var_.value_.object_value_->find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
             }
         }
     }
@@ -2538,7 +2481,7 @@ public:
             var_.value_.object_value_->erase(first, last);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
             break;
         }
     }
@@ -2551,7 +2494,7 @@ public:
             var_.value_.array_value_->erase(first, last);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
             break;
         }
     }
@@ -2566,7 +2509,7 @@ public:
             var_.value_.object_value_->remove(name);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
             break;
         }
     }
@@ -2610,7 +2553,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
             }
         }
     }
@@ -2625,7 +2568,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2640,7 +2583,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2655,7 +2598,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2672,7 +2615,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
             }
         }
     }
@@ -2687,7 +2630,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2702,7 +2645,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2717,7 +2660,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::domain_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
@@ -2731,7 +2674,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2743,7 +2686,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2757,7 +2700,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2769,7 +2712,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2783,7 +2726,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2795,7 +2738,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION(std::domain_error,"Attempting to insert into a value that is not an array");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
             }
         }
     }
@@ -2951,7 +2894,7 @@ public:
         case value_types::object_t:
             return object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
         }
     }
 
@@ -2965,7 +2908,7 @@ public:
         case value_types::object_t:
             return const_object_range(object_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an object");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
         }
     }
 
@@ -2976,7 +2919,7 @@ public:
         case value_types::array_t:
             return array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
         }
     }
 
@@ -2987,7 +2930,7 @@ public:
         case value_types::array_t:
             return const_array_range(array_value());
         default:
-            JSONCONS_THROW_EXCEPTION(std::domain_error,"Not an array");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
         }
     }
 

@@ -30,18 +30,18 @@ BOOST_AUTO_TEST_CASE(test_object_at)
     BOOST_REQUIRE_THROW(static_cast<const json&>(a).at("key2"), std::out_of_range);
 
     json b = json::array();
-    BOOST_REQUIRE_THROW(b.at("key1"), std::domain_error);
-    BOOST_REQUIRE_THROW(static_cast<const json&>(b).at("key1"), std::domain_error);
+    BOOST_REQUIRE_THROW(b.at("key1"), std::runtime_error);
+    BOOST_REQUIRE_THROW(static_cast<const json&>(b).at("key1"), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_object_find)
 {
     json b = json::array();
     b.resize(3);
-    BOOST_REQUIRE_THROW(b.find("key1"), std::domain_error);
-    BOOST_REQUIRE_THROW(static_cast<const json&>(b).find("key1"), std::domain_error);
-    BOOST_REQUIRE_THROW(b.find(std::string("key1")), std::domain_error);
-    BOOST_REQUIRE_THROW(static_cast<const json&>(b).find(std::string("key1")), std::domain_error);
+    BOOST_REQUIRE_THROW(b.find("key1"), std::runtime_error);
+    BOOST_REQUIRE_THROW(static_cast<const json&>(b).find("key1"), std::runtime_error);
+    BOOST_REQUIRE_THROW(b.find(std::string("key1")), std::runtime_error);
+    BOOST_REQUIRE_THROW(static_cast<const json&>(b).find(std::string("key1")), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_array_at)
@@ -56,35 +56,35 @@ BOOST_AUTO_TEST_CASE(test_array_at)
 
     json b;
     b["key1"] = "value1";
-    BOOST_REQUIRE_THROW(b.at(0), std::domain_error);
-    BOOST_REQUIRE_THROW(static_cast<const json&>(b).at(0), std::domain_error);
+    BOOST_REQUIRE_THROW(b.at(0), std::runtime_error);
+    BOOST_REQUIRE_THROW(static_cast<const json&>(b).at(0), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_object_set)
 {
     json b = json::array();
     b.resize(3);
-    BOOST_REQUIRE_THROW(b.set("key1","value1"), std::domain_error);
+    BOOST_REQUIRE_THROW(b.set("key1","value1"), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_array_add)
 {
     json b;
     b["key1"] = "value1";
-    BOOST_REQUIRE_THROW(b.add(0), std::domain_error);
+    BOOST_REQUIRE_THROW(b.add(0), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_object_index)
 {
     json b = json::array();
-    BOOST_REQUIRE_THROW(b["key1"], std::domain_error);
+    BOOST_REQUIRE_THROW(b["key1"], std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_array_index)
 {
     json b;
     b["key1"] = "value1";
-    BOOST_REQUIRE_THROW(b[0], std::domain_error);
+    BOOST_REQUIRE_THROW(b[0], std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

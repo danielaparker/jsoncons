@@ -100,12 +100,12 @@ Assigns a new value to a `json` variable, replacing it's current contents.
     object_range members();  
     const_object_range members() const;  
 Returns a "range" defined by `begin()` and `end()` over the members of a `json` object      
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     array_range elements();
     const_array_range elements() const;
 Returns a "range" defined by `begin()` and `end()` over the elements of a `json` array      
-Throws `std::domain_error` if not an array.
+Throws `std::runtime_error` if not an array.
 
 ### Capacity
 
@@ -189,33 +189,33 @@ Non-generic versions of `is_` methods
     json& operator[](size_t i)
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     json& operator[](const std::string& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     object_iterator find(const std::string& name)
     object_iterator find(const char* name)
     const_object_iterator find(const std::string& name) const
     const_object_iterator find(const char* name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     json& at(const std::string& name)
     const json& at(const std::string& name) const
 Returns a reference to the value with the specifed name in a json object.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
     json& at(size_t i)
     const json& at(size_t i) const
 Returns a reference to the element at index `i` in a json array.  
-Throws `std::domain_error` if not an array.
+Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <typename T>
@@ -270,22 +270,22 @@ Remove all elements from an array or object value, otherwise do nothing
 
     void erase(array_iterator first, array_iterator last)
 Remove the elements from an array in the range '[first,last)'.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     void erase(object_iterator first, object_iterator last)
 Remove the members from an object in the range '[first,last)'.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     void erase(const std::string& name)
 Remove a member with the specified name from an object
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     void set(const std::string& name, const json& val)
     void set(std::string&& name, const json& val)
     void set(const std::string& name, json&& val)
     void set(std::string&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     object_iterator set(object_iterator hint, const std::string& name, const json& val)
     object_iterator set(object_iterator hint, std::string&& name, const json& val)
@@ -294,18 +294,18 @@ Throws `std::domain_error` if not an object.
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_terator` pointing at the member that was inserted or updated
-Throws `std::domain_error` if not an object.
+Throws `std::runtime_error` if not an object.
 
     void add(const json& val)
     void add(json&& val)
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
-Throws `std::domain_error` if not an array.
+Throws `std::runtime_error` if not an array.
 
     void add(array_iterator pos, const json& val)
     void add(array_iterator pos, json&& val)
 Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The content of `val` is copied (or moved) to the new element.
-Throws `std::domain_error` if not an array.
+Throws `std::runtime_error` if not an array.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
