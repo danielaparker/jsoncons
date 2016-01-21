@@ -324,7 +324,7 @@ public:
             }
             return p;
 #else
-            return new array();
+            return new array(get_allocator());
 #endif
         }
 
@@ -336,7 +336,7 @@ public:
             //alloc.construct(value_.array_value_,*(var.value_.array_value_));
             try
             {
-                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val, get_allocator());
+                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val);
             }
             catch (...)
             {
@@ -356,7 +356,7 @@ public:
             array* p = alloc.allocate(1);
             try
             {
-                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val), get_allocator());
+                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val));
             }
             catch (...)
             {
@@ -427,7 +427,7 @@ public:
             }
             return p;
 #else
-            return new object();
+            return new object(get_allocator());
 #endif
        }
 
@@ -440,7 +440,7 @@ public:
             //alloc.construct(value_.object_value_,*(var.value_.object_value_));
             try
             {
-                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val, get_allocator());
+                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val);
             }
             catch (...)
             {
@@ -460,7 +460,7 @@ public:
             object* p = alloc.allocate(1);
             try
             {
-                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val), get_allocator());
+                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val));
             }
             catch (...)
             {

@@ -39,12 +39,12 @@ public:
     {
     }
 
-    json_array(const json_array& val,const Alloc& allocator = Alloc())
+    json_array(const json_array& val)
         : elements_(val.elements_)
     {
     }
 
-    json_array(json_array&& val, const Alloc& allocator = Alloc())
+    json_array(json_array&& val)
         : elements_(std::move(val.elements_))
     {
     }
@@ -290,12 +290,12 @@ public:
     {
     }
 
-    json_object(const json_object<JsonT,Alloc>& val, const Alloc& allocator = Alloc())
+    json_object(const json_object<JsonT,Alloc>& val)
         : members_(val.members_)
     {
     }
 
-    json_object(json_object&& val,const Alloc& allocator = Alloc())
+    json_object(json_object&& val)
         : members_(std::move(val.members_))
     {
     }
