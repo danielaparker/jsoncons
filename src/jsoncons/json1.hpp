@@ -289,8 +289,8 @@ public:
         void delete_array(array* p)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
             alloc.deallocate(p,1);
 #else
             typename Alloc:: template rebind<array>::other alloc(*this);
@@ -326,7 +326,19 @@ public:
             }
             return p;
 #else
-            return new array(get_allocator());
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            array* p = alloc.allocate(1);
+            try
+            {
+                alloc.construct(p, get_allocator());
+            }
+            catch (...)
+            {
+                alloc.deallocate(p,1);
+                throw;
+            }
+            return p;
+            //return new array(get_allocator());
 #endif
         }
 
@@ -351,11 +363,22 @@ public:
             }
             return p;
 #else
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            array* p = alloc.allocate(1);
+            try
+            {
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new array(val, get_allocator());
+                alloc.construct(p, val, get_allocator());
 #else
-            return new array(val);
+                alloc.construct(p, val);
 #endif
+            }
+            catch (...)
+            {
+                alloc.deallocate(p,1);
+                throw;
+            }
+            return p;
 #endif
         }
 
@@ -379,11 +402,22 @@ public:
             }
             return p;
 #else
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            array* p = alloc.allocate(1);
+            try
+            {
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new array(std::move(val), get_allocator());
+                alloc.construct(p, std::move(val), get_allocator());
 #else
-            return new array(std::move(val));
+                alloc.construct(p, std::move(val));
 #endif
+            }
+            catch (...)
+            {
+                alloc.deallocate(p,1);
+                throw;
+            }
+            return p;
 #endif
         }
 
@@ -403,7 +437,18 @@ public:
             }
             return p;
 #else
-            return new array(size);
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            array* p = alloc.allocate(1);
+            try
+            {
+                alloc.construct(p, size, get_allocator());
+            }
+            catch (...)
+            {
+                alloc.deallocate(p,1);
+                throw;
+            }
+            return p;
 #endif
         }
 
@@ -425,7 +470,18 @@ public:
 
             return p;
 #else
-            return new array(first,last);
+            typename Alloc:: template rebind<array>::other alloc(*this);
+            array* p = alloc.allocate(1);
+            try
+            {
+                alloc.construct(p, first, last, get_allocator());
+            }
+            catch (...)
+            {
+                alloc.deallocate(p,1);
+                throw;
+            }
+            return p;
 #endif
         }
 
