@@ -336,7 +336,11 @@ public:
             //alloc.construct(value_.array_value_,*(var.value_.array_value_));
             try
             {
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val, get_allocator());
+#else
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val);
+#endif
             }
             catch (...)
             {
@@ -345,7 +349,11 @@ public:
             }
             return p;
 #else
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+            return new array(val, get_allocator());
+#else
             return new array(val);
+#endif
 #endif
         }
 
@@ -356,7 +364,11 @@ public:
             array* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val), get_allocator());
+#else
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val));
+#endif
             }
             catch (...)
             {
@@ -365,7 +377,11 @@ public:
             }
             return p;
 #else
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+            return new array(std::move(val), get_allocator());
+#else
             return new array(std::move(val));
+#endif
 #endif
         }
 
@@ -440,7 +456,11 @@ public:
             //alloc.construct(value_.object_value_,*(var.value_.object_value_));
             try
             {
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val, get_allocator());
+#else
                 std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val);
+#endif
             }
             catch (...)
             {
@@ -449,7 +469,11 @@ public:
             }
             return p;
 #else
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+            return new object(val,get_allocator());
+#else
             return new object(val);
+#endif
 #endif
         }
 
@@ -460,7 +484,11 @@ public:
             object* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val),get_allocator());
+#else
                 std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val));
+#endif
             }
             catch (...)
             {
@@ -469,7 +497,11 @@ public:
             }
             return p;
 #else
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+            return new object(val,get_allocator());
+#else
             return new object(val);
+#endif
 #endif
         }
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(Char)) - 1;

@@ -43,11 +43,21 @@ public:
         : elements_(val.elements_)
     {
     }
-
     json_array(json_array&& val)
         : elements_(std::move(val.elements_))
     {
     }
+
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+    json_array(const json_array& val, const Alloc& allocator)
+        : elements_(val.elements_,allocator)
+    {
+    }
+    json_array(json_array&& val, const Alloc& allocator)
+        : elements_(std::move(val.elements_),allocator)
+    {
+    }
+#endif
 
     json_array(size_t n, const Alloc& allocator = Alloc())
         : elements_(n,allocator)
@@ -299,6 +309,19 @@ public:
         : members_(std::move(val.members_))
     {
     }
+
+#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+    json_object(const json_object<JsonT,Alloc>& val, const Alloc& allocator)
+        : members_(val.members_,allocator)
+    {
+    }
+
+    json_object(json_object&& val,const Alloc& allocator)
+        : members_(std::move(val.members_),allocator)
+    {
+    }
+#endif
+
     iterator begin()
     {
         return members_.begin();
