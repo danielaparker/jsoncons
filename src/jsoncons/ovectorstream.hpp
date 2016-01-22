@@ -93,23 +93,14 @@ protected:
     {
         if (!CharTraits::eq_int_type(c, CharTraits::eof()))
         {
-            if (this->pptr() == this->epptr())
-            {
-                size_t pos = buf_.size();
-                buf_.resize(pos*2);
-                this->setp(buf_.data(), buf_.data() + buf_.size());
-                this->pubseekpos(pos, std::ios_base::out);
-                *this->pptr() = CharTraits::to_char_type(c);
-                this->pbump(1);
-                this->pubsync();
-                return c;
-            } 
-            else
-            {
-                *this->pptr() = CharTraits::to_char_type(c);
-                this->pbump(1);
-                return c;
-            }
+            size_t pos = buf_.size();
+            buf_.resize(pos*2);
+            this->setp(buf_.data(), buf_.data() + buf_.size());
+            this->pubseekpos(pos, std::ios_base::out);
+            *this->pptr() = CharTraits::to_char_type(c);
+            this->pbump(1);
+            this->pubsync();
+            return c;
         } 
         else  
         {
@@ -121,26 +112,13 @@ protected:
                      std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) override
     {
         bool in  = false;
-        bool out = false;
+        bool out = true;
 
-        const std::ios_base::openmode inout =
-            std::ios_base::in | std::ios_base::out;
-
-        if ((mode & inout) == inout)
+        if ((in  && (!(mode_ & std::ios_base::in) || (off != 0 && this->gptr() == 0))) ||
+             (out && (!(mode_ & std::ios_base::out) || (off != 0 && this->pptr() == 0)))) 
         {
-            if (dir == std::ios_base::beg || dir == std::ios_base::end) in = out = true;
-        } 
-        else if (mode & std::ios_base::in) 
-            in = true;
-        else if (mode & std::ios_base::out) 
-            out = true;
-
-        if (!in && !out) 
             return pos_type(off_type(-1));
-        else 
-            if ((in  && (!(mode_ & std::ios_base::in) || (off != 0 && this->gptr() == 0))) ||
-                 (out && (!(mode_ & std::ios_base::out) || (off != 0 && this->pptr() == 0)))) 
-                return pos_type(off_type(-1));
+        }
 
         std::streamoff newoff;
         switch (dir)
@@ -161,24 +139,13 @@ protected:
 
         off += newoff;
 
-        if (in)
+        std::ptrdiff_t n = this->epptr() - this->pbase();
+
+        if (off < 0 || off > n) return pos_type(off_type(-1));
+        else
         {
-            std::ptrdiff_t n = this->egptr() - this->eback();
-
-            if (off < 0 || off > n) return pos_type(off_type(-1));
-            else this->setg(this->eback(), this->eback() + off, this->eback() + n);
-        }
-
-        if (out)
-        {
-            std::ptrdiff_t n = this->epptr() - this->pbase();
-
-            if (off < 0 || off > n) return pos_type(off_type(-1));
-            else
-            {
-                this->setp(this->pbase(), this->pbase() + n);
-                this->pbump(static_cast<int>(off));
-            }
+            this->setp(this->pbase(), this->pbase() + n);
+            this->pbump(static_cast<int>(off));
         }
 
         return pos_type(off);
