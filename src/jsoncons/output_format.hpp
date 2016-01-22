@@ -2,8 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://sourceforge.net/projects/jsoncons/files/ for latest version
-// See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS_OUTPUT_FORMAT_HPP
 #define JSONCONS_OUTPUT_FORMAT_HPP

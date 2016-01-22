@@ -2,8 +2,7 @@
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// See https://sourceforge.net/projects/jsoncons/files/ for latest version
-// See https://sourceforge.net/p/jsoncons/wiki/Home/ for documentation.
+// See https://github.com/danielaparker/jsoncons for latest version
 
 #ifndef JSONCONS_JSON_STRUCTURES_HPP
 #define JSONCONS_JSON_STRUCTURES_HPP
@@ -249,6 +248,16 @@ public:
         return value_;
     }
 
+    void value(const JsonT& value)
+    {
+        value_ = value;
+    }
+
+    void value(JsonT&& value)
+    {
+        value_ = std::move(value);
+    }
+
     void swap(json_object_member& pair)
     {
         name_.swap(pair.name_);
@@ -433,7 +442,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(name,value);
+            it->value(value);
         }
         else
         {
@@ -450,7 +459,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(std::move(name),value);
+            it->value(value);
         }
         else
         {
@@ -467,7 +476,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(name,std::move(value));
+            it->value(std::move(value));
         }
         else
         {
@@ -484,7 +493,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(std::move(name),std::move(value));
+            it->value(std::move(value));
         }
         else
         {
@@ -511,7 +520,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(name,value);
+            it->value(value);
         }
         else
         {
@@ -539,7 +548,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(std::move(name),value);
+            it->value(value);
         }
         else
         {
@@ -567,7 +576,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(name,std::move(value));
+            it->value(std::move(value));
         }
         else
         {
@@ -595,7 +604,7 @@ public:
         }
         else if (it->name() == name)
         {
-            *it = value_type(std::move(name),std::move(value));
+            it->value(std::move(value));
         }
         else
         {
