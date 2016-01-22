@@ -210,7 +210,7 @@ public:
         {
             if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
             }
             return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
@@ -220,7 +220,7 @@ public:
         {
             if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
             {
-                JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
             }
             return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
         }
@@ -2870,7 +2870,7 @@ public:
     {
         if (var_.type_ != value_types::any_t)
         {
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
         }
         return var_.value_.any_value_->template cast<T>();
     }
@@ -2879,7 +2879,7 @@ public:
     {
         if (var_.type_ != value_types::any_t)
         {
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad any cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
         }
         return var_.value_.any_value_->template cast<T>();
     }
@@ -3000,7 +3000,7 @@ public:
         case value_types::array_t:
             return *(var_.value_.array_value_);
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad array cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad array cast");
             break;
         }
     }
@@ -3012,7 +3012,7 @@ public:
         case value_types::array_t:
             return *(var_.value_.array_value_);
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad array cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad array cast");
             break;
         }
     }
@@ -3028,7 +3028,7 @@ public:
         case value_types::object_t:
             return *(var_.value_.object_value_);
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad object cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad object cast");
             break;
         }
     }
@@ -3042,7 +3042,7 @@ public:
         case value_types::object_t:
             return *(var_.value_.object_value_);
         default:
-            JSONCONS_THROW_EXCEPTION(std::exception,"Bad object cast");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad object cast");
             break;
         }
     }
@@ -3118,7 +3118,7 @@ private:
         reader.check_done();
         if (!handler.is_valid())
         {
-            JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
         }
         o = handler.get_result();
         return is;
@@ -3159,7 +3159,7 @@ const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::get(const std::basic_s
         }
     default:
         {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
         }
     }
 }
@@ -3354,7 +3354,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istre
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
     }
     return handler.get_result();
 }
@@ -3369,7 +3369,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istre
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
     }
     return handler.get_result();
 }
@@ -3385,7 +3385,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -3402,7 +3402,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -3418,7 +3418,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -3435,7 +3435,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic
     parser.check_done(s.c_str(),parser.index(),s.length());
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
     }
     return handler.get_result();
 }
@@ -3450,13 +3450,13 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     errno_t err = fopen_s(&fp, filename.c_str(), "rb");
     if (err != 0) 
     {
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
 #else
     fp = std::fopen(filename.c_str(), "rb");
     if (fp == nullptr)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
 #endif
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
@@ -3475,7 +3475,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
             }
 
             basic_json_parser<CharT> parser(handler);
@@ -3494,7 +3494,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     }
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json file");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
     }
     return handler.get_result();
 }
@@ -3509,13 +3509,13 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     errno_t err = fopen_s(&fp, filename.c_str(), "rb");
     if (err != 0) 
     {
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
 #else
     fp = std::fopen(filename.c_str(), "rb");
     if (fp == nullptr)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::exception,"Cannot open file %s", filename);
+        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
 #endif
 
@@ -3535,7 +3535,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
             size_t result = std::fread (buffer.data(),1,size,fp);
             if (result != static_cast<unsigned long long>(size))
             {
-                JSONCONS_THROW_EXCEPTION_1(std::exception,"Error reading file %s", filename);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
             }
 
             basic_json_parser<CharT> parser(handler,err_handler);
@@ -3554,7 +3554,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     }
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json file");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
     }
     return handler.get_result();
 }
@@ -3570,7 +3570,7 @@ typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::beg
     case value_types::object_t:
         return var_.value_.object_value_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
     }
 }
 
@@ -3584,7 +3584,7 @@ typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc
     case value_types::object_t:
         return var_.value_.object_value_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
     }
 }
 
@@ -3599,7 +3599,7 @@ typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::end
     case value_types::object_t:
         return var_.value_.object_value_->end();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
     }
 }
 
@@ -3613,7 +3613,7 @@ typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc
     case value_types::object_t:
         return var_.value_.object_value_->end();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an object");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
     }
 }
 
@@ -3625,7 +3625,7 @@ typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::begi
     case value_types::array_t:
         return var_.value_.array_value_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
     }
 }
 
@@ -3637,7 +3637,7 @@ typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>
     case value_types::array_t:
         return var_.value_.array_value_->begin();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
     }
 }
 
@@ -3649,7 +3649,7 @@ typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::end_
     case value_types::array_t:
         return var_.value_.array_value_->end();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
     }
 }
 
@@ -3661,7 +3661,7 @@ typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>
     case value_types::array_t:
         return var_.value_.array_value_->end();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an array");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
     }
 }
 
@@ -3695,7 +3695,7 @@ int basic_json<CharT, Alloc>::as_int() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a int");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a int");
     }
 }
 
@@ -3713,7 +3713,7 @@ unsigned int basic_json<CharT, Alloc>::as_uint() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a unsigned int");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a unsigned int");
     }
 }
 
@@ -3731,7 +3731,7 @@ long basic_json<CharT, Alloc>::as_long() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a long");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long");
     }
 }
 
@@ -3749,7 +3749,7 @@ unsigned long basic_json<CharT, Alloc>::as_ulong() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an unsigned long");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned long");
     }
 }
 
@@ -3763,7 +3763,7 @@ typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value()
 			return *var_.value_.any_value_;
         }
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an any value");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
     }
 }
 
@@ -3777,7 +3777,7 @@ const typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_valu
 			return *var_.value_.any_value_;
         }
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not an any value");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
     }
 }
 
@@ -3791,7 +3791,7 @@ const CharT* basic_json<CharT, Alloc>::as_cstring() const
     case value_types::string_t:
         return var_.value_.string_value_->c_str();
     default:
-        JSONCONS_THROW_EXCEPTION(std::exception,"Not a string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
     }
 }
 
@@ -3804,7 +3804,7 @@ std::basic_istream<CharT>& operator>>(std::basic_istream<CharT>& is, basic_json<
     reader.check_done();
     if (!handler.is_valid())
     {
-        JSONCONS_THROW_EXCEPTION(std::exception,"Failed to parse json stream");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
     }
     o = handler.get_result();
     return is;
