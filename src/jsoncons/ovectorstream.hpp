@@ -111,15 +111,6 @@ protected:
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                      std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) override
     {
-        bool in  = false;
-        bool out = true;
-
-        if ((in  && (!(mode_ & std::ios_base::in) || (off != 0 && this->gptr() == 0))) ||
-             (out && (!(mode_ & std::ios_base::out) || (off != 0 && this->pptr() == 0)))) 
-        {
-            return pos_type(off_type(-1));
-        }
-
         std::streamoff newoff;
         switch (dir)
         {
@@ -130,8 +121,7 @@ protected:
             newoff = static_cast<std::streamoff>(buf_.size());
             break;
         case std::ios_base::cur:
-            newoff = in ? static_cast<std::streamoff>(this->gptr() - this->eback())
-                : static_cast<std::streamoff>(this->pptr() - this->pbase());
+            newoff = static_cast<std::streamoff>(this->pptr() - this->pbase());
             break;
         default:
             return pos_type(off_type(-1));
