@@ -283,6 +283,9 @@ Throws `std::runtime_error` if not an object.
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
 
+    void shrink_to_fit()
+Requests the removal of unused capacity.
+
     void set(const std::string& name, const json& val)
     void set(std::string&& name, const json& val)
     void set(const std::string& name, json&& val)
@@ -312,9 +315,6 @@ Throws `std::runtime_error` if not an array.
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
-
-    void shrink_to_fit()
-Requests the removal of unused capacity.
 
 ### Relational operators
 

@@ -21,6 +21,17 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(jsoncons_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_shrink_to_fit)
+{
+    json val = json::make_array(3);
+    val.reserve(100);
+    val[0].reserve(100);
+    val[0]["key"] = "value";
+    val.shrink_to_fit();
+    BOOST_CHECK_EQUAL(3,val.size());
+    BOOST_CHECK_EQUAL(1,val[0].size());
+}
+
 BOOST_AUTO_TEST_CASE(test_boost_optional)
 {
     boost::optional<jsoncons::json> opt_json;
