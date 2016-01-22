@@ -1637,6 +1637,11 @@ public:
             return evaluate().get(name,default_val);
         }
 
+        void shrink_to_fit()
+        {
+            evaluate().shrink_to_fit();
+        }
+
         void clear()
         {
             evaluate().clear();
@@ -2527,8 +2532,35 @@ public:
 
     // Modifiers
 
-    void clear();
-    // Remove all elements from an array or object
+    void shrink_to_fit()
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_value_->shrink_to_fit();
+            break;
+        case value_types::object_t:
+            var_.value_.object_value_->shrink_to_fit();
+            break;
+        default:
+            break;
+        }
+    }
+
+    void clear()
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_value_->clear();
+            break;
+        case value_types::object_t:
+            var_.value_.object_value_->clear();
+            break;
+        default:
+            break;
+        }
+    }
 
     void erase(object_iterator first, object_iterator last)
     {
@@ -3161,22 +3193,6 @@ const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::get(const std::basic_s
         {
             JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
         }
-    }
-}
-
-template<typename CharT, typename Alloc>
-void basic_json<CharT, Alloc>::clear()
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        var_.value_.array_value_->clear();
-        break;
-    case value_types::object_t:
-        var_.value_.object_value_->clear();
-        break;
-    default:
-        break;
     }
 }
 

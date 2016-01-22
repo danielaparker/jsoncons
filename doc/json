@@ -818,10 +818,13 @@ Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
 <pre><code>template &lt;typename T&gt;
-const json get(const std::string&amp; name, T default_val) const
+const json get(const std::string&amp; name, const T&amp; default_val) const
+template &lt;typename T&gt;
+const json get(const std::string&amp; name, T&amp;&amp; default_val) const
 </code></pre>
 
-<p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.</p>
+<p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.<br>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>template &lt;typename T&gt;
 T as() const
@@ -942,6 +945,11 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 </code></pre>
 
 <p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
+
+<pre><code>void shrink_to_fit()
+</code></pre>
+
+<p>Requests the removal of unused capacity.</p>
 
 <h3>Relational operators</h3>
 

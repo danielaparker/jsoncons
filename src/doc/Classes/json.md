@@ -313,6 +313,9 @@ Throws `std::runtime_error` if not an array.
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
+    void shrink_to_fit()
+Requests the removal of unused capacity.
+
 ### Relational operators
 
     bool operator==(const json& rhs) const

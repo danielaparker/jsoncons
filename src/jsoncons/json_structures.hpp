@@ -85,6 +85,15 @@ public:
 
     void clear() {elements_.clear();}
 
+    void shrink_to_fit() 
+    {
+        for (size_t i = 0; i < elements_.size(); ++i)
+        {
+            elements_[i].shrink_to_fit();
+        }
+        elements_.shrink_to_fit();
+    }
+
     void reserve(size_t n) {elements_.reserve(n);}
 
     void resize(size_t n) {elements_.resize(n);}
@@ -284,6 +293,11 @@ public:
         return *this;
     }
 
+    void shrink_to_fit() 
+    {
+        name_.shrink_to_fit();
+        value_.shrink_to_fit();
+    }
 private:
     std::basic_string<char_type> name_;
     JsonT value_;
@@ -371,6 +385,15 @@ public:
     size_t capacity() const {return members_.capacity();}
 
     void clear() {members_.clear();}
+
+    void shrink_to_fit() 
+    {
+        for (size_t i = 0; i < members_.size(); ++i)
+        {
+            members_[i].shrink_to_fit();
+        }
+        members_.shrink_to_fit();
+    }
 
     void reserve(size_t n) {members_.reserve(n);}
 

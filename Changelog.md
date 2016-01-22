@@ -1,4 +1,4 @@
-master
+0.98.3
 ------
 
 New features
@@ -9,6 +9,7 @@ New features
 - json array range accessor `elements()` added, which supports range-based for loops over json arrays, and replaces `begin_elements` and `end_elements`
 - json object range accessor `members()` added, which supports range-based for loops over json objects, and replaces `begin_members` and `end_members`
 - New version of json `add` member function that takes a parameter `array_iterator` 
+- json member function `shrink_to_fit` added
 
 API Changes 
 
