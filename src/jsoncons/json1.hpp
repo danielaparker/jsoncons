@@ -1631,6 +1631,12 @@ public:
             return evaluate().get(name,default_val);
         }
 
+        template <typename T>
+        basic_json<CharT,Alloc> get(const std::basic_string<CharT>& name, T&& default_val) const
+        {
+            return evaluate().get(name,default_val);
+        }
+
         void clear()
         {
             evaluate().clear();
@@ -2462,8 +2468,62 @@ public:
 
     const basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name) const;
 
-    template <typename T>
-    basic_json<CharT,Alloc> get(const std::basic_string<CharT>& name, const T& default_val) const;
+
+    template<typename T>
+    basic_json<CharT, Alloc> get(const std::basic_string<CharT>& name, const T& default_val) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            {
+                return basic_json<CharT,Alloc>(default_val);
+            }
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_value_->find(name);
+                if (it != end_members())
+                {
+                    return it->value();
+                }
+                else
+                {
+                    return basic_json<CharT,Alloc>(default_val);
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    template<typename T>
+    basic_json<CharT, Alloc> get(const std::basic_string<CharT>& name, T&& default_val) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            {
+                return basic_json<CharT,Alloc>(default_val);
+            }
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_value_->find(name);
+                if (it != end_members())
+                {
+                    return it->value();
+                }
+                else
+                {
+                    return basic_json<CharT,Alloc>(std::move(default_val));
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
 
     // Modifiers
 
@@ -3096,35 +3156,6 @@ const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::get(const std::basic_s
         {
             const_object_iterator it = var_.value_.object_value_->find(name);
             return it != end_members() ? it->value() : a_null;
-        }
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::exception,"Attempting to get %s from a value that is not an object", name);
-        }
-    }
-}
-
-template<typename CharT, typename Alloc>
-template<typename T>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::get(const std::basic_string<CharT>& name, const T& default_val) const
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        {
-            return basic_json<CharT,Alloc>(default_val);
-        }
-    case value_types::object_t:
-        {
-            const_object_iterator it = var_.value_.object_value_->find(name);
-            if (it != end_members())
-            {
-                return it->value();
-            }
-            else
-            {
-                return basic_json<CharT,Alloc>(default_val);
-            }
         }
     default:
         {
