@@ -24,7 +24,7 @@
 
 namespace jsoncons { namespace csv {
 
-template <typename Char>
+template <typename CharT>
 struct json_csv_parser_traits
 {
 };
@@ -87,17 +87,17 @@ namespace data_types
     enum column_types_t{string_t,integer_t,float_t,boolean_t};
 };
 
-template<typename Char>
-class basic_csv_parser : private basic_parsing_context<Char>
+template<typename CharT>
+class basic_csv_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 3;
 
 public:
-    basic_csv_parser(basic_json_input_handler<Char>& handler)
+    basic_csv_parser(basic_json_input_handler<CharT>& handler)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -110,13 +110,13 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<Char>& handler,
-                     basic_csv_parameters<Char> params)
+    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+                     basic_csv_parameters<CharT> params)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
          parameters_(params),
-         err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
          is_negative_(false),
          cp_(0),
          index_(0)
@@ -130,8 +130,8 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<Char>& handler,
-                     basic_parse_error_handler<Char>& err_handler)
+    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+                     basic_parse_error_handler<CharT>& err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
@@ -149,9 +149,9 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<Char>& handler,
-                     basic_parse_error_handler<Char>& err_handler,
-                     basic_csv_parameters<Char> params)
+    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+                     basic_parse_error_handler<CharT>& err_handler,
+                     basic_csv_parameters<CharT> params)
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
@@ -174,17 +174,17 @@ public:
     {
     }
 
-    const std::vector<std::basic_string<Char>>& column_labels() const
+    const std::vector<std::basic_string<CharT>>& column_labels() const
     {
         return column_labels_;
     }
 
-    void column_labels(const std::vector<std::basic_string<Char>>& value)
+    void column_labels(const std::vector<std::basic_string<CharT>>& value)
     {
         column_labels_ = value;
     }
 
-    basic_parsing_context<Char> const & parsing_context() const
+    basic_parsing_context<CharT> const & parsing_context() const
     {
         return *this;
     }
@@ -249,13 +249,13 @@ public:
 
         if (parameters_.header().length() > 0)
         {
-            basic_empty_json_input_handler<Char> ih;
-            basic_csv_parameters<Char> params;
+            basic_empty_json_input_handler<CharT> ih;
+            basic_csv_parameters<CharT> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.quote_char(parameters_.quote_char());
             params.quote_escape_char(parameters_.quote_escape_char());
 			params.assume_header(true);
-            basic_csv_parser<Char> p(ih,params);
+            basic_csv_parser<CharT> p(ih,params);
             p.begin_parse();
             p.parse(parameters_.header().data(),0,parameters_.header().length());
             p.end_parse();
@@ -263,30 +263,30 @@ public:
         }
         if (parameters_.data_types().length() > 0)
         {
-            basic_empty_json_input_handler<Char> ih;
-            basic_csv_parameters<Char> params;
+            basic_empty_json_input_handler<CharT> ih;
+            basic_csv_parameters<CharT> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.assume_header(true);
-            basic_csv_parser<Char> p(ih,params);
+            basic_csv_parser<CharT> p(ih,params);
             p.begin_parse();
             p.parse(&(parameters_.data_types()[0]),0,parameters_.data_types().length());
             p.end_parse();
 			column_types_.resize(p.column_labels().size());
             for (size_t i = 0; i < p.column_labels().size(); ++i)
             {
-                if (p.column_labels()[i] == json_csv_parser_traits<Char>::string_literal())
+                if (p.column_labels()[i] == json_csv_parser_traits<CharT>::string_literal())
                 {
                     column_types_[i] = data_types::string_t;
                 }
-                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::integer_literal())
+                else if (p.column_labels()[i] == json_csv_parser_traits<CharT>::integer_literal())
                 {
                     column_types_[i] = data_types::integer_t;
                 }
-                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::float_literal())
+                else if (p.column_labels()[i] == json_csv_parser_traits<CharT>::float_literal())
                 {
                     column_types_[i] = data_types::float_t;
                 }
-                else if (p.column_labels()[i] == json_csv_parser_traits<Char>::boolean_literal())
+                else if (p.column_labels()[i] == json_csv_parser_traits<CharT>::boolean_literal())
                 {
                     column_types_[i] = data_types::boolean_t;
                 }
@@ -308,7 +308,7 @@ public:
         column_ = 1;
     }
 
-    void parse(const Char* p, size_t start, size_t length)
+    void parse(const CharT* p, size_t start, size_t length)
     {
         index_ = start;
         for (; index_ < length && state_ != states::done; ++index_)
@@ -703,9 +703,9 @@ private:
         return column_;
     }
 
-    Char do_current_char() const override
+    CharT do_current_char() const override
     {
-        return (Char)prev_char_;
+        return (CharT)prev_char_;
     }
 
     void push(modes::modes_t modes)
@@ -752,21 +752,21 @@ private:
     states::states_t state_;
     int top_;
     std::vector<modes::modes_t> stack_;
-    basic_json_input_handler<Char> *handler_;
-    basic_parse_error_handler<Char> *err_handler_;
+    basic_json_input_handler<CharT> *handler_;
+    basic_parse_error_handler<CharT> *err_handler_;
     unsigned long column_;
     unsigned long line_;
     int curr_char_;
     int prev_char_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<Char> string_buffer_;
+    std::basic_string<CharT> string_buffer_;
     bool is_negative_;
     states::states_t saved_state_;
     size_t index_;
     int depth_;
-    basic_csv_parameters<Char> parameters_;
-    std::vector<std::basic_string<Char>> column_labels_;
+    basic_csv_parameters<CharT> parameters_;
+    std::vector<std::basic_string<CharT>> column_labels_;
     std::vector<data_types::column_types_t> column_types_;
 	size_t column_index_;
 };

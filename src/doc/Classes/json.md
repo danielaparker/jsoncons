@@ -329,7 +329,7 @@ Inserts json value into string using specified [output_format](output_format).
     std::ostream& to_stream(std::ostream& os) const
 Inserts json value into stream with default output format.
 
-    std::ostream& to_stream(std::ostream<Char> os, const output_format& format) const
+    std::ostream& to_stream(std::ostream<CharT> os, const output_format& format) const
 Inserts json value into stream using specified [output_format](output_format).
 
     void to_stream(json_output_handler& handler) const
@@ -344,11 +344,11 @@ Reads a `json` value from a stream.
 Inserts json value into stream.
 
     std::ostream& print(const json& val)  
-    std::ostream& print(const json& val, const output_format<Char>& format)  
+    std::ostream& print(const json& val, const output_format<CharT>& format)  
 Inserts json value into stream using the specified [output_format](output_format) if supplied.
 
     std::ostream& pretty_print(const json& val)  
-    std::ostream& pretty_print(const json& val, const output_format<Char>& format)  
+    std::ostream& pretty_print(const json& val, const output_format<CharT>& format)  
 Inserts json value into stream using the specified [output_format](output_format) if supplied.
 
     void swap(json& a, json& b)

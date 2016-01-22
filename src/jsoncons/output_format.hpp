@@ -18,10 +18,10 @@
 
 namespace jsoncons {
 
-template <typename Char>
+template <typename CharT>
 class buffered_ostream;
 
-template <typename Char>
+template <typename CharT>
 class basic_output_format
 {
     int indent_;
@@ -29,9 +29,9 @@ class basic_output_format
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
-    std::basic_string<Char> nan_replacement_;
-    std::basic_string<Char> pos_inf_replacement_;
-    std::basic_string<Char> neg_inf_replacement_;
+    std::basic_string<CharT> nan_replacement_;
+    std::basic_string<CharT> pos_inf_replacement_;
+    std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
 public:
@@ -46,9 +46,9 @@ public:
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
-        nan_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
-        pos_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
-        neg_inf_replacement_(json_char_traits<Char,sizeof(Char)>::null_literal()),
+        nan_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
+        pos_inf_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
+        neg_inf_replacement_(json_char_traits<CharT,sizeof(CharT)>::null_literal()),
         escape_all_non_ascii_(false),
         escape_solidus_(false)
     {
@@ -82,17 +82,17 @@ public:
 
     bool replace_neg_inf() const {return replace_neg_inf_;}
 
-    std::basic_string<Char> nan_replacement() const
+    std::basic_string<CharT> nan_replacement() const
     {
         return nan_replacement_;
     }
 
-    std::basic_string<Char> pos_inf_replacement() const
+    std::basic_string<CharT> pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
-    std::basic_string<Char> neg_inf_replacement() const
+    std::basic_string<CharT> neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }
@@ -135,17 +135,17 @@ public:
         replace_neg_inf_ = replace;
     }
 
-    void nan_replacement(const std::basic_string<Char>& replacement)
+    void nan_replacement(const std::basic_string<CharT>& replacement)
     {
         nan_replacement_ = replacement;
     }
 
-    void pos_inf_replacement(const std::basic_string<Char>& replacement)
+    void pos_inf_replacement(const std::basic_string<CharT>& replacement)
     {
         pos_inf_replacement_ = replacement;
     }
 
-    void neg_inf_replacement(const std::basic_string<Char>& replacement)
+    void neg_inf_replacement(const std::basic_string<CharT>& replacement)
     {
         neg_inf_replacement_ = replacement;
     }
@@ -156,17 +156,17 @@ public:
     }
 };
 
-template<typename Char>
-void escape_string(const Char* s,
+template<typename CharT>
+void escape_string(const CharT* s,
                    size_t length,
-                   const basic_output_format<Char>& format,
-                   buffered_ostream<Char>& os)
+                   const basic_output_format<CharT>& format,
+                   buffered_ostream<CharT>& os)
 {
-    const Char* begin = s;
-    const Char* end = s + length;
-    for (const Char* it = begin; it != end; ++it)
+    const CharT* begin = s;
+    const CharT* end = s + length;
+    for (const CharT* it = begin; it != end; ++it)
     {
-        Char c = *it;
+        CharT c = *it;
         switch (c)
         {
         case '\\':
@@ -207,7 +207,7 @@ void escape_string(const Char* s,
             else if (is_control_character(u) || format.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                uint32_t cp = json_char_traits<Char, sizeof(Char)>::convert_char_to_codepoint(it, end);
+                uint32_t cp = json_char_traits<CharT, sizeof(CharT)>::convert_char_to_codepoint(it, end);
                 if (is_non_ascii_character(cp) || is_control_character(u))
                 {
                     if (cp > 0xFFFF)

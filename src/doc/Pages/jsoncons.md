@@ -392,13 +392,13 @@ In the json class, constructors, accessors and modifiers are templated, for exam
 
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
-    template <typename Char, typename Alloc, typename T>
+    template <typename CharT, typename Alloc, typename T>
     class json_type_traits
     {
     public:
-        static bool is(const basic_json<Char,Alloc>&);
-        static T as(const basic_json<Char,Alloc>& val);
-        static void assign(basic_json<Char,Alloc>& lhs, T rhs);
+        static bool is(const basic_json<CharT,Alloc>&);
+        static T as(const basic_json<CharT,Alloc>& val);
+        static void assign(basic_json<CharT,Alloc>& lhs, T rhs);
     };
 
 This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write
@@ -451,8 +451,8 @@ By default, if you print `val` on a stream,
 
 the template function
 
-    template <typename Char,class T> inline
-    void serialize(basic_json_output_handler<Char>& os, const T&)
+    template <typename CharT,class T> inline
+    void serialize(basic_json_output_handler<CharT>& os, const T&)
     {
         os.value(null_type());
     }

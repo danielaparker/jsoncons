@@ -22,25 +22,25 @@
 
 namespace jsoncons {
 
-template<typename Char>
+template<typename CharT>
 class basic_json_reader 
 {
     static const size_t default_max_buffer_length = 16384;
 
-    basic_json_parser<Char> parser_;
-    std::basic_istream<Char> *is_;
-    basic_parse_error_handler<Char> *err_handler_;
+    basic_json_parser<CharT> parser_;
+    std::basic_istream<CharT> *is_;
+    basic_parse_error_handler<CharT> *err_handler_;
     bool eof_;
-    std::vector<Char> buffer_;
+    std::vector<CharT> buffer_;
     size_t buffer_length_;
     size_t buffer_capacity_;
     size_t index_;
 public:
-    basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_input_handler<Char>& handler)
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler)
         : parser_(handler),
           is_(std::addressof(is)),
-          err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
+          err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
           eof_(false),
           buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
@@ -49,9 +49,9 @@ public:
         buffer_.resize(buffer_capacity_);
     }
 
-    basic_json_reader(std::basic_istream<Char>& is,
-                      basic_json_input_handler<Char>& handler,
-                      basic_parse_error_handler<Char>& err_handler)
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler,
+                      basic_parse_error_handler<CharT>& err_handler)
        : parser_(handler,err_handler),
          is_(std::addressof(is)),
          err_handler_(std::addressof(err_handler)),

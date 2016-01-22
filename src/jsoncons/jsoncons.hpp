@@ -21,18 +21,18 @@
 
 namespace jsoncons {
 
-template <typename Char>
+template <typename CharT>
 class buffered_ostream
 {
     static const size_t default_buffer_length = 16384;
 
-    std::basic_ostream<Char>* os_;
-    std::vector<Char> buffer_;
-    Char * const begin_buffer_;
-	const Char* const end_buffer_;
-    Char* p_;
+    std::basic_ostream<CharT>* os_;
+    std::vector<CharT> buffer_;
+    CharT * const begin_buffer_;
+	const CharT* const end_buffer_;
+    CharT* p_;
 public:
-	buffered_ostream(std::basic_ostream<Char>& os)
+	buffered_ostream(std::basic_ostream<CharT>& os)
 		: os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
 	{
 	}
@@ -49,12 +49,12 @@ public:
         os_->flush();
     }
 
-	void write(const Char* s, size_t length)
+	void write(const CharT* s, size_t length)
 	{
 		size_t diff = end_buffer_ - p_;
 		if (diff >= length)
 		{
-			std::memcpy(p_, s, length*sizeof(Char));
+			std::memcpy(p_, s, length*sizeof(CharT));
 			p_ += length;
 		}
 		else
@@ -65,12 +65,12 @@ public:
 		}
 	}
 
-    void write(const std::basic_string<Char>& s)
+    void write(const std::basic_string<CharT>& s)
     {
         write(s.c_str(),s.length());
     }
 
-	void put(Char c)
+	void put(CharT c)
 	{
 		if (p_ < end_buffer_)
 		{
@@ -163,7 +163,7 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
-template <typename Char,size_t Size>
+template <typename CharT,size_t Size>
 struct json_char_traits
 {
 };

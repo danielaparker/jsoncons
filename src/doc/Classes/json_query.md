@@ -6,9 +6,9 @@ Returns a `json` array of `json` values selected from a root `json` structure.
 
     #include "jsoncons/jsonpath/json_query.hpp"
 
-    template<typename Char, class Alloc>
-    basic_json<Char,Alloc> json_query(const basic_json<Char,Alloc>& root, 
-                                      const std::basic_string<Char>& path);
+    template<typename CharT, class Alloc>
+    basic_json<CharT,Alloc> json_query(const basic_json<CharT,Alloc>& root, 
+                                      const std::basic_string<CharT>& path);
 
 [JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 

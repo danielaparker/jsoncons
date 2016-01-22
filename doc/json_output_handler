@@ -517,12 +517,12 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 
 <p>Output name event for a name-value pair. Uses <code>do_name</code>.</p>
 
-<pre><code>void name(const Char* p, size_t length)
+<pre><code>void name(const CharT* p, size_t length)
 </code></pre>
 
 <p>Output name event for a name-value pair. Uses <code>do_name</code>.</p>
 
-<pre><code>void value(const Char* p)
+<pre><code>void value(const CharT* p)
 </code></pre>
 
 <p>Send a null terminated string event.</p>

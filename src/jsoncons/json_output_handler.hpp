@@ -48,7 +48,7 @@ void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
 	}
 }
 
-template <typename Char>
+template <typename CharT>
 class basic_json_output_handler
 {
 public:
@@ -86,29 +86,29 @@ public:
         do_end_array();
     }
 
-    void name(const std::basic_string<Char>& name)
+    void name(const std::basic_string<CharT>& name)
     {
         do_name(name.c_str(), name.length());
     }
 
-    void name(const Char* p, size_t length) 
+    void name(const CharT* p, size_t length) 
     {
         do_name(p, length);
     }
 
-    void value(const std::basic_string<Char>& value) 
+    void value(const std::basic_string<CharT>& value) 
     {
         do_string_value(value.c_str(), value.length());
     }
 
-    void value(const Char* p, size_t length) 
+    void value(const CharT* p, size_t length) 
     {
         do_string_value(p, length);
     }
 
-    void value(const Char* p) 
+    void value(const CharT* p) 
     {
-        do_string_value(p, std::char_traits<Char>::length(p));
+        do_string_value(p, std::char_traits<CharT>::length(p));
     }
 
     void value(int value) 
@@ -162,7 +162,7 @@ private:
 
     virtual void do_end_json() = 0;
 
-    virtual void do_name(const Char* name, size_t length) = 0;
+    virtual void do_name(const CharT* name, size_t length) = 0;
 
     virtual void do_begin_object() = 0;
 
@@ -174,7 +174,7 @@ private:
 
     virtual void do_null_value() = 0;
 
-    virtual void do_string_value(const Char* value, size_t length) = 0;
+    virtual void do_string_value(const CharT* value, size_t length) = 0;
 
     virtual void do_double_value(double value) = 0;
 
@@ -185,8 +185,8 @@ private:
     virtual void do_bool_value(bool value) = 0;
 };
 
-template <typename Char>
-class null_json_output_handler_impl : public basic_json_output_handler<Char>
+template <typename CharT>
+class null_json_output_handler_impl : public basic_json_output_handler<CharT>
 {
 private:
 
@@ -198,7 +198,7 @@ private:
     {
     }
 
-    void do_name(const Char* name, size_t length) override
+    void do_name(const CharT* name, size_t length) override
     {
     }
 
@@ -222,7 +222,7 @@ private:
     {
     }
 
-    void do_string_value(const Char*, size_t length) override
+    void do_string_value(const CharT*, size_t length) override
     {
     }
 
@@ -244,10 +244,10 @@ private:
 
 };
 
-template<typename Char>
-basic_json_output_handler<Char>& null_json_output_handler()
+template<typename CharT>
+basic_json_output_handler<CharT>& null_json_output_handler()
 {
-    static null_json_output_handler_impl<Char> instance;
+    static null_json_output_handler_impl<CharT> instance;
     return instance;
 }
 

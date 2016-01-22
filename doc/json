@@ -474,10 +474,7 @@ typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
 </code></pre>
 
 <p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
-and <code>std::allocator&lt;void&gt;</code> as the allocator type. The allocator type is used to supply an allocator for dynamically allocated, <br>
-fixed size small objects in the <code>json</code> container, the <code>json</code> container will rebind it as necessary. The allocator type<br>
-is not used for structures including vectors and strings that use large or variable amounts of memory, <br>
-these always use the default allocators.</p>
+and <code>std::allocator&lt;void&gt;</code> as the allocator type. </p>
 
 <h3>Header</h3>
 
@@ -652,14 +649,14 @@ const_object_range members() const;
 </code></pre>
 
 <p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the members of a <code>json</code> object<br><br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>array_range elements();
 const_array_range elements() const;
 </code></pre>
 
 <p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the elements of a <code>json</code> array<br><br>
-Throws <code>std::domain_error</code> if not an array.</p>
+Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Capacity</h3>
 
@@ -781,19 +778,19 @@ const json&amp; operator[](size_t i) const
 </code></pre>
 
 <p>Returns a reference to the value at position i in a json object or array.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>json&amp; operator[](const std::string&amp; name)
 </code></pre>
 
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. <br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>const json&amp; operator[](const std::string&amp; name) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>object_iterator find(const std::string&amp; name)
 object_iterator find(const char* name)
@@ -802,14 +799,14 @@ const_object_iterator find(const char* name) const
 </code></pre>
 
 <p>Returns an object iterator to a member whose name compares equal to <code>name</code>. If there is no such member, returns <code>end_member()</code>.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>json&amp; at(const std::string&amp; name)
 const json&amp; at(const std::string&amp; name) const
 </code></pre>
 
 <p>Returns a reference to the value with the specifed name in a json object.<br>
-Throws <code>std::domain_error</code> if not an object.<br>
+Throws <code>std::runtime_error</code> if not an object.<br>
 Throws <code>std::out_of_range</code> if the object does not have a member with the specified name.  </p>
 
 <pre><code>json&amp; at(size_t i)
@@ -817,7 +814,7 @@ const json&amp; at(size_t i) const
 </code></pre>
 
 <p>Returns a reference to the element at index <code>i</code> in a json array.<br><br>
-Throws <code>std::domain_error</code> if not an array.<br>
+Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
 <pre><code>template &lt;typename T&gt;
@@ -892,19 +889,19 @@ T&amp; any_cast()
 </code></pre>
 
 <p>Remove the elements from an array in the range '[first,last)'.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>void erase(object_iterator first, object_iterator last)
 </code></pre>
 
 <p>Remove the members from an object in the range '[first,last)'.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>void erase(const std::string&amp; name)
 </code></pre>
 
 <p>Remove a member with the specified name from an object<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>void set(const std::string&amp; name, const json&amp; val)
 void set(std::string&amp;&amp; name, const json&amp; val)
@@ -913,7 +910,7 @@ void set(std::string&amp;&amp; name, json&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>object_iterator set(object_iterator hint, const std::string&amp; name, const json&amp; val)
 object_iterator set(object_iterator hint, std::string&amp;&amp; name, const json&amp; val)
@@ -924,14 +921,14 @@ object_iterator set(object_iterator hint, std::string&amp;&amp; name, json&amp;&
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
 Returns a <code>member_terator</code> pointing at the member that was inserted or updated<br>
-Throws <code>std::domain_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>void add(const json&amp; val)
 void add(json&amp;&amp; val)
 </code></pre>
 
 <p>Adds a new element at the end of a json array. The content of <code>val</code> is copied (or moved) to the new element.<br>
-Throws <code>std::domain_error</code> if not an array.</p>
+Throws <code>std::runtime_error</code> if not an array.</p>
 
 <pre><code>void add(array_iterator pos, const json&amp; val)
 void add(array_iterator pos, json&amp;&amp; val)
@@ -939,7 +936,7 @@ void add(array_iterator pos, json&amp;&amp; val)
 
 <p>Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
 The content of <code>val</code> is copied (or moved) to the new element.<br>
-Throws <code>std::domain_error</code> if not an array.</p>
+Throws <code>std::runtime_error</code> if not an array.</p>
 
 <pre><code>void swap(json&amp; val)
 </code></pre>
@@ -975,7 +972,7 @@ Throws <code>std::domain_error</code> if not an array.</p>
 
 <p>Inserts json value into stream with default output format.</p>
 
-<pre><code>std::ostream&amp; to_stream(std::ostream&lt;Char&gt; os, const output_format&amp; format) const
+<pre><code>std::ostream&amp; to_stream(std::ostream&lt;CharT&gt; os, const output_format&amp; format) const
 </code></pre>
 
 <p>Inserts json value into stream using specified <a href="output_format">output_format</a>.</p>
@@ -998,13 +995,13 @@ Throws <code>std::domain_error</code> if not an array.</p>
 <p>Inserts json value into stream.</p>
 
 <pre><code>std::ostream&amp; print(const json&amp; val)  
-std::ostream&amp; print(const json&amp; val, const output_format&lt;Char&gt;&amp; format)  
+std::ostream&amp; print(const json&amp; val, const output_format&lt;CharT&gt;&amp; format)  
 </code></pre>
 
 <p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
 
 <pre><code>std::ostream&amp; pretty_print(const json&amp; val)  
-std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&gt;&amp; format)  
+std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT&gt;&amp; format)  
 </code></pre>
 
 <p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
@@ -1014,135 +1011,52 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;Char&
 
 <p>Exchanges the values of <code>a</code> and <code>b</code></p>
 
-<p>Deprecated:</p>
+<h3>Deprecated names</h3>
 
-<pre><code>void add(size_t index, const json&amp; val)
-void add(size_t index, json&amp;&amp; val)
+<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="deprecated">deprecated list</a> for the status of old names.</p>
+
+<h2>Examples</h2>
+
+<h3>Range-based for loop over members of an object</h3>
+
+<pre><code>json book = json::parse(R"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
+
+for (auto member: book.members())
+{
+    std::cout &lt;&lt; member.name() &lt;&lt; ":" &lt;&lt; member.value().as&lt;string&gt;() &lt;&lt; std::endl;
+} 
 </code></pre>
 
-<p>Use add with iterator instead</p>
+<h3>Range-based for loop over elements of an array</h3>
 
-<pre><code>void remove_range(size_t from_index, size_t to_index)
+<pre><code>json books = json::make_array(3);
+
+books[0]["category"] = "Fiction";
+books[0]["title"] = "A Wild Sheep Chase: A Novel";
+books[0]["author"] = "Haruki Murakami";
+
+books[1]["category"] = "History";
+books[1]["title"] = "Charlie Wilson's War";
+books[1]["author"] = "George Crile";
+
+books[2]["category"] = "Fiction";
+books[2]["title"] = "Kafka on the Shore";
+books[2]["author"] = "Haruki Murakami";
+
+for (auto book: books.elements())
+{
+    std::cout &lt;&lt; book["title"].as&lt;std::string&gt;() &lt;&lt; std::end;
+} 
 </code></pre>
-
-<p>Use erase with iterator instead</p>
-
-<pre><code>void remove(const std::string&amp; name)
-</code></pre>
-
-<p>Use erase instead</p>
-
-<pre><code>static json parse(std::istream&amp; is)
-static json parse(std::istream&amp; is, 
-                  parse_error_handler&amp; err_handler)
-</code></pre>
-
-<p>Use <code>parse_stream</code> instead</p>
-
-<pre><code>long long as_longlong() const
-</code></pre>
-
-<p>Use as_integer or as instead</p>
-
-<pre><code>unsigned long long as_ulonglong() const
-</code></pre>
-
-<p>Use as_uinteger or as instead</p>
-
-<pre><code>bool is_longlong() const
-</code></pre>
-
-<p>Use is_integer instead</p>
-
-<pre><code>bool is_ulonglong() const
-</code></pre>
-
-<p>Use is_uinteger instead</p>
-
-<pre><code>bool is_numeric() const
-</code></pre>
-
-<p>Use <code>is_number</code> instead</p>
-
-<pre><code>void remove_member(const std::string&amp; name)
-</code></pre>
-
-<p>Use <code>remove</code> instead</p>
-
-<pre><code>const json&amp; get(const std::string&amp; name) const
-</code></pre>
-
-<p>Use the version of <code>get</code> with two parameters and explicitly specify a json null default value </p>
-
-<pre><code>bool has_member(const std::string&amp; name) const
-</code></pre>
-
-<p>Use count(const std::string&amp; name) instead.</p>
-
-<pre><code>object_iterator begin_members()
-const_object_iterator begin_members() const
-</code></pre>
-
-<p>Use members().begin() instead.</p>
-
-<pre><code>object_iterator end_members()
-const_object_iterator end_members() const
-</code></pre>
-
-<p>Use members().end() instead.</p>
-
-<pre><code>array_iterator begin_elements()
-const_array_iterator begin_elements() const
-</code></pre>
-
-<p>Use elements().begin() instead.</p>
-
-<pre><code>array_iterator end_elements()
-const_array_iterator end_elements() const
-</code></pre>
-
-<p>Use elements().end() instead.</p>
-
-<pre><code>bool is_empty() const
-</code></pre>
-
-<p>Use <code>empty</code> instead</p>
-
-<pre><code>static json parse_string(const std::string&amp; s)
-static json parse_string(const std::string&amp; s, 
-                         parse_error_handler&amp; err_handler)
-</code></pre>
-
-<p>Use <code>parse</code> instead</p>
-
-<pre><code>void resize_array(size_t n)
-</code></pre>
-
-<p>Use <code>resize</code> instead. </p>
-
-<pre><code>void resize_array(size_t n, const json&amp; val)
-</code></pre>
-
-<p>Use <code>resize</code> instead. </p>
-
-<h3>Member constants</h3>
-
-<pre><code>null
-</code></pre>
-
-<p>Constant json null value. Use assignment to <code>jsoncons::null_type()</code> or <code>json::null_type()</code> instead.</p>
-
-<pre><code>an_object
-</code></pre>
-
-<p>Empty constant json array value. Use the default constructor <code>json()</code> instead.</p>
-
-<pre><code>an_array
-</code></pre>
-
-<p>Empty constant json array value.  Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</p>
-
-<h3>Examples</h3>
 
 <h3>Accessors and defaults</h3>
 

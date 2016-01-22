@@ -56,7 +56,7 @@ namespace jsoncons { namespace jsonpath {
         return true;
     }
 
-    template <typename Char>
+    template <typename CharT>
     struct json_jsonpath_traits
     {
     };
@@ -73,22 +73,22 @@ namespace jsoncons { namespace jsonpath {
         static const std::wstring length_literal() {return L"length";};
     };
 
-template<typename Char, class Alloc>
-basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
+template<typename CharT, class Alloc>
+basic_json<CharT,Alloc> json_query(const basic_json<CharT, Alloc>& root, const std::basic_string<CharT>& path)
 {
     return json_query(root,path.c_str(),path.length());
 }
 
-template<typename Char, class Alloc>
-basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Char* path)
+template<typename CharT, class Alloc>
+basic_json<CharT,Alloc> json_query(const basic_json<CharT, Alloc>& root, const CharT* path)
 {
-    return json_query(root,path,std::char_traits<Char>::length(path));
+    return json_query(root,path,std::char_traits<CharT>::length(path));
 }
 
-template<typename Char, class Alloc>
-basic_json<Char,Alloc> json_query(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
+template<typename CharT, class Alloc>
+basic_json<CharT,Alloc> json_query(const basic_json<CharT, Alloc>& root, const CharT* path, size_t length)
 {
-    jsonpath_evaluator<Char,Alloc> evaluator;
+    jsonpath_evaluator<CharT,Alloc> evaluator;
     evaluator.evaluate(root,path,length);
     return evaluator.get_values();
 }
@@ -114,16 +114,16 @@ namespace states {
     };
 };
 
-template<typename Char, class Alloc>
-class jsonpath_evaluator : private basic_parsing_context<Char>
+template<typename CharT, class Alloc>
+class jsonpath_evaluator : private basic_parsing_context<CharT>
 {
 private:
-    typedef const basic_json<Char,Alloc>* cjson_ptr;
+    typedef const basic_json<CharT,Alloc>* cjson_ptr;
     typedef std::vector<cjson_ptr> node_set;
 
-    basic_parse_error_handler<Char> *err_handler_;
+    basic_parse_error_handler<CharT> *err_handler_;
     states::states_t state_;
-    std::basic_string<Char> buffer_;
+    std::basic_string<CharT> buffer_;
     size_t start_;
     size_t end_;
     size_t step_;
@@ -134,12 +134,12 @@ private:
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
-    std::vector<std::shared_ptr<basic_json<Char,Alloc>>> temp_;
+    std::vector<std::shared_ptr<basic_json<CharT,Alloc>>> temp_;
     size_t line_;
     size_t column_;
-    const Char* begin_input_;
-    const Char* end_input_;
-    const Char* p_;
+    const CharT* begin_input_;
+    const CharT* end_input_;
+    const CharT* p_;
     states::states_t pre_line_break_state_;
 
     void transfer_nodes()
@@ -150,13 +150,13 @@ private:
 
 public:
     jsonpath_evaluator()
-        : err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance()))
+        : err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance()))
     {
     }
 
-    basic_json<Char,Alloc> get_values() const
+    basic_json<CharT,Alloc> get_values() const
     {
-        basic_json<Char,Alloc> result = basic_json<Char,Alloc>::make_array();
+        basic_json<CharT,Alloc> result = basic_json<CharT,Alloc>::make_array();
 
         if (stack_.size() > 0)
         {
@@ -169,16 +169,16 @@ public:
         return result;
     }
 
-    void evaluate(const basic_json<Char, Alloc>& root, const std::basic_string<Char>& path)
+    void evaluate(const basic_json<CharT, Alloc>& root, const std::basic_string<CharT>& path)
     {
         evaluate(root,path.c_str(),path.length());
     }
-    void evaluate(const basic_json<Char, Alloc>& root, const Char* path)
+    void evaluate(const basic_json<CharT, Alloc>& root, const CharT* path)
     {
-        evaluate(root,path,std::char_traits<Char>::length(path));
+        evaluate(root,path,std::char_traits<CharT>::length(path));
     }
 
-    void evaluate(const basic_json<Char, Alloc>& root, const Char* path, size_t length)
+    void evaluate(const basic_json<CharT, Alloc>& root, const CharT* path, size_t length)
     {
         begin_input_ = path;
         end_input_ = path + length;
@@ -511,7 +511,7 @@ public:
                     {
                         if (stack_.back().size() == 1)
                         {
-                            jsonpath_filter_parser<Char,Alloc> parser(&p_,&line_,&column_);
+                            jsonpath_filter_parser<CharT,Alloc> parser(&p_,&line_,&column_);
                             parser.parse(p_,end_input_);
                             auto index = parser.eval(*(stack_.back()[0]));
                             if (index.is<size_t>())
@@ -533,7 +533,7 @@ public:
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<Char,Alloc> parser(&p_,&line_,&column_);
+                        jsonpath_filter_parser<CharT,Alloc> parser(&p_,&line_,&column_);
                         parser.parse(p_,end_input_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
@@ -695,8 +695,8 @@ public:
             break;
         }
     }
-    void accept(const basic_json<Char,Alloc>& val,
-                jsonpath_filter_parser<Char,Alloc>& filter)
+    void accept(const basic_json<CharT,Alloc>& val,
+                jsonpath_filter_parser<CharT,Alloc>& filter)
     {
         if (val.is_object())
         {
@@ -833,7 +833,7 @@ public:
         }
     }
 
-    void find(const std::basic_string<Char>& name)
+    void find(const std::basic_string<CharT>& name)
     {
 		if (name.length() > 0)
 		{
@@ -845,7 +845,7 @@ public:
 		}
     }
 
-    void find1(const basic_json<Char,Alloc>& context_val, const std::basic_string<Char>& name)
+    void find1(const basic_json<CharT,Alloc>& context_val, const std::basic_string<CharT>& name)
     {
         if (context_val.is_object())
         {
@@ -874,9 +874,9 @@ public:
                     nodes_.push_back(std::addressof(context_val[index]));
                 }
 			}
-            else if (name == json_jsonpath_traits<Char>::length_literal() && context_val.size() > 0)
+            else if (name == json_jsonpath_traits<CharT>::length_literal() && context_val.size() > 0)
             {
-                auto q = std::make_shared<basic_json<Char,Alloc>>(context_val.size());
+                auto q = std::make_shared<basic_json<CharT,Alloc>>(context_val.size());
                 temp_.push_back(q);
                 nodes_.push_back(q.get());
             }
@@ -903,7 +903,7 @@ public:
         return column_;
     }
 
-    Char do_current_char() const override
+    CharT do_current_char() const override
     {
         return 0; //p_ < end_input_? *p_ : 0;
     }

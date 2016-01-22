@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace csv {
 
-template <typename Char>
+template <typename CharT>
 struct csv_char_traits
 {
 };
@@ -49,17 +49,17 @@ struct csv_char_traits<wchar_t>
     static const std::wstring nonnumeric_literal() {return L"nonumeric";};
 };
  
-template <typename Char>
-void escape_string(const Char* s,
+template <typename CharT>
+void escape_string(const CharT* s,
                    size_t length,
-                   Char quote_char, Char quote_escape_char,
-                   buffered_ostream<Char>& os)
+                   CharT quote_char, CharT quote_escape_char,
+                   buffered_ostream<CharT>& os)
 {
-    const Char* begin = s;
-    const Char* end = s + length;
-    for (const Char* it = begin; it != end; ++it)
+    const CharT* begin = s;
+    const CharT* end = s + length;
+    for (const CharT* it = begin; it != end; ++it)
     {
-        Char c = *it;
+        CharT c = *it;
         if (c == quote_char)
         {
             os.put(quote_escape_char); 
@@ -72,8 +72,8 @@ void escape_string(const Char* s,
     }
 }
 
-template<typename Char>
-class basic_csv_serializer : public basic_json_output_handler<Char>
+template<typename CharT>
+class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
     struct stack_item
     {
@@ -90,18 +90,18 @@ class basic_csv_serializer : public basic_json_output_handler<Char>
         size_t count_;
         bool skip_;
     };
-    buffered_ostream<Char> os_;
-    basic_csv_parameters<Char> parameters_;
-    basic_output_format<Char> format_;
+    buffered_ostream<CharT> os_;
+    basic_csv_parameters<CharT> parameters_;
+    basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-    std::basic_ostringstream<Char> header_oss_;
-    buffered_ostream<Char> header_os_;
-    std::map<std::basic_string<Char>,size_t> header_;
-    float_printer<Char> fp_;
+    std::basic_ostringstream<CharT> header_oss_;
+    buffered_ostream<CharT> header_os_;
+    std::map<std::basic_string<CharT>,size_t> header_;
+    float_printer<CharT> fp_;
 public:
-    basic_csv_serializer(std::basic_ostream<Char>& os)
+    basic_csv_serializer(std::basic_ostream<CharT>& os)
        :
        os_(os),
        format_(),
@@ -114,8 +114,8 @@ public:
     {
     }
 
-    basic_csv_serializer(std::basic_ostream<Char>& os,
-                         basic_csv_parameters<Char> params)
+    basic_csv_serializer(std::basic_ostream<CharT>& os,
+                         basic_csv_parameters<CharT> params)
        :
        os_(os),
        parameters_(params),
@@ -180,7 +180,7 @@ private:
         end_value();
     }
 
-    void do_name(const Char* name, size_t length) override
+    void do_name(const CharT* name, size_t length) override
     {
         if (stack_.size() == 2)
         {
@@ -192,12 +192,12 @@ private:
                 }
                 bool quote = false;
                 if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
-                    (parameters_.quote_style() == quote_styles::minimal && std::char_traits<Char>::find(name,length,parameters_.field_delimiter()) != nullptr))
+                    (parameters_.quote_style() == quote_styles::minimal && std::char_traits<CharT>::find(name,length,parameters_.field_delimiter()) != nullptr))
                 {
                     quote = true;
                     os_.put(parameters_.quote_char());
                 }
-                jsoncons::csv::escape_string<Char>(name, length, parameters_.quote_char(), parameters_.quote_escape_char(), os_);
+                jsoncons::csv::escape_string<CharT>(name, length, parameters_.quote_char(), parameters_.quote_escape_char(), os_);
                 if (quote)
                 {
                     os_.put(parameters_.quote_char());
@@ -206,7 +206,7 @@ private:
             }
             else
             {
-                typename std::map<std::basic_string<Char>,size_t>::iterator it = header_.find(std::basic_string<Char>(name,length));
+                typename std::map<std::basic_string<CharT>,size_t>::iterator it = header_.find(std::basic_string<CharT>(name,length));
                 if (it == header_.end())
                 {
                     stack_.back().skip_ = true;
@@ -241,7 +241,7 @@ private:
         }
     }
 
-    void do_string_value(const Char* val, size_t length) override
+    void do_string_value(const CharT* val, size_t length) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -316,18 +316,18 @@ private:
         }
     }
 
-	void value(const Char* val, size_t length, buffered_ostream<Char>& os)
+	void value(const CharT* val, size_t length, buffered_ostream<CharT>& os)
 	{
 		begin_value(os);
 
 		bool quote = false;
 		if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
-			(parameters_.quote_style() == quote_styles::minimal && std::char_traits<Char>::find(val, length, parameters_.field_delimiter()) != nullptr))
+			(parameters_.quote_style() == quote_styles::minimal && std::char_traits<CharT>::find(val, length, parameters_.field_delimiter()) != nullptr))
 		{
 			quote = true;
 			os.put(parameters_.quote_char());
 		}
-		jsoncons::csv::escape_string<Char>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
+		jsoncons::csv::escape_string<CharT>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
 		if (quote)
 		{
 			os.put(parameters_.quote_char());
@@ -336,7 +336,7 @@ private:
 		end_value();
 	}
 
-    void value(double val, buffered_ostream<Char>& os)
+    void value(double val, buffered_ostream<CharT>& os)
     {
         begin_value(os);
 
@@ -354,7 +354,7 @@ private:
         }
         //else if (format_.floatfield() != 0)
         //{
-        //    std::basic_ostringstream<Char> ss;
+        //    std::basic_ostringstream<CharT> ss;
         //    ss.imbue(std::locale::classic());
         //    ss.setf(format_.floatfield(), std::ios::floatfield);
         //    ss << std::showpoint << std::setprecision(format_.precision()) << val;
@@ -369,53 +369,53 @@ private:
 
     }
 
-    void value(long long val, buffered_ostream<Char>& os)
+    void value(long long val, buffered_ostream<CharT>& os)
     {
         begin_value(os);
 
-		std::basic_ostringstream<Char> ss;
+		std::basic_ostringstream<CharT> ss;
 		ss << val;
         os.write(ss.str());
 
         end_value();
     }
 
-    void value(unsigned long long val, buffered_ostream<Char>& os)
+    void value(unsigned long long val, buffered_ostream<CharT>& os)
     {
         begin_value(os);
 
-		std::basic_ostringstream<Char> ss;
+		std::basic_ostringstream<CharT> ss;
 		ss << val;
 		os.write(ss.str());
 
         end_value();
     }
 
-    void value(bool val, buffered_ostream<Char>& os) 
+    void value(bool val, buffered_ostream<CharT>& os) 
     {
         begin_value(os);
 
         if (val)
         {
-            os.write(json_char_traits<Char,sizeof(Char)>::true_literal());
+            os.write(json_char_traits<CharT,sizeof(CharT)>::true_literal());
         }
         else
         {
-            os.write(json_char_traits<Char,sizeof(Char)>::false_literal());
+            os.write(json_char_traits<CharT,sizeof(CharT)>::false_literal());
         }
 
         end_value();
     }
 
-    void do_null_value(buffered_ostream<Char>& os) 
+    void do_null_value(buffered_ostream<CharT>& os) 
     {
         begin_value(os);
-        os.write(json_char_traits<Char,sizeof(Char)>::null_literal());
+        os.write(json_char_traits<CharT,sizeof(CharT)>::null_literal());
         end_value();
 
     }
 
-    void begin_value(buffered_ostream<Char>& os)
+    void begin_value(buffered_ostream<CharT>& os)
     {
         if (!stack_.empty())
         {

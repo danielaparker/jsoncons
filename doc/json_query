@@ -477,9 +477,9 @@ vertical-align:1px;
 
 <pre><code>#include "jsoncons/jsonpath/json_query.hpp"
 
-template&lt;typename Char, class Alloc&gt;
-basic_json&lt;Char,Alloc&gt; json_query(const basic_json&lt;Char,Alloc&gt;&amp; root, 
-                                  const std::basic_string&lt;Char&gt;&amp; path);
+template&lt;typename CharT, class Alloc&gt;
+basic_json&lt;CharT,Alloc&gt; json_query(const basic_json&lt;CharT,Alloc&gt;&amp; root, 
+                                  const std::basic_string&lt;CharT&gt;&amp; path);
 </code></pre>
 
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. </p>

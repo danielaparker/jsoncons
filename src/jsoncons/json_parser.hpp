@@ -80,21 +80,21 @@ namespace states {
     };
 };
 
-template<typename Char>
-class basic_json_parser : private basic_parsing_context<Char>
+template<typename CharT>
+class basic_json_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 100;
 
     states::states_t state_;
     int top_;
     std::vector<modes::modes_t> stack_;
-    basic_json_input_handler<Char> *handler_;
-    basic_parse_error_handler<Char> *err_handler_;
+    basic_json_input_handler<CharT> *handler_;
+    basic_parse_error_handler<CharT> *err_handler_;
     size_t column_;
     size_t line_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<Char> string_buffer_;
+    std::basic_string<CharT> string_buffer_;
     std::basic_string<char> number_buffer_;
     bool is_negative_;
     states::states_t saved_state_;
@@ -103,17 +103,17 @@ class basic_json_parser : private basic_parsing_context<Char>
     int depth_;
     int max_depth_;
     float_reader float_reader_;
-    const Char* begin_input_;
-    const Char* end_input_;
-    const Char* p_;
+    const CharT* begin_input_;
+    const CharT* end_input_;
+    const CharT* p_;
 
 public:
-    basic_json_parser(basic_json_input_handler<Char>& handler)
+    basic_json_parser(basic_json_input_handler<CharT>& handler)
        : state_(states::start), 
          top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<Char>::instance())),
+         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
          column_(0),
          line_(0),
          cp_(0),
@@ -124,8 +124,8 @@ public:
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
-    basic_json_parser(basic_json_input_handler<Char>& handler,
-                      basic_parse_error_handler<Char>& err_handler)
+    basic_json_parser(basic_json_input_handler<CharT>& handler,
+                      basic_parse_error_handler<CharT>& err_handler)
        : state_(states::start), 
          top_(-1),
          stack_(default_depth),
@@ -142,7 +142,7 @@ public:
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
-    basic_parsing_context<Char> const & parsing_context() const
+    basic_parsing_context<CharT> const & parsing_context() const
     {
         return *this;
     }
@@ -182,12 +182,12 @@ public:
         column_ = 1;
     }
 
-    void check_done(const Char* input, size_t start, size_t length)
+    void check_done(const CharT* input, size_t start, size_t length)
     {
         index_ = start;
         for (; index_ < length; ++index_)
         {
-            Char curr_char_ = input[index_];
+            CharT curr_char_ = input[index_];
             switch (curr_char_)
             {
             case '\n':
@@ -204,7 +204,7 @@ public:
 
     void parse_string()
     {
-        const Char* sb = p_;
+        const CharT* sb = p_;
         bool done = false;
         while (!done && p_ < end_input_)
         {
@@ -289,7 +289,7 @@ public:
         }
     }
 
-    void parse(const Char* const input, size_t start, size_t length)
+    void parse(const CharT* const input, size_t start, size_t length)
     {
         begin_input_ = input + start;
         end_input_ = input + length;
@@ -1050,7 +1050,7 @@ public:
                     }
                     else
                     {
-                        json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp_, string_buffer_);
+                        json_char_traits<CharT, sizeof(CharT)>::append_codepoint_to_string(cp_, string_buffer_);
                         state_ = states::string;
                     }
                 }
@@ -1116,7 +1116,7 @@ public:
 				{
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    json_char_traits<Char, sizeof(Char)>::append_codepoint_to_string(cp, string_buffer_);
+                    json_char_traits<CharT, sizeof(CharT)>::append_codepoint_to_string(cp, string_buffer_);
                     state_ = states::string;
 				}
                 ++p_;
@@ -1991,7 +1991,7 @@ private:
         }
     }
 
-    void end_string_value(const Char* s, size_t length) 
+    void end_string_value(const CharT* s, size_t length) 
     {
         switch (stack_[top_])
         {
@@ -2074,7 +2074,7 @@ private:
         return column_;
     }
 
-    Char do_current_char() const override
+    CharT do_current_char() const override
     {
         return p_ < end_input_? *p_ : 0;
     }

@@ -60,7 +60,7 @@ private:
 
 typedef parse_exception json_parse_exception;
 
-template<typename Char>
+template<typename CharT>
 class basic_parsing_context
 {
 public:
@@ -74,13 +74,13 @@ public:
     {
         return do_column_number();
     }
-    Char current_char() const
+    CharT current_char() const
     {
         return do_current_char();
     }
 
     // Deprecated
-    Char last_char() const
+    CharT last_char() const
     {
         return do_current_char();
     }
@@ -88,13 +88,13 @@ public:
 private:
     virtual size_t do_line_number() const = 0;
     virtual size_t do_column_number() const = 0;
-    virtual Char do_current_char() const = 0;
+    virtual CharT do_current_char() const = 0;
 };
 
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;
 
-template <typename Char>
+template <typename CharT>
 class basic_parse_error_handler
 {
 public:
@@ -103,19 +103,19 @@ public:
     }
 
     void warning(std::error_code ec,
-                 const basic_parsing_context<Char>& context) throw (parse_exception) 
+                 const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
         do_warning(ec,context);
     }
 
     void error(std::error_code ec,
-               const basic_parsing_context<Char>& context) throw (parse_exception) 
+               const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
         do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const basic_parsing_context<Char>& context) throw (parse_exception) 
+                     const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
         do_fatal_error(ec,context);
         throw parse_exception(ec,context.line_number(),context.column_number());
@@ -123,34 +123,34 @@ public:
 
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (parse_exception) = 0;
+                            const basic_parsing_context<CharT>& context) throw (parse_exception) = 0;
 
     virtual void do_error(std::error_code,
-                          const basic_parsing_context<Char>& context) throw (parse_exception) = 0;
+                          const basic_parsing_context<CharT>& context) throw (parse_exception) = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<Char>& context) throw (parse_exception)
+                                const basic_parsing_context<CharT>& context) throw (parse_exception)
     {
     }
 };
 
-template <typename Char>
-class basic_default_parse_error_handler : public basic_parse_error_handler<Char>
+template <typename CharT>
+class basic_default_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 public:
-    static basic_parse_error_handler<Char>& instance()
+    static basic_parse_error_handler<CharT>& instance()
     {
-        static basic_default_parse_error_handler<Char> instance;
+        static basic_default_parse_error_handler<CharT> instance;
         return instance;
     }
 private:
     virtual void do_warning(std::error_code,
-                            const basic_parsing_context<Char>& context) throw (parse_exception) 
+                            const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
     }
 
     virtual void do_error(std::error_code ec,
-                          const basic_parsing_context<Char>& context) throw (parse_exception)
+                          const basic_parsing_context<CharT>& context) throw (parse_exception)
     {
         throw parse_exception(ec,context.line_number(),context.column_number());
     }

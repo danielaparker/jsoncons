@@ -24,12 +24,12 @@
 namespace jsoncons
 {
 
-template <typename Char>
+template <typename CharT>
 class buffered_ostream;
 
 #ifdef _MSC_VER
 
-template <typename Char>
+template <typename CharT>
 class float_printer
 {
     int precision_;
@@ -39,7 +39,7 @@ public:
     {
     }
 
-    void print(double val, buffered_ostream<Char>& os)
+    void print(double val, buffered_ostream<CharT>& os)
     {
         char buf[_CVTBUFSIZE];
         int decimal_point = 0;
@@ -141,10 +141,10 @@ public:
 
 #else
 
-template <typename Char>
+template <typename CharT>
 class float_printer
 {
-    jsoncons::basic_ovectorstream<Char> vs_;
+    jsoncons::basic_ovectorstream<CharT> vs_;
 public:
     float_printer(int precision)
         : vs_(255)
@@ -153,13 +153,13 @@ public:
         vs_.precision(precision);
     }
 
-    void print(double val, buffered_ostream<Char>& os)
+    void print(double val, buffered_ostream<CharT>& os)
     {
         vs_.reset();
         vs_ << val;
 
-        const Char* s = vs_.data();
-        const Char* se = s + vs_.length();
+        const CharT* s = vs_.data();
+        const CharT* se = s + vs_.length();
 
         bool dot = false;
         while (s < se)
@@ -190,14 +190,14 @@ public:
 
 #endif
 
-template<typename Char>
-std::basic_string<Char> float_to_string(double val, int precision)
+template<typename CharT>
+std::basic_string<CharT> float_to_string(double val, int precision)
 {
-    std::basic_ostringstream<Char> ss;
+    std::basic_ostringstream<CharT> ss;
     ss.imbue(std::locale::classic());
     {
-        buffered_ostream<Char> os(ss);
-        float_printer<Char> printer(precision);
+        buffered_ostream<CharT> os(ss);
+        float_printer<CharT> printer(precision);
         printer.print(val, os);
     }
     return ss.str();

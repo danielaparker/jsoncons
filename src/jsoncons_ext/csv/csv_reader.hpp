@@ -22,7 +22,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<typename Char>
+template<typename CharT>
 class basic_csv_reader 
 {
     struct stack_item
@@ -42,8 +42,8 @@ public:
       \param is The input stream to read from
     */
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler)
+    basic_csv_reader(std::basic_istream<CharT>& is,
+                     basic_json_input_handler<CharT>& handler)
 
        : parser_(handler),
          is_(std::addressof(is)),
@@ -56,9 +56,9 @@ public:
     {
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     basic_csv_parameters<Char> params)
+    basic_csv_reader(std::basic_istream<CharT>& is,
+                     basic_json_input_handler<CharT>& handler,
+                     basic_csv_parameters<CharT> params)
 
        : parser_(handler,params),
          is_(std::addressof(is)),
@@ -71,9 +71,9 @@ public:
     {
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     basic_parse_error_handler<Char>& err_handler)
+    basic_csv_reader(std::basic_istream<CharT>& is,
+                     basic_json_input_handler<CharT>& handler,
+                     basic_parse_error_handler<CharT>& err_handler)
        :
          parser_(handler,err_handler),
          is_(std::addressof(is)),
@@ -88,10 +88,10 @@ public:
     {
     }
 
-    basic_csv_reader(std::basic_istream<Char>& is,
-                     basic_json_input_handler<Char>& handler,
-                     basic_parse_error_handler<Char>& err_handler,
-                     basic_csv_parameters<Char> params)
+    basic_csv_reader(std::basic_istream<CharT>& is,
+                     basic_json_input_handler<CharT>& handler,
+                     basic_parse_error_handler<CharT>& err_handler,
+                     basic_csv_parameters<CharT> params)
        :
          parser_(handler,err_handler,params),
          is_(std::addressof(is)),
@@ -158,14 +158,14 @@ private:
     basic_csv_reader(const basic_csv_reader&); // noop
     basic_csv_reader& operator = (const basic_csv_reader&); // noop
 
-    std::basic_istream<Char>* is_;
-    std::vector<Char> buffer_;
+    std::basic_istream<CharT>* is_;
+    std::vector<CharT> buffer_;
     size_t buffer_capacity_;
     size_t index_;
     size_t buffer_position_;
     size_t buffer_length_;
     bool eof_;
-    basic_csv_parser<Char> parser_;
+    basic_csv_parser<CharT> parser_;
 };
 
 typedef basic_csv_reader<char> csv_reader;

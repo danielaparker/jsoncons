@@ -164,7 +164,7 @@ public:
     }
 };
 
-template <typename Char,class ValueT>
+template <typename CharT,class ValueT>
 class compare_with_string
 {
     size_t length_;
@@ -174,10 +174,10 @@ public:
     {
     }
 
-    bool operator()(const ValueT& a, const Char* b) const
+    bool operator()(const ValueT& a, const CharT* b) const
     {
         size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        return std::char_traits<Char>::compare(a.name().c_str(),b,len) < 0;
+        return std::char_traits<CharT>::compare(a.name().c_str(),b,len) < 0;
     }
 };
 

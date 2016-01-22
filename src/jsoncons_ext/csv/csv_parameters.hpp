@@ -28,7 +28,7 @@ namespace quote_styles
         enum json_types_t{string_t,number_t,bool_t};
     }
 
-template <typename Char>
+template <typename CharT>
 class basic_csv_parameters
 {
 public:
@@ -160,72 +160,72 @@ public:
         unquoted_empty_value_is_null_ = value;
     }
 
-    std::basic_string<Char> data_types() const
+    std::basic_string<CharT> data_types() const
     {
         return data_types_;
     }
 
-    std::basic_string<Char> header() const
+    std::basic_string<CharT> header() const
     {
         return header_;
     }
 
-    void header(std::basic_string<Char> value)
+    void header(std::basic_string<CharT> value)
     {
         header_ = value;
     }
 
-    void data_types(std::basic_string<Char> value)
+    void data_types(std::basic_string<CharT> value)
     {
         data_types_ = value;
     }
 
-    Char field_delimiter() const
+    CharT field_delimiter() const
     {
         return field_delimiter_;
     }
 
-    void field_delimiter(Char value)
+    void field_delimiter(CharT value)
     {
         field_delimiter_ = value;
     }
 
-    std::basic_string<Char> line_delimiter() const
+    std::basic_string<CharT> line_delimiter() const
     {
         return line_delimiter_;
     }
 
-    void line_delimiter(std::basic_string<Char> value)
+    void line_delimiter(std::basic_string<CharT> value)
     {
         line_delimiter_ = value;
     }
 
-    Char quote_char() const
+    CharT quote_char() const
     {
         return quote_char_;
     }
 
-    void quote_char(Char value)
+    void quote_char(CharT value)
     {
         quote_char_ = value;
     }
 
-    Char quote_escape_char() const
+    CharT quote_escape_char() const
     {
         return quote_escape_char_;
     }
 
-    void quote_escape_char(Char value)
+    void quote_escape_char(CharT value)
     {
         quote_escape_char_ = value;
     }
 
-    Char comment_starter() const
+    CharT comment_starter() const
     {
         return comment_starter_;
     }
 
-    void comment_starter(Char value)
+    void comment_starter(CharT value)
     {
         comment_starter_ = value;
     }
@@ -257,16 +257,16 @@ private:
     bool unquoted_empty_value_is_null_;
 	bool ignore_empty_values_;
     bool assume_header_;
-    Char field_delimiter_;
-    std::basic_string<Char> line_delimiter_;
-    Char quote_char_;
-    Char quote_escape_char_;
-    Char comment_starter_;
+    CharT field_delimiter_;
+    std::basic_string<CharT> line_delimiter_;
+    CharT quote_char_;
+    CharT quote_escape_char_;
+    CharT comment_starter_;
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
-    std::basic_string<Char> header_;
-    std::basic_string<Char> data_types_;
+    std::basic_string<CharT> header_;
+    std::basic_string<CharT> data_types_;
 };
 
 typedef basic_csv_parameters<char> csv_parameters;
