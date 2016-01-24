@@ -288,11 +288,11 @@ public:
         void delete_array(array* p)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
             alloc.deallocate(p,1);
 #else
-            typename Alloc:: template rebind<array>::other alloc(*this);
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
             delete p;
 #endif
        }
@@ -300,7 +300,7 @@ public:
         void delete_object(object* p)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
             std::allocator_traits<Alloc>::rebind_traits<object>::destroy(alloc, p);
             alloc.deallocate(p,1);
 #else
@@ -311,7 +311,7 @@ public:
         array* create_array()
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             array* p = alloc.allocate(1);
             try
             {
@@ -331,7 +331,7 @@ public:
         array* create_array(const array& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             array* p = alloc.allocate(1);
             //alloc.construct(value_.array_value_,*(var.value_.array_value_));
             try
@@ -360,7 +360,7 @@ public:
         array* create_array(array&& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             array* p = alloc.allocate(1);
             try
             {
@@ -388,7 +388,7 @@ public:
         array* create_array(size_t size)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             array* p = alloc.allocate(1);
             try
             {
@@ -409,7 +409,7 @@ public:
         array* create_array(InputIterator first, InputIterator last)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             array* p = alloc.allocate(1);
             try
             {
@@ -430,7 +430,7 @@ public:
         object* create_object()
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
             object* p = alloc.allocate(1);
             try
             {
@@ -450,7 +450,7 @@ public:
         object* create_object(const object& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
             object* p = alloc.allocate(1);
 
             //alloc.construct(value_.object_value_,*(var.value_.object_value_));
@@ -480,7 +480,7 @@ public:
         object* create_object(object&& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(*this);
+            std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
             object* p = alloc.allocate(1);
             try
             {
