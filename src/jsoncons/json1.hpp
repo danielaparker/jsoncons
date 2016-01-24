@@ -1138,13 +1138,35 @@ public:
             return type_ == value_types::double_t || type_ == value_types::integer_t || type_ == value_types::uinteger_t;
         }
 
-        void swap(variant& var)
+        void swap(variant& rhs)
         {
             using std::swap;
-
-            swap(type_,var.type_);
-            swap(small_string_length_,var.small_string_length_);
-            swap(value_,var.value_);
+            if (this == &rhs)
+            {
+                // same object, do nothing
+            }
+            else if (get_allocator() == rhs.get_allocator())
+            {
+                // same allocator, swap contents
+                swap(type_,rhs.type_);
+                swap(small_string_length_, rhs.small_string_length_);
+                swap(value_, rhs.value_);
+            }
+#if !defined(BOOST_NO_CXX11_ALLOCATOR)
+            else if (std::allocator_traits<Alloc>::propagate_on_container_swap::value)
+            {
+                // swap allocators and contents
+                swap(static_cast<Alloc&>(*this),static_cast<Alloc&>(rhs));
+                swap(type_, rhs.type_);
+                swap(small_string_length_, rhs.small_string_length_);
+                swap(value_, rhs.value_);
+            }
+#endif
+            else
+            {
+                // Undefined behaviour
+                std::terminate();
+            }
         }
 
         value_types::value_types_t type_;
