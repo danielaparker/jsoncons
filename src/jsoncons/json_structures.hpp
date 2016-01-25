@@ -30,6 +30,7 @@ public:
     typedef typename std::vector<JsonT,allocator_type>::const_reference const_reference;
     typedef typename std::vector<JsonT,allocator_type>::iterator iterator;
     typedef typename std::vector<JsonT,allocator_type>::const_iterator const_iterator;
+    typedef typename std::vector<JsonT,allocator_type>::value_type value_type;
 
     json_array(const allocator_type& allocator = allocator_type())
         : elements_(allocator)
@@ -237,16 +238,16 @@ public:
     json_object_member()
     {
     }
-    json_object_member(const char_type* name_data, size_t name_length)
-        : name_(name_data,name_length)
+    json_object_member(const char_type* name_data, size_t name_length, const allocator_type& allocator=allocator_type())
+        : name_(name_data,name_length,allocator)
     {
     }
     json_object_member(const char_type* name_data, size_t name_length, const JsonT& val)
-        : name_(name_data,name_length), value_(val)
+        : name_(name_data,name_length,val.get_allocator()), value_(val)
     {
     }
     json_object_member(const char_type* name_data, size_t name_length, JsonT&& val)
-        : name_(name_data,name_length), value_(std::move(val))
+        : name_(name_data,name_length,val.get_allocator()), value_(std::move(val))
     {
     }
     json_object_member(const json_object_member& member)
@@ -298,7 +299,7 @@ public:
         value_.swap(member.value_);
     }
 
-    json_object_member& operator=(json_object_member const & member)
+    json_object_member& operator=(const json_object_member& member)
     {
         if (this != & member)
         {

@@ -184,7 +184,7 @@ public:
         column_labels_ = value;
     }
 
-    basic_parsing_context<CharT> const & parsing_context() const
+    const basic_parsing_context<CharT>& parsing_context() const
     {
         return *this;
     }

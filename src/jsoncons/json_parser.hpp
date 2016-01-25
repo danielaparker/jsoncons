@@ -142,7 +142,7 @@ public:
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
 
-    basic_parsing_context<CharT> const & parsing_context() const
+    const basic_parsing_context<CharT>& parsing_context() const
     {
         return *this;
     }
