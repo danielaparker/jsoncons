@@ -224,7 +224,13 @@ class json_object_member
 {
 public:
     typedef typename JsonT::char_type char_type;
-    typedef std::basic_string<char_type> name_type;
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<Alloc>::template rebind_alloc<char_type> string_allocator_type;
+#else
+    typedef typename Alloc:: template rebind<char_type>::other string_allocator_type;
+#endif
+
+    typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
 
     json_object_member()
     {
@@ -294,8 +300,8 @@ public:
     {
         if (this != & member)
         {
-            name_ = member.name;
-            value_ = member.value;
+            name_ = member.name_;
+            value_ = member.value_;
         }
         return *this;
     }
@@ -316,7 +322,7 @@ public:
         value_.shrink_to_fit();
     }
 private:
-    std::basic_string<char_type> name_;
+    name_type name_;
     JsonT value_;
 };
 
