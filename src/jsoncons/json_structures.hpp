@@ -186,7 +186,13 @@ public:
     bool operator()(const ValueT& a, const CharT* b) const
     {
         size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        return std::char_traits<CharT>::compare(a.name().c_str(),b,len) < 0;
+        int result = std::char_traits<CharT>::compare(a.name().data(),b,len);
+        if (result < 0 || result > 0)
+        {
+            return result < 0;
+        }
+
+        return a.name().length() < length_;
     }
 };
 
