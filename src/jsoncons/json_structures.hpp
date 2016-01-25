@@ -219,15 +219,16 @@ public:
     }
 };
 
-template <class JsonT, class Alloc>
+template <class JsonT>
 class json_object_member
 {
 public:
+    typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::char_type char_type;
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<Alloc>::template rebind_alloc<char_type> string_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>::template rebind_alloc<char_type> string_allocator_type;
 #else
-    typedef typename Alloc:: template rebind<char_type>::other string_allocator_type;
+    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
 #endif
 
     typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
@@ -331,7 +332,7 @@ class json_object
 {
     json_object<JsonT,Alloc>& operator=(const json_object<JsonT,Alloc>&);
 public:
-    typedef json_object_member<JsonT,Alloc> value_type;
+    typedef json_object_member<JsonT> value_type;
     typedef typename JsonT::char_type char_type;
     typedef Alloc allocator_type;
     typedef value_type& reference; 
