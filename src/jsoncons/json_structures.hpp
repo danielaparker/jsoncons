@@ -269,9 +269,9 @@ public:
         return name_.length();
     }
 
-    const std::basic_string<char_type>& name() const
+    std::basic_string<char_type> name() const
     {
-        return name_;
+        return std::basic_string<char_type>(name_.data(),name.length());
     }
 
     JsonT& value()
