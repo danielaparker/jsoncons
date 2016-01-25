@@ -111,9 +111,9 @@ public:
         elements_.erase(first,last);
     }
 
-    JsonT& at(size_t i) {return elements_.at(i);}
+    JsonT& operator[](size_t i) {return elements_[i];}
 
-    const JsonT& at(size_t i) const {return elements_.at(i);}
+    const JsonT& operator[](size_t i) const {return elements_[i];}
 
     void push_back(const JsonT& value)
     {
@@ -335,13 +335,11 @@ class json_object
 public:
     typedef typename JsonT::allocator_type allocator_type;
     typedef json_object_member<JsonT> value_type;
-    
     typedef typename JsonT::char_type char_type;
-    typedef allocator_type allocator_type;
-    typedef value_type& reference; 
-    typedef const value_type& const_reference; 
     typedef typename std::vector<value_type,allocator_type>::iterator iterator;
     typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
+    typedef typename std::vector<value_type,allocator_type>::reference reference;
+    typedef typename std::vector<value_type,allocator_type>::const_reference const_reference;
 private:
     std::vector<value_type,allocator_type> members_;
 public:

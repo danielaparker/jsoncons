@@ -2412,7 +2412,7 @@ public:
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.value_.array_value_->at(i);
+            return var_.value_.array_value_->operator[](i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
@@ -2427,7 +2427,7 @@ public:
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.value_.array_value_->at(i);
+            return var_.value_.array_value_->operator[](i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
