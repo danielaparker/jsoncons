@@ -199,7 +199,7 @@ private:
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
         }
     }
 
@@ -216,7 +216,7 @@ private:
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
         }
     }
 
@@ -233,7 +233,7 @@ private:
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
         }
     }
 
@@ -250,7 +250,7 @@ private:
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value);
+            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
         }
     }
 
@@ -267,7 +267,7 @@ private:
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(JsonT::null);
+            stack_[top_].value.array_value().push_back(value_type(null_type(),result_.get_allocator()));
         }
     }
 
