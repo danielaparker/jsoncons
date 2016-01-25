@@ -271,7 +271,7 @@ public:
 
     std::basic_string<char_type> name() const
     {
-        return std::basic_string<char_type>(name_.data(),name.length());
+        return std::basic_string<char_type>(name_.data(),name_.length());
     }
 
     JsonT& value()
