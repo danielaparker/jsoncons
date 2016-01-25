@@ -484,12 +484,34 @@ typedef basic_json_deserializer&lt;json&gt; json_deserializer
 
 <p><a href="json_input_handler">json_input_handler</a></p>
 
+<h3>Member types</h3>
+
+<table>
+<thead>
+<tr>
+<th>Member type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>allocator_type</code></td>
+<td>Allocator</td>
+</tr>
+</tbody>
+</table>
+
 <h3>Constructors</h3>
 
-<pre><code>json_deserializer()
+<pre><code>json_deserializer(const allocator_type allocator = allocator_type())
 </code></pre>
 
 <h3>Member functions</h3>
+
+<pre><code>allocator_type get_allocator() const
+</code></pre>
+
+<p>Returns the allocator associated with the json value.</p>
 
 <pre><code>bool is_valid() const
 </code></pre>
