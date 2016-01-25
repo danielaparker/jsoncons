@@ -119,7 +119,7 @@ private:
             {
                 stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
-            else if (stack_[top_-1].value.is_array()) 
+            else
             {
                 stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
             }
@@ -144,7 +144,7 @@ private:
             {
                 stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
             }
-            else if (stack_[top_-1].value.is_array()) 
+            else
             {
                 stack_[top_-1].value.array_value().push_back(std::move(stack_[top_].value));
             }
@@ -171,7 +171,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(p,length));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(JsonT(p,length));
         }
@@ -187,7 +187,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -203,7 +203,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -219,7 +219,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -235,7 +235,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(value);
         }
@@ -251,7 +251,7 @@ private:
         {
             stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),std::move(JsonT(null_type())));
         } 
-        else if (stack_[top_].value.is_array()) 
+        else
         {
             stack_[top_].value.array_value().push_back(JsonT::null);
         }
