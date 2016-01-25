@@ -185,24 +185,37 @@ public:
 
     bool operator()(const ValueT& a, const CharT* b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.name().data(),b,len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),length_);
+        int result = std::char_traits<CharT>::compare(a.name_data(),b,len);
         if (result < 0 || result > 0)
         {
             return result < 0;
         }
 
-        return a.name().length() < length_;
+        return a.name_length() < length_;
     }
 };
 
 template <class ValueT>
 class member_compare
 {
+    typedef typename ValueT::char_type char_type;
 public:
     bool operator()(const ValueT& a, const ValueT& b) const
     {
-        return a.name() < b.name();
+        if (a.name_length() == b.name_length())
+        {
+            return std::char_traits<char_type>::compare(a.name_data(),b.name_data(),a.name_length()) < 0;
+        }
+
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),b.name_length());
+        int result = std::char_traits<char_type>::compare(a.name_data(),b.name_data(),len);
+        if (result < 0 || result > 0)
+        {
+            return result < 0;
+        }
+
+        return a.name_length() < b.name_length();
     }
 };
 
@@ -215,15 +228,13 @@ public:
     json_object_member()
     {
     }
-    json_object_member(const json_object_member& pair)
-        : name_(pair.name_), value_(pair.value_)
+    json_object_member(const json_object_member& member)
+        : name_(member.name_), value_(member.value_)
     {
     }
-    json_object_member(json_object_member&& pair)
-        : name_(std::move(pair.name_)), value_(std::move(pair.value_))
+    json_object_member(json_object_member&& member)
+        : name_(std::move(member.name_)), value_(std::move(member.value_))
     {
-        //name_.swap(pair.name_);
-        //value_.swap(pair.value_);
     }
     json_object_member(const std::basic_string<char_type>& name, 
                        const JsonT& value)
@@ -246,6 +257,16 @@ public:
                        JsonT&& value)
         : name_(name), value_(std::move(std::move(value)))
     {
+    }
+
+    const char_type* name_data() const
+    {
+        return name_.data();
+    }
+
+    const size_t name_length() const
+    {
+        return name_.length();
     }
 
     const std::basic_string<char_type>& name() const
@@ -273,10 +294,10 @@ public:
         value_ = std::move(value);
     }
 
-    void swap(json_object_member& pair)
+    void swap(json_object_member& member)
     {
-        name_.swap(pair.name_);
-        value_.swap(pair.value_);
+        name_.swap(member.name_);
+        value_.swap(member.value_);
     }
 
     json_object_member& operator=(json_object_member const & member)
