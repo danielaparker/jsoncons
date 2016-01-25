@@ -185,26 +185,19 @@ public:
 
     bool operator()(const ValueT& a, const CharT* b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.name().data(),b,len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),length_);
+        int result = std::char_traits<CharT>::compare(a.name_ptr(),b,len);
         if (result < 0 || result > 0)
         {
             return result < 0;
         }
-
-        return a.name().length() < length_;
+        
+        return a.name_length() < length_;
     }
 };
 
 template <class ValueT>
-class member_compare
-{
-public:
-    bool operator()(const ValueT& a, const ValueT& b) const
-    {
-        return a.name() < b.name();
-    }
-};
+class member_compare;
 
 template <class JsonT, class Alloc>
 class json_object_member
@@ -212,45 +205,65 @@ class json_object_member
 public:
     typedef typename JsonT::char_type char_type;
 
+    friend class member_compare<JsonT>;
+
     json_object_member()
+        : name_length_(0)
     {
+        name_ptr_ = new char_type[0];
     }
     json_object_member(const json_object_member& pair)
-        : name_(pair.name_), value_(pair.value_)
+        : name_length_(pair.name_length_), value_(pair.value_)
     {
+        name_ptr_ = new char_type[pair.name_length_];
+        std::char_traits<char_type>::copy(name_ptr_,pair.name_ptr_,pair.name_length_);
     }
     json_object_member(json_object_member&& pair)
-        : name_(std::move(pair.name_)), value_(std::move(pair.value_))
+        : name_length_(pair.name_length_), value_(std::move(pair.value_))
     {
-        //name_.swap(pair.name_);
-        //value_.swap(pair.value_);
+        name_ptr_ = new char_type[pair.name_length_];
+        std::char_traits<char_type>::copy(name_ptr_,pair.name_ptr_,pair.name_length_);
     }
     json_object_member(const std::basic_string<char_type>& name, 
                        const JsonT& value)
-        : name_(name), value_(value)
+        : name_length_(name.length()), value_(value)
     {
+        name_ptr_ = new char_type[name.length()];
+        std::char_traits<char_type>::copy(name_ptr_,name.c_str(),name.length());
     }
 
     json_object_member(std::basic_string<char_type>&& name, 
                        JsonT&& value)
-        : name_(std::move(name)), value_(std::move(value))
+        : name_length_(name.length()), value_(std::move(value))
     {
+        name_ptr_ = new char_type[name.length()];
+        std::char_traits<char_type>::copy(name_ptr_,name.c_str(),name.length());
     }
 
     json_object_member(std::basic_string<char_type>&& name, const JsonT& value)
-        : name_(std::move(name)), value_(value)
+        : name_length_(name.length()), value_(value)
     {
+        name_ptr_ = new char_type[name.length()];
+        std::char_traits<char_type>::copy(name_ptr_,name.c_str(),name.length());
     }
 
     json_object_member(const std::basic_string<char_type>& name, 
                        JsonT&& value)
-        : name_(name), value_(std::move(std::move(value)))
+        : name_length_(name.length()),
+          value_(std::move(std::move(value)))
     {
+        name_ptr_ = new char_type[name.length()];
+        std::char_traits<char_type>::copy(name_ptr_,name.data(),name.length());
     }
 
-    const std::basic_string<char_type>& name() const
+    ~json_object_member()
     {
-        return name_;
+        delete[] name_ptr_;
+    }
+
+    std::basic_string<char_type> name() const
+    {
+        return std::basic_string<char_type>(name_ptr_,name_length_);
     }
 
     JsonT& value()
@@ -275,38 +288,75 @@ public:
 
     void swap(json_object_member& pair)
     {
-        name_.swap(pair.name_);
+        using std::swap;
+        swap(name_ptr_,pair.name_ptr_);
+        swap(name_length_,pair.name_length_);
         value_.swap(pair.value_);
     }
 
-    json_object_member& operator=(json_object_member const & member)
+    json_object_member& operator=(json_object_member const & rhs)
     {
-        if (this != & member)
+        if (this != & rhs)
         {
-            name_ = member.name;
-            value_ = member.value;
+            delete[] name_ptr_;
+            name_ptr = new char[rhs.name_length_];
+            name_ptr = std::char_traits<char_type>::copy(rhs.name_ptr_,rhs.name_length_);
+            name_length_ = rhs.name_length_;
+            value_ = rhs.value;
         }
         return *this;
     }
 
-    json_object_member& operator=(json_object_member&& member)
+    json_object_member& operator=(json_object_member&& rhs)
     {
-        if (this != &member)
+        if (this != &rhs)
         {
-            name_.swap(member.name_);
-            value_.swap(member.value_);
+            swap(rhs);
         }
         return *this;
     }
 
     void shrink_to_fit() 
     {
-        name_.shrink_to_fit();
         value_.shrink_to_fit();
     }
+
+    const char_type* name_ptr() const
+    {
+        return name_ptr_;
+    }
+    size_t name_length() const
+    {
+        return name_length_;
+    }
 private:
-    std::basic_string<char_type> name_;
+    char_type* name_ptr_;
+    size_t name_length_;
     JsonT value_;
+};
+
+template <class ValueT>
+class member_compare
+{
+public:
+    typedef typename ValueT::char_type char_type;
+
+    bool operator()(const ValueT& a, const ValueT& b) const
+    {
+        if (a.name_length() == b.name_length())
+        {
+            return std::char_traits<char_type>::compare(a.name_ptr(),b.name_ptr(),a.name_length()) < 0;
+        }
+        
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),b.name_length());
+        int result = std::char_traits<char_type>::compare(a.name_ptr(),b.name_ptr(),len);
+        if (result < 0 || result > 0)
+        {
+            return result < 0;
+        }
+
+        return a.name_length() < b.name_length();
+    }
 };
 
 template <class JsonT,typename Alloc>
@@ -647,6 +697,11 @@ public:
         members_.push_back(value_type(std::move(name), std::move(val)));
     }
 
+    void bulk_insert(value_type&& val)
+    {
+        members_.push_back(std::move(val));
+    }
+
     JsonT& at(const std::basic_string<char_type>& name) 
     {
         auto it = find(name);
@@ -701,6 +756,11 @@ public:
 	{
 		std::sort(members_.begin(),members_.end(),member_compare<value_type>());
 	}
+
+    void end_bulk_insert()
+    {
+        std::sort(members_.begin(),members_.end(),member_compare<value_type>());
+    }
 
     bool operator==(const json_object<JsonT,Alloc>& rhs) const
     {
