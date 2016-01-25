@@ -171,8 +171,8 @@ public:
 
     typedef Alloc allocator_type;
 
-    typedef json_array<basic_json<CharT,Alloc>,Alloc> array;
-    typedef json_object<basic_json<CharT,Alloc>,Alloc> object;
+    typedef json_array<basic_json<CharT>> array;
+    typedef json_object<basic_json<CharT>>  object;
 
     typedef CharT char_type;
 
@@ -560,25 +560,25 @@ public:
             }
         }
 
-        variant(const Alloc& a, const json_object<basic_json<CharT,Alloc>,Alloc>& val)
+        variant(const Alloc& a, const json_object<basic_json<CharT>> & val)
             : Alloc(a), type_(value_types::object_t)
         {
             value_.object_value_ = create_object(val);
         }
 
-        variant(const Alloc& a, json_object<basic_json<CharT,Alloc>,Alloc>&& val)
+        variant(const Alloc& a, json_object<basic_json<CharT>> && val)
             : Alloc(a), type_(value_types::object_t)
         {
             value_.object_value_ = create_object(std::move(val));
         }
 
-        variant(const Alloc& a, const json_array<basic_json<CharT,Alloc>,Alloc>& val)
+        variant(const Alloc& a, const json_array<basic_json<CharT>>& val)
             : Alloc(a), type_(value_types::array_t)
         {
             value_.array_value_ = create_array(val);
         }
 
-        variant(const Alloc& a, json_array<basic_json<CharT,Alloc>,Alloc>&& val)
+        variant(const Alloc& a, json_array<basic_json<CharT>>&& val)
             : Alloc(a), type_(value_types::array_t)
         {
             value_.array_value_ = create_array(std::move(val));
@@ -791,14 +791,14 @@ public:
             return *this;
         }
 
-        void assign(const json_object<basic_json<CharT,Alloc>,Alloc>& val)
+        void assign(const json_object<basic_json<CharT>> & val)
         {
 			destroy();
 			type_ = value_types::object_t;
 			value_.object_value_ = create_object(val);
 		}
 
-        void assign(json_object<basic_json<CharT,Alloc>,Alloc>&& val)
+        void assign(json_object<basic_json<CharT>> && val)
         {
 			switch (type_)
 			{
@@ -813,14 +813,14 @@ public:
 			}
 		}
 
-        void assign(const json_array<basic_json<CharT,Alloc>,Alloc>& val)
+        void assign(const json_array<basic_json<CharT>>& val)
         {
             destroy();
             type_ = value_types::array_t;
             value_.array_value_ = create_array(val);
         }
 
-        void assign(json_array<basic_json<CharT,Alloc>,Alloc>&& val)
+        void assign(json_array<basic_json<CharT>>&& val)
         {
 			switch (type_)
 			{
@@ -1196,10 +1196,10 @@ public:
     static const basic_json<CharT,Alloc> an_array;
     static const basic_json<CharT,Alloc> null;
 
-    typedef typename json_object<basic_json<CharT,Alloc>,Alloc>::iterator object_iterator;
-    typedef typename json_object<basic_json<CharT,Alloc>,Alloc>::const_iterator const_object_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,Alloc>::iterator array_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,Alloc>::const_iterator const_array_iterator;
+    typedef typename json_object<basic_json<CharT>> ::iterator object_iterator;
+    typedef typename json_object<basic_json<CharT>> ::const_iterator const_object_iterator;
+    typedef typename json_array<basic_json<CharT>>::iterator array_iterator;
+    typedef typename json_array<basic_json<CharT>>::const_iterator const_array_iterator;
 
     template <typename structure, bool is_const_iterator = true>
     class range 
@@ -1918,17 +1918,17 @@ public:
     {
     }
 
-    basic_json(const json_array<basic_json<CharT,Alloc>,Alloc>& val, const Alloc& allocator = Alloc())
+    basic_json(const json_array<basic_json<CharT>>& val, const Alloc& allocator = Alloc())
         : var_(allocator, val)
     {
     }
 
-    basic_json(json_array<basic_json<CharT,Alloc>,Alloc>&& other, const Alloc& allocator = Alloc())
+    basic_json(json_array<basic_json<CharT>>&& other, const Alloc& allocator = Alloc())
         : var_(allocator, std::move(other))
     {
     }
 
-    basic_json(json_object<basic_json<CharT,Alloc>,Alloc>&& other, const Alloc& allocator = Alloc())
+    basic_json(json_object<basic_json<CharT>> && other, const Alloc& allocator = Alloc())
         : var_(allocator, std::move(other))
     {
     }
@@ -2904,12 +2904,12 @@ public:
         var_.assign(rhs);
     }
 
-    void assign_object(const json_object<basic_json<CharT,Alloc>,Alloc>& rhs)
+    void assign_object(const json_object<basic_json<CharT>> & rhs)
     {
         var_.assign(rhs);
     }
 
-    void assign_array(const json_array<basic_json<CharT,Alloc>,Alloc>& rhs)
+    void assign_array(const json_array<basic_json<CharT>>& rhs)
     {
         var_.assign(rhs);
     }
@@ -3285,7 +3285,7 @@ void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handl
     case value_types::array_t:
         {
             handler.begin_array();
-            json_array<basic_json<CharT,Alloc>,Alloc> *o = var_.value_.array_value_;
+            json_array<basic_json<CharT>> *o = var_.value_.array_value_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);
@@ -3334,7 +3334,7 @@ const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::null = basic_json<CharT
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT,Alloc>,Alloc>()));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT>>()));
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
@@ -3360,7 +3360,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT,Alloc>,Alloc>()));
+    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT>>()));
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
