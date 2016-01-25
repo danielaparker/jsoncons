@@ -224,8 +224,21 @@ class json_object_member
 {
 public:
     typedef typename JsonT::char_type char_type;
+    typedef std::basic_string<char_type> name_type;
 
     json_object_member()
+    {
+    }
+    json_object_member(const char_type* name_data, size_t name_length)
+        : name_(name_data,name_length)
+    {
+    }
+    json_object_member(const char_type* name_data, size_t name_length, const JsonT& val)
+        : name_(name_data,name_length), value_(val)
+    {
+    }
+    json_object_member(const char_type* name_data, size_t name_length, JsonT&& val)
+        : name_(name_data,name_length), value_(std::move(val))
     {
     }
     json_object_member(const json_object_member& member)
@@ -666,6 +679,16 @@ public:
     void push_back(std::basic_string<char_type>&& name, JsonT&& val)
     {
         members_.push_back(value_type(std::move(name), std::move(val)));
+    }
+
+    void bulk_insert(const value_type& member)
+    {
+        members_.push_back(member);
+    }
+
+    void bulk_insert(value_type&& member)
+    {
+        members_.push_back(std::move(member));
     }
 
     JsonT& at(const std::basic_string<char_type>& name) 
