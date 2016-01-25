@@ -662,13 +662,13 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s.c_str(),s.length(),get_allocator());
+                value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
             }
             else
             {
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)s.length();
-                std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
                 value_.small_string_value_[small_string_length_] = 0;
             }
         }
@@ -849,13 +849,13 @@ public:
                 if (s.length() > variant::small_string_capacity)
                 {
                     type_ = value_types::string_t;
-                    value_.string_value_ = create_string_data(s.c_str(),s.length(),get_allocator());
+                    value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
                 }
                 else
                 {
                     type_ = value_types::small_string_t;
                     small_string_length_ = (unsigned char)s.length();
-                    std::memcpy(value_.small_string_value_,s.c_str(),s.length()*sizeof(CharT));
+                    std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
                     value_.small_string_value_[small_string_length_] = 0;
                 }
                 break;
@@ -3276,7 +3276,7 @@ void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handl
             object* o = var_.value_.object_value_;
             for (const_object_iterator it = o->begin(); it != o->end(); ++it)
             {
-                handler.name((it->name()).c_str(),it->name().length());
+                handler.name((it->name()).data(),it->name().length());
                 it->value().to_stream(handler);
             }
             handler.end_object();
@@ -3418,9 +3418,9 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
     basic_json_parser<CharT> parser(handler);
     parser.begin_parse();
-    parser.parse(s.c_str(),0,s.length());
+    parser.parse(s.data(),0,s.length());
     parser.end_parse();
-    parser.check_done(s.c_str(),parser.index(),s.length());
+    parser.check_done(s.data(),parser.index(),s.length());
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -3435,9 +3435,9 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
     basic_json_parser<CharT> parser(handler,err_handler);
     parser.begin_parse();
-    parser.parse(s.c_str(),0,s.length());
+    parser.parse(s.data(),0,s.length());
     parser.end_parse();
-    parser.check_done(s.c_str(),parser.index(),s.length());
+    parser.check_done(s.data(),parser.index(),s.length());
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -3451,9 +3451,9 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
     basic_json_parser<CharT> parser(handler);
     parser.begin_parse();
-    parser.parse(s.c_str(),0,s.length());
+    parser.parse(s.data(),0,s.length());
     parser.end_parse();
-    parser.check_done(s.c_str(),parser.index(),s.length());
+    parser.check_done(s.data(),parser.index(),s.length());
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -3468,9 +3468,9 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
     basic_json_parser<CharT> parser(handler,err_handler);
     parser.begin_parse();
-    parser.parse(s.c_str(),0,s.length());
+    parser.parse(s.data(),0,s.length());
     parser.end_parse();
-    parser.check_done(s.c_str(),parser.index(),s.length());
+    parser.check_done(s.data(),parser.index(),s.length());
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
