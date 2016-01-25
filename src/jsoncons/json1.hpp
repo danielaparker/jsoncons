@@ -273,14 +273,14 @@ public:
         any_handle* impl_;
     };
 
-    const Alloc& get_allocator() const
+    Alloc get_allocator() const
     {
-        return var_.get_allocator();
+        return var_;
     }
 
     struct variant : public Alloc
     {
-        const Alloc& get_allocator() const
+        Alloc get_allocator() const
         {
             return *this;
         }

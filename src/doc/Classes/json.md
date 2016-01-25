@@ -13,6 +13,7 @@ and `std::allocator<void>` as the allocator type.
 
 Member type                         |Definition
 ------------------------------------|------------------------------
+`allocator_type`|Allocator
 `member_type`|[member_type](json_member_type) is a class that stores a name and a json value
 `any`|[any](json%20any) can contain any value that supports copy construction and assignment.
 `null_type`|An alias for `jsoncons::null_type`
