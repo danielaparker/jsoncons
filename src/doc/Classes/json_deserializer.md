@@ -12,11 +12,20 @@ The `json_deserializer` class is an instantiation of the `basic_json_deserialize
 
 [json_input_handler](json_input_handler)
 
+### Member types
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`allocator_type`|Allocator
+
 ### Constructors
 
-    json_deserializer()
+    json_deserializer(const allocator_type allocator = allocator_type())
 
 ### Member functions
+
+    allocator_type get_allocator() const
+Returns the allocator associated with the json value.
 
     bool is_valid() const
 Checks if the `deserializer` contains a valid json value. The initial `is_valid()` is true (the value is an empty object), becomes false when a `do_begin_json` event is received, becomes `true` when a `do_end_json` event is received, and becomes false when `get_result()` is called.

@@ -330,29 +330,31 @@ The result is
 ### About jsoncons::json
 
 The json class is an instantiation of the `basic_json` class template that uses `char` as the character type
-and `std::allocator<void>` as the allocator type,
+and `std::allocator<char>` as the allocator type,
 
-    typedef basic_json<char,std::allocator<void>> json
+    typedef basic_json<char,std::allocator<char>> json
+
+The `jsoncons` library will rebind the supplied allocator to the types it allocates, `char`, `json::array` and `json::object`, and the internal containers`std::basic_string` and `std::vector` will rebind as well.
 
 The library includes an instantiation for wide characters as well,
 
-    typedef basic_json<wchar_t,std::allocator<void>> wjson
+    typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson
 
-Note that the allocator type allows you to supply a custom allocator. For instance, you can use the boost `fast_pool_allocator`:
+Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 
     #include <boost/pool/pool_alloc.hpp>
     #include "jsoncons/json.hpp"
 
-    typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> myjson;
+    typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
 
     myjson o;
 
     o.set("FirstName","Joe");
     o.set("LastName","Smith");
 
-This results in a json object instance being allocated from the boost memory pool. 
-The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory, 
-these always use the default allocators.
+This results in a json value being constucted with all memory being allocated from the boost memory pool. (In this particular case there is no improvement in performance over `std::allocator`.)
+
+Note that the underlying memory pool used by the this allocator is never freed. 
 
 ## Wide character support
 

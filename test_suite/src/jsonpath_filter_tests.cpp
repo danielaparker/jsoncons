@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
     size_t line = 1;
     size_t column = 1;
     const char* pend;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(&pend,&line,&column);
+    jsonpath_filter_parser<char,std::allocator<char>> parser(&pend,&line,&column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
     size_t line = 1;
     size_t column = 1;
     const char* pend;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(&pend,&line,&column);
+    jsonpath_filter_parser<char,std::allocator<char>> parser(&pend,&line,&column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
     size_t line = 1;
     size_t column = 1;
     const char* pend;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(&pend,&line,&column);
+    jsonpath_filter_parser<char,std::allocator<char>> parser(&pend,&line,&column);
     json parent = json::array();
     parent.add(1);
     parent.add(2);
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     size_t line = 1;
     size_t column = 1;
     const char* pend;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(&pend,&line,&column);
+    jsonpath_filter_parser<char,std::allocator<char>> parser(&pend,&line,&column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
     size_t line = 1;
     size_t column = 1;
     const char* pend;
-    jsonpath_filter_parser<char,std::allocator<void>> parser(&pend,&line,&column);
+    jsonpath_filter_parser<char,std::allocator<char>> parser(&pend,&line,&column);
 	json parent = json::array();
 	parent.add(1);
 	parent.add(2);

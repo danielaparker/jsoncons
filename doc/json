@@ -470,11 +470,11 @@ vertical-align:1px;
 <body>
 <pre><code>jsoncons::json
 
-typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
+typedef basic_json&lt;char,std::allocator&lt;char&gt;&gt; json
 </code></pre>
 
 <p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
-and <code>std::allocator&lt;void&gt;</code> as the allocator type. </p>
+and <code>std::allocator&lt;char&gt;</code> as the allocator type. The <code>jsoncons</code> library will rebind the supplied allocator to the types it allocates, <code>char</code>, <code>json::array</code> and <code>json::object</code>, and the internal containers<code>std::basic_string</code> and <code>std::vector</code> will rebind as well.</p>
 
 <h3>Header</h3>
 
@@ -491,6 +491,10 @@ and <code>std::allocator&lt;void&gt;</code> as the allocator type. </p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>allocator_type</code></td>
+<td>Allocator</td>
+</tr>
 <tr>
 <td><code>member_type</code></td>
 <td>
@@ -906,6 +910,11 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 <p>Remove a member with the specified name from an object<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
+<pre><code>void shrink_to_fit()
+</code></pre>
+
+<p>Requests the removal of unused capacity.</p>
+
 <pre><code>void set(const std::string&amp; name, const json&amp; val)
 void set(std::string&amp;&amp; name, const json&amp; val)
 void set(const std::string&amp; name, json&amp;&amp; val)
@@ -945,11 +954,6 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 </code></pre>
 
 <p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
-
-<pre><code>void shrink_to_fit()
-</code></pre>
-
-<p>Requests the removal of unused capacity.</p>
 
 <h3>Relational operators</h3>
 

@@ -28,6 +28,17 @@ BOOST_AUTO_TEST_CASE(test_get_with_string_default)
   std::cout << "result:" << result << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_compare_with_string)
+{
+    json a;
+    a["key"] = "value";
+    a["key1"] = "value1";
+    a["key2"] = "value2";
+    BOOST_CHECK(a["key"] == a["key"]);
+    BOOST_CHECK(!(a["key"] == a["key1"]));
+    BOOST_CHECK(!(a["key"] == a["key2"]));
+}
+
 BOOST_AUTO_TEST_CASE(test_object_key_proxy)
 {
     json a;

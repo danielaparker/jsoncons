@@ -1,12 +1,9 @@
     jsoncons::wjson
 
-    typedef basic_json<wchar_t,std::allocator<void>> wjson
+    typedef basic_json<wchar_t,std::allocator<char>> wjson
 
 The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type
-and `std::allocator<void>` as the allocator type. The allocator type is used to supply an allocator for dynamically allocated, 
-fixed size small objects in the `wjson` container, the `wjson` container will rebind it as necessary. The allocator type
-is not used for structures including vectors and strings that use large or variable amounts of memory, 
-these always use the default allocators.
+and `std::allocator<wchar_t>` as the allocator type. The `jsoncons` library will rebind the supplied allocator to the types it allocates, `char`, `json::array` and `json::object`, and the internal containers`std::basic_string` and `std::vector` will rebind as well.
 
 ### Header
 

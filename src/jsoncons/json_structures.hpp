@@ -21,19 +21,18 @@
 
 namespace jsoncons {
 
-template <class JsonT, typename Alloc>
+template <class JsonT>
 class json_array 
 {
-    std::vector<JsonT,Alloc> elements_;
-    json_array& operator=(const json_array<JsonT,Alloc>&);
 public:
-    typedef typename std::vector<JsonT,Alloc>::allocator_type allocator_type;
-    typedef typename std::vector<JsonT,Alloc>::reference reference;
-    typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
-    typedef typename std::vector<JsonT,Alloc>::iterator iterator;
-    typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
+    typedef typename JsonT::allocator_type allocator_type;
+    typedef typename std::vector<JsonT,allocator_type>::reference reference;
+    typedef typename std::vector<JsonT,allocator_type>::const_reference const_reference;
+    typedef typename std::vector<JsonT,allocator_type>::iterator iterator;
+    typedef typename std::vector<JsonT,allocator_type>::const_iterator const_iterator;
+    typedef typename std::vector<JsonT,allocator_type>::value_type value_type;
 
-    json_array(const Alloc& allocator = Alloc())
+    json_array(const allocator_type& allocator = allocator_type())
         : elements_(allocator)
     {
     }
@@ -48,33 +47,33 @@ public:
     }
 
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-    json_array(const json_array& val, const Alloc& allocator)
+    json_array(const json_array& val, const allocator_type& allocator)
         : elements_(val.elements_,allocator)
     {
     }
-    json_array(json_array&& val, const Alloc& allocator)
+    json_array(json_array&& val, const allocator_type& allocator)
         : elements_(std::move(val.elements_),allocator)
     {
     }
 #endif
 
-    json_array(size_t n, const Alloc& allocator = Alloc())
+    json_array(size_t n, const allocator_type& allocator = allocator_type())
         : elements_(n,allocator)
     {
     }
 
-    json_array(size_t n, const JsonT& val, const Alloc& allocator = Alloc())
+    json_array(size_t n, const JsonT& val, const allocator_type& allocator = allocator_type())
         : elements_(n,val,allocator)
     {
     }
 
     template <class InputIterator>
-    json_array(InputIterator begin, InputIterator end, const Alloc& allocator = Alloc())
+    json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
         : elements_(begin,end,allocator)
     {
     }
 
-    void swap(json_array<JsonT,Alloc>& val)
+    void swap(json_array<JsonT>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -112,9 +111,9 @@ public:
         elements_.erase(first,last);
     }
 
-    JsonT& at(size_t i) {return elements_.at(i);}
+    JsonT& operator[](size_t i) {return elements_[i];}
 
-    const JsonT& at(size_t i) const {return elements_.at(i);}
+    const JsonT& operator[](size_t i) const {return elements_[i];}
 
     void push_back(const JsonT& value)
     {
@@ -156,7 +155,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<JsonT,Alloc>& rhs) const
+    bool operator==(const json_array<JsonT>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -171,6 +170,9 @@ public:
         }
         return true;
     }
+private:
+    json_array& operator=(const json_array<JsonT>&);
+    std::vector<JsonT,allocator_type> elements_;
 };
 
 template <typename CharT,class ValueT>
@@ -225,6 +227,7 @@ class json_object_member
 public:
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::char_type char_type;
+    typedef typename JsonT::allocator_type allocator_type;
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<allocator_type>::template rebind_alloc<char_type> string_allocator_type;
 #else
@@ -236,16 +239,16 @@ public:
     json_object_member()
     {
     }
-    json_object_member(const char_type* name_data, size_t name_length)
-        : name_(name_data,name_length)
+    json_object_member(const char_type* name_data, size_t name_length, const allocator_type& allocator=allocator_type())
+        : name_(name_data,name_length,allocator)
     {
     }
     json_object_member(const char_type* name_data, size_t name_length, const JsonT& val)
-        : name_(name_data,name_length), value_(val)
+        : name_(name_data,name_length,val.get_allocator()), value_(val)
     {
     }
     json_object_member(const char_type* name_data, size_t name_length, JsonT&& val)
-        : name_(name_data,name_length), value_(std::move(val))
+        : name_(name_data,name_length,val.get_allocator()), value_(std::move(val))
     {
     }
     json_object_member(const json_object_member& member)
@@ -297,7 +300,7 @@ public:
         value_.swap(member.value_);
     }
 
-    json_object_member& operator=(json_object_member const & member)
+    json_object_member& operator=(const json_object_member& member)
     {
         if (this != & member)
         {
@@ -327,27 +330,26 @@ private:
     JsonT value_;
 };
 
-template <class JsonT,typename Alloc>
+template <class JsonT>
 class json_object
 {
-    json_object<JsonT,Alloc>& operator=(const json_object<JsonT,Alloc>&);
 public:
+    typedef typename JsonT::allocator_type allocator_type;
     typedef json_object_member<JsonT> value_type;
     typedef typename JsonT::char_type char_type;
-    typedef Alloc allocator_type;
-    typedef value_type& reference; 
-    typedef const value_type& const_reference; 
-    typedef typename std::vector<value_type,Alloc>::iterator iterator;
-    typedef typename std::vector<value_type,Alloc>::const_iterator const_iterator;
+    typedef typename std::vector<value_type,allocator_type>::iterator iterator;
+    typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
+    typedef typename std::vector<value_type,allocator_type>::reference reference;
+    typedef typename std::vector<value_type,allocator_type>::const_reference const_reference;
 private:
-    std::vector<value_type,Alloc> members_;
+    std::vector<value_type,allocator_type> members_;
 public:
-    json_object(const Alloc& allocator = Alloc())
+    json_object(const allocator_type& allocator = allocator_type())
         : members_(allocator)
     {
     }
 
-    json_object(const json_object<JsonT,Alloc>& val)
+    json_object(const json_object<JsonT>& val)
         : members_(val.members_)
     {
     }
@@ -358,12 +360,12 @@ public:
     }
 
 #if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-    json_object(const json_object<JsonT,Alloc>& val, const Alloc& allocator)
+    json_object(const json_object<JsonT>& val, const allocator_type& allocator)
         : members_(val.members_,allocator)
     {
     }
 
-    json_object(json_object&& val,const Alloc& allocator)
+    json_object(json_object&& val,const allocator_type& allocator)
         : members_(std::move(val.members_),allocator)
     {
     }
@@ -725,7 +727,7 @@ public:
 		std::sort(members_.begin(),members_.end(),member_compare<value_type>());
 	}
 
-    bool operator==(const json_object<JsonT,Alloc>& rhs) const
+    bool operator==(const json_object<JsonT>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -743,6 +745,8 @@ public:
         }
         return true;
     }
+private:
+    json_object<JsonT>& operator=(const json_object<JsonT>&);
 };
 
 
