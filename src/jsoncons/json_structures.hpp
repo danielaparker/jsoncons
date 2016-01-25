@@ -249,29 +249,6 @@ public:
         : name_(std::move(member.name_)), value_(std::move(member.value_))
     {
     }
-    json_object_member(const std::basic_string<char_type>& name, 
-                       const JsonT& value)
-        : name_(name), value_(value)
-    {
-    }
-
-    json_object_member(std::basic_string<char_type>&& name, 
-                       JsonT&& value)
-        : name_(std::move(name)), value_(std::move(value))
-    {
-    }
-
-    json_object_member(std::basic_string<char_type>&& name, const JsonT& value)
-        : name_(std::move(name)), value_(value)
-    {
-    }
-
-    json_object_member(const std::basic_string<char_type>& name, 
-                       JsonT&& value)
-        : name_(name), value_(std::move(std::move(value)))
-    {
-    }
-
     const char_type* name_data() const
     {
         return name_.data();
@@ -501,7 +478,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,compare_with_string<char_type,value_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(name, value));
+            members_.push_back(value_type(name.data(), name.length(),value));
         }
         else if (it->name() == name)
         {
@@ -509,7 +486,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(name,value));
+            members_.insert(it,value_type(name.data(),name.length(),value));
         }
     }
 
@@ -526,7 +503,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(std::move(name),value));
+            members_.insert(it,value_type(name.data(),name.length(),value));
         }
     }
 
@@ -535,7 +512,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,compare_with_string<char_type,value_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(name, std::move(value)));
+            members_.push_back(value_type(name.data(),name.length(),std::move(value)));
         }
         else if (it->name() == name)
         {
@@ -543,7 +520,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(name,std::move(value)));
+            members_.insert(it,value_type(name.data(),name.length(),std::move(value)));
         }
     }
 
@@ -552,7 +529,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,compare_with_string<char_type,value_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(name.data(),name.length(), std::move(value)));
         }
         else if (it->name() == name)
         {
@@ -560,7 +537,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(std::move(name),std::move(value)));
+            members_.insert(it,value_type(name.data(),name.length(),std::move(value)));
         }
     }
 
@@ -578,7 +555,7 @@ public:
         
         if (it == members_.end())
         {
-            members_.push_back(value_type(name, value));
+            members_.push_back(value_type(name.data(),name.length(), value));
             it = members_.end();
         }
         else if (it->name() == name)
@@ -587,7 +564,7 @@ public:
         }
         else
         {
-           it = members_.insert(it,value_type(name,value));
+           it = members_.insert(it,value_type(name.data(),name.length().data(),name.length(),value));
         }
         return it;
     }
@@ -606,7 +583,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), value));
+            members_.push_back(value_type(name.data(),name.length(), value));
             it = members_.end();
         }
         else if (it->name() == name)
@@ -615,7 +592,7 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),value));
+            it = members_.insert(it,value_type(name.data(),name.length().data(),name.length(),value));
         }
         return it;
     }
@@ -634,7 +611,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(name, std::move(value)));
+            members_.push_back(value_type(name.data(),name.length().data(),name.length(),std::move(value)));
             it = members_.end();
         }
         else if (it->name() == name)
@@ -643,7 +620,7 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(name,std::move(value)));
+            it = members_.insert(it,value_type(name.data(),name.length(),std::move(value)));
         }
         return it;
     }
@@ -662,7 +639,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(name.data(),name.length(), std::move(value)));
             it = members_.end();
         }
         else if (it->name() == name)
@@ -671,14 +648,9 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),std::move(value)));
+            it = members_.insert(it,value_type(name.data(),name.length(),std::move(value)));
         }
         return it;
-    }
-
-    void push_back(std::basic_string<char_type>&& name, JsonT&& val)
-    {
-        members_.push_back(value_type(std::move(name), std::move(val)));
     }
 
     void bulk_insert(const value_type& member)

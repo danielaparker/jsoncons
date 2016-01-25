@@ -24,10 +24,11 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
     static const int default_depth = 100;
 
     typedef typename JsonT::char_type char_type;
+    typedef typename JsonT::member_type member_type;
 
     struct stack_item
     {
-        std::basic_string<char_type> name;
+        member_type member;
         JsonT value;
     };
 
@@ -117,7 +118,9 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
+                //stack_[top_-1].value.object_value().bulk_insert(std::move(member_type(std::move(stack_[top_-1].name),std::move(stack_[top_].value))));
+                stack_[top_-1].member.value(std::move(stack_[top_].value));
+                stack_[top_-1].value.object_value().bulk_insert(std::move(stack_[top_-1].member));
             }
             else
             {
@@ -142,7 +145,8 @@ private:
         {
             if (stack_[top_-1].value.is_object())
             {
-                stack_[top_-1].value.object_value().push_back(std::move(stack_[top_-1].name),std::move(stack_[top_].value));
+                stack_[top_-1].member.value(std::move(stack_[top_].value));
+                stack_[top_-1].value.object_value().bulk_insert(std::move(stack_[top_-1].member));
             }
             else
             {
@@ -158,7 +162,7 @@ private:
 
     void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name = std::basic_string<char_type>(p,length);
+        stack_[top_].member = member_type(p,length);
     }
 
     void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
@@ -169,7 +173,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(p,length));
+            stack_[top_].member.value(JsonT(p,length));
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
@@ -185,7 +190,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
+            stack_[top_].member.value(value);
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
@@ -201,7 +207,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
+            stack_[top_].member.value(value);
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
@@ -217,7 +224,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
+            stack_[top_].member.value(value);
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
@@ -233,7 +241,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),JsonT(value));
+            stack_[top_].member.value(value);
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
@@ -249,7 +258,8 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].value.object_value().push_back(std::move(stack_[top_].name),std::move(JsonT(null_type())));
+            stack_[top_].member.value(null_type());
+            stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
