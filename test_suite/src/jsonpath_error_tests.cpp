@@ -51,7 +51,6 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-
 void test_error_code(const json& root, const std::string& path, int value, const std::error_category& category, size_t line, size_t column)
 {
 	try

@@ -71,11 +71,11 @@ string_data<CharT>* create_string_data(const Alloc& allocator)
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
-    char* storage = alloc.allocate(mem_size);
 #else
-    char* storage = new char[mem_size];
+    typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
 
+	char* storage = alloc.allocate(mem_size);
     string_data<CharT>* ps = new(storage)string_data<CharT>();
     auto psa = reinterpret_cast<string_dataA<CharT>*>(storage); 
 
@@ -93,11 +93,11 @@ string_data<CharT>* create_string_data(const CharT* s, size_t length, const Allo
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
-    char* storage = alloc.allocate(mem_size);
 #else
-    char* storage = new char[mem_size];
+    typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
 
+    char* storage = alloc.allocate(mem_size);
     string_data<CharT>* ps = new(storage)string_data<CharT>();
     auto psa = reinterpret_cast<string_dataA<CharT>*>(storage); 
 
@@ -115,10 +115,10 @@ void destroy_string_data(string_data<CharT>* p, const Alloc& allocator)
     size_t mem_size = sizeof(storage_type) + p->length_*sizeof(CharT);
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
-    alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
 #else
-    ::operator delete(reinterpret_cast<void*>(p));
+    typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
+    alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
 }
 
 template <typename CharT,class T> inline
@@ -287,11 +287,11 @@ public:
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
             std::allocator_traits<Alloc>::rebind_traits<array>::destroy(alloc, p);
-            alloc.deallocate(p,1);
 #else
             typename Alloc:: template rebind<array>::other alloc(get_allocator());
-            delete p;
+			alloc.destroy(p);
 #endif
+            alloc.deallocate(p,1);
        }
 
         void delete_object(object* p)
@@ -309,10 +309,17 @@ public:
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
+#endif
             array* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, get_allocator());
+#else
+                new(p) array(get_allocator());
+#endif
             }
             catch (...)
             {
@@ -320,23 +327,22 @@ public:
                 throw;
             }
             return p;
-#else
-            return new array(get_allocator());
-#endif
         }
 
         array* create_array(const array& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
+#endif
             array* p = alloc.allocate(1);
-            //alloc.construct(value_.array_value_,*(var.value_.array_value_));
             try
             {
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val, get_allocator());
 #else
-                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, val);
+                alloc.construct(p, val);
 #endif
             }
             catch (...)
@@ -345,26 +351,23 @@ public:
                 throw;
             }
             return p;
-#else
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new array(val, get_allocator());
-#else
-            return new array(val);
-#endif
-#endif
         }
 
         array* create_array(array&& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
+#endif
+
             array* p = alloc.allocate(1);
             try
             {
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val), get_allocator());
 #else
-                std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, std::move(val));
+                new(p) array(std::move(val));
 #endif
             }
             catch (...)
@@ -373,23 +376,24 @@ public:
                 throw;
             }
             return p;
-#else
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new array(std::move(val), get_allocator());
-#else
-            return new array(std::move(val));
-#endif
-#endif
         }
 
         array* create_array(size_t size)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
+#endif
+
             array* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, size, get_allocator());
+#else
+                new(p)array(size,get_allocator());
+#endif
             }
             catch (...)
             {
@@ -397,9 +401,6 @@ public:
                 throw;
             }
             return p;
-#else
-            return new array(size,get_allocator());
-#endif
         }
 
         template<class InputIterator>
@@ -407,31 +408,42 @@ public:
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<array> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<array>::other alloc(get_allocator());
+#endif
+
             array* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<array>::construct(alloc, p, first, last, get_allocator());
+#else
+                new(p)array(first, last, get_allocator());
+#endif
             }
             catch (...)
             {
                 alloc.deallocate(p,1);
                 throw;
             }
-
             return p;
-#else
-            return new array(first,last,get_allocator());
-#endif
         }
 
         object* create_object()
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<object>::other alloc(get_allocator());
+#endif
             object* p = alloc.allocate(1);
             try
             {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, get_allocator());
+#else
+                new(p) object(get_allocator());
+#endif
             }
             catch (...)
             {
@@ -439,24 +451,22 @@ public:
                 throw;
             }
             return p;
-#else
-            return new object(get_allocator());
-#endif
        }
 
         object* create_object(const object& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<object>::other alloc(get_allocator());
+#endif
             object* p = alloc.allocate(1);
-
-            //alloc.construct(value_.object_value_,*(var.value_.object_value_));
             try
             {
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
                 std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val, get_allocator());
 #else
-                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, val);
+                alloc.construct(p, val);
 #endif
             }
             catch (...)
@@ -465,26 +475,23 @@ public:
                 throw;
             }
             return p;
-#else
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new object(val,get_allocator());
-#else
-            return new object(val);
-#endif
-#endif
         }
 
         object* create_object(object&& val)
         {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
+#else
+            typename Alloc:: template rebind<object>::other alloc(get_allocator());
+#endif
+
             object* p = alloc.allocate(1);
             try
             {
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val),get_allocator());
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val), get_allocator());
 #else
-                std::allocator_traits<Alloc>::rebind_traits<object>::construct(alloc, p, std::move(val));
+                new(p)object(std::move(val));
 #endif
             }
             catch (...)
@@ -493,13 +500,6 @@ public:
                 throw;
             }
             return p;
-#else
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-            return new object(val,get_allocator());
-#else
-            return new object(val);
-#endif
-#endif
         }
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(CharT)) - 1;
 
