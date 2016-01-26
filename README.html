@@ -554,7 +554,7 @@ json book3;
 book3.reserve(6);
 
 // Insert in name alphabetical order
-// Provide a hint to set where to insert the member
+// Give set a hint where to insert the next member
 json::object_iterator pos;
 pos = book3.set(book3.members().begin(),"author", "Haruki Murakami");
 pos = book3.set(pos, "category", "Fiction");
@@ -597,8 +597,8 @@ std::cout &lt;&lt; book1 &lt;&lt; "," &lt;&lt; book2 &lt;&lt; "," &lt;&lt; book3
 for(auto book : booklist.elements())
 {
     std::cout &lt;&lt; book["title"].as&lt;std::string&gt;()
-        &lt;&lt; ","
-        &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
+          &lt;&lt; ","
+          &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
 // Serialize the booklist to a file
@@ -659,16 +659,41 @@ std::ifstream is("booklist.json");
 json booklist;
 is &gt;&gt; booklist;
 
-// Use a JsonPath expression to find the authors of 
-// books that cost less than $12
+// Use a JsonPath expression to find 
+//  
+// (1) The authors of books that cost less than $12
 json result = json_query(booklist, "$[*][?(@.price &lt; 12)].author");
+std::cout &lt;&lt; "(1) " &lt;&lt; result &lt;&lt; std::endl;
 
-std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+// (2) The number of books
+result = json_query(booklist, "$.length");
+std::cout &lt;&lt; "(2) " &lt;&lt; result &lt;&lt; std::endl;
+
+// (3) The third book
+result = json_query(booklist, "$[2]");
+std::cout &lt;&lt; "(3) " &lt;&lt; std::endl &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+
+// (4) The authors of books that were published in 2004
+result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
+std::cout &lt;&lt; "(4) " &lt;&lt; result &lt;&lt; std::endl;
 </code></pre>
 
 <p>Result:</p>
 
-<pre><code>["Haruki Murakami","George Crile"]
+<pre><code>(1) ["Haruki Murakami","George Crile"]
+(2) [4]
+(3)
+[
+    {
+        "author":"George Crile",
+        "category":"History",
+        "date":"2007-11-06",
+        "isbn":"0802143415",
+        "price":10.5,
+        "title":"Charlie Wilson's War"
+    }
+]
+(4) ["Charles Bukowski"]
 </code></pre>
 
 <h2>Once again, this time with wide characters</h2>
@@ -707,7 +732,7 @@ wjson book3;
 book3.reserve(6);
 
 // Insert in name alphabetical order
-// Provide a hint where to insert the member
+// Give set a hint where to insert the next member
 wjson::object_iterator pos;
 pos = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
 pos = book3.set(pos, L"category", L"Fiction");
@@ -750,8 +775,8 @@ std::wcout &lt;&lt; book1 &lt;&lt; L"," &lt;&lt; book2 &lt;&lt; L"," &lt;&lt; bo
 for (auto book : booklist.elements())
 {
     std::wcout &lt;&lt; book[L"title"].as&lt;std::wstring&gt;()
-           &lt;&lt; L","
-           &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
+               &lt;&lt; L","
+               &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
 // Serialize the booklist to a file
@@ -775,7 +800,20 @@ std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 
 <p>Result:</p>
 
-<pre><code>["Charles Bukowski"]
+<pre><code>(1) ["Haruki Murakami","George Crile"]
+(2) [4]
+(3)
+[
+    {
+        "author":"George Crile",
+        "category":"History",
+        "date":"2007-11-06",
+        "isbn":"0802143415",
+        "price":10.5,
+        "title":"Charlie Wilson's War"
+    }
+]
+(4) ["Charles Bukowski"]
 </code></pre>
 
 <h2>Acknowledgements</h2>

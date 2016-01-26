@@ -14,6 +14,7 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
+void run_readme_examples();
 void array_examples();
 void json_any_examples();
 void wjson_examples();
@@ -259,6 +260,7 @@ void parse_exception_example()
 
 int main()
 {
+    run_readme_examples();
     first_example_a();
     first_example_b();
     first_example_c();

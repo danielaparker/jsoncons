@@ -1149,7 +1149,7 @@ public:
                 swap(small_string_length_, rhs.small_string_length_);
                 swap(value_, rhs.value_);
             }
-#if !defined(BOOST_NO_CXX11_ALLOCATOR)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             else if (std::allocator_traits<Alloc>::propagate_on_container_swap::value)
             {
                 // swap allocators and contents

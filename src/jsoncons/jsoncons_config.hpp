@@ -47,6 +47,8 @@ namespace jsoncons
 #if defined(_MSC_VER)
 #if _MSC_VER < 1800 // VS2013
 #define JSONCONS_NO_CXX11_ALLOCATOR
+#define JSONCONS_NO_RAW_STRING_LITERALS
+#define JSONCONS_NO_FOR_RANGE
 #endif
 #if _MSC_VER >= 1900
 #define JSONCONS_ALIGNOF alignof

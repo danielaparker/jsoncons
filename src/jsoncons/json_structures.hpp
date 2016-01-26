@@ -573,7 +573,7 @@ public:
         }
         else
         {
-           it = members_.insert(it,value_type(name.data(),name.length().data(),name.length(),value));
+           it = members_.insert(it,value_type(name.data(),name.length(),value));
         }
         return it;
     }
@@ -601,7 +601,7 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(name.data(),name.length().data(),name.length(),value));
+            it = members_.insert(it,value_type(name.data(),name.length(),value));
         }
         return it;
     }
@@ -620,7 +620,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(name.data(),name.length().data(),name.length(),std::move(value)));
+            members_.push_back(value_type(name.data(),name.length(),std::move(value)));
             it = members_.end();
         }
         else if (it->name() == name)

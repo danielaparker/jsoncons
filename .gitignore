@@ -45,3 +45,13 @@ test_suite/build/vs2015/.vs
 test_suite/build/vs2015/.vs/test_suite/v14/.suo
 
 test_suite/build/vs2010sp1/vs2010sp1.vcxproj.user
+
+examples/build/vs2015/x64/Debug
+examples/build/vs2010sp1/ipch/vs2010sp1-69a5eb43/vs2010sp1-632e7c4c.ipch
+examples/build/vs2015/.vs/vs2015/v14/.suo
+examples/build/vs2015/Debug
+examples/build/vs2015/vs2015.VC.opendb
+examples/build/vs2015/vs2015.vcxproj.user
+examples/build/vs2015/vs2015.sdf
+examples/build/vs2015/vs2015.sln
+examples/output/xxx.txt

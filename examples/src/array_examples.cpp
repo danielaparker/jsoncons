@@ -63,7 +63,7 @@ void add_element_to_array()
     std::cout << cities << std::endl;  // output is "[]"
     cities.add("Toronto");
     cities.add("Vancouver");
-    cities.add(cities.elements.begin(),"Montreal");  // inserts "Montreal" at beginning of array
+    cities.add(cities.elements().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
     std::cout << cities << std::endl;
 }
