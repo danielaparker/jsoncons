@@ -791,11 +791,23 @@ std::wifstream is("booklist2.json");
 wjson booklist;
 is &gt;&gt; booklist;
 
-// Use a JsonPath expression to find the authors of 
-// books that were published in 2004
-wjson result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
+// Use a JsonPath expression to find 
+//  
+// (1) The authors of books that cost less than $12
+wjson result = json_query(booklist, L"$[*][?(@.price &lt; 12)].author");
+std::wcout &lt;&lt; L"(1) " &lt;&lt; result &lt;&lt; std::endl;
 
-std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+// (2) The number of books
+result = json_query(booklist, L"$.length");
+std::wcout &lt;&lt; L"(2) " &lt;&lt; result &lt;&lt; std::endl;
+
+// (3) The third book
+result = json_query(booklist, L"$[2]");
+std::wcout &lt;&lt; L"(3) " &lt;&lt; std::endl &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+
+// (4) The authors of books that were published in 2004
+result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
+std::wcout &lt;&lt; L"(4) " &lt;&lt; result &lt;&lt; std::endl;
 </code></pre>
 
 <p>Result:</p>

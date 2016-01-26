@@ -310,11 +310,23 @@ Result:
     wjson booklist;
     is >> booklist;
 
-    // Use a JsonPath expression to find the authors of 
-    // books that were published in 2004
-    wjson result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
+    // Use a JsonPath expression to find 
+    //  
+    // (1) The authors of books that cost less than $12
+    wjson result = json_query(booklist, L"$[*][?(@.price < 12)].author");
+    std::wcout << L"(1) " << result << std::endl;
 
-    std::wcout << pretty_print(result) << std::endl;
+    // (2) The number of books
+    result = json_query(booklist, L"$.length");
+    std::wcout << L"(2) " << result << std::endl;
+
+    // (3) The third book
+    result = json_query(booklist, L"$[2]");
+    std::wcout << L"(3) " << std::endl << pretty_print(result) << std::endl;
+
+    // (4) The authors of books that were published in 2004
+    result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
+    std::wcout << L"(4) " << result << std::endl;
 
 Result:
 
