@@ -46,7 +46,7 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     json_array(const json_array& val, const allocator_type& allocator)
         : elements_(val.elements_,allocator)
     {
