@@ -334,7 +334,7 @@ and `std::allocator<char>` as the allocator type,
 
     typedef basic_json<char,std::allocator<char>> json
 
-The `jsoncons` library will rebind the supplied allocator to the types it allocates, `char`, `json::array` and `json::object`, and the internal containers`std::basic_string` and `std::vector` will rebind as well.
+The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
 
 The library includes an instantiation for wide characters as well,
 

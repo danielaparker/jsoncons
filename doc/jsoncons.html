@@ -837,22 +837,24 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <h3>About jsoncons::json</h3>
 
 <p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
-and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
+and <code>std::allocator&lt;char&gt;</code> as the allocator type,</p>
 
-<pre><code>typedef basic_json&lt;char,std::allocator&lt;void&gt;&gt; json
+<pre><code>typedef basic_json&lt;char,std::allocator&lt;char&gt;&gt; json
 </code></pre>
+
+<p>The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <p>The library includes an instantiation for wide characters as well,</p>
 
-<pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;void&gt;&gt; wjson
+<pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;wchar_t&gt;&gt; wjson
 </code></pre>
 
-<p>Note that the allocator type allows you to supply a custom allocator. For instance, you can use the boost <code>fast_pool_allocator</code>:</p>
+<p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
 
 <pre><code>#include &lt;boost/pool/pool_alloc.hpp&gt;
 #include "jsoncons/json.hpp"
 
-typedef jsoncons::basic_json&lt;char, boost::fast_pool_allocator&lt;void&gt;&gt; myjson;
+typedef jsoncons::basic_json&lt;char, boost::fast_pool_allocator&lt;char&gt;&gt; myjson;
 
 myjson o;
 
@@ -860,9 +862,9 @@ o.set("FirstName","Joe");
 o.set("LastName","Smith");
 </code></pre>
 
-<p>This results in a json object instance being allocated from the boost memory pool. <br>
-The allocator type is not used for structures including vectors and strings that use large or variable amounts of memory, <br>
-these always use the default allocators.</p>
+<p>This results in a json value being constucted with all memory being allocated from the boost memory pool. (In this particular case there is no improvement in performance over <code>std::allocator</code>.)</p>
+
+<p>Note that the underlying memory pool used by the this allocator is never freed. </p>
 
 <h2>Wide character support</h2>
 

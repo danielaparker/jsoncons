@@ -474,7 +474,7 @@ typedef basic_json&lt;wchar_t,std::allocator&lt;char&gt;&gt; wjson
 </code></pre>
 
 <p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type<br>
-and <code>std::allocator&lt;wchar_t&gt;</code> as the allocator type. The <code>jsoncons</code> library will rebind the supplied allocator to the types it allocates, <code>char</code>, <code>json::array</code> and <code>json::object</code>, and the internal containers<code>std::basic_string</code> and <code>std::vector</code> will rebind as well.</p>
+and <code>std::allocator&lt;wchar_t&gt;</code> as the allocator type. The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 
