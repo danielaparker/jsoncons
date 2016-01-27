@@ -32,6 +32,111 @@
 
 namespace jsoncons {
 
+template <typename CharT, class Alloc>
+class json_any
+{
+public:
+    json_any()
+        : impl_(nullptr)
+    {
+    }
+    json_any(const json_any& val)
+    {
+		impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
+    }
+    json_any(const json_any& val, const Alloc& allocator)
+    {
+        impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
+    }
+    json_any(json_any&& val)
+        : impl_(std::move(val.impl_))
+    {
+        val.impl_ = nullptr;
+    }
+    json_any(json_any&& val, const Alloc& allocator)
+        : impl_(std::move(val.impl_))
+    {
+        val.impl_ = nullptr;
+    }
+    ~json_any()
+    {
+        delete impl_;
+    }
+
+    template<typename T>
+    explicit json_any(T val)
+    {
+        impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
+    }
+
+    template <typename T>
+    typename type_wrapper<T>::reference cast() 
+    {
+        if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad json_any cast");
+        }
+        return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
+    }
+
+    template <typename T>
+    typename type_wrapper<T>::const_reference cast() const
+    {
+        if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad json_any cast");
+        }
+        return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
+    }
+
+    json_any& operator=(json_any rhs)
+    {
+        std::swap(impl_,rhs.impl_);
+        return *this;
+    }
+
+    void to_stream(basic_json_output_handler<CharT>& os) const 
+    {
+        impl_->to_stream(os);
+    }
+
+    class any_handle
+    {
+    public:
+        virtual ~any_handle()
+        {
+        }
+
+        virtual any_handle* clone() const = 0;
+
+        virtual void to_stream(basic_json_output_handler<CharT>& os) const = 0;
+    };
+
+    template <class T>
+    class any_handle_impl : public any_handle
+    {
+    public:
+        any_handle_impl(T value)
+            : value_(value)
+        {
+        }
+
+        virtual any_handle* clone() const
+        {
+            return new any_handle_impl<T>(value_);
+        }
+
+        virtual void to_stream(basic_json_output_handler<CharT>& os) const
+        {
+            serialize(os,value_);
+        }
+
+        T value_;
+    };
+
+    any_handle* impl_;
+};
+
 template <typename CharT>
 struct string_data
 {
@@ -170,105 +275,11 @@ public:
 
     typedef json_array<basic_json<CharT,Alloc>> array;
     typedef json_object<basic_json<CharT,Alloc>>  object;
+    typedef json_any<CharT,Alloc> any;
 
     typedef CharT char_type;
 
     typedef jsoncons::null_type null_type;
-
-    class any
-    {
-    public:
-        any()
-            : impl_(nullptr)
-        {
-        }
-        any(const any& val)
-        {
-			impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
-        }
-        any(any&& val)
-            : impl_(std::move(val.impl_))
-        {
-            val.impl_ = nullptr;
-        }
-        ~any()
-        {
-            delete impl_;
-        }
-
-        template<typename T>
-        explicit any(T val)
-        {
-            impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
-        }
-
-        template <typename T>
-        typename type_wrapper<T>::reference cast() 
-        {
-            if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
-            }
-            return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
-        }
-
-        template <typename T>
-        typename type_wrapper<T>::const_reference cast() const
-        {
-            if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad any cast");
-            }
-            return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
-        }
-
-        any& operator=(any rhs)
-        {
-            std::swap(impl_,rhs.impl_);
-            return *this;
-        }
-
-        void to_stream(basic_json_output_handler<CharT>& os) const 
-        {
-            impl_->to_stream(os);
-        }
-
-        class any_handle
-        {
-        public:
-            virtual ~any_handle()
-            {
-            }
-
-            virtual any_handle* clone() const = 0;
-
-            virtual void to_stream(basic_json_output_handler<CharT>& os) const = 0;
-        };
-
-        template <class T>
-        class any_handle_impl : public any_handle
-        {
-        public:
-            any_handle_impl(T value)
-                : value_(value)
-            {
-            }
-
-            virtual any_handle* clone() const
-            {
-                return new any_handle_impl<T>(value_);
-            }
-
-            virtual void to_stream(basic_json_output_handler<CharT>& os) const
-            {
-                serialize(os,value_);
-            }
-
-            T value_;
-        };
-
-        any_handle* impl_;
-    };
 
     Alloc get_allocator() const
     {
@@ -358,7 +369,7 @@ public:
             try
             {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-                std::allocator_traits<Alloc>::rebind_traits<T>::construct(alloc, p, std::move(val), get_allocator());
+                std::allocator_traits<Alloc>::rebind_traits<T>::construct(alloc, p, std::move(val));
 #else
                 new(p) T(std::move(val));
 #endif
@@ -428,6 +439,12 @@ public:
             : Alloc(a), type_(value_types::empty_object_t)
         {
         }
+
+        explicit variant(variant&& var)
+            : Alloc(var.get_allocator()), type_(value_types::null_t)
+        {
+            swap(var);
+        }
 		
         explicit variant(const Alloc& a, variant&& var)
             : Alloc(a), type_(value_types::null_t)
@@ -435,10 +452,29 @@ public:
             swap(var);
         }
 
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        explicit variant(const variant& var)
+            : Alloc(std::allocator_traits<allocator_type>::select_on_container_copy_construction(var.get_allocator()))
+        {
+            init_variant(var);
+        }
+#else
+        explicit variant(const variant& var)
+            : Alloc(var.get_allocator())
+        {
+            init_variant(var);
+        }
+#endif
         explicit variant(const Alloc& a, const variant& var)
             : Alloc(a), type_(var.type_)
         {
-            switch (var.type_)
+            init_variant(var);
+        }
+
+        void init_variant(const variant& var)
+        {
+            type_ = var.type_;
+            switch (type_)
             {
             case value_types::null_t:
             case value_types::empty_object_t:
@@ -473,7 +509,6 @@ public:
                 value_.any_value_ = create_value(*(var.value_.any_value_));
                 break;
             default:
-                // throw
                 break;
             }
         }
@@ -1826,12 +1861,22 @@ public:
     {
     }
 
-    basic_json(const basic_json<CharT, Alloc>& val, const Alloc& allocator = Alloc())
+    basic_json(const basic_json<CharT, Alloc>& val)
+        : var_(val.var_)
+    {
+    }
+
+    basic_json(const basic_json<CharT, Alloc>& val, const Alloc& allocator)
         : var_(allocator, val.var_)
     {
     }
 
-    basic_json(basic_json<CharT,Alloc>&& other, const Alloc& allocator = Alloc())
+    basic_json(basic_json<CharT,Alloc>&& other)
+        : var_(std::move(other.var_))
+    {
+    }
+
+    basic_json(basic_json<CharT,Alloc>&& other, const Alloc& allocator)
         : var_(allocator, std::move(other.var_))
     {
     }

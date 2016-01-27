@@ -64,21 +64,28 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 
 ### Constructors
 
-    json()
+    json(const allocator_type& allocator=allocator_type())
 Constructs an empty json object. 
 
     json(const json& val)
 Constructs a copy of val
 
+    json(const json& val, const allocator_type& allocator)
+Copy with allocator
+
     json(json&& val)
 Acquires the contents of val, leaving val a `null` value
 
+    json(json&& val, const allocator_type& allocator)
+Move with allocator
+
     template <typename T>
-    json(T val)
+    json(T val, const allocator_type& allocator=allocator_type())
 Constructs a `json` value for types supported in `json_type_traits`
 
     template <class InputIterator>
-    json(InputIterator first, InputIterator last)
+    json(InputIterator first, InputIterator last, 
+         const allocator_type& allocator=allocator_type())
 
 Constructs a json array with the elements in the range [first,last).
 

@@ -601,7 +601,7 @@ static json make_array(size_t size1 ... size_t sizeN, T val)
 
 <h3>Constructors</h3>
 
-<pre><code>json()
+<pre><code>json(const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
 <p>Constructs an empty json object. </p>
@@ -611,19 +611,30 @@ static json make_array(size_t size1 ... size_t sizeN, T val)
 
 <p>Constructs a copy of val</p>
 
+<pre><code>json(const json&amp; val, const allocator_type&amp; allocator)
+</code></pre>
+
+<p>Copy with allocator</p>
+
 <pre><code>json(json&amp;&amp; val)
 </code></pre>
 
 <p>Acquires the contents of val, leaving val a <code>null</code> value</p>
 
+<pre><code>json(json&amp;&amp; val, const allocator_type&amp; allocator)
+</code></pre>
+
+<p>Move with allocator</p>
+
 <pre><code>template &lt;typename T&gt;
-json(T val)
+json(T val, const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
 <p>Constructs a <code>json</code> value for types supported in <code>json_type_traits</code></p>
 
 <pre><code>template &lt;class InputIterator&gt;
-json(InputIterator first, InputIterator last)
+json(InputIterator first, InputIterator last, 
+     const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
 <p>Constructs a json array with the elements in the range [first,last).</p>
