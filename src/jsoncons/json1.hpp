@@ -299,10 +299,11 @@ public:
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             std::allocator_traits<Alloc>::rebind_alloc<object> alloc(get_allocator());
             std::allocator_traits<Alloc>::rebind_traits<object>::destroy(alloc, p);
-            alloc.deallocate(p,1);
 #else
-            delete p;
+            typename Alloc:: template rebind<object>::other alloc(get_allocator());
+            alloc.destroy(p);
 #endif
+            alloc.deallocate(p,1);
         }
 
         array* create_array()

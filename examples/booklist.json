@@ -1,5 +1,11 @@
 [
     {
+        "author":"Charles Bukowski",
+        "category":"Fiction",
+        "date":"2004-07-08",
+        "isbn":"1852272007",
+        "price":22.48,
+        "title":"Pulp"
     },
     {
         "author":"Haruki Murakami",
