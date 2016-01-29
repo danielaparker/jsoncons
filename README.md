@@ -42,6 +42,18 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons).
 
+## Building the test suite and examples with CMake
+
+[CMake](https://cmake.org/) is a C++ Makefiles/Solution generator for cross-platform software development. 
+
+Instructions for building the test suite with CMake may be found in
+
+    jsoncons/test_suite/build/cmake/README.txt
+
+Instructions for building the examples with CMake may be found in
+
+    jsoncons/examples/build/cmake/README.txt
+
 ## Examples
 
 ### json construction
