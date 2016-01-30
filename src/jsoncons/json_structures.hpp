@@ -46,16 +46,22 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     json_array(const json_array& val, const allocator_type& allocator)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(val.elements_,allocator)
+#else
+        : elements_(val.elements_)
+#endif
     {
     }
     json_array(json_array&& val, const allocator_type& allocator)
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(std::move(val.elements_),allocator)
+#else
+        : elements_(val.elements_)
+#endif
     {
     }
-#endif
 
     json_array(size_t n, const allocator_type& allocator = allocator_type())
         : elements_(n,allocator)
@@ -359,17 +365,23 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_CXX11_COPY_CONSTRUCTOR)
-    json_object(const json_object<JsonT>& val, const allocator_type& allocator)
-        : members_(val.members_,allocator)
+    json_object(const json_object<JsonT>& val, const allocator_type& allocator) :
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        members_(val.members_,allocator)
+#else
+        members_(val.members_)
+#endif
     {
     }
 
-    json_object(json_object&& val,const allocator_type& allocator)
-        : members_(std::move(val.members_),allocator)
+    json_object(json_object&& val,const allocator_type& allocator) :
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        members_(std::move(val.members_),allocator)
+#else
+        members_(std::move(val.members_))
+#endif
     {
     }
-#endif
 
     iterator begin()
     {
