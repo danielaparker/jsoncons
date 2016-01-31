@@ -76,8 +76,11 @@ BOOST_AUTO_TEST_CASE(test_array_add)
 
 BOOST_AUTO_TEST_CASE(test_object_index)
 {
-    json b = json::array();
-    BOOST_REQUIRE_THROW(b["key1"], std::runtime_error);
+    json b;
+    BOOST_REQUIRE_THROW(b["key1"].as<std::string>(), std::out_of_range);
+
+    b["key1"] = "value1";
+    BOOST_REQUIRE_THROW(b["key2"].as<std::string>(), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(test_array_index)

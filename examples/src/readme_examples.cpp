@@ -109,13 +109,25 @@ void example1()
     auto it = book.find("author");
     if (it != book.members().end())
     {
-        // book has a member `author`
+        // member "author" found
     }
 
     if (book.count("author") > 0)
     {
-        // book has a member `author`
+        // book has member "author"
     }
+
+    try
+    {
+        book["author"].as<std::string>();
+    }
+    catch (std::out_of_range e)
+    {
+        // member "author" not found
+    }
+
+    book.get("author", "author unknown");
+    // Returns author if found, otherwise "author unknown"
 	
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
@@ -246,13 +258,25 @@ void example3()
     auto it = book.find(L"author");
     if (it != book.members().end())
     {
-        // book has a member `author`
+        // book has member "author"
     }
 
     if (book.count(L"author") > 0)
     {
-        // book has a member `author`
+        // book has member "author"
     }
+
+    try
+    {
+        book[L"author"].as<std::wstring>();
+    }
+    catch (std::out_of_range e)
+    {
+        // member "author" not found
+    }
+
+    book.get(L"author", L"author unknown");
+    // Returns author if found, otherwise "author unknown"
 
     // Serialize the booklist to a file
 	std::wofstream os(L"booklist2.json");

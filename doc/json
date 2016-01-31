@@ -799,13 +799,15 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. <br>
-Throws <code>std::runtime_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.<br>
+If read, throws <code>std::out_of_range</code> if the object does not have a member with the specified name.  </p>
 
 <pre><code>const json&amp; operator[](const std::string&amp; name) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object.<br>
+Throws <code>std::out_of_range</code> if the object does not have a member with the specified name.  </p>
 
 <pre><code>object_iterator find(const std::string&amp; name)
 object_iterator find(const char* name)
@@ -871,7 +873,7 @@ as&lt;unsigned long long&gt;
 
 <p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
-<pre><code>as&lt;string&gt;
+<pre><code>as&lt;string&gt; 
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>

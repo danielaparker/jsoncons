@@ -158,6 +158,18 @@ Instructions for building the examples with CMake may be found in
     {
         // book has a member `author`
     }
+
+    try
+    {
+        book["author"].as<std::string>();
+    }
+    catch (std::out_of_range e)
+    {
+        // member "author" not found
+    }
+
+    book.get("author", "author unknown");
+    // Returns author if found, otherwise "author unknown"
 	
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
@@ -354,6 +366,18 @@ Result:
     {
         // book has a member `author`
     }
+
+    try
+    {
+        book[L"author"].as<std::wstring>();
+    }
+    catch (std::out_of_range e)
+    {
+        // member "author" not found
+    }
+
+    book.get(L"author", L"author unknown");
+    // Returns author if found, otherwise "author unknown"
 
     // Serialize the booklist to a file
     std::wofstream os(L"booklist2.json");

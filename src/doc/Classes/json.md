@@ -202,10 +202,12 @@ Throws `std::runtime_error` if not an object.
     json& operator[](const std::string& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
+If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
     const json& operator[](const std::string& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
+Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
     object_iterator find(const std::string& name)
     object_iterator find(const char* name)
@@ -255,7 +257,7 @@ If value is double, returns value, if value is signed or unsigned integer, casts
     as<unsigned long long> 
 Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
-    as<string>
+    as<string> 
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const noexcept

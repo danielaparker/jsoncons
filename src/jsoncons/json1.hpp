@@ -1376,7 +1376,7 @@ public:
             return evaluate().is_double();
         }
 
-        std::basic_string<CharT> as_string() const
+        std::basic_string<CharT> as_string() const 
         {
             return evaluate().as_string();
         }
@@ -1696,7 +1696,7 @@ public:
             evaluate().add(pos, std::move(value));
         }
 
-        std::basic_string<CharT> to_string() const
+        std::basic_string<CharT> to_string() const 
         {
             return evaluate().to_string();
         }
@@ -1965,7 +1965,7 @@ public:
             return object_key_proxy(*this, name);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
             break;
         }
     }
@@ -1975,7 +1975,7 @@ public:
         return at(name);
     }
 
-    std::basic_string<CharT> to_string() const;
+    std::basic_string<CharT> to_string() const ;
 
     std::basic_string<CharT> to_string(const basic_output_format<CharT>& format) const;
 
@@ -2217,7 +2217,7 @@ public:
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
         }
     }
 
@@ -2234,7 +2234,7 @@ public:
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a unsigned long long");
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
         }
     }
 
@@ -2265,7 +2265,7 @@ public:
 
     unsigned long as_ulong() const;
 
-    std::basic_string<CharT> as_string() const
+    std::basic_string<CharT> as_string() const 
     {
         switch (var_.type_)
         {
@@ -2278,7 +2278,7 @@ public:
         }
     }
 
-    std::basic_string<CharT> as_string(const basic_output_format<CharT>& format) const
+    std::basic_string<CharT> as_string(const basic_output_format<CharT>& format) const 
     {
         switch (var_.type_)
         {
@@ -2304,7 +2304,15 @@ public:
         case value_types::empty_object_t:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
-            return var_.value_.object_value_->at(name);
+            {
+                auto it = var_.value_.object_value_->find(name);
+                if (it == end_members())
+                {
+                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
+                }
+                return it->value();
+            }
+            break;
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2319,7 +2327,15 @@ public:
         case value_types::empty_object_t:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
-            return var_.value_.object_value_->at(name);
+            {
+                auto it = var_.value_.object_value_->find(name);
+                if (it == end_members())
+                {
+                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
+                }
+                return it->value();
+            }
+            break;
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -3111,7 +3127,7 @@ bool basic_json<CharT, Alloc>::operator==(const basic_json<CharT, Alloc>& rhs) c
 }
 
 template<typename CharT, typename Alloc>
-std::basic_string<CharT> basic_json<CharT, Alloc>::to_string() const
+std::basic_string<CharT> basic_json<CharT, Alloc>::to_string() const 
 {
     std::basic_ostringstream<CharT> os;
     {
@@ -3625,7 +3641,7 @@ int basic_json<CharT, Alloc>::as_int() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a int");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an int");
     }
 }
 
@@ -3643,7 +3659,7 @@ unsigned int basic_json<CharT, Alloc>::as_uint() const
     case value_types::bool_t:
         return var_.value_.bool_value_ ? 1 : 0;
     default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a unsigned int");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned int");
     }
 }
 
@@ -3721,7 +3737,7 @@ const CharT* basic_json<CharT, Alloc>::as_cstring() const
     case value_types::string_t:
         return var_.value_.string_value_->c_str();
     default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
     }
 }
 
