@@ -151,12 +151,12 @@ Instructions for building the examples with CMake may be found in
     auto it = book.find("author");
     if (it != book.members().end())
     {
-        // book has a member `author`
+        // member "author" found
     }
 
     if (book.count("author") > 0)
     {
-        // book has a member `author`
+        // book has a member "author"
     }
 
     try
@@ -359,12 +359,12 @@ Result:
     auto it = book.find(L"author");
     if (it != book.members().end())
     {
-        // book has a member `author`
+        // member "author" found
     }
 
     if (book.count(L"author") > 0)
     {
-        // book has a member `author`
+        // book has a member "author"
     }
 
     try
