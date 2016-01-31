@@ -144,7 +144,7 @@ Instructions for building the examples with CMake may be found in
     const json& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(auto member : book.members())
+    for (auto member : book.members())
     {
     	std::cout << member.name()
     		      << ","
@@ -173,14 +173,15 @@ Instructions for building the examples with CMake may be found in
 
     book.get("author", "author unknown");
     // Returns author if found, otherwise "author unknown"
-	
+```
+```c++	
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
     os << pretty_print(booklist);
 ```
 
 The JSON output `booklist.json`
-
+```
     [
         {
             "author":"Charles Bukowski",
@@ -215,9 +216,10 @@ The JSON output `booklist.json`
             "title":"Kafka on the Shore"
         }
     ]
-
+```
 ### json query
 
+```c++
     #include <fstream>
     #include "jsoncons/json.hpp"
     #include "jsoncons_ext/jsonpath/json_query.hpp"
@@ -248,9 +250,9 @@ The JSON output `booklist.json`
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
     std::cout << "(4) " << result << std::endl;
-
+```
 Result:
-
+```
     (1) ["Haruki Murakami","George Crile"]
     (2) [4]
     (3)
@@ -265,11 +267,12 @@ Result:
         }
     ]
     (4) ["Charles Bukowski"]
-
+```
 ## Once again, this time with wide characters
 
 ### wjson construction
 
+```c++
     #include "jsoncons/json.hpp"
 
     // For convenience
@@ -340,7 +343,7 @@ Result:
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
-
+```c++
     //Loop through the booklist elements using a range-based for loop    
     for (auto book : booklist.elements())
     {
@@ -353,7 +356,7 @@ Result:
     const wjson& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(auto member : book.members())
+    for (auto member : book.members())
     {
         std::wcout << member.name()
                    << L","
@@ -382,13 +385,15 @@ Result:
 
     book.get(L"author", L"author unknown");
     // Returns author if found, otherwise "author unknown"
-
+```
+```c++
     // Serialize the booklist to a file
     std::wofstream os(L"booklist2.json");
     os << pretty_print(booklist);
-
+```
 ### wjson query
 
+```c++
     // Deserialize the booklist
     std::wifstream is("booklist2.json");
     wjson booklist;
@@ -411,9 +416,9 @@ Result:
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
     std::wcout << L"(4) " << result << std::endl;
-
+```
 Result:
-
+```
     (1) ["Haruki Murakami","George Crile"]
     (2) [4]
     (3)
@@ -428,7 +433,7 @@ Result:
         }
     ]
     (4) ["Charles Bukowski"]
-
+```
 ## Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
