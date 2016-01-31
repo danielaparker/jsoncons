@@ -136,6 +136,30 @@ Instructions for building the examples with CMake may be found in
     		  << ","
 	          << book["price"].as<double>() << std::endl;
     }
+
+    // The second book
+    const json& book = booklist[1];
+
+    //Loop through the book members using a range-based for loop    
+#if !defined(JSONCONS_NO_FOR_RANGE)
+    for(auto member : book.members())
+    {
+    	std::cout << member.name()
+    		      << ","
+	              << member.value().as<std::string>() << std::endl;
+    }
+#endif
+
+    auto it = book.find("author");
+    if (it != book.members().end())
+    {
+        // book has a member `author`
+    }
+
+    if (book.count("author") > 0)
+    {
+        // book has a member `author`
+    }
 	
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
@@ -309,6 +333,30 @@ Result:
         std::wcout << book[L"title"].as<std::wstring>()
           	       << L","
         	       << book[L"price"].as<double>() << std::endl;
+    }
+
+    // The second book
+    const wjson& book = booklist[1];
+
+    //Loop through the book members using a range-based for loop    
+#if !defined(JSONCONS_NO_FOR_RANGE)
+    for(auto member : book.members())
+    {
+        std::wcout << member.name()
+                   << L","
+                   << member.value().as<std::wstring>() << std::endl;
+    }
+#endif
+
+    auto it = book.find(L"author");
+    if (it != book.members().end())
+    {
+        // book has a member `author`
+    }
+
+    if (book.count(L"author") > 0)
+    {
+        // book has a member `author`
     }
 
     // Serialize the booklist to a file

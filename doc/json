@@ -833,8 +833,6 @@ Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
 <pre><code>template &lt;typename T&gt;
-const json get(const std::string&amp; name, const T&amp; default_val) const
-template &lt;typename T&gt;
 const json get(const std::string&amp; name, T&amp;&amp; default_val) const
 </code></pre>
 

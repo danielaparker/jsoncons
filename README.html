@@ -615,6 +615,32 @@ for(auto book : booklist.elements())
           &lt;&lt; book["price"].as&lt;double&gt;() &lt;&lt; std::endl;
 }
 
+// The second book
+const json&amp; book = booklist[1];
+
+//Loop through the book members using a range-based for loop    
+</code></pre>
+
+<p>#if !defined(JSONCONS_NO_FOR_RANGE)<br>
+    for(auto member : book.members())<br>
+    {<br>
+        std::cout &lt;&lt; member.name()<br>
+                  &lt;&lt; ","<br>
+                  &lt;&lt; member.value().asstd::string() &lt;&lt; std::endl;<br>
+    }<br>
+#endif</p>
+
+<pre><code>auto it = book.find("author");
+if (it != book.members().end())
+{
+    // book has a member `author`
+}
+
+if (book.count("author") &gt; 0)
+{
+    // book has a member `author`
+}
+
 // Serialize the booklist to a file
 std::ofstream os("booklist.json");
 os &lt;&lt; pretty_print(booklist);
@@ -791,6 +817,32 @@ for (auto book : booklist.elements())
     std::wcout &lt;&lt; book[L"title"].as&lt;std::wstring&gt;()
                &lt;&lt; L","
                &lt;&lt; book[L"price"].as&lt;double&gt;() &lt;&lt; std::endl;
+}
+
+// The second book
+const wjson&amp; book = booklist[1];
+
+//Loop through the book members using a range-based for loop    
+</code></pre>
+
+<p>#if !defined(JSONCONS_NO_FOR_RANGE)<br>
+    for(auto member : book.members())<br>
+    {<br>
+        std::wcout &lt;&lt; member.name()<br>
+                   &lt;&lt; L","<br>
+                   &lt;&lt; member.value().asstd::wstring() &lt;&lt; std::endl;<br>
+    }<br>
+#endif</p>
+
+<pre><code>auto it = book.find(L"author");
+if (it != book.members().end())
+{
+    // book has a member `author`
+}
+
+if (book.count(L"author") &gt; 0)
+{
+    // book has a member `author`
 }
 
 // Serialize the booklist to a file

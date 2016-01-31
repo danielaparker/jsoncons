@@ -124,18 +124,30 @@ template <typename CharT, class Alloc>
 class serializable_any
 {
 public:
-    serializable_any()
+    typedef Alloc allocator_type;
+
+    serializable_any(const Alloc& allocator = Alloc())
         : impl_(nullptr)
     {
     }
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     serializable_any(const serializable_any& val)
+        : allocator_(std::allocator_traits<allocator_type>::select_on_container_copy_construction(val.get_allocator()))
     {
-		impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
+		impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
     }
+#else
+    serializable_any(const serializable_any& val)
+        : allocator_(val.get_allocator())
+    {
+        impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
+    }
+#endif
     serializable_any(const serializable_any& val, const Alloc& allocator)
     {
-        impl_ = val.impl_ != nullptr ? val.impl_->clone() : nullptr;
+        impl_ = val.impl_ != nullptr ? val.impl_->clone(Alloc()) : nullptr;
     }
+
     serializable_any(serializable_any&& val)
         : impl_(std::move(val.impl_))
     {
@@ -148,13 +160,18 @@ public:
     }
     ~serializable_any()
     {
-        delete impl_;
+        destroy_instance(allocator_,impl_);
     }
 
     template<typename T>
     explicit serializable_any(T val)
     {
-        impl_ = new any_handle_impl<typename type_wrapper<T>::value_type>(val);
+        impl_ = create_instance<any_handle_impl<typename type_wrapper<T>::value_type>>(allocator_,val);
+    }
+
+    Alloc get_allocator() const
+    {
+        return allocator_;
     }
 
     template <typename T>
@@ -195,7 +212,7 @@ public:
         {
         }
 
-        virtual any_handle* clone() const = 0;
+        virtual any_handle* clone(const Alloc& allocator) const = 0;
 
         virtual void to_stream(basic_json_output_handler<CharT>& os) const = 0;
     };
@@ -204,14 +221,14 @@ public:
     class any_handle_impl : public any_handle
     {
     public:
-        any_handle_impl(T value)
+        any_handle_impl(T value, const Alloc& allocator)
             : value_(value)
         {
         }
 
-        virtual any_handle* clone() const
+        virtual any_handle* clone(const Alloc& allocator) const
         {
-            return new any_handle_impl<T>(value_);
+            return create_instance<any_handle_impl<T>>(allocator, value_);
         }
 
         virtual void to_stream(basic_json_output_handler<CharT>& os) const
@@ -222,6 +239,7 @@ public:
         T value_;
     };
 
+    Alloc allocator_;
     any_handle* impl_;
 };
 
@@ -1543,21 +1561,16 @@ public:
             return evaluate().find(name);
         }
 
+        // Deprecated
         const basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name) const
         {
             return evaluate().get(name);
         }
 
         template <typename T>
-        basic_json<CharT,Alloc> get(const std::basic_string<CharT>& name, const T& default_val) const
-        {
-            return evaluate().get(name,default_val);
-        }
-
-        template <typename T>
         basic_json<CharT,Alloc> get(const std::basic_string<CharT>& name, T&& default_val) const
         {
-            return evaluate().get(name,default_val);
+            return evaluate().get(name,std::forward<T>(default_val));
         }
 
         void shrink_to_fit()
@@ -2404,29 +2417,18 @@ public:
         }
     }
 
-    const basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name) const;
-
-
-    template<typename T>
-    basic_json<CharT, Alloc> get(const std::basic_string<CharT>& name, const T& default_val) const
+    const basic_json<CharT,Alloc>& get(const std::basic_string<CharT>& name) const
     {
+        static const basic_json<CharT, Alloc> a_null = null_type();
+
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            {
-                return basic_json<CharT,Alloc>(default_val);
-            }
+            return a_null;
         case value_types::object_t:
             {
                 const_object_iterator it = var_.value_.object_value_->find(name);
-                if (it != end_members())
-                {
-                    return it->value();
-                }
-                else
-                {
-                    return basic_json<CharT,Alloc>(default_val);
-                }
+                return it != end_members() ? it->value() : a_null;
             }
         default:
             {
@@ -2442,7 +2444,7 @@ public:
         {
         case value_types::empty_object_t:
             {
-                return basic_json<CharT,Alloc>(default_val);
+                return basic_json<CharT,Alloc>(std::forward<T>(default_val));
             }
         case value_types::object_t:
             {
@@ -2453,7 +2455,7 @@ public:
                 }
                 else
                 {
-                    return basic_json<CharT,Alloc>(std::move(default_val));
+                    return basic_json<CharT,Alloc>(std::forward<T>(default_val));
                 }
             }
         default:
@@ -3106,27 +3108,6 @@ template<typename CharT, typename Alloc>
 bool basic_json<CharT, Alloc>::operator==(const basic_json<CharT, Alloc>& rhs) const
 {
     return var_ == rhs.var_;
-}
-
-template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc>& basic_json<CharT, Alloc>::get(const std::basic_string<CharT>& name) const
-{
-    static const basic_json<CharT, Alloc> a_null = null_type();
-
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        return a_null;
-    case value_types::object_t:
-        {
-            const_object_iterator it = var_.value_.object_value_->find(name);
-            return it != end_members() ? it->value() : a_null;
-        }
-    default:
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-        }
-    }
 }
 
 template<typename CharT, typename Alloc>
