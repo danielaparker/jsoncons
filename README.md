@@ -143,7 +143,7 @@ Instructions for building the examples with CMake may be found in
     // The second book
     const json& book = booklist[1];
 
-    //Loop through the book members using a range-based for loop    
+    //Loop through the book's name-value pairs using a range-based for loop    
     for (auto member : book.members())
     {
     	std::cout << member.name()
@@ -355,7 +355,7 @@ Result:
     // The second book
     const wjson& book = booklist[1];
 
-    //Loop through the book members using a range-based for loop    
+    //Loop through the book's name-value pairs using a range-based for loop    
     for (auto member : book.members())
     {
         std::wcout << member.name()
