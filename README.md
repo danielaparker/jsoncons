@@ -73,7 +73,7 @@ Instructions for building the examples with CMake may be found in
     book1["price"] = 9.01;
     book1["isbn"] = "037571894X";  
 
-    // Construct another using the member function set
+    // Construct another using the `set` function
     json book2;
 
     book2.set("category", "History");
@@ -271,7 +271,7 @@ Result:
     book1[L"price"] = 9.01;
     book1[L"isbn"] = L"037571894X";
 
-    // Construct another using the member function set
+    // Construct another using the `set` function
     wjson book2;
 
     book2.set(L"category", L"History");
