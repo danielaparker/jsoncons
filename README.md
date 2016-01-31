@@ -133,7 +133,7 @@ Instructions for building the examples with CMake may be found in
 
 ```c++
     //Loop through the booklist elements using a range-based for loop    
-    for(auto book : booklist.elements())
+    for (auto book : booklist.elements())
     {
     	std::cout << book["title"].as<std::string>()
     		  << ","
