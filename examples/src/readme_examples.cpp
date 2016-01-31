@@ -121,7 +121,7 @@ void example1()
     {
         book["author"].as<std::string>();
     }
-    catch (std::out_of_range e)
+    catch (const std::out_of_range&)
     {
         // member "author" not found
     }
@@ -270,7 +270,7 @@ void example3()
     {
         book[L"author"].as<std::wstring>();
     }
-    catch (std::out_of_range e)
+    catch (const std::out_of_range&)
     {
         // member "author" not found
     }

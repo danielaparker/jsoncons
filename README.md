@@ -166,7 +166,7 @@ Instructions for building the examples with CMake may be found in
     {
         book["author"].as<std::string>();
     }
-    catch (std::out_of_range e)
+    catch (const std::out_of_range& e)
     {
         // member "author" not found
     }
@@ -378,7 +378,7 @@ Result:
     {
         book[L"author"].as<std::wstring>();
     }
-    catch (std::out_of_range e)
+    catch (const std::out_of_range& e)
     {
         // member "author" not found
     }
