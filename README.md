@@ -171,7 +171,7 @@ Instructions for building the examples with CMake may be found in
         // member "author" not found
     }
 
-    book.get("author", "author unknown");
+    book.get("author", "author unknown").as<std::string>();
     // Returns author if found, otherwise "author unknown"
 ```
 ```c++	
@@ -383,7 +383,7 @@ Result:
         // member "author" not found
     }
 
-    book.get(L"author", L"author unknown");
+    book.get(L"author", L"author unknown").as<std::wstring>();
     // Returns author if found, otherwise "author unknown"
 ```
 ```c++
