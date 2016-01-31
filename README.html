@@ -551,7 +551,7 @@ book1["date"] = "2002-04-09";
 book1["price"] = 9.01;
 book1["isbn"] = "037571894X";  
 
-// Construct another using the member function set
+// Construct another using the `set` function
 json book2;
 
 book2.set("category", "History");
@@ -619,18 +619,14 @@ for(auto book : booklist.elements())
 const json&amp; book = booklist[1];
 
 //Loop through the book members using a range-based for loop    
-</code></pre>
+for(auto member : book.members())
+{
+    std::cout &lt;&lt; member.name()
+              &lt;&lt; ","
+              &lt;&lt; member.value().as&lt;std::string&gt;() &lt;&lt; std::endl;
+}
 
-<p>#if !defined(JSONCONS_NO_FOR_RANGE)<br>
-    for(auto member : book.members())<br>
-    {<br>
-        std::cout &lt;&lt; member.name()<br>
-                  &lt;&lt; ","<br>
-                  &lt;&lt; member.value().asstd::string() &lt;&lt; std::endl;<br>
-    }<br>
-#endif</p>
-
-<pre><code>auto it = book.find("author");
+auto it = book.find("author");
 if (it != book.members().end())
 {
     // book has a member `author`
@@ -755,7 +751,7 @@ book1[L"date"] = L"2002-04-09";
 book1[L"price"] = 9.01;
 book1[L"isbn"] = L"037571894X";
 
-// Construct another using the member function set
+// Construct another using the `set` function
 wjson book2;
 
 book2.set(L"category", L"History");
@@ -823,18 +819,14 @@ for (auto book : booklist.elements())
 const wjson&amp; book = booklist[1];
 
 //Loop through the book members using a range-based for loop    
-</code></pre>
+for(auto member : book.members())
+{
+    std::wcout &lt;&lt; member.name()
+               &lt;&lt; L","
+               &lt;&lt; member.value().as&lt;std::wstring&gt;() &lt;&lt; std::endl;
+}
 
-<p>#if !defined(JSONCONS_NO_FOR_RANGE)<br>
-    for(auto member : book.members())<br>
-    {<br>
-        std::wcout &lt;&lt; member.name()<br>
-                   &lt;&lt; L","<br>
-                   &lt;&lt; member.value().asstd::wstring() &lt;&lt; std::endl;<br>
-    }<br>
-#endif</p>
-
-<pre><code>auto it = book.find(L"author");
+auto it = book.find(L"author");
 if (it != book.members().end())
 {
     // book has a member `author`
