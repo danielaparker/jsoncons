@@ -102,7 +102,7 @@ void example1()
     {
     	std::cout << member.name()
     		      << ","
-	              << member.value().as<std::string>() << std::endl;
+	              << member.value() << std::endl;
     }
 #endif
 
@@ -251,7 +251,7 @@ void example3()
     {
         std::wcout << member.name()
                    << L","
-                   << member.value().as<std::wstring>() << std::endl;
+                   << member.value() << std::endl;
     }
 #endif
 

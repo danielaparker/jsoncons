@@ -622,8 +622,8 @@ vertical-align:1px;
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> member : book.members())
     {
         std::cout &lt;&lt; member.<span class="pl-c1">name</span>()
-                  &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                  &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
+              &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
     }
 
     <span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);
@@ -833,7 +833,7 @@ vertical-align:1px;
     {
         std::wcout &lt;&lt; member.<span class="pl-c1">name</span>()
                    &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                   &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::wstring&gt;() &lt;&lt; std::endl;
+                   &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
     }
 
     <span class="pl-k">auto</span> it = book.find(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);

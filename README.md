@@ -147,8 +147,8 @@ Instructions for building the examples with CMake may be found in
     for (auto member : book.members())
     {
     	std::cout << member.name()
-    		      << ","
-	              << member.value().as<std::string>() << std::endl;
+    		  << ","
+	          << member.value() << std::endl;
     }
 
     auto it = book.find("author");
@@ -360,7 +360,7 @@ Result:
     {
         std::wcout << member.name()
                    << L","
-                   << member.value().as<std::wstring>() << std::endl;
+                   << member.value() << std::endl;
     }
 
     auto it = book.find(L"author");
