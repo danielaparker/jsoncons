@@ -143,14 +143,14 @@ public:
         elements_.insert(it, std::move(value));
     }
 
-    void add(const_iterator pos, const JsonT& value)
+    iterator add(const_iterator pos, const JsonT& value)
     {
-        elements_.insert(pos, value);
+        return elements_.insert(pos, value);
     }
 
-    void add(const_iterator pos, JsonT&& value)
+    iterator add(const_iterator pos, JsonT&& value)
     {
-        elements_.insert(pos, std::move(value));
+        return elements_.insert(pos, std::move(value));
     }
 
     iterator begin() {return elements_.begin();}

@@ -1686,14 +1686,14 @@ public:
             evaluate().add(index, std::move(value));
         }
 
-        void add(array_iterator pos, const basic_json<CharT,Alloc>& value)
+        array_iterator add(const_array_iterator pos, const basic_json<CharT,Alloc>& value)
         {
-            evaluate().add(pos, value);
+            return evaluate().add(pos, value);
         }
 
-        void add(array_iterator pos, basic_json<CharT,Alloc>&& value)
+        array_iterator add(const_array_iterator pos, basic_json<CharT,Alloc>&& value)
         {
-            evaluate().add(pos, std::move(value));
+            return evaluate().add(pos, std::move(value));
         }
 
         std::basic_string<CharT> to_string() const 
@@ -2759,12 +2759,12 @@ public:
         }
     }
 
-    void add(const_array_iterator pos, const basic_json<CharT, Alloc>& value)
+    array_iterator add(const_array_iterator pos, const basic_json<CharT, Alloc>& value)
     {
         switch (var_.type_)
         {
         case value_types::array_t:
-            var_.value_.array_value_->add(pos, value);
+            return var_.value_.array_value_->add(pos, value);
             break;
         default:
             {
@@ -2773,10 +2773,10 @@ public:
         }
     }
 
-    void add(const_array_iterator pos, basic_json<CharT, Alloc>&& value){
+    array_iterator add(const_array_iterator pos, basic_json<CharT, Alloc>&& value){
         switch (var_.type_){
         case value_types::array_t:
-            var_.value_.array_value_->add(pos, std::move(value));
+            return var_.value_.array_value_->add(pos, std::move(value));
             break;
         default:
             {

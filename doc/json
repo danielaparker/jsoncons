@@ -953,8 +953,8 @@ void add(json&amp;&amp; val)
 <p>Adds a new element at the end of a json array. The content of <code>val</code> is copied (or moved) to the new element.<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
 
-<pre><code>void add(array_iterator pos, const json&amp; val)
-void add(array_iterator pos, json&amp;&amp; val)
+<pre><code>array_iterator add(const_array_iterator pos, const json&amp; val)
+array_iterator add(const_array_iterator pos, json&amp;&amp; val)
 </code></pre>
 
 <p>Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>

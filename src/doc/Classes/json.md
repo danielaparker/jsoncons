@@ -315,8 +315,8 @@ Throws `std::runtime_error` if not an object.
 Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
 Throws `std::runtime_error` if not an array.
 
-    void add(array_iterator pos, const json& val)
-    void add(array_iterator pos, json&& val)
+    array_iterator add(const_array_iterator pos, const json& val)
+    array_iterator add(const_array_iterator pos, json&& val)
 Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The content of `val` is copied (or moved) to the new element.
 Throws `std::runtime_error` if not an array.
