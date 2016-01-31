@@ -58,6 +58,7 @@ Instructions for building the examples with CMake may be found in
 
 ### json construction
 
+```c++
     #include "jsoncons/json.hpp"
 
     // For convenience
@@ -128,7 +129,9 @@ Instructions for building the examples with CMake may be found in
 
 	// See what's left of book1, 2, 3 and 4 (expect nulls)
 	std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+```
 
+```c++
     //Loop through the booklist elements using a range-based for loop    
     for(auto book : booklist.elements())
     {
@@ -174,6 +177,7 @@ Instructions for building the examples with CMake may be found in
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
     os << pretty_print(booklist);
+```
 
 The JSON output `booklist.json`
 
