@@ -53,7 +53,7 @@ Instructions for building the examples with CMake may be found in
 
 ## Examples
 
-The examples below illustrate the use of the [json](json) class and [json_query](json_query) function.
+The examples below illustrate the use of the [json](https://github.com/danielaparker/jsoncons/wiki/json) class and [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) function.
 
 ### json construction
 
