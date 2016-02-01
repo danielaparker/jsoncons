@@ -1152,29 +1152,62 @@ public:
     typedef range<array,false> array_range;
     typedef range<array,true> const_array_range;
 
-    class object_key_proxy 
+    template <class ParentT>
+    class json_proxy 
     {
     private:
-        basic_json<CharT,Alloc>& parent_;
+        typedef json_proxy<ParentT> proxy_type;
+
+        ParentT& parent_;
         const std::basic_string<CharT>& name_;
 
-        object_key_proxy(); // noop
-        object_key_proxy& operator = (const object_key_proxy& other); // noop
+        json_proxy(); // noop
+        json_proxy& operator = (const json_proxy& other); // noop
 
-        object_key_proxy(basic_json<CharT,Alloc>& parent, 
-              const std::basic_string<CharT>& name)
+        json_proxy(ParentT& parent, const std::basic_string<CharT>& name)
             : parent_(parent), name_(name)
         {
         }
 
         basic_json<CharT,Alloc>& evaluate() 
         {
-            return parent_.at(name_);
+            return parent_.evaluate(name_);
         }
 
         const basic_json<CharT,Alloc>& evaluate() const
         {
-            return parent_.at(name_);
+            return parent_.evaluate(name_);
+        }
+
+        basic_json<CharT,Alloc>& evaluate_with_default()
+        {
+            basic_json<CharT,Alloc>& val = parent_.evaluate_with_default();
+            auto it = val.find(name_);
+            if (it == val.members().end())
+            {
+                it = val.set(val.members().begin(),name_,basic_json<CharT,Alloc>());
+            }
+            return it->value();
+        }
+
+        basic_json<CharT,Alloc>& evaluate(size_t index)
+        {
+            return parent_.evaluate(name_).at(index);
+        }
+
+        const basic_json<CharT,Alloc>& evaluate(size_t index) const
+        {
+            return parent_.evaluate(name_).at(index);
+        }
+
+        basic_json<CharT,Alloc>& evaluate(const std::basic_string<CharT>& index)
+        {
+            return parent_.evaluate(name_).at(index);
+        }
+
+        const basic_json<CharT,Alloc>& evaluate(const std::basic_string<CharT>& index) const
+        {
+            return parent_.evaluate(name_).at(index);
         }
     public:
 
@@ -1483,21 +1516,21 @@ public:
         }
 
         template <typename T>
-        object_key_proxy& operator=(T val)
+        json_proxy& operator=(T val)
         {
-            parent_.set(name_, val);
+            parent_.evaluate_with_default().set(name_, val);
             return *this;
         }
 
-        object_key_proxy& operator=(const basic_json& val)
+        json_proxy& operator=(const basic_json& val)
         {
-            parent_.set(name_, val);
+            parent_.evaluate_with_default().set(name_, val);
             return *this;
         }
 
-        object_key_proxy& operator=(basic_json<CharT,Alloc>&& val)
+        json_proxy& operator=(basic_json&& val)
         {
-            parent_.set(name_, std::move(val));
+            parent_.evaluate_with_default().set(name_, std::move(val));
             return *this;
         }
 
@@ -1513,22 +1546,22 @@ public:
 
         basic_json<CharT,Alloc>& operator[](size_t i)
         {
-            return evaluate()[i];
+            return evaluate_with_default().at(i);
         }
 
         const basic_json<CharT,Alloc>& operator[](size_t i) const
         {
-            return evaluate()[i];
+            return evaluate().at(i);
         }
 
-        object_key_proxy operator[](const std::basic_string<CharT>& name)
+        json_proxy<proxy_type> operator[](const std::basic_string<CharT>& name)
         {
-            return object_key_proxy(evaluate(),name);
+            return json_proxy<proxy_type>(*this,name);
         }
 
-        const basic_json<CharT,Alloc>& operator[](const std::basic_string<CharT>& name) const
+        const json_proxy<proxy_type> operator[](const std::basic_string<CharT>& name) const
         {
-            return evaluate().at(name);
+            return json_proxy<proxy_type>(*this,name);
         }
 
         basic_json<CharT,Alloc>& at(const std::basic_string<CharT>& name)
@@ -1539,6 +1572,16 @@ public:
         const basic_json<CharT,Alloc>& at(const std::basic_string<CharT>& name) const
         {
             return evaluate().at(name);
+        }
+
+        const basic_json<CharT,Alloc>& at(size_t index)
+        {
+            return evaluate().at(name);
+        }
+
+        const basic_json<CharT,Alloc>& at(size_t index) const
+        {
+            return evaluate().at(index);
         }
 
         object_iterator find(const std::basic_string<CharT>& name)
@@ -1575,7 +1618,7 @@ public:
 
         void shrink_to_fit()
         {
-            evaluate().shrink_to_fit();
+            evaluate_with_default().shrink_to_fit();
         }
 
         void clear()
@@ -1594,6 +1637,12 @@ public:
         {
             evaluate().erase(first, last);
         }
+
+        void erase(const std::basic_string<CharT>& name)
+        {
+            evaluate().erase(name);
+        }
+
         // Remove a range of elements from an array 
 
         void remove_range(size_t from_index, size_t to_index)
@@ -1601,11 +1650,6 @@ public:
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
-
-        void erase(const std::basic_string<CharT>& name)
-        {
-            evaluate().erase(name);
-        }
 
         void remove(const std::basic_string<CharT>& name)
         {
@@ -1668,32 +1712,32 @@ public:
 
         void add(basic_json<CharT,Alloc>&& value)
         {
-            evaluate().add(std::move(value));
+            evaluate_with_default().add(std::move(value));
         }
 
         void add(const basic_json<CharT,Alloc>& value)
         {
-            evaluate().add(value);
+            evaluate_with_default().add(value);
         }
 
         void add(size_t index, const basic_json<CharT,Alloc>& value)
         {
-            evaluate().add(index, value);
+            evaluate_with_default().add(index, value);
         }
 
         void add(size_t index, basic_json<CharT,Alloc>&& value)
         {
-            evaluate().add(index, std::move(value));
+            evaluate_with_default().add(index, std::move(value));
         }
 
         array_iterator add(const_array_iterator pos, const basic_json<CharT,Alloc>& value)
         {
-            return evaluate().add(pos, value);
+            return evaluate_with_default().add(pos, value);
         }
 
         array_iterator add(const_array_iterator pos, basic_json<CharT,Alloc>&& value)
         {
-            return evaluate().add(pos, std::move(value));
+            return evaluate_with_default().add(pos, std::move(value));
         }
 
         std::basic_string<CharT> to_string() const 
@@ -1723,10 +1767,10 @@ public:
 
         void swap(basic_json<CharT,Alloc>& val)
         {
-            parent_.swap(val);
+            evaluate_with_default().swap(val);
         }
 
-        friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const object_key_proxy& o)
+        friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const json_proxy& o)
         {
             o.to_stream(os);
             return os;
@@ -1857,7 +1901,8 @@ public:
     {
     }
 
-    basic_json(const object_key_proxy& proxy, const Alloc& allocator = Alloc())
+    template <class ParentT>
+    basic_json(const json_proxy<ParentT>& proxy, const Alloc& allocator = Alloc())
         : var_(allocator, proxy.evaluate().var_)
     {
     }
@@ -1956,13 +2001,13 @@ public:
         return at(i);
     }
 
-    object_key_proxy operator[](const std::basic_string<CharT>& name)
+    json_proxy<basic_json<CharT, Alloc>> operator[](const std::basic_string<CharT>& name)
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
         case value_types::object_t:
-            return object_key_proxy(*this, name);
+            return json_proxy<basic_json<CharT,Alloc>>(*this, name);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2320,6 +2365,41 @@ public:
         }
     }
 
+    basic_json<CharT, Alloc>& evaluate() 
+    {
+        return *this;
+    }
+
+    basic_json<CharT, Alloc>& evaluate_with_default() 
+    {
+        return *this;
+    }
+
+    const basic_json<CharT, Alloc>& evaluate() const
+    {
+        return *this;
+    }
+
+    basic_json<CharT, Alloc>& evaluate(size_t i) 
+    {
+        return at(i);
+    }
+
+    const basic_json<CharT, Alloc>& evaluate(size_t i) const
+    {
+        return at(i);
+    }
+
+    basic_json<CharT, Alloc>& evaluate(const std::basic_string<CharT>& name) 
+    {
+        return at(name);
+    }
+
+    const basic_json<CharT, Alloc>& evaluate(const std::basic_string<CharT>& name) const
+    {
+        return at(name);
+    }
+
     const basic_json<CharT, Alloc>& at(const std::basic_string<CharT>& name) const
     {
         switch (var_.type_)
@@ -2652,6 +2732,8 @@ public:
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_value_ = create_instance<object>(var_);
+            return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
+            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, name, value);
             break;
@@ -2667,6 +2749,8 @@ public:
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_value_ = create_instance<object>(var_);
+            return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
+            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, std::move(name),value);
             break;
@@ -2682,6 +2766,8 @@ public:
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_value_ = create_instance<object>(var_);
+            return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
+            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, name,std::move(value));
             break;
@@ -2697,6 +2783,8 @@ public:
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
             var_.value_.object_value_ = create_instance<object>(var_);
+            return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
+            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, std::move(name),std::move(value));
             break;

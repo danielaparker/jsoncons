@@ -87,22 +87,22 @@ void example1()
 #if !defined(JSONCONS_NO_FOR_RANGE)
     for(auto book : booklist.elements())
     {
-    	std::cout << book["title"].as<std::string>()
-    		  << ","
-	          << book["price"].as<double>() << std::endl;
+        std::cout << book["title"].as<std::string>()
+                  << ","
+                  << book["price"].as<double>() << std::endl;
     }
 #endif
 
     // The second book
-    const json& book = booklist[1];
+    json& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
 #if !defined(JSONCONS_NO_FOR_RANGE)
     for(auto member : book.members())
     {
-    	std::cout << member.name()
-    		      << ","
-	              << member.value() << std::endl;
+        std::cout << member.name()
+                  << ","
+                  << member.value() << std::endl;
     }
 #endif
 
@@ -128,7 +128,14 @@ void example1()
 
     book.get("author", "author unknown").as<std::string>();
     // Returns author if found, otherwise "author unknown"
-	
+
+    // Add ratings
+    book["ratings"]["*****"] = 4;
+    book["ratings"]["*"] = 1;
+
+    // Delete one-star ratings
+    book["ratings"].erase("*");
+
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
     os << pretty_print(booklist);
@@ -142,7 +149,7 @@ void example2()
     is >> booklist;
 
     // Use a JsonPath expression to find 
-    //  
+      
     // (1) The authors of books that cost less than $12
     json result = json_query(booklist, "$[*][?(@.price < 12)].author");
     std::cout << "(1) " << result << std::endl;
@@ -158,6 +165,10 @@ void example2()
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
     std::cout << "(4) " << result << std::endl;
+
+    // (5) The titles of all books that have ratings
+    result = json_query(booklist, "$[*][?(@.ratings)].title");
+    std::cout << "(5) " << result << std::endl;
 }
 
 void example3()
@@ -214,36 +225,36 @@ void example3()
 #else
     wjson book4;
 #endif
-	// Construct a booklist array
-	wjson booklist = wjson::array();
+    // Construct a booklist array
+    wjson booklist = wjson::array();
 
-	// For efficiency, reserve memory, to avoid reallocations
-	booklist.reserve(4);
+    // For efficiency, reserve memory, to avoid reallocations
+    booklist.reserve(4);
 
-	// For efficency, tell jsoncons to move the contents 
-	// of the four book objects into the array
-	booklist.add(std::move(book1));
+    // For efficency, tell jsoncons to move the contents 
+    // of the four book objects into the array
+    booklist.add(std::move(book1));
     booklist.add(std::move(book2));
     booklist.add(std::move(book3));
 
     // Add the last one to the front
     booklist.add(booklist.elements().begin(),std::move(book4));    
 
-	// See what's left of book1, 2, 3 and 4 (expect nulls)
-	std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
+    // See what's left of book1, 2, 3 and 4 (expect nulls)
+    std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
 
-	//Loop through the booklist elements using a range-based for loop    
+    //Loop through the booklist elements using a range-based for loop    
 #if !defined(JSONCONS_NO_FOR_RANGE)
-	for (auto book : booklist.elements())
-	{
-	    std::wcout << book[L"title"].as<std::wstring>()
-	      	       << L","
-	    	       << book[L"price"].as<double>() << std::endl;
-	}
+    for (auto book : booklist.elements())
+    {
+        std::wcout << book[L"title"].as<std::wstring>()
+          	       << L","
+        	       << book[L"price"].as<double>() << std::endl;
+    }
 #endif
 
     // The second book
-    const wjson& book = booklist[1];
+    wjson& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
 #if !defined(JSONCONS_NO_FOR_RANGE)
@@ -278,9 +289,16 @@ void example3()
     book.get(L"author", L"author unknown").as<std::wstring>();
     // Returns author if found, otherwise "author unknown"
 
+    // Add ratings
+    book[L"ratings"][L"*****"] = 4;
+    book[L"ratings"][L"*"] = 2;
+
+    // Delete one-star ratings
+    book[L"ratings"].erase(L"*");
+
     // Serialize the booklist to a file
-	std::wofstream os(L"booklist2.json");
-	os << pretty_print(booklist);
+    std::wofstream os(L"booklist2.json");
+    os << pretty_print(booklist);
 }
 
 void example4()
@@ -307,6 +325,10 @@ void example4()
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
     std::wcout << L"(4) " << result << std::endl;
+
+    // (5) The titles of all books that have ratings
+    result = json_query(booklist, L"$[*][?(@.ratings)].title");
+    std::wcout << L"(5) " << result << std::endl;
 }
 
 }

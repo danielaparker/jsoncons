@@ -647,7 +647,15 @@ vertical-align:1px;
     }
 
     book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span></pre></div>
+    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+
+    <span class="pl-c">// Add ratings</span>
+    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
+    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+
+    <span class="pl-c">// Delete one-star ratings</span>
+    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
+</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
     std::ofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
@@ -670,6 +678,10 @@ vertical-align:1px;
             "date":"2002-04-09",
             "isbn":"037571894X",
             "price":9.01,
+            "ratings":
+            {
+                "*****":4
+            },
             "title":"A Wild Sheep Chase: A Novel"
         },
         {
@@ -722,7 +734,11 @@ vertical-align:1px;
 
     <span class="pl-c">// (4) The authors of books that were published in 2004</span>
     result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+
+    <span class="pl-c">// (5) The titles of all books that have ratings</span>
+    result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
 
 <p>Result:</p>
 
@@ -740,6 +756,7 @@ vertical-align:1px;
         }
     ]
     (4) ["Charles Bukowski"]
+    (5) ["A Wild Sheep Chase: A Novel"]
 </code></pre>
 
 <h2>Once again, this time with wide characters</h2>
@@ -857,7 +874,15 @@ vertical-align:1px;
     }
 
     book.get(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span></pre></div>
+    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+
+    <span class="pl-c">// Add ratings</span>
+    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][L<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
+    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][L<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+
+    <span class="pl-c">// Delete one-star ratings</span>
+    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(L<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
+</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
     std::wofstream <span class="pl-en">os</span>(L<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
@@ -886,7 +911,11 @@ vertical-align:1px;
 
     <span class="pl-c">// (4) The authors of books that were published in 2004</span>
     result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
+    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+
+    <span class="pl-c">// (5) The titles of all books that have ratings</span>
+    result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
 
 <p>Result:</p>
 
@@ -904,6 +933,7 @@ vertical-align:1px;
         }
     ]
     (4) ["Charles Bukowski"]
+    (5) ["A Wild Sheep Chase: A Novel"]
 </code></pre>
 
 <h2>Acknowledgements</h2>

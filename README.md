@@ -173,6 +173,14 @@ Instructions for building the examples with CMake may be found in
 
     book.get("author", "author unknown").as<std::string>();
     // Returns author if found, otherwise "author unknown"
+
+    // Add ratings
+    book["ratings"]["*****"] = 4;
+    book["ratings"]["*"] = 2;
+
+    // Delete one-star ratings
+    book["ratings"].erase("*");
+
 ```
 ```c++	
     // Serialize the booklist to a file
@@ -197,6 +205,10 @@ The JSON output `booklist.json`
             "date":"2002-04-09",
             "isbn":"037571894X",
             "price":9.01,
+            "ratings":
+            {
+                "*****":4
+            },
             "title":"A Wild Sheep Chase: A Novel"
         },
         {
@@ -250,6 +262,10 @@ The JSON output `booklist.json`
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
     std::cout << "(4) " << result << std::endl;
+
+    // (5) The titles of all books that have ratings
+    result = json_query(booklist, "$[*][?(@.ratings)].title");
+    std::cout << "(5) " << result << std::endl;
 ```
 Result:
 ```
@@ -267,6 +283,7 @@ Result:
         }
     ]
     (4) ["Charles Bukowski"]
+    (5) ["A Wild Sheep Chase: A Novel"]
 ```
 ## Once again, this time with wide characters
 
@@ -385,6 +402,14 @@ Result:
 
     book.get(L"author", L"author unknown").as<std::wstring>();
     // Returns author if found, otherwise "author unknown"
+
+    // Add ratings
+    book[L"ratings"][L"*****"] = 4;
+    book[L"ratings"][L"*"] = 2;
+
+    // Delete one-star ratings
+    book[L"ratings"].erase(L"*");
+
 ```
 ```c++
     // Serialize the booklist to a file
@@ -416,6 +441,10 @@ Result:
     // (4) The authors of books that were published in 2004
     result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
     std::wcout << L"(4) " << result << std::endl;
+
+    // (5) The titles of all books that have ratings
+    result = json_query(booklist, L"$[*][?(@.ratings)].title");
+    std::wcout << L"(5) " << result << std::endl;
 ```
 Result:
 ```
@@ -433,6 +462,7 @@ Result:
         }
     ]
     (4) ["Charles Bukowski"]
+    (5) ["A Wild Sheep Chase: A Novel"]
 ```
 ## Acknowledgements
 

@@ -29,8 +29,6 @@ void construct_json_from_vector()
 {
     json root;
 
-    root["addresses"];
-
     std::vector<json> addresses;
     json address1;
     address1["city"] = "San Francisco";

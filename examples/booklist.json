@@ -13,6 +13,10 @@
         "date":"2002-04-09",
         "isbn":"037571894X",
         "price":9.01,
+        "ratings":
+        {
+            "*****":4
+        },
         "title":"A Wild Sheep Chase: A Novel"
     },
     {

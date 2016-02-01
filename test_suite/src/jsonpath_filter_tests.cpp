@@ -46,6 +46,7 @@ struct jsonpath_filter_fixture
         return bicycle;
     }
 };
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
     std::string expr1 = "(1 + 1)";

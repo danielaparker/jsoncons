@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     std::string s2 = a["object1"].get("field2").as<std::string>();
     a["object1"].get("field2").is_null();
     //std::cout << s2 << std::endl;
-    BOOST_REQUIRE_THROW(a["object1"].at("field2"), json_exception);
+    BOOST_REQUIRE_THROW(a["object1"].at("field2").as<std::string>(), std::out_of_range);
 
     BOOST_CHECK_EQUAL(std::string("value1"),s1);
     BOOST_CHECK_EQUAL(std::string("value1"),s1a);
