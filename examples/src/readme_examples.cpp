@@ -75,10 +75,12 @@ void example1()
     // of the four book objects into the array
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
-    booklist.add(std::move(book3));
 
-    // Add the last one to the front
-    booklist.add(booklist.elements().begin(),std::move(book4));    
+    // Add the third one to the front
+    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    
+    // Add the last one immediately after
+    booklist.add(where+1,std::move(book4));    
 
 	// See what's left of book1, 2, 3 and 4 (expect nulls)
 	std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
@@ -235,10 +237,12 @@ void example3()
     // of the four book objects into the array
     booklist.add(std::move(book1));
     booklist.add(std::move(book2));
-    booklist.add(std::move(book3));
 
-    // Add the last one to the front
-    booklist.add(booklist.elements().begin(),std::move(book4));    
+    // Add the third one to the front
+    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+
+    // Add the last one immediately after
+    booklist.add(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;

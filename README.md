@@ -1,6 +1,6 @@
 # jsoncons: a C++ library for json construction
 
-jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a tree structured `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
+jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
 
 jsoncons uses some features that are new to C++ 11, particularly move semantics and the AllocatorAwareContainer concept. Through the use of conditional directives, however, it retains compatibility with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, MS Visual C++ 15, clang 3.3 and GCC 4.8. 
 
@@ -25,10 +25,7 @@ The library has a number of features, which are listed below:
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
 
-## What's new on master
-
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
-- There are a few API changes, most retaining backwards compatability, refer to the [Changelog](https://github.com/danielaparker/jsoncons/blob/master/Changelog.md) for details.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names. New code should avoid the deprecated names.
 
 ## Benchmarks
 
@@ -55,6 +52,8 @@ Instructions for building the examples with CMake may be found in
     jsoncons/examples/build/cmake/README.txt
 
 ## Examples
+
+The examples below illustrate the use of the [json](json) class and [json_query](json_query) function.
 
 ### json construction
 
@@ -122,22 +121,24 @@ Instructions for building the examples with CMake may be found in
     // of the four book objects into the array
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
-    booklist.add(std::move(book3));
 
-    // Add the last one to the front
-    booklist.add(booklist.elements().begin(),std::move(book4));    
+    // Add the third one to the front
+    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    
+    // Add the last one immediately after
+    booklist.add(where+1,std::move(book4));    
 
-	// See what's left of book1, 2, 3 and 4 (expect nulls)
-	std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+    // See what's left of book1, 2, 3 and 4 (expect nulls)
+    std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 ```
 
 ```c++
     //Loop through the booklist elements using a range-based for loop    
     for (auto book : booklist.elements())
     {
-    	std::cout << book["title"].as<std::string>()
-    		  << ","
-	          << book["price"].as<double>() << std::endl;
+        std::cout << book["title"].as<std::string>()
+                  << ","
+                  << book["price"].as<double>() << std::endl;
     }
 
     // The second book
@@ -146,9 +147,9 @@ Instructions for building the examples with CMake may be found in
     //Loop through the book's name-value pairs using a range-based for loop    
     for (auto member : book.members())
     {
-    	std::cout << member.name()
-    		  << ","
-	          << member.value() << std::endl;
+        std::cout << member.name()
+                  << ","
+                  << member.value() << std::endl;
     }
 
     auto it = book.find("author");
@@ -189,14 +190,26 @@ Instructions for building the examples with CMake may be found in
 ```
 
 The JSON output `booklist.json`
-```
+```json
     [
+        {
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2006-01-03",
+            "isbn":"1400079276",
+            "price":13.45,
+            "title":"Kafka on the Shore"
+        },
         {
             "author":"Charles Bukowski",
             "category":"Fiction",
             "date":"2004-07-08",
             "isbn":"1852272007",
             "price":22.48,
+            "ratings":
+            {
+                "*****":4
+            },
             "title":"Pulp"
         },
         {
@@ -205,10 +218,6 @@ The JSON output `booklist.json`
             "date":"2002-04-09",
             "isbn":"037571894X",
             "price":9.01,
-            "ratings":
-            {
-                "*****":4
-            },
             "title":"A Wild Sheep Chase: A Novel"
         },
         {
@@ -218,14 +227,6 @@ The JSON output `booklist.json`
             "isbn":"0802143415",
             "price":10.5,
             "title":"Charlie Wilson's War"
-        },
-        {
-            "author":"Haruki Murakami",
-            "category":"Fiction",
-            "date":"2006-01-03",
-            "isbn":"1400079276",
-            "price":13.45,
-            "title":"Kafka on the Shore"
         }
     ]
 ```
@@ -274,16 +275,16 @@ Result:
     (3)
     [
         {
-            "author":"George Crile",
-            "category":"History",
-            "date":"2007-11-06",
-            "isbn":"0802143415",
-            "price":10.5,
-            "title":"Charlie Wilson's War"
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2002-04-09",
+            "isbn":"037571894X",
+            "price":9.01,
+            "title":"A Wild Sheep Chase: A Novel"
         }
     ]
     (4) ["Charles Bukowski"]
-    (5) ["A Wild Sheep Chase: A Novel"]
+    (5) ["Pulp"]
 ```
 ## Once again, this time with wide characters
 
@@ -353,10 +354,12 @@ Result:
     // of the four book objects into the array
     booklist.add(std::move(book1));
     booklist.add(std::move(book2));
-    booklist.add(std::move(book3));
 
-    // Add the last one to the front
-    booklist.add(booklist.elements().begin(),std::move(book4));    
+    // Add the third one to the front
+    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    
+    // Add the last one immediately after
+    booklist.add(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
@@ -453,16 +456,16 @@ Result:
     (3)
     [
         {
-            "author":"George Crile",
-            "category":"History",
-            "date":"2007-11-06",
-            "isbn":"0802143415",
-            "price":10.5,
-            "title":"Charlie Wilson's War"
+            "author":"Haruki Murakami",
+            "category":"Fiction",
+            "date":"2002-04-09",
+            "isbn":"037571894X",
+            "price":9.01,
+            "title":"A Wild Sheep Chase: A Novel"
         }
     ]
     (4) ["Charles Bukowski"]
-    (5) ["A Wild Sheep Chase: A Novel"]
+    (5) ["Pulp"]
 ```
 ## Acknowledgements
 

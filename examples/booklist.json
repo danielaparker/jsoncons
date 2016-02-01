@@ -1,10 +1,22 @@
 [
     {
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2006-01-03",
+        "isbn":"1400079276",
+        "price":13.45,
+        "title":"Kafka on the Shore"
+    },
+    {
         "author":"Charles Bukowski",
         "category":"Fiction",
         "date":"2004-07-08",
         "isbn":"1852272007",
         "price":22.48,
+        "ratings":
+        {
+            "*****":4
+        },
         "title":"Pulp"
     },
     {
@@ -13,10 +25,6 @@
         "date":"2002-04-09",
         "isbn":"037571894X",
         "price":9.01,
-        "ratings":
-        {
-            "*****":4
-        },
         "title":"A Wild Sheep Chase: A Novel"
     },
     {
@@ -26,13 +34,5 @@
         "isbn":"0802143415",
         "price":10.5,
         "title":"Charlie Wilson's War"
-    },
-    {
-        "author":"Haruki Murakami",
-        "category":"Fiction",
-        "date":"2006-01-03",
-        "isbn":"1400079276",
-        "price":13.45,
-        "title":"Kafka on the Shore"
     }
 ]

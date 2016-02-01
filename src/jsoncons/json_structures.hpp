@@ -193,14 +193,14 @@ public:
 
     bool operator()(const ValueT& a, const CharT* b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),length_);
-        int result = std::char_traits<CharT>::compare(a.name_data(),b,len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
+        int result = std::char_traits<CharT>::compare(a.name().data(),b,len);
         if (result < 0 || result > 0)
         {
             return result < 0;
         }
 
-        return a.name_length() < length_;
+        return a.name().length() < length_;
     }
 };
 
@@ -211,19 +211,19 @@ class member_compare
 public:
     bool operator()(const ValueT& a, const ValueT& b) const
     {
-        if (a.name_length() == b.name_length())
+        if (a.name().length() == b.name().length())
         {
-            return std::char_traits<char_type>::compare(a.name_data(),b.name_data(),a.name_length()) < 0;
+            return std::char_traits<char_type>::compare(a.name().data(),b.name().data(),a.name().length()) < 0;
         }
 
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name_length(),b.name_length());
-        int result = std::char_traits<char_type>::compare(a.name_data(),b.name_data(),len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),b.name().length());
+        int result = std::char_traits<char_type>::compare(a.name().data(),b.name().data(),len);
         if (result < 0 || result > 0)
         {
             return result < 0;
         }
 
-        return a.name_length() < b.name_length();
+        return a.name().length() < b.name().length();
     }
 };
 
@@ -264,15 +264,6 @@ public:
     json_object_member(json_object_member&& member)
         : name_(std::move(member.name_)), value_(std::move(member.value_))
     {
-    }
-    const char_type* name_data() const
-    {
-        return name_.data();
-    }
-
-    const size_t name_length() const
-    {
-        return name_.length();
     }
 
     const name_type& name() const
