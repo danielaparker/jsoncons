@@ -142,7 +142,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     }
 
     // The second book
-    const json& book = booklist[1];
+    json& book = booklist[1];
 
     //Loop through the book's name-value pairs using a range-based for loop    
     for (auto member : book.members())
@@ -374,7 +374,7 @@ Result:
     }
 
     // The second book
-    const wjson& book = booklist[1];
+    wjson& book = booklist[1];
 
     //Loop through the book's name-value pairs using a range-based for loop    
     for (auto member : book.members())

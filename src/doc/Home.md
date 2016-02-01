@@ -1,4 +1,4 @@
-All core jsoncons classes and functions are in namespace `jsoncons`. Extensions are in namespace `jsoncons_ext`. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+All core jsoncons classes and functions are in namespace `jsoncons`. Extensions are in namespace `jsoncons_ext`. 
 
 ### Roadmap
 
