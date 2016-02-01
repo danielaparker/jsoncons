@@ -122,10 +122,10 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     booklist.add(std::move(book1));    
     booklist.add(std::move(book2));    
 
-    // Add the third one to the front
+    // Add the third book to the front
     auto where = booklist.add(booklist.elements().begin(),std::move(book3));
     
-    // Add the last one immediately after
+    // and the last one immediately after
     booklist.add(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
@@ -332,8 +332,8 @@ Result:
     pos = book3.set(pos, L"price", 13.45);
     pos = book3.set(pos, L"title", L"Kafka on the Shore");
 
-	// Construct a fourth from a string
-	wjson book4 = wjson::parse(LR"(
+    // Construct a fourth from a string
+    wjson book4 = wjson::parse(LR"(
     {
         "category" : "Fiction",
         "title" : "Pulp",
@@ -355,21 +355,22 @@ Result:
     booklist.add(std::move(book1));
     booklist.add(std::move(book2));
 
-    // Add the third one to the front
+    // Add the third book to the front
     auto where = booklist.add(booklist.elements().begin(),std::move(book3));
     
-    // Add the last one immediately after
+    // and the last one immediately after
     booklist.add(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
+```
 ```c++
     //Loop through the booklist elements using a range-based for loop    
     for (auto book : booklist.elements())
     {
         std::wcout << book[L"title"].as<std::wstring>()
-          	       << L","
-        	       << book[L"price"].as<double>() << std::endl;
+                   << L","
+                   << book[L"price"].as<double>() << std::endl;
     }
 
     // The second book
