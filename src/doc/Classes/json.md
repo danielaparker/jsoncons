@@ -144,18 +144,18 @@ Returns the number of object members that match `name`.
     bool is() const noexcept
 Returns `true` if json value has type `T`, `false` otherwise.  
 
-    is<char> 
-    is<signed char>
-    is<unsigned char>
-    is<wchar_t>
-    is<short>
-    is<unsigned short> 
-    is<int> 
-    is<unsigned int> 
-    is<long> 
-    is<unsigned long> 
-    is<long long> 
-    is<unsigned long long> 
+    bool is<char> const noexcept 
+    bool is<signed char> const noexcept
+    bool is<unsigned char> const noexcept
+    bool is<wchar_t> const noexcept
+    bool is<short> const noexcept
+    bool is<unsigned short> const noexcept 
+    bool is<int> const noexcept 
+    bool is<unsigned int> const noexcept 
+    bool is<long> const noexcept 
+    bool is<unsigned long> const noexcept 
+    bool is<long long> const noexcept 
+    bool is<unsigned long long> const noexcept 
 Return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
 
     is<double> 
@@ -243,28 +243,28 @@ Returns `false` if value is `false` or `null`, if value is a zero length string,
     as<double>
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
 
-    as<char>
-    as<signed char>
-    as<unsigned char>
-    as<wchar_t>
-    as<short>
-    as<unsigned short> 
-    as<int> 
-    as<unsigned int> 
-    as<long> 
-    as<unsigned long> 
-    as<long long> 
-    as<unsigned long long> 
+    char as<char> const
+    signed char as<signed char> const
+    unsigned char as<unsigned char> const
+    wchar_t as<wchar_t> const
+    short as<short> const
+    unsigned short as<unsigned short> const 
+    int as<int> const 
+    unsigned int as<unsigned int> const 
+    long as<long> const 
+    unsigned long as<unsigned long> const 
+    long long as<long long> const 
+    unsigned long long as<unsigned long long> const 
 Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
-    as<string> 
+    std::string as<std::string> const noexcept
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const noexcept
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
-    std::string as_string() const
+    std::string as_string() const noexcept
 Non-generic versions of `as` methods
 
     template <typename T>
@@ -319,6 +319,7 @@ Throws `std::runtime_error` if not an array.
     array_iterator add(const_array_iterator pos, json&& val)
 Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The content of `val` is copied (or moved) to the new element.
+Returns an `array_iterator` that points to the new value
 Throws `std::runtime_error` if not an array.
 
     void swap(json& val)
@@ -334,7 +335,7 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
-    std::string to_string() const
+    std::string to_string() const noexcept
 Inserts json value into string.
 
     std::string to_string(const output_format& format) const

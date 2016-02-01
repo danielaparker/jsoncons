@@ -718,18 +718,18 @@ bool is() const noexcept
 
 <p>Returns <code>true</code> if json value has type <code>T</code>, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;char&gt; 
-is&lt;signed char&gt;
-is&lt;unsigned char&gt;
-is&lt;wchar_t&gt;
-is&lt;short&gt;
-is&lt;unsigned short&gt; 
-is&lt;int&gt; 
-is&lt;unsigned int&gt; 
-is&lt;long&gt; 
-is&lt;unsigned long&gt; 
-is&lt;long long&gt; 
-is&lt;unsigned long long&gt; 
+<pre><code>bool is&lt;char&gt; const noexcept 
+bool is&lt;signed char&gt; const noexcept
+bool is&lt;unsigned char&gt; const noexcept
+bool is&lt;wchar_t&gt; const noexcept
+bool is&lt;short&gt; const noexcept
+bool is&lt;unsigned short&gt; const noexcept 
+bool is&lt;int&gt; const noexcept 
+bool is&lt;unsigned int&gt; const noexcept 
+bool is&lt;long&gt; const noexcept 
+bool is&lt;unsigned long&gt; const noexcept 
+bool is&lt;long long&gt; const noexcept 
+bool is&lt;unsigned long long&gt; const noexcept 
 </code></pre>
 
 <p>Return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.  </p>
@@ -857,23 +857,23 @@ T as() const
 
 <p>If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is <code>null</code>, returns <code>NaN</code>, otherwise throws.</p>
 
-<pre><code>as&lt;char&gt;
-as&lt;signed char&gt;
-as&lt;unsigned char&gt;
-as&lt;wchar_t&gt;
-as&lt;short&gt;
-as&lt;unsigned short&gt; 
-as&lt;int&gt; 
-as&lt;unsigned int&gt; 
-as&lt;long&gt; 
-as&lt;unsigned long&gt; 
-as&lt;long long&gt; 
-as&lt;unsigned long long&gt; 
+<pre><code>char as&lt;char&gt; const
+signed char as&lt;signed char&gt; const
+unsigned char as&lt;unsigned char&gt; const
+wchar_t as&lt;wchar_t&gt; const
+short as&lt;short&gt; const
+unsigned short as&lt;unsigned short&gt; const 
+int as&lt;int&gt; const 
+unsigned int as&lt;unsigned int&gt; const 
+long as&lt;long&gt; const 
+unsigned long as&lt;unsigned long&gt; const 
+long long as&lt;long long&gt; const 
+unsigned long long as&lt;unsigned long long&gt; const 
 </code></pre>
 
 <p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
-<pre><code>as&lt;string&gt; 
+<pre><code>std::string as&lt;std::string&gt; const noexcept
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
@@ -882,7 +882,7 @@ as&lt;unsigned long long&gt;
 int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
-std::string as_string() const
+std::string as_string() const noexcept
 </code></pre>
 
 <p>Non-generic versions of <code>as</code> methods</p>
@@ -959,6 +959,7 @@ array_iterator add(const_array_iterator pos, json&amp;&amp; val)
 
 <p>Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
 The content of <code>val</code> is copied (or moved) to the new element.<br>
+Returns an <code>array_iterator</code> that points to the new value<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
 
 <pre><code>void swap(json&amp; val)
@@ -980,7 +981,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Serialization</h3>
 
-<pre><code>std::string to_string() const
+<pre><code>std::string to_string() const noexcept
 </code></pre>
 
 <p>Inserts json value into string.</p>

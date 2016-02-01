@@ -30,11 +30,11 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, std::basic_string<CharT>>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_string();
     }
-    static std::basic_string<CharT> as(const basic_json<CharT, Alloc>& rhs)
+    static std::basic_string<CharT> as(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.as_string();
     }
@@ -48,7 +48,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::any>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& lhs)
+    static bool is(const basic_json<CharT, Alloc>& lhs) JSONCONS_NOEXCEPT
     {
         return lhs.is_any();
     }
@@ -66,7 +66,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, typename type_wrapper<CharT>::const_pointer_type>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_string();
     }
@@ -85,7 +85,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -114,7 +114,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, unsigned char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -143,7 +143,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, signed char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -172,7 +172,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, wchar_t>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -201,7 +201,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::object>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_object();
     }
@@ -220,7 +220,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::array>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_array();
     }
@@ -239,7 +239,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, jsoncons::null_type>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_null();
     }
@@ -258,7 +258,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, bool>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
     }
@@ -276,7 +276,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, short>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -305,7 +305,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, unsigned short>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -334,7 +334,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, int>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -363,7 +363,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, unsigned int>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -392,7 +392,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -421,7 +421,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, unsigned long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -450,7 +450,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, long long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -479,7 +479,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, unsigned long long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -508,7 +508,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, double>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
     }
@@ -527,7 +527,7 @@ template<typename CharT, typename Alloc>
 class json_type_traits<CharT, Alloc, float>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
     }
@@ -545,7 +545,7 @@ template<typename CharT, typename Alloc, typename T>
 class json_type_traits<CharT, Alloc, std::vector<T>>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs)
+    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_array();
         for (size_t i = 0; result && i < rhs.size(); ++i)

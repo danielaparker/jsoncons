@@ -160,7 +160,10 @@ public:
     }
     ~serializable_any()
     {
-        destroy_instance(allocator_,impl_);
+        if (impl_ != nullptr)
+        {
+            destroy_instance(allocator_,impl_);
+        }
     }
 
     template<typename T>
@@ -1409,7 +1412,7 @@ public:
             return evaluate().is_double();
         }
 
-        std::basic_string<CharT> as_string() const 
+        std::basic_string<CharT> as_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string();
         }
@@ -1740,7 +1743,7 @@ public:
             return evaluate_with_default().add(pos, std::move(value));
         }
 
-        std::basic_string<CharT> to_string() const 
+        std::basic_string<CharT> to_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string();
         }
@@ -2020,7 +2023,15 @@ public:
         return at(name);
     }
 
-    std::basic_string<CharT> to_string() const ;
+    std::basic_string<CharT> to_string() const JSONCONS_NOEXCEPT
+    {
+        std::basic_ostringstream<CharT> os;
+        {
+            basic_json_serializer<CharT> serializer(os);
+            to_stream(serializer);
+        }
+        return os.str();
+    }
 
     std::basic_string<CharT> to_string(const basic_output_format<CharT>& format) const;
 
@@ -2310,7 +2321,7 @@ public:
 
     unsigned long as_ulong() const;
 
-    std::basic_string<CharT> as_string() const 
+    std::basic_string<CharT> as_string() const JSONCONS_NOEXCEPT
     {
         switch (var_.type_)
         {
@@ -3212,17 +3223,6 @@ template<typename CharT, typename Alloc>
 bool basic_json<CharT, Alloc>::operator==(const basic_json<CharT, Alloc>& rhs) const
 {
     return var_ == rhs.var_;
-}
-
-template<typename CharT, typename Alloc>
-std::basic_string<CharT> basic_json<CharT, Alloc>::to_string() const 
-{
-    std::basic_ostringstream<CharT> os;
-    {
-        basic_json_serializer<CharT> serializer(os);
-        to_stream(serializer);
-    }
-    return os.str();
 }
 
 template<typename CharT, typename Alloc>
