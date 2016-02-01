@@ -582,6 +582,42 @@ void neg_inf_replacement(const std::string&amp; replacement)
 
 <pre><code>void precision(size_t prec)
 </code></pre>
+
+<h2>Examples</h2>
+
+<h3>Default NaN, inf and -inf replacement</h3>
+
+<div class="highlight highlight-source-c++"><pre>    json obj;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = std::sqrt(-<span class="pl-c1">1.0</span>);
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = -<span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
+    std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
+
+<p>The output is</p>
+
+<div class="highlight highlight-source-json"><pre>    {<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
+
+<h3>User specified <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</h3>
+
+<div class="highlight highlight-source-c++"><pre>    json obj;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = std::sqrt(-<span class="pl-c1">1.0</span>);
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = -<span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
+
+    output_format format;
+    format.nan_replacement(<span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>);        <span class="pl-c">// default is "null"</span>
+    format.pos_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>1e9999<span class="pl-pds">"</span></span>);  <span class="pl-c">// default is "null"</span>
+    format.neg_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>-1e9999<span class="pl-pds">"</span></span>); <span class="pl-c">// default is "null"</span>
+
+    std::cout &lt;&lt; pretty_print(obj,format) &lt;&lt; std::endl;</pre></div>
+
+<p>The output is</p>
+
+<div class="highlight highlight-source-json"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">1e9999</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">-1e9999</span>
+    }</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

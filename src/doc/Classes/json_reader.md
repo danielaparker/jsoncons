@@ -54,3 +54,41 @@ Use `max_nesting_depth()` instead
     void max_depth(size_t depth)
 Use `max_nesting_depth(size_t depth)` instead
 
+## Examples
+
+
+### Reading a sequence of JSON texts from a stream
+
+`jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
+
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
+
+This is the code that reads them: 
+
+    std::ifstream is("json-texts.json");
+    if (!is.is_open())
+    {
+        throw std::exception("Cannot open file");
+    }
+
+    json_deserializer handler;
+    json_reader reader(is,handler);
+
+    while (!reader.eof())
+    {
+        reader.read_next();
+        if (!reader.eof())
+        {
+            json val = handler.get_result();
+            std::cout << val << std::endl;
+        }
+    }
+
+The output is
+
+    {"a":1,"b":2,"c":3}
+    {"a":4,"b":5,"c":6}
+    {"a":7,"b":8,"c":9}
+

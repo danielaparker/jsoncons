@@ -544,6 +544,46 @@ size_t max_nesting_depth() const
 </code></pre>
 
 <p>Use <code>max_nesting_depth(size_t depth)</code> instead</p>
+
+<h2>Examples</h2>
+
+<h3>Reading a sequence of JSON texts from a stream</h3>
+
+<p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+</code></pre>
+
+<p>This is the code that reads them: </p>
+
+<pre><code>std::ifstream is("json-texts.json");
+if (!is.is_open())
+{
+    throw std::exception("Cannot open file");
+}
+
+json_deserializer handler;
+json_reader reader(is,handler);
+
+while (!reader.eof())
+{
+    reader.read_next();
+    if (!reader.eof())
+    {
+        json val = handler.get_result();
+        std::cout &lt;&lt; val &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+
+<p>The output is</p>
+
+<pre><code>{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
