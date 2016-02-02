@@ -129,6 +129,7 @@ public:
     serializable_any(const Alloc& allocator = Alloc())
         : impl_(nullptr)
     {
+        (void)allocator;
     }
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     serializable_any(const serializable_any& val)
@@ -145,6 +146,7 @@ public:
 #endif
     serializable_any(const serializable_any& val, const Alloc& allocator)
     {
+        (void)allocator;
         impl_ = val.impl_ != nullptr ? val.impl_->clone(Alloc()) : nullptr;
     }
 
@@ -156,6 +158,7 @@ public:
     serializable_any(serializable_any&& val, const Alloc& allocator)
         : impl_(std::move(val.impl_))
     {
+        (void)allocator;
         val.impl_ = nullptr;
     }
     ~serializable_any()
@@ -227,6 +230,7 @@ public:
         any_handle_impl(T value, const Alloc& allocator)
             : value_(value)
         {
+            (void)allocator;
         }
 
         virtual any_handle* clone(const Alloc& allocator) const
@@ -284,7 +288,7 @@ string_data<CharT>* create_string_data(const Alloc& allocator)
     size_t mem_size = sizeof(storage_type) + length*sizeof(CharT);
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
@@ -306,7 +310,7 @@ string_data<CharT>* create_string_data(const CharT* s, size_t length, const Allo
     size_t mem_size = sizeof(storage_type) + length*sizeof(CharT);
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
@@ -328,7 +332,7 @@ void destroy_string_data(const Alloc& allocator, string_data<CharT>* p)
     typedef typename std::aligned_storage<sizeof(string_dataA<CharT>), JSONCONS_ALIGNOF(string_dataA<CharT>)>::type storage_type;
     size_t mem_size = sizeof(storage_type) + p->length_*sizeof(CharT);
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>::rebind_alloc<char> alloc(allocator);
+    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif

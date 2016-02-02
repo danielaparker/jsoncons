@@ -111,7 +111,7 @@ private:
         is_valid_ = true;
     }
 
-    void do_begin_object(const basic_parsing_context<char_type>& context) override
+    void do_begin_object(const basic_parsing_context<char_type>&) override
     {
         push_object();
     }
