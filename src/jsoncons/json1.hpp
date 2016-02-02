@@ -36,7 +36,7 @@ template <class T, class Alloc>
 T* create_instance(const Alloc& allocator)
 {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
 #else
     typename Alloc:: template rebind<T>::other alloc(allocator);
 #endif
@@ -44,7 +44,7 @@ T* create_instance(const Alloc& allocator)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, allocator);
 #else
         new(storage) T(allocator);
 #endif
@@ -61,7 +61,7 @@ template <class T, class Alloc, class Arg>
 T* create_instance(const Alloc& allocator, Arg&& val)
 {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
 #else
     typename Alloc:: template rebind<T>::other alloc(allocator);
 #endif
@@ -69,7 +69,7 @@ T* create_instance(const Alloc& allocator, Arg&& val)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val), allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val), allocator);
 #else
         new(storage)T(std::forward<Arg>(val), allocator);
 #endif
@@ -86,7 +86,7 @@ template <class T, class Alloc, class Arg1, class Arg2>
 T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
 {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
 #else
     typename Alloc:: template rebind<T>::other alloc(allocator);
 #endif
@@ -94,7 +94,7 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), allocator);
 #else
     new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2), allocator);
 #endif
@@ -111,8 +111,8 @@ template <class T, class Alloc>
 void destroy_instance(const Alloc& allocator, T* p)
 {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-    std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
 #else
     typename Alloc:: template rebind<T>::other alloc(allocator);
     alloc.destroy(p);
@@ -288,7 +288,7 @@ string_data<CharT>* create_string_data(const Alloc& allocator)
     size_t mem_size = sizeof(storage_type) + length*sizeof(CharT);
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
@@ -310,7 +310,7 @@ string_data<CharT>* create_string_data(const CharT* s, size_t length, const Allo
     size_t mem_size = sizeof(storage_type) + length*sizeof(CharT);
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
@@ -332,7 +332,7 @@ void destroy_string_data(const Alloc& allocator, string_data<CharT>* p)
     typedef typename std::aligned_storage<sizeof(string_dataA<CharT>), JSONCONS_ALIGNOF(string_dataA<CharT>)>::type storage_type;
     size_t mem_size = sizeof(storage_type) + p->length_*sizeof(CharT);
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<char> alloc(allocator);
 #else
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
@@ -966,7 +966,7 @@ public:
                 swap(value_, rhs.value_);
             }
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            else if (std::allocator_traits<Alloc>::propagate_on_container_swap::value)
+            else if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value)
             {
                 // swap allocators and contents
                 swap(static_cast<Alloc&>(*this),static_cast<Alloc&>(rhs));
