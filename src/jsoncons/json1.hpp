@@ -1017,7 +1017,7 @@ public:
     template <typename structure, bool is_const_iterator = true>
     class range 
     {
-        typedef typename std::conditional<is_const_iterator, typename const structure&, typename structure&>::type structure_ref;
+        typedef typename std::conditional<is_const_iterator, const structure&, structure&>::type structure_ref;
         typedef typename std::conditional<is_const_iterator, typename structure::const_iterator, typename structure::iterator>::type iterator;
         typedef typename structure::const_iterator const_iterator;
         structure_ref val_;
@@ -1470,7 +1470,7 @@ public:
 
         const basic_json<CharT,Alloc>& at(size_t index)
         {
-            return evaluate().at(name);
+            return evaluate().at(index);
         }
 
         const basic_json<CharT,Alloc>& at(size_t index) const
@@ -3085,7 +3085,7 @@ private:
 
     friend std::basic_istream<CharT>& operator<<(std::basic_istream<CharT>& is, basic_json<CharT, Alloc>& o)
     {
-        basic_json_deserializer<CharT, Alloc> handler;
+        basic_json_deserializer<basic_json<CharT, Alloc>> handler;
         basic_json_reader<CharT> reader(is, handler);
         reader.read_next();
         reader.check_done();
@@ -3221,7 +3221,7 @@ const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::null = basic_json<CharT
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT,Alloc>>()));
+    basic_json<CharT, Alloc> a = basic_json<CharT, Alloc>::array();
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
@@ -3247,7 +3247,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<CharT, Alloc> a(basic_json<CharT, Alloc>(json_array<basic_json<CharT,Alloc>>()));
+    basic_json<CharT, Alloc> a = basic_json<CharT, Alloc>::array();
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {

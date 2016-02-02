@@ -1776,7 +1776,7 @@ public:
                 ++column_;
                 break;
             default:
-                JSONCONS_THROW_EXCEPTION(std::exception,"Bad parser state");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad parser state");
                 break;
             }
         }
