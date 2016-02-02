@@ -233,7 +233,6 @@ class json_object_member
 public:
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::allocator_type allocator_type;
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<allocator_type>::template rebind_alloc<char_type> string_allocator_type;
 #else

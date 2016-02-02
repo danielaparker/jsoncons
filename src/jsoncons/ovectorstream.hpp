@@ -111,6 +111,8 @@ protected:
     pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                      std::ios_base::openmode mode = std::ios_base::out) override
     {
+        (void)mode; // Always out
+
         std::streamoff newoff;
         switch (dir)
         {
@@ -161,6 +163,8 @@ protected:
     pos_type seekpos(pos_type pos, std::ios_base::openmode mode
                      = std::ios_base::out) override
     {  
+        (void)mode; // Always out
+
         return seekoff_beg(pos - pos_type(off_type(0)));
     }
 };
@@ -197,19 +201,19 @@ public:
 
     size_t length()
     {
-        return pptr() - pbase();
+        return this->pptr() - this->pbase();
     }
 
     void set_locale(const std::locale& loc)
     {
         std::locale result = std::basic_ostream<CharT, CharTraits>::imbue(loc);
-        pubimbue(loc);
+        this->pubimbue(loc);
     }
 
     void reset()
     {
-        clear();
-        seekp(0, std::ios::beg);
+        this->clear();
+        this->seekp(0, std::ios::beg);
     }
 
     const CharT* data() const

@@ -131,6 +131,7 @@ private:
     virtual void do_fatal_error(std::error_code,
                                 const basic_parsing_context<CharT>& context) throw (parse_exception)
     {
+        (void)context;
     }
 };
 
@@ -147,6 +148,7 @@ private:
     virtual void do_warning(std::error_code,
                             const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
+        (void)context;
     }
 
     virtual void do_error(std::error_code ec,

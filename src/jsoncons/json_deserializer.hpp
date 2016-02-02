@@ -140,6 +140,7 @@ private:
 
     void do_begin_array(const basic_parsing_context<char_type>& context) override
     {
+        (void)context;
         push_array();
     }
 

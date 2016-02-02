@@ -240,14 +240,18 @@ private:
 
     void do_name(const CharT* p, size_t length, const basic_parsing_context<CharT>&) override
     {
+        (void)p;
+        (void)length;
     }
 
     void do_null_value(const basic_parsing_context<CharT>&) override
     {
     }
 
-    void do_string_value(const CharT*, size_t length, const basic_parsing_context<CharT>&) override
+    void do_string_value(const CharT* p, size_t length, const basic_parsing_context<CharT>&) override
     {
+        (void)p;
+        (void)length;
     }
 
     void do_double_value(double, const basic_parsing_context<CharT>&) override

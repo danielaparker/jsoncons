@@ -200,6 +200,8 @@ private:
 
     void do_name(const CharT* name, size_t length) override
     {
+        (void)name;
+        (void)length;
     }
 
     void do_begin_object() override
@@ -222,8 +224,10 @@ private:
     {
     }
 
-    void do_string_value(const CharT*, size_t length) override
+    void do_string_value(const CharT* p, size_t length) override
     {
+        (void)p;
+        (void)length;
     }
 
     void do_double_value(double) override
