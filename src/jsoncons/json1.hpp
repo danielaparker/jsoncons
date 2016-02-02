@@ -361,18 +361,26 @@ namespace value_types
 {
     enum value_types_t 
     {
+        // Simple types
         empty_object_t,
-        object_t,
-        array_t,
         small_string_t,
-        string_t,
         double_t,
         integer_t,
         uinteger_t,
         bool_t,
         null_t,
+        // Non simple types
+        string_t,
+        object_t,
+        array_t,
         any_t
     };
+}
+
+inline
+bool is_simple(value_types::value_types_t type)
+{
+    return type < value_types::string_t;
 }
 
 template <typename CharT, typename Alloc = std::allocator<CharT>>
@@ -667,38 +675,23 @@ public:
         {
             if (this != &val)
             {
-                switch (type_)
+                if (is_simple(type_))
                 {
-                case value_types::null_t:
-                case value_types::bool_t:
-                case value_types::empty_object_t:
-                case value_types::small_string_t:
-                case value_types::integer_t:
-                case value_types::uinteger_t:
-                case value_types::double_t:
-                    switch (val.type_)
+                    if (is_simple(val.type_))
                     {
-                    case value_types::null_t:
-                    case value_types::bool_t:
-                    case value_types::empty_object_t:
-                    case value_types::small_string_t:
-                    case value_types::integer_t:
-                    case value_types::uinteger_t:
-                    case value_types::double_t:
                         type_ = val.type_;
                         small_string_length_ = val.small_string_length_;
                         value_ = val.value_;
-                        break;
-                    default:
-                        swap(variant(get_allocator(),val));
-                        break;
                     }
-                    break;
-                default:
+                    else
                     {
-                        swap(variant(get_allocator(),val));
+                        init_variant(val);
                     }
-                    break;
+                }
+                else
+                {
+                    destroy_variant();
+                    init_variant(val);
                 }
             }
             return *this;
@@ -759,183 +752,77 @@ public:
 
         void assign(const std::basic_string<CharT>& s)
         {
-            switch (type_)
+            destroy_variant();
+            if (s.length() > variant::small_string_capacity)
             {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                if (s.length() > variant::small_string_capacity)
-                {
-                    type_ = value_types::string_t;
-                    value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
-                }
-                else
-                {
-                    type_ = value_types::small_string_t;
-                    small_string_length_ = (unsigned char)s.length();
-                    std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
-                    value_.small_string_value_[small_string_length_] = 0;
-                }
-                break;
-            default:
-                variant(get_allocator(),s).swap(*this);
-                break;
+                type_ = value_types::string_t;
+                value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
+                small_string_length_ = (unsigned char)s.length();
+                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
+                value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
         void assign_string(const CharT* s, size_t length)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-				{
-					if (length > variant::small_string_capacity)
-					{
-						type_ = value_types::string_t;
-						value_.string_value_ = create_string_data(s,length,get_allocator());
-					}
-					else
-					{
-						type_ = value_types::small_string_t;
-						small_string_length_ = (unsigned char)length;
-						std::memcpy(value_.small_string_value_,s,length*sizeof(CharT));
-                        value_.small_string_value_[small_string_length_] = 0;
-					}
-				}
-                break;
-            default:
-                variant(get_allocator(),s,length).swap(*this);
-                break;
-            }
+            destroy_variant();
+			if (length > variant::small_string_capacity)
+			{
+				type_ = value_types::string_t;
+				value_.string_value_ = create_string_data(s,length,get_allocator());
+			}
+			else
+			{
+				type_ = value_types::small_string_t;
+				small_string_length_ = (unsigned char)length;
+				std::memcpy(value_.small_string_value_,s,length*sizeof(CharT));
+                value_.small_string_value_[small_string_length_] = 0;
+			}
         }
 
         void assign(int64_t val)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::integer_t;
-                value_.integer_value_ = val;
-                break;
-            default:
-                variant(get_allocator(),val).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::integer_t;
+            value_.integer_value_ = val;
         }
 
         void assign(uint64_t val)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::uinteger_t;
-                value_.uinteger_value_ = val;
-                break;
-            default:
-                variant(get_allocator(),val).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::uinteger_t;
+            value_.uinteger_value_ = val;
         }
 
         void assign(double val)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::double_t;
-                value_.float_value_ = val;
-                break;
-            default:
-                variant(get_allocator(),val).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::double_t;
+            value_.float_value_ = val;
         }
 
         void assign(bool val)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::bool_t;
-                value_.bool_value_ = val;
-                break;
-            default:
-                variant(get_allocator(),val).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::bool_t;
+            value_.bool_value_ = val;
         }
 
         void assign(null_type)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::null_t;
-                break;
-            default:
-                variant(get_allocator(),null_type()).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::null_t;
         }
 
         void assign(const any& rhs)
         {
-            switch (type_)
-            {
-            case value_types::null_t:
-            case value_types::bool_t:
-            case value_types::empty_object_t:
-            case value_types::small_string_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::double_t:
-                type_ = value_types::any_t;
-                value_.any_value_ = create_instance<any>(get_allocator(), rhs);
-                break;
-            default:
-                variant(get_allocator(),rhs).swap(*this);
-                break;
-            }
+            destroy_variant();
+            type_ = value_types::any_t;
+            value_.any_value_ = create_instance<any>(get_allocator(), rhs);
         }
 
         bool operator!=(const variant& rhs) const
