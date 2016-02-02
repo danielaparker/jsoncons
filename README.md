@@ -91,13 +91,13 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    json::object_iterator pos;
-    pos = book3.set(book3.members().begin(),"author", "Haruki Murakami");
-    pos = book3.set(pos, "category", "Fiction");
-    pos = book3.set(pos, "date", "2006-01-03");
-    pos = book3.set(pos, "isbn", "1400079276");  
-    pos = book3.set(pos, "price", 13.45);
-    pos = book3.set(pos, "title", "Kafka on the Shore");
+    json::object_iterator hint;
+    hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    hint = book3.set(hint, "category", "Fiction");
+    hint = book3.set(hint, "date", "2006-01-03");
+    hint = book3.set(hint, "isbn", "1400079276");  
+    hint = book3.set(hint, "price", 13.45);
+    hint = book3.set(hint, "title", "Kafka on the Shore");
 
     // Construct a fourth from a string
     json book4 = json::parse(R"(
@@ -123,10 +123,10 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     booklist.add(std::move(book2));    
 
     // Add the third book to the front
-    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    auto pos = booklist.add(booklist.elements().begin(),std::move(book3));
     
     // and the last one immediately after
-    booklist.add(where+1,std::move(book4));    
+    booklist.add(pos+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
@@ -324,13 +324,13 @@ Result:
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    wjson::object_iterator pos;
-    pos = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
-    pos = book3.set(pos, L"category", L"Fiction");
-    pos = book3.set(pos, L"date", L"2006-01-03");
-    pos = book3.set(pos, L"isbn", L"1400079276");
-    pos = book3.set(pos, L"price", 13.45);
-    pos = book3.set(pos, L"title", L"Kafka on the Shore");
+    wjson::object_iterator hint;
+    hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    hint = book3.set(hint, L"category", L"Fiction");
+    hint = book3.set(hint, L"date", L"2006-01-03");
+    hint = book3.set(hint, L"isbn", L"1400079276");
+    hint = book3.set(hint, L"price", 13.45);
+    hint = book3.set(hint, L"title", L"Kafka on the Shore");
 
     // Construct a fourth from a string
     wjson book4 = wjson::parse(LR"(
@@ -356,10 +356,10 @@ Result:
     booklist.add(std::move(book2));
 
     // Add the third book to the front
-    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    auto pos = booklist.add(booklist.elements().begin(),std::move(book3));
     
     // and the last one immediately after
-    booklist.add(where+1,std::move(book4));    
+    booklist.add(pos+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;

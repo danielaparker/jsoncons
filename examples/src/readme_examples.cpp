@@ -41,13 +41,13 @@ void example1()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    json::object_iterator pos;
-    pos = book3.set(book3.members().begin(),"author", "Haruki Murakami");
-    pos = book3.set(pos, "category", "Fiction");
-    pos = book3.set(pos, "date", "2006-01-03");
-    pos = book3.set(pos, "isbn", "1400079276");  
-    pos = book3.set(pos, "price", 13.45);
-    pos = book3.set(pos, "title", "Kafka on the Shore");
+    json::object_iterator hint;
+    hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    hint = book3.set(hint, "category", "Fiction");
+    hint = book3.set(hint, "date", "2006-01-03");
+    hint = book3.set(hint, "isbn", "1400079276");  
+    hint = book3.set(hint, "price", 13.45);
+    hint = book3.set(hint, "title", "Kafka on the Shore");
 
     // Construct a fourth from a string
 #if !defined(JSONCONS_NO_RAW_STRING_LITERALS)
@@ -203,13 +203,13 @@ void example3()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    wjson::object_iterator pos;
-    pos = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
-    pos = book3.set(pos, L"category", L"Fiction");
-    pos = book3.set(pos, L"date", L"2006-01-03");
-    pos = book3.set(pos, L"isbn", L"1400079276");
-    pos = book3.set(pos, L"price", 13.45);
-    pos = book3.set(pos, L"title", L"Kafka on the Shore");
+    wjson::object_iterator hint;
+    hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    hint = book3.set(hint, L"category", L"Fiction");
+    hint = book3.set(hint, L"date", L"2006-01-03");
+    hint = book3.set(hint, L"isbn", L"1400079276");
+    hint = book3.set(hint, L"price", 13.45);
+    hint = book3.set(hint, L"title", L"Kafka on the Shore");
 
 	// Construct a fourth from a string
 

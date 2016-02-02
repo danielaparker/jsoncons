@@ -566,13 +566,13 @@ vertical-align:1px;
 
     <span class="pl-c">// Insert in name alphabetical order</span>
     <span class="pl-c">// Give set a hint where to insert the next member</span>
-    json::object_iterator pos;
-    pos = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);  
-    pos = book3.set(pos, <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
-    pos = book3.set(pos, <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
+    json::object_iterator hint;
+    hint = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);  
+    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
+    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
 
     <span class="pl-c">// Construct a fourth from a string</span>
     json book4 = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
@@ -598,10 +598,10 @@ vertical-align:1px;
     booklist.add(std::move(book2));    
 
     <span class="pl-c">// Add the third book to the front</span>
-    <span class="pl-k">auto</span> where = booklist.add(booklist.elements().begin(),std::move(book3));
+    <span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
 
     <span class="pl-c">// and the last one immediately after</span>
-    booklist.add(where+<span class="pl-c1">1</span>,std::move(book4));    
+    booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
 
     <span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
     std::cout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;</pre></div>
@@ -794,13 +794,13 @@ vertical-align:1px;
 
     <span class="pl-c">// Insert in name alphabetical order</span>
     <span class="pl-c">// Give set a hint where to insert the next member</span>
-    wjson::object_iterator pos;
-    pos = book3.set(book3.members().begin(), L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);
-    pos = book3.set(pos, L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
-    pos = book3.set(pos, L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
+    wjson::object_iterator hint;
+    hint = book3.set(book3.members().begin(), L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);
+    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
+    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
 
     <span class="pl-c">// Construct a fourth from a string</span>
     wjson book4 = wjson::parse(LR<span class="pl-s"><span class="pl-pds">"</span>(</span>
@@ -826,10 +826,10 @@ vertical-align:1px;
     booklist.add(std::move(book2));
 
     <span class="pl-c">// Add the third book to the front</span>
-    <span class="pl-k">auto</span> where = booklist.add(booklist.elements().begin(),std::move(book3));
+    <span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
 
     <span class="pl-c">// and the last one immediately after</span>
-    booklist.add(where+<span class="pl-c1">1</span>,std::move(book4));    
+    booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
 
     <span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
     std::wcout &lt;&lt; book1 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;</pre></div>
