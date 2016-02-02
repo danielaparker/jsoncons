@@ -638,11 +638,11 @@ vertical-align:1px;
 
     <span class="pl-k">try</span>
     {
-        book[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+        book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
     }
     <span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
     {
-        <span class="pl-c">// member "author" not found</span>
+        <span class="pl-c">// member "ratings" not found</span>
     }
 
     book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
@@ -866,11 +866,11 @@ vertical-align:1px;
 
     <span class="pl-k">try</span>
     {
-        book[L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;();
+        book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;();
     }
     <span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
     {
-        <span class="pl-c">// member "author" not found</span>
+        <span class="pl-c">// member "ratings" not found</span>
     }
 
     book.get(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();

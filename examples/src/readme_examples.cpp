@@ -119,17 +119,17 @@ void example1()
         // book has member "author"
     }
 
+    book.get("author", "author unknown").as<std::string>();
+    // Returns author if found, otherwise "author unknown"
+
     try
     {
-        book["author"].as<std::string>();
+        book["ratings"].as<std::string>();
     }
     catch (const std::out_of_range&)
     {
-        // member "author" not found
+        // member "ratings" not found
     }
-
-    book.get("author", "author unknown").as<std::string>();
-    // Returns author if found, otherwise "author unknown"
 
     // Add ratings
     book["ratings"]["*****"] = 4;
@@ -281,17 +281,17 @@ void example3()
         // book has member "author"
     }
 
+    book.get(L"author", L"author unknown").as<std::wstring>();
+    // Returns author if found, otherwise "author unknown"
+
     try
     {
-        book[L"author"].as<std::wstring>();
+        book[L"ratings"].as<std::wstring>();
     }
     catch (const std::out_of_range&)
     {
-        // member "author" not found
+        // member "ratings" not found
     }
-
-    book.get(L"author", L"author unknown").as<std::wstring>();
-    // Returns author if found, otherwise "author unknown"
 
     // Add ratings
     book[L"ratings"][L"*****"] = 4;
