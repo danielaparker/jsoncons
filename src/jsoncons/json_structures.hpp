@@ -25,7 +25,7 @@ template <class JsonT, class Alloc>
 class json_array 
 {
 public:
-    typedef typename Alloc allocator_type;
+    typedef Alloc allocator_type;
     typedef typename std::vector<JsonT,Alloc>::reference reference;
     typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
@@ -336,7 +336,7 @@ template <class NameT,class JsonT,class Alloc>
 class json_object
 {
 public:
-    typedef typename Alloc allocator_type;
+    typedef Alloc allocator_type;
     typedef typename JsonT::char_type char_type;
     typedef NameT name_type;
     typedef name_value_pair<NameT,JsonT> value_type;

@@ -115,13 +115,12 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         parameters_(params),
          err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
          is_negative_(false),
          cp_(0),
-         index_(0)
-
-    {
+         index_(0),
+         parameters_(params)
+   {
         depth_ = default_depth;
         state_ = states::start;
         top_ = -1;
@@ -139,7 +138,6 @@ public:
          is_negative_(false),
          cp_(0),
          index_(0)
-
     {
         depth_ = default_depth;
         state_ = states::start;
@@ -156,11 +154,10 @@ public:
          stack_(default_depth),
          handler_(std::addressof(handler)),
          err_handler_(std::addressof(err_handler)),
-         parameters_(params),
          is_negative_(false),
          cp_(0),
-         index_(0)
-
+         index_(0),
+         parameters_(params)
     {
         depth_ = default_depth;
         state_ = states::start;
@@ -754,16 +751,15 @@ private:
     std::vector<modes::modes_t> stack_;
     basic_json_input_handler<CharT> *handler_;
     basic_parse_error_handler<CharT> *err_handler_;
+    bool is_negative_;
+    uint32_t cp_;
+    size_t index_;
     unsigned long column_;
     unsigned long line_;
     int curr_char_;
     int prev_char_;
-    uint32_t cp_;
-    uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
-    bool is_negative_;
     states::states_t saved_state_;
-    size_t index_;
     int depth_;
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_labels_;

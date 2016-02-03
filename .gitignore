@@ -6,3 +6,6 @@ examples/build/cmake/build_vc140x64
 examples/build/vs2015
 examples/build/vs2010sp1
 
+
+examples/build/cmake/build_llvm.sh
+examples/build/cmake/build_llvm

@@ -43,7 +43,7 @@ T* create_instance(const Alloc& allocator)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
 #else
         new(storage) T();
 #endif
@@ -68,7 +68,7 @@ T* create_instance(const Alloc& allocator, Arg&& val)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
 #else
         new(storage)T(std::forward<Arg>(val));
 #endif
@@ -161,7 +161,7 @@ void destroy_instance(const Alloc& allocator, T* p)
 {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-    typename std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
+    std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
 #else
     typename Alloc:: template rebind<T>::other alloc(allocator);
     alloc.destroy(p);

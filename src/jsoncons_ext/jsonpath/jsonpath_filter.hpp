@@ -356,11 +356,11 @@ public:
     {
         return value_ != rhs;
     }
-    bool regex(const term& rhs) const override
+    bool regex(const term<CharT,Alloc>& rhs) const override
     {
         return rhs.regex2(value_.as_string());
     }
-    bool ampamp(const term& rhs) const override
+    bool ampamp(const term<CharT,Alloc>& rhs) const override
     {
         return rhs.ampamp(value_);
     }
@@ -368,7 +368,7 @@ public:
     {
         return jsoncons::jsonpath::ampamp(value_,rhs);
     }
-    bool pipepipe(const term& rhs) const override
+    bool pipepipe(const term<CharT,Alloc>& rhs) const override
     {
         return rhs.pipepipe(value_);
     }
@@ -503,7 +503,7 @@ public:
         return result;
     }
 
-    bool ne(const term& rhs) const override
+    bool ne(const term<CharT,Alloc>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -530,7 +530,7 @@ public:
         }
         return result;
     }
-    bool regex(const term& rhs) const override
+    bool regex(const term<CharT,Alloc>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -543,7 +543,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const term& rhs) const override
+    bool ampamp(const term<CharT,Alloc>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -569,7 +569,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const term& rhs) const override
+    bool pipepipe(const term<CharT,Alloc>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)

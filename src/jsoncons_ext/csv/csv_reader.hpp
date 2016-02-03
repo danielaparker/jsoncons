@@ -158,14 +158,14 @@ private:
     basic_csv_reader(const basic_csv_reader&); // noop
     basic_csv_reader& operator = (const basic_csv_reader&); // noop
 
+    basic_csv_parser<CharT> parser_;
     std::basic_istream<CharT>* is_;
     std::vector<CharT> buffer_;
     size_t buffer_capacity_;
-    size_t index_;
     size_t buffer_position_;
     size_t buffer_length_;
     bool eof_;
-    basic_csv_parser<CharT> parser_;
+    size_t index_;
 };
 
 typedef basic_csv_reader<char> csv_reader;

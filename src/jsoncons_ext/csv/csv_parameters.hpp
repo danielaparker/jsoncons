@@ -250,21 +250,21 @@ public:
         max_lines_ = value;
     }
 private:
+    bool assume_header_;
+    bool ignore_empty_values_;
     bool trim_leading_;
     bool trim_trailing_;
     bool trim_leading_inside_quotes_;
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
-	bool ignore_empty_values_;
-    bool assume_header_;
     CharT field_delimiter_;
-    std::basic_string<CharT> line_delimiter_;
     CharT quote_char_;
     CharT quote_escape_char_;
     CharT comment_starter_;
     quote_styles::quote_styles_t quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
+    std::basic_string<CharT> line_delimiter_;
     std::basic_string<CharT> header_;
     std::basic_string<CharT> data_types_;
 };
