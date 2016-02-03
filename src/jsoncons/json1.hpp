@@ -81,6 +81,31 @@ T* create_instance(const Alloc& allocator, Arg&& val)
     return storage;
 }
 
+template <class T, class Alloc>
+T* create_array(const Alloc& allocator, size_t val)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+#endif
+    T* storage = alloc.allocate(1);
+    try
+    {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, val);
+#else
+        new(storage)T(val);
+#endif
+    }
+    catch (...)
+    {
+        alloc.deallocate(storage,1);
+        throw;
+    }
+    return storage;
+}
+
 template <class T, class Alloc, class Arg1, class Arg2>
 T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
 {
@@ -632,7 +657,7 @@ public:
                 value_.string_value_ = create_string_data<CharT>(get_allocator());
                 break;
             case value_types::array_t:
-                value_.array_value_ = create_instance<array>(get_allocator(), size);
+                value_.array_value_ = create_array<array>(get_allocator(), size);
                 break;
             case value_types::object_t:
                 value_.object_value_ = create_instance<object>(get_allocator());

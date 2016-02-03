@@ -25,14 +25,14 @@ template <class JsonT, class Alloc>
 class json_array 
 {
 public:
-    typedef typename JsonT::allocator_type allocator_type;
-    typedef typename std::vector<JsonT,allocator_type>::reference reference;
-    typedef typename std::vector<JsonT,allocator_type>::const_reference const_reference;
-    typedef typename std::vector<JsonT,allocator_type>::iterator iterator;
-    typedef typename std::vector<JsonT,allocator_type>::const_iterator const_iterator;
-    typedef typename std::vector<JsonT,allocator_type>::value_type value_type;
+    typedef typename Alloc allocator_type;
+    typedef typename std::vector<JsonT,Alloc>::reference reference;
+    typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
+    typedef typename std::vector<JsonT,Alloc>::iterator iterator;
+    typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
+    typedef typename std::vector<JsonT,Alloc>::value_type value_type;
 
-    json_array(const allocator_type& allocator = allocator_type())
+    json_array(const Alloc& allocator = Alloc())
         : elements_(allocator)
     {
     }
@@ -46,7 +46,7 @@ public:
     {
     }
 
-    json_array(const json_array& val, const allocator_type& allocator)
+    json_array(const json_array& val, const Alloc& allocator)
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(val.elements_,allocator)
 #else
@@ -54,7 +54,7 @@ public:
 #endif
     {
     }
-    json_array(json_array&& val, const allocator_type& allocator)
+    json_array(json_array&& val, const Alloc& allocator)
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(std::move(val.elements_),allocator)
 #else
@@ -63,18 +63,18 @@ public:
     {
     }
 
-    json_array(size_t n, const allocator_type& allocator = allocator_type())
-        : elements_(n,allocator)
+    json_array(size_t n/*, const Alloc& allocator = Alloc()*/)
+        : elements_(n/*,allocator*/)
     {
     }
 
-    json_array(size_t n, const JsonT& val, const allocator_type& allocator = allocator_type())
+    json_array(size_t n, const JsonT& val, const Alloc& allocator = Alloc())
         : elements_(n,val,allocator)
     {
     }
 
     template <class InputIterator>
-    json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
+    json_array(InputIterator begin, InputIterator end, const Alloc& allocator = Alloc())
         : elements_(begin,end,allocator)
     {
     }
@@ -178,7 +178,7 @@ public:
     }
 private:
     json_array& operator=(const json_array<JsonT,Alloc>&);
-    std::vector<JsonT,allocator_type> elements_;
+    std::vector<JsonT,Alloc> elements_;
 };
 
 template <typename CharT,class ValueT>
@@ -325,7 +325,7 @@ template <class NameT,class JsonT,class Alloc>
 class json_object
 {
 public:
-    typedef typename JsonT::allocator_type allocator_type;
+    typedef typename Alloc allocator_type;
     typedef typename JsonT::char_type char_type;
     typedef json_object_member<NameT,JsonT> value_type;
 
