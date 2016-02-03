@@ -88,7 +88,7 @@ private:
 #define JSONCONS_THROW_EXCEPTION(Base,x) throw jsoncons::json_exception_0<Base>((x))
 #define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base>((fmt),(arg1))
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-	throw jsoncons::json_exception_0<std::exception>("assertion '" #x "' failed at " __FILE__ ":" \
+	throw jsoncons::json_exception_0<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
 			JSONCONS_STR(__LINE__)); }
 
 // json_char_traits

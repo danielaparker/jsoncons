@@ -394,8 +394,11 @@ public:
 
     typedef Alloc allocator_type;
 
-    typedef json_array<basic_json<CharT,Alloc>> array;
-    typedef json_object<basic_json<CharT,Alloc>>  object;
+    typedef Alloc array_allocator_type;
+    typedef Alloc object_allocator_type;
+
+    typedef json_array<basic_json<CharT,Alloc>,array_allocator_type> array;
+    typedef json_object<basic_json<CharT,Alloc>,object_allocator_type>  object;
     typedef serializable_any<CharT,Alloc> any;
 
     typedef CharT char_type;
@@ -494,25 +497,25 @@ public:
             }
         }
 
-        variant(const Alloc& a, const json_object<basic_json<CharT,Alloc>> & val)
+        variant(const Alloc& a, const object & val)
             : Alloc(a), type_(value_types::object_t)
         {
             value_.object_value_ = create_instance<object>(get_allocator(), val)              ;
         }
 
-        variant(const Alloc& a, json_object<basic_json<CharT,Alloc>> && val)
+        variant(const Alloc& a, object && val)
             : Alloc(a), type_(value_types::object_t)
         {
             value_.object_value_ = create_instance<object>(get_allocator(), std::move(val));
         }
 
-        variant(const Alloc& a, const json_array<basic_json<CharT,Alloc>>& val)
+        variant(const Alloc& a, const array& val)
             : Alloc(a), type_(value_types::array_t)
         {
             value_.array_value_ = create_instance<array>(get_allocator(), val)              ;
         }
 
-        variant(const Alloc& a, json_array<basic_json<CharT,Alloc>>&& val)
+        variant(const Alloc& a, array&& val)
             : Alloc(a), type_(value_types::array_t)
         {
             value_.array_value_ = create_instance<array>(get_allocator(), std::move(val));
@@ -710,14 +713,14 @@ public:
             return *this;
         }
 
-        void assign(const json_object<basic_json<CharT,Alloc>> & val)
+        void assign(const object & val)
         {
 			destroy_variant();
 			type_ = value_types::object_t;
 			value_.object_value_ = create_instance<object>(get_allocator(), val)              ;
 		}
 
-        void assign(json_object<basic_json<CharT,Alloc>> && val)
+        void assign(object && val)
         {
 			switch (type_)
 			{
@@ -732,14 +735,14 @@ public:
 			}
 		}
 
-        void assign(const json_array<basic_json<CharT,Alloc>>& val)
+        void assign(const array& val)
         {
             destroy_variant();
             type_ = value_types::array_t;
             value_.array_value_ = create_instance<array>(get_allocator(), val)              ;
         }
 
-        void assign(json_array<basic_json<CharT,Alloc>>&& val)
+        void assign(array&& val)
         {
 			switch (type_)
 			{
@@ -1009,10 +1012,10 @@ public:
     static const basic_json<CharT,Alloc> an_array;
     static const basic_json<CharT,Alloc> null;
 
-    typedef typename json_object<basic_json<CharT,Alloc>> ::iterator object_iterator;
-    typedef typename json_object<basic_json<CharT,Alloc>> ::const_iterator const_object_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>>::iterator array_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>>::const_iterator const_array_iterator;
+    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::iterator object_iterator;
+    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::const_iterator const_object_iterator;
+    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::iterator array_iterator;
+    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::const_iterator const_array_iterator;
 
     template <typename structure, bool is_const_iterator = true>
     class range 
@@ -1780,17 +1783,17 @@ public:
     {
     }
 
-    basic_json(const json_array<basic_json<CharT,Alloc>>& val, const Alloc& allocator = Alloc())
+    basic_json(const array& val, const Alloc& allocator = Alloc())
         : var_(allocator, val)
     {
     }
 
-    basic_json(json_array<basic_json<CharT,Alloc>>&& other, const Alloc& allocator = Alloc())
+    basic_json(array&& other, const Alloc& allocator = Alloc())
         : var_(allocator, std::move(other))
     {
     }
 
-    basic_json(json_object<basic_json<CharT,Alloc>> && other, const Alloc& allocator = Alloc())
+    basic_json(object && other, const Alloc& allocator = Alloc())
         : var_(allocator, std::move(other))
     {
     }
@@ -2823,12 +2826,12 @@ public:
         var_.assign(rhs);
     }
 
-    void assign_object(const json_object<basic_json<CharT,Alloc>> & rhs)
+    void assign_object(const object & rhs)
     {
         var_.assign(rhs);
     }
 
-    void assign_array(const json_array<basic_json<CharT,Alloc>>& rhs)
+    void assign_array(const array& rhs)
     {
         var_.assign(rhs);
     }
@@ -3172,7 +3175,7 @@ void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handl
     case value_types::array_t:
         {
             handler.begin_array();
-            json_array<basic_json<CharT,Alloc>> *o = var_.value_.array_value_;
+            array *o = var_.value_.array_value_;
             for (const_array_iterator it = o->begin(); it != o->end(); ++it)
             {
                 it->to_stream(handler);

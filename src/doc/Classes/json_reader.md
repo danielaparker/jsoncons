@@ -70,7 +70,7 @@ This is the code that reads them:
     std::ifstream is("json-texts.json");
     if (!is.is_open())
     {
-        throw std::exception("Cannot open file");
+        throw std::runtime_error("Cannot open file");
     }
 
     json_deserializer handler;

@@ -21,7 +21,7 @@
 
 namespace jsoncons {
 
-template <class JsonT>
+template <class JsonT, class Alloc>
 class json_array 
 {
 public:
@@ -79,7 +79,7 @@ public:
     {
     }
 
-    void swap(json_array<JsonT>& val)
+    void swap(json_array<JsonT,Alloc>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -161,7 +161,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<JsonT>& rhs) const
+    bool operator==(const json_array<JsonT,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -177,7 +177,7 @@ public:
         return true;
     }
 private:
-    json_array& operator=(const json_array<JsonT>&);
+    json_array& operator=(const json_array<JsonT,Alloc>&);
     std::vector<JsonT,allocator_type> elements_;
 };
 
@@ -326,7 +326,7 @@ private:
     JsonT value_;
 };
 
-template <class JsonT>
+template <class JsonT,class Alloc>
 class json_object
 {
 public:
@@ -345,7 +345,7 @@ public:
     {
     }
 
-    json_object(const json_object<JsonT>& val)
+    json_object(const json_object<JsonT,Alloc>& val)
         : members_(val.members_)
     {
     }
@@ -355,7 +355,7 @@ public:
     {
     }
 
-    json_object(const json_object<JsonT>& val, const allocator_type& allocator) :
+    json_object(const json_object<JsonT,Alloc>& val, const allocator_type& allocator) :
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         members_(val.members_,allocator)
 #else
@@ -729,7 +729,7 @@ public:
 		std::sort(members_.begin(),members_.end(),member_compare<value_type>());
 	}
 
-    bool operator==(const json_object<JsonT>& rhs) const
+    bool operator==(const json_object<JsonT,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -748,7 +748,7 @@ public:
         return true;
     }
 private:
-    json_object<JsonT>& operator=(const json_object<JsonT>&);
+    json_object<JsonT,Alloc>& operator=(const json_object<JsonT,Alloc>&);
 };
 
 
