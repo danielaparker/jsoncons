@@ -254,7 +254,7 @@ public:
         : name_(std::move(name)), value_(val)
     {
     }
-    name_value_pair(name_type& name, ValueT&& val)
+    name_value_pair(const name_type& name, ValueT&& val)
         : name_(name), value_(std::move(val))
     {
     }

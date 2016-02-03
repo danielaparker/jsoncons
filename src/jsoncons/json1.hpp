@@ -456,7 +456,8 @@ public:
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
 #else
-    typedef typename Alloc:: template rebind<basic_json<CharT,Alloc>>::other array_allocator_type;
+    //typedef typename Alloc:: template rebind<basic_json<CharT,Alloc>>::other array_allocator_type;
+	typedef Alloc array_allocator_type;
 #endif
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
