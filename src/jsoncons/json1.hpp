@@ -15,7 +15,6 @@
 #include <cstring>
 #include <ostream>
 #include <memory>
-#include <array>
 #include <typeinfo>
 #include "json_structures.hpp"
 #include "jsoncons/jsoncons.hpp"
@@ -44,9 +43,9 @@ T* create_instance(const Alloc& allocator)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
 #else
-        new(storage) T(allocator);
+        new(storage) T();
 #endif
     }
     catch (...)
@@ -69,9 +68,9 @@ T* create_instance(const Alloc& allocator, Arg&& val)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val), allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
 #else
-        new(storage)T(std::forward<Arg>(val), allocator);
+        new(storage)T(std::forward<Arg>(val));
 #endif
     }
     catch (...)
@@ -94,9 +93,9 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), allocator);
+        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
 #else
-    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2), allocator);
+    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2));
 #endif
     }
     catch (...)
@@ -227,7 +226,7 @@ public:
     class any_handle_impl : public any_handle
     {
     public:
-        any_handle_impl(T value, const Alloc& allocator)
+        any_handle_impl(T value, const Alloc& allocator = Alloc())
             : value_(value)
         {
             (void)allocator;
@@ -484,10 +483,10 @@ public:
                 value_.string_value_ = create_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
                 break;
             case value_types::array_t:
-                value_.array_value_ = create_instance<array>(get_allocator(), *(var.value_.array_value_) )             ;
+                value_.array_value_ = create_instance<array>(get_allocator(), *(var.value_.array_value_));
                 break;
             case value_types::object_t:
-                value_.object_value_ = create_instance<object>(get_allocator(), *(var.value_.object_value_) )             ;
+                value_.object_value_ = create_instance<object>(get_allocator(), *(var.value_.object_value_));
                 break;
             case value_types::any_t:
                 value_.any_value_ = create_instance<any>(get_allocator(), *(var.value_.any_value_));
@@ -500,7 +499,7 @@ public:
         variant(const Alloc& a, const object & val)
             : Alloc(a), type_(value_types::object_t)
         {
-            value_.object_value_ = create_instance<object>(get_allocator(), val)              ;
+            value_.object_value_ = create_instance<object>(get_allocator(), val) ;
         }
 
         variant(const Alloc& a, object && val)
@@ -512,7 +511,7 @@ public:
         variant(const Alloc& a, const array& val)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_value_ = create_instance<array>(get_allocator(), val)              ;
+            value_.array_value_ = create_instance<array>(get_allocator(), val) ;
         }
 
         variant(const Alloc& a, array&& val)
@@ -717,7 +716,7 @@ public:
         {
 			destroy_variant();
 			type_ = value_types::object_t;
-			value_.object_value_ = create_instance<object>(get_allocator(), val)              ;
+			value_.object_value_ = create_instance<object>(get_allocator(), val) ;
 		}
 
         void assign(object && val)
@@ -739,7 +738,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::array_t;
-            value_.array_value_ = create_instance<array>(get_allocator(), val)              ;
+            value_.array_value_ = create_instance<array>(get_allocator(), val) ;
         }
 
         void assign(array&& val)
