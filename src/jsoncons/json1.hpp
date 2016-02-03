@@ -394,23 +394,9 @@ public:
     typedef Alloc allocator_type;
 
     //typedef Alloc array_allocator_type;
-    typedef Alloc object_allocator_type;
-
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
-#else
-    typedef typename Alloc:: template rebind<basic_json<CharT,Alloc>>::other array_allocator_type;
-#endif
-
-    typedef json_array<basic_json<CharT,Alloc>,array_allocator_type> array;
-    typedef json_object<basic_json<CharT,Alloc>,object_allocator_type>  object;
-    typedef serializable_any<CharT,Alloc> any;
+    //typedef Alloc object_allocator_type;
 
     typedef CharT char_type;
-
-    typedef jsoncons::null_type null_type;
-    // Deprecated
-    typedef any json_any_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
@@ -419,6 +405,26 @@ public:
 #endif
     typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
     typedef json_object_member<name_type,basic_json<CharT,Alloc>> member_type;
+
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
+#else
+    typedef typename Alloc:: template rebind<basic_json<CharT,Alloc>>::other array_allocator_type;
+#endif
+
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<member_type> object_allocator_type;
+#else
+    typedef typename Alloc:: template rebind<member_type>::other object_allocator_type;
+#endif
+
+    typedef json_array<basic_json<CharT,Alloc>,array_allocator_type> array;
+    typedef json_object<basic_json<CharT,Alloc>,object_allocator_type>  object;
+    typedef serializable_any<CharT,Alloc> any;
+
+    typedef jsoncons::null_type null_type;
+    // Deprecated
+    typedef any json_any_type;
 
     //typedef typename object::value_type member_type;
     typedef member_type name_value_pair;
