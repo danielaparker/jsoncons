@@ -393,8 +393,14 @@ public:
 
     typedef Alloc allocator_type;
 
-    typedef Alloc array_allocator_type;
+    //typedef Alloc array_allocator_type;
     typedef Alloc object_allocator_type;
+
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
+#else
+    typedef typename Alloc:: template rebind<basic_json<CharT,Alloc>>::other array_allocator_type;
+#endif
 
     typedef json_array<basic_json<CharT,Alloc>,array_allocator_type> array;
     typedef json_object<basic_json<CharT,Alloc>,object_allocator_type>  object;
@@ -403,6 +409,21 @@ public:
     typedef CharT char_type;
 
     typedef jsoncons::null_type null_type;
+    // Deprecated
+    typedef any json_any_type;
+
+    typedef typename object::value_type member_type;
+    typedef member_type name_value_pair;
+
+    // Deprecated static data members
+    static const basic_json<CharT,Alloc> an_object;
+    static const basic_json<CharT,Alloc> an_array;
+    static const basic_json<CharT,Alloc> null;
+
+    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::iterator object_iterator;
+    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::const_iterator const_object_iterator;
+    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::iterator array_iterator;
+    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::const_iterator const_array_iterator;
 
     Alloc get_allocator() const
     {
@@ -1000,21 +1021,6 @@ public:
         } value_;
     };
 
-    // Deprecated
-    typedef any json_any_type;
-
-    typedef typename object::value_type member_type;
-    typedef member_type name_value_pair;
-
-    // Deprecated static data members
-    static const basic_json<CharT,Alloc> an_object;
-    static const basic_json<CharT,Alloc> an_array;
-    static const basic_json<CharT,Alloc> null;
-
-    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::iterator object_iterator;
-    typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::const_iterator const_object_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::iterator array_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::const_iterator const_array_iterator;
 
     template <typename structure, bool is_const_iterator = true>
     class range 
