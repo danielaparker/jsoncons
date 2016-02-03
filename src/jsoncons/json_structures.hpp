@@ -721,7 +721,7 @@ public:
         return it->value();
     }
 
-	void sort_members()
+	void end_bulk_insert()
 	{
 		std::sort(members_.begin(),members_.end(),member_compare<value_type>());
 	}

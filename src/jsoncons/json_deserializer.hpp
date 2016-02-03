@@ -118,7 +118,7 @@ private:
 
     void do_end_object(const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value.object_value().sort_members();
+        stack_[top_].value.object_value().end_bulk_insert();
         if (top_ > 0)
         {
             if (stack_[top_-1].value.is_object())
