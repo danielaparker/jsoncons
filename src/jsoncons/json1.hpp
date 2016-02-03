@@ -393,9 +393,6 @@ public:
 
     typedef Alloc allocator_type;
 
-    //typedef Alloc array_allocator_type;
-    //typedef Alloc object_allocator_type;
-
     typedef CharT char_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
@@ -438,6 +435,38 @@ public:
     typedef typename json_object<basic_json<CharT,Alloc>,object_allocator_type> ::const_iterator const_object_iterator;
     typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::iterator array_iterator;
     typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::const_iterator const_array_iterator;
+
+    template <typename structure, bool is_const_iterator = true>
+    class range 
+    {
+        typedef typename std::conditional<is_const_iterator, const structure&, structure&>::type structure_ref;
+        typedef typename std::conditional<is_const_iterator, typename structure::const_iterator, typename structure::iterator>::type iterator;
+        typedef typename structure::const_iterator const_iterator;
+        structure_ref val_;
+
+    public:
+        range(structure_ref val)
+            : val_(val)
+        {
+        }
+
+    public:
+        friend class basic_json<CharT, Alloc>;
+
+        iterator begin()
+        {
+            return val_.begin();
+        }
+        iterator end()
+        {
+            return val_.end();
+        }
+    };
+
+    typedef range<object,false> object_range;
+    typedef range<object,true> const_object_range;
+    typedef range<array,false> array_range;
+    typedef range<array,true> const_array_range;
 
     Alloc get_allocator() const
     {
@@ -1034,39 +1063,6 @@ public:
             CharT small_string_value_[sizeof(int64_t)/sizeof(CharT)];
         } value_;
     };
-
-
-    template <typename structure, bool is_const_iterator = true>
-    class range 
-    {
-        typedef typename std::conditional<is_const_iterator, const structure&, structure&>::type structure_ref;
-        typedef typename std::conditional<is_const_iterator, typename structure::const_iterator, typename structure::iterator>::type iterator;
-        typedef typename structure::const_iterator const_iterator;
-        structure_ref val_;
-
-    public:
-        range(structure_ref val)
-            : val_(val)
-        {
-        }
-
-    public:
-        friend class basic_json<CharT, Alloc>;
-
-        iterator begin()
-        {
-            return val_.begin();
-        }
-        iterator end()
-        {
-            return val_.end();
-        }
-    };
-
-    typedef range<object,false> object_range;
-    typedef range<object,true> const_object_range;
-    typedef range<array,false> array_range;
-    typedef range<array,true> const_array_range;
 
     template <class ParentT>
     class json_proxy 

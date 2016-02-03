@@ -233,13 +233,6 @@ class json_object_member
 public:
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::char_type char_type;
-//#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-//    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
-//#else
-//    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
-//#endif
-
-//    typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
 
     typedef NameT name_type;
 
@@ -334,14 +327,8 @@ class json_object
 public:
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::char_type char_type;
-
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
-#else
-    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
-#endif
-    typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
-    typedef json_object_member<name_type,JsonT> value_type;
+    typedef typename JsonT::member_type value_type;
+    typedef typename JsonT::name_type name_type;
 
     typedef typename std::vector<value_type,allocator_type>::iterator iterator;
     typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
