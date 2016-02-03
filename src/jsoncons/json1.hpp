@@ -412,7 +412,15 @@ public:
     // Deprecated
     typedef any json_any_type;
 
-    typedef typename object::value_type member_type;
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
+#else
+    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
+#endif
+    typedef std::basic_string<char_type,std::char_traits<char_type>,string_allocator_type> name_type;
+    typedef json_object_member<name_type,basic_json<CharT,Alloc>> member_type;
+
+    //typedef typename object::value_type member_type;
     typedef member_type name_value_pair;
 
     // Deprecated static data members
