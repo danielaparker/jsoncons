@@ -451,7 +451,7 @@ public:
     typedef typename allocator_type:: template rebind<char_type>::other name_allocator_type;
 #endif
     typedef std::basic_string<char_type,std::char_traits<char_type>,name_allocator_type> name_type;
-    typedef json_object_member<name_type,basic_json<CharT,Alloc>> member_type;
+    typedef name_value_pair<name_type,basic_json<CharT,Alloc>> member_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
