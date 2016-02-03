@@ -468,7 +468,7 @@ public:
     typedef range<array,false> array_range;
     typedef range<array,true> const_array_range;
 
-    Alloc get_allocator() const
+    allocator_type get_allocator() const
     {
         return var_;
     }
@@ -563,13 +563,13 @@ public:
         variant(const Alloc& a, const object & val)
             : Alloc(a), type_(value_types::object_t)
         {
-            value_.object_value_ = create_instance<object>(get_allocator(), val) ;
+            value_.object_value_ = create_instance<object>(get_allocator(), val, object_allocator_type(get_allocator())) ;
         }
 
         variant(const Alloc& a, object && val)
             : Alloc(a), type_(value_types::object_t)
         {
-            value_.object_value_ = create_instance<object>(get_allocator(), std::move(val));
+            value_.object_value_ = create_instance<object>(get_allocator(), std::move(val), object_allocator_type(get_allocator()));
         }
 
         variant(const Alloc& a, const array& val)
