@@ -456,10 +456,10 @@ public:
     static const basic_json<CharT,Alloc> an_array;
     static const basic_json<CharT,Alloc> null;
 
-    typedef typename json_object<name_type,basic_json<CharT,Alloc>,object_allocator_type> ::iterator object_iterator;
-    typedef typename json_object<name_type,basic_json<CharT,Alloc>,object_allocator_type> ::const_iterator const_object_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::iterator array_iterator;
-    typedef typename json_array<basic_json<CharT,Alloc>,array_allocator_type>::const_iterator const_array_iterator;
+    typedef typename object::iterator object_iterator;
+    typedef typename object::const_iterator const_object_iterator;
+    typedef typename array::iterator array_iterator;
+    typedef typename array::const_iterator const_array_iterator;
 
     template <typename structure, bool is_const_iterator = true>
     class range 
