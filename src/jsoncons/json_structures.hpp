@@ -435,33 +435,60 @@ public:
 
     iterator find(const char_type* name)
     {
-        size_t length = std::char_traits<char_type>::length(name);
-        compare_with_string<char_type,value_type> comp(length);
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? it : end();
+        return find(name, std::char_traits<char_type>::length(name));
     }
 
     const_iterator find(const char_type* name) const
     {
-        size_t length = std::char_traits<char_type>::length(name);
-        compare_with_string<char_type,value_type> comp(length);
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && it->name() == name) ? it : end();
+        return find(name, std::char_traits<char_type>::length(name));
     }
 
-    iterator find(const name_type& name)
+    iterator find(const char_type* name, size_t length)
     {
-        compare_with_string<char_type,value_type> comp(name.length());
-        auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
-        return (it != members_.end() && it->name() == name) ? it : end();
+        compare_with_string<char_type,value_type> comp(length);
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && 
+                std::char_traits<CharT>::compare(it->name(),name,length) == 0) ? 
+                it : end();
+    }
+
+    const_iterator find(const char_type* name, size_t length) const
+    {
+        compare_with_string<char_type,value_type> comp(length);
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        return (it != members_.end() && 
+                std::char_traits<CharT>::compare(it->name(),name,length) == 0) ? 
+                it : end();
+    }
+
+    iterator find(const std::basic_string<char_type>& name)
+    {
+        return find(name.data(), name.length());
     }
  
-    // Fixed by cperthuis
-    const_iterator find(const name_type& name) const
+    const_iterator find(const std::basic_string<char_type>& name) const
     {
-        compare_with_string<char_type,value_type> comp(name.length());
-        auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
-        return (it != members_.end() && it->name() == name) ? it : end();
+        return find(name.data(), name.length());
+    }
+
+    JsonT& at(const std::basic_string<char_type>& name) 
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
+        }
+        return it->value();
+    }
+
+    const JsonT& at(const std::basic_string<char_type>& name) const
+    {
+        auto it = find(name);
+        if (it == end())
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
+        }
+        return it->value();
     }
 
     void erase(iterator first, iterator last) 
@@ -469,27 +496,25 @@ public:
         members_.erase(first,last);
     }
 
-    void remove_range(size_t from_index, size_t to_index) 
+    void erase(const char_type* name) 
     {
-        JSONCONS_ASSERT(from_index <= to_index);
-        JSONCONS_ASSERT(to_index <= members_.size());
-        members_.erase(members_.begin()+from_index,members_.begin()+to_index);
+        erase(name, std::char_traits<char_type>::length(name));
     }
 
-    // Fixed by cperthuis
-    void remove(const name_type& name) 
+    void erase(const char_type* name, size_t length) 
     {
-        compare_with_string<char_type,value_type> comp(name.length());
-        auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
-        if (it != members_.end() && it->name() == name)
+        compare_with_string<char_type,value_type> comp(length);
+        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        if (it != members_.end() && 
+            std::char_traits<CharT>::compare(it->name(),name,length) == 0))
         {
             members_.erase(it);
         }
     }
 
-    const value_type& get(size_t i) const 
+    void erase(const std::basic_string<char_type>& name) 
     {
-        return members_[i];
+        return erase(name.data(),name.length());
     }
 
     void set(const name_type& name, const JsonT& value)
@@ -680,56 +705,6 @@ public:
     void bulk_insert(value_type&& member)
     {
         members_.push_back(std::move(member));
-    }
-
-    JsonT& at(const name_type& name) 
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
-        }
-        return it->value();
-    }
-
-    const JsonT& at(const name_type& name) const
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
-        }
-        return it->value();
-    }
-
-    JsonT& get(const name_type& name)
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "Member %s not found.", name);
-        }
-        return it->value();
-    }
-
-    const JsonT& get(const name_type& name) const
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "Member %s not found.", name);
-        }
-        return it->value();
-    }
-
-    JsonT& get(const char_type* name) 
-    {
-        auto it = find(name);
-        if (it == end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
-        }
-        return it->value();
     }
 
 	void end_bulk_insert()
