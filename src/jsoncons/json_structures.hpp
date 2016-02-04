@@ -449,7 +449,7 @@ public:
         return (it != members_.end() && it->name() == name) ? it : end();
     }
 
-    iterator find(const std::basic_string<char_type>& name)
+    iterator find(const name_type& name)
     {
         compare_with_string<char_type,value_type> comp(name.length());
         auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
@@ -457,7 +457,7 @@ public:
     }
  
     // Fixed by cperthuis
-    const_iterator find(const std::basic_string<char_type>& name) const
+    const_iterator find(const name_type& name) const
     {
         compare_with_string<char_type,value_type> comp(name.length());
         auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
@@ -477,7 +477,7 @@ public:
     }
 
     // Fixed by cperthuis
-    void remove(const std::basic_string<char_type>& name) 
+    void remove(const name_type& name) 
     {
         compare_with_string<char_type,value_type> comp(name.length());
         auto it = std::lower_bound(members_.begin(),members_.end(), name.data(), comp);
@@ -682,7 +682,7 @@ public:
         members_.push_back(std::move(member));
     }
 
-    JsonT& at(const std::basic_string<char_type>& name) 
+    JsonT& at(const name_type& name) 
     {
         auto it = find(name);
         if (it == end())
@@ -692,7 +692,7 @@ public:
         return it->value();
     }
 
-    const JsonT& at(const std::basic_string<char_type>& name) const
+    const JsonT& at(const name_type& name) const
     {
         auto it = find(name);
         if (it == end())
@@ -702,7 +702,7 @@ public:
         return it->value();
     }
 
-    JsonT& get(const std::basic_string<char_type>& name)
+    JsonT& get(const name_type& name)
     {
         auto it = find(name);
         if (it == end())
@@ -712,7 +712,7 @@ public:
         return it->value();
     }
 
-    const JsonT& get(const std::basic_string<char_type>& name) const
+    const JsonT& get(const name_type& name) const
     {
         auto it = find(name);
         if (it == end())
