@@ -517,20 +517,37 @@ public:
         return erase(name.data(),name.length());
     }
 
-    void set(const name_type& name, const JsonT& value)
+    void set(const char_type* pname, size_t length, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,compare_with_string<char_type,value_type>(name.length()));
+        auto it = std::lower_bound(members_.begin(),members_.end(),pname,compare_with_string<char_type,value_type>(length));
         if (it == members_.end())
         {
-            members_.push_back(value_type(name,value));
+            members_.push_back(value_type(name_type(pname,length),value));
         }
-        else if (it->name() == name)
+        else if (it->name().length() == length && std::char_traits<char_type>::compare(it->name().data(),pname,length) == 0)
         {
             it->value(value);
         }
         else
         {
-            members_.insert(it,value_type(name,value));
+            members_.insert(it,value_type(name_type(pname,length),value));
+        }
+    }
+
+    void set(const char_type* pname, size_t length, JsonT&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),pname,compare_with_string<char_type,value_type>(length));
+        if (it == members_.end())
+        {
+            members_.push_back(value_type(name_type(pname,length),std::move(value)));
+        }
+        else if (it->name().length() == length && std::char_traits<char_type>::compare(it->name().data(),pname,length) == 0)
+        {
+            it->value(std::move(value));
+        }
+        else
+        {
+            members_.insert(it,value_type(name_type(pname,length),std::move(value)));
         }
     }
 
@@ -551,21 +568,14 @@ public:
         }
     }
 
-    void set(const name_type& name, JsonT&& value)
+    void set(const std::basic_string<char_type>& name, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,compare_with_string<char_type,value_type>(name.length()));
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(name,std::move(value)));
-        }
-        else if (it->name() == name)
-        {
-            it->value(std::move(value));
-        }
-        else
-        {
-            members_.insert(it,value_type(name,std::move(value)));
-        }
+        set(name.data(),name.length(),value);
+    }
+
+    void set(const std::basic_string<char_type>& name, JsonT&& value)
+    {
+        set(name.data(),name.length(),std::move(value));
     }
 
     void set(name_type&& name, JsonT&& value)
