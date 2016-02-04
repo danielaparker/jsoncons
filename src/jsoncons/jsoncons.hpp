@@ -8,7 +8,6 @@
 #define JSONCONS_JSONCONS_HPP
 
 #include <locale>
-#include <codecvt>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -65,8 +64,17 @@ public:
     json_exception_1(const std::string& format, const std::wstring& arg1) JSONCONS_NOEXCEPT
         : Base(""), format_(format)
     {
-        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-        arg1_ = converter.to_bytes(arg1);
+        char buf[255];
+        size_t retval;
+#if defined(JSONCONS_HAS_WCSTOMBS_S)
+        wcstombs_s(&retval, buf, sizeof(buf), arg1.c_str(), arg1.size());
+#else
+        retval = wcstombs(buf, arg1.c_str(), sizeof(buf));
+#endif
+        if (retval != static_cast<std::size_t>(-1))
+        {
+            arg1_ = buf;
+        }
     }
     ~json_exception_1() JSONCONS_NOEXCEPT
     {

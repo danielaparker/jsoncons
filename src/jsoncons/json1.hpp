@@ -93,7 +93,7 @@ T* create_array(const Alloc& allocator, size_t val)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, val);
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, val);
 #else
         new(storage)T(val);
 #endif
@@ -118,7 +118,7 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
 #else
     new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2));
 #endif
@@ -143,7 +143,7 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3
     try
     {
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        typename std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
 #else
     new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
 #endif
@@ -598,10 +598,10 @@ public:
                 value_.string_value_ = create_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
                 break;
             case value_types::array_t:
-                value_.array_value_ = create_instance<array>(get_allocator(), *(var.value_.array_value_));
+                value_.array_value_ = create_instance<array>(get_allocator(), *(var.value_.array_value_), array_allocator_type(*this));
                 break;
             case value_types::object_t:
-                value_.object_value_ = create_instance<object>(get_allocator(), *(var.value_.object_value_));
+                value_.object_value_ = create_instance<object>(get_allocator(), *(var.value_.object_value_), object_allocator_type(*this));
                 break;
             case value_types::any_t:
                 value_.any_value_ = create_instance<any>(get_allocator(), *(var.value_.any_value_));
@@ -626,13 +626,13 @@ public:
         variant(const Alloc& a, const array& val)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_value_ = create_instance<array>(get_allocator(), val) ;
+            value_.array_value_ = create_instance<array>(get_allocator(), val, array_allocator_type(*this));
         }
 
         variant(const Alloc& a, array&& val)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_value_ = create_instance<array>(get_allocator(), std::move(val));
+            value_.array_value_ = create_instance<array>(get_allocator(), std::move(val), array_allocator_type(*this));
         }
 
         variant(const Alloc& a, value_types::value_types_t type, size_t size)
@@ -661,7 +661,7 @@ public:
                 value_.array_value_ = create_array<array>(get_allocator(), size);
                 break;
             case value_types::object_t:
-                value_.object_value_ = create_instance<object>(get_allocator());
+                value_.object_value_ = create_instance<object>(get_allocator(), object_allocator_type(*this));
                 break;
             case value_types::any_t:
                 value_.any_value_ = create_instance<any>(get_allocator());
@@ -763,7 +763,7 @@ public:
         variant(const Alloc& a, InputIterator first, InputIterator last)
             : Alloc(a), type_(value_types::array_t)
         {
-            value_.array_value_ = create_instance<array>(get_allocator(), first, last);
+            value_.array_value_ = create_instance<array>(get_allocator(), first, last, array_allocator_type(*this));
         }
 
         ~variant()
@@ -831,7 +831,7 @@ public:
         {
 			destroy_variant();
 			type_ = value_types::object_t;
-			value_.object_value_ = create_instance<object>(get_allocator(), val) ;
+			value_.object_value_ = create_instance<object>(get_allocator(), val, object_allocator_type(*this));
 		}
 
         void assign(object && val)
@@ -844,7 +844,7 @@ public:
 			default:
 				destroy_variant();
 				type_ = value_types::object_t;
-				value_.object_value_ = create_instance<object>(get_allocator(), std::move(val));
+				value_.object_value_ = create_instance<object>(get_allocator(), std::move(val), object_allocator_type(*this));
 				break;
 			}
 		}
@@ -853,7 +853,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::array_t;
-            value_.array_value_ = create_instance<array>(get_allocator(), val) ;
+            value_.array_value_ = create_instance<array>(get_allocator(), val, array_allocator_type(*this)) ;
         }
 
         void assign(array&& val)
@@ -866,7 +866,7 @@ public:
 			default:
 				destroy_variant();
 				type_ = value_types::array_t;
-				value_.array_value_ = create_instance<array>(get_allocator(), std::move(val));
+				value_.array_value_ = create_instance<array>(get_allocator(), std::move(val), array_allocator_type(*this));
 				break;
 			}
 		}
@@ -2135,7 +2135,7 @@ public:
             break;
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->reserve(n);
             break;
@@ -2640,7 +2640,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->set(name, value);
             break;
@@ -2655,7 +2655,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),value);
             break;
@@ -2670,7 +2670,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->set(name,std::move(value));
             break;
@@ -2685,7 +2685,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),std::move(value));
             break;
@@ -2702,7 +2702,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
             return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
             break;
         case value_types::object_t:
@@ -2719,7 +2719,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
             return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
             break;
         case value_types::object_t:
@@ -2736,7 +2736,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
             return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
             break;
         case value_types::object_t:
@@ -2753,7 +2753,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
             return var_.value_.object_value_->set(var_.value_.object_value_->begin(), name, value);
             break;
         case value_types::object_t:
@@ -3065,7 +3065,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create_instance<object>(var_);
+            var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
             return *(var_.value_.object_value_);
         case value_types::object_t:
             return *(var_.value_.object_value_);
@@ -3439,8 +3439,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
 {
     FILE* fp;
 
-
-#if defined(_MSC_VER)
+#if defined(JSONCONS_HAS_FOPEN_S)
     errno_t err = fopen_s(&fp, filename.c_str(), "rb");
     if (err != 0) 
     {
@@ -3560,7 +3559,7 @@ typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::beg
     {
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_value_ = create_instance<object>(var_);
+        var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
     case value_types::object_t:
         return var_.value_.object_value_->begin();
     default:
@@ -3589,7 +3588,7 @@ typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::end
     {
     case value_types::empty_object_t:
         var_.type_ = value_types::object_t;
-        var_.value_.object_value_ = create_instance<object>(var_);
+        var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
     case value_types::object_t:
         return var_.value_.object_value_->end();
     default:
