@@ -702,7 +702,7 @@ public:
         {
             if (recursive_descent_ && val.is_object())
             {
-                for (auto it = val.begin_members(); it != val.end_members(); ++it)
+                for (auto it = val.members().begin(); it != val.members().end(); ++it)
                 {
                     accept(it->value(),filter);
                 }
@@ -714,7 +714,7 @@ public:
         }
         else if (val.is_array())
         {
-            for (auto it = val.begin_elements(); it != val.end_elements(); ++it)
+            for (auto it = val.elements().begin(); it != val.elements().end(); ++it)
             {
                 accept(*it,filter);
             }
@@ -730,14 +730,14 @@ public:
             cjson_ptr p = stack_.back()[i];
             if (p->is_array())
             {
-                for (auto it = p->begin_elements(); it != p->end_elements(); ++it)
+                for (auto it = p->elements().begin(); it != p->elements().end(); ++it)
                 {
                     nodes_.push_back(std::addressof(*it));
                 }
             }
             else if (p->is_object())
             {
-                for (auto it = p->begin_members(); it != p->end_members(); ++it)
+                for (auto it = p->members().begin(); it != p->members().end(); ++it)
                 {
                     nodes_.push_back(std::addressof(it->value()));
                 }
@@ -855,7 +855,7 @@ public:
             }
             if (recursive_descent_)
             {
-                for (auto it = context_val.begin_members(); it != context_val.end_members(); ++it)
+                for (auto it = context_val.members().begin(); it != context_val.members().end(); ++it)
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
@@ -882,7 +882,7 @@ public:
             }
             if (recursive_descent_)
             {
-                for (auto it = context_val.begin_elements(); it != context_val.end_elements(); ++it)
+                for (auto it = context_val.elements().begin(); it != context_val.elements().end(); ++it)
                 {
                     if (it->is_object() || it->is_array())
                     {

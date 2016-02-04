@@ -1897,21 +1897,46 @@ public:
     {
     }
 
-    object_iterator begin_members();
+    // Deprecated
+    object_iterator begin_members()
+    {
+        return members().begin();
+    }
 
-    const_object_iterator begin_members() const;
+    const_object_iterator begin_members() const
+    {
+        return members().begin();
+    }
 
-    object_iterator end_members();
+    object_iterator end_members()
+    {
+        return members().end();
+    }
 
-    const_object_iterator end_members() const;
+    const_object_iterator end_members() const
+    {
+        return members().end();
+    }
 
-    array_iterator begin_elements();
+    array_iterator begin_elements()
+    {
+        return elements().begin();
+    }
 
-    const_array_iterator begin_elements() const;
+    const_array_iterator begin_elements() const
+    {
+        return elements().begin();
+    }
 
-    array_iterator end_elements();
+    array_iterator end_elements()
+    {
+        return elements().end();
+    }
 
-    const_array_iterator end_elements() const;
+    const_array_iterator end_elements() const
+    {
+        return elements().end();
+    }
 
     basic_json& operator=(const basic_json<CharT,Alloc>& rhs)
     {
@@ -2016,12 +2041,12 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.value_.object_value_->find(name);
-                if (it == end_members())
+                if (it == members().end())
                 {
                     return 0;
                 }
                 size_t count = 0;
-                while (it != end_members() && it->name() == name)
+                while (it != members().end() && it->name() == name)
                 {
                     ++count;
                     ++it;
@@ -2322,7 +2347,7 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.value_.object_value_->find(name);
-                if (it == end_members())
+                if (it == members().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
                 }
@@ -2380,7 +2405,7 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.value_.object_value_->find(name);
-                if (it == end_members())
+                if (it == members().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
                 }
@@ -2429,7 +2454,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return end_members();
+            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2444,7 +2469,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return end_members();
+            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2459,7 +2484,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return end_members();
+            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2474,7 +2499,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return end_members();
+            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2495,7 +2520,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.value_.object_value_->find(name);
-                return it != end_members() ? it->value() : a_null;
+                return it != members().end() ? it->value() : a_null;
             }
         default:
             {
@@ -2516,7 +2541,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.value_.object_value_->find(name);
-                if (it != end_members())
+                if (it != members().end())
                 {
                     return it->value();
                 }
@@ -3553,112 +3578,6 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
 }
 
 template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::begin_members()
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
-    case value_types::object_t:
-        return var_.value_.object_value_->begin();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc>::begin_members() const
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        return cobject().begin_members();
-    case value_types::object_t:
-        return var_.value_.object_value_->begin();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::object_iterator basic_json<CharT, Alloc>::end_members()
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        var_.type_ = value_types::object_t;
-        var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
-    case value_types::object_t:
-        return var_.value_.object_value_->end();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::const_object_iterator basic_json<CharT, Alloc>::end_members() const
-{
-    switch (var_.type_)
-    {
-    case value_types::empty_object_t:
-        return cobject().end_members();
-    case value_types::object_t:
-        return var_.value_.object_value_->end();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::begin_elements()
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_value_->begin();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>::begin_elements() const
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_value_->begin();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::array_iterator basic_json<CharT, Alloc>::end_elements()
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_value_->end();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-    }
-}
-
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::const_array_iterator basic_json<CharT, Alloc>::end_elements() const
-{
-    switch (var_.type_)
-    {
-    case value_types::array_t:
-        return var_.value_.array_value_->end();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-    }
-}
-
-template<typename CharT, typename Alloc>
 bool basic_json<CharT, Alloc>::has_member(const std::basic_string<CharT>& name) const
 {
     switch (var_.type_)
@@ -3666,7 +3585,7 @@ bool basic_json<CharT, Alloc>::has_member(const std::basic_string<CharT>& name) 
     case value_types::object_t:
         {
             const_object_iterator it = var_.value_.object_value_->find(name);
-            return it != end_members();
+            return it != members().end();
         }
         break;
     default:
