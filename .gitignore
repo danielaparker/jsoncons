@@ -9,3 +9,5 @@ examples/build/vs2010sp1
 
 examples/build/cmake/build_llvm.sh
 examples/build/cmake/build_llvm
+
+test_suite/src/jcr_tests.cpp
