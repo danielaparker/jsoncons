@@ -447,8 +447,8 @@ public:
     {
         compare_with_string<char_type,value_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && 
-                std::char_traits<CharT>::compare(it->name(),name,length) == 0) ? 
+        return (it != members_.end() && it->name().length() == length &&
+                std::char_traits<char_type>::compare(it->name().data(),name,length) == 0) ? 
                 it : end();
     }
 
@@ -456,8 +456,8 @@ public:
     {
         compare_with_string<char_type,value_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && 
-                std::char_traits<CharT>::compare(it->name(),name,length) == 0) ? 
+        return (it != members_.end() && it->name().length() == length &&
+                std::char_traits<char_type>::compare(it->name().data(),name,length) == 0) ? 
                 it : end();
     }
 
@@ -505,8 +505,8 @@ public:
     {
         compare_with_string<char_type,value_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        if (it != members_.end() && 
-            std::char_traits<CharT>::compare(it->name(),name,length) == 0))
+        if (it != members_.end() && it->name().length() == length &&
+            std::char_traits<char_type>::compare(it->name().data(),name,length) == 0)
         {
             members_.erase(it);
         }
