@@ -1037,7 +1037,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
 <h3>Deprecated names</h3>
 
-<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="deprecated">deprecated list</a> for the status of old names.</p>
+<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
 
 <h2>Examples</h2>
 
