@@ -137,11 +137,12 @@ public:
         return *handler_;
     }
 
-    // Deprecated
+#if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_input_handler<CharT>& parent()
     {
         return *handler_;
     }
+#endif
 
 private:
     void do_begin_json() override

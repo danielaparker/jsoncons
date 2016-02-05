@@ -106,7 +106,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, char ch)
     {
-        lhs.assign_longlong(ch);
+        lhs.assign_integer(ch);
     }
 };
 
@@ -135,7 +135,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, unsigned char ch)
     {
-        lhs.assign_ulonglong(ch);
+        lhs.assign_uinteger(ch);
     }
 };
 
@@ -164,7 +164,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, signed char ch)
     {
-        lhs.assign_longlong(ch);
+        lhs.assign_integer(ch);
     }
 };
 
@@ -193,7 +193,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, wchar_t ch)
     {
-        lhs.assign_longlong(ch);
+        lhs.assign_integer(ch);
     }
 };
 
@@ -293,11 +293,11 @@ public:
     }
     static short as(const basic_json<CharT, Alloc>& rhs)
     {
-        return static_cast<short>(rhs.as_int());
+        return static_cast<short>(rhs.as_integer());
     }
     static void assign(basic_json<CharT, Alloc>& lhs, short rhs)
     {
-        lhs.assign_longlong(rhs);
+        lhs.assign_integer(rhs);
     }
 };
 
@@ -322,11 +322,11 @@ public:
     }
     static unsigned short as(const basic_json<CharT, Alloc>& rhs)
     {
-        return (unsigned short)rhs.as_uint();
+        return (unsigned short)rhs.as_uinteger();
     }
     static void assign(basic_json<CharT, Alloc>& lhs, unsigned short rhs)
     {
-        lhs.assign_ulonglong(rhs);
+        lhs.assign_uinteger(rhs);
     }
 };
 
@@ -351,11 +351,11 @@ public:
     }
     static int as(const basic_json<CharT, Alloc>& rhs)
     {
-        return rhs.as_int();
+        return static_cast<int>(rhs.as_integer());
     }
     static void assign(basic_json<CharT, Alloc>& lhs, int rhs)
     {
-        lhs.assign_longlong(rhs);
+        lhs.assign_integer(rhs);
     }
 };
 
@@ -380,11 +380,11 @@ public:
     }
     static unsigned int as(const basic_json<CharT, Alloc>& rhs)
     {
-        return rhs.as_uint();
+        return static_cast<unsigned int>(rhs.as_uinteger());
     }
     static void assign(basic_json<CharT, Alloc>& lhs, unsigned int rhs)
     {
-        lhs.assign_ulonglong(rhs);
+        lhs.assign_uinteger(rhs);
     }
 };
 
@@ -409,11 +409,11 @@ public:
     }
     static long as(const basic_json<CharT, Alloc>& rhs)
     {
-        return rhs.as_long();
+        return static_cast<long>(rhs.as_integer());
     }
     static void assign(basic_json<CharT, Alloc>& lhs, long rhs)
     {
-        lhs.assign_longlong(rhs);
+        lhs.assign_integer(rhs);
     }
 };
 
@@ -438,11 +438,11 @@ public:
     }
     static unsigned long as(const basic_json<CharT, Alloc>& rhs)
     {
-        return rhs.as_ulong();
+        return static_cast<unsigned long>(rhs.as_uinteger());
     }
     static void assign(basic_json<CharT, Alloc>& lhs, unsigned long rhs)
     {
-        lhs.assign_ulonglong(rhs);
+        lhs.assign_uinteger(rhs);
     }
 };
 
@@ -471,7 +471,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, long long rhs)
     {
-        lhs.assign_longlong(rhs);
+        lhs.assign_integer(rhs);
     }
 };
 
@@ -500,7 +500,7 @@ public:
     }
     static void assign(basic_json<CharT, Alloc>& lhs, unsigned long long rhs)
     {
-        lhs.assign_ulonglong(rhs);
+        lhs.assign_uinteger(rhs);
     }
 };
 

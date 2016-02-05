@@ -81,31 +81,6 @@ T* create_instance(const Alloc& allocator, Arg&& val)
     return storage;
 }
 
-template <class T, class Alloc>
-T* create_array(const Alloc& allocator, size_t val)
-{
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-#endif
-    T* storage = alloc.allocate(1);
-    try
-    {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, val);
-#else
-        new(storage)T(val);
-#endif
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
 template <class T, class Alloc, class Arg1, class Arg2>
 T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
 {
@@ -471,16 +446,6 @@ public:
     typedef serializable_any<CharT,Alloc> any;
 
     typedef jsoncons::null_type null_type;
-    // Deprecated
-    typedef any json_any_type;
-
-    //typedef typename object::value_type member_type;
-    typedef member_type name_value_pair;
-
-    // Deprecated static data members
-    static const basic_json<CharT,Alloc> an_object;
-    static const basic_json<CharT,Alloc> an_array;
-    static const basic_json<CharT,Alloc> null;
 
     typedef typename object::iterator object_iterator;
     typedef typename object::const_iterator const_object_iterator;
@@ -633,43 +598,6 @@ public:
             : Alloc(a), type_(value_types::array_t)
         {
             value_.array_value_ = create_instance<array>(get_allocator(), std::move(val), array_allocator_type(*this));
-        }
-
-        variant(const Alloc& a, value_types::value_types_t type, size_t size)
-            : Alloc(a), type_(type)
-        {
-            switch (type)
-            {
-            case value_types::null_t:
-            case value_types::empty_object_t:
-                break;
-            case value_types::double_t:
-                break;
-            case value_types::integer_t:
-                break;
-            case value_types::uinteger_t:
-                break;
-            case value_types::bool_t:
-                break;
-            case value_types::small_string_t:
-                small_string_length_ = 0;
-                break;
-            case value_types::string_t:
-                value_.string_value_ = create_string_data<CharT>(get_allocator());
-                break;
-            case value_types::array_t:
-                value_.array_value_ = create_array<array>(get_allocator(), size);
-                break;
-            case value_types::object_t:
-                value_.object_value_ = create_instance<object>(get_allocator(), object_allocator_type(*this));
-                break;
-            case value_types::any_t:
-                value_.any_value_ = create_instance<any>(get_allocator());
-                break;
-            default:
-                // throw
-                break;
-            }
         }
 
         explicit variant(const Alloc& a, const any& val)
@@ -1033,12 +961,6 @@ public:
             return type_ == value_types::bool_t;
         }
 
-        // Deprecated
-        bool is_empty() const JSONCONS_NOEXCEPT
-        {
-            return empty();
-        }
-
         bool empty() const JSONCONS_NOEXCEPT
         {
             switch (type_)
@@ -1196,46 +1118,6 @@ public:
             return evaluate().elements();
         }
 
-        object_iterator begin_members()
-        {
-            return evaluate().begin_members();
-        }
-
-        const_object_iterator begin_members() const
-        {
-            return evaluate().begin_members();
-        }
-
-        object_iterator end_members()
-        {
-            return evaluate().end_members();
-        }
-
-        const_object_iterator end_members() const
-        {
-            return evaluate().end_members();
-        }
-
-        array_iterator begin_elements()
-        {
-            return evaluate().begin_elements();
-        }
-
-        const_array_iterator begin_elements() const
-        {
-            return evaluate().begin_elements();
-        }
-
-        array_iterator end_elements()
-        {
-            return evaluate().end_elements();
-        }
-
-        const_array_iterator end_elements() const
-        {
-            return evaluate().end_elements();
-        }
-
         size_t size() const JSONCONS_NOEXCEPT
         {
             return evaluate().size();
@@ -1246,12 +1128,6 @@ public:
             return evaluate().type();
         }
 
-        // Deprecated
-        bool has_member(const name_type& name) const
-        {
-            return evaluate().has_member(name);
-        }
-
         size_t count(const name_type& name) const
         {
             return evaluate().count(name);
@@ -1260,12 +1136,6 @@ public:
         bool is_null() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_null();
-        }
-
-        // Deprecated
-        bool is_empty() const JSONCONS_NOEXCEPT
-        {
-            return empty();
         }
 
         bool empty() const
@@ -1294,17 +1164,6 @@ public:
             evaluate().resize(n,val);
         }
 
-        void resize_array(size_t n)
-        {
-            evaluate().resize_array(n);
-        }
-
-        template <typename T>
-        void resize_array(size_t n, T val)
-        {
-            evaluate().resize_array(n,val);
-        }
-
         template<typename T>
         bool is() const
         {
@@ -1320,13 +1179,6 @@ public:
         {
             return evaluate().is_number();
         }
-
-        // Deprecate
-        bool is_numeric() const JSONCONS_NOEXCEPT
-        {
-            return is_number();
-        }
-
         bool is_bool() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_bool();
@@ -1347,19 +1199,9 @@ public:
             return evaluate().is_any();
         }
 
-        bool is_longlong() const JSONCONS_NOEXCEPT
-        {
-            return evaluate().is_longlong();
-        }
-
         bool is_integer() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_integer();
-        }
-
-        bool is_ulonglong() const JSONCONS_NOEXCEPT
-        {
-            return evaluate().is_ulonglong();
         }
 
         bool is_uinteger() const JSONCONS_NOEXCEPT
@@ -1412,31 +1254,6 @@ public:
         double as_double() const
         {
             return evaluate().as_double();
-        }
-
-        int as_int() const
-        {
-            return evaluate().as_int();
-        }
-
-        unsigned int as_uint() const
-        {
-            return evaluate().as_uint();
-        }
-
-        long as_long() const
-        {
-            return evaluate().as_long();
-        }
-
-        unsigned long as_ulong() const
-        {
-            return evaluate().as_ulong();
-        }
-
-        long long as_longlong() const
-        {
-            return evaluate().as_longlong();
         }
 
         int64_t as_integer() const
@@ -1567,12 +1384,6 @@ public:
             return evaluate().find(name);
         }
 
-        // Deprecated
-        const basic_json<CharT,Alloc>& get(const name_type& name) const
-        {
-            return evaluate().get(name);
-        }
-
         template <typename T>
         basic_json<CharT,Alloc> get(const name_type& name, T&& default_val) const
         {
@@ -1604,25 +1415,6 @@ public:
         void erase(const name_type& name)
         {
             evaluate().erase(name);
-        }
-
-        // Remove a range of elements from an array 
-
-        void remove_range(size_t from_index, size_t to_index)
-        {
-            evaluate().remove_range(from_index, to_index);
-        }
-        // Remove a range of elements from an array 
-
-        void remove(const name_type& name)
-        {
-            evaluate().remove(name);
-        }
-
-        // Deprecated
-        void remove_member(const name_type& name)
-        {
-            evaluate().remove(name);
         }
 
        // Remove a member from an object 
@@ -1683,16 +1475,6 @@ public:
             evaluate_with_default().add(value);
         }
 
-        void add(size_t index, const basic_json<CharT,Alloc>& value)
-        {
-            evaluate_with_default().add(index, value);
-        }
-
-        void add(size_t index, basic_json<CharT,Alloc>&& value)
-        {
-            evaluate_with_default().add(index, std::move(value));
-        }
-
         array_iterator add(const_array_iterator pos, const basic_json<CharT,Alloc>& value)
         {
             return evaluate_with_default().add(pos, value);
@@ -1738,28 +1520,146 @@ public:
             o.to_stream(os);
             return os;
         }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+        void resize_array(size_t n)
+        {
+            evaluate().resize_array(n);
+        }
+
+        template <typename T>
+        void resize_array(size_t n, T val)
+        {
+            evaluate().resize_array(n,val);
+        }
+
+        object_iterator begin_members()
+        {
+            return evaluate().begin_members();
+        }
+
+        const_object_iterator begin_members() const
+        {
+            return evaluate().begin_members();
+        }
+
+        object_iterator end_members()
+        {
+            return evaluate().end_members();
+        }
+
+        const_object_iterator end_members() const
+        {
+            return evaluate().end_members();
+        }
+
+        array_iterator begin_elements()
+        {
+            return evaluate().begin_elements();
+        }
+
+        const_array_iterator begin_elements() const
+        {
+            return evaluate().begin_elements();
+        }
+
+        array_iterator end_elements()
+        {
+            return evaluate().end_elements();
+        }
+
+        const_array_iterator end_elements() const
+        {
+            return evaluate().end_elements();
+        }
+
+        const basic_json<CharT,Alloc>& get(const name_type& name) const
+        {
+            return evaluate().get(name);
+        }
+
+        bool is_ulonglong() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_ulonglong();
+        }
+
+        bool is_longlong() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_longlong();
+        }
+
+        int as_int() const
+        {
+            return evaluate().as_int();
+        }
+
+        unsigned int as_uint() const
+        {
+            return evaluate().as_uint();
+        }
+
+        long as_long() const
+        {
+            return evaluate().as_long();
+        }
+
+        unsigned long as_ulong() const
+        {
+            return evaluate().as_ulong();
+        }
+
+        long long as_longlong() const
+        {
+            return evaluate().as_longlong();
+        }
+
+        void add(size_t index, const basic_json<CharT,Alloc>& value)
+        {
+            evaluate_with_default().add(index, value);
+        }
+
+        void add(size_t index, basic_json<CharT,Alloc>&& value)
+        {
+            evaluate_with_default().add(index, std::move(value));
+        }
+
+        bool has_member(const name_type& name) const
+        {
+            return evaluate().has_member(name);
+        }
+
+        // Remove a range of elements from an array 
+        void remove_range(size_t from_index, size_t to_index)
+        {
+            evaluate().remove_range(from_index, to_index);
+        }
+        // Remove a range of elements from an array 
+        void remove(const name_type& name)
+        {
+            evaluate().remove(name);
+        }
+        void remove_member(const name_type& name)
+        {
+            evaluate().remove(name);
+        }
+        bool is_empty() const JSONCONS_NOEXCEPT
+        {
+            return empty();
+        }
+        bool is_numeric() const JSONCONS_NOEXCEPT
+        {
+            return is_number();
+        }
+#endif
     };
 
     static basic_json parse_stream(std::basic_istream<CharT>& is);
     static basic_json parse_stream(std::basic_istream<CharT>& is, basic_parse_error_handler<CharT>& err_handler);
 
-    // Deprecated
-    static basic_json parse(std::basic_istream<CharT>& is)
-    {
-        parse_stream(is);
-    }
-    static basic_json parse(std::basic_istream<CharT>& is, basic_parse_error_handler<CharT>& err_handler)
-    {
-        parse_stream(is,err_handler);
-    }
-
     static basic_json parse(const std::basic_string<CharT>& s);
 
     static basic_json parse(const std::basic_string<CharT>& s, basic_parse_error_handler<CharT>& err_handler);
-
-    static basic_json parse_string(const std::basic_string<CharT>& s);
-
-    static basic_json parse_string(const std::basic_string<CharT>& s, basic_parse_error_handler<CharT>& err_handler);
 
     static basic_json parse_file(const std::string& s);
 
@@ -1881,12 +1781,6 @@ public:
         : var_(allocator, s, length)
     {
     }
-
-    basic_json(value_types::value_types_t type, size_t size, const Alloc& allocator = Alloc())
-        : var_(allocator,type,size)
-    {
-    }
-
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Alloc& allocator = Alloc())
         : var_(allocator,first,last)
@@ -1895,47 +1789,6 @@ public:
 
     ~basic_json()
     {
-    }
-
-    // Deprecated
-    object_iterator begin_members()
-    {
-        return members().begin();
-    }
-
-    const_object_iterator begin_members() const
-    {
-        return members().begin();
-    }
-
-    object_iterator end_members()
-    {
-        return members().end();
-    }
-
-    const_object_iterator end_members() const
-    {
-        return members().end();
-    }
-
-    array_iterator begin_elements()
-    {
-        return elements().begin();
-    }
-
-    const_array_iterator begin_elements() const
-    {
-        return elements().begin();
-    }
-
-    array_iterator end_elements()
-    {
-        return elements().end();
-    }
-
-    const_array_iterator end_elements() const
-    {
-        return elements().end();
     }
 
     basic_json& operator=(const basic_json<CharT,Alloc>& rhs)
@@ -2031,9 +1884,6 @@ public:
         return var_.is_null();
     }
 
-    // Deprecated
-    bool has_member(const name_type& name) const;
-
     size_t count(const name_type& name) const
     {
         switch (var_.type_)
@@ -2091,19 +1941,9 @@ public:
         return var_.type_ == value_types::any_t;
     }
 
-    bool is_longlong() const JSONCONS_NOEXCEPT
-    {
-        return var_.type_ == value_types::integer_t;
-    }
-
     bool is_integer() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::integer_t;
-    }
-
-    bool is_ulonglong() const JSONCONS_NOEXCEPT
-    {
-        return var_.type_ == value_types::uinteger_t;
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
@@ -2119,18 +1959,6 @@ public:
     bool is_number() const JSONCONS_NOEXCEPT
     {
         return var_.is_number();
-    }
-
-    // Deprecated 
-    bool is_numeric() const JSONCONS_NOEXCEPT
-    {
-        return is_number();
-    }
-
-    // Deprecated
-    bool is_empty() const JSONCONS_NOEXCEPT
-    {
-        return empty();
     }
 
     bool empty() const JSONCONS_NOEXCEPT
@@ -2177,11 +2005,6 @@ public:
         }
     }
 
-    void resize_array(size_t n)
-    {
-        resize(n);
-    }
-
     template <typename T>
     void resize(size_t n, T val)
     {
@@ -2191,12 +2014,6 @@ public:
             var_.value_.array_value_->resize(n, val);
             break;
         }
-    }
-
-    template <typename T>
-    void resize_array(size_t n, T val)
-    {
-        resize(n,val);
     }
 
     template<typename T>
@@ -2233,16 +2050,6 @@ public:
         default:
             return false;
         }
-    }
-
-    long long as_longlong() const
-    {
-        return as_integer();
-    }
-
-    unsigned long long as_ulonglong() const
-    {
-        return as_uinteger();
     }
 
     int64_t as_integer() const
@@ -2295,16 +2102,6 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
         }
     }
-
-    // Deprecated
-
-    int as_int() const;
-
-    unsigned int as_uint() const;
-
-    long as_long() const;
-
-    unsigned long as_ulong() const;
 
     std::basic_string<CharT> as_string() const JSONCONS_NOEXCEPT
     {
@@ -2509,26 +2306,6 @@ public:
         }
     }
 
-    const basic_json<CharT,Alloc>& get(const name_type& name) const
-    {
-        static const basic_json<CharT, Alloc> a_null = null_type();
-
-        switch (var_.type_)
-        {
-        case value_types::empty_object_t:
-            return a_null;
-        case value_types::object_t:
-            {
-                const_object_iterator it = var_.value_.object_value_->find(name);
-                return it != members().end() ? it->value() : a_null;
-            }
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
     template<typename T>
     basic_json<CharT, Alloc> get(const name_type& name, T&& default_val) const
     {
@@ -2631,33 +2408,6 @@ public:
             break;
         }
     }
-    // Removes a member from an object value
-
-    void remove_range(size_t from_index, size_t to_index)
-    {
-        switch (var_.type_)
-        {
-        case value_types::array_t:
-            var_.value_.array_value_->remove_range(from_index, to_index);
-            break;
-        default:
-            break;
-        }
-    }
-    // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
-
-    void remove(const name_type& name)
-    {
-        erase(name);
-    }
-    // Removes a member from an object value
-
-    // Deprecated
-    void remove_member(const name_type& name)
-    {
-        erase(name);
-    }
-    // Removes a member from an object value
 
     void set(const name_type& name, const basic_json<CharT, Alloc>& value)
     {
@@ -2821,32 +2571,6 @@ public:
         }
     }
 
-    void add(size_t index, const basic_json<CharT, Alloc>& value)
-    {
-        switch (var_.type_)
-        {
-        case value_types::array_t:
-            var_.value_.array_value_->add(index, value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
-    }
-
-    void add(size_t index, basic_json<CharT, Alloc>&& value){
-        switch (var_.type_){
-        case value_types::array_t:
-            var_.value_.array_value_->add(index, std::move(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
-    }
-
     array_iterator add(const_array_iterator pos, const basic_json<CharT, Alloc>& value)
     {
         switch (var_.type_)
@@ -2955,15 +2679,17 @@ public:
         return var_.value_.any_value_->template cast<T>();
     }
 
+    void assign_integer(int64_t rhs)
+    {
+        var_.assign(rhs);
+    }
+
+    void assign_uinteger(uint64_t rhs)
+    {
+        var_.assign(rhs);
+    }
+
     void assign_double(double rhs)
-    {
-        var_.assign(rhs);
-    }
-    void assign_longlong(long long rhs)
-    {
-        var_.assign(rhs);
-    }
-    void assign_ulonglong(unsigned long long rhs)
     {
         var_.assign(rhs);
     }
@@ -2977,6 +2703,274 @@ public:
 
     template <typename T>
     static basic_json make_3d_array(size_t m, size_t n, size_t k, T val);
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    typedef any json_any_type;
+    typedef member_type name_value_pair;
+
+    static const basic_json<CharT,Alloc> an_object;
+    static const basic_json<CharT,Alloc> an_array;
+    static const basic_json<CharT,Alloc> null;
+
+    static basic_json parse(std::basic_istream<CharT>& is)
+    {
+        parse_stream(is);
+    }
+    static basic_json parse(std::basic_istream<CharT>& is, basic_parse_error_handler<CharT>& err_handler)
+    {
+        parse_stream(is,err_handler);
+    }
+
+    static basic_json parse_string(const std::basic_string<CharT>& s)
+    {
+        return parse(s);
+    }
+
+    static basic_json parse_string(const std::basic_string<CharT>& s, basic_parse_error_handler<CharT>& err_handler)
+    {
+        return parse(s,err_handler);
+    }
+
+    void resize_array(size_t n)
+    {
+        resize(n);
+    }
+
+    template <typename T>
+    void resize_array(size_t n, T val)
+    {
+        resize(n,val);
+    }
+
+    object_iterator begin_members()
+    {
+        return members().begin();
+    }
+
+    const_object_iterator begin_members() const
+    {
+        return members().begin();
+    }
+
+    object_iterator end_members()
+    {
+        return members().end();
+    }
+
+    const_object_iterator end_members() const
+    {
+        return members().end();
+    }
+
+    array_iterator begin_elements()
+    {
+        return elements().begin();
+    }
+
+    const_array_iterator begin_elements() const
+    {
+        return elements().begin();
+    }
+
+    array_iterator end_elements()
+    {
+        return elements().end();
+    }
+
+    const_array_iterator end_elements() const
+    {
+        return elements().end();
+    }
+
+    const basic_json<CharT,Alloc>& get(const name_type& name) const
+    {
+        static const basic_json<CharT, Alloc> a_null = null_type();
+
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return a_null;
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_value_->find(name);
+                return it != members().end() ? it->value() : a_null;
+            }
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    bool is_longlong() const JSONCONS_NOEXCEPT
+    {
+        return var_.type_ == value_types::integer_t;
+    }
+
+    bool is_ulonglong() const JSONCONS_NOEXCEPT
+    {
+        return var_.type_ == value_types::uinteger_t;
+    }
+
+    long long as_longlong() const
+    {
+        return as_integer();
+    }
+
+    unsigned long long as_ulonglong() const
+    {
+        return as_uinteger();
+    }
+
+    int as_int() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<int>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<int>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<int>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an int");
+        }
+    }
+
+    unsigned int as_uint() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<unsigned int>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<unsigned int>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<unsigned int>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned int");
+        }
+    }
+
+    long as_long() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<long>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<long>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<long>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long");
+        }
+    }
+
+    unsigned long as_ulong() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::double_t:
+            return static_cast<unsigned long>(var_.value_.float_value_);
+        case value_types::integer_t:
+            return static_cast<unsigned long>(var_.value_.integer_value_);
+        case value_types::uinteger_t:
+            return static_cast<unsigned long>(var_.value_.uinteger_value_);
+        case value_types::bool_t:
+            return var_.value_.bool_value_ ? 1 : 0;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned long");
+        }
+    }
+
+    void add(size_t index, const basic_json<CharT, Alloc>& value)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_value_->add(index, value);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    void add(size_t index, basic_json<CharT, Alloc>&& value){
+        switch (var_.type_){
+        case value_types::array_t:
+            var_.value_.array_value_->add(index, std::move(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    bool has_member(const name_type& name) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_value_->find(name);
+                return it != members().end();
+            }
+            break;
+        default:
+            return false;
+        }
+    }
+
+    void remove_range(size_t from_index, size_t to_index)
+    {
+        switch (var_.type_)
+        {
+        case value_types::array_t:
+            var_.value_.array_value_->remove_range(from_index, to_index);
+            break;
+        default:
+            break;
+        }
+    }
+    // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
+
+    void remove(const name_type& name)
+    {
+        erase(name);
+    }
+    void remove_member(const name_type& name)
+    {
+        erase(name);
+    }
+    // Removes a member from an object value
+
+    bool is_empty() const JSONCONS_NOEXCEPT
+    {
+        return empty();
+    }
+    bool is_numeric() const JSONCONS_NOEXCEPT
+    {
+        return is_number();
+    }
+
+    void assign_longlong(long long rhs)
+    {
+        var_.assign(rhs);
+    }
+    void assign_ulonglong(unsigned long long rhs)
+    {
+        var_.assign(rhs);
+    }
 
     template<int size>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array()
@@ -3013,6 +3007,7 @@ public:
     {
         return build_array<CharT,Alloc,size>()(m, n, k, val);
     }
+#endif
 
     object_range members()
     {
@@ -3106,10 +3101,11 @@ public:
 
     const object& object_value() const
     {
+        static const basic_json<CharT, Alloc> cobject = basic_json<CharT, Alloc>::object();
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return cobject().object_value();
+            return cobject.object_value();
         case value_types::object_t:
             return *(var_.value_.object_value_);
         default:
@@ -3119,11 +3115,6 @@ public:
     }
 
 private:
-    const basic_json<CharT,Alloc>& cobject() const
-    {
-        static const basic_json<CharT, Alloc> c = basic_json<CharT, Alloc>(value_types::object_t,0);
-        return c;
-    }
 
     template<typename Char2, typename Allocator2, size_t size>
     class build_array
@@ -3307,14 +3298,14 @@ void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os, const ba
     to_stream(serializer);
 }
 
-
-// Deprecated static data members
+#if !defined(JSONCONS_NO_DEPRECATED)
 template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_object = basic_json<CharT, Alloc>(value_types::object_t,0);
+const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_object = basic_json<CharT, Alloc>::object();
 template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_array = basic_json<CharT, Alloc>(value_types::array_t,0);        
+const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_array = basic_json<CharT, Alloc>::array();        
 template<typename CharT, typename Alloc>
 const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::null = basic_json<CharT, Alloc>(jsoncons::null_type());
+#endif
 
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n)
@@ -3416,39 +3407,6 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string
 template<typename CharT, typename Alloc>
 basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string<CharT>& s, 
                                                        basic_parse_error_handler<CharT>& err_handler)
-{
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_parser<CharT> parser(handler,err_handler);
-    parser.begin_parse();
-    parser.parse(s.data(),0,s.length());
-    parser.end_parse();
-    parser.check_done(s.data(),parser.index(),s.length());
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-    }
-    return handler.get_result();
-}
-
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic_string<CharT>& s)
-{
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_parser<CharT> parser(handler);
-    parser.begin_parse();
-    parser.parse(s.data(),0,s.length());
-    parser.end_parse();
-    parser.check_done(s.data(),parser.index(),s.length());
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-    }
-    return handler.get_result();
-}
-
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_string(const std::basic_string<CharT>& s, 
-                                                              basic_parse_error_handler<CharT>& err_handler)
 {
     basic_json_deserializer<basic_json<CharT, Alloc>> handler;
     basic_json_parser<CharT> parser(handler,err_handler);
@@ -3579,94 +3537,6 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
     }
     return handler.get_result();
-}
-
-template<typename CharT, typename Alloc>
-bool basic_json<CharT, Alloc>::has_member(const name_type& name) const
-{
-    switch (var_.type_)
-    {
-    case value_types::object_t:
-        {
-            const_object_iterator it = var_.value_.object_value_->find(name);
-            return it != members().end();
-        }
-        break;
-    default:
-        return false;
-    }
-}
-
-template<typename CharT, typename Alloc>
-int basic_json<CharT, Alloc>::as_int() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<int>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<int>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<int>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an int");
-    }
-}
-
-template<typename CharT, typename Alloc>
-unsigned int basic_json<CharT, Alloc>::as_uint() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<unsigned int>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<unsigned int>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<unsigned int>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned int");
-    }
-}
-
-template<typename CharT, typename Alloc>
-long basic_json<CharT, Alloc>::as_long() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<long>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<long>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<long>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long");
-    }
-}
-
-template<typename CharT, typename Alloc>
-unsigned long basic_json<CharT, Alloc>::as_ulong() const
-{
-    switch (var_.type_)
-    {
-    case value_types::double_t:
-        return static_cast<unsigned long>(var_.value_.float_value_);
-    case value_types::integer_t:
-        return static_cast<unsigned long>(var_.value_.integer_value_);
-    case value_types::uinteger_t:
-        return static_cast<unsigned long>(var_.value_.uinteger_value_);
-    case value_types::bool_t:
-        return var_.value_.bool_value_ ? 1 : 0;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned long");
-    }
 }
 
 template<typename CharT, typename Alloc>

@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
         std::cout << e.what() << std::endl;
     }
 
-    std::string experience = obj.has_member("outdoor_experience") ? obj["outdoor_experience"].as<std::string>() : "";
+    std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
     bool first_aid_certification = obj.get("first_aid_certification",false).as<bool>();
 
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         os << "{\"max_longlong\":-" << max_value << "}";
         json val = json::parse(os.str());
         std::cout << val << std::endl;
-        BOOST_CHECK(val["max_longlong"].is_longlong());
+        BOOST_CHECK(val["max_longlong"].is_integer());
     }
     {
         std::ostringstream os;
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
         os << "{\"max_ulonglong\":" << max_uvalue << "}";
         json val = json::parse(os.str());
         std::cout << val << std::endl;
-        BOOST_CHECK(val["max_ulonglong"].is_ulonglong());
+        BOOST_CHECK(val["max_ulonglong"].is_uinteger());
     }
     {
         std::ostringstream os;

@@ -522,6 +522,34 @@ vertical-align:1px;
 </tr>
 <tr>
 <td></td>
+<td>as_int() const</td>
+<td><em>✓</em></td>
+<td>Use <code>as&lt;int&gt;</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>as_uint() const</td>
+<td><em>✓</em></td>
+<td>Use <code>as&lt;unsigned int&gt;</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>as_long() const</td>
+<td><em>✓</em></td>
+<td>Use <code>as&lt;long&gt;</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>as_ulong() const</td>
+<td><em>✓</em></td>
+<td>Use <code>as&lt;unsigned long&gt;</code>
+</td>
+</tr>
+<tr>
+<td></td>
 <td>as_longlong() const</td>
 <td><em>✓</em></td>
 <td>Use as_integer or <code>as&lt;long long&gt;</code>
@@ -723,6 +751,18 @@ vertical-align:1px;
 <td>do_ulonglong_value(unsigned long long value)</td>
 <td></td>
 <td>Override do_uinteger_value(uint64_t value)</td>
+</tr>
+<tr>
+<td>basic_parsing_context</td>
+<td>last_char()</td>
+<td><em>✓</em></td>
+<td>Use current_char()</td>
+</tr>
+<tr>
+<td>json_filter</td>
+<td>parent()</td>
+<td><em>✓</em></td>
+<td>Use input_handler()</td>
 </tr>
 </tbody>
 </table>

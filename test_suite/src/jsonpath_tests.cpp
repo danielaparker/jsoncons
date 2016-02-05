@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
     json books = fixture.book();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        bool has_isbn = books[i].has_member("isbn");
+        bool has_isbn = books[i].count("isbn") > 0;
         if (has_isbn)
         {
             json result = json_query(books[i],"@.isbn");
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_empty_isbn)
     json books = fixture.book();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        bool has_isbn = books[i].has_member("isbn");
+        bool has_isbn = books[i].count("isbn") > 0;
         if (has_isbn)
         {
             json result = json_query(books[i],"@.isbn");
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
     json expected = json::array();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        if (books[i].has_member("isbn"))
+        if (books[i].count("isbn") > 0)
         {
             expected.add(books[i]);
         }

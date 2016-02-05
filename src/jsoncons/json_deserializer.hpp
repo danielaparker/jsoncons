@@ -59,11 +59,12 @@ public:
         return std::move(result_);
     }
 
-//  Deprecated
+#if !defined(JSONCONS_NO_DEPRECATED)
     JsonT& root()
     {
         return result_;
     }
+#endif
 
 private:
     JsonT result_;
@@ -192,7 +193,7 @@ private:
     {
         if (top_ == -1)
         {
-            result_.assign_longlong(value);
+            result_.assign_integer(value);
         }
         else if (stack_[top_].value.is_object())
         {
@@ -209,7 +210,7 @@ private:
     {
         if (top_ == -1)
         {
-            result_.assign_ulonglong(value);
+            result_.assign_uinteger(value);
         }
         else if (stack_[top_].value.is_object())
         {

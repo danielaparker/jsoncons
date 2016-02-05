@@ -102,7 +102,7 @@ void first_example_d()
             json& book = books[i];
             string author = book["author"].as<std::string>();
             string title = book["title"].as<std::string>();
-            if (book.has_member("price") && book["price"].is_numeric())
+            if (book.count("price") > 0 && book["price"].is_number())
             {
                 double price = book["price"].as<double>();
                 std::cout << author << ", " << title << ", " << price << std::endl;

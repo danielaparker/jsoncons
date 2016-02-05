@@ -149,7 +149,7 @@ public:
         return eof_;
     }
 
-    // Deprecated
+#if !defined(JSONCONS_NO_DEPRECATED)
     void read()
     {
         read_next();
@@ -164,6 +164,7 @@ public:
     {
         parser_.max_nesting_depth(depth);
     }
+#endif
 };
 
 typedef basic_json_reader<char> json_reader;

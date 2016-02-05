@@ -849,9 +849,9 @@ public:
     {
         if (context_val.is_object())
         {
-            if (context_val.has_member(name))
+            if (context_val.count(name) > 0)
             {
-                nodes_.push_back(std::addressof(context_val.get(name)));
+                nodes_.push_back(std::addressof(context_val.at(name)));
             }
             if (recursive_descent_)
             {

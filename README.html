@@ -499,7 +499,7 @@ vertical-align:1px;
 </li>
 </ul>
 
-<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="deprecated">deprecated list</a> for the status of old names. New code should avoid the deprecated names.</p>
+<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names.  The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
 
 <h2>Benchmarks</h2>
 
@@ -636,6 +636,9 @@ vertical-align:1px;
         <span class="pl-c">// book has a member "author"</span>
     }
 
+    book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
+    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+
     <span class="pl-k">try</span>
     {
         book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
@@ -644,9 +647,6 @@ vertical-align:1px;
     {
         <span class="pl-c">// member "ratings" not found</span>
     }
-
-    book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
 
     <span class="pl-c">// Add ratings</span>
     book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
@@ -864,6 +864,9 @@ vertical-align:1px;
         <span class="pl-c">// book has a member "author"</span>
     }
 
+    book.get(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();
+    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+
     <span class="pl-k">try</span>
     {
         book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;();
@@ -872,9 +875,6 @@ vertical-align:1px;
     {
         <span class="pl-c">// member "ratings" not found</span>
     }
-
-    book.get(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
 
     <span class="pl-c">// Add ratings</span>
     book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][L<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;

@@ -32,7 +32,7 @@ private:
     {
         if (ec.category() == json_error_category())
         {
-            if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.last_char() == ']' || context.last_char() == '}'))
+            if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.current_char() == ']' || context.current_char() == '}'))
             {
                 default_parse_error_handler::instance().error(ec,context);
             }

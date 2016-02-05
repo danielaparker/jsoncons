@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test_assignment)
     BOOST_CHECK_CLOSE(double_2.as<double>(), 7.0, 0.000001);
     BOOST_CHECK(double_2.as<int>() == 7);
     BOOST_CHECK(root["myobject"]["bool_2"].as<bool>());
-    BOOST_CHECK(root["myobject"]["int_2"].as_longlong() == 0);
+    BOOST_CHECK(root["myobject"]["int_2"].as_integer() == 0);
     BOOST_CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
     BOOST_CHECK(root["myobject"]["bool_2"].as<bool>());
@@ -131,12 +131,12 @@ BOOST_AUTO_TEST_CASE(example)
 
 BOOST_AUTO_TEST_CASE(test_null)
 {
-    json nullval = json::null;
+    json nullval = json::null_type();
     BOOST_CHECK(nullval.is_null());
     BOOST_CHECK(nullval.is<json::null_type>());
 
     json obj;
-    obj["field"] = json::null;
+    obj["field"] = json::null_type();
     std::cout << obj << std::endl;
 }
 

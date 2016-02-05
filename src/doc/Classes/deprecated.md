@@ -12,6 +12,10 @@ class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_it
     |remove(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
     |parse(std::istream& is)|<em>&#x2713;</em>|Use parse_stream(std::istream& is)
     |parse(std::istream& is, parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse_stream(std::istream& is, parse_error_handler& err_handler)
+    |as_int() const|<em>&#x2713;</em>|Use `as<int>`
+    |as_uint() const|<em>&#x2713;</em>|Use `as<unsigned int>`
+    |as_long() const|<em>&#x2713;</em>|Use `as<long>`
+    |as_ulong() const|<em>&#x2713;</em>|Use `as<unsigned long>`
     |as_longlong() const|<em>&#x2713;</em>|Use as_integer or `as<long long>`
     |as_ulonglong() const|<em>&#x2713;</em>|Use as_uinteger or `as<unsigned long long>`
     |is_longlong() const|<em>&#x2713;</em>|Use is_integer() or is<long long>()
@@ -45,5 +49,6 @@ json_input_handler class|do_longlong_value(long long value, const parsing_contex
     |do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
 json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)
     |do_ulonglong_value(unsigned long long value)||Override do_uinteger_value(uint64_t value)
-
+basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
+json_filter|parent()|<em>&#x2713;</em>|Use input_handler()
 

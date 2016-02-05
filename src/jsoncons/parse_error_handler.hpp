@@ -79,11 +79,12 @@ public:
         return do_current_char();
     }
 
-    // Deprecated
+#if !defined(JSONCONS_NO_DEPRECATED)
     CharT last_char() const
     {
         return do_current_char();
     }
+#endif
 
 private:
     virtual size_t do_line_number() const = 0;

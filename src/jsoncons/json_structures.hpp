@@ -32,7 +32,7 @@ public:
     typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
     typedef typename std::vector<JsonT,Alloc>::value_type value_type;
 
-    json_array(const Alloc& allocator = Alloc())
+    explicit json_array(const Alloc& allocator = Alloc())
         : elements_(allocator)
     {
     }
@@ -63,13 +63,13 @@ public:
     {
     }
 
-    json_array(size_t n/*, const Alloc& allocator = Alloc()*/)
-        : elements_(n/*,allocator*/)
+    explicit json_array(size_t n, const Alloc& allocator = Alloc())
+        : elements_(n,JsonT(),allocator)
     {
     }
 
-    json_array(size_t n, const JsonT& val, const Alloc& allocator = Alloc())
-        : elements_(n,val,allocator)
+    explicit json_array(size_t n, const JsonT& value, const Alloc& allocator = Alloc())
+        : elements_(n,value,allocator)
     {
     }
 

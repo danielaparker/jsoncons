@@ -127,12 +127,12 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
     json a = json::make_array<1>(10,0);
     BOOST_CHECK(a.size() == 10);
-    BOOST_CHECK(a[0].as_longlong() == 0);
+    BOOST_CHECK(a[0].as_integer() == 0);
     a[1] = 1;
     a[2] = 2;
-    BOOST_CHECK(a[1].as_longlong() == 1);
-    BOOST_CHECK(a[2].as_longlong() == 2);
-    BOOST_CHECK(a[9].as_longlong() == 0);
+    BOOST_CHECK(a[1].as_integer() == 1);
+    BOOST_CHECK(a[2].as_integer() == 2);
+    BOOST_CHECK(a[9].as_integer() == 0);
 
     BOOST_CHECK(a[1].as<long long>() == 1);
     BOOST_CHECK(a[2].as<long long>() == 2);
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE(test_three_dim_array)
     a[0][2][0] = 2;
     a[0][2][1] = 3;
 
-    BOOST_CHECK(a[0][2][0].as_longlong() == 2);
-    BOOST_CHECK(a[0][2][1].as_longlong() == 3);
-    BOOST_CHECK(a[3][2][1].as_longlong() == 0);
+    BOOST_CHECK(a[0][2][0].as_integer() == 2);
+    BOOST_CHECK(a[0][2][1].as_integer() == 3);
+    BOOST_CHECK(a[3][2][1].as_integer() == 0);
 
     BOOST_CHECK(a[0][2][0].as<long long>() == 2);
     BOOST_CHECK(a[0][2][1].as<long long>() == 3);

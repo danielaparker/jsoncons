@@ -168,8 +168,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
     BOOST_CHECK(val[1].size()==3);
     BOOST_CHECK(val[2].size()==3);
     BOOST_CHECK(val[0][0]==json("a"));
-    BOOST_CHECK(val[0][1]==json::null);
-    BOOST_CHECK(val[0][2]==json::null);
+    BOOST_CHECK(val[0][1]==json::null_type());
+    BOOST_CHECK(val[0][2]==json::null_type());
     BOOST_CHECK(val[1][0]==json("1"));
     BOOST_CHECK(val[1][1]==json("2"));
     BOOST_CHECK(val[1][2]==json("3"));

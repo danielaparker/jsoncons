@@ -25,7 +25,7 @@ The library has a number of features, which are listed below:
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names. New code should avoid the deprecated names.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names.  The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
 ## Benchmarks
 
