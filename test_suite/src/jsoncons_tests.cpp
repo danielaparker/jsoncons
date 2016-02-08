@@ -8,7 +8,6 @@
 #include <boost/test/unit_test.hpp>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
-#include "jsoncons/json_filter.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>

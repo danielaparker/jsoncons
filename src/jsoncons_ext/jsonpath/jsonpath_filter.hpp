@@ -18,7 +18,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-template <class CharT,class Alloc>
+template <class JsonT>
 class jsonpath_evaluator;
 
 namespace filter_states {
@@ -61,18 +61,21 @@ namespace token_types {
     };
 }
 
-template<typename CharT, class Alloc>
+template <class JsonT>
 class term
 {
 public:
-    virtual void initialize(const basic_json<CharT,Alloc>& context_node)
+    typedef typename JsonT::string_type string_type;
+    typedef typename JsonT::char_type char_type;
+
+    virtual void initialize(const JsonT& context_node)
     {
     }
     virtual bool accept_single_node() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual basic_json<CharT,Alloc> evaluate_single_node() const
+    virtual JsonT evaluate_single_node() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -84,7 +87,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool eq(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool eq(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -92,7 +95,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool ne(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool ne(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -100,7 +103,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool regex2(const std::basic_string<CharT>& subject) const
+    virtual bool regex2(const string_type& subject) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -108,7 +111,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool ampamp(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool ampamp(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -116,7 +119,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool pipepipe(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool pipepipe(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -124,7 +127,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool lt(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool lt(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -132,43 +135,43 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool gt(const basic_json<CharT,Alloc>& rhs) const
+    virtual bool gt(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-	virtual basic_json<CharT, Alloc> minus(const term& rhs) const 
+	virtual JsonT minus(const term& rhs) const 
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual basic_json<CharT,Alloc>  minus(const basic_json<CharT,Alloc>& rhs) const
+    virtual JsonT  minus(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual basic_json<CharT,Alloc>  unary_minus() const
+    virtual JsonT  unary_minus() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual basic_json<CharT,Alloc> plus(const term& rhs) const
+    virtual JsonT plus(const term& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual basic_json<CharT,Alloc>  plus(const basic_json<CharT,Alloc>& rhs) const
+    virtual JsonT  plus(const JsonT& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
 };
 
-template<typename CharT, class Alloc>
+template <class JsonT>
 class token
 {
     token_types::token_types_t type_;
-    std::shared_ptr<term<CharT,Alloc>> term_;
+    std::shared_ptr<term<JsonT>> term_;
 public:
     token(token_types::token_types_t type)
         : type_(type)
     {
     }
-    token(token_types::token_types_t type, std::shared_ptr<term<CharT,Alloc>> term)
+    token(token_types::token_types_t type, std::shared_ptr<term<JsonT>> term)
         : type_(type), term_(term)
     {
     }
@@ -182,12 +185,12 @@ public:
         return type_;
     }
 
-    std::shared_ptr<term<CharT,Alloc>> term()
+    std::shared_ptr<term<JsonT>> term()
     {
         return term_;
     }
 
-    void initialize(const basic_json<CharT,Alloc>& context_node)
+    void initialize(const JsonT& context_node)
     {
         if (term_.get() != nullptr)
         {
@@ -196,20 +199,20 @@ public:
     }
 };
 
-template<typename CharT, class Alloc>
+template <class JsonT>
 class token_stream
 {
-    std::vector<token<CharT,Alloc>>& tokens_;
+    std::vector<token<JsonT>>& tokens_;
     size_t index_;
 public:
-    token_stream(std::vector<token<CharT,Alloc>>& tokens)
+    token_stream(std::vector<token<JsonT>>& tokens)
         : tokens_(tokens), index_(0)
     {
     }
 
-    token<CharT,Alloc> get()
+    token<JsonT> get()
     {
-        static token<CharT,Alloc> done = token<CharT,Alloc>(token_types::done);
+        static token<JsonT> done = token<JsonT>(token_types::done);
         return index_ < tokens_.size() ? tokens_[index_++] : done;
     }
     void putback()
@@ -218,20 +221,20 @@ public:
     }
 };
 
-template<typename CharT, class Alloc>
-bool ampamp(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+bool ampamp(const JsonT& lhs, const JsonT& rhs)
 {
     return lhs.as_bool() && rhs.as_bool();
 }
 
-template<typename CharT, class Alloc>
-bool pipepipe(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+bool pipepipe(const JsonT& lhs, const JsonT& rhs)
 {
     return lhs.as_bool() || rhs.as_bool();
 }
 
-template<typename CharT, class Alloc>
-bool lt(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+bool lt(const JsonT& lhs, const JsonT& rhs)
 {
     bool result = false;
     if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
@@ -253,16 +256,16 @@ bool lt(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
     return result;
 }
 
-template<typename CharT, class Alloc>
-bool gt(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+bool gt(const JsonT& lhs, const JsonT& rhs)
 {
     return lt(rhs,lhs);
 }
 
-template<typename CharT, class Alloc>
-basic_json<CharT,Alloc> plus(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+JsonT plus(const JsonT& lhs, const JsonT& rhs)
 {
-    basic_json<CharT,Alloc> result = jsoncons::null_type();
+    JsonT result = jsoncons::null_type();
     if (lhs.is<long long>() && rhs.is<long long>())
     {
         result = ((lhs.as<long long>() + rhs.as<long long>()));
@@ -278,10 +281,10 @@ basic_json<CharT,Alloc> plus(const basic_json<CharT,Alloc>& lhs, const basic_jso
     return result;
 }
 
-template<typename CharT, class Alloc>
-basic_json<CharT,Alloc> unary_minus(const basic_json<CharT,Alloc>& lhs)
+template <class JsonT>
+JsonT unary_minus(const JsonT& lhs)
 {
-    basic_json<CharT,Alloc> result = jsoncons::null_type();
+    JsonT result = jsoncons::null_type();
     if (lhs.is<long long>())
     {
         result = -lhs.as<long long>();
@@ -293,10 +296,10 @@ basic_json<CharT,Alloc> unary_minus(const basic_json<CharT,Alloc>& lhs)
     return result;
 }
 
-template<typename CharT, class Alloc>
-basic_json<CharT,Alloc> minus(const basic_json<CharT,Alloc>& lhs, const basic_json<CharT,Alloc>& rhs)
+template <class JsonT>
+JsonT minus(const JsonT& lhs, const JsonT& rhs)
 {
-    basic_json<CharT,Alloc> result = jsoncons::null_type();
+    JsonT result = jsoncons::null_type();
     if (lhs.is<long long>() && rhs.is<long long>())
     {
         result = ((lhs.as<long long>() - rhs.as<long long>()));
@@ -312,10 +315,10 @@ basic_json<CharT,Alloc> minus(const basic_json<CharT,Alloc>& lhs, const basic_js
     return result;
 }
 
-template<typename CharT, class Alloc>
-class value_term : public term<CharT,Alloc>
+template <class JsonT>
+class value_term : public term<JsonT>
 {
-    basic_json<CharT,Alloc> value_;
+    JsonT value_;
 public:
     template <class T>
     value_term(const T& value)
@@ -328,7 +331,7 @@ public:
         return value_.as_bool();
     }
 
-    basic_json<CharT,Alloc> evaluate_single_node() const override
+    JsonT evaluate_single_node() const override
     {
         return value_;
     }
@@ -338,124 +341,124 @@ public:
         return !value_.as_bool();
     }
 
-    bool eq(const term<CharT,Alloc>& rhs) const override
+    bool eq(const term<JsonT>& rhs) const override
     {
         return rhs.eq(value_);
     }
 
-    bool eq(const basic_json<CharT,Alloc>& rhs) const override
+    bool eq(const JsonT& rhs) const override
     {
         return value_ == rhs;
     }
 
-    bool ne(const term<CharT,Alloc>& rhs) const override
+    bool ne(const term<JsonT>& rhs) const override
     {
         return rhs.ne(value_);
     }
-    bool ne(const basic_json<CharT,Alloc>& rhs) const override
+    bool ne(const JsonT& rhs) const override
     {
         return value_ != rhs;
     }
-    bool regex(const term<CharT,Alloc>& rhs) const override
+    bool regex(const term<JsonT>& rhs) const override
     {
         return rhs.regex2(value_.as_string());
     }
-    bool ampamp(const term<CharT,Alloc>& rhs) const override
+    bool ampamp(const term<JsonT>& rhs) const override
     {
         return rhs.ampamp(value_);
     }
-    bool ampamp(const basic_json<CharT,Alloc>& rhs) const override
+    bool ampamp(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::ampamp(value_,rhs);
     }
-    bool pipepipe(const term<CharT,Alloc>& rhs) const override
+    bool pipepipe(const term<JsonT>& rhs) const override
     {
         return rhs.pipepipe(value_);
     }
-    bool pipepipe(const basic_json<CharT,Alloc>& rhs) const override
+    bool pipepipe(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::pipepipe(value_,rhs);
     }
 
-    bool lt(const term<CharT,Alloc>& rhs) const override
+    bool lt(const term<JsonT>& rhs) const override
     {
         return rhs.gt(value_);
     }
 
-    bool lt(const basic_json<CharT,Alloc>& rhs) const override
+    bool lt(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::lt(value_,rhs);
     }
 
-    bool gt(const term<CharT,Alloc>& rhs) const override
+    bool gt(const term<JsonT>& rhs) const override
     {
         return rhs.lt(value_);
     }
 
-    bool gt(const basic_json<CharT,Alloc>& rhs) const override
+    bool gt(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::gt(value_,rhs);
     }
 
-    basic_json<CharT,Alloc> minus(const term<CharT,Alloc>& rhs) const override
+    JsonT minus(const term<JsonT>& rhs) const override
     {
         return jsoncons::jsonpath::plus(rhs.unary_minus(),value_);
     }
 
-    basic_json<CharT,Alloc> minus(const basic_json<CharT,Alloc>& rhs) const override
+    JsonT minus(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::minus(value_,rhs);
     }
 
-    basic_json<CharT,Alloc> unary_minus() const override
+    JsonT unary_minus() const override
     {
         return jsoncons::jsonpath::unary_minus(value_);
     }
 
-    basic_json<CharT,Alloc> plus(const term<CharT,Alloc>& rhs) const override
+    JsonT plus(const term<JsonT>& rhs) const override
     {
         return rhs.plus(value_);
     }
 
-    basic_json<CharT,Alloc> plus(const basic_json<CharT,Alloc>& rhs) const override
+    JsonT plus(const JsonT& rhs) const override
     {
         return jsoncons::jsonpath::plus(value_,rhs);
     }
 };
 
-template<typename CharT, class Alloc>
-class regex_term : public term<CharT,Alloc>
+template <class JsonT>
+class regex_term : public term<JsonT>
 {
-    std::basic_string<CharT> pattern_;
+    string_type pattern_;
     std::regex::flag_type flags_;
 public:
-    regex_term(const std::basic_string<CharT>& pattern, std::regex::flag_type flags)
+    regex_term(const string_type& pattern, std::regex::flag_type flags)
         : pattern_(pattern), flags_(flags)
     {
     }
 
-    bool regex2(const std::basic_string<CharT>& subject) const override
+    bool regex2(const string_type& subject) const override
     {
-		std::basic_regex<CharT> pattern(pattern_,
+		std::basic_regex<char_type> pattern(pattern_,
                                        flags_);
         return std::regex_match(subject, pattern);
     }
 };
 
-template<typename CharT, class Alloc>
-class path_term : public term<CharT,Alloc>
+template <class JsonT>
+class path_term : public term<JsonT>
 {
-    std::basic_string<CharT> path_;
-    basic_json<CharT,Alloc> nodes_;
+    string_type path_;
+    JsonT nodes_;
 public:
-    path_term(const std::basic_string<CharT>& path)
+    path_term(const string_type& path)
         : path_(path)
     {
     }
 
-    void initialize(const basic_json<CharT,Alloc>& context_node) override
+    void initialize(const JsonT& context_node) override
     {
-        jsonpath_evaluator<CharT,Alloc> evaluator;
+        jsonpath_evaluator<JsonT> evaluator;
         evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_values();
     }
@@ -465,7 +468,7 @@ public:
         return nodes_.size() != 0;
     }
 
-    basic_json<CharT,Alloc> evaluate_single_node() const override
+    JsonT evaluate_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
@@ -475,7 +478,7 @@ public:
         return nodes_.size() == 0;
     }
 
-    bool eq(const term<CharT,Alloc>& rhs) const override
+    bool eq(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -489,7 +492,7 @@ public:
         return result;
     }
 
-    bool eq(const basic_json<CharT,Alloc>& rhs) const override
+    bool eq(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -503,7 +506,7 @@ public:
         return result;
     }
 
-    bool ne(const term<CharT,Alloc>& rhs) const override
+    bool ne(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -517,7 +520,7 @@ public:
         return result;
 
     }
-    bool ne(const basic_json<CharT,Alloc>& rhs) const override
+    bool ne(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -530,7 +533,7 @@ public:
         }
         return result;
     }
-    bool regex(const term<CharT,Alloc>& rhs) const override
+    bool regex(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -543,7 +546,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const term<CharT,Alloc>& rhs) const override
+    bool ampamp(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -556,7 +559,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const basic_json<CharT,Alloc>& rhs) const override
+    bool ampamp(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -569,7 +572,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const term<CharT,Alloc>& rhs) const override
+    bool pipepipe(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -582,7 +585,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const basic_json<CharT,Alloc>& rhs) const override
+    bool pipepipe(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -596,7 +599,7 @@ public:
         return result;
     }
 
-    bool lt(const basic_json<CharT,Alloc>& rhs) const override
+    bool lt(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -610,7 +613,7 @@ public:
         return result;
     }
 
-    bool lt(const term<CharT,Alloc>& rhs) const override
+    bool lt(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -624,7 +627,7 @@ public:
         return result;
     }
 
-    bool gt(const basic_json<CharT,Alloc>& rhs) const override
+    bool gt(const JsonT& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -638,7 +641,7 @@ public:
         return result;
     }
 
-    bool gt(const term<CharT,Alloc>& rhs) const override
+    bool gt(const term<JsonT>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -652,55 +655,58 @@ public:
         return result;
     }
 
-    basic_json<CharT,Alloc> minus(const basic_json<CharT,Alloc>& rhs) const override
+    JsonT minus(const JsonT& rhs) const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : jsoncons::null_type();
     }
 
-    basic_json<CharT,Alloc> minus(const term<CharT,Alloc>& rhs) const override
+    JsonT minus(const term<JsonT>& rhs) const override
     {
 
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(rhs.unary_minus(),nodes_[0]) : jsoncons::null_type();
     }
 
-    basic_json<CharT,Alloc> unary_minus() const override
+    JsonT unary_minus() const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::unary_minus(nodes_[0]) : jsoncons::null_type();
     }
 
-    basic_json<CharT,Alloc> plus(const basic_json<CharT,Alloc>& rhs) const override
+    JsonT plus(const JsonT& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
-    basic_json<CharT,Alloc> plus(const term<CharT,Alloc>& rhs) const override
+    JsonT plus(const term<JsonT>& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
 };
 
-template<typename CharT, class Alloc>
+template <class JsonT>
 class jsonpath_filter_parser
 {
+    typedef typename JsonT::string_type string_type;
+    typedef typename JsonT::char_type char_type;
+
     size_t& line_;
     size_t& column_;
     filter_states::states_t state_;
-    std::basic_string<CharT> buffer_;
-    std::vector<token<CharT,Alloc>> tokens_;
+    string_type buffer_;
+    std::vector<token<JsonT>> tokens_;
     int depth_;
-    const CharT* begin_input_;
-    const CharT* end_input_;
-    const CharT*& p_;
+    const char_type* begin_input_;
+    const char_type* end_input_;
+    const char_type*& p_;
     filter_states::states_t pre_line_break_state_;
 public:
-    jsonpath_filter_parser(const CharT** expr, size_t* line,size_t* column)
+    jsonpath_filter_parser(const char_type** expr, size_t* line,size_t* column)
         : p_(*expr), line_(*line), column_(*column)
     {
     }
 
-    bool exists(const basic_json<CharT,Alloc>& context_node)
+    bool exists(const JsonT& context_node)
     {
         for (auto it=tokens_.begin(); it != tokens_.end(); ++it)
         {
@@ -708,14 +714,14 @@ public:
         }
         bool result = false;
 
-        token_stream<CharT,Alloc> ts(tokens_);
+        token_stream<JsonT> ts(tokens_);
         auto e = expression(ts);
         result = e->accept_single_node();
 
         return result;
     }
 
-    basic_json<CharT,Alloc> eval(const basic_json<CharT,Alloc>& context_node)
+    JsonT eval(const JsonT& context_node)
     {
         try
         {
@@ -724,9 +730,9 @@ public:
                 it->initialize(context_node);
             }
        
-            token_stream<CharT,Alloc> ts(tokens_);
+            token_stream<JsonT> ts(tokens_);
             auto e = expression(ts);
-    		basic_json<CharT, Alloc> result = e->evaluate_single_node();
+    		JsonT result = e->evaluate_single_node();
 
             return result;
         }
@@ -736,7 +742,7 @@ public:
         }
     }
 
-    std::shared_ptr<term<CharT,Alloc>> primary(token_stream<CharT,Alloc>& ts)
+    std::shared_ptr<term<JsonT>> primary(token_stream<JsonT>& ts)
     {
         auto t = ts.get();
 
@@ -756,14 +762,14 @@ public:
             return t.term();
         case token_types::exclaim:
 		{
-			basic_json<CharT,Alloc> val = primary(ts)->exclaim();
-			auto expr = std::make_shared<value_term<CharT, Alloc>>(val);
+			JsonT val = primary(ts)->exclaim();
+			auto expr = std::make_shared<value_term<JsonT>>(val);
             return expr;
 		}
         case token_types::minus:
         {
-            basic_json<CharT,Alloc> val = primary(ts)->unary_minus();
-            auto expr = std::make_shared<value_term<CharT, Alloc>>(val);
+            JsonT val = primary(ts)->unary_minus();
+            auto expr = std::make_shared<value_term<JsonT>>(val);
             return expr;
         }
         default:
@@ -771,7 +777,7 @@ public:
         }
     }
 
-    std::shared_ptr<term<CharT,Alloc>> expression(token_stream<CharT,Alloc>& ts)
+    std::shared_ptr<term<JsonT>> expression(token_stream<JsonT>& ts)
     {
         auto left = term(ts);
         auto t = ts.get();
@@ -781,15 +787,15 @@ public:
             {
             case token_types::plus:
 			{
-				basic_json<CharT, Alloc> val = left->plus(*(term(ts)));
-				left = std::make_shared<value_term<CharT, Alloc>>(val);
+				JsonT val = left->plus(*(term(ts)));
+				left = std::make_shared<value_term<JsonT>>(val);
 				t = ts.get();
 			}
                 break;
             case token_types::minus:
 			{
-				basic_json<CharT, Alloc> val = left->minus(*(term(ts)));
-				left = std::make_shared<value_term<CharT, Alloc>>(val);
+				JsonT val = left->minus(*(term(ts)));
+				left = std::make_shared<value_term<JsonT>>(val);
 				t = ts.get();
 			}
                 break;
@@ -801,7 +807,7 @@ public:
         return left;
     }
 
-    std::shared_ptr<term<CharT,Alloc>> term(token_stream<CharT,Alloc>& ts)
+    std::shared_ptr<term<JsonT>> term(token_stream<JsonT>& ts)
     {
         auto left = primary(ts);
         auto t = ts.get();
@@ -812,72 +818,72 @@ public:
             case token_types::eq:
             {
                 bool e = left->eq(*(primary(ts)));
-                basic_json<CharT, Alloc> val(e);
-                left = std::make_shared<value_term<CharT, Alloc>>(val);
+                JsonT val(e);
+                left = std::make_shared<value_term<JsonT>>(val);
                 t = ts.get();
             }
                 break;
             case token_types::ne:
 			{
 				bool e = left->ne(*(primary(ts)));
-				basic_json<CharT, Alloc> val(e);
-				left = std::make_shared<value_term<CharT, Alloc>>(val);
+				JsonT val(e);
+				left = std::make_shared<value_term<JsonT>>(val);
                 t = ts.get();
 			}
                 break;
             case token_types::regex:
                 {
                     bool e = left->regex(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::ampamp:
                 {
                     bool e = left->ampamp(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::pipepipe:
                 {
                     bool e = left->pipepipe(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::lt:
                 {
                     bool e = left->lt(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::gt:
                 {
                     bool e = left->gt(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::lte:
                 {
                     bool e = left->lt(*(primary(ts))) || left->eq(*(primary(ts)));
-                    basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+                    JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::gte:
                 {
 					bool e = left->gt(*(primary(ts))) || left->eq(*(primary(ts)));
-					basic_json<CharT, Alloc> val(e);
-                    left = std::make_shared<value_term<CharT, Alloc>>(val);
+					JsonT val(e);
+                    left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
                 break;
@@ -888,12 +894,12 @@ public:
         }
     }
 
-    void parse(const CharT* expr, size_t length)
+    void parse(const char_type* expr, size_t length)
     {
         parse(expr,expr+length);
     }
 
-    void parse(const CharT* expr, const CharT* end_expr)
+    void parse(const char_type* expr, const char_type* end_expr)
     {
         p_ = expr;
         end_input_ = end_expr;
@@ -939,10 +945,10 @@ public:
                 case '(':
                     state_ = filter_states::expect_path_or_value;
                     ++depth_;
-                    tokens_.push_back(token<CharT,Alloc>(token_types::left_paren));
+                    tokens_.push_back(token<JsonT>(token_types::left_paren));
                     break;
                 case ')':
-                    tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                    tokens_.push_back(token<JsonT>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -981,12 +987,12 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::ne));
+                        tokens_.push_back(token<JsonT>(token_types::ne));
                     }
         		    else
         		    {
         		    	state_ = filter_states::expect_path_or_value;
-        		    	tokens_.push_back(token<CharT, Alloc>(token_types::exclaim));
+        		    	tokens_.push_back(token<JsonT>(token_types::exclaim));
         		    }
                     break;
                 case '&':
@@ -995,7 +1001,7 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::ampamp));
+                        tokens_.push_back(token<JsonT>(token_types::ampamp));
                     }
                     break;
                 case '|':
@@ -1004,7 +1010,7 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::pipepipe));
+                        tokens_.push_back(token<JsonT>(token_types::pipepipe));
                     }
                     break;
                 case '=':
@@ -1013,14 +1019,14 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::eq));
+                        tokens_.push_back(token<JsonT>(token_types::eq));
                     }
                     else if (p_+1  < end_input_ && *(p_+1) == '~')
                     {
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_regex;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::regex));
+                        tokens_.push_back(token<JsonT>(token_types::regex));
                     }
                     break;
                 case '>':
@@ -1029,12 +1035,12 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::gte));
+                        tokens_.push_back(token<JsonT>(token_types::gte));
                     }
                     else
                     {
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::gt));
+                        tokens_.push_back(token<JsonT>(token_types::gt));
                     }
                     break;
                 case '<':
@@ -1043,21 +1049,21 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::lte));
+                        tokens_.push_back(token<JsonT>(token_types::lte));
                     }
                     else
                     {
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<CharT,Alloc>(token_types::lt));
+                        tokens_.push_back(token<JsonT>(token_types::lt));
                     }
                     break;
                 case '+':
                     state_ = filter_states::expect_path_or_value;
-                    tokens_.push_back(token<CharT,Alloc>(token_types::plus));
+                    tokens_.push_back(token<JsonT>(token_types::plus));
                     break;
                 case '-':
                     state_ = filter_states::expect_path_or_value;
-                    tokens_.push_back(token<CharT,Alloc>(token_types::minus));
+                    tokens_.push_back(token<JsonT>(token_types::minus));
                     break;
                 case ' ':case '\t':
                     break;
@@ -1106,8 +1112,8 @@ public:
                             {
                                 try
                                 {
-                                    auto val = basic_json<CharT, Alloc>::parse(buffer_);
-                                    tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<value_term<CharT, Alloc>>(val)));
+                                    auto val = JsonT::parse(buffer_);
+                                    tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
                                 }
                                 catch (const parse_exception& e)
                                 {
@@ -1123,8 +1129,8 @@ public:
                         {
                             try
                             {
-                                auto val = basic_json<CharT,Alloc>::parse(buffer_);
-                                tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<value_term<CharT, Alloc>>(val)));
+                                auto val = JsonT::parse(buffer_);
+                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1132,7 +1138,7 @@ public:
                             }
                             buffer_.clear();
                         }
-                        tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                        tokens_.push_back(token<JsonT>(token_types::right_paren));
 						if (--depth_ == 0)
 						{
                             state_ = filter_states::start;
@@ -1150,8 +1156,8 @@ public:
 						{
                             try
                             {
-                                auto val = basic_json<CharT,Alloc>::parse(buffer_);
-                                tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<value_term<CharT, Alloc>>(val)));
+                                auto val = JsonT::parse(buffer_);
+                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1209,8 +1215,8 @@ public:
                         {
                             try
                             {
-                                auto val = basic_json<CharT,Alloc>::parse(buffer_);
-                                tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<value_term<CharT, Alloc>>(val)));
+                                auto val = JsonT::parse(buffer_);
+                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1268,8 +1274,8 @@ public:
                         {
                             try
                             {
-                                auto val = basic_json<CharT,Alloc>::parse(buffer_);
-                                tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<value_term<CharT, Alloc>>(val)));
+                                auto val = JsonT::parse(buffer_);
+                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1346,12 +1352,12 @@ public:
                     break;
                 case '(':
                     ++depth_;
-                    tokens_.push_back(token<CharT,Alloc>(token_types::left_paren));
+                    tokens_.push_back(token<JsonT>(token_types::left_paren));
                     ++p_;
                     ++column_;
                     break;
                 case ')':
-                    tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                    tokens_.push_back(token<JsonT>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1392,7 +1398,7 @@ public:
                 case ' ':case '\t':
                     break;
                 case ')':
-                    tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                    tokens_.push_back(token<JsonT>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1443,7 +1449,7 @@ public:
                 case ' ':case '\t':
                     break;
                 case ')':
-                    tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                    tokens_.push_back(token<JsonT>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1495,7 +1501,7 @@ public:
                     {
                         if (buffer_.length() > 0)
                         {
-                            tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<path_term<CharT,Alloc>>(buffer_)));
+                            tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<path_term<JsonT>>(buffer_)));
                             buffer_.clear();
                         }
                         state_ = filter_states::oper;
@@ -1505,8 +1511,8 @@ public:
                 case ')':
                     if (buffer_.length() > 0)
                     {
-                        tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<path_term<CharT,Alloc>>(buffer_)));
-                        tokens_.push_back(token<CharT,Alloc>(token_types::right_paren));
+                        tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<path_term<JsonT>>(buffer_)));
+                        tokens_.push_back(token<JsonT>(token_types::right_paren));
                         buffer_.clear();
                     }
                     if (--depth_ == 0)
@@ -1597,7 +1603,7 @@ public:
                                 ++column_;
                                 flags |= std::regex_constants::icase;
                             }
-                            tokens_.push_back(token<CharT,Alloc>(token_types::term,std::make_shared<regex_term<CharT, Alloc>>(buffer_,flags)));
+                            tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<regex_term<JsonT>>(buffer_,flags)));
                             buffer_.clear();
                         }
                         state_ = filter_states::expect_path_or_value;

@@ -26,66 +26,70 @@
 
 namespace jsoncons {
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, std::basic_string<CharT>>
+template<class JsonT>
+class json_type_traits<JsonT, typename JsonT::string_type>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    typedef typename JsonT::string_type string_type;
+
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_string();
     }
-    static std::basic_string<CharT> as(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static string_type as(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.as_string();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, const std::basic_string<CharT>& rhs)
+    static void assign(JsonT& lhs, const string_type& rhs)
     {
         lhs.assign_string(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::any>
+template<class JsonT>
+class json_type_traits<JsonT, typename JsonT::any>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& lhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& lhs) JSONCONS_NOEXCEPT
     {
         return lhs.is_any();
     }
-    static typename basic_json<CharT, Alloc>::any as(const basic_json<CharT, Alloc>& rhs)
+    static typename JsonT::any as(const JsonT& rhs)
     {
         return rhs.any_value();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, typename basic_json<CharT, Alloc>::any rhs)
+    static void assign(JsonT& lhs, typename JsonT::any rhs)
     {
         lhs.assign_any(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, typename type_wrapper<CharT>::const_pointer_type>
+template<class JsonT>
+class json_type_traits<JsonT, typename type_wrapper<typename JsonT::char_type>::const_pointer_type>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    typedef typename JsonT::char_type char_type;
+
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_string();
     }
-    static const CharT* as(const basic_json<CharT, Alloc>& rhs)
+    static const char_type* as(const JsonT& rhs)
     {
         return rhs.as_cstring();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, const CharT *rhs)
+    static void assign(JsonT& lhs, const char_type *rhs)
     {
-        size_t length = std::char_traits<CharT>::length(rhs);
+        size_t length = std::char_traits<char_type>::length(rhs);
         lhs.assign_string(rhs,length);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, char>
+template<class JsonT>
+class json_type_traits<JsonT, char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -100,21 +104,21 @@ public:
             return false;
         }
     }
-    static char as(const basic_json<CharT, Alloc>& rhs)
+    static char as(const JsonT& rhs)
     {
         return static_cast<char>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, char ch)
+    static void assign(JsonT& lhs, char ch)
     {
         lhs.assign_integer(ch);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, unsigned char>
+template<class JsonT>
+class json_type_traits<JsonT, unsigned char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -129,21 +133,21 @@ public:
             return false;
         }
     }
-    static unsigned char as(const basic_json<CharT, Alloc>& rhs)
+    static unsigned char as(const JsonT& rhs)
     {
         return static_cast<unsigned char>(rhs.as_uinteger());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, unsigned char ch)
+    static void assign(JsonT& lhs, unsigned char ch)
     {
         lhs.assign_uinteger(ch);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, signed char>
+template<class JsonT>
+class json_type_traits<JsonT, signed char>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -158,21 +162,21 @@ public:
             return false;
         }
     }
-    static signed char as(const basic_json<CharT, Alloc>& rhs)
+    static signed char as(const JsonT& rhs)
     {
         return static_cast<signed char>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, signed char ch)
+    static void assign(JsonT& lhs, signed char ch)
     {
         lhs.assign_integer(ch);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, wchar_t>
+template<class JsonT>
+class json_type_traits<JsonT, wchar_t>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -187,96 +191,96 @@ public:
             return false;
         }
     }
-    static wchar_t as(const basic_json<CharT, Alloc>& rhs)
+    static wchar_t as(const JsonT& rhs)
     {
         return static_cast<wchar_t>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, wchar_t ch)
+    static void assign(JsonT& lhs, wchar_t ch)
     {
         lhs.assign_integer(ch);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::object>
+template<class JsonT>
+class json_type_traits<JsonT, typename JsonT::object>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_object();
     }
-    static typename basic_json<CharT, Alloc>::object as(basic_json<CharT, Alloc> rhs)
+    static typename JsonT::object as(JsonT rhs)
     {
 		JSONCONS_ASSERT(rhs.is_object());
 		return rhs.object_value();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, typename basic_json<CharT, Alloc>::object rhs)
+    static void assign(JsonT& lhs, typename JsonT::object rhs)
     {
         lhs.assign_object(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, typename basic_json<CharT, Alloc>::array>
+template<class JsonT>
+class json_type_traits<JsonT, typename JsonT::array>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_array();
     }
-    static typename basic_json<CharT, Alloc>::array as(const basic_json<CharT, Alloc>& rhs)
+    static typename JsonT::array as(const JsonT& rhs)
     {
 		JSONCONS_ASSERT(rhs.is_array());
         return rhs.array_value();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, typename basic_json<CharT, Alloc>::array rhs)
+    static void assign(JsonT& lhs, typename JsonT::array rhs)
     {
         lhs.assign_array(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, jsoncons::null_type>
+template<class JsonT>
+class json_type_traits<JsonT, jsoncons::null_type>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_null();
     }
-    static typename jsoncons::null_type as(const basic_json<CharT, Alloc>& rhs)
+    static typename jsoncons::null_type as(const JsonT& rhs)
     {
         JSONCONS_ASSERT(rhs.is_null());
         return jsoncons::null_type();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, null_type)
+    static void assign(JsonT& lhs, null_type)
     {
         lhs.assign_null();
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, bool>
+template<class JsonT>
+class json_type_traits<JsonT, bool>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
     }
-    static bool as(const basic_json<CharT, Alloc>& rhs)
+    static bool as(const JsonT& rhs)
     {
         return rhs.as_bool();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, bool rhs)
+    static void assign(JsonT& lhs, bool rhs)
     {
         lhs.assign_bool(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, short>
+template<class JsonT>
+class json_type_traits<JsonT, short>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -291,21 +295,21 @@ public:
             return false;
         }
     }
-    static short as(const basic_json<CharT, Alloc>& rhs)
+    static short as(const JsonT& rhs)
     {
         return static_cast<short>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, short rhs)
+    static void assign(JsonT& lhs, short rhs)
     {
         lhs.assign_integer(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, unsigned short>
+template<class JsonT>
+class json_type_traits<JsonT, unsigned short>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -320,21 +324,21 @@ public:
             return false;
         }
     }
-    static unsigned short as(const basic_json<CharT, Alloc>& rhs)
+    static unsigned short as(const JsonT& rhs)
     {
         return (unsigned short)rhs.as_uinteger();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, unsigned short rhs)
+    static void assign(JsonT& lhs, unsigned short rhs)
     {
         lhs.assign_uinteger(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, int>
+template<class JsonT>
+class json_type_traits<JsonT, int>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -349,21 +353,21 @@ public:
             return false;
         }
     }
-    static int as(const basic_json<CharT, Alloc>& rhs)
+    static int as(const JsonT& rhs)
     {
         return static_cast<int>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, int rhs)
+    static void assign(JsonT& lhs, int rhs)
     {
         lhs.assign_integer(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, unsigned int>
+template<class JsonT>
+class json_type_traits<JsonT, unsigned int>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -378,21 +382,21 @@ public:
             return false;
         }
     }
-    static unsigned int as(const basic_json<CharT, Alloc>& rhs)
+    static unsigned int as(const JsonT& rhs)
     {
         return static_cast<unsigned int>(rhs.as_uinteger());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, unsigned int rhs)
+    static void assign(JsonT& lhs, unsigned int rhs)
     {
         lhs.assign_uinteger(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, long>
+template<class JsonT>
+class json_type_traits<JsonT, long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -407,21 +411,21 @@ public:
             return false;
         }
     }
-    static long as(const basic_json<CharT, Alloc>& rhs)
+    static long as(const JsonT& rhs)
     {
         return static_cast<long>(rhs.as_integer());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, long rhs)
+    static void assign(JsonT& lhs, long rhs)
     {
         lhs.assign_integer(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, unsigned long>
+template<class JsonT>
+class json_type_traits<JsonT, unsigned long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -436,21 +440,21 @@ public:
             return false;
         }
     }
-    static unsigned long as(const basic_json<CharT, Alloc>& rhs)
+    static unsigned long as(const JsonT& rhs)
     {
         return static_cast<unsigned long>(rhs.as_uinteger());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, unsigned long rhs)
+    static void assign(JsonT& lhs, unsigned long rhs)
     {
         lhs.assign_uinteger(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, long long>
+template<class JsonT>
+class json_type_traits<JsonT, long long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -465,21 +469,21 @@ public:
             return false;
         }
     }
-    static long long as(const basic_json<CharT, Alloc>& rhs)
+    static long long as(const JsonT& rhs)
     {
         return rhs.as_integer();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, long long rhs)
+    static void assign(JsonT& lhs, long long rhs)
     {
         lhs.assign_integer(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, unsigned long long>
+template<class JsonT>
+class json_type_traits<JsonT, unsigned long long>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
@@ -494,58 +498,58 @@ public:
             return false;
         }
     }
-    static unsigned long long as(const basic_json<CharT, Alloc>& rhs)
+    static unsigned long long as(const JsonT& rhs)
     {
         return rhs.as_uinteger();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, unsigned long long rhs)
+    static void assign(JsonT& lhs, unsigned long long rhs)
     {
         lhs.assign_uinteger(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, double>
+template<class JsonT>
+class json_type_traits<JsonT, double>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
     }
 
-    static double as(const basic_json<CharT, Alloc>& rhs)
+    static double as(const JsonT& rhs)
     {
         return rhs.as_double();
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, double rhs)
+    static void assign(JsonT& lhs, double rhs)
     {
         lhs.assign_double(rhs);
     }
 };
 
-template<typename CharT, typename Alloc>
-class json_type_traits<CharT, Alloc, float>
+template<class JsonT>
+class json_type_traits<JsonT, float>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
     }
-    static double as(const basic_json<CharT, Alloc>& rhs)
+    static double as(const JsonT& rhs)
     {
         return static_cast<float>(rhs.as_double());
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, float rhs)
+    static void assign(JsonT& lhs, float rhs)
     {
         lhs.assign_double(static_cast<double>(rhs));
     }
 };
 
-template<typename CharT, typename Alloc, typename T>
-class json_type_traits<CharT, Alloc, std::vector<T>>
+template<class JsonT, typename T>
+class json_type_traits<JsonT, std::vector<T>>
 {
 public:
-    static bool is(const basic_json<CharT, Alloc>& rhs) JSONCONS_NOEXCEPT
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_array();
         for (size_t i = 0; result && i < rhs.size(); ++i)
@@ -557,7 +561,7 @@ public:
         }
         return result;
     }
-    static std::vector<T> as(const basic_json<CharT, Alloc>& rhs)
+    static std::vector<T> as(const JsonT& rhs)
     {
         std::vector<T> v(rhs.size());
         for (size_t i = 0; i < v.size(); ++i)
@@ -566,9 +570,9 @@ public:
         }
         return v;
     }
-    static void assign(basic_json<CharT, Alloc>& lhs, const std::vector<T>& rhs)
+    static void assign(JsonT& lhs, const std::vector<T>& rhs)
     {
-        lhs = basic_json<CharT, Alloc>(rhs.begin(), rhs.end());
+        lhs = JsonT(rhs.begin(), rhs.end());
     }
 };
 

@@ -369,17 +369,17 @@ void serialize(basic_json_output_handler<CharT>& os, const T&)
     os.value(null_type());
 }
 
-template <typename CharT, class Alloc>
+template <typename StringT, class Alloc>
 class basic_json;
 
 template <typename CharT>
 class basic_parse_error_handler;
 
-template <typename CharT, typename Alloc, typename T>
+template <class JsonT, typename T>
 class json_type_traits
 {
 public:
-    static bool is(const basic_json<CharT,Alloc>&)
+    static bool is(const JsonT&)
     {
         return false;
     }
@@ -411,26 +411,27 @@ bool is_simple(value_types::value_types_t type)
     return type < value_types::string_t;
 }
 
-template <typename CharT, typename Alloc = std::allocator<CharT>>
+template <typename StringT, typename Alloc = std::allocator<CharT>>
 class basic_json
 {
 public:
 
     typedef Alloc allocator_type;
 
-    typedef CharT char_type;
+    typedef typename StringT::value_type char_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> name_allocator_type;
 #else
     typedef typename allocator_type:: template rebind<char_type>::other name_allocator_type;
 #endif
-    typedef std::basic_string<char_type,std::char_traits<char_type>,name_allocator_type> name_type;
-    typedef basic_json<CharT,Alloc> value_type;
-    typedef name_value_pair<name_type,value_type> member_type;
+    typedef std::basic_string<char_type,std::char_traits<char_type>,name_allocator_type> string_type;
+    typedef string_type name_type;
+    typedef basic_json<StringT,Alloc> value_type;
+    typedef name_value_pair<string_type,value_type> member_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<CharT,Alloc>> array_allocator_type;
+    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<StringT,Alloc>> array_allocator_type;
 #else
     typedef typename Alloc:: template rebind<value_type>::other array_allocator_type;
 #endif
@@ -441,9 +442,9 @@ public:
     typedef typename Alloc:: template rebind<member_type>::other object_allocator_type;
 #endif
 
-    typedef json_array<basic_json<CharT,Alloc>,array_allocator_type> array;
-    typedef json_object<name_type,basic_json<CharT,Alloc>,object_allocator_type>  object;
-    typedef serializable_any<CharT,Alloc> any;
+    typedef json_array<basic_json<StringT,Alloc>,array_allocator_type> array;
+    typedef json_object<string_type,basic_json<StringT,Alloc>,object_allocator_type>  object;
+    typedef serializable_any<char_type,Alloc> any;
 
     typedef jsoncons::null_type null_type;
 
@@ -467,7 +468,7 @@ public:
         }
 
     public:
-        friend class basic_json<CharT, Alloc>;
+        friend class basic_json<StringT, Alloc>;
 
         iterator begin()
         {
@@ -496,7 +497,7 @@ public:
             return *this;
         }
 
-        static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(CharT)) - 1;
+        static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
         variant(const Alloc& a)
             : Alloc(a), type_(value_types::empty_object_t)
@@ -556,7 +557,7 @@ public:
                 break;
             case value_types::small_string_t:
                 small_string_length_ = var.small_string_length_;
-                std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,var.value_.small_string_value_,var.small_string_length_*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
@@ -635,7 +636,7 @@ public:
             value_.uinteger_value_ = val;
         }
 
-        explicit variant(const Alloc& a, const std::basic_string<CharT>& s)
+        explicit variant(const Alloc& a, const string_type& s)
             : Alloc(a)
         {
             if (s.length() > variant::small_string_capacity)
@@ -647,30 +648,30 @@ public:
             {
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)s.length();
-                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
-        explicit variant(const Alloc& a, const CharT* s)
+        explicit variant(const Alloc& a, const char_type* s)
             : Alloc(a)
         {
-            size_t length = std::char_traits<CharT>::length(s);
+            size_t length = std::char_traits<char_type>::length(s);
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s,std::char_traits<CharT>::length(s),get_allocator());
+                value_.string_value_ = create_string_data(s,std::char_traits<char_type>::length(s),get_allocator());
             }
             else
             {
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)length;
-                std::memcpy(value_.small_string_value_,s,length*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,s,length*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
-        explicit variant(const Alloc& a, const CharT* s, size_t length)
+        explicit variant(const Alloc& a, const char_type* s, size_t length)
             : Alloc(a)
         {
             if (length > variant::small_string_capacity)
@@ -682,7 +683,7 @@ public:
             {
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)length;
-                std::memcpy(value_.small_string_value_,s,length*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,s,length*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
             }
         }
@@ -799,7 +800,7 @@ public:
 			}
 		}
 
-        void assign(const std::basic_string<CharT>& s)
+        void assign(const string_type& s)
         {
             destroy_variant();
             if (s.length() > variant::small_string_capacity)
@@ -811,12 +812,12 @@ public:
             {
                 type_ = value_types::small_string_t;
                 small_string_length_ = (unsigned char)s.length();
-                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(CharT));
+                std::memcpy(value_.small_string_value_,s.data(),s.length()*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
             }
         }
 
-        void assign_string(const CharT* s, size_t length)
+        void assign_string(const char_type* s, size_t length)
         {
             destroy_variant();
 			if (length > variant::small_string_capacity)
@@ -828,7 +829,7 @@ public:
 			{
 				type_ = value_types::small_string_t;
 				small_string_length_ = (unsigned char)length;
-				std::memcpy(value_.small_string_value_,s,length*sizeof(CharT));
+				std::memcpy(value_.small_string_value_,s,length*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
 			}
         }
@@ -933,7 +934,7 @@ public:
             case value_types::empty_object_t:
                 return true;
             case value_types::small_string_t:
-                return small_string_length_ == rhs.small_string_length_ ? std::char_traits<CharT>::compare(value_.small_string_value_,rhs.value_.small_string_value_,small_string_length_) == 0 : false;
+                return small_string_length_ == rhs.small_string_length_ ? std::char_traits<char_type>::compare(value_.small_string_value_,rhs.value_.small_string_value_,small_string_length_) == 0 : false;
             case value_types::string_t:
                 return *(value_.string_value_) == *(rhs.value_.string_value_);
             case value_types::array_t:
@@ -1032,8 +1033,8 @@ public:
             object* object_value_;
             array* array_value_;
             any* any_value_;
-            string_data<CharT>* string_value_;
-            CharT small_string_value_[sizeof(int64_t)/sizeof(CharT)];
+            string_data<char_type>* string_value_;
+            char_type small_string_value_[sizeof(int64_t)/sizeof(char_type)];
         } value_;
     };
 
@@ -1044,59 +1045,59 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        const std::basic_string<CharT>& name_;
+        const string_type& name_;
 
         json_proxy(); // noop
         json_proxy& operator = (const json_proxy& other); // noop
 
-        json_proxy(ParentT& parent, const name_type& name)
+        json_proxy(ParentT& parent, const string_type& name)
             : parent_(parent), name_(name)
         {
         }
 
-        basic_json<CharT,Alloc>& evaluate() 
+        basic_json<StringT,Alloc>& evaluate() 
         {
             return parent_.evaluate(name_);
         }
 
-        const basic_json<CharT,Alloc>& evaluate() const
+        const basic_json<StringT,Alloc>& evaluate() const
         {
             return parent_.evaluate(name_);
         }
 
-        basic_json<CharT,Alloc>& evaluate_with_default()
+        basic_json<StringT,Alloc>& evaluate_with_default()
         {
-            basic_json<CharT,Alloc>& val = parent_.evaluate_with_default();
+            basic_json<StringT,Alloc>& val = parent_.evaluate_with_default();
             auto it = val.find(name_);
             if (it == val.members().end())
             {
-                it = val.set(val.members().begin(),name_,basic_json<CharT,Alloc>());
+                it = val.set(val.members().begin(),name_,basic_json<StringT,Alloc>());
             }
             return it->value();
         }
 
-        basic_json<CharT,Alloc>& evaluate(size_t index)
+        basic_json<StringT,Alloc>& evaluate(size_t index)
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        const basic_json<CharT,Alloc>& evaluate(size_t index) const
+        const basic_json<StringT,Alloc>& evaluate(size_t index) const
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        basic_json<CharT,Alloc>& evaluate(const std::basic_string<CharT>& index)
+        basic_json<StringT,Alloc>& evaluate(const string_type& index)
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        const basic_json<CharT,Alloc>& evaluate(const std::basic_string<CharT>& index) const
+        const basic_json<StringT,Alloc>& evaluate(const string_type& index) const
         {
             return parent_.evaluate(name_).at(index);
         }
     public:
 
-        friend class basic_json<CharT,Alloc>;
+        friend class basic_json<StringT,Alloc>;
 
         object_range members()
         {
@@ -1128,7 +1129,7 @@ public:
             return evaluate().type();
         }
 
-        size_t count(const name_type& name) const
+        size_t count(const string_type& name) const
         {
             return evaluate().count(name);
         }
@@ -1214,12 +1215,12 @@ public:
             return evaluate().is_double();
         }
 
-        std::basic_string<CharT> as_string() const JSONCONS_NOEXCEPT
+        string_type as_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string();
         }
 
-        std::basic_string<CharT> as_string(const basic_output_format<CharT>& format) const
+        string_type as_string(const basic_output_format<char_type>& format) const
         {
             return evaluate().as_string(format);
         }
@@ -1324,68 +1325,68 @@ public:
             return evaluate() != val;
         }
 
-        basic_json<CharT,Alloc>& operator[](size_t i)
+        basic_json<StringT,Alloc>& operator[](size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const basic_json<CharT,Alloc>& operator[](size_t i) const
+        const basic_json<StringT,Alloc>& operator[](size_t i) const
         {
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const name_type& name)
+        json_proxy<proxy_type> operator[](const string_type& name)
         {
             return json_proxy<proxy_type>(*this,name);
         }
 
-        const json_proxy<proxy_type> operator[](const name_type& name) const
+        const json_proxy<proxy_type> operator[](const string_type& name) const
         {
             return json_proxy<proxy_type>(*this,name);
         }
 
-        basic_json<CharT,Alloc>& at(const name_type& name)
+        basic_json<StringT,Alloc>& at(const string_type& name)
         {
             return evaluate().at(name);
         }
 
-        const basic_json<CharT,Alloc>& at(const name_type& name) const
+        const basic_json<StringT,Alloc>& at(const string_type& name) const
         {
             return evaluate().at(name);
         }
 
-        const basic_json<CharT,Alloc>& at(size_t index)
+        const basic_json<StringT,Alloc>& at(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json<CharT,Alloc>& at(size_t index) const
+        const basic_json<StringT,Alloc>& at(size_t index) const
         {
             return evaluate().at(index);
         }
 
-        object_iterator find(const name_type& name)
+        object_iterator find(const string_type& name)
         {
             return evaluate().find(name);
         }
 
-        const_object_iterator find(const name_type& name) const
+        const_object_iterator find(const string_type& name) const
         {
             return evaluate().find(name);
         }
 
-        object_iterator find(const CharT* name)
+        object_iterator find(const char_type* name)
         {
             return evaluate().find(name);
         }
 
-        const_object_iterator find(const CharT* name) const
+        const_object_iterator find(const char_type* name) const
         {
             return evaluate().find(name);
         }
 
         template <typename T>
-        basic_json<CharT,Alloc> get(const name_type& name, T&& default_val) const
+        basic_json<StringT,Alloc> get(const string_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1412,110 +1413,110 @@ public:
             evaluate().erase(first, last);
         }
 
-        void erase(const name_type& name)
+        void erase(const string_type& name)
         {
             evaluate().erase(name);
         }
 
        // Remove a member from an object 
 
-        void set(const name_type& name, const basic_json<CharT,Alloc>& value)
+        void set(const string_type& name, const basic_json<StringT,Alloc>& value)
         {
             evaluate().set(name,value);
         }
 
-        void set(name_type&& name, const basic_json<CharT,Alloc>& value)
+        void set(string_type&& name, const basic_json<StringT,Alloc>& value)
 
         {
             evaluate().set(std::move(name),value);
         }
 
-        void set(const name_type& name, basic_json<CharT,Alloc>&& value)
+        void set(const string_type& name, basic_json<StringT,Alloc>&& value)
 
         {
             evaluate().set(name,std::move(value));
         }
 
-        void set(name_type&& name, basic_json<CharT,Alloc>&& value)
+        void set(string_type&& name, basic_json<StringT,Alloc>&& value)
 
         {
             evaluate().set(std::move(name),std::move(value));
         }
 
-        object_iterator set(object_iterator hint, const name_type& name, const basic_json<CharT,Alloc>& value)
+        object_iterator set(object_iterator hint, const string_type& name, const basic_json<StringT,Alloc>& value)
         {
             return evaluate().set(hint, name,value);
         }
 
-        object_iterator set(object_iterator hint, name_type&& name, const basic_json<CharT,Alloc>& value)
+        object_iterator set(object_iterator hint, string_type&& name, const basic_json<StringT,Alloc>& value)
 
         {
             return evaluate().set(hint, std::move(name),value);
         }
 
-        object_iterator set(object_iterator hint, const name_type& name, basic_json<CharT,Alloc>&& value)
+        object_iterator set(object_iterator hint, const string_type& name, basic_json<StringT,Alloc>&& value)
 
         {
             return evaluate().set(hint, name,std::move(value));
         }
 
-        object_iterator set(object_iterator hint, name_type&& name, basic_json<CharT,Alloc>&& value)
+        object_iterator set(object_iterator hint, string_type&& name, basic_json<StringT,Alloc>&& value)
 
         {
             return evaluate().set(hint, std::move(name),std::move(value));
         }
 
-        void add(basic_json<CharT,Alloc>&& value)
+        void add(basic_json<StringT,Alloc>&& value)
         {
             evaluate_with_default().add(std::move(value));
         }
 
-        void add(const basic_json<CharT,Alloc>& value)
+        void add(const basic_json<StringT,Alloc>& value)
         {
             evaluate_with_default().add(value);
         }
 
-        array_iterator add(const_array_iterator pos, const basic_json<CharT,Alloc>& value)
+        array_iterator add(const_array_iterator pos, const basic_json<StringT,Alloc>& value)
         {
             return evaluate_with_default().add(pos, value);
         }
 
-        array_iterator add(const_array_iterator pos, basic_json<CharT,Alloc>&& value)
+        array_iterator add(const_array_iterator pos, basic_json<StringT,Alloc>&& value)
         {
             return evaluate_with_default().add(pos, std::move(value));
         }
 
-        std::basic_string<CharT> to_string() const JSONCONS_NOEXCEPT
+        string_type to_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string();
         }
 
-        std::basic_string<CharT> to_string(const basic_output_format<CharT>& format) const
+        string_type to_string(const basic_output_format<char_type>& format) const
         {
             return evaluate().to_string(format);
         }
 
-        void to_stream(std::basic_ostream<CharT>& os) const
+        void to_stream(std::basic_ostream<char_type>& os) const
         {
             evaluate().to_stream(os);
         }
 
-        void to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format) const
+        void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
         {
             evaluate().to_stream(os,format);
         }
 
-        void to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting) const
+        void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
         {
             evaluate().to_stream(os,format,indenting);
         }
 
-        void swap(basic_json<CharT,Alloc>& val)
+        void swap(basic_json<StringT,Alloc>& val)
         {
             evaluate_with_default().swap(val);
         }
 
-        friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const json_proxy& o)
+        friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_proxy& o)
         {
             o.to_stream(os);
             return os;
@@ -1574,7 +1575,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const basic_json<CharT,Alloc>& get(const name_type& name) const
+        const basic_json<StringT,Alloc>& get(const string_type& name) const
         {
             return evaluate().get(name);
         }
@@ -1614,17 +1615,17 @@ public:
             return evaluate().as_longlong();
         }
 
-        void add(size_t index, const basic_json<CharT,Alloc>& value)
+        void add(size_t index, const basic_json<StringT,Alloc>& value)
         {
             evaluate_with_default().add(index, value);
         }
 
-        void add(size_t index, basic_json<CharT,Alloc>&& value)
+        void add(size_t index, basic_json<StringT,Alloc>&& value)
         {
             evaluate_with_default().add(index, std::move(value));
         }
 
-        bool has_member(const name_type& name) const
+        bool has_member(const string_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -1635,11 +1636,11 @@ public:
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
-        void remove(const name_type& name)
+        void remove(const string_type& name)
         {
             evaluate().remove(name);
         }
-        void remove_member(const name_type& name)
+        void remove_member(const string_type& name)
         {
             evaluate().remove(name);
         }
@@ -1654,33 +1655,59 @@ public:
 #endif
     };
 
-    static basic_json parse_stream(std::basic_istream<CharT>& is);
-    static basic_json parse_stream(std::basic_istream<CharT>& is, basic_parse_error_handler<CharT>& err_handler);
+    static basic_json parse_stream(std::basic_istream<char_type>& is);
+    static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
 
-    static basic_json parse(const std::basic_string<CharT>& s);
+    static basic_json parse(const string_type& s)
+    {
+        basic_json_deserializer<basic_json<StringT, Alloc>> handler;
+        basic_json_parser<char_type> parser(handler);
+        parser.begin_parse();
+        parser.parse(s.data(),0,s.length());
+        parser.end_parse();
+        parser.check_done(s.data(),parser.index(),s.length());
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
+        }
+        return handler.get_result();
+    }
 
-    static basic_json parse(const std::basic_string<CharT>& s, basic_parse_error_handler<CharT>& err_handler);
+    static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
+    {
+        basic_json_deserializer<basic_json<StringT, Alloc>> handler;
+        basic_json_parser<char_type> parser(handler,err_handler);
+        parser.begin_parse();
+        parser.parse(s.data(),0,s.length());
+        parser.end_parse();
+        parser.check_done(s.data(),parser.index(),s.length());
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
+        }
+        return handler.get_result();
+    }
 
     static basic_json parse_file(const std::string& s);
 
-    static basic_json parse_file(const std::string& s, basic_parse_error_handler<CharT>& err_handler);
+    static basic_json parse_file(const std::string& s, basic_parse_error_handler<char_type>& err_handler);
 
-    static basic_json<CharT,Alloc> make_array()
+    static basic_json<StringT,Alloc> make_array()
     {
-        return typename basic_json<CharT,Alloc>::array();
+        return typename basic_json<StringT,Alloc>::array();
     }
 
-    static basic_json<CharT,Alloc> make_array(size_t n)
+    static basic_json<StringT,Alloc> make_array(size_t n)
     {
-        basic_json<CharT,Alloc> val = make_array();
+        basic_json<StringT,Alloc> val = make_array();
         val.resize(n);
         return val;
     }
 
-    template <typename T>
-    static basic_json<CharT,Alloc> make_array(size_t n, T val)
+    template <typename U>
+    static basic_json<StringT,Alloc> make_array(size_t n, U val)
     {
-        basic_json<CharT,Alloc> a = make_array();
+        basic_json<StringT,Alloc> a = make_array();
         a.resize(n,val);
         return a;
     }
@@ -1688,38 +1715,38 @@ public:
     template<int size>
     static typename std::enable_if<size==1,basic_json>::type make_array()
     {
-        return build_array<CharT,Alloc,size>()();
+        return build_array<StringT,Alloc,size>()();
     }
 
     template<size_t size>
     static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
     {
-        return build_array<CharT,Alloc,size>()(n);
+        return build_array<StringT,Alloc,size>()(n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==1,basic_json>::type make_array(size_t n, T val)
     {
-        return build_array<CharT,Alloc,size>()(n, val);
+        return build_array<StringT,Alloc,size>()(n, val);
     }
     template<size_t size>
     static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n)
     {
-        return build_array<CharT,Alloc,size>()(m, n);
+        return build_array<StringT,Alloc,size>()(m, n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n, T val)
     {
-        return build_array<CharT,Alloc,size>()(m, n, val);
+        return build_array<StringT,Alloc,size>()(m, n, val);
     }
     template<size_t size>
     static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k)
     {
-        return build_array<CharT,Alloc,size>()(m, n, k);
+        return build_array<StringT,Alloc,size>()(m, n, k);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k, T val)
     {
-        return build_array<CharT,Alloc,size>()(m, n, k, val);
+        return build_array<StringT,Alloc,size>()(m, n, k, val);
     }
 
     variant var_;
@@ -1729,22 +1756,22 @@ public:
     {
     }
 
-    basic_json(const basic_json<CharT, Alloc>& val)
+    basic_json(const basic_json<StringT, Alloc>& val)
         : var_(val.var_)
     {
     }
 
-    basic_json(const basic_json<CharT, Alloc>& val, const Alloc& allocator)
+    basic_json(const basic_json<StringT, Alloc>& val, const Alloc& allocator)
         : var_(allocator, val.var_)
     {
     }
 
-    basic_json(basic_json<CharT,Alloc>&& other)
+    basic_json(basic_json<StringT,Alloc>&& other)
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(basic_json<CharT,Alloc>&& other, const Alloc& allocator)
+    basic_json(basic_json<StringT,Alloc>&& other, const Alloc& allocator)
         : var_(allocator, std::move(other.var_))
     {
     }
@@ -1774,10 +1801,10 @@ public:
     basic_json(T val, const Alloc& allocator = Alloc())
         : var_(allocator)
     {
-        json_type_traits<CharT,Alloc,T>::assign(*this,val);
+        json_type_traits<value_type,T>::assign(*this,val);
     }
 
-    basic_json(const CharT *s, size_t length, const Alloc& allocator = Alloc())
+    basic_json(const char_type *s, size_t length, const Alloc& allocator = Alloc())
         : var_(allocator, s, length)
     {
     }
@@ -1791,13 +1818,13 @@ public:
     {
     }
 
-    basic_json& operator=(const basic_json<CharT,Alloc>& rhs)
+    basic_json& operator=(const basic_json<StringT,Alloc>& rhs)
     {
         var_ = rhs.var_;
         return *this;
     }
 
-    basic_json& operator=(basic_json<CharT,Alloc>&& rhs)
+    basic_json& operator=(basic_json<StringT,Alloc>&& rhs)
     {
         if (this != &rhs)
         {
@@ -1807,15 +1834,15 @@ public:
     }
 
     template <class T>
-    basic_json<CharT, Alloc>& operator=(T val)
+    basic_json<StringT, Alloc>& operator=(T val)
     {
-        json_type_traits<CharT,Alloc,T>::assign(*this,val);
+        json_type_traits<value_type,T>::assign(*this,val);
         return *this;
     }
 
-    bool operator!=(const basic_json<CharT,Alloc>& rhs) const;
+    bool operator!=(const basic_json<StringT,Alloc>& rhs) const;
 
-    bool operator==(const basic_json<CharT,Alloc>& rhs) const;
+    bool operator==(const basic_json<StringT,Alloc>& rhs) const;
 
     size_t size() const JSONCONS_NOEXCEPT
     {
@@ -1832,23 +1859,23 @@ public:
         }
     }
 
-    basic_json<CharT,Alloc>& operator[](size_t i)
+    basic_json<StringT,Alloc>& operator[](size_t i)
     {
         return at(i);
     }
 
-    const basic_json<CharT,Alloc>& operator[](size_t i) const
+    const basic_json<StringT,Alloc>& operator[](size_t i) const
     {
         return at(i);
     }
 
-    json_proxy<basic_json<CharT, Alloc>> operator[](const name_type& name)
+    json_proxy<basic_json<StringT, Alloc>> operator[](const string_type& name)
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
         case value_types::object_t:
-            return json_proxy<basic_json<CharT,Alloc>>(*this, name);
+            return json_proxy<basic_json<StringT,Alloc>>(*this, name);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -1856,35 +1883,115 @@ public:
         }
     }
 
-    const basic_json<CharT,Alloc>& operator[](const name_type& name) const
+    const basic_json<StringT,Alloc>& operator[](const string_type& name) const
     {
         return at(name);
     }
 
-    std::basic_string<CharT> to_string() const JSONCONS_NOEXCEPT
+    string_type to_string() const JSONCONS_NOEXCEPT
     {
-        std::basic_ostringstream<CharT> os;
+        std::basic_ostringstream<char_type> os;
         {
-            basic_json_serializer<CharT> serializer(os);
+            basic_json_serializer<char_type> serializer(os);
             to_stream(serializer);
         }
         return os.str();
     }
 
-    std::basic_string<CharT> to_string(const basic_output_format<CharT>& format) const;
+    string_type to_string(const basic_output_format<char_type>& format) const
+    {
+        std::basic_ostringstream<char_type> os;
+        {
+            basic_json_serializer<char_type> serializer(os, format);
+            to_stream(serializer);
+        }
+        return os.str();
+    }
 
-    void to_stream(std::basic_ostream<CharT>& os) const;
+    void to_stream(basic_json_output_handler<char_type>& handler) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            handler.value(var_.value_.small_string_value_,var_.small_string_length_);
+            break;
+        case value_types::string_t:
+            handler.value(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            break;
+        case value_types::double_t:
+            handler.value(var_.value_.float_value_);
+            break;
+        case value_types::integer_t:
+            handler.value(var_.value_.integer_value_);
+            break;
+        case value_types::uinteger_t:
+            handler.value(var_.value_.uinteger_value_);
+            break;
+        case value_types::bool_t:
+            handler.value(var_.value_.bool_value_);
+            break;
+        case value_types::null_t:
+            handler.value(null_type());
+            break;
+        case value_types::empty_object_t:
+            handler.begin_object();
+            handler.end_object();
+            break;
+        case value_types::object_t:
+            {
+                handler.begin_object();
+                object* o = var_.value_.object_value_;
+                for (const_object_iterator it = o->begin(); it != o->end(); ++it)
+                {
+                    handler.name((it->name()).data(),it->name().length());
+                    it->value().to_stream(handler);
+                }
+                handler.end_object();
+            }
+            break;
+        case value_types::array_t:
+            {
+                handler.begin_array();
+                array *o = var_.value_.array_value_;
+                for (const_array_iterator it = o->begin(); it != o->end(); ++it)
+                {
+                    it->to_stream(handler);
+                }
+                handler.end_array();
+            }
+            break;
+        case value_types::any_t:
+            var_.value_.any_value_->to_stream(handler);
+            break;
+        default:
+            break;
+        }
+    }
 
-    void to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format) const;
+    void to_stream(std::basic_ostream<char_type>& os) const
+    {
+        basic_json_serializer<char_type> serializer(os);
+        to_stream(serializer);
+    }
 
-    void to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting) const;
+    void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+    {
+        basic_json_serializer<char_type> serializer(os, format);
+        to_stream(serializer);
+    }
+
+    void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+    {
+        basic_json_serializer<char_type> serializer(os, format, indenting);
+        to_stream(serializer);
+    }
 
     bool is_null() const JSONCONS_NOEXCEPT
     {
         return var_.is_null();
     }
 
-    size_t count(const name_type& name) const
+    size_t count(const string_type& name) const
     {
         switch (var_.type_)
         {
@@ -1912,7 +2019,7 @@ public:
     template<typename T>
     bool is() const
     {
-        return json_type_traits<CharT,Alloc,T>::is(*this);
+        return json_type_traits<value_type,T>::is(*this);
     }
 
     bool is_string() const JSONCONS_NOEXCEPT
@@ -2019,7 +2126,7 @@ public:
     template<typename T>
     T as() const
     {
-        return json_type_traits<CharT,Alloc,T>::as(*this);
+        return json_type_traits<value_type,T>::as(*this);
     }
 
     bool as_bool() const JSONCONS_NOEXCEPT
@@ -2103,39 +2210,50 @@ public:
         }
     }
 
-    std::basic_string<CharT> as_string() const JSONCONS_NOEXCEPT
+    string_type as_string() const JSONCONS_NOEXCEPT
     {
         switch (var_.type_)
         {
         case value_types::small_string_t:
-            return std::basic_string<CharT>(var_.value_.small_string_value_,var_.small_string_length_);
+            return string_type(var_.value_.small_string_value_,var_.small_string_length_);
         case value_types::string_t:
-            return std::basic_string<CharT>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            return string_type(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
         default:
             return to_string();
         }
     }
 
-    std::basic_string<CharT> as_string(const basic_output_format<CharT>& format) const 
+    string_type as_string(const basic_output_format<char_type>& format) const 
     {
         switch (var_.type_)
         {
         case value_types::small_string_t:
-            return std::basic_string<CharT>(var_.value_.small_string_value_,var_.small_string_length_);
+            return string_type(var_.value_.small_string_value_,var_.small_string_length_);
         case value_types::string_t:
-            return std::basic_string<CharT>(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            return string_type(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
         default:
             return to_string(format);
         }
     }
 
-    const CharT* as_cstring() const;
+    const char_type* as_cstring() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return var_.value_.small_string_value_;
+        case value_types::string_t:
+            return var_.value_.string_value_->c_str();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
+        }
+    }
 
     any& any_value();
 
     const any& any_value() const;
 
-    basic_json<CharT, Alloc>& at(const name_type& name)
+    basic_json<StringT, Alloc>& at(const string_type& name)
     {
         switch (var_.type_)
         {
@@ -2158,42 +2276,42 @@ public:
         }
     }
 
-    basic_json<CharT, Alloc>& evaluate() 
+    basic_json<StringT, Alloc>& evaluate() 
     {
         return *this;
     }
 
-    basic_json<CharT, Alloc>& evaluate_with_default() 
+    basic_json<StringT, Alloc>& evaluate_with_default() 
     {
         return *this;
     }
 
-    const basic_json<CharT, Alloc>& evaluate() const
+    const basic_json<StringT, Alloc>& evaluate() const
     {
         return *this;
     }
 
-    basic_json<CharT, Alloc>& evaluate(size_t i) 
+    basic_json<StringT, Alloc>& evaluate(size_t i) 
     {
         return at(i);
     }
 
-    const basic_json<CharT, Alloc>& evaluate(size_t i) const
+    const basic_json<StringT, Alloc>& evaluate(size_t i) const
     {
         return at(i);
     }
 
-    basic_json<CharT, Alloc>& evaluate(const name_type& name) 
+    basic_json<StringT, Alloc>& evaluate(const string_type& name) 
     {
         return at(name);
     }
 
-    const basic_json<CharT, Alloc>& evaluate(const name_type& name) const
+    const basic_json<StringT, Alloc>& evaluate(const string_type& name) const
     {
         return at(name);
     }
 
-    const basic_json<CharT, Alloc>& at(const name_type& name) const
+    const basic_json<StringT, Alloc>& at(const string_type& name) const
     {
         switch (var_.type_)
         {
@@ -2216,7 +2334,7 @@ public:
         }
     }
 
-    basic_json<CharT, Alloc>& at(size_t i)
+    basic_json<StringT, Alloc>& at(size_t i)
     {
         switch (var_.type_)
         {
@@ -2231,7 +2349,7 @@ public:
         }
     }
 
-    const basic_json<CharT, Alloc>& at(size_t i) const
+    const basic_json<StringT, Alloc>& at(size_t i) const
     {
         switch (var_.type_)
         {
@@ -2246,7 +2364,7 @@ public:
         }
     }
 
-    object_iterator find(const name_type& name)
+    object_iterator find(const string_type& name)
     {
         switch (var_.type_)
         {
@@ -2261,7 +2379,7 @@ public:
         }
     }
 
-    const_object_iterator find(const name_type& name) const
+    const_object_iterator find(const string_type& name) const
     {
         switch (var_.type_)
         {
@@ -2276,7 +2394,7 @@ public:
         }
     }
 
-    object_iterator find(const CharT* name)
+    object_iterator find(const char_type* name)
     {
         switch (var_.type_)
         {
@@ -2291,7 +2409,7 @@ public:
         }
     }
 
-    const_object_iterator find(const CharT* name) const
+    const_object_iterator find(const char_type* name) const
     {
         switch (var_.type_)
         {
@@ -2307,13 +2425,13 @@ public:
     }
 
     template<typename T>
-    basic_json<CharT, Alloc> get(const name_type& name, T&& default_val) const
+    basic_json<StringT, Alloc> get(const string_type& name, T&& default_val) const
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
             {
-                return basic_json<CharT,Alloc>(std::forward<T>(default_val));
+                return basic_json<StringT,Alloc>(std::forward<T>(default_val));
             }
         case value_types::object_t:
             {
@@ -2324,7 +2442,7 @@ public:
                 }
                 else
                 {
-                    return basic_json<CharT,Alloc>(std::forward<T>(default_val));
+                    return basic_json<StringT,Alloc>(std::forward<T>(default_val));
                 }
             }
         default:
@@ -2396,7 +2514,7 @@ public:
 
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void erase(const name_type& name)
+    void erase(const string_type& name)
     {
         switch (var_.type_)
         {
@@ -2409,7 +2527,7 @@ public:
         }
     }
 
-    void set(const name_type& name, const basic_json<CharT, Alloc>& value)
+    void set(const string_type& name, const basic_json<StringT, Alloc>& value)
     {
         switch (var_.type_)
         {
@@ -2426,7 +2544,7 @@ public:
         }
     }
 
-    void set(name_type&& name, const basic_json<CharT, Alloc>& value){
+    void set(string_type&& name, const basic_json<StringT, Alloc>& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2441,7 +2559,7 @@ public:
         }
     }
 
-    void set(const name_type& name, basic_json<CharT, Alloc>&& value){
+    void set(const string_type& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2456,7 +2574,7 @@ public:
         }
     }
 
-    void set(name_type&& name, basic_json<CharT, Alloc>&& value){
+    void set(string_type&& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2471,7 +2589,7 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, const name_type& name, const basic_json<CharT, Alloc>& value)
+    object_iterator set(object_iterator hint, const string_type& name, const basic_json<StringT, Alloc>& value)
     {
         switch (var_.type_)
         {
@@ -2491,7 +2609,7 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, name_type&& name, const basic_json<CharT, Alloc>& value){
+    object_iterator set(object_iterator hint, string_type&& name, const basic_json<StringT, Alloc>& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2509,7 +2627,7 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, const name_type& name, basic_json<CharT, Alloc>&& value){
+    object_iterator set(object_iterator hint, const string_type& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2527,7 +2645,7 @@ public:
         }
     } 
 
-    object_iterator set(object_iterator hint, name_type&& name, basic_json<CharT, Alloc>&& value){
+    object_iterator set(object_iterator hint, string_type&& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
@@ -2545,7 +2663,7 @@ public:
         }
     }
 
-    void add(const basic_json<CharT, Alloc>& value)
+    void add(const basic_json<StringT, Alloc>& value)
     {
         switch (var_.type_)
         {
@@ -2559,7 +2677,7 @@ public:
         }
     }
 
-    void add(basic_json<CharT, Alloc>&& value){
+    void add(basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::array_t:
             var_.value_.array_value_->push_back(std::move(value));
@@ -2571,7 +2689,7 @@ public:
         }
     }
 
-    array_iterator add(const_array_iterator pos, const basic_json<CharT, Alloc>& value)
+    array_iterator add(const_array_iterator pos, const basic_json<StringT, Alloc>& value)
     {
         switch (var_.type_)
         {
@@ -2585,7 +2703,7 @@ public:
         }
     }
 
-    array_iterator add(const_array_iterator pos, basic_json<CharT, Alloc>&& value){
+    array_iterator add(const_array_iterator pos, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::array_t:
             return var_.value_.array_value_->add(pos, std::move(value));
@@ -2602,9 +2720,7 @@ public:
         return var_.type_;
     }
 
-    void to_stream(basic_json_output_handler<CharT>& handler) const;
-
-    void swap(basic_json<CharT,Alloc>& b)
+    void swap(basic_json<StringT,Alloc>& b)
     {
         var_.swap(b.var_);
     }
@@ -2615,27 +2731,27 @@ public:
         std::vector<T> v(size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = json_type_traits<CharT,Alloc,T>::as(at(i));
+            v[i] = json_type_traits<value_type,T>::as(at(i));
         }
         return v;
     }
 
-    friend void swap(basic_json<CharT,Alloc>& a, basic_json<CharT,Alloc>& b)
+    friend void swap(basic_json<StringT,Alloc>& a, basic_json<StringT,Alloc>& b)
     {
         a.swap(b);
     }
 
-    void assign_any(const typename basic_json<CharT,Alloc>::any& rhs)
+    void assign_any(const typename basic_json<StringT,Alloc>::any& rhs)
     {
         var_.assign(rhs);
     }
 
-    void assign_string(const std::basic_string<CharT>& rhs)
+    void assign_string(const string_type& rhs)
     {
         var_.assign(rhs);
     }
 
-    void assign_string(const CharT* rhs, size_t length)
+    void assign_string(const char_type* rhs, size_t length)
     {
         var_.assign_string(rhs,length);
     }
@@ -2708,25 +2824,25 @@ public:
     typedef any json_any_type;
     typedef member_type name_value_pair;
 
-    static const basic_json<CharT,Alloc> an_object;
-    static const basic_json<CharT,Alloc> an_array;
-    static const basic_json<CharT,Alloc> null;
+    static const basic_json<StringT,Alloc> an_object;
+    static const basic_json<StringT,Alloc> an_array;
+    static const basic_json<StringT,Alloc> null;
 
-    static basic_json parse(std::basic_istream<CharT>& is)
+    static basic_json parse(std::basic_istream<char_type>& is)
     {
         parse_stream(is);
     }
-    static basic_json parse(std::basic_istream<CharT>& is, basic_parse_error_handler<CharT>& err_handler)
+    static basic_json parse(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler)
     {
         parse_stream(is,err_handler);
     }
 
-    static basic_json parse_string(const std::basic_string<CharT>& s)
+    static basic_json parse_string(const string_type& s)
     {
         return parse(s);
     }
 
-    static basic_json parse_string(const std::basic_string<CharT>& s, basic_parse_error_handler<CharT>& err_handler)
+    static basic_json parse_string(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
     {
         return parse(s,err_handler);
     }
@@ -2782,9 +2898,9 @@ public:
         return elements().end();
     }
 
-    const basic_json<CharT,Alloc>& get(const name_type& name) const
+    const basic_json<StringT,Alloc>& get(const string_type& name) const
     {
-        static const basic_json<CharT, Alloc> a_null = null_type();
+        static const basic_json<StringT, Alloc> a_null = null_type();
 
         switch (var_.type_)
         {
@@ -2890,7 +3006,7 @@ public:
         }
     }
 
-    void add(size_t index, const basic_json<CharT, Alloc>& value)
+    void add(size_t index, const basic_json<StringT, Alloc>& value)
     {
         switch (var_.type_)
         {
@@ -2904,7 +3020,7 @@ public:
         }
     }
 
-    void add(size_t index, basic_json<CharT, Alloc>&& value){
+    void add(size_t index, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
         case value_types::array_t:
             var_.value_.array_value_->add(index, std::move(value));
@@ -2916,7 +3032,7 @@ public:
         }
     }
 
-    bool has_member(const name_type& name) const
+    bool has_member(const string_type& name) const
     {
         switch (var_.type_)
         {
@@ -2944,11 +3060,11 @@ public:
     }
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove(const name_type& name)
+    void remove(const string_type& name)
     {
         erase(name);
     }
-    void remove_member(const name_type& name)
+    void remove_member(const string_type& name)
     {
         erase(name);
     }
@@ -2975,37 +3091,37 @@ public:
     template<int size>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array()
     {
-        return build_array<CharT,Alloc,size>()();
+        return build_array<StringT,Alloc,size>()();
     }
     template<size_t size>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
     {
-        return build_array<CharT,Alloc,size>()(n);
+        return build_array<StringT,Alloc,size>()(n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
     {
-        return build_array<CharT,Alloc,size>()(n, val);
+        return build_array<StringT,Alloc,size>()(n, val);
     }
     template<size_t size>
     static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
     {
-        return build_array<CharT,Alloc,size>()(m, n);
+        return build_array<StringT,Alloc,size>()(m, n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
     {
-        return build_array<CharT,Alloc,size>()(m, n, val);
+        return build_array<StringT,Alloc,size>()(m, n, val);
     }
     template<size_t size>
     static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
     {
-        return build_array<CharT,Alloc,size>()(m, n, k);
+        return build_array<StringT,Alloc,size>()(m, n, k);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
     {
-        return build_array<CharT,Alloc,size>()(m, n, k, val);
+        return build_array<StringT,Alloc,size>()(m, n, k, val);
     }
 #endif
 
@@ -3101,7 +3217,7 @@ public:
 
     const object& object_value() const
     {
-        static const basic_json<CharT, Alloc> cobject = basic_json<CharT, Alloc>::object();
+        static const basic_json<StringT, Alloc> cobject = basic_json<StringT, Alloc>::object();
         switch (var_.type_)
         {
         case value_types::empty_object_t:
@@ -3116,66 +3232,66 @@ public:
 
 private:
 
-    template<typename Char2, typename Allocator2, size_t size>
+    template<typename StringT2, typename Allocator2, size_t size>
     class build_array
     {};
-    template<typename Char2, typename Allocator2>
-    class build_array<Char2,Allocator2,1>
+    template<typename StringT2, typename Allocator2>
+    class build_array<StringT2,Allocator2,1>
     {
     public:
-        basic_json<Char2,Allocator2> operator() ()
+        basic_json<StringT2,Allocator2> operator() ()
         {
-            return basic_json<Char2,Allocator2>::make_array();
+            return basic_json<StringT2,Allocator2>::make_array();
         }
-        basic_json<Char2,Allocator2> operator() (size_t n)
+        basic_json<StringT2,Allocator2> operator() (size_t n)
         {
-            return basic_json<Char2,Allocator2>::make_array(n);
+            return basic_json<StringT2,Allocator2>::make_array(n);
         }
         template <typename T>
-        basic_json<Char2,Allocator2> operator() (size_t n, T val)
+        basic_json<StringT2,Allocator2> operator() (size_t n, T val)
         {
-            return basic_json<Char2,Allocator2>::make_array(n, val);
+            return basic_json<StringT2,Allocator2>::make_array(n, val);
         }
     };
-    template<typename Char2, typename Allocator2>
-    class build_array<Char2,Allocator2,2>
+    template<typename StringT2, typename Allocator2>
+    class build_array<StringT2,Allocator2,2>
     {
     public:
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n)
+        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n)
         {
-            return basic_json<Char2,Allocator2>::make_2d_array(m, n);
+            return basic_json<StringT2,Allocator2>::make_2d_array(m, n);
         }
         template <typename T>
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, T val)
+        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, T val)
         {
-            return basic_json<Char2,Allocator2>::make_2d_array(m, n, val);
+            return basic_json<StringT2,Allocator2>::make_2d_array(m, n, val);
         }
     };
-    template<typename Char2, typename Allocator2>
-    class build_array<Char2,Allocator2,3>
+    template<typename StringT2, typename Allocator2>
+    class build_array<StringT2,Allocator2,3>
     {
     public:
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, size_t k)
+        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, size_t k)
         {
-            return basic_json<Char2,Allocator2>::make_3d_array (m, n, k);
+            return basic_json<StringT2,Allocator2>::make_3d_array (m, n, k);
         }
         template <typename T>
-        basic_json<Char2,Allocator2> operator() (size_t m, size_t n, size_t k, T val)
+        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, size_t k, T val)
         {
-            return basic_json<Char2,Allocator2>::make_3d_array (m, n, k, val);
+            return basic_json<StringT2,Allocator2>::make_3d_array (m, n, k, val);
         }
     };
 
-    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_json<CharT, Alloc>& o)
+    friend std::basic_ostream<typename StringT::value_type>& operator<<(std::basic_ostream<typename StringT::value_type>& os, const basic_json<StringT, Alloc>& o)
     {
         o.to_stream(os);
         return os;
     }
 
-    friend std::basic_istream<CharT>& operator<<(std::basic_istream<CharT>& is, basic_json<CharT, Alloc>& o)
+    friend std::basic_istream<typename StringT::value_type>& operator<<(std::basic_istream<typename StringT::value_type>& is, basic_json<StringT, Alloc>& o)
     {
-        basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-        basic_json_reader<CharT> reader(is, handler);
+        basic_json_deserializer<basic_json<StringT, Alloc>> handler;
+        basic_json_reader<typename StringT::value_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -3187,183 +3303,90 @@ private:
     }
 };
 
-template <typename CharT, typename Alloc>
-void swap(typename basic_json<CharT,Alloc>::member_type& a, typename basic_json<CharT,Alloc>::member_type& b)
+template <class JsonT>
+void swap(typename JsonT::member_type& a, typename JsonT::member_type& b)
 {
     a.swap(b);
 }
 
-template<typename CharT, typename Alloc>
-bool basic_json<CharT, Alloc>::operator!=(const basic_json<CharT, Alloc>& rhs) const
+template<typename StringT, typename Alloc>
+bool basic_json<StringT, Alloc>::operator!=(const basic_json<StringT, Alloc>& rhs) const
 {
     return !(*this == rhs);
 }
 
-template<typename CharT, typename Alloc>
-bool basic_json<CharT, Alloc>::operator==(const basic_json<CharT, Alloc>& rhs) const
+template<typename StringT, typename Alloc>
+bool basic_json<StringT, Alloc>::operator==(const basic_json<StringT, Alloc>& rhs) const
 {
     return var_ == rhs.var_;
 }
 
-template<typename CharT, typename Alloc>
-std::basic_string<CharT> basic_json<CharT, Alloc>::to_string(const basic_output_format<CharT>& format) const
-{
-    std::basic_ostringstream<CharT> os;
-    {
-        basic_json_serializer<CharT> serializer(os, format);
-        to_stream(serializer);
-    }
-    return os.str();
-}
-
-template<typename CharT, typename Alloc>
-void basic_json<CharT, Alloc>::to_stream(basic_json_output_handler<CharT>& handler) const
-{
-    switch (var_.type_)
-    {
-    case value_types::small_string_t:
-        handler.value(var_.value_.small_string_value_,var_.small_string_length_);
-        break;
-    case value_types::string_t:
-        handler.value(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
-        break;
-    case value_types::double_t:
-        handler.value(var_.value_.float_value_);
-        break;
-    case value_types::integer_t:
-        handler.value(var_.value_.integer_value_);
-        break;
-    case value_types::uinteger_t:
-        handler.value(var_.value_.uinteger_value_);
-        break;
-    case value_types::bool_t:
-        handler.value(var_.value_.bool_value_);
-        break;
-    case value_types::null_t:
-        handler.value(null_type());
-        break;
-    case value_types::empty_object_t:
-        handler.begin_object();
-        handler.end_object();
-        break;
-    case value_types::object_t:
-        {
-            handler.begin_object();
-            object* o = var_.value_.object_value_;
-            for (const_object_iterator it = o->begin(); it != o->end(); ++it)
-            {
-                handler.name((it->name()).data(),it->name().length());
-                it->value().to_stream(handler);
-            }
-            handler.end_object();
-        }
-        break;
-    case value_types::array_t:
-        {
-            handler.begin_array();
-            array *o = var_.value_.array_value_;
-            for (const_array_iterator it = o->begin(); it != o->end(); ++it)
-            {
-                it->to_stream(handler);
-            }
-            handler.end_array();
-        }
-        break;
-    case value_types::any_t:
-        var_.value_.any_value_->to_stream(handler);
-        break;
-    default:
-        break;
-    }
-}
-
-template<typename CharT, typename Alloc>
-void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os) const
-{
-    basic_json_serializer<CharT> serializer(os);
-    to_stream(serializer);
-}
-
-template<typename CharT, typename Alloc>
-void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format) const
-{
-    basic_json_serializer<CharT> serializer(os, format);
-    to_stream(serializer);
-}
-
-template<typename CharT, typename Alloc>
-void basic_json<CharT, Alloc>::to_stream(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting) const
-{
-    basic_json_serializer<CharT> serializer(os, format, indenting);
-    to_stream(serializer);
-}
-
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_object = basic_json<CharT, Alloc>::object();
-template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::an_array = basic_json<CharT, Alloc>::array();        
-template<typename CharT, typename Alloc>
-const basic_json<CharT, Alloc> basic_json<CharT, Alloc>::null = basic_json<CharT, Alloc>(jsoncons::null_type());
+template<typename StringT, typename Alloc>
+const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::an_object = basic_json<StringT, Alloc>::object();
+template<typename StringT, typename Alloc>
+const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::an_array = basic_json<StringT, Alloc>::array();        
+template<typename StringT, typename Alloc>
+const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::null = basic_json<StringT, Alloc>(jsoncons::null_type());
 #endif
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::make_2d_array(size_t m, size_t n)
 {
-    basic_json<CharT, Alloc> a = basic_json<CharT, Alloc>::array();
+    basic_json<StringT, Alloc> a = basic_json<StringT, Alloc>::array();
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<CharT, Alloc>::make_array(n);
+        a[i] = basic_json<StringT, Alloc>::make_array(n);
     }
     return a;
 }
 
-template<typename CharT, typename Alloc>
+template<typename StringT, typename Alloc>
 template<typename T>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_2d_array(size_t m, size_t n, T val)
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::make_2d_array(size_t m, size_t n, T val)
 {
-    basic_json<CharT, Alloc> v;
+    basic_json<StringT, Alloc> v;
     v = val;
-    basic_json<CharT, Alloc> a = make_array(m);
+    basic_json<StringT, Alloc> a = make_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<CharT, Alloc>::make_array(n, v);
+        a[i] = basic_json<StringT, Alloc>::make_array(n, v);
     }
     return a;
 }
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
-    basic_json<CharT, Alloc> a = basic_json<CharT, Alloc>::array();
+    basic_json<StringT, Alloc> a = basic_json<StringT, Alloc>::array();
     a.resize(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<CharT, Alloc>::make_2d_array(n, k);
+        a[i] = basic_json<StringT, Alloc>::make_2d_array(n, k);
     }
     return a;
 }
 
-template<typename CharT, typename Alloc>
+template<typename StringT, typename Alloc>
 template<typename T>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::make_3d_array(size_t m, size_t n, size_t k, T val)
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::make_3d_array(size_t m, size_t n, size_t k, T val)
 {
-    basic_json<CharT, Alloc> v;
+    basic_json<StringT, Alloc> v;
     v = val;
-    basic_json<CharT, Alloc> a = make_array(m);
+    basic_json<StringT, Alloc> a = make_array(m);
     for (size_t i = 0; i < a.size(); ++i)
     {
-        a[i] = basic_json<CharT, Alloc>::make_2d_array(n, k, v);
+        a[i] = basic_json<StringT, Alloc>::make_2d_array(n, k, v);
     }
     return a;
 }
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istream<CharT>& is)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::parse_stream(std::basic_istream<char_type>& is)
 {
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_reader<CharT> reader(is, handler);
+    basic_json_deserializer<basic_json<StringT, Alloc>> handler;
+    basic_json_reader<char_type> reader(is, handler);
     reader.read_next();
     reader.check_done();
     if (!handler.is_valid())
@@ -3373,12 +3396,12 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istre
     return handler.get_result();
 }
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istream<CharT>& is, 
-                                                              basic_parse_error_handler<CharT>& err_handler)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::parse_stream(std::basic_istream<char_type>& is, 
+                                                              basic_parse_error_handler<char_type>& err_handler)
 {
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_reader<CharT> reader(is, handler, err_handler);
+    basic_json_deserializer<basic_json<StringT, Alloc>> handler;
+    basic_json_reader<char_type> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
     if (!handler.is_valid())
@@ -3388,41 +3411,8 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_stream(std::basic_istre
     return handler.get_result();
 }
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string<CharT>& s)
-{
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_parser<CharT> parser(handler);
-    parser.begin_parse();
-    parser.parse(s.data(),0,s.length());
-    parser.end_parse();
-    parser.check_done(s.data(),parser.index(),s.length());
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-    }
-    return handler.get_result();
-}
-
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse(const std::basic_string<CharT>& s, 
-                                                       basic_parse_error_handler<CharT>& err_handler)
-{
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_parser<CharT> parser(handler,err_handler);
-    parser.begin_parse();
-    parser.parse(s.data(),0,s.length());
-    parser.end_parse();
-    parser.check_done(s.data(),parser.index(),s.length());
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-    }
-    return handler.get_result();
-}
-
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string& filename)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::parse_file(const std::string& filename)
 {
     FILE* fp;
 
@@ -3439,7 +3429,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
         JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
 #endif
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
+    basic_json_deserializer<basic_json<StringT, Alloc>> handler;
     try
     {
         // obtain file size:
@@ -3449,7 +3439,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
 
         if (size > 0)
         {
-            std::vector<CharT> buffer(size);
+            std::vector<char_type> buffer(size);
 
             // copy the file into the buffer:
             size_t result = std::fread (buffer.data(),1,size,fp);
@@ -3458,7 +3448,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
             }
 
-            basic_json_parser<CharT> parser(handler);
+            basic_json_parser<char_type> parser(handler);
             parser.begin_parse();
             parser.parse(buffer.data(),0,buffer.size());
             parser.end_parse();
@@ -3479,27 +3469,27 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     return handler.get_result();
 }
 
-template<typename CharT, typename Alloc>
-basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string& filename, 
-                                                            basic_parse_error_handler<CharT>& err_handler)
+template<typename StringT, typename Alloc>
+basic_json<StringT, Alloc> basic_json<StringT, Alloc>::parse_file(const std::string& filename, 
+                                                            basic_parse_error_handler<char_type>& err_handler)
 {
     FILE* fp;
 
-#if defined(_MSC_VER)
-    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
-    if (err != 0) 
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#else
+#if !defined(JSONCONS_HAS_FOPEN_S)
     fp = std::fopen(filename.c_str(), "rb");
     if (fp == nullptr)
     {
         JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
     }
+#else
+    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
+    if (err != 0) 
+    {
+        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
+    }
 #endif
 
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
+    basic_json_deserializer<basic_json<StringT, Alloc>> handler;
     try
     {
         // obtain file size:
@@ -3509,7 +3499,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
 
         if (size > 0)
         {
-            std::vector<CharT> buffer(size);
+            std::vector<char_type> buffer(size);
 
             // copy the file into the buffer:
             size_t result = std::fread (buffer.data(),1,size,fp);
@@ -3518,7 +3508,7 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
             }
 
-            basic_json_parser<CharT> parser(handler,err_handler);
+            basic_json_parser<char_type> parser(handler,err_handler);
             parser.begin_parse();
             parser.parse(buffer.data(),0,buffer.size());
             parser.end_parse();
@@ -3539,8 +3529,8 @@ basic_json<CharT, Alloc> basic_json<CharT, Alloc>::parse_file(const std::string&
     return handler.get_result();
 }
 
-template<typename CharT, typename Alloc>
-typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value()
+template<typename StringT, typename Alloc>
+typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_value()
 {
     switch (var_.type_)
     {
@@ -3553,8 +3543,8 @@ typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value()
     }
 }
 
-template<typename CharT, typename Alloc>
-const typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_value() const
+template<typename StringT, typename Alloc>
+const typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_value() const
 {
     switch (var_.type_)
     {
@@ -3567,25 +3557,11 @@ const typename basic_json<CharT, Alloc>::any& basic_json<CharT, Alloc>::any_valu
     }
 }
 
-template<typename CharT, typename Alloc>
-const CharT* basic_json<CharT, Alloc>::as_cstring() const
+template <typename JsonT>
+std::basic_istream<typename JsonT::char_type>& operator>>(std::basic_istream<typename JsonT::char_type>& is, JsonT& o)
 {
-    switch (var_.type_)
-    {
-    case value_types::small_string_t:
-        return var_.value_.small_string_value_;
-    case value_types::string_t:
-        return var_.value_.string_value_->c_str();
-    default:
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
-    }
-}
-
-template <typename CharT, typename Alloc>
-std::basic_istream<CharT>& operator>>(std::basic_istream<CharT>& is, basic_json<CharT, Alloc>& o)
-{
-    basic_json_deserializer<basic_json<CharT, Alloc>> handler;
-    basic_json_reader<CharT> reader(is, handler);
+    basic_json_deserializer<JsonT> handler;
+    basic_json_reader<typename JsonT::char_type> reader(is, handler);
     reader.read_next();
     reader.check_done();
     if (!handler.is_valid())
@@ -3596,70 +3572,72 @@ std::basic_istream<CharT>& operator>>(std::basic_istream<CharT>& is, basic_json<
     return is;
 }
 
-template<typename CharT, typename Alloc>
+template<typename JsonT>
 class json_printable
 {
 public:
-    json_printable(const basic_json<CharT, Alloc>& o,
+    typedef typename JsonT::char_type char_type;
+
+    json_printable(const JsonT& o,
                    bool is_pretty_print)
        : o_(&o), is_pretty_print_(is_pretty_print)
     {
     }
 
-    json_printable(const basic_json<CharT, Alloc>& o,
+    json_printable(const JsonT& o,
                    bool is_pretty_print,
-                   const basic_output_format<CharT>& format)
+                   const basic_output_format<char_type>& format)
        : o_(&o), is_pretty_print_(is_pretty_print), format_(format)
     {
         ;
     }
 
-    void to_stream(std::basic_ostream<CharT>& os) const
+    void to_stream(std::basic_ostream<char_type>& os) const
     {
         o_->to_stream(os, format_, is_pretty_print_);
     }
 
-    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const json_printable<CharT, Alloc>& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<JsonT>& o)
     {
         o.to_stream(os);
         return os;
     }
 
-    const basic_json<CharT, Alloc> *o_;
+    const JsonT *o_;
     bool is_pretty_print_;
-    basic_output_format<CharT> format_;
+    basic_output_format<char_type> format_;
 private:
     json_printable();
 };
 
-template<typename CharT, class Alloc>
-json_printable<CharT, Alloc> print(const basic_json<CharT, Alloc>& val)
+template<typename JsonT>
+json_printable<JsonT> print(const JsonT& val)
 {
-    return json_printable<CharT, Alloc>(val,false);
+    return json_printable<JsonT>(val,false);
 }
 
-template<typename CharT, class Alloc>
-json_printable<CharT, Alloc> print(const basic_json<CharT, Alloc>& val,
-                                  const basic_output_format<CharT>& format)
+template<class JsonT>
+json_printable<JsonT> print(const JsonT& val,
+                            const basic_output_format<typename JsonT::char_type>& format)
 {
-    return json_printable<CharT, Alloc>(val, false, format);
+    return json_printable<JsonT>(val, false, format);
 }
 
-template<typename CharT, class Alloc>
-json_printable<CharT, Alloc> pretty_print(const basic_json<CharT, Alloc>& val)
+template<class JsonT>
+json_printable<JsonT> pretty_print(const JsonT& val)
 {
-    return json_printable<CharT, Alloc>(val,true);
+    return json_printable<JsonT>(val,true);
 }
 
-template<typename CharT, class Alloc>
-json_printable<CharT, Alloc> pretty_print(const basic_json<CharT, Alloc>& val,
-                                         const basic_output_format<CharT>& format)
+template<typename JsonT>
+json_printable<JsonT> pretty_print(const JsonT& val,
+                                   const basic_output_format<typename JsonT::char_type>& format)
 {
-    return json_printable<CharT, Alloc>(val, true, format);
+    return json_printable<JsonT>(val, true, format);
 }
 
-typedef basic_json<char,std::allocator<char>> json;
-typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
+typedef basic_json<std::string,std::allocator<char>> json;
+typedef basic_json<std::wstring,std::allocator<wchar_t>> wjson;
 
 typedef basic_json_deserializer<json> json_deserializer;
 typedef basic_json_deserializer<wjson> wjson_deserializer;
