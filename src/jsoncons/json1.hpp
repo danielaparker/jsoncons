@@ -426,7 +426,6 @@ public:
     typedef typename allocator_type:: template rebind<char_type>::other name_allocator_type;
 #endif
     typedef std::basic_string<char_type,std::char_traits<char_type>,name_allocator_type> string_type;
-    typedef string_type name_type;
     typedef basic_json<StringT,Alloc> value_type;
     typedef name_value_pair<string_type,value_type> member_type;
 

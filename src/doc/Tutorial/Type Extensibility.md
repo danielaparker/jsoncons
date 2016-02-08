@@ -17,7 +17,7 @@ For example, by including the header file `jsoncons_ext/boost/type_extensions.hp
         observation_dates.add(date(2014,2,14));
         observation_dates.add(date(2014,2,21));
 
-		deal["ObservationDates"] = std::move(observation_dates);
+        deal["ObservationDates"] = std::move(observation_dates);
 
         date maturity = deal["Maturity"].as<date>();
         std::cout << "Maturity: " << maturity << std::endl << std::endl;
@@ -30,7 +30,7 @@ For example, by including the header file `jsoncons_ext/boost/type_extensions.hp
         {
             date d = it->as<date>();
             std::cout << d << std::endl;
-			++it;
+            ++it;
         }
         std::cout << std::endl;
 
@@ -56,38 +56,40 @@ You can look in the header file `jsoncons_ext/boost/type_extensions.hpp`
 to see how the specialization of `json_type_traits` that supports
 the conversions works. In this implementation the `boost` date values are stored in the `json` values as strings.
 
-    namespace jsoncons
+namespace jsoncons 
+{
+    template <typename JsonT>
+    class json_type_traits<JsonT,boost::gregorian::date>
     {
-        template <typename Alloc>
-        class json_type_traits<char,Alloc,boost::gregorian::date>
+    public:
+        static bool is(const JsonT& val) 
         {
-        public:
-            static bool is(const basic_json<char,Alloc>& val)
+            if (!val.is_string())
             {
-                if (!val.is<std::string>())
-                {
-                    return false;
-                }
-                std::string s = val.as<std::string>();
-                try
-                {
-                    boost::gregorian::date_from_iso_string(s);
-                    return true;
-                }
-                catch (...)
-                {
-                    return false;
-                }
+                return false;
             }
-            static boost::gregorian::date as(const basic_json<char,Alloc>& val)
+            std::string s = val.template as<std::string>();
+            try
             {
-                std::string s = val.as<std::string>();
-                return boost::gregorian::from_simple_string(s);
+                boost::gregorian::date_from_iso_string(s);
+                return true;
             }
-            static void assign(basic_json<char,Alloc>& lhs, boost::gregorian::date val)
+            catch (...)
             {
-                lhs = to_iso_extended_string(val);
+                return false;
             }
-        };
+        }
+
+        static boost::gregorian::date as(const JsonT& val)
+        {
+            std::string s = val.template as<std::string>();
+            return boost::gregorian::from_simple_string(s);
+        }
+
+        static void assign(JsonT& lhs, boost::gregorian::date val)
+        {
+            lhs = to_iso_extended_string(val);
+        }
     };
+}
 

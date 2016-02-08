@@ -25,7 +25,7 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
 
     typedef typename JsonT::char_type char_type;
     typedef typename JsonT::member_type member_type;
-    typedef typename member_type::name_type name_type;
+    typedef typename member_type::string_type string_type;
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::array array;
     typedef typename JsonT::object object;
@@ -169,7 +169,7 @@ private:
 
     void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].member = member_type(name_type(p,length));
+        stack_[top_].member = member_type(string_type(p,length));
     }
 
     void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override

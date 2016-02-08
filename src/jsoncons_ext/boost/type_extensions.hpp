@@ -15,8 +15,8 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
-namespace jsoncons {
-
+namespace jsoncons 
+{
     template <typename JsonT>
     class json_type_traits<JsonT,boost::gregorian::date>
     {

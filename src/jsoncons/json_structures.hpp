@@ -204,8 +204,8 @@ public:
     }
 };
 
-template <class NameT,typename CharT>
-bool name_le_string(const NameT& a, const CharT* b, size_t length)
+template <class StringT,typename CharT>
+bool name_le_string(const StringT& a, const CharT* b, size_t length)
 {
     size_t min_len = std::min JSONCONS_NO_MACRO_EXP(a.length(),length);
     int result = std::char_traits<CharT>::compare(a.data(),b, min_len);
@@ -217,8 +217,8 @@ bool name_le_string(const NameT& a, const CharT* b, size_t length)
     return a.length() <= length;
 }
 
-template <class NameT,typename CharT>
-bool name_eq_string(const NameT& a, const CharT* b, size_t length)
+template <class StringT,typename CharT>
+bool name_eq_string(const StringT& a, const CharT* b, size_t length)
 {
     return a.length() == length && std::char_traits<CharT>::compare(a.data(),b,length) == 0;
 }
@@ -246,38 +246,38 @@ public:
     }
 };
 
-template <class NameT, class ValueT>
+template <class StringT, class ValueT>
 class name_value_pair
 {
 public:
-    typedef NameT name_type;
-    typedef typename NameT::value_type char_type;
+    typedef StringT string_type;
+    typedef typename StringT::value_type char_type;
 
     name_value_pair()
     {
     }
-    name_value_pair(const name_type& name)
+    name_value_pair(const string_type& name)
         : name_(name)
     {
     }
-    name_value_pair(name_type&& name)
+    name_value_pair(string_type&& name)
         : name_(std::move(name))
     {
     }
 
-    name_value_pair(const name_type& name, const ValueT& val)
+    name_value_pair(const string_type& name, const ValueT& val)
         : name_(name), value_(val)
     {
     }
-    name_value_pair(name_type&& name, const ValueT& val)
+    name_value_pair(string_type&& name, const ValueT& val)
         : name_(std::move(name)), value_(val)
     {
     }
-    name_value_pair(const name_type& name, ValueT&& val)
+    name_value_pair(const string_type& name, ValueT&& val)
         : name_(name), value_(std::move(val))
     {
     }
-    name_value_pair(name_type&& name, ValueT&& val)
+    name_value_pair(string_type&& name, ValueT&& val)
         : name_(std::move(name)), value_(std::move(val))
     {
     }
@@ -290,7 +290,7 @@ public:
     {
     }
 
-    const name_type& name() const
+    const string_type& name() const
     {
         return name_;
     }
@@ -347,18 +347,18 @@ public:
         value_.shrink_to_fit();
     }
 private:
-    name_type name_;
+    string_type name_;
     ValueT value_;
 };
 
-template <class NameT,class JsonT,class Alloc>
+template <class StringT,class JsonT,class Alloc>
 class json_object
 {
 public:
     typedef Alloc allocator_type;
     typedef typename JsonT::char_type char_type;
-    typedef NameT name_type;
-    typedef name_value_pair<NameT,JsonT> value_type;
+    typedef StringT string_type;
+    typedef name_value_pair<StringT,JsonT> value_type;
 
     typedef typename std::vector<value_type,allocator_type>::iterator iterator;
     typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
@@ -372,7 +372,7 @@ public:
     {
     }
 
-    json_object(const json_object<NameT,JsonT,Alloc>& val)
+    json_object(const json_object<StringT,JsonT,Alloc>& val)
         : members_(val.members_)
     {
     }
@@ -382,7 +382,7 @@ public:
     {
     }
 
-    json_object(const json_object<NameT,JsonT,Alloc>& val, const allocator_type& allocator) :
+    json_object(const json_object<StringT,JsonT,Alloc>& val, const allocator_type& allocator) :
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         members_(val.members_,allocator)
 #else
@@ -476,17 +476,17 @@ public:
         return (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : end();
     }
 
-    iterator find(const name_type& name)
+    iterator find(const string_type& name)
     {
         return find(name.data(), name.length());
     }
  
-    const_iterator find(const name_type& name) const
+    const_iterator find(const string_type& name) const
     {
         return find(name.data(), name.length());
     }
 
-    JsonT& at(const name_type& name) 
+    JsonT& at(const string_type& name) 
     {
         auto it = find(name);
         if (it == end())
@@ -496,7 +496,7 @@ public:
         return it->value();
     }
 
-    const JsonT& at(const name_type& name) const
+    const JsonT& at(const string_type& name) const
     {
         auto it = find(name);
         if (it == end())
@@ -526,7 +526,7 @@ public:
         }
     }
 
-    void erase(const name_type& name) 
+    void erase(const string_type& name) 
     {
         return erase(name.data(),name.length());
     }
@@ -536,7 +536,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
         {
-            members_.push_back(value_type(name_type(s,length),value));
+            members_.push_back(value_type(string_type(s,length),value));
         }
         else if (name_eq_string(it->name(),s,length))
         {
@@ -544,7 +544,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(name_type(s,length),value));
+            members_.insert(it,value_type(string_type(s,length),value));
         }
     }
 
@@ -553,7 +553,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
         {
-            members_.push_back(value_type(name_type(s,length),std::move(value)));
+            members_.push_back(value_type(string_type(s,length),std::move(value)));
         }
         else if (name_eq_string(it->name(),s,length))
         {
@@ -561,11 +561,11 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(name_type(s,length),std::move(value)));
+            members_.insert(it,value_type(string_type(s,length),std::move(value)));
         }
     }
 
-    void set(name_type&& name, const JsonT& value)
+    void set(string_type&& name, const JsonT& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -582,17 +582,17 @@ public:
         }
     }
 
-    void set(const name_type& name, const JsonT& value)
+    void set(const string_type& name, const JsonT& value)
     {
         set(name.data(),name.length(),value);
     }
 
-    void set(const name_type& name, JsonT&& value)
+    void set(const string_type& name, JsonT&& value)
     {
         set(name.data(),name.length(),std::move(value));
     }
 
-    void set(name_type&& name, JsonT&& value)
+    void set(string_type&& name, JsonT&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -633,7 +633,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(name_type(s, length), value));
+            members_.push_back(value_type(string_type(s, length), value));
             it = members_.end();
         }
         else if (name_eq_string(it->name(),s,length))
@@ -642,7 +642,7 @@ public:
         }
         else
         {
-           it = members_.insert(it,value_type(name_type(s,length),value));
+           it = members_.insert(it,value_type(string_type(s,length),value));
         }
         return it;
     }
@@ -661,7 +661,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(name_type(s, length), std::move(value)));
+            members_.push_back(value_type(string_type(s, length), std::move(value)));
             it = members_.end();
         }
         else if (name_eq_string(it->name(),s,length))
@@ -670,17 +670,17 @@ public:
         }
         else
         {
-           it = members_.insert(it,value_type(name_type(s,length),std::move(value)));
+           it = members_.insert(it,value_type(string_type(s,length),std::move(value)));
         }
         return it;
     }
 
-    iterator set(iterator hint, const name_type& name, const JsonT& value)
+    iterator set(iterator hint, const string_type& name, const JsonT& value)
     {
         return set(hint,name.data(),name.length(),value);
     }
 
-    iterator set(iterator hint, name_type&& name, const JsonT& value)
+    iterator set(iterator hint, string_type&& name, const JsonT& value)
     {
         iterator it;
         if (hint != end() && hint->name() <= name)
@@ -708,12 +708,12 @@ public:
         return it;
     }
 
-    iterator set(iterator hint, const name_type& name, JsonT&& value)
+    iterator set(iterator hint, const string_type& name, JsonT&& value)
     {
         return set(hint,name.data(),name.length(),std::move(value));
     }
 
-    iterator set(iterator hint, name_type&& name, JsonT&& value)
+    iterator set(iterator hint, string_type&& name, JsonT&& value)
     {
         iterator it;
         if (hint != members_.end() && hint->name() <= name)
@@ -756,7 +756,7 @@ public:
 		std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
 	}
 
-    bool operator==(const json_object<NameT,JsonT,Alloc>& rhs) const
+    bool operator==(const json_object<StringT,JsonT,Alloc>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -775,7 +775,7 @@ public:
         return true;
     }
 private:
-    json_object<NameT,JsonT,Alloc>& operator=(const json_object<NameT,JsonT,Alloc>&);
+    json_object<StringT,JsonT,Alloc>& operator=(const json_object<StringT,JsonT,Alloc>&);
 };
 
 
