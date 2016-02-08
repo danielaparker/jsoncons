@@ -237,17 +237,17 @@ template <class JsonT>
 bool lt(const JsonT& lhs, const JsonT& rhs)
 {
     bool result = false;
-    if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+    if (lhs. template is<unsigned long long>() && rhs. template is<unsigned long long>())
     {
-        result = lhs.as<unsigned long long>() < rhs.as<unsigned long long>();
+        result = lhs. template as<unsigned long long>() < rhs. template as<unsigned long long>();
     }
-    else if (lhs.is<long long>() && rhs.is<long long>())
+    else if (lhs. template is<long long>() && rhs. template is<long long>())
     {
-        result = lhs.as<long long>() < rhs.as<long long>();
+        result = lhs. template as<long long>() < rhs. template as<long long>();
     }
-    else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
+    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
-        result = lhs.as<double>() < rhs.as<double>();
+        result = lhs.as_double() < rhs.as_double();
     }
     else if (lhs.is_string() && rhs.is_string())
     {
@@ -266,17 +266,17 @@ template <class JsonT>
 JsonT plus(const JsonT& lhs, const JsonT& rhs)
 {
     JsonT result = jsoncons::null_type();
-    if (lhs.is<long long>() && rhs.is<long long>())
+    if (lhs.is_integer() && rhs.is_integer())
     {
-        result = ((lhs.as<long long>() + rhs.as<long long>()));
+        result = ((lhs.as_integer() + rhs.as_integer()));
     }
-    else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
+    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
-        result = (lhs.as<double>() + rhs.as<double>());
+        result = (lhs.as_double() + rhs.as_double());
     }
-    else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>())
+    else if (lhs.is_uinteger() && rhs.is_uinteger())
     {
-        result = (lhs.as<unsigned long long>() + rhs.as<unsigned long long>());
+        result = (lhs.as_uinteger() + rhs.as_uinteger());
     }
     return result;
 }
@@ -285,13 +285,13 @@ template <class JsonT>
 JsonT unary_minus(const JsonT& lhs)
 {
     JsonT result = jsoncons::null_type();
-    if (lhs.is<long long>())
+    if (lhs.is_integer())
     {
-        result = -lhs.as<long long>();
+        result = -lhs.as_integer();
     }
-    else if (lhs.is<double>())
+    else if (lhs.is_double())
     {
-        result = -lhs.as<double>();
+        result = -lhs.as_double();
     }
     return result;
 }
@@ -300,17 +300,17 @@ template <class JsonT>
 JsonT minus(const JsonT& lhs, const JsonT& rhs)
 {
     JsonT result = jsoncons::null_type();
-    if (lhs.is<long long>() && rhs.is<long long>())
+    if (lhs.is_integer() && rhs.is_integer())
     {
-        result = ((lhs.as<long long>() - rhs.as<long long>()));
+        result = ((lhs.as_integer() - rhs.as_integer()));
     }
-    else if ((lhs.is_number() && rhs.is<double>()) || lhs.is<double>() && rhs.is_number())
+    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
-        result = (lhs.as<double>() - rhs.as<double>());
+        result = (lhs.as_double() - rhs.as_double());
     }
-    else if (lhs.is<unsigned long long>() && rhs.is<unsigned long long>() && lt(rhs,lhs))
+    else if (lhs.is_uinteger() && rhs.is_uinteger() && lt(rhs,lhs))
     {
-        result = (lhs.as<unsigned long long>() - rhs.as<unsigned long long>());
+        result = (lhs.as_uinteger() - rhs.as_uinteger());
     }
     return result;
 }
@@ -429,6 +429,8 @@ public:
 template <class JsonT>
 class regex_term : public term<JsonT>
 {
+    typedef typename JsonT::char_type char_type;
+    typedef typename JsonT::string_type string_type;
     string_type pattern_;
     std::regex::flag_type flags_;
 public:
@@ -448,6 +450,8 @@ public:
 template <class JsonT>
 class path_term : public term<JsonT>
 {
+    typedef typename JsonT::string_type string_type;
+
     string_type path_;
     JsonT nodes_;
 public:
@@ -702,7 +706,7 @@ class jsonpath_filter_parser
     filter_states::states_t pre_line_break_state_;
 public:
     jsonpath_filter_parser(const char_type** expr, size_t* line,size_t* column)
-        : p_(*expr), line_(*line), column_(*column)
+        : line_(*line), column_(*column),p_(*expr)
     {
     }
 

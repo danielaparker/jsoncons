@@ -411,7 +411,7 @@ bool is_simple(value_types::value_types_t type)
     return type < value_types::string_t;
 }
 
-template <typename StringT, typename Alloc = std::allocator<CharT>>
+template <typename StringT, typename Alloc = std::allocator<typename StringT::value_type>>
 class basic_json
 {
 public:
@@ -895,6 +895,8 @@ public:
                         return value_.integer_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
                         return value_.integer_value_ == rhs.value_.float_value_;
+                    default:
+                        break;
                     }
                     break;
                 case value_types::uinteger_t:
@@ -906,6 +908,8 @@ public:
                         return value_.uinteger_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
                         return value_.uinteger_value_ == rhs.value_.float_value_;
+                    default:
+                        break;
                     }
                     break;
                 case value_types::double_t:
@@ -917,7 +921,11 @@ public:
                         return value_.float_value_ == rhs.value_.uinteger_value_;
                     case value_types::double_t:
                         return value_.float_value_ == rhs.value_.float_value_;
+                    default:
+                        break;
                     }
+                    break;
+                default:
                     break;
                 }
             }
@@ -2050,12 +2058,12 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_ == value_types::integer_t;
+        return var_.type_ == value_types::integer_t || (var_.type_ == value_types::uinteger_t && (as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.type_ == value_types::uinteger_t;
+        return var_.type_ == value_types::uinteger_t || (var_.type_ == value_types::integer_t && as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
@@ -2098,6 +2106,8 @@ public:
             var_.value_.object_value_ = create_instance<object>(var_, object_allocator_type(var_));
         case value_types::object_t:
             var_.value_.object_value_->reserve(n);
+            break;
+        default:
             break;
         }
     }
@@ -2164,11 +2174,11 @@ public:
         switch (var_.type_)
         {
         case value_types::double_t:
-            return static_cast<long long>(var_.value_.float_value_);
+            return static_cast<int64_t>(var_.value_.float_value_);
         case value_types::integer_t:
-            return static_cast<long long>(var_.value_.integer_value_);
+            return static_cast<int64_t>(var_.value_.integer_value_);
         case value_types::uinteger_t:
-            return static_cast<long long>(var_.value_.uinteger_value_);
+            return static_cast<int64_t>(var_.value_.uinteger_value_);
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:
@@ -2181,11 +2191,11 @@ public:
         switch (var_.type_)
         {
         case value_types::double_t:
-            return static_cast<unsigned long long>(var_.value_.float_value_);
+            return static_cast<uint64_t>(var_.value_.float_value_);
         case value_types::integer_t:
-            return static_cast<unsigned long long>(var_.value_.integer_value_);
+            return static_cast<uint64_t>(var_.value_.integer_value_);
         case value_types::uinteger_t:
-            return static_cast<unsigned long long>(var_.value_.uinteger_value_);
+            return static_cast<uint64_t>(var_.value_.uinteger_value_);
         case value_types::bool_t:
             return var_.value_.bool_value_ ? 1 : 0;
         default:

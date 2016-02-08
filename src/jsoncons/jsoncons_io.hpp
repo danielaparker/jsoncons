@@ -118,7 +118,6 @@ public:
             throw std::runtime_error("Failed attempting double to string conversion");
         }
         char* s = buf;
-        char* s0 = s;
         char* se = s + precision_;
 
         int i, k;

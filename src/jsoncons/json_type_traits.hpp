@@ -95,10 +95,6 @@ public:
         {
             return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
         }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
-        }
         else
         {
             return false;
@@ -456,18 +452,7 @@ class json_type_traits<JsonT, long long>
 public:
     static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
-        if (rhs.is_integer())
-        {
-            return true;
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
+        return rhs.is_integer();
     }
     static long long as(const JsonT& rhs)
     {
@@ -485,18 +470,7 @@ class json_type_traits<JsonT, unsigned long long>
 public:
     static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return rhs.is_uinteger();
     }
     static unsigned long long as(const JsonT& rhs)
     {

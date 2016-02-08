@@ -518,9 +518,9 @@ public:
                             jsonpath_filter_parser<JsonT> parser(&p_,&line_,&column_);
                             parser.parse(p_,end_input_);
                             auto index = parser.eval(*(stack_.back()[0]));
-                            if (index.is<size_t>())
+                            if (index.template is<size_t>())
                             {
-                                start_ = index.as<size_t>();
+                                start_ = index. template as<size_t>();
                                 find_elements();
                             }
                             else if (index.is_string())
@@ -696,6 +696,8 @@ public:
                 buffer_.clear();
                 transfer_nodes();
             }
+            break;
+        default:
             break;
         }
     }
