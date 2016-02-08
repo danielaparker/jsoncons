@@ -1943,12 +1943,12 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_ == value_types::integer_t;
+        return var_.type_ == value_types::integer_t || (var_.type_ == value_types::uinteger_t && (as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.type_ == value_types::uinteger_t;
+        return var_.type_ == value_types::uinteger_t || (var_.type_ == value_types::integer_t && as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
