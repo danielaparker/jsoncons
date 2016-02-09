@@ -472,41 +472,40 @@ vertical-align:1px;
 
 <p>For example, by including the header file <code>jsoncons_ext/boost/type_extensions.hpp</code>, you can access and modify <code>json</code> values with <code>boost::gregorian</code> dates.</p>
 
-<pre><code>#include "jsoncons/json.hpp"
-#include "jsoncons_ext/boost/type_extensions.hpp"
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/boost/type_extensions.hpp<span class="pl-pds">"</span></span>
 
-namespace my
-{
-    using jsoncons::json;
-    using boost::gregorian::date;
-
-    json deal;
-    deal["Maturity"] = date(2014,10,14);
-
-    json observation_dates = make_array();
-    observation_dates.add(date(2014,2,14));
-    observation_dates.add(date(2014,2,21));
-
-    deal["ObservationDates"] = std::move(observation_dates);
-
-    date maturity = deal["Maturity"].as&lt;date&gt;();
-    std::cout &lt;&lt; "Maturity: " &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
-
-    std::cout &lt;&lt; "Observation dates: " &lt;&lt; std::endl &lt;&lt; std::endl;
-    json::array_iterator it = deal["ObservationDates"].elements().begin();
-    json::array_iterator end = deal["ObservationDates"].end_elements();
-
-    while (it != end)
+    <span class="pl-k">namespace</span> <span class="pl-en">my</span>
     {
-        date d = it-&gt;as&lt;date&gt;();
-        std::cout &lt;&lt; d &lt;&lt; std::endl;
-        ++it;
-    }
-    std::cout &lt;&lt; std::endl;
+        <span class="pl-k">using</span> jsoncons::json;
+        <span class="pl-k">using</span> boost::gregorian::date;
 
-    std::cout &lt;&lt; pretty_print(deal) &lt;&lt; std::endl;
-}
-</code></pre>
+        json deal;
+        deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>] = date(<span class="pl-c1">2014</span>,<span class="pl-c1">10</span>,<span class="pl-c1">14</span>);
+
+        json observation_dates = make_array();
+        observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">14</span>));
+        observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">21</span>));
+
+        deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>] = std::move(observation_dates);
+
+        date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>].as&lt;date&gt;();
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Maturity: <span class="pl-pds">"</span></span> &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
+
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
+        json::array_iterator it = deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].elements().begin();
+        json::array_iterator end = deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].end_elements();
+
+        <span class="pl-k">while</span> (it != end)
+        {
+            date d = it-&gt;as&lt;date&gt;();
+            std::cout &lt;&lt; d &lt;&lt; std::endl;
+            ++it;
+        }
+        std::cout &lt;&lt; std::endl;
+
+        std::cout &lt;&lt; pretty_print(deal) &lt;&lt; std::endl;
+    }</pre></div>
 
 <p>The output is</p>
 
@@ -516,56 +515,54 @@ Observation dates:
 
 2014-Feb-14
 2014-Feb-21
-
-{
-    "Maturity":"2014-10-14",
-    "ObservationDates":
-    ["2014-02-14","2014-02-21"]
-}
 </code></pre>
+
+<div class="highlight highlight-source-json"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2014-10-14<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>:
+        [<span class="pl-s"><span class="pl-pds">"</span>2014-02-14<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2014-02-21<span class="pl-pds">"</span></span>]
+    }</pre></div>
 
 <p>You can look in the header file <code>jsoncons_ext/boost/type_extensions.hpp</code><br>
 to see how the specialization of <code>json_type_traits</code> that supports<br>
 the conversions works. In this implementation the <code>boost</code> date values are stored in the <code>json</code> values as strings.</p>
 
-<p>namespace jsoncons <br>
-{<br>
-    template <br>
-    class json_type_traits<br>
-    {<br>
-    public:<br>
-        static bool is(const JsonT&amp; val) <br>
-        {<br>
-            if (!val.is_string())<br>
-            {<br>
-                return false;<br>
-            }<br>
-            std::string s = val.template asstd::string();<br>
-            try<br>
-            {<br>
-                boost::gregorian::date_from_iso_string(s);<br>
-                return true;<br>
-            }<br>
-            catch (...)<br>
-            {<br>
-                return false;<br>
-            }<br>
-        }</p>
-
-<pre><code>    static boost::gregorian::date as(const JsonT&amp; val)
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
     {
-        std::string s = val.template as&lt;std::string&gt;();
-        return boost::gregorian::from_simple_string(s);
-    }
+        <span class="pl-k">template </span>&lt;<span class="pl-k">typename</span> JsonT&gt;
+        <span class="pl-k">class</span> <span class="pl-en">json_type_traits</span>&lt;JsonT,boost::gregorian::date&gt;
+        {
+        <span class="pl-k">public:</span>
+            <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> JsonT&amp; val) noexcept
+            {
+                <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
+                {
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                }
+                std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+                <span class="pl-k">try</span>
+                {
+                    <span class="pl-c1">boost::gregorian::date_from_iso_string</span>(s);
+                    <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                }
+                <span class="pl-k">catch</span> (...)
+                {
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                }
+            }
 
-    static void assign(JsonT&amp; lhs, boost::gregorian::date val)
-    {
-        lhs = to_iso_extended_string(val);
-    }
-};
-</code></pre>
+            <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> JsonT&amp; val)
+            {
+                std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+                <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+            }
 
-<p>}</p>
+            <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(JsonT&amp; lhs, boost::gregorian::date val)
+            {
+                lhs = <span class="pl-c1">to_iso_extended_string</span>(val);
+            }
+        };
+    }</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

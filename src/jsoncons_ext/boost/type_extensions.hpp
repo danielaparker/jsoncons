@@ -21,7 +21,7 @@ namespace jsoncons
     class json_type_traits<JsonT,boost::gregorian::date>
     {
     public:
-        static bool is(const JsonT& val) 
+        static bool is(const JsonT& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_string())
             {
