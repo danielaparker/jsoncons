@@ -472,7 +472,7 @@ vertical-align:1px;
 
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
 
-<p>jsoncons uses some features that are new to C++ 11, particularly move semantics and the AllocatorAwareContainer concept. Through the use of conditional directives, however, it retains compatibility with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, MS Visual C++ 15, clang 3.3 and GCC 4.8. </p>
+<p>jsoncons uses some features that are new to C++ 11, particularly <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. Through the use of conditional directives, however, it retains compatibility with VC++ 10 SP1 (note that SP1 is required for VC++ 10, it fixes compiler bugs with move semantics.) It has been tested with MS Visual C++ 10 SP1, MS Visual C++ 15, clang 3.3 and GCC 4.8. </p>
 
 <h2>Using the jsoncons library</h2>
 
@@ -836,17 +836,17 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 
 <h3>About jsoncons::json</h3>
 
-<p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
+<p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>std::string</code> as the string type<br>
 and <code>std::allocator&lt;char&gt;</code> as the allocator type,</p>
 
-<pre><code>typedef basic_json&lt;char,std::allocator&lt;char&gt;&gt; json
+<pre><code>typedef basic_json&lt;std::string,std::allocator&lt;char&gt;&gt; json
 </code></pre>
 
 <p>The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <p>The library includes an instantiation for wide characters as well,</p>
 
-<pre><code>typedef basic_json&lt;wchar_t,std::allocator&lt;wchar_t&gt;&gt; wjson
+<pre><code>typedef basic_json&lt;std::wstring,std::allocator&lt;wchar_t&gt;&gt; wjson
 </code></pre>
 
 <p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
@@ -854,7 +854,7 @@ and <code>std::allocator&lt;char&gt;</code> as the allocator type,</p>
 <pre><code>#include &lt;boost/pool/pool_alloc.hpp&gt;
 #include "jsoncons/json.hpp"
 
-typedef jsoncons::basic_json&lt;char, boost::fast_pool_allocator&lt;char&gt;&gt; myjson;
+typedef jsoncons::basic_json&lt;std::string, boost::fast_pool_allocator&lt;char&gt;&gt; myjson;
 
 myjson o;
 
@@ -907,13 +907,13 @@ void add(T val)
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 
-<pre><code>template &lt;typename CharT, typename Alloc, typename T&gt;
+<pre><code>template &lt;class JsonT, typename T&gt;
 class json_type_traits
 {
 public:
-    static bool is(const basic_json&lt;CharT,Alloc&gt;&amp;);
-    static T as(const basic_json&lt;CharT,Alloc&gt;&amp; val);
-    static void assign(basic_json&lt;CharT,Alloc&gt;&amp; lhs, T rhs);
+    static bool is(const JsonT&amp; rhs) noexcept;
+    static T as(const JsonT&amp; rhs);
+    static void assign(JsonT&amp; lhs, T rhs);
 };
 </code></pre>
 

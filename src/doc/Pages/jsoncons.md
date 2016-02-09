@@ -329,23 +329,23 @@ The result is
 
 ### About jsoncons::json
 
-The json class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The json class is an instantiation of the `basic_json` class template that uses `std::string` as the string type
 and `std::allocator<char>` as the allocator type,
 
-    typedef basic_json<char,std::allocator<char>> json
+    typedef basic_json<std::string,std::allocator<char>> json
 
 The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
 
 The library includes an instantiation for wide characters as well,
 
-    typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson
+    typedef basic_json<std::wstring,std::allocator<wchar_t>> wjson
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 
     #include <boost/pool/pool_alloc.hpp>
     #include "jsoncons/json.hpp"
 
-    typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
+    typedef jsoncons::basic_json<std::string, boost::fast_pool_allocator<char>> myjson;
 
     myjson o;
 

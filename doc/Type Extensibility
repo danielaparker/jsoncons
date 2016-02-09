@@ -528,41 +528,44 @@ Observation dates:
 to see how the specialization of <code>json_type_traits</code> that supports<br>
 the conversions works. In this implementation the <code>boost</code> date values are stored in the <code>json</code> values as strings.</p>
 
-<pre><code>namespace jsoncons
-{
-    template &lt;typename Alloc&gt;
-    class json_type_traits&lt;char,Alloc,boost::gregorian::date&gt;
+<p>namespace jsoncons <br>
+{<br>
+    template <br>
+    class json_type_traits<br>
+    {<br>
+    public:<br>
+        static bool is(const JsonT&amp; val) <br>
+        {<br>
+            if (!val.is_string())<br>
+            {<br>
+                return false;<br>
+            }<br>
+            std::string s = val.template asstd::string();<br>
+            try<br>
+            {<br>
+                boost::gregorian::date_from_iso_string(s);<br>
+                return true;<br>
+            }<br>
+            catch (...)<br>
+            {<br>
+                return false;<br>
+            }<br>
+        }</p>
+
+<pre><code>    static boost::gregorian::date as(const JsonT&amp; val)
     {
-    public:
-        static bool is(const basic_json&lt;char,Alloc&gt;&amp; val)
-        {
-            if (!val.is&lt;std::string&gt;())
-            {
-                return false;
-            }
-            std::string s = val.as&lt;std::string&gt;();
-            try
-            {
-                boost::gregorian::date_from_iso_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        }
-        static boost::gregorian::date as(const basic_json&lt;char,Alloc&gt;&amp; val)
-        {
-            std::string s = val.as&lt;std::string&gt;();
-            return boost::gregorian::from_simple_string(s);
-        }
-        static void assign(basic_json&lt;char,Alloc&gt;&amp; lhs, boost::gregorian::date val)
-        {
-            lhs = to_iso_extended_string(val);
-        }
-    };
+        std::string s = val.template as&lt;std::string&gt;();
+        return boost::gregorian::from_simple_string(s);
+    }
+
+    static void assign(JsonT&amp; lhs, boost::gregorian::date val)
+    {
+        lhs = to_iso_extended_string(val);
+    }
 };
 </code></pre>
+
+<p>}</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

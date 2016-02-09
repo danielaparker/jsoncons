@@ -470,10 +470,10 @@ vertical-align:1px;
 <body>
 <pre><code>jsoncons::json
 
-typedef basic_json&lt;char,std::allocator&lt;char&gt;&gt; json
+typedef basic_json&lt;std::string,std::allocator&lt;char&gt;&gt; json
 </code></pre>
 
-<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>std::string</code> as the string type<br>
 and <code>std::allocator&lt;char&gt;</code> as the allocator type. The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
