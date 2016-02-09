@@ -16,15 +16,24 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
-#include "jsoncons/json1.hpp"
+#include "jsoncons/jsoncons.hpp"
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
-
 namespace jsoncons {
+
+template <class JsonT, typename T>
+class json_type_traits
+{
+public:
+    static bool is(const JsonT&)
+    {
+        return false;
+    }
+};
 
 template<class JsonT>
 class json_type_traits<JsonT, typename JsonT::string_type>
