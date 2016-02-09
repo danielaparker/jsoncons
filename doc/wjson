@@ -470,7 +470,7 @@ vertical-align:1px;
 <body>
 <pre><code>jsoncons::wjson
 
-typedef basic_json&lt;wstring,std::allocator&lt;char&gt;&gt; wjson
+typedef basic_json&lt;std::wstring,std::allocator&lt;char&gt;&gt; wjson
 </code></pre>
 
 <p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>std::wstring</code> as the string type<br>

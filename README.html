@@ -501,6 +501,13 @@ vertical-align:1px;
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
 
+<p>What's new on master</p>
+
+<ul>
+<li><p>The first template parameter of <code>basic_json</code> has been changed from <code>CharT</code> (char or wchar_t) to StringT (std::string or std::wstring). This change will be transparent to anyone using <code>json</code> or <code>wjson</code>, but those using custom allocators will need to change this template parameter.</p></li>
+<li><p>The first two template parameters of <code>json_type_traits</code>, <code>CharT</code> and <code>Alloc</code>, have been replaced with <code>JsonT</code>, the json class itself, rather than its template parameters. This change will be transparent to everyone except those who have extended <code>json_type_traits</code>, who will need to make this change.</p></li>
+</ul>
+
 <h2>Benchmarks</h2>
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
