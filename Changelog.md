@@ -1,3 +1,8 @@
+0.98.4
+------
+
+- Fixes issues with compilation with clang
+
 0.98.3
 ------
 
