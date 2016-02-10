@@ -37,9 +37,12 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
         JsonT value;
     };
 
+    allocator_type allocator_;
+    JsonT result_;
+
 public:
-    basic_json_deserializer(const allocator_type allocator = allocator_type())
-        : result_(allocator),
+    basic_json_deserializer(const allocator_type& allocator = allocator_type())
+        : allocator_(allocator),
           top_(-1),
           stack_(default_depth),
           depth_(default_depth),
@@ -67,7 +70,6 @@ public:
 #endif
 
 private:
-    JsonT result_;
 
     void push_object()
     {
@@ -77,7 +79,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].value = object(result_.get_allocator());
+        stack_[top_].value = object(allocator_);
     }
 
     void push_array()
@@ -88,7 +90,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_].value = array(result_.get_allocator());
+        stack_[top_].value = array(allocator_);
     }
 
     void pop_object()
@@ -180,12 +182,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(p,length,result_.get_allocator()));
+            stack_[top_].member.value(value_type(p,length,allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(JsonT(p,length,result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(JsonT(p,length,allocator_));
         }
     }
 
@@ -197,12 +199,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(value,result_.get_allocator()));
+            stack_[top_].member.value(value_type(value,allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(value_type(value,allocator_));
         }
     }
 
@@ -214,12 +216,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(value,result_.get_allocator()));
+            stack_[top_].member.value(value_type(value,allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(value_type(value,allocator_));
         }
     }
 
@@ -231,12 +233,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(value,result_.get_allocator()));
+            stack_[top_].member.value(value_type(value,allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(value_type(value,allocator_));
         }
     }
 
@@ -248,12 +250,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(value,result_.get_allocator()));
+            stack_[top_].member.value(value_type(value,allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value_type(value,result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(value_type(value,allocator_));
         }
     }
 
@@ -265,12 +267,12 @@ private:
         }
         else if (stack_[top_].value.is_object())
         {
-            stack_[top_].member.value(value_type(null_type(),result_.get_allocator()));
+            stack_[top_].member.value(value_type(null_type(),allocator_));
             stack_[top_].value.object_value().bulk_insert(std::move(stack_[top_].member));
         } 
         else
         {
-            stack_[top_].value.array_value().push_back(value_type(null_type(),result_.get_allocator()));
+            stack_[top_].value.array_value().push_back(value_type(null_type(),allocator_));
         }
     }
 

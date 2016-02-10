@@ -135,9 +135,10 @@ void destroy_instance(const Alloc& allocator, T* p)
 }
 
 template <class JsonT, class Alloc>
-class json_array : public Alloc
+class json_array
 {
 public:
+    typedef Alloc allocator_type;
     typedef JsonT value_type;
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<JsonT> vector_allocator_type;
@@ -148,7 +149,7 @@ public:
     typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
     typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
-
+/*
     static void* operator new(size_t size, const Alloc& allocator)
     {
         auto* p = create<array>(allocator, vector_allocator_type(allocator));
@@ -159,9 +160,9 @@ public:
     {
         destroy_instance(*(static_cast<json_array<JsonT,Alloc>*>(p)),static_cast<json_array<JsonT,Alloc>*>(p));
     }
-
+*/
     json_array(const Alloc& allocator = Alloc())
-        : Alloc(allocator), elements_(allocator)
+        : elements_(allocator)
     {
     }
 
@@ -207,9 +208,9 @@ public:
     {
     }
 
-    Alloc get_allocator()
+    Alloc get_allocator() const
     {
-        return *this;
+        return elements_.get_allocator();
     }
 
     void swap(json_array<JsonT,Alloc>& val)
@@ -531,6 +532,11 @@ public:
         members_(std::move(val.members_))
 #endif
     {
+    }
+
+    Alloc get_allocator() const
+    {
+        return members_.get_allocator();
     }
 
     iterator begin()

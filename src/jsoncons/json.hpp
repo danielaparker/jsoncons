@@ -362,122 +362,109 @@ public:
     typedef range<array,false> array_range;
     typedef range<array,true> const_array_range;
 
-    allocator_type get_allocator() const
+    struct variant
     {
-        return var_;
-    }
-
-    struct variant : public Alloc
-    {
-        Alloc get_allocator() const
-        {
-            return *this;
-        }
-
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
         variant(const Alloc& a)
-            : Alloc(a), type_(value_types::empty_object_t)
+            : type_(value_types::empty_object_t)
         {
         }
 
         explicit variant(variant&& var)
-            : Alloc(var.get_allocator()), type_(value_types::null_t)
+            : type_(value_types::null_t)
         {
             swap(var);
         }
 		
         explicit variant(const Alloc& a, variant&& var)
-            : Alloc(a), type_(value_types::null_t)
+            : type_(value_types::null_t)
         {
             swap(var);
         }
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         explicit variant(const variant& var)
-            : Alloc(std::allocator_traits<allocator_type>::select_on_container_copy_construction(var.get_allocator()))
         {
             init_variant(var);
         }
 #else
         explicit variant(const variant& var)
-            : Alloc(var.get_allocator())
         {
             init_variant(var);
         }
 #endif
         explicit variant(const Alloc& a, const variant& var)
-            : Alloc(a), type_(var.type_)
+            : type_(var.type_)
         {
             init_variant(var);
         }
 
         variant(const Alloc& a, const object & val)
-            : Alloc(a), type_(value_types::object_t)
+            : type_(value_types::object_t)
         {
-            value_.object_value_ = create<object>(get_allocator(), val, object_allocator_type(get_allocator())) ;
+            value_.object_value_ = create<object>(a, val, object_allocator_type(a)) ;
         }
 
         variant(const Alloc& a, object && val)
-            : Alloc(a), type_(value_types::object_t)
+            : type_(value_types::object_t)
         {
-            value_.object_value_ = create<object>(get_allocator(), std::move(val), object_allocator_type(get_allocator()));
+            value_.object_value_ = create<object>(a, std::move(val), object_allocator_type(a));
         }
 
         variant(const Alloc& a, const array& val)
-            : Alloc(a), type_(value_types::array_t)
+            : type_(value_types::array_t)
         {
-            value_.array_value_ = create<array>(get_allocator(), val, array_allocator_type(*this));
+            value_.array_value_ = create<array>(a, val, array_allocator_type(a));
         }
 
         variant(const Alloc& a, array&& val)
-            : Alloc(a), type_(value_types::array_t)
+            : type_(value_types::array_t)
         {
-            value_.array_value_ = create<array>(get_allocator(), std::move(val), array_allocator_type(*this));
+            value_.array_value_ = create<array>(a, std::move(val), array_allocator_type(a));
         }
 
         explicit variant(const Alloc& a, const any& val)
-            : Alloc(a), type_(value_types::any_t)
+            : type_(value_types::any_t)
         {
-            value_.any_value_ = create<any>(get_allocator(), val);
+            value_.any_value_ = create<any>(a, val);
         }
 
         explicit variant(const Alloc& a, jsoncons::null_type)
-            : Alloc(a), type_(value_types::null_t)
+            : type_(value_types::null_t)
         {
         }
 
         explicit variant(const Alloc& a, bool val)
-            : Alloc(a), type_(value_types::bool_t)
+            : type_(value_types::bool_t)
         {
             value_.bool_value_ = val;
         }
 
         explicit variant(const Alloc& a, double val)
-            : Alloc(a), type_(value_types::double_t)
+            : type_(value_types::double_t)
         {
             value_.float_value_ = val;
         }
 
         explicit variant(const Alloc& a, int64_t val)
-            : Alloc(a), type_(value_types::integer_t)
+            : type_(value_types::integer_t)
         {
             value_.integer_value_ = val;
         }
 
         explicit variant(const Alloc& a, uint64_t val)
-            : Alloc(a), type_(value_types::uinteger_t)
+            : type_(value_types::uinteger_t)
         {
             value_.uinteger_value_ = val;
         }
 
         explicit variant(const Alloc& a, const string_type& s)
-            : Alloc(a)
         {
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(a, s, string_allocator_type(a));
             }
             else
             {
@@ -489,13 +476,12 @@ public:
         }
 
         explicit variant(const Alloc& a, const char_type* s)
-            : Alloc(a)
         {
             size_t length = std::char_traits<char_type>::length(s);
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(a, s, string_allocator_type(a));
             }
             else
             {
@@ -507,12 +493,11 @@ public:
         }
 
         explicit variant(const Alloc& a, const char_type* s, size_t length)
-            : Alloc(a)
         {
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create<string_type>(get_allocator(), s, length, string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(a, s, length, string_allocator_type(a));
             }
             else
             {
@@ -525,9 +510,9 @@ public:
 
         template<class InputIterator>
         variant(const Alloc& a, InputIterator first, InputIterator last)
-            : Alloc(a), type_(value_types::array_t)
+            : type_(value_types::array_t)
         {
-            value_.array_value_ = create<array>(get_allocator(), first, last, array_allocator_type(*this));
+            value_.array_value_ = create<array>(a, first, last, array_allocator_type(a));
         }
 
         void init_variant(const variant& var)
@@ -556,16 +541,16 @@ public:
                 value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = create<string_type>(get_allocator(), *(var.value_.string_value_), string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(var.value_.string_value_->get_allocator(), *(var.value_.string_value_), string_allocator_type(var.value_.string_value_->get_allocator()));
                 break;
             case value_types::array_t:
-                value_.array_value_ = create<array>(get_allocator(), *(var.value_.array_value_), array_allocator_type(*this));
+                value_.array_value_ = create<array>(var.value_.array_value_->get_allocator(), *(var.value_.array_value_), array_allocator_type(var.value_.array_value_->get_allocator()));
                 break;
             case value_types::object_t:
-                value_.object_value_ = create<object>(get_allocator(), *(var.value_.object_value_), object_allocator_type(*this));
+                value_.object_value_ = create<object>(var.value_.object_value_->get_allocator(), *(var.value_.object_value_), object_allocator_type(var.value_.object_value_->get_allocator()));
                 break;
             case value_types::any_t:
-                value_.any_value_ = create<any>(get_allocator(), *(var.value_.any_value_));
+                value_.any_value_ = create<any>(var.value_.any_value_->get_allocator(), *(var.value_.any_value_));
                 break;
             default:
                 break;
@@ -582,16 +567,16 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                destroy_instance(get_allocator(), value_.string_value_);
+                destroy_instance(value_.string_value_->get_allocator(), value_.string_value_);
                 break;
             case value_types::array_t:
-                destroy_instance(get_allocator(), value_.array_value_);
+                destroy_instance(value_.array_value_->get_allocator(), value_.array_value_);
                 break;
             case value_types::object_t:
-                destroy_instance(get_allocator(), value_.object_value_);
+                destroy_instance(value_.object_value_->get_allocator(), value_.object_value_);
                 break;
             case value_types::any_t:
-                destroy_instance(get_allocator(), value_.any_value_);
+                destroy_instance(value_.any_value_->get_allocator(), value_.any_value_);
                 break;
             default:
                 break; 
@@ -637,7 +622,7 @@ public:
         {
 			destroy_variant();
 			type_ = value_types::object_t;
-			value_.object_value_ = create<object>(get_allocator(), val, object_allocator_type(*this));
+			value_.object_value_ = create<object>(val.get_allocator(), val, object_allocator_type(val.get_allocator()));
 		}
 
         void assign(object && val)
@@ -650,7 +635,7 @@ public:
 			default:
 				destroy_variant();
 				type_ = value_types::object_t;
-				value_.object_value_ = create<object>(get_allocator(), std::move(val), object_allocator_type(*this));
+				value_.object_value_ = create<object>(val.get_allocator(), std::move(val), object_allocator_type(val.get_allocator()));
 				break;
 			}
 		}
@@ -659,7 +644,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::array_t;
-            value_.array_value_ = create<array>(get_allocator(), val, array_allocator_type(*this)) ;
+            value_.array_value_ = create<array>(val.get_allocator(), val, array_allocator_type(val.get_allocator())) ;
         }
 
         void assign(array&& val)
@@ -672,7 +657,7 @@ public:
 			default:
 				destroy_variant();
 				type_ = value_types::array_t;
-				value_.array_value_ = create<array>(get_allocator(), std::move(val), array_allocator_type(*this));
+				value_.array_value_ = create<array>(val.get_allocator(), std::move(val), array_allocator_type(val.get_allocator()));
 				break;
 			}
 		}
@@ -683,7 +668,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(s.get_allocator(), s, string_allocator_type(s.get_allocator()));
             }
             else
             {
@@ -694,13 +679,13 @@ public:
             }
         }
 
-        void assign_string(const char_type* s, size_t length)
+        void assign_string(const char_type* s, size_t length, const Alloc& allocator = Alloc())
         {
             destroy_variant();
 			if (length > variant::small_string_capacity)
 			{
 				type_ = value_types::string_t;
-                value_.string_value_ = create<string_type>(get_allocator(), s, length, string_allocator_type(get_allocator()));
+                value_.string_value_ = create<string_type>(allocator, s, length, string_allocator_type(allocator));
 			}
 			else
 			{
@@ -749,7 +734,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::any_t;
-            value_.any_value_ = create<any>(get_allocator(), rhs);
+            value_.any_value_ = create<any>(rhs.get_allocator(), rhs);
         }
 
         bool operator!=(const variant& rhs) const
@@ -883,27 +868,11 @@ public:
             {
                 // same object, do nothing
             }
-            else if (get_allocator() == rhs.get_allocator())
+            else
             {
-                // same allocator, swap contents
-                swap(type_,rhs.type_);
-                swap(small_string_length_, rhs.small_string_length_);
-                swap(value_, rhs.value_);
-            }
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-            else if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value)
-            {
-                // swap allocators and contents
-                swap(static_cast<Alloc&>(*this),static_cast<Alloc&>(rhs));
                 swap(type_, rhs.type_);
                 swap(small_string_length_, rhs.small_string_length_);
                 swap(value_, rhs.value_);
-            }
-#endif
-            else
-            {
-                // Undefined behaviour
-                std::terminate();
             }
         }
 
@@ -1980,7 +1949,7 @@ public:
             break;
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->reserve(n);
             break;
@@ -2420,7 +2389,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(name, value);
             break;
@@ -2435,7 +2404,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),value);
             break;
@@ -2450,7 +2419,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(name,std::move(value));
             break;
@@ -2465,7 +2434,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),std::move(value));
             break;
@@ -2482,7 +2451,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
             var_.value_.object_value_->set(name, value);
             return members().begin();
             break;
@@ -2500,7 +2469,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
             var_.value_.object_value_->set(std::move(name), value);
             return members().begin();
             break;
@@ -2518,7 +2487,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
             var_.value_.object_value_->set(name, std::move(value));
             return members().begin();
             break;
@@ -2536,7 +2505,7 @@ public:
         switch (var_.type_){
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
             var_.value_.object_value_->set(std::move(name), std::move(value));
             return members().begin();
             break;
@@ -3092,7 +3061,7 @@ public:
         {
         case value_types::empty_object_t:
             var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(var_, object_allocator_type(var_));
+            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
             return *(var_.value_.object_value_);
         case value_types::object_t:
             return *(var_.value_.object_value_);
