@@ -207,6 +207,11 @@ public:
     {
     }
 
+    Alloc get_allocator()
+    {
+        return *this;
+    }
+
     void swap(json_array<JsonT,Alloc>& val)
     {
         elements_.swap(val.elements_);

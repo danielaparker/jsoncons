@@ -28,25 +28,34 @@ private:
         char* memory_ptr_; 
         node_type* next_ptr_; 
     }; 
-    size_t offset_, size_, align_; 
+    struct node_typeA
+    {
+        node_type data;
+        char c[1];
+    };
+    typedef typename std::aligned_storage<sizeof(node_typeA), JSONCONS_ALIGNOF(node_typeA)>::type storage_type;
+
+    size_t offset_, size_; 
     node_type* head_; 
     node_type* curr_; 
 
     node_type* add_node()
     {
-        node_type* storage = reinterpret_cast<node_type*>(alloc(sizeof(node_type) + size_)); 
-        storage->memory_ptr_ = reinterpret_cast<char* >(storage + 1); 
-        storage->next_ptr_ = nullptr; 
+        size_t mem_size = sizeof(storage_type) + size_ - 1;
+        node_type* storage = reinterpret_cast<node_type*>(alloc(mem_size)); 
+        node_type* p = new(storage)node_type();
+        auto pa = reinterpret_cast<node_typeA*>(storage);
+        p->memory_ptr_ = new(&pa->c)char[size_];
+        p->next_ptr_ = nullptr;
         return storage; 
     }
-protected: 
-    void * alloc(size_t n) {return malloc(n);} 
+
+    void* alloc(size_t n) {return malloc(n);} 
     void dealloc(void* storage) {free(storage);} 
 public: 
-    pool(size_t size, size_t log2_align = 3)
+    pool(size_t size)
         : offset_(0), size_(size) 
     { 
-        align_ = (1 << log2_align) - 1; 
         head_ = curr_ = add_node(); 
     } 
     ~pool()
@@ -63,12 +72,19 @@ public:
         void *pv; 
         if (n > (size_ - offset_)) 
         { 
-            if (size_ < n) size_ = n; curr_->next_ptr_ = add_node(); 
+            if (size_ < n) 
+            {
+                size_ = n;
+            }
+            curr_->next_ptr_ = add_node(); 
             curr_ = curr_->next_ptr_; 
             offset_ = 0; 
         } 
         pv = reinterpret_cast<void *>(curr_->memory_ptr_ + offset_); 
-        offset_ += (n + align_) & ~align_; 
+
+        size_t mem_size = sizeof(storage_type) + n - 1;
+
+        offset_ += mem_size; 
         return pv; 
     }
 }; 
@@ -89,10 +105,6 @@ public:
     {
         typedef pool_allocator<U> other;
     }; 
-    pool_allocator() throw() 
-        : pool_ptr_(nullptr) 
-    {
-    } 
     pool_allocator(pool* pp) throw() : pool_ptr_(pp) 
     {
     } 
@@ -151,11 +163,14 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
 
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
-    pool a_pool(1024, 2);
+    pool a_pool(1024);
     pool_allocator<json> a_pool_allocator(&a_pool); 
-    
+
     typedef basic_json<std::string,pool_allocator<json>> myjson;
-    myjson root(a_pool_allocator);
+    myjson::array an_array = myjson::array(a_pool_allocator);
+
+    //myjson root = myjson::array(an_array);
+    //root.set("field1",10.0);
  
 	// Works but memory is never freed by allocator
     
