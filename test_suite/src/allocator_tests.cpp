@@ -168,20 +168,15 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 
     typedef basic_json<std::string,pool_allocator<json>> myjson;
     myjson::array an_array = myjson::array(a_pool_allocator);
+    myjson::object an_object = myjson::object(a_pool_allocator);
 
-    //myjson root = myjson::array(an_array);
-    //root.set("field1",10.0);
- 
-	// Works but memory is never freed by allocator
-    
-    /*myjson o;
+    myjson root = an_object;
+    root.set("field1", 10.0);
+    root.set("field1", 20.0);
 
-    o.set("field1",10.0);
-    o.set("field2",20.0);
-    o.set("field333","Too large for small string value");
-
-	std::string s = o["field333"].as<std::string>();
-
-    std::cout << o << std::endl; */
+    myjson& val = root.at("field1");
+    //BOOST_CHECK_EQUAL(10.0,root["field1"]);
+    //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
+    //std::cout << root << std::endl; 
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -268,7 +268,6 @@ namespace value_types
     enum value_types_t 
     {
         // Simple types
-        empty_object_t,
         small_string_t,
         double_t,
         integer_t,
@@ -299,7 +298,7 @@ public:
     typedef typename StringT::value_type char_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
+    typedef typename StringT::allocator_type string_allocator_type;
 #else
     typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
 #endif
@@ -366,11 +365,6 @@ public:
     {
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
-        variant()
-            : type_(value_types::empty_object_t)
-        {
-        }
-
         variant(const Alloc& a)
             : type_(value_types::object_t)
         {
@@ -383,7 +377,7 @@ public:
             swap(var);
         }
 		
-        explicit variant(const Alloc& a, variant&& var)
+        explicit variant(variant&& var, const Alloc& a)
             : type_(value_types::null_t)
         {
             swap(var);
@@ -400,72 +394,96 @@ public:
             init_variant(var);
         }
 #endif
-        explicit variant(const Alloc& a, const variant& var)
+        explicit variant(const variant& var, const Alloc& a)
             : type_(var.type_)
         {
             init_variant(var);
         }
 
-        variant(const Alloc& a, const object & val)
+        variant(const object & val)
+            : type_(value_types::object_t)
+        {
+            value_.object_value_ = create<object>(val.get_allocator(), val) ;
+        }
+
+        variant(const object & val, const Alloc& a)
             : type_(value_types::object_t)
         {
             value_.object_value_ = create<object>(a, val, object_allocator_type(a)) ;
         }
 
-        variant(const Alloc& a, object&& val)
+        variant(object&& val)
+            : type_(value_types::object_t)
+        {
+            value_.object_value_ = create<object>(val.get_allocator(), std::move(val));
+        }
+
+        variant(object&& val, const Alloc& a)
             : type_(value_types::object_t)
         {
             value_.object_value_ = create<object>(a, std::move(val), object_allocator_type(a));
         }
 
-        variant(const Alloc& a, const array& val)
+        variant(const array& val)
+            : type_(value_types::array_t)
+        {
+            value_.array_value_ = create<array>(val.get_allocator(), val);
+        }
+
+        variant(const array& val, const Alloc& a)
             : type_(value_types::array_t)
         {
             value_.array_value_ = create<array>(a, val, array_allocator_type(a));
         }
 
-        variant(const Alloc& a, array&& val)
+        variant(array&& val)
+            : type_(value_types::array_t)
+        {
+            value_.array_value_ = create<array>(val.get_allocator(), std::move(val));
+        }
+
+        variant(array&& val, const Alloc& a)
             : type_(value_types::array_t)
         {
             value_.array_value_ = create<array>(a, std::move(val), array_allocator_type(a));
         }
 
-        explicit variant(const Alloc& a, const any& val)
+        explicit variant(const any& val, const Alloc& a)
             : type_(value_types::any_t)
         {
             value_.any_value_ = create<any>(a, val);
         }
 
-        explicit variant(const Alloc& a, jsoncons::null_type)
+        explicit variant(null_type)
             : type_(value_types::null_t)
         {
         }
 
-        explicit variant(const Alloc& a, bool val)
+        explicit variant(bool val, const Alloc& a)
             : type_(value_types::bool_t)
         {
             value_.bool_value_ = val;
         }
 
-        explicit variant(const Alloc& a, double val)
+        explicit variant(double val, const Alloc& a)
             : type_(value_types::double_t)
         {
             value_.float_value_ = val;
         }
 
-        explicit variant(const Alloc& a, int64_t val)
+        explicit variant(int64_t val, const Alloc& a)
             : type_(value_types::integer_t)
         {
             value_.integer_value_ = val;
         }
 
-        explicit variant(const Alloc& a, uint64_t val)
+        explicit variant(uint64_t val, const Alloc& a)
             : type_(value_types::uinteger_t)
         {
             value_.uinteger_value_ = val;
         }
 
-        explicit variant(const Alloc& a, const string_type& s)
+        explicit variant(const string_type& s, const Alloc& a)
         {
             if (s.length() > variant::small_string_capacity)
             {
@@ -481,7 +499,7 @@ public:
             }
         }
 
-        explicit variant(const Alloc& a, const char_type* s)
+        explicit variant(const char_type* s, const Alloc& a)
         {
             size_t length = std::char_traits<char_type>::length(s);
             if (length > variant::small_string_capacity)
@@ -498,7 +516,7 @@ public:
             }
         }
 
-        explicit variant(const Alloc& a, const char_type* s, size_t length)
+        explicit variant(const char_type* s, size_t length, const Alloc& a)
         {
             if (length > variant::small_string_capacity)
             {
@@ -515,7 +533,7 @@ public:
         }
 
         template<class InputIterator>
-        variant(const Alloc& a, InputIterator first, InputIterator last)
+        variant(InputIterator first, InputIterator last, const Alloc& a)
             : type_(value_types::array_t)
         {
             value_.array_value_ = create<array>(a, first, last, array_allocator_type(a));
@@ -527,7 +545,6 @@ public:
             switch (type_)
             {
             case value_types::null_t:
-            case value_types::empty_object_t:
                 break;
             case value_types::double_t:
                 value_.float_value_ = var.value_.float_value_;
@@ -807,7 +824,6 @@ public:
             case value_types::bool_t:
                 return value_.bool_value_ == rhs.value_.bool_value_;
             case value_types::null_t:
-            case value_types::empty_object_t:
                 return true;
             case value_types::small_string_t:
                 return small_string_length_ == rhs.small_string_length_ ? std::char_traits<char_type>::compare(value_.small_string_value_,rhs.value_.small_string_value_,small_string_length_) == 0 : false;
@@ -848,8 +864,6 @@ public:
                 return value_.string_value_->length() == 0;
             case value_types::array_t:
                 return value_.array_value_->size() == 0;
-            case value_types::empty_object_t:
-                return true;
             case value_types::object_t:
                 return value_.object_value_->size() == 0;
             default:
@@ -1611,12 +1625,7 @@ public:
 
     variant var_;
 
-    basic_json() 
-        : var_()
-    {
-    }
-
-    basic_json(const Alloc& allocator) 
+    basic_json(const Alloc& allocator = Alloc()) 
         : var_(allocator)
     {
     }
@@ -1627,7 +1636,7 @@ public:
     }
 
     basic_json(const basic_json<StringT, Alloc>& val, const Alloc& allocator)
-        : var_(allocator, val.var_)
+        : var_(val.var_,allocator)
     {
     }
 
@@ -1637,45 +1646,57 @@ public:
     }
 
     basic_json(basic_json<StringT,Alloc>&& other, const Alloc& allocator)
-        : var_(allocator, std::move(other.var_))
+        : var_(std::move(other.var_),allocator)
     {
     }
 
-    basic_json(const array& val, const Alloc& allocator = Alloc())
-        : var_(allocator, val)
+    basic_json(const array& val)
+        : var_(val)
     {
     }
 
-    basic_json(array&& other, const Alloc& allocator = Alloc())
-        : var_(allocator, std::move(other))
+    basic_json(array&& other)
+        : var_(std::move(other))
     {
     }
 
-    basic_json(object && other, const Alloc& allocator = Alloc())
-        : var_(allocator, std::move(other))
+    basic_json(const object& other)
+        : var_(other)
+    {
+    }
+
+    basic_json(object&& other)
+        : var_(std::move(other))
     {
     }
 
     template <class ParentT>
     basic_json(const json_proxy<ParentT>& proxy, const Alloc& allocator = Alloc())
-        : var_(allocator, proxy.evaluate().var_)
+        : var_(proxy.evaluate().var_,allocator)
     {
     }
 
     template <typename T>
-    basic_json(T val, const Alloc& allocator = Alloc())
+    basic_json(T val)
+        : var_(null_type())
+    {
+        json_type_traits<value_type,T>::assign(*this,val);
+    }
+
+    template <typename T>
+    basic_json(T val, const Alloc& allocator)
         : var_(allocator)
     {
         json_type_traits<value_type,T>::assign(*this,val);
     }
 
     basic_json(const char_type *s, size_t length, const Alloc& allocator = Alloc())
-        : var_(allocator, s, length)
+        : var_(s, length, allocator)
     {
     }
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Alloc& allocator = Alloc())
-        : var_(allocator,first,last)
+        : var_(first,last,allocator)
     {
     }
 
@@ -1713,8 +1734,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return 0;
         case value_types::object_t:
             return var_.value_.object_value_->size();
         case value_types::array_t:
@@ -1738,7 +1757,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
         case value_types::object_t:
             return json_proxy<basic_json<StringT,Alloc>>(*this, name);
             break;
@@ -1797,10 +1815,6 @@ public:
             break;
         case value_types::null_t:
             handler.value(null_type());
-            break;
-        case value_types::empty_object_t:
-            handler.begin_object();
-            handler.end_object();
             break;
         case value_types::object_t:
             {
@@ -1900,7 +1914,7 @@ public:
 
     bool is_object() const JSONCONS_NOEXCEPT
     {
-        return var_.type_ == value_types::object_t || var_.type_ == value_types::empty_object_t;
+        return var_.type_ == value_types::object_t;
     }
 
     bool is_array() const JSONCONS_NOEXCEPT
@@ -1958,9 +1972,6 @@ public:
         case value_types::array_t:
             var_.value_.array_value_->reserve(n);
             break;
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->reserve(n);
             break;
@@ -2001,7 +2012,6 @@ public:
         switch (var_.type_)
         {
         case value_types::null_t:
-        case value_types::empty_object_t:
             return false;
         case value_types::bool_t:
             return var_.value_.bool_value_;
@@ -2124,8 +2134,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
                 auto it = var_.value_.object_value_->find(name);
@@ -2182,8 +2190,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
                 auto it = var_.value_.object_value_->find(name);
@@ -2235,8 +2241,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2250,8 +2254,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2265,8 +2267,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2280,8 +2280,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return members().end();
         case value_types::object_t:
             return var_.value_.object_value_->find(name);
         default:
@@ -2296,10 +2294,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            {
-                return basic_json<StringT,Alloc>(std::forward<T>(default_val));
-            }
         case value_types::object_t:
             {
                 const_object_iterator it = var_.value_.object_value_->find(name);
@@ -2355,8 +2349,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            break;
         case value_types::object_t:
             var_.value_.object_value_->erase(first, last);
             break;
@@ -2398,9 +2390,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(name, value);
             break;
@@ -2413,9 +2402,6 @@ public:
 
     void set(string_type&& name, const basic_json<StringT, Alloc>& value){
         switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),value);
             break;
@@ -2428,9 +2414,6 @@ public:
 
     void set(const string_type& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
         case value_types::object_t:
             var_.value_.object_value_->set(name,std::move(value));
             break;
@@ -2441,11 +2424,10 @@ public:
         }
     }
 
-    void set(string_type&& name, basic_json<StringT, Alloc>&& value){
-        switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
+    void set(string_type&& name, basic_json<StringT, Alloc>&& value)
+    {
+        switch (var_.type_)
+        {
         case value_types::object_t:
             var_.value_.object_value_->set(std::move(name),std::move(value));
             break;
@@ -2460,12 +2442,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
-            var_.value_.object_value_->set(name, value);
-            return members().begin();
-            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, name, value);
             break;
@@ -2478,12 +2454,6 @@ public:
 
     object_iterator set(object_iterator hint, string_type&& name, const basic_json<StringT, Alloc>& value){
         switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
-            var_.value_.object_value_->set(std::move(name), value);
-            return members().begin();
-            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, std::move(name),value);
             break;
@@ -2496,12 +2466,6 @@ public:
 
     object_iterator set(object_iterator hint, const string_type& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
-            var_.value_.object_value_->set(name, std::move(value));
-            return members().begin();
-            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, name,std::move(value));
             break;
@@ -2514,12 +2478,6 @@ public:
 
     object_iterator set(object_iterator hint, string_type&& name, basic_json<StringT, Alloc>&& value){
         switch (var_.type_){
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
-            var_.value_.object_value_->set(std::move(name), std::move(value));
-            return members().begin();
-            break;
         case value_types::object_t:
             return var_.value_.object_value_->set(hint, std::move(name),std::move(value));
             break;
@@ -2771,8 +2729,6 @@ public:
 
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return a_null;
         case value_types::object_t:
             {
                 const_object_iterator it = var_.value_.object_value_->find(name);
@@ -2997,8 +2953,6 @@ public:
         static object empty;
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return object_range(empty);
         case value_types::object_t:
             return object_range(object_value());
         default:
@@ -3011,8 +2965,6 @@ public:
         static const object empty;
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return const_object_range(empty);
         case value_types::object_t:
             return const_object_range(object_value());
         default:
@@ -3070,10 +3022,6 @@ public:
     {
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            var_.type_ = value_types::object_t;
-            var_.value_.object_value_ = create<object>(Alloc(), object_allocator_type(Alloc()));
-            return *(var_.value_.object_value_);
         case value_types::object_t:
             return *(var_.value_.object_value_);
         default:
@@ -3084,11 +3032,8 @@ public:
 
     const object& object_value() const
     {
-        static const basic_json<StringT, Alloc> cobject = basic_json<StringT, Alloc>::object();
         switch (var_.type_)
         {
-        case value_types::empty_object_t:
-            return cobject.object_value();
         case value_types::object_t:
             return *(var_.value_.object_value_);
         default:
