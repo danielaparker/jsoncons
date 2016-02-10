@@ -299,11 +299,11 @@ public:
     typedef typename StringT::value_type char_type;
 
 #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> name_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> string_allocator_type;
 #else
-    typedef typename allocator_type:: template rebind<char_type>::other name_allocator_type;
+    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
 #endif
-    typedef std::basic_string<char_type,std::char_traits<char_type>,name_allocator_type> string_type;
+    typedef StringT string_type;
     typedef basic_json<StringT,Alloc> value_type;
     typedef name_value_pair<string_type,value_type> member_type;
 
@@ -477,7 +477,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
             }
             else
             {
@@ -495,7 +495,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s,std::char_traits<char_type>::length(s),get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
             }
             else
             {
@@ -512,7 +512,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s,length,get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), s, length, string_allocator_type(get_allocator()));
             }
             else
             {
@@ -556,7 +556,7 @@ public:
                 value_.small_string_value_[small_string_length_] = 0;
                 break;
             case value_types::string_t:
-                value_.string_value_ = create_string_data(var.value_.string_value_->c_str(),var.value_.string_value_->length(),get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), *(var.value_.string_value_), string_allocator_type(get_allocator()));
                 break;
             case value_types::array_t:
                 value_.array_value_ = create<array>(get_allocator(), *(var.value_.array_value_), array_allocator_type(*this));
@@ -582,7 +582,7 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                destroy_string_data(get_allocator(), value_.string_value_);
+                destroy_instance(get_allocator(), value_.string_value_);
                 break;
             case value_types::array_t:
                 destroy_instance(get_allocator(), value_.array_value_);
@@ -683,7 +683,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                value_.string_value_ = create_string_data(s.data(),s.length(),get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), s, string_allocator_type(get_allocator()));
             }
             else
             {
@@ -700,7 +700,7 @@ public:
 			if (length > variant::small_string_capacity)
 			{
 				type_ = value_types::string_t;
-				value_.string_value_ = create_string_data(s,length,get_allocator());
+                value_.string_value_ = create<string_type>(get_allocator(), s, length, string_allocator_type(get_allocator()));
 			}
 			else
 			{
@@ -918,7 +918,7 @@ public:
             object* object_value_;
             array* array_value_;
             any* any_value_;
-            string_data<char_type>* string_value_;
+            string_type* string_value_;
             char_type small_string_value_[sizeof(int64_t)/sizeof(char_type)];
         } value_;
     };
@@ -1801,7 +1801,7 @@ public:
             handler.value(var_.value_.small_string_value_,var_.small_string_length_);
             break;
         case value_types::string_t:
-            handler.value(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            handler.value(var_.value_.string_value_->data(),var_.value_.string_value_->length());
             break;
         case value_types::double_t:
             handler.value(var_.value_.float_value_);
@@ -2104,7 +2104,7 @@ public:
         case value_types::small_string_t:
             return string_type(var_.value_.small_string_value_,var_.small_string_length_);
         case value_types::string_t:
-            return string_type(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            return string_type(var_.value_.string_value_->data(),var_.value_.string_value_->length());
         default:
             return to_string();
         }
@@ -2117,7 +2117,7 @@ public:
         case value_types::small_string_t:
             return string_type(var_.value_.small_string_value_,var_.small_string_length_);
         case value_types::string_t:
-            return string_type(var_.value_.string_value_->c_str(),var_.value_.string_value_->length());
+            return string_type(var_.value_.string_value_->data(),var_.value_.string_value_->length());
         default:
             return to_string(format);
         }
