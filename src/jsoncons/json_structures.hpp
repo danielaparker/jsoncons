@@ -149,18 +149,7 @@ public:
     typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
     typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
-/*
-    static void* operator new(size_t size, const Alloc& allocator)
-    {
-        auto* p = create<array>(allocator, vector_allocator_type(allocator));
-        return p;
-    }
 
-    static void operator delete(void* p)
-    {
-        destroy_instance(*(static_cast<json_array<JsonT,Alloc>*>(p)),static_cast<json_array<JsonT,Alloc>*>(p));
-    }
-*/
     json_array(const Alloc& allocator = Alloc())
         : elements_(allocator)
     {
