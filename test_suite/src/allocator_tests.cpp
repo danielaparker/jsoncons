@@ -172,9 +172,16 @@ BOOST_AUTO_TEST_CASE(test_allocator)
 
     myjson root = an_object;
     root.set("field1", 10.0);
-    root.set("field1", 20.0);
+    root.set("field2", 20.0);
 
-    myjson& val = root.at("field1");
+    auto it = root.find("field1");
+
+    std::cout << it->name() << std::endl;
+    if (it != root.members().end())
+    {
+        myjson& val = it->value();
+    }
+    
     //BOOST_CHECK_EQUAL(10.0,root["field1"]);
     //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
     //std::cout << root << std::endl; 

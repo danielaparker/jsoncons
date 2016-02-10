@@ -2950,7 +2950,6 @@ public:
 
     object_range members()
     {
-        static object empty;
         switch (var_.type_)
         {
         case value_types::object_t:
@@ -2962,7 +2961,6 @@ public:
 
     const_object_range members() const
     {
-        static const object empty;
         switch (var_.type_)
         {
         case value_types::object_t:
