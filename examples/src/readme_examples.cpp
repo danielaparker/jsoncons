@@ -14,7 +14,7 @@ namespace readme_examples {
 void example1()
 {
     // Construct a book object
-    json book1 = json::object();
+    json book1;
 
     book1["category"] = "Fiction";
     book1["title"] = "A Wild Sheep Chase: A Novel";
@@ -24,7 +24,7 @@ void example1()
     book1["isbn"] = "037571894X";  
 
     // Construct another using the member function set
-    json book2 = json::object();
+    json book2;
 
     book2.set("category", "History");
     book2.set("title", "Charlie Wilson's War");
@@ -34,7 +34,7 @@ void example1()
     book2.set("isbn", "0802143415");  
 
     // Use set again, but more efficiently
-    json book3 = json::object();
+    json book3;
 
     // Reserve memory, to avoid reallocations
     book3.reserve(6);
@@ -176,7 +176,7 @@ void example2()
 void example3()
 {
 	// Construct a book object
-	wjson book1 = wjson::object();
+	wjson book1;
 
 	book1[L"category"] = L"Fiction";
 	book1[L"title"] = L"A Wild Sheep Chase: A Novel";
@@ -186,7 +186,7 @@ void example3()
 	book1[L"isbn"] = L"037571894X";
 
 	// Construct another using the member function set
-	wjson book2 = wjson::object();
+	wjson book2;
 
 	book2.set(L"category", L"History");
 	book2.set(L"title", L"Charlie Wilson's War");
@@ -196,7 +196,7 @@ void example3()
 	book2.set(L"isbn", L"0802143415");
 
     // Use set again, but more efficiently
-    wjson book3 = wjson::object();
+    wjson book3;
 
     // Reserve memory, to avoid reallocations
     book3.reserve(6);
