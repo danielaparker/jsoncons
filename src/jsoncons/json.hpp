@@ -366,9 +366,15 @@ public:
     {
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
-        variant(const Alloc& a)
+        variant()
             : type_(value_types::empty_object_t)
         {
+        }
+
+        variant(const Alloc& a)
+            : type_(value_types::object_t)
+        {
+            value_.object_value_ = create<object>(a, object_allocator_type(a));
         }
 
         explicit variant(variant&& var)
@@ -406,7 +412,7 @@ public:
             value_.object_value_ = create<object>(a, val, object_allocator_type(a)) ;
         }
 
-        variant(const Alloc& a, object && val)
+        variant(const Alloc& a, object&& val)
             : type_(value_types::object_t)
         {
             value_.object_value_ = create<object>(a, std::move(val), object_allocator_type(a));
@@ -1605,7 +1611,12 @@ public:
 
     variant var_;
 
-    basic_json(const Alloc& allocator = Alloc()) 
+    basic_json() 
+        : var_()
+    {
+    }
+
+    basic_json(const Alloc& allocator) 
         : var_(allocator)
     {
     }
