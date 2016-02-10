@@ -468,12 +468,19 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>Coming in later release:</p>
+<p>For next release (0.99):</p>
 
 <ul>
-<li><p>Revisit error codes, parsing_context, and opportunities for error recovery. Attempt to support <a href="http://json5.org/">json 5</a> behaviour through an parse_error_handler and a json_filter.</p></li>
-<li><p>Support <a href="http://www.ietf.org/id/draft-newton-json-content-rules-04.txt">JSON Content Rules</a></p></li>
+<li>Full support for AllocatorAwareContainer concept for C++ 11 compilers, continued support for VC++ 2010 with conditional directives. </li>
+<li>Include examples and test cases</li>
+</ul>
+
+<p>For subsequent releases:</p>
+
+<ul>
+<li><p>Support <a href="http://www.ietf.org/id/draft-newton-json-content-rules-05.txt">JSON Content Rules</a> for schema validation in <code>jsoncons_ext</code></p></li>
 <li><p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p></li>
+<li><p>Revisit error codes, parsing_context, and opportunities for error recovery. Attempt to support <a href="http://json5.org/">json 5</a> behaviour through an parse_error_handler and a json_filter.</p></li>
 </ul>
 </body>
 </html>

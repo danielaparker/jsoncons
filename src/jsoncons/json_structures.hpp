@@ -21,19 +21,147 @@
 
 namespace jsoncons {
 
+template <class T, class Alloc>
+T* create(const Alloc& allocator)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+#endif
+    T* storage = alloc.allocate(1);
+    try
+    {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
+#else
+        new(storage) T();
+#endif
+    }
+    catch (...)
+    {
+        alloc.deallocate(storage,1);
+        throw;
+    }
+    return storage;
+}
+
+template <class T, class Alloc, class Arg>
+T* create(const Alloc& allocator, Arg&& val)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+#endif
+    T* storage = alloc.allocate(1);
+    try
+    {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
+#else
+        new(storage)T(std::forward<Arg>(val));
+#endif
+    }
+    catch (...)
+    {
+        alloc.deallocate(storage,1);
+        throw;
+    }
+    return storage;
+}
+
+template <class T, class Alloc, class Arg1, class Arg2>
+T* create(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+#endif
+    T* storage = alloc.allocate(1);
+    try
+    {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
+#else
+    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2));
+#endif
+    }
+    catch (...)
+    {
+        alloc.deallocate(storage,1);
+        throw;
+    }
+    return storage;
+}
+
+template <class T, class Alloc, class Arg1, class Arg2, class Arg3>
+T* create(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+#endif
+    T* storage = alloc.allocate(1);
+    try
+    {
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
+#else
+    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
+#endif
+    }
+    catch (...)
+    {
+        alloc.deallocate(storage,1);
+        throw;
+    }
+    return storage;
+}
+
+template <class T, class Alloc>
+void destroy_instance(const Alloc& allocator, T* p)
+{
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
+    std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
+#else
+    typename Alloc:: template rebind<T>::other alloc(allocator);
+    alloc.destroy(p);
+#endif
+    alloc.deallocate(p,1);
+}
+
 template <class JsonT, class Alloc>
-class json_array 
+class json_array : public Alloc
 {
 public:
-    typedef Alloc allocator_type;
+    typedef JsonT value_type;
+#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
+    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<JsonT> vector_allocator_type;
+#else
+    typedef typename Alloc:: template rebind<JsonT>::other vector_allocator_type;
+#endif
     typedef typename std::vector<JsonT,Alloc>::reference reference;
     typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
     typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
-    typedef typename std::vector<JsonT,Alloc>::value_type value_type;
 
-    explicit json_array(const Alloc& allocator = Alloc())
-        : elements_(allocator)
+    static void* operator new(size_t size, const Alloc& allocator)
+    {
+        auto* p = create<array>(allocator, vector_allocator_type(allocator));
+        return p;
+    }
+
+    static void operator delete(void* p)
+    {
+        destroy_instance(*(static_cast<json_array<JsonT,Alloc>*>(p)),static_cast<json_array<JsonT,Alloc>*>(p));
+    }
+
+    json_array(const Alloc& allocator = Alloc())
+        : Alloc(allocator), elements_(allocator)
     {
     }
 
