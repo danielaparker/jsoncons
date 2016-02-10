@@ -70,7 +70,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     using jsoncons::json;
 
     // Construct a book object
-    json book1;
+    json book1 = json::object();
 
     book1["category"] = "Fiction";
     book1["title"] = "A Wild Sheep Chase: A Novel";
@@ -80,7 +80,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     book1["isbn"] = "037571894X";  
 
     // Construct another using the set function
-    json book2;
+    json book2 = json::object();
 
     book2.set("category", "History");
     book2.set("title", "Charlie Wilson's War");
@@ -90,7 +90,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     book2.set("isbn", "0802143415");  
 
     // Use set again, but more efficiently
-    json book3;
+    json book3 = json::object();
 
     // Reserve memory, to avoid reallocations
     book3.reserve(6);
@@ -303,7 +303,7 @@ Result:
     using jsoncons::wjson;
 
     // Construct a book object
-    wjson book1;
+    wjson book1 = wjson::object();
 
     book1[L"category"] = L"Fiction";
     book1[L"title"] = L"A Wild Sheep Chase: A Novel";
@@ -313,7 +313,7 @@ Result:
     book1[L"isbn"] = L"037571894X";
 
     // Construct another using the set function
-    wjson book2;
+    wjson book2 = wjson::object();
 
     book2.set(L"category", L"History");
     book2.set(L"title", L"Charlie Wilson's War");
@@ -323,7 +323,7 @@ Result:
     book2.set(L"isbn", L"0802143415");
 
     // Use set again, but more efficiently
-    wjson book3;
+    wjson book3 = wjson::object();
 
     // Reserve memory, to avoid reallocations
     book3.reserve(6);
