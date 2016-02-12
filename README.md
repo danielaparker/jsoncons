@@ -31,6 +31,8 @@ What's new on master
 
 - Going forward, support for VC++ 2010 has been dropped - VC++ 2013 or later is required.  
 
+- The deprecated `json` member constants `null`, `an_object`, and `an_array` have been removed, they're incompatible with stateful allocators (see the deprecated list for alternatives.)
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

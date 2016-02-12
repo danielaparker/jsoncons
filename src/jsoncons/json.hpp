@@ -2833,10 +2833,6 @@ public:
     typedef any json_any_type;
     typedef member_type name_value_pair;
 
-    static const basic_json<StringT,Alloc> an_object;
-    static const basic_json<StringT,Alloc> an_array;
-    static const basic_json<StringT,Alloc> null;
-
     static basic_json parse(std::basic_istream<char_type>& is)
     {
         parse_stream(is);
@@ -3324,15 +3320,6 @@ bool basic_json<StringT, Alloc>::operator==(const basic_json<StringT, Alloc>& rh
 {
     return var_ == rhs.var_;
 }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-template<typename StringT, typename Alloc>
-const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::an_object = basic_json<StringT, Alloc>::object();
-template<typename StringT, typename Alloc>
-const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::an_array = basic_json<StringT, Alloc>::array();        
-template<typename StringT, typename Alloc>
-const basic_json<StringT, Alloc> basic_json<StringT, Alloc>::null = basic_json<StringT, Alloc>(jsoncons::null_type());
-#endif
 
 template<typename StringT, typename Alloc>
 basic_json<StringT, Alloc> basic_json<StringT, Alloc>::make_2d_array(size_t m, size_t n)

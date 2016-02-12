@@ -682,20 +682,20 @@ vertical-align:1px;
 <tr>
 <td>json member constants</td>
 <td>null</td>
-<td><em>✓</em></td>
+<td></td>
 <td>Use assignment to <code>jsoncons::null_type()</code> or <code>json::null_type()</code>
 </td>
 </tr>
 <tr>
 <td></td>
 <td>an_object</td>
-<td><em>✓</em></td>
+<td></td>
 <td>Use the default constructor <code>json()</code> instead.</td>
 </tr>
 <tr>
 <td></td>
 <td>an_array</td>
-<td><em>✓</em></td>
+<td></td>
 <td>Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</td>
 </tr>
 <tr>

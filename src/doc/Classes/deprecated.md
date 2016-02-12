@@ -37,9 +37,9 @@ class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_it
     |parse_string(const std::string& s,parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(const std::string& s,parse_error_handler& err_handler)
     |resize_array(size_t n)|<em>&#x2713;</em>|resize(size_t n)
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
-json member constants|null|<em>&#x2713;</em>|Use assignment to `jsoncons::null_type()` or `json::null_type()`
-    |an_object|<em>&#x2713;</em>|Use the default constructor `json()` instead.
-    |an_array|<em>&#x2713;</em>|Use assignment to `json::array()` or `json::make_array()` instead.
+json member constants|null||Use assignment to `jsoncons::null_type()` or `json::null_type()`
+    |an_object||Use the default constructor `json()` instead.
+    |an_array||Use assignment to `json::array()` or `json::make_array()` instead.
 class json_deserializer|json& root()|<em>&#x2713;</em>|json get_result()
 class json_reader|read()|<em>&#x2713;</em>|Use read_next()
     |max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
