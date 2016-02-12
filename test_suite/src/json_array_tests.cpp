@@ -96,7 +96,10 @@ BOOST_AUTO_TEST_CASE(test_object_erase_range)
     o["key3"] = "value3";
     o["key4"] = "value4";
 
-    o.erase(o.members().begin()+1,o.members().begin()+3);
+    auto first = o.find("key2");
+    auto last = o.find("key4");
+
+    o.erase(first,last);
     
     BOOST_CHECK_EQUAL(2,o.size());
     BOOST_CHECK_EQUAL(1,o.count("key1"));

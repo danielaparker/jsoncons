@@ -171,6 +171,8 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     myjson::object an_object = myjson::object(a_pool_allocator);
 
     myjson root = an_object;
+    root.reserve(1);
+
     root.set("field1", 10.0);
     root.set("field2", 20.0);
 

@@ -474,6 +474,93 @@ private:
     ValueT value_;
 };
 
+template <class IteratorT,class NonConstIteratorT>
+class json_object_iterator
+{
+public:
+    typedef IteratorT iterator;
+    typedef typename std::iterator_traits<IteratorT>::value_type value_type;
+    typedef typename std::iterator_traits<IteratorT>::difference_type difference_type;
+    typedef typename std::iterator_traits<IteratorT>::pointer pointer;
+    typedef typename std::iterator_traits<IteratorT>::reference reference;
+    typedef std::bidirectional_iterator_tag  iterator_category;
+
+    json_object_iterator(iterator it)
+        : it_(it)
+    {
+    }
+
+    json_object_iterator(const json_object_iterator<NonConstIteratorT,NonConstIteratorT>& it)
+        : it_(it.it_)
+    {
+    }
+
+    json_object_iterator& operator=(json_object_iterator rhs)
+    {
+        swap(*this,rhs);
+        return *this;
+    }
+
+    json_object_iterator& operator++()
+    {
+        ++it_;
+        return *this;
+    }
+
+    json_object_iterator operator++(int) // postfix increment
+    {
+        json_object_iterator temp(*this);
+        ++it_;
+        return temp;
+    }
+
+    json_object_iterator& operator--()
+    {
+        --it_;
+        return *this;
+    }
+
+    json_object_iterator operator--(int)
+    {
+        json_object_iterator temp(*this);
+        --it_;
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        return *it_;
+    }
+
+    pointer operator->() const
+    {
+        return &(*it_);
+    }
+
+    friend bool operator==(const json_object_iterator& it1, const json_object_iterator& it2)
+    {
+        return it1.it_ == it2.it_;
+    }
+    friend bool operator!=(const json_object_iterator& it1, const json_object_iterator& it2)
+    {
+        return it1.it_ != it2.it_;
+    }
+    friend void swap(json_object_iterator& lhs, json_object_iterator& rhs)
+    {
+        using std::swap;
+        swap(lhs.it_,rhs.it_);
+    }
+
+    iterator get()
+    {
+        return it_;
+    }
+
+//private:
+
+    IteratorT it_;
+};
+
 template <class StringT,class JsonT,class Alloc>
 class json_object
 {
@@ -482,11 +569,16 @@ public:
     typedef typename JsonT::char_type char_type;
     typedef StringT string_type;
     typedef name_value_pair<StringT,JsonT> value_type;
+    typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
+    typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
-    typedef typename std::vector<value_type,allocator_type>::iterator iterator;
-    typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
-    typedef typename std::vector<value_type,allocator_type>::reference reference;
-    typedef typename std::vector<value_type,allocator_type>::const_reference const_reference;
+    typedef typename json_object_iterator<base_iterator,base_iterator> iterator;
+    typedef typename json_object_iterator<const_base_iterator,base_iterator> const_iterator;
+
+    //typedef typename std::vector<value_type,allocator_type>::iterator iterator;
+    //typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
+    //typedef typename std::vector<value_type,allocator_type>::reference reference;
+    //typedef typename std::vector<value_type,allocator_type>::const_reference const_reference;
 private:
     std::vector<value_type,allocator_type> members_;
 public:
@@ -530,24 +622,28 @@ public:
 
     iterator begin()
     {
-        return members_.begin();
+        //return members_.begin();
+        return iterator(members_.begin());
     }
 
     iterator end()
     {
-        return members_.end();
+        //return members_.end();
+        return iterator(members_.end());
     }
 
     const_iterator begin() const
     {
-        return members_.begin();
+        //return iterator(members.data());
+        return const_iterator(members_.begin());
     }
 
     const_iterator end() const
     {
-        return members_.end();
+        //return members_.end();
+        return const_iterator(members_.end());
     }
-
+/*
     const_iterator cbegin() const
     {
         return members_.begin();
@@ -557,7 +653,7 @@ public:
     {
         return members_.end();
     }
-
+*/
     void swap(json_object& val)
     {
         members_.swap(val.members_);
@@ -594,14 +690,16 @@ public:
     {
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : end();
+        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
+        return iterator(result);
     }
 
     const_iterator find(const char_type* name, size_t length) const
     {
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        return (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : end();
+        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
+        return const_iterator(result);
     }
 
     iterator find(const string_type& name)
@@ -611,13 +709,13 @@ public:
  
     const_iterator find(const string_type& name) const
     {
-        return find(name.data(), name.length());
+        return const_iterator(find(name.data(), name.length()));
     }
 
     JsonT& at(const string_type& name) 
     {
         auto it = find(name);
-        if (it == end())
+        if (it == members_.end())
         {
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
         }
@@ -627,7 +725,7 @@ public:
     const JsonT& at(const string_type& name) const
     {
         auto it = find(name);
-        if (it == end())
+        if (it == members_.end())
         {
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
         }
@@ -636,7 +734,7 @@ public:
 
     void erase(iterator first, iterator last) 
     {
-        members_.erase(first,last);
+        members_.erase(first.get(),last.get());
     }
 
     void erase(const char_type* name) 
@@ -749,10 +847,10 @@ public:
 
     iterator set(iterator hint, const char_type* s, size_t length, const JsonT& value)
     {
-        iterator it;
-        if (hint != end() && name_le_string(hint->name(), s, length))
+        base_iterator it;
+        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
         {
-            it = std::lower_bound(hint,end(),s,member_lt_string<value_type,char_type>(length));
+            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         }
         else
         {
@@ -772,15 +870,15 @@ public:
         {
            it = members_.insert(it,value_type(string_type(s,length),value));
         }
-        return it;
+        return iterator(it);
     }
 
     iterator set(iterator hint, const char_type* s, size_t length, JsonT&& value)
     {
-        iterator it;
-        if (hint != end() && name_le_string(hint->name(), s, length))
+        base_iterator it;
+        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
         {
-            it = std::lower_bound(hint,end(),s,member_lt_string<value_type,char_type>(length));
+            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         }
         else
         {
@@ -800,7 +898,7 @@ public:
         {
            it = members_.insert(it,value_type(string_type(s,length),std::move(value)));
         }
-        return it;
+        return iterator(it);
     }
 
     iterator set(iterator hint, const string_type& name, const JsonT& value)
@@ -810,10 +908,10 @@ public:
 
     iterator set(iterator hint, string_type&& name, const JsonT& value)
     {
-        iterator it;
-        if (hint != end() && hint->name() <= name)
+        base_iterator it;
+        if (hint.get() != members_.end() && hint.get()->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -833,7 +931,7 @@ public:
         {
             it = members_.insert(it,value_type(std::move(name),value));
         }
-        return it;
+        return iterator(it);
     }
 
     iterator set(iterator hint, const string_type& name, JsonT&& value)
@@ -843,10 +941,10 @@ public:
 
     iterator set(iterator hint, string_type&& name, JsonT&& value)
     {
-        iterator it;
-        if (hint != members_.end() && hint->name() <= name)
+        std::vector<value_type,allocator_type>::iterator it;
+        if (hint.get() != members_.end() && hint.get()->name() <= name)
         {
-            it = std::lower_bound(hint,end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -866,7 +964,7 @@ public:
         {
             it = members_.insert(it,value_type(std::move(name),std::move(value)));
         }
-        return it;
+        return iterator(it);
     }
 
     void bulk_insert(const value_type& member)
