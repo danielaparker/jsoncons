@@ -1,7 +1,6 @@
 For next release (0.99):
 
-- Full support for AllocatorAwareContainer concept for C++ 11 compilers, continued support for VC++ 2010 with conditional directives. 
-- Include examples and test cases
+- Full support for AllocatorAwareContainer concept
 
 For subsequent releases:
 
