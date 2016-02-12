@@ -483,10 +483,15 @@ public:
     typedef typename std::iterator_traits<IteratorT>::difference_type difference_type;
     typedef typename std::iterator_traits<IteratorT>::pointer pointer;
     typedef typename std::iterator_traits<IteratorT>::reference reference;
-    typedef std::bidirectional_iterator_tag  iterator_category;
+    typedef std::bidirectional_iterator_tag iterator_category;
+
+    json_object_iterator(bool empty = false)
+        : empty_(empty)
+    {
+    }
 
     json_object_iterator(iterator it)
-        : it_(it)
+        : empty_(false), it_(it)
     {
     }
 
@@ -537,18 +542,24 @@ public:
         return &(*it_);
     }
 
+    bool empty() const
+    {
+        return empty_;
+    }
+
     friend bool operator==(const json_object_iterator& it1, const json_object_iterator& it2)
     {
-        return it1.it_ == it2.it_;
+        return (it1.empty() && it2.empty()) || (it1.it_ == it2.it_);
     }
     friend bool operator!=(const json_object_iterator& it1, const json_object_iterator& it2)
     {
-        return it1.it_ != it2.it_;
+        return !(it1.it_ == it2.it_);
     }
     friend void swap(json_object_iterator& lhs, json_object_iterator& rhs)
     {
         using std::swap;
         swap(lhs.it_,rhs.it_);
+        swap(lhs.empty_,rhs.empty_);
     }
 
     iterator get()
@@ -557,7 +568,7 @@ public:
     }
 
 //private:
-
+    bool empty_;
     IteratorT it_;
 };
 
@@ -572,8 +583,8 @@ public:
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
-    typedef typename json_object_iterator<base_iterator,base_iterator> iterator;
-    typedef typename json_object_iterator<const_base_iterator,base_iterator> const_iterator;
+    typedef json_object_iterator<base_iterator,base_iterator> iterator;
+    typedef json_object_iterator<const_base_iterator,base_iterator> const_iterator;
 
     //typedef typename std::vector<value_type,allocator_type>::iterator iterator;
     //typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;

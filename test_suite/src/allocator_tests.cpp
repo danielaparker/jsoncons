@@ -33,7 +33,7 @@ private:
         node_type data;
         char c[1];
     };
-    typedef typename std::aligned_storage<sizeof(node_typeA), JSONCONS_ALIGNOF(node_typeA)>::type storage_type;
+    typedef std::aligned_storage<sizeof(node_typeA), JSONCONS_ALIGNOF(node_typeA)>::type storage_type;
 
     size_t offset_, size_; 
     node_type* head_; 
