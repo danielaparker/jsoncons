@@ -260,30 +260,37 @@ void parse_exception_example()
 
 int main()
 {
-    run_readme_examples();
-    first_example_a();
-    first_example_b();
-    first_example_c();
-    first_example_d();
+    try
+    {
+        run_readme_examples();
+        first_example_a();
+        first_example_b();
+        first_example_c();
+        first_example_d();
 
-    second_example_a();
+        second_example_a();
 
-    array_examples();
-    json_any_examples();
+        array_examples();
+        json_any_examples();
 
-    read_csv_file();
-    write_csv_file();
+        read_csv_file();
+        write_csv_file();
 
-    more_examples();
-    mulitple_json_objects();
+        more_examples();
+        mulitple_json_objects();
 
-    introspection_example();
+        introspection_example();
 
-    wjson_examples();
+        wjson_examples();
 
-    read_and_write_escaped_unicode();
+        read_and_write_escaped_unicode();
 
-	parse_exception_example();
+        parse_exception_example();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 
     return 0;
 }
