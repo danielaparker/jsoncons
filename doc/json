@@ -601,10 +601,20 @@ static json make_array(size_t size1 ... size_t sizeN, T val)
 
 <h3>Constructors</h3>
 
-<pre><code>json(const allocator_type&amp; allocator=allocator_type())
+<pre><code>json()
 </code></pre>
 
 <p>Constructs an empty json object. </p>
+
+<pre><code>json(const allocator_type&amp; allocator)
+</code></pre>
+
+<p>Constructs a json object. </p>
+
+<pre><code>json(std::initializer_list&lt;json&gt; list, const allocator_type&amp; allocator)
+</code></pre>
+
+<p>Constructs a json array with the elements of the initializer list <code>init</code>. </p>
 
 <pre><code>json(const json&amp; val)
 </code></pre>
@@ -1043,196 +1053,181 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
 <h3>Range-based for loop over members of an object</h3>
 
-<pre><code>json book = json::parse(R"(
-{
-    "category" : "Fiction",
-    "title" : "Pulp",
-    "author" : "Charles Bukowski",
-    "date" : "2004-07-08",
-    "price" : 22.48,
-    "isbn" : "1852272007"  
-}
-)");
+<div class="highlight highlight-source-c++"><pre>    json book = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>category<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Fiction<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>title<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Pulp<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>author<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Charles Bukowski<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>date<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">2004</span>-<span class="pl-c1">07</span>-<span class="pl-c1">08</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>price<span class="pl-s"><span class="pl-pds">"</span> : 22.48,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>isbn<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">1852272007</span><span class="pl-s"><span class="pl-pds">"</span>  </span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    )<span class="pl-pds">"</span></span>);
 
-for (auto member: book.members())
-{
-    std::cout &lt;&lt; member.name() &lt;&lt; ":" &lt;&lt; member.value().as&lt;string&gt;() &lt;&lt; std::endl;
-} 
-</code></pre>
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> member: book.members())
+    {
+        std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
+    } </pre></div>
 
 <h3>Range-based for loop over elements of an array</h3>
 
-<pre><code>json books = json::make_array(3);
+<div class="highlight highlight-source-c++"><pre>    json book1;    
+    book1[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
+    book1[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
+    book1[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
 
-books[0]["category"] = "Fiction";
-books[0]["title"] = "A Wild Sheep Chase: A Novel";
-books[0]["author"] = "Haruki Murakami";
+    json book2;    
+    book2[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>;
+    book2[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>;
+    book2[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>;
 
-books[1]["category"] = "History";
-books[1]["title"] = "Charlie Wilson's War";
-books[1]["author"] = "George Crile";
+    json book3;    
+    book3[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
+    book3[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>;
+    book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
 
-books[2]["category"] = "Fiction";
-books[2]["title"] = "Kafka on the Shore";
-books[2]["author"] = "Haruki Murakami";
+    <span class="pl-c">// Constructing a json array with an initializer list </span>
+    json booklist = {book1, book2, book3};    
 
-for (auto book: books.elements())
-{
-    std::cout &lt;&lt; book["title"].as&lt;std::string&gt;() &lt;&lt; std::end;
-} 
-</code></pre>
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> book: booklist.elements())
+    {
+        std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::end;
+    } </pre></div>
 
 <h3>Accessors and defaults</h3>
 
-<pre><code>json obj;
+<div class="highlight highlight-source-c++"><pre>    json obj;
 
-obj["field1"] = 1;
-obj["field3"] = "Toronto";
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;
 
-double x1 = obj.count("field1") &gt; 0 ? obj["field1"].as&lt;double&gt;() : 10.0;
-double x2 = obj.count("field2") &gt; 0 ? obj["field2"].as&lt;double&gt;() : 20.0;
+    <span class="pl-k">double</span> x1 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">10.0</span>;
+    <span class="pl-k">double</span> x2 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">20.0</span>;
 
-std::string x3 = obj.get("field3","Montreal").as&lt;std::string&gt;();
-std::string x4 = obj.get("field4","San Francisco").as&lt;std::string&gt;();
+    std::string x3 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
+    std::string x4 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>San Francisco<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
 
-std::cout &lt;&lt; "x1=" &lt;&lt; x1 &lt;&lt; std::endl;
-std::cout &lt;&lt; "x2=" &lt;&lt; x2 &lt;&lt; std::endl;
-std::cout &lt;&lt; "x3=" &lt;&lt; x3 &lt;&lt; std::endl;
-std::cout &lt;&lt; "x4=" &lt;&lt; x4 &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x1=<span class="pl-pds">"</span></span> &lt;&lt; x1 &lt;&lt; std::endl;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x2=<span class="pl-pds">"</span></span> &lt;&lt; x2 &lt;&lt; std::endl;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x3=<span class="pl-pds">"</span></span> &lt;&lt; x3 &lt;&lt; std::endl;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x4=<span class="pl-pds">"</span></span> &lt;&lt; x4 &lt;&lt; std::endl;</pre></div>
 
 <p>The output is</p>
 
-<pre><code>x1=1
-x2=20
-x3=Toronto
-x4=San Francisco
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>    x1=<span class="pl-c1">1</span>
+    x2=<span class="pl-c1">20</span>
+    x3=Toronto
+    x4=San Francisco</pre></div>
 
 <h3>Nulls</h3>
 
-<pre><code>json obj;
-obj["field1"] = json::null_type();
-std::cout &lt;&lt; obj &lt;&lt; std::endl;
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>    json obj;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = json::null_type();
+    std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 
 <p>The output is </p>
 
-<pre><code>{"field1":null}
-</code></pre>
+<div class="highlight highlight-source-json"><pre>    {<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
 
 <h3>Array</h3>
 
-<pre><code>json arr = json::make_array();
-arr.add(10);
-arr.add(20);
-arr.add(30);
+<div class="highlight highlight-source-c++"><pre>    json arr = json::make_array();
+    arr.add(<span class="pl-c1">10</span>);
+    arr.add(<span class="pl-c1">20</span>);
+    arr.add(<span class="pl-c1">30</span>);
 
-std::cout &lt;&lt; arr &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 
 <p>The output is </p>
 
-<pre><code>[10,20,30]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>    [<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 
 <h3>Array from std::vector</h3>
 
-<pre><code>std::vector&lt;int&gt; v;
-v.push_back(10);
-v.push_back(20);
-v.push_back(30);
+<div class="highlight highlight-source-c++"><pre>    std::vector&lt;<span class="pl-k">int</span>&gt; v;
+    v.push_back(<span class="pl-c1">10</span>);
+    v.push_back(<span class="pl-c1">20</span>);
+    v.push_back(<span class="pl-c1">30</span>);
 
-json arr(v.begin(),v.end());
+    json <span class="pl-en">arr</span>(v.begin(),v.end());
 
-std::cout &lt;&lt; arr &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 
 <p>The output is </p>
 
-<pre><code>[10,20,30]
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>    [<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 
 <h3>Object iterator</h3>
 
-<pre><code>json obj;
-obj["city"] = "Toronto";
-obj["province"] = "Ontario";
-obj["country"] = "Canada";
+<div class="highlight highlight-source-c++"><pre>    json obj;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>;
+    obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>;
 
-for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
-{
-    std::cout &lt;&lt; it-&gt;name() &lt;&lt; "=" &lt;&lt; it-&gt;value().as&lt;std::string&gt;() &lt;&lt; std::endl;
-}
-</code></pre>
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.members().begin(); it != obj.members().end(); ++it)
+    {
+        std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
+    }</pre></div>
 
 <p>The output is</p>
 
-<pre><code>city=Toronto
-country=Canada
-province=Ontario
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>    city=Toronto
+    country=Canada
+    province=Ontario</pre></div>
 
 <h3>Array iterator</h3>
 
-<pre><code>json arr = json::make_array();
-arr.add("Toronto");
-arr.add("Vancouver");
-arr.add("Montreal");
+<div class="highlight highlight-source-c++"><pre>    json arr = {<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>};
 
-for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
-{
-    std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
-}
-</code></pre>
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.elements().begin(); it != arr.elements().end(); ++it)
+    {
+        std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
+    }</pre></div>
 
 <p>The output is</p>
 
-<pre><code>Toronto
-Vancouver 
-Montreal
-</code></pre>
+<div class="highlight highlight-source-json"><pre>    Toronto
+    Vancouver 
+    Montreal</pre></div>
 
 <h3>Constructing json structures</h3>
 
-<pre><code>json root;
+<div class="highlight highlight-source-c++"><pre>    json root;
 
-root["persons"] = json::make_array();
+    root[<span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>] = json::make_array();
 
-json person;
-person["first_name"] = "John";
-person["last_name"] = "Smith";
-person["birth_date"] = "1972-01-30";
+    json person;
+    person[<span class="pl-s"><span class="pl-pds">"</span>first_name<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>John<span class="pl-pds">"</span></span>;
+    person[<span class="pl-s"><span class="pl-pds">"</span>last_name<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Smith<span class="pl-pds">"</span></span>;
+    person[<span class="pl-s"><span class="pl-pds">"</span>birth_date<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>1972-01-30<span class="pl-pds">"</span></span>;
 
-json address;
-address["city"] = "Toronto";
-address["country"] = "Canada";
+    json address;
+    address[<span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;
+    address[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>;
 
-person["address"] = std::move(address);
+    person[<span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>] = std::move(address);
 
-root["persons"].add(std::move(person));
+    root[<span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>].add(std::move(person));
 
-std::cout &lt;&lt; pretty_print(root) &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; pretty_print(root) &lt;&lt; std::endl;</pre></div>
 
 <p>The output is</p>
 
-<pre><code>{
-    "persons":
-    [
-        {
-            "address":
+<div class="highlight highlight-source-c++"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>:
+        [
             {
-                "city":"Toronto",
-                "country":"Canada"
-            },
-            "birth_date":"1972-01-30",
-            "first_name":"John",
-            "last_name":"Smith"
-        }
-    ]
-}
-</code></pre>
+                <span class="pl-s"><span class="pl-pds">"</span>address<span class="pl-pds">"</span></span>:
+                {
+                    <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>
+                },
+                <span class="pl-s"><span class="pl-pds">"</span>birth_date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1972-01-30<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>first_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>John<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>last_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Smith<span class="pl-pds">"</span></span>
+            }
+        ]
+    }</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -506,7 +506,10 @@ vertical-align:1px;
 <ul>
 <li><p>Going forward, support for VC++ 2010 has been dropped - VC++ 2013 or later is required.  </p></li>
 <li><p>The deprecated <code>json</code> member constants <code>null</code>, <code>an_object</code>, and <code>an_array</code> have been removed, they're incompatible with stateful allocators (see the deprecated list for alternatives.)</p></li>
+<li><p>Added <code>json</code> <code>std::initializer_list</code> constructor for constructing arrays, e.g.</p></li>
 </ul>
+
+<div class="highlight highlight-source-c++"><pre>    json image_formats = {<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
 
 <h2>Benchmarks</h2>
 

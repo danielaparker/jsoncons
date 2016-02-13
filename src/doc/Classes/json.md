@@ -64,8 +64,14 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 
 ### Constructors
 
-    json(const allocator_type& allocator=allocator_type())
+    json()
 Constructs an empty json object. 
+
+    json(const allocator_type& allocator)
+Constructs a json object. 
+
+    json(std::initializer_list<json> list, const allocator_type& allocator)
+Constructs a json array with the elements of the initializer list `init`. 
 
     json(const json& val)
 Constructs a copy of val
@@ -376,7 +382,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 ## Examples
 
 ### Range-based for loop over members of an object
-
+```c++
     json book = json::parse(R"(
     {
         "category" : "Fiction",
@@ -392,30 +398,34 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     {
         std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
     } 
-
+```
 ### Range-based for loop over elements of an array
+```c++
+    json book1;    
+    book1["category"] = "Fiction";
+    book1["title"] = "A Wild Sheep Chase: A Novel";
+    book1["author"] = "Haruki Murakami";
 
-    json books = json::make_array(3);
+    json book2;    
+    book2["category"] = "History";
+    book2["title"] = "Charlie Wilson's War";
+    book2["author"] = "George Crile";
 
-    books[0]["category"] = "Fiction";
-    books[0]["title"] = "A Wild Sheep Chase: A Novel";
-    books[0]["author"] = "Haruki Murakami";
+    json book3;    
+    book3["category"] = "Fiction";
+    book3["title"] = "Kafka on the Shore";
+    book3["author"] = "Haruki Murakami";
 
-    books[1]["category"] = "History";
-    books[1]["title"] = "Charlie Wilson's War";
-    books[1]["author"] = "George Crile";
+    // Constructing a json array with an initializer list 
+    json booklist = {book1, book2, book3};    
 
-    books[2]["category"] = "Fiction";
-    books[2]["title"] = "Kafka on the Shore";
-    books[2]["author"] = "Haruki Murakami";
-
-    for (auto book: books.elements())
+    for (auto book: booklist.elements())
     {
         std::cout << book["title"].as<std::string>() << std::end;
     } 
-    
+```    
 ### Accessors and defaults
-
+```c++
     json obj;
 
     obj["field1"] = 1;
@@ -431,39 +441,39 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     std::cout << "x2=" << x2 << std::endl;
     std::cout << "x3=" << x3 << std::endl;
     std::cout << "x4=" << x4 << std::endl;
-
+```
 The output is
-
+```c++
     x1=1
     x2=20
     x3=Toronto
     x4=San Francisco
-
+```
 ### Nulls
-
+```c++
     json obj;
     obj["field1"] = json::null_type();
     std::cout << obj << std::endl;
-
+```
 The output is 
-
+```json
     {"field1":null}
-
+```
 ### Array
-
+```c++
     json arr = json::make_array();
     arr.add(10);
     arr.add(20);
     arr.add(30);
 
     std::cout << arr << std::endl;
-
+```
 The output is 
-
+```json
     [10,20,30]
-
+```
 ### Array from std::vector
-
+```c++
     std::vector<int> v;
     v.push_back(10);
     v.push_back(20);
@@ -472,13 +482,13 @@ The output is
     json arr(v.begin(),v.end());
 
     std::cout << arr << std::endl;
-
+```
 The output is 
-
+```c++
     [10,20,30]
-
+```
 ### Object iterator
-
+```c++
     json obj;
     obj["city"] = "Toronto";
     obj["province"] = "Ontario";
@@ -488,34 +498,31 @@ The output is
     {
         std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
-
+```
 The output is
-
+```c++
     city=Toronto
     country=Canada
     province=Ontario
-
+```
 ### Array iterator
-
-    json arr = json::make_array();
-    arr.add("Toronto");
-    arr.add("Vancouver");
-    arr.add("Montreal");
+```c++
+    json arr = {"Toronto", "Vancouver", "Montreal"};
 
     for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
         std::cout << it->as<std::string>() << std::endl;
     }
-
+```
 The output is
-
+```json
     Toronto
     Vancouver 
     Montreal
-
+```
 ### Constructing json structures
-
-	json root;
+```c++
+    json root;
 
     root["persons"] = json::make_array();
 
@@ -533,9 +540,9 @@ The output is
     root["persons"].add(std::move(person));
 
     std::cout << pretty_print(root) << std::endl;
-
+```
 The output is
-
+```c++
     {
         "persons":
         [
@@ -551,4 +558,4 @@ The output is
             }
         ]
     }
-
+```

@@ -18,6 +18,35 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_array_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_initializer_list_of_integers)
+{
+    json arr = {0,1,2,3};
+    BOOST_CHECK(arr.is_array());
+    BOOST_CHECK(arr.size() == 4);
+    for (size_t i = 0; i < arr.size(); ++i)
+    {
+        BOOST_CHECK_EQUAL(i,arr[i].as<size_t>());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_initializer_list_of_objects)
+{
+    json book1;
+    book1["author"] = "Smith";
+    book1["title"] = "Old Bones";
+
+    json book2;
+    book2["author"] = "Jones";
+    book2["title"] = "New Things";
+
+    json arr = {book1, book2};
+    BOOST_CHECK(arr.is_array());
+    BOOST_CHECK(arr.size() == 2);
+
+    BOOST_CHECK_EQUAL(book1,arr[0]);
+    BOOST_CHECK_EQUAL(book2,arr[1]);
+}
+
 BOOST_AUTO_TEST_CASE(test_array_constructor)
 {
     json arr = json::array();
@@ -25,7 +54,6 @@ BOOST_AUTO_TEST_CASE(test_array_constructor)
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 10);
     BOOST_CHECK_CLOSE(arr[0].as<double>(), 10.0, 0.0000001);
-
 }
 
 BOOST_AUTO_TEST_CASE(test_make_array)

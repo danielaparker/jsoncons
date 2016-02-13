@@ -189,15 +189,17 @@ void more_examples()
 	image_sizing["dimension2"] = jsoncons::null_type();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
-    json image_formats = json::make_array();
-    image_formats.add("JPEG");
-    image_formats.add("PSD");
-    image_formats.add("TIFF");
-    image_formats.add("DNG");
+    json image_formats = {"JPEG","PSD","TIFF","DNG"};
+
+    json color_spaces = json::array();
+    color_spaces.add("sRGB");
+    color_spaces.add("AdobeRGB");
+    color_spaces.add("ProPhoto RGB");
 
     json file_export;
     file_export["image_formats"] = std::move(image_formats);
     file_export["image_sizing"] = std::move(image_sizing);
+    file_export["color_spaces"] = std::move(color_spaces);
     std::cout << pretty_print(file_export) << std::endl;
 
     size_t n = 10, m = 3;

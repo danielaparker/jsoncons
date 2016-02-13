@@ -33,6 +33,11 @@ What's new on master
 
 - The deprecated `json` member constants `null`, `an_object`, and `an_array` have been removed, they're incompatible with stateful allocators (see the deprecated list for alternatives.)
 
+- Added `json` `std::initializer_list` constructor for constructing arrays, e.g.
+```c++
+    json image_formats = {"JPEG","PSD","TIFF","DNG"};
+``` 
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

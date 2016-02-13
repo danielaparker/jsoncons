@@ -404,6 +404,13 @@ public:
             value_.object_val_ = create_instance<object>(a, object_allocator_type(a));
         }
 
+        variant(std::initializer_list<value_type> init,
+                const Alloc& a)
+            : type_(value_types::array_t)
+        {
+            value_.array_val_ = create_instance<array>(a, std::move(init), array_allocator_type(a));
+        }
+
         explicit variant(variant&& var)
             : type_(value_types::null_t)
         {
@@ -1669,6 +1676,12 @@ public:
 
     basic_json(const Alloc& allocator) 
         : var_(allocator)
+    {
+    }
+
+    basic_json(std::initializer_list<value_type> init,
+               const Alloc& allocator = Alloc()) 
+        : var_(std::move(init), allocator)
     {
     }
 

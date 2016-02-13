@@ -17,6 +17,7 @@
 #include <sstream>
 #include <iomanip>
 #include <utility>
+#include <initializer_list>
 #include "jsoncons/jsoncons.hpp"
 
 namespace jsoncons {
@@ -69,6 +70,12 @@ public:
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end, const Alloc& allocator = Alloc())
         : elements_(begin,end,allocator)
+    {
+    }
+
+    json_array(std::initializer_list<JsonT> init, 
+               const Alloc& allocator = Allocator())
+        : elements_(std::move(init),allocator)
     {
     }
 
