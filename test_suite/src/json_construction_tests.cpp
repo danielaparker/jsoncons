@@ -20,7 +20,13 @@ BOOST_AUTO_TEST_SUITE(json_construction_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_construction_from_string)
 {
-    std::string input = "{\"first_name\":\"Jane\",\"last_name\":\"Roe\",\"events_attended\":10}";
+    std::string input = R"(
+    {
+        "first_name":"Jane",
+        "last_name":"Roe",
+        "events_attended":10
+    }
+    )";
 
     json val = json::parse(input);
 

@@ -468,18 +468,22 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>#include "jsoncons/json.hpp"
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 
-using jsoncons::json;
-using jsoncons::pretty_print;
-using std::string;
-</code></pre>
+    <span class="pl-k">using</span> jsoncons::json;
+    <span class="pl-k">using</span> jsoncons::pretty_print;</pre></div>
 
 <h2>Constructing a json value</h2>
 
 <h3>From a string</h3>
 
-<div class="highlight highlight-source-c++"><pre>    string input = <span class="pl-s"><span class="pl-pds">"</span>{<span class="pl-cce">\"</span>first_name<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Jane<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>last_name<span class="pl-cce">\"</span>:<span class="pl-cce">\"</span>Roe<span class="pl-cce">\"</span>,<span class="pl-cce">\"</span>events_attended<span class="pl-cce">\"</span>:10}<span class="pl-pds">"</span></span>;
+<div class="highlight highlight-source-c++"><pre>    std::string input = R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>first_name<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>Jane<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>last_name<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>Roe<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>events_attended<span class="pl-s"><span class="pl-pds">"</span>:10</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    )<span class="pl-pds">"</span></span>;
 
     json val = json::parse(input);
 
@@ -609,8 +613,8 @@ using std::string;
     obj[<span class="pl-s"><span class="pl-pds">"</span>events_attended<span class="pl-pds">"</span></span>] = <span class="pl-c1">10</span>;
     obj[<span class="pl-s"><span class="pl-pds">"</span>accept_waiver_of_liability<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
 
-    string first_name = obj[<span class="pl-s"><span class="pl-pds">"</span>first_name<span class="pl-pds">"</span></span>].as&lt;string&gt;();
-    string last_name = obj.at(<span class="pl-s"><span class="pl-pds">"</span>last_name<span class="pl-pds">"</span></span>).as&lt;string&gt;();
+    std::string first_name = obj[<span class="pl-s"><span class="pl-pds">"</span>first_name<span class="pl-pds">"</span></span>].as&lt;std::string&gt;();
+    std::string last_name = obj.at(<span class="pl-s"><span class="pl-pds">"</span>last_name<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
     <span class="pl-k">int</span> events_attended = obj[<span class="pl-s"><span class="pl-pds">"</span>events_attended<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">int</span>&gt;();
     <span class="pl-k">bool</span> accept_waiver_of_liability = obj[<span class="pl-s"><span class="pl-pds">"</span>accept_waiver_of_liability<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">bool</span>&gt;();
 
@@ -630,14 +634,14 @@ using std::string;
 
     <span class="pl-k">try</span>
     {
-        string experience = obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;string&gt;();
+        std::string experience = obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
     }
     <span class="pl-k">catch</span> (<span class="pl-k">const</span> json_exception&amp; e)
     {
         std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
     }
 
-    string experience = obj.count(<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].as&lt;string&gt;() : <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
+    std::string experience = obj.count(<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].as&lt;std::string&gt;() : <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
 
     <span class="pl-k">bool</span> first_aid_certification = obj.get(<span class="pl-s"><span class="pl-pds">"</span>first_aid_certification<span class="pl-pds">"</span></span>,<span class="pl-c1">false</span>).as&lt;<span class="pl-k">bool</span>&gt;();
 
@@ -659,7 +663,7 @@ using std::string;
 
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.members().begin(); it != obj.members().end(); ++it)
     {
-        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>name=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, value=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>name=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, value=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
     }</pre></div>
 
 <p>The output is</p>
@@ -680,7 +684,7 @@ using std::string;
 
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
-        std::cout &lt;&lt; it-&gt;as&lt;string&gt;() &lt;&lt; std::endl;
+        std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
     }</pre></div>
 
 <p>The output is</p>
