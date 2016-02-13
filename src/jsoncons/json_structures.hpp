@@ -27,11 +27,7 @@ class json_array
 public:
     typedef Alloc allocator_type;
     typedef JsonT value_type;
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<JsonT> vector_allocator_type;
-#else
-    typedef typename Alloc:: template rebind<JsonT>::other vector_allocator_type;
-#endif
     typedef typename std::vector<JsonT,Alloc>::reference reference;
     typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
@@ -52,19 +48,11 @@ public:
     }
 
     json_array(const json_array& val, const Alloc& allocator)
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(val.elements_,allocator)
-#else
-        : elements_(val.elements_)
-#endif
     {
     }
     json_array(json_array&& val, const Alloc& allocator)
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         : elements_(std::move(val.elements_),allocator)
-#else
-        : elements_(val.elements_)
-#endif
     {
     }
 
@@ -496,20 +484,12 @@ public:
     }
 
     json_object(const json_object<StringT,JsonT,Alloc>& val, const allocator_type& allocator) :
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         members_(val.members_,allocator)
-#else
-        members_(val.members_)
-#endif
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         members_(std::move(val.members_),allocator)
-#else
-        members_(std::move(val.members_))
-#endif
     {
     }
 

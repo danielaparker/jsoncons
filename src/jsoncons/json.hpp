@@ -35,19 +35,11 @@ namespace jsoncons {
 template <class T, class Alloc>
 T* create_instance(const Alloc& allocator)
 {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-#endif
     T* storage = alloc.allocate(1);
     try
     {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
-#else
-        new(storage) T();
-#endif
     }
     catch (...)
     {
@@ -60,19 +52,11 @@ T* create_instance(const Alloc& allocator)
 template <class T, class Alloc, class Arg>
 T* create_instance(const Alloc& allocator, Arg&& val)
 {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-#endif
     T* storage = alloc.allocate(1);
     try
     {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
-#else
-        new(storage)T(std::forward<Arg>(val));
-#endif
     }
     catch (...)
     {
@@ -85,19 +69,11 @@ T* create_instance(const Alloc& allocator, Arg&& val)
 template <class T, class Alloc, class Arg1, class Arg2>
 T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
 {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-#endif
     T* storage = alloc.allocate(1);
     try
     {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
-#else
-    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2));
-#endif
     }
     catch (...)
     {
@@ -110,19 +86,11 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
 template <class T, class Alloc, class Arg1, class Arg2, class Arg3>
 T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3)
 {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-#endif
     T* storage = alloc.allocate(1);
     try
     {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
-#else
-    new(storage)T(std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
-#endif
     }
     catch (...)
     {
@@ -135,13 +103,8 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3
 template <class T, class Alloc>
 void destroy_instance(const Alloc& allocator, T* p)
 {
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
     std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
-#else
-    typename Alloc:: template rebind<T>::other alloc(allocator);
-    alloc.destroy(p);
-#endif
     alloc.deallocate(p,1);
 }
 
@@ -156,19 +119,11 @@ public:
     {
         (void)allocator;
     }
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     serializable_any(const serializable_any& val)
         : allocator_(std::allocator_traits<allocator_type>::select_on_container_copy_construction(val.get_allocator()))
     {
 		impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
     }
-#else
-    serializable_any(const serializable_any& val)
-        : allocator_(val.get_allocator())
-    {
-        impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
-    }
-#endif
     serializable_any(const serializable_any& val, const Alloc& allocator)
     {
         (void)allocator;
@@ -322,26 +277,14 @@ public:
 
     typedef typename StringT::value_type char_type;
 
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename StringT::allocator_type string_allocator_type;
-#else
-    typedef typename allocator_type:: template rebind<char_type>::other string_allocator_type;
-#endif
     typedef StringT string_type;
     typedef basic_json<StringT,Alloc> value_type;
     typedef name_value_pair<string_type,value_type> member_type;
 
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<basic_json<StringT,Alloc>> array_allocator_type;
-#else
-    typedef typename Alloc:: template rebind<value_type>::other array_allocator_type;
-#endif
 
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<member_type> object_allocator_type;
-#else
-    typedef typename Alloc:: template rebind<member_type>::other object_allocator_type;
-#endif
 
     typedef json_array<basic_json<StringT,Alloc>,array_allocator_type> array;
     typedef json_object<string_type,basic_json<StringT,Alloc>,object_allocator_type>  object;
@@ -428,11 +371,7 @@ public:
         {
             size_t mem_size = aligned_size(length*sizeof(char));
 
-        #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             typename std::allocator_traits<string_allocator_type>:: template rebind_alloc<char> alloc(allocator);
-        #else
-            typename Alloc:: template rebind<char>::other alloc(allocator);
-        #endif
 
             char* storage = alloc.allocate(mem_size);
             string_data* ps = new(storage)string_data(allocator);
@@ -448,11 +387,7 @@ public:
         void destroy_string_data(const string_allocator_type& allocator, string_data* p)
         {
             size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-        #if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
             typename std::allocator_traits<string_allocator_type>:: template rebind_alloc<char> alloc(allocator);
-        #else
-            typename Alloc:: template rebind<char>::other alloc(allocator);
-        #endif
             alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
         }
 
@@ -481,17 +416,10 @@ public:
             swap(var);
         }
 
-#if !defined(JSONCONS_NO_CXX11_ALLOCATOR)
         explicit variant(const variant& var)
         {
             init_variant(var);
         }
-#else
-        explicit variant(const variant& var)
-        {
-            init_variant(var);
-        }
-#endif
         explicit variant(const variant& var, const Alloc& a)
             : type_(var.type_)
         {
