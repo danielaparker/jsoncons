@@ -256,7 +256,7 @@ private:
         }
     }
 
-    void do_double_value(double val) override
+    void do_double_value(double val, uint8_t precision) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -362,7 +362,7 @@ private:
         //}
         else
         {
-            fp_.print(val,os);
+            fp_.print(val,format_.precision(),os);
         }
 
         end_value();

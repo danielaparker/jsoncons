@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
         os.begin_array();
         for (size_t j = 0; j < A.size2(); ++j)
         {
-            os.value(A(i, j));
+            os.value(A(i, j),0);
         }
         os.end_array();
     }

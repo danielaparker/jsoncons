@@ -542,7 +542,7 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 
 <p>Output non-negative integer event. Uses <code>do_uinteger_value</code>.</p>
 
-<pre><code>void value(double value)
+<pre><code>void value(double value, uint8_t precision = 0)
 </code></pre>
 
 <p>Output floating point value event. Uses <code>do_double_value</code>.</p>
@@ -604,7 +604,7 @@ typedef basic_json_output_handler&lt;char&gt; json_output_handler
 
 <p>Receive non-negative integer value event</p>
 
-<pre><code>virtual void do_double_value(double value)
+<pre><code>virtual void do_double_value(double value, uint8_t precision)
 </code></pre>
 
 <p>Receive floating point value event</p>

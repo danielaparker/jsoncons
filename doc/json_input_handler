@@ -639,7 +639,7 @@ line and column information is provided in the <a href="parsing_context">parsing
 <p>Receive non-negative integer value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
 
-<pre><code>virtual void do_double_value(double value, const parsing_context&amp; context)
+<pre><code>virtual void do_double_value(double value, uint8_t precision, const parsing_context&amp; context)
 </code></pre>
 
 <p>Receive floating point value event. Contextual information including<br>

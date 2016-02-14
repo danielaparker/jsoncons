@@ -18,7 +18,7 @@ inline void serialize(json_output_handler& os, const std::vector<double>& v)
     os.begin_array();
     for (size_t i = 0; i < v.size(); ++i)
     {
-        os.value(v[i]);
+        os.value(v[i], 0);
     }
     os.end_array();
 }

@@ -141,9 +141,9 @@ public:
         do_uinteger_value(value);
     }
 
-    void value(double value)
+    void value(double value, uint8_t precision = 0)
     {
-        do_double_value(value);
+        do_double_value(value, precision);
     }
 
     void value(bool value) 
@@ -176,7 +176,7 @@ private:
 
     virtual void do_string_value(const CharT* value, size_t length) = 0;
 
-    virtual void do_double_value(double value) = 0;
+    virtual void do_double_value(double value, uint8_t precision) = 0;
 
     virtual void do_integer_value(int64_t value) = 0;
 
@@ -230,7 +230,7 @@ private:
         (void)length;
     }
 
-    void do_double_value(double) override
+    void do_double_value(double, uint8_t) override
     {
     }
 

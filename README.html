@@ -511,6 +511,10 @@ vertical-align:1px;
 
 <div class="highlight highlight-source-c++"><pre>    json image_formats = {<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
 
+<ul>
+<li>When parsing fractional numbers in text, floating point number precision is retained, and made available to serialization to preserve round-trip. The default output precision has been changed from 15 to 16.</li>
+</ul>
+
 <h2>Benchmarks</h2>
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>

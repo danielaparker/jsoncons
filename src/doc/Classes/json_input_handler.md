@@ -115,7 +115,7 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive non-negative integer value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_double_value(double value, const parsing_context& context)
+    virtual void do_double_value(double value, uint8_t precision, const parsing_context& context)
 Receive floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 

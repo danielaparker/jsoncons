@@ -242,28 +242,25 @@ class basic_json;
 template <typename CharT>
 class basic_parse_error_handler;
 
-namespace value_types
+enum class value_types : uint8_t 
 {
-    enum value_types_t 
-    {
-        // Simple types
-        empty_object_t,
-        small_string_t,
-        double_t,
-        integer_t,
-        uinteger_t,
-        bool_t,
-        null_t,
-        // Non simple types
-        string_t,
-        object_t,
-        array_t,
-        any_t
-    };
-}
+    // Simple types
+    empty_object_t,
+    small_string_t,
+    double_t,
+    integer_t,
+    uinteger_t,
+    bool_t,
+    null_t,
+    // Non simple types
+    string_t,
+    object_t,
+    array_t,
+    any_t
+};
 
 inline
-bool is_simple(value_types::value_types_t type)
+bool is_simple(value_types type)
 {
     return type < value_types::string_t;
 }
@@ -328,7 +325,7 @@ public:
 
     struct variant
     {
-                struct string_data : public string_allocator_type
+        struct string_data : public string_allocator_type
         {
             const char_type* c_str() const { return p_; }
             const char_type* data() const { return p_; }
@@ -498,9 +495,10 @@ public:
             value_.bool_val_ = val;
         }
 
-        explicit variant(double val, const Alloc& a)
-            : type_(value_types::double_t)
+        explicit variant(double val, uint8_t precision, const Alloc& a)
+            : type_(value_types::double_t), length_or_precision_(0)
         {
+            length_or_precision_ = precision;
             value_.double_val_ = val;
         }
 
@@ -527,9 +525,9 @@ public:
             else
             {
                 type_ = value_types::small_string_t;
-                small_string_length_ = (unsigned char)s.length();
+                length_or_precision_ = static_cast<uint8_t>(s.length());
                 std::memcpy(value_.small_string_val_,s.data(),s.length()*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                value_.small_string_val_[length_or_precision_] = 0;
             }
         }
 
@@ -545,9 +543,9 @@ public:
             else
             {
                 type_ = value_types::small_string_t;
-                small_string_length_ = (unsigned char)length;
+                length_or_precision_ = static_cast<uint8_t>(length);
                 std::memcpy(value_.small_string_val_,s,length*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                value_.small_string_val_[length_or_precision_] = 0;
             }
         }
 
@@ -562,9 +560,9 @@ public:
             else
             {
                 type_ = value_types::small_string_t;
-                small_string_length_ = (unsigned char)length;
+                length_or_precision_ = static_cast<uint8_t>(length);
                 std::memcpy(value_.small_string_val_,s,length*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                value_.small_string_val_[length_or_precision_] = 0;
             }
         }
 
@@ -584,6 +582,7 @@ public:
             case value_types::empty_object_t:
                 break;
             case value_types::double_t:
+                length_or_precision_ = 0;
                 value_.double_val_ = var.value_.double_val_;
                 break;
             case value_types::integer_t:
@@ -596,9 +595,9 @@ public:
                 value_.bool_val_ = var.value_.bool_val_;
                 break;
             case value_types::small_string_t:
-                small_string_length_ = var.small_string_length_;
-                std::memcpy(value_.small_string_val_,var.value_.small_string_val_,var.small_string_length_*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                length_or_precision_ = var.length_or_precision_;
+                std::memcpy(value_.small_string_val_,var.value_.small_string_val_,var.length_or_precision_*sizeof(char_type));
+                value_.small_string_val_[length_or_precision_] = 0;
                 break;
             case value_types::string_t:
                 //value_.string_val_ = create_instance<string_type>(var.value_.string_val_->get_allocator(), *(var.value_.string_val_), string_allocator_type(var.value_.string_val_->get_allocator()));
@@ -654,7 +653,7 @@ public:
                     if (is_simple(val.type_))
                     {
                         type_ = val.type_;
-                        small_string_length_ = val.small_string_length_;
+                        length_or_precision_ = val.length_or_precision_;
                         value_ = val.value_;
                     }
                     else
@@ -736,9 +735,9 @@ public:
             else
             {
                 type_ = value_types::small_string_t;
-                small_string_length_ = (unsigned char)s.length();
+                length_or_precision_ = static_cast<uint8_t>(s.length());
                 std::memcpy(value_.small_string_val_,s.data(),s.length()*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                value_.small_string_val_[length_or_precision_] = 0;
             }
         }
 
@@ -754,9 +753,9 @@ public:
 			else
 			{
 				type_ = value_types::small_string_t;
-				small_string_length_ = (unsigned char)length;
+                length_or_precision_ = static_cast<uint8_t>(length);
 				std::memcpy(value_.small_string_val_,s,length*sizeof(char_type));
-                value_.small_string_val_[small_string_length_] = 0;
+                value_.small_string_val_[length_or_precision_] = 0;
 			}
         }
 
@@ -774,10 +773,11 @@ public:
             value_.uinteger_val_ = val;
         }
 
-        void assign(double val)
+        void assign(double val, uint8_t precision = 0)
         {
             destroy_variant();
             type_ = value_types::double_t;
+            length_or_precision_ = precision;
             value_.double_val_ = val;
         }
 
@@ -868,7 +868,7 @@ public:
             case value_types::empty_object_t:
                 return true;
             case value_types::small_string_t:
-                return small_string_length_ == rhs.small_string_length_ ? std::char_traits<char_type>::compare(value_.small_string_val_,rhs.value_.small_string_val_,small_string_length_) == 0 : false;
+                return length_or_precision_ == rhs.length_or_precision_ ? std::char_traits<char_type>::compare(value_.small_string_val_,rhs.value_.small_string_val_,length_or_precision_) == 0 : false;
             case value_types::string_t:
                 return *(value_.string_val_) == *(rhs.value_.string_val_);
             case value_types::array_t:
@@ -901,7 +901,7 @@ public:
             switch (type_)
             {
             case value_types::small_string_t:
-                return small_string_length_ == 0;
+                return length_or_precision_ == 0;
             case value_types::string_t:
                 return value_.string_val_->length() == 0;
             case value_types::array_t:
@@ -935,13 +935,13 @@ public:
             else
             {
                 swap(type_, rhs.type_);
-                swap(small_string_length_, rhs.small_string_length_);
+                swap(length_or_precision_, rhs.length_or_precision_);
                 swap(value_, rhs.value_);
             }
         }
 
-        value_types::value_types_t type_;
-        unsigned char small_string_length_;
+        value_types type_;
+        uint8_t length_or_precision_;
         union
         {
             double double_val_;
@@ -1042,7 +1042,7 @@ public:
             return evaluate().size();
         }
 
-        value_types::value_types_t type() const
+        value_types type() const
         {
             return evaluate().type();
         }
@@ -1738,6 +1738,11 @@ public:
         json_type_traits<value_type,T>::assign(*this,val);
     }
 
+    basic_json(double val, uint8_t precision)
+        : var_(val,precision)
+    {
+    }
+
     template <typename T>
     basic_json(T val, const Alloc& allocator)
         : var_(allocator)
@@ -1855,13 +1860,13 @@ public:
         switch (var_.type_)
         {
         case value_types::small_string_t:
-            handler.value(var_.value_.small_string_val_,var_.small_string_length_);
+            handler.value(var_.value_.small_string_val_,var_.length_or_precision_);
             break;
         case value_types::string_t:
             handler.value(var_.value_.string_val_->data(),var_.value_.string_val_->length());
             break;
         case value_types::double_t:
-            handler.value(var_.value_.double_val_);
+            handler.value(var_.value_.double_val_, var_.length_or_precision_);
             break;
         case value_types::integer_t:
             handler.value(var_.value_.integer_val_);
@@ -2111,7 +2116,7 @@ public:
         case value_types::uinteger_t:
             return var_.value_.uinteger_val_ != 0;
         case value_types::small_string_t:
-            return var_.small_string_length_ != 0;
+            return var_.length_or_precision_ != 0;
         case value_types::string_t:
             return var_.value_.string_val_->length() != 0;
         case value_types::array_t:
@@ -2181,7 +2186,7 @@ public:
         switch (var_.type_)
         {
         case value_types::small_string_t:
-            return string_type(var_.value_.small_string_val_,var_.small_string_length_);
+            return string_type(var_.value_.small_string_val_,var_.length_or_precision_);
         case value_types::string_t:
             return string_type(var_.value_.string_val_->data(),var_.value_.string_val_->length());
         default:
@@ -2194,7 +2199,7 @@ public:
         switch (var_.type_)
         {
         case value_types::small_string_t:
-            return string_type(var_.value_.small_string_val_,var_.small_string_length_);
+            return string_type(var_.value_.small_string_val_,var_.length_or_precision_);
         case value_types::string_t:
             return string_type(var_.value_.string_val_->data(),var_.value_.string_val_->length());
         default:
@@ -2665,9 +2670,14 @@ public:
         }
     }
 
-    value_types::value_types_t type() const
+    value_types type() const
     {
         return var_.type_;
+    }
+
+    uint8_t length_or_precision() const
+    {
+        return var_.length_or_precision_;
     }
 
     void swap(basic_json<StringT,Alloc>& b)
@@ -2755,9 +2765,9 @@ public:
         var_.assign(rhs);
     }
 
-    void assign_double(double rhs)
+    void assign_double(double rhs, uint8_t precision = 0)
     {
-        var_.assign(rhs);
+        var_.assign(rhs,precision);
     }
 
     static basic_json make_2d_array(size_t m, size_t n);

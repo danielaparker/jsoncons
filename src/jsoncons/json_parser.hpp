@@ -106,6 +106,7 @@ class basic_json_parser : private basic_parsing_context<CharT>
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
+    uint8_t precision_;
 
 public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
@@ -1208,6 +1209,7 @@ public:
                         }
                         break;
                     case '.':
+                        precision_ = static_cast<uint8_t>(number_buffer_.length());
                         number_buffer_.push_back(static_cast<char>(*p_));
                         state_ = states::fraction;
                         break;
@@ -1297,6 +1299,7 @@ public:
                         state_ = states::integer;
                         break;
                     case '.':
+                        precision_ = static_cast<uint8_t>(number_buffer_.length());
                         number_buffer_.push_back(static_cast<char>(*p_));
                         state_ = states::fraction;
                         break;
@@ -1383,6 +1386,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                        ++precision_;
                         number_buffer_.push_back(static_cast<char>(*p_));
                         state_ = states::fraction;
                         break;
@@ -1821,10 +1825,10 @@ private:
     {
         try
         {
-            double d = float_reader_.read(number_buffer_.c_str(), number_buffer_.length());
+            double d = float_reader_.read(number_buffer_.data(), precision_);
             if (is_negative_)
                 d = -d;
-            handler_->value(d, *this);
+            handler_->value(d, static_cast<uint8_t>(precision_), *this);
         }
         catch (...)
         {
@@ -1864,7 +1868,7 @@ private:
                 try
                 {
                     double d = float_reader_.read(number_buffer_.c_str(), number_buffer_.length());
-                    handler_->value(-d, *this);
+                    handler_->value(-d, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1885,7 +1889,7 @@ private:
                 try
                 {
                     double d = float_reader_.read(number_buffer_.c_str(),number_buffer_.length());
-                    handler_->value(d, *this);
+                    handler_->value(d, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)
                 {

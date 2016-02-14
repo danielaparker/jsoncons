@@ -21,7 +21,7 @@ void serialize(json_output_handler& os, const boost::numeric::ublas::matrix<doub
         os.begin_array();
         for (size_t j = 0; j < A.size2(); ++j)
         {
-            os.value(A(i, j));
+            os.value(A(i, j),0);
         }
         os.end_array();
     }

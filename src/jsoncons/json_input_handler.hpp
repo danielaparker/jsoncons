@@ -155,14 +155,14 @@ public:
         do_uinteger_value(value,context);
     }
 
-    void value(float value, const basic_parsing_context<CharT>& context)
+    void value(float value, uint8_t precision, const basic_parsing_context<CharT>& context)
     {
-        do_double_value(value, context);
+        do_double_value(value, precision, context);
     }
 
-    void value(double value, const basic_parsing_context<CharT>& context)
+    void value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
     {
-        do_double_value(value, context);
+        do_double_value(value, precision, context);
     }
 
     void value(bool value, const basic_parsing_context<CharT>& context) 
@@ -194,7 +194,7 @@ private:
 
     virtual void do_string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context) = 0;
 
-    virtual void do_double_value(double value, const basic_parsing_context<CharT>& context) = 0;
+    virtual void do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context) = 0;
 
     virtual void do_integer_value(int64_t value, const basic_parsing_context<CharT>& context) = 0;
 
@@ -254,7 +254,7 @@ private:
         (void)length;
     }
 
-    void do_double_value(double, const basic_parsing_context<CharT>&) override
+    void do_double_value(double, uint8_t, const basic_parsing_context<CharT>&) override
     {
     }
 

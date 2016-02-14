@@ -179,7 +179,7 @@ private:
         end_value();
     }
 
-    void do_double_value(double value) override
+    void do_double_value(double value, uint8_t precision) override
     {
         begin_value();
 
@@ -205,7 +205,7 @@ private:
         //}
         else
         {
-            fp_.print(value,bos_);
+            fp_.print(value,precision,bos_);
         }
 
         end_value();

@@ -25,7 +25,7 @@ template <typename CharT>
 class basic_output_format
 {
     int indent_;
-    int precision_;
+    uint8_t precision_;
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
@@ -42,7 +42,7 @@ public:
     basic_output_format()
         :
         indent_(default_indent),
-        precision_(15),
+        precision_(16),
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
@@ -61,7 +61,7 @@ public:
         return indent_;
     }
 
-    int precision() const
+    uint8_t precision() const
     {
         return precision_;
     }
@@ -99,7 +99,7 @@ public:
 
 //  Modifiers
 
-    void precision(int prec)
+    void precision(uint8_t prec)
     {
         precision_ = prec;
     }

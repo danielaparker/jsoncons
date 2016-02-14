@@ -46,7 +46,7 @@ Output signed integer event. Uses `do_integer_value`.
     void value(unsigned long long value)
 Output non-negative integer event. Uses `do_uinteger_value`.
 
-    void value(double value)
+    void value(double value, uint8_t precision = 0)
 Output floating point value event. Uses `do_double_value`.
 
     void value(bool value)
@@ -84,7 +84,7 @@ Receive signed integer value event
     virtual void do_uinteger_value(uint64_t value)
 Receive non-negative integer value event
 
-    virtual void do_double_value(double value)
+    virtual void do_double_value(double value, uint8_t precision)
 Receive floating point value event
 
     virtual void do_bool_value(bool value)

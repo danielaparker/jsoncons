@@ -233,11 +233,11 @@ private:
         }
     }
 
-    void do_double_value(double value, const basic_parsing_context<char_type>&) override
+    void do_double_value(double value, uint8_t precision, const basic_parsing_context<char_type>&) override
     {
         if (top_ == -1)
         {
-            result_.assign_double(value);
+            result_.assign_double(value,precision);
         }
         else if (stack_[top_].value.is_object())
         {

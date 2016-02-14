@@ -38,6 +38,8 @@ What's new on master
     json image_formats = {"JPEG","PSD","TIFF","DNG"};
 ``` 
 
+- When parsing fractional numbers in text, floating point number precision is retained, and made available to serialization to preserve round-trip. The default output precision has been changed from 15 to 16.
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

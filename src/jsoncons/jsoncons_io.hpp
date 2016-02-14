@@ -94,31 +94,28 @@ public:
 template <typename CharT>
 class float_printer
 {
-    int precision_;
+    uint8_t precision_;
 public:
     float_printer(int precision)
         : precision_(precision)
     {
     }
 
-    void print(double val, buffered_ostream<CharT>& os)
+    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
     {
         char buf[_CVTBUFSIZE];
         int decimal_point = 0;
         int sign = 0;
 
-        if (precision_ >= _CVTBUFSIZE)
-        {
-            precision_ = _CVTBUFSIZE - 1;
-        }
+        int prec = (precision == 0) ? precision_ : precision;
 
-        int err = _ecvt_s(buf, _CVTBUFSIZE, val, precision_, &decimal_point, &sign);
+        int err = _ecvt_s(buf, _CVTBUFSIZE, val, prec, &decimal_point, &sign);
         if (err != 0)
         {
             throw std::runtime_error("Failed attempting double to string conversion");
         }
         char* s = buf;
-        char* se = s + precision_;
+        char* se = s + prec;
 
         int i, k;
         int j;
@@ -206,17 +203,19 @@ template <typename CharT>
 class float_printer
 {
     jsoncons::basic_ovectorstream<CharT> vs_;
+    uint8_t precision_;
 public:
-    float_printer(int precision)
-        : vs_(255)
+    float_printer(uint8_t precision)
+        : vs_(255), precision_(precision)
     {
         vs_.set_locale(std::locale::classic());
         vs_.precision(precision);
     }
 
-    void print(double val, buffered_ostream<CharT>& os)
+    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
     {
         vs_.reset();
+        vs_.precision(precision == 0 ? precision_ : precision);
         vs_ << val;
 
         const CharT* s = vs_.data();
@@ -250,19 +249,6 @@ public:
 };
 
 #endif
-
-template<typename CharT>
-std::basic_string<CharT> float_to_string(double val, int precision)
-{
-    std::basic_ostringstream<CharT> ss;
-    ss.imbue(std::locale::classic());
-    {
-        buffered_ostream<CharT> os(ss);
-        float_printer<CharT> printer(precision);
-        printer.print(val, os);
-    }
-    return ss.str();
-}
 
 // string_to_float only requires narrow char
 #ifdef _MSC_VER

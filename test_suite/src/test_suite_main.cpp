@@ -30,8 +30,7 @@ BOOST_AUTO_TEST_CASE(test_object_key_proxy)
     b["key2"] = json();
     b["key2"]["key3"] = std::move(a);
 
-	std::cout << a.type() << std::endl;
-    BOOST_CHECK(a.is_null());
+	BOOST_CHECK(a.is_null());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

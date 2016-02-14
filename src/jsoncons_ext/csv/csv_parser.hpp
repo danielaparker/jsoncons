@@ -656,7 +656,7 @@ private:
                     std::istringstream iss(string_buffer_);
                     double val;
                     iss >> val;
-                    handler_->value(val, *this);
+                    handler_->value(val, 0, *this);
                 }
                 break;
             case data_types::boolean_t:
