@@ -41,8 +41,7 @@ void example1()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    json::object_iterator hint;
-    hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    auto hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
     hint = book3.set(hint, "category", "Fiction");
     hint = book3.set(hint, "date", "2006-01-03");
     hint = book3.set(hint, "isbn", "1400079276");  
@@ -82,8 +81,8 @@ void example1()
     // Add the last one immediately after
     booklist.add(where+1,std::move(book4));    
 
-	// See what's left of book1, 2, 3 and 4 (expect nulls)
-	std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+    // See what's left of book1, 2, 3 and 4 (expect nulls)
+    std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
 #if !defined(JSONCONS_NO_FOR_RANGE)
@@ -175,25 +174,25 @@ void example2()
 
 void example3()
 {
-	// Construct a book object
-	wjson book1;
+    // Construct a book object
+    wjson book1;
 
-	book1[L"category"] = L"Fiction";
-	book1[L"title"] = L"A Wild Sheep Chase: A Novel";
-	book1[L"author"] = L"Haruki Murakami";
-	book1[L"date"] = L"2002-04-09";
-	book1[L"price"] = 9.01;
-	book1[L"isbn"] = L"037571894X";
+    book1[L"category"] = L"Fiction";
+    book1[L"title"] = L"A Wild Sheep Chase: A Novel";
+    book1[L"author"] = L"Haruki Murakami";
+    book1[L"date"] = L"2002-04-09";
+    book1[L"price"] = 9.01;
+    book1[L"isbn"] = L"037571894X";
 
-	// Construct another using the member function set
-	wjson book2;
+    // Construct another using the member function set
+    wjson book2;
 
-	book2.set(L"category", L"History");
-	book2.set(L"title", L"Charlie Wilson's War");
-	book2.set(L"author", L"George Crile");
-	book2.set(L"date", L"2007-11-06");
-	book2.set(L"price", 10.50);
-	book2.set(L"isbn", L"0802143415");
+    book2.set(L"category", L"History");
+    book2.set(L"title", L"Charlie Wilson's War");
+    book2.set(L"author", L"George Crile");
+    book2.set(L"date", L"2007-11-06");
+    book2.set(L"price", 10.50);
+    book2.set(L"isbn", L"0802143415");
 
     // Use set again, but more efficiently
     wjson book3;
@@ -203,18 +202,17 @@ void example3()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    wjson::object_iterator hint;
-    hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    auto hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
     hint = book3.set(hint, L"category", L"Fiction");
     hint = book3.set(hint, L"date", L"2006-01-03");
     hint = book3.set(hint, L"isbn", L"1400079276");
     hint = book3.set(hint, L"price", 13.45);
     hint = book3.set(hint, L"title", L"Kafka on the Shore");
 
-	// Construct a fourth from a string
+    // Construct a fourth from a string
 
 #if !defined(JSONCONS_NO_RAW_STRING_LITERALS)
-	wjson book4 = wjson::parse(LR"(
+    wjson book4 = wjson::parse(LR"(
     {
         "category" : "Fiction",
         "title" : "Pulp",
@@ -252,8 +250,8 @@ void example3()
     for (auto book : booklist.elements())
     {
         std::wcout << book[L"title"].as<std::wstring>()
-          	       << L","
-        	       << book[L"price"].as<double>() << std::endl;
+                   << L","
+                   << book[L"price"].as<double>() << std::endl;
     }
 #endif
 

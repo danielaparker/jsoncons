@@ -104,8 +104,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    json::object_iterator hint;
-    hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    auto hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
     hint = book3.set(hint, "category", "Fiction");
     hint = book3.set(hint, "date", "2006-01-03");
     hint = book3.set(hint, "isbn", "1400079276");  
@@ -196,7 +195,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     book["ratings"].erase("*");
 
 ```
-```c++	
+```c++  
     // Serialize the booklist to a file
     std::ofstream os("booklist.json");
     os << pretty_print(booklist);
@@ -337,8 +336,7 @@ Result:
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    wjson::object_iterator hint;
-    hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    auto hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
     hint = book3.set(hint, L"category", L"Fiction");
     hint = book3.set(hint, L"date", L"2006-01-03");
     hint = book3.set(hint, L"isbn", L"1400079276");

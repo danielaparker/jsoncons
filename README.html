@@ -580,8 +580,7 @@ vertical-align:1px;
 
     <span class="pl-c">// Insert in name alphabetical order</span>
     <span class="pl-c">// Give set a hint where to insert the next member</span>
-    json::object_iterator hint;
-    hint = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+    <span class="pl-k">auto</span> hint = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);  
@@ -808,8 +807,7 @@ vertical-align:1px;
 
     <span class="pl-c">// Insert in name alphabetical order</span>
     <span class="pl-c">// Give set a hint where to insert the next member</span>
-    wjson::object_iterator hint;
-    hint = book3.set(book3.members().begin(), L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+    <span class="pl-k">auto</span> hint = book3.set(book3.members().begin(), L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
     hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);
