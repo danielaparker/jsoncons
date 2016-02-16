@@ -505,6 +505,7 @@ public:
         explicit variant(double val, uint8_t precision)
             : type_(value_types::double_t), length_or_precision_(precision)
         {
+            value_.double_val_ = val;
         }
 
         explicit variant(int64_t val, const Alloc& a)
