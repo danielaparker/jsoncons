@@ -36,7 +36,7 @@ namespace json_parser_errc
     const int expected_comma_or_right_bracket = 19;
     const int unexpected_right_bracket = 20;
     const int unexpected_right_brace = 21;
-}
+};
 
 class json_error_category_impl
    : public std::error_category

@@ -95,25 +95,24 @@ JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_
     return evaluator.get_values();
 }
 
-namespace states {
-    enum states_t {
-        start,
-        cr,
-        lf,
-        expect_separator,
-        expect_unquoted_name,
-        unquoted_name,
-        single_quoted_name,
-        double_quoted_name,
-        left_bracket,
-        left_bracket_start,
-        left_bracket_end,
-        left_bracket_end2,
-        left_bracket_step,
-        left_bracket_step2,
-        expect_right_bracket,
-        dot
-    };
+enum class states 
+{
+    start,
+    cr,
+    lf,
+    expect_separator,
+    expect_unquoted_name,
+    unquoted_name,
+    single_quoted_name,
+    double_quoted_name,
+    left_bracket,
+    left_bracket_start,
+    left_bracket_end,
+    left_bracket_end2,
+    left_bracket_step,
+    left_bracket_step2,
+    expect_right_bracket,
+    dot
 };
 
 template<class JsonT>
@@ -126,7 +125,7 @@ private:
     typedef std::vector<cjson_ptr> node_set;
 
     basic_parse_error_handler<char_type> *err_handler_;
-    states::states_t state_;
+    states state_;
     string_type buffer_;
     size_t start_;
     size_t end_;
@@ -144,7 +143,7 @@ private:
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    states::states_t pre_line_break_state_;
+    states pre_line_break_state_;
 
     void transfer_nodes()
     {
@@ -510,8 +509,8 @@ public:
                 case ' ':case '\t':
                     ++p_;
                     ++column_;
-					break;
-				case '(':
+                    break;
+                case '(':
                     {
                         if (stack_.back().size() == 1)
                         {
@@ -613,10 +612,10 @@ public:
                     state_ = states::lf;
                     break;
                 case '[':
-					find(buffer_);
+                    find(buffer_);
                     buffer_.clear();
                     transfer_nodes();
-					start_ = 0;
+                    start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
@@ -842,14 +841,14 @@ public:
 
     void find(const string_type& name)
     {
-		if (name.length() > 0)
-		{
+        if (name.length() > 0)
+        {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
                 find1(*(stack_.back()[i]), name);
             }
             recursive_descent_ = false;
-		}
+        }
     }
 
     void find1(const JsonT& context_val, const string_type& name)
@@ -880,7 +879,7 @@ public:
                 {
                     nodes_.push_back(std::addressof(context_val[index]));
                 }
-			}
+            }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
             {
                 auto q = std::make_shared<JsonT>(context_val.size());

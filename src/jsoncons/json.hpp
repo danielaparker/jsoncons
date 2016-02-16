@@ -489,17 +489,10 @@ public:
         {
         }
 
-        explicit variant(bool val, const Alloc& a)
+        explicit variant(bool val)
             : type_(value_types::bool_t)
         {
             value_.bool_val_ = val;
-        }
-
-        explicit variant(double val, uint8_t precision, const Alloc& a)
-            : type_(value_types::double_t), length_or_precision_(0)
-        {
-            length_or_precision_ = precision;
-            value_.double_val_ = val;
         }
 
         explicit variant(double val, uint8_t precision)
@@ -508,13 +501,13 @@ public:
             value_.double_val_ = val;
         }
 
-        explicit variant(int64_t val, const Alloc& a)
+        explicit variant(int64_t val)
             : type_(value_types::integer_t)
         {
             value_.integer_val_ = val;
         }
 
-        explicit variant(uint64_t val, const Alloc& a)
+        explicit variant(uint64_t val)
             : type_(value_types::uinteger_t)
         {
             value_.uinteger_val_ = val;

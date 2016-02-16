@@ -22,62 +22,60 @@
 
 namespace jsoncons {
 
-namespace modes {
-    enum modes_t {
-        done,
-        start,
-        array_element,
-        object_member_name,
-        object_member_value
-    };
+enum class modes 
+{
+    done,
+    start,
+    array_element,
+    object_member_name,
+    object_member_value
 };
 
-namespace states {
-    enum states_t {
-        start, 
-        slash,  
-        slash_slash, 
-        slash_star, 
-        slash_star_star,
-        expect_comma_or_end,  
-        object,
-        expect_member_name, 
-        expect_colon,
-        expect_value,
-        array, 
-        string,
-        escape, 
-        u1, 
-        u2, 
-        u3, 
-        u4, 
-        expect_surrogate_pair1, 
-        expect_surrogate_pair2, 
-        u6, 
-        u7, 
-        u8, 
-        u9, 
-        minus, 
-        zero,  
-        integer,
-        fraction,
-        exp1,
-        exp2,
-        exp3,
-        n,
-        nu,
-        nul,
-        t,  
-        tr,  
-        tru, 
-        f,  
-        fa, 
-        fal,
-        fals,
-        cr,
-        lf,
-        done
-    };
+enum class states 
+{
+    start, 
+    slash,  
+    slash_slash, 
+    slash_star, 
+    slash_star_star,
+    expect_comma_or_end,  
+    object,
+    expect_member_name, 
+    expect_colon,
+    expect_value,
+    array, 
+    string,
+    escape, 
+    u1, 
+    u2, 
+    u3, 
+    u4, 
+    expect_surrogate_pair1, 
+    expect_surrogate_pair2, 
+    u6, 
+    u7, 
+    u8, 
+    u9, 
+    minus, 
+    zero,  
+    integer,
+    fraction,
+    exp1,
+    exp2,
+    exp3,
+    n,
+    nu,
+    nul,
+    t,  
+    tr,  
+    tru, 
+    f,  
+    fa, 
+    fal,
+    fals,
+    cr,
+    lf,
+    done
 };
 
 template<typename CharT>
@@ -85,9 +83,9 @@ class basic_json_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 100;
 
-    states::states_t state_;
+    states state_;
     int top_;
-    std::vector<modes::modes_t> stack_;
+    std::vector<modes> stack_;
     basic_json_input_handler<CharT> *handler_;
     basic_parse_error_handler<CharT> *err_handler_;
     size_t column_;
@@ -97,8 +95,8 @@ class basic_json_parser : private basic_parsing_context<CharT>
     std::basic_string<CharT> string_buffer_;
     std::basic_string<char> number_buffer_;
     bool is_negative_;
-    states::states_t saved_state_;
-    states::states_t pre_line_break_state_;
+    states saved_state_;
+    states pre_line_break_state_;
     size_t index_;
     int depth_;
     int max_depth_;
@@ -227,8 +225,8 @@ public:
                     err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
-					pre_line_break_state_ = state_;
-					state_ = states::cr;
+                    pre_line_break_state_ = state_;
+                    state_ = states::cr;
                     done = true;
                     ++p_;
                 }
@@ -239,7 +237,7 @@ public:
                     err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
-					pre_line_break_state_ = state_;
+                    pre_line_break_state_ = state_;
                     state_ = states::lf;
                     done = true;
                     ++p_;
@@ -312,7 +310,7 @@ public:
 
             switch (state_)
             {
-			case states::cr:
+            case states::cr:
                 ++line_;
                 column_ = 1;
                 switch (*p_)
@@ -326,7 +324,7 @@ public:
                     break;
                 }
                 break;
-			case states::lf:
+            case states::lf:
                 ++line_;
                 column_ = 1;
                 state_ = pre_line_break_state_;
@@ -344,22 +342,22 @@ public:
                             state_ = states::lf;
                             break;
                         case ' ':case '\t':
-    					{
-    						bool done = false;
-    						while (!done && (p_ + 1) < end_input_)
-    						{
-    							switch (*(p_ + 1))
-    							{
-    							case ' ':case '\t':
-    								++p_;
-    								++column_;
-    								break;
-    							default:
-    								done = true;
-    								break;
-    							}
-    						}
-    					}
+                        {
+                            bool done = false;
+                            while (!done && (p_ + 1) < end_input_)
+                            {
+                                switch (*(p_ + 1))
+                                {
+                                case ' ':case '\t':
+                                    ++p_;
+                                    ++column_;
+                                    break;
+                                default:
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
                         break; 
                     case '{':
                         handler_->begin_json();
@@ -522,10 +520,10 @@ public:
                         state_ = states::slash;
                         break;
                     default:
-						if (peek() == modes::array_element)
-						{
-							err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
-						}
+                        if (peek() == modes::array_element)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
+                        }
                         else if (peek() == modes::object_member_value)
                         {
                             err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
@@ -1114,12 +1112,12 @@ public:
                 ++column_;
                 break;
             case states::u9: 
-				{
+                {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
                     json_char_traits<CharT, sizeof(CharT)>::append_codepoint_to_string(cp, string_buffer_);
                     state_ = states::string;
-				}
+                }
                 ++p_;
                 ++column_;
                 break;
@@ -1785,7 +1783,7 @@ public:
             }
         }
         index_ += (p_-begin_input_);
-	}
+    }
 
     void end_parse()
     {
@@ -1811,7 +1809,7 @@ public:
         }
     }
 
-    states::states_t state() const
+    states state() const
     {
         return state_;
     }
@@ -2083,7 +2081,7 @@ private:
         return p_ < end_input_? *p_ : 0;
     }
 
-    bool push(modes::modes_t modes)
+    bool push(modes mode)
     {
         ++top_;
         if (top_ >= depth_)
@@ -2095,29 +2093,29 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_] = modes;
+        stack_[top_] = mode;
         return true;
     }
 
-    int peek()
+    modes peek()
     {
         return stack_[top_];
     }
 
-    bool peek(modes::modes_t modes)
+    bool peek(modes mode)
     {
-        return stack_[top_] == modes;
+        return stack_[top_] == mode;
     }
 
-    void flip(modes::modes_t mode1, modes::modes_t mode2)
+    void flip(modes mode1, modes mode2)
     {
         JSONCONS_ASSERT((top_ >= 0) && (stack_[top_] == mode1))
         stack_[top_] = mode2;
     }
 
-    bool pop(modes::modes_t modes)
+    bool pop(modes mode)
     {
-        if (top_ < 0 || stack_[top_] != modes)
+        if (top_ < 0 || stack_[top_] != mode)
         {
             return false;
         }

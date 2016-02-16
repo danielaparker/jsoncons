@@ -17,25 +17,15 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_type_traits_test_suite)
 
-enum log_level_t
-{
-        Trace = 0,
-        Debug,
-        Info,
-        Warning,
-        Error,
-        Critical
-};
-
 BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
 {
     json::object o;
 
-	json val;
+    json val;
 
-	val = o;
+    val = o;
 
-	val.set("A",o);
+    val.set("A",o);
 }
 
 BOOST_AUTO_TEST_CASE(test_uint8_t)

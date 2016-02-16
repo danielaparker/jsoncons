@@ -53,38 +53,35 @@ struct json_csv_parser_traits<wchar_t> // assume utf16
     static const std::wstring boolean_literal() {return L"boolean";};
 };
 
-namespace modes {
-    enum modes_t {
-        done,
-        header,
-		array,
-		object
-    };
+enum class modes {
+    done,
+    header,
+    array,
+    object
 };
 
-namespace states {
-    enum states_t {
-        start, 
-        comment,
-        expect_value,
-        between_fields,
-		quoted_string,
-		unquoted_string,
-        escaped_value,
-        minus, 
-        zero,  
-        integer,
-        fraction,
-        exp1,
-        exp2,
-        exp3,
-        done
-    };
-};
-
-namespace data_types
+enum class states 
 {
-    enum column_types_t{string_t,integer_t,float_t,boolean_t};
+    start, 
+    comment,
+    expect_value,
+    between_fields,
+    quoted_string,
+    unquoted_string,
+    escaped_value,
+    minus, 
+    zero,  
+    integer,
+    fraction,
+    exp1,
+    exp2,
+    exp3,
+    done
+};
+
+enum class data_types
+{
+    string_t,integer_t,float_t,boolean_t
 };
 
 template<typename CharT>
@@ -251,7 +248,7 @@ public:
             params.field_delimiter(parameters_.field_delimiter());
             params.quote_char(parameters_.quote_char());
             params.quote_escape_char(parameters_.quote_escape_char());
-			params.assume_header(true);
+            params.assume_header(true);
             basic_csv_parser<CharT> p(ih,params);
             p.begin_parse();
             p.parse(parameters_.header().data(),0,parameters_.header().length());
@@ -268,7 +265,7 @@ public:
             p.begin_parse();
             p.parse(&(parameters_.data_types()[0]),0,parameters_.data_types().length());
             p.end_parse();
-			column_types_.resize(p.column_labels().size());
+            column_types_.resize(p.column_labels().size());
             for (size_t i = 0; i < p.column_labels().size(); ++i)
             {
                 if (p.column_labels()[i] == json_csv_parser_traits<CharT>::string_literal())
@@ -502,7 +499,7 @@ all_states:
         handler_->end_json();
     }
 
-    states::states_t state() const
+    states state() const
     {
         return state_;
     }
@@ -681,7 +678,7 @@ private:
                 break;
             default:
                 handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-                break;	
+                break;  
             }
         }
         else
@@ -705,7 +702,7 @@ private:
         return (CharT)prev_char_;
     }
 
-    void push(modes::modes_t modes)
+    void push(modes mode)
     {
         ++top_;
         if (top_ >= depth_)
@@ -713,7 +710,7 @@ private:
             depth_ *= 2;
             stack_.resize(depth_);
         }
-        stack_[top_] = modes;
+        stack_[top_] = mode;
     }
 
     int peek()
@@ -721,12 +718,12 @@ private:
         return stack_[top_];
     }
 
-    bool peek(modes::modes_t modes)
+    bool peek(modes mode)
     {
-        return stack_[top_] == modes;
+        return stack_[top_] == mode;
     }
 
-    bool flip(modes::modes_t mode1, modes::modes_t mode2)
+    bool flip(modes mode1, modes mode2)
     {
         if (top_ < 0 || stack_[top_] != mode1)
         {
@@ -736,9 +733,9 @@ private:
         return true;
     }
 
-    bool pop(modes::modes_t modes)
+    bool pop(modes mode)
     {
-        if (top_ < 0 || stack_[top_] != modes)
+        if (top_ < 0 || stack_[top_] != mode)
         {
             return false;
         }
@@ -746,9 +743,9 @@ private:
         return true;
     }
 
-    states::states_t state_;
+    states state_;
     int top_;
-    std::vector<modes::modes_t> stack_;
+    std::vector<modes> stack_;
     basic_json_input_handler<CharT> *handler_;
     basic_parse_error_handler<CharT> *err_handler_;
     bool is_negative_;
@@ -759,12 +756,12 @@ private:
     int curr_char_;
     int prev_char_;
     std::basic_string<CharT> string_buffer_;
-    states::states_t saved_state_;
+    states saved_state_;
     int depth_;
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_labels_;
-    std::vector<data_types::column_types_t> column_types_;
-	size_t column_index_;
+    std::vector<data_types> column_types_;
+    size_t column_index_;
 };
 
 typedef basic_csv_parser<char> csv_parser;

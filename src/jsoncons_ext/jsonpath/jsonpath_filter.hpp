@@ -21,45 +21,43 @@ namespace jsoncons { namespace jsonpath {
 template <class JsonT>
 class jsonpath_evaluator;
 
-namespace filter_states {
-    enum states_t {
-        start,
-        cr,
-        lf,
-        expect_right_round_bracket,
-        expect_oper_or_right_round_bracket,
-        expect_path_or_value,
-        expect_regex,
-        regex,
-        single_quoted_text,
-        double_quoted_text,
-        unquoted_text,
-        path,
-        value,
-        oper
-    };
-}
+enum class filter_states
+{
+    start,
+    cr,
+    lf,
+    expect_right_round_bracket,
+    expect_oper_or_right_round_bracket,
+    expect_path_or_value,
+    expect_regex,
+    regex,
+    single_quoted_text,
+    double_quoted_text,
+    unquoted_text,
+    path,
+    value,
+    oper
+};
 
-namespace token_types {
-    enum token_types_t {
-        left_paren,
-        right_paren,
-        term,
-        eq,
-        ne,
-        regex,
-        ampamp,
-        pipepipe,
-        lt,
-        gt,
-        lte,
-        gte,
-        plus,
-        minus,
-        exclaim,
-        done
-    };
-}
+enum class token_types
+{
+    left_paren,
+    right_paren,
+    term,
+    eq,
+    ne,
+    regex,
+    ampamp,
+    pipepipe,
+    lt,
+    gt,
+    lte,
+    gte,
+    plus,
+    minus,
+    exclaim,
+    done
+};
 
 template <class JsonT>
 class term
@@ -83,7 +81,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-	virtual bool eq(const term& rhs) const 
+    virtual bool eq(const term& rhs) const 
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -139,7 +137,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-	virtual JsonT minus(const term& rhs) const 
+    virtual JsonT minus(const term& rhs) const 
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -164,14 +162,14 @@ public:
 template <class JsonT>
 class token
 {
-    token_types::token_types_t type_;
+    token_types type_;
     std::shared_ptr<term<JsonT>> term_;
 public:
-    token(token_types::token_types_t type)
+    token(token_types type)
         : type_(type)
     {
     }
-    token(token_types::token_types_t type, std::shared_ptr<term<JsonT>> term)
+    token(token_types type, std::shared_ptr<term<JsonT>> term)
         : type_(type), term_(term)
     {
     }
@@ -180,7 +178,7 @@ public:
     {
     }
 
-    token_types::token_types_t type() const
+    token_types type() const
     {
         return type_;
     }
@@ -441,7 +439,7 @@ public:
 
     bool regex2(const string_type& subject) const override
     {
-		std::basic_regex<char_type> pattern(pattern_,
+        std::basic_regex<char_type> pattern(pattern_,
                                        flags_);
         return std::regex_match(subject, pattern);
     }
@@ -696,14 +694,14 @@ class jsonpath_filter_parser
 
     size_t& line_;
     size_t& column_;
-    filter_states::states_t state_;
+    filter_states state_;
     string_type buffer_;
     std::vector<token<JsonT>> tokens_;
     int depth_;
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type*& p_;
-    filter_states::states_t pre_line_break_state_;
+    filter_states pre_line_break_state_;
 public:
     jsonpath_filter_parser(const char_type** expr, size_t* line,size_t* column)
         : line_(*line), column_(*column),p_(*expr)
@@ -736,7 +734,7 @@ public:
        
             token_stream<JsonT> ts(tokens_);
             auto e = expression(ts);
-    		JsonT result = e->evaluate_single_node();
+            JsonT result = e->evaluate_single_node();
 
             return result;
         }
@@ -753,23 +751,23 @@ public:
         switch (t.type())
         {
         case token_types::left_paren:
-		{
-			auto expr = expression(ts);
-			t = ts.get();
-			if (t.type() != token_types::right_paren)
-			{
+        {
+            auto expr = expression(ts);
+            t = ts.get();
+            if (t.type() != token_types::right_paren)
+            {
                 throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_right_brace, jsonpath_error_category()),line_,column_);
-			}
-			return expr;
-		}
+            }
+            return expr;
+        }
         case token_types::term:
             return t.term();
         case token_types::exclaim:
-		{
-			JsonT val = primary(ts)->exclaim();
-			auto expr = std::make_shared<value_term<JsonT>>(val);
+        {
+            JsonT val = primary(ts)->exclaim();
+            auto expr = std::make_shared<value_term<JsonT>>(val);
             return expr;
-		}
+        }
         case token_types::minus:
         {
             JsonT val = primary(ts)->unary_minus();
@@ -790,18 +788,18 @@ public:
             switch (t.type())
             {
             case token_types::plus:
-			{
-				JsonT val = left->plus(*(term(ts)));
-				left = std::make_shared<value_term<JsonT>>(val);
-				t = ts.get();
-			}
+            {
+                JsonT val = left->plus(*(term(ts)));
+                left = std::make_shared<value_term<JsonT>>(val);
+                t = ts.get();
+            }
                 break;
             case token_types::minus:
-			{
-				JsonT val = left->minus(*(term(ts)));
-				left = std::make_shared<value_term<JsonT>>(val);
-				t = ts.get();
-			}
+            {
+                JsonT val = left->minus(*(term(ts)));
+                left = std::make_shared<value_term<JsonT>>(val);
+                t = ts.get();
+            }
                 break;
             default:
                 ts.putback();
@@ -828,12 +826,12 @@ public:
             }
                 break;
             case token_types::ne:
-			{
-				bool e = left->ne(*(primary(ts)));
-				JsonT val(e);
-				left = std::make_shared<value_term<JsonT>>(val);
+            {
+                bool e = left->ne(*(primary(ts)));
+                JsonT val(e);
+                left = std::make_shared<value_term<JsonT>>(val);
                 t = ts.get();
-			}
+            }
                 break;
             case token_types::regex:
                 {
@@ -885,8 +883,8 @@ public:
                 break;
             case token_types::gte:
                 {
-					bool e = left->gt(*(primary(ts))) || left->eq(*(primary(ts)));
-					JsonT val(e);
+                    bool e = left->gt(*(primary(ts))) || left->eq(*(primary(ts)));
+                    JsonT val(e);
                     left = std::make_shared<value_term<JsonT>>(val);
                     t = ts.get();
                 }
@@ -993,11 +991,11 @@ public:
                         state_ = filter_states::expect_path_or_value;
                         tokens_.push_back(token<JsonT>(token_types::ne));
                     }
-        		    else
-        		    {
-        		    	state_ = filter_states::expect_path_or_value;
-        		    	tokens_.push_back(token<JsonT>(token_types::exclaim));
-        		    }
+                    else
+                    {
+                        state_ = filter_states::expect_path_or_value;
+                        tokens_.push_back(token<JsonT>(token_types::exclaim));
+                    }
                     break;
                 case '&':
                     if (p_+1  < end_input_ && *(p_+1) == '&')
@@ -1143,11 +1141,11 @@ public:
                             buffer_.clear();
                         }
                         tokens_.push_back(token<JsonT>(token_types::right_paren));
-						if (--depth_ == 0)
-						{
+                        if (--depth_ == 0)
+                        {
                             state_ = filter_states::start;
                             done = true;
-						}
+                        }
                         else
                         {
                             state_ = filter_states::expect_path_or_value;
@@ -1157,7 +1155,7 @@ public:
                         break;
                     case ' ':case '\t':
                         if (buffer_.length() > 0)
-						{
+                        {
                             try
                             {
                                 auto val = JsonT::parse(buffer_);
@@ -1167,8 +1165,8 @@ public:
                             {
                                 throw parse_exception(e.code(),line_,column_);
                             }
-							buffer_.clear();
-						}
+                            buffer_.clear();
+                        }
                         ++p_;
                         ++column_;
                         break; 
@@ -1228,7 +1226,7 @@ public:
                             }
                             buffer_.clear();
                         }
-						state_ = filter_states::expect_path_or_value;
+                        state_ = filter_states::expect_path_or_value;
                         break;
 
                     default: 
@@ -1338,10 +1336,10 @@ public:
                     ++p_;
                     ++column_;
                     break;
-				case ' ':case '\t':
+                case ' ':case '\t':
                     ++p_;
                     ++column_;
-					break;
+                    break;
                 case '\'':
                     buffer_.push_back('\"');
                     state_ = filter_states::single_quoted_text;

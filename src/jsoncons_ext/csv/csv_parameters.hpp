@@ -18,15 +18,10 @@
 
 namespace jsoncons { namespace csv {
 
-namespace quote_styles
+enum class quote_styles
 {
-    enum quote_styles_t{all,minimal,none,nonnumeric};
+    all,minimal,none,nonnumeric
 };
-
-    namespace json_types
-    {
-        enum json_types_t{string_t,number_t,bool_t};
-    }
 
 template <typename CharT>
 class basic_csv_parameters
@@ -230,12 +225,12 @@ public:
         comment_starter_ = value;
     }
 
-    quote_styles::quote_styles_t quote_style() const
+    quote_styles quote_style() const
     {
         return quote_style_;
     }
 
-    void assume_header(quote_styles::quote_styles_t value)
+    void assume_header(quote_styles value)
     {
         quote_style_ = value;
     }
@@ -261,7 +256,7 @@ private:
     CharT quote_char_;
     CharT quote_escape_char_;
     CharT comment_starter_;
-    quote_styles::quote_styles_t quote_style_;
+    quote_styles quote_style_;
     unsigned long max_lines_;
     size_t header_lines_;
     std::basic_string<CharT> line_delimiter_;
