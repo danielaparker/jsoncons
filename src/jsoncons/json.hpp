@@ -122,7 +122,7 @@ public:
     serializable_any(const serializable_any& val)
         : allocator_(std::allocator_traits<allocator_type>::select_on_container_copy_construction(val.get_allocator()))
     {
-		impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
+        impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
     }
     serializable_any(const serializable_any& val, const Alloc& allocator)
     {
@@ -337,7 +337,7 @@ public:
 
             bool operator==(const string_data& rhs) const
             {
-            	return length() == rhs.length() ? std::char_traits<char_type>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
+                return length() == rhs.length() ? std::char_traits<char_type>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
             }
 
             string_data(const string_allocator_type& allocator)
@@ -413,7 +413,7 @@ public:
         {
             swap(var);
         }
-		
+        
         explicit variant(variant&& var, const Alloc& a)
             : type_(value_types::null_t)
         {
@@ -500,6 +500,11 @@ public:
         {
             length_or_precision_ = precision;
             value_.double_val_ = val;
+        }
+
+        explicit variant(double val, uint8_t precision)
+            : type_(value_types::double_t), length_or_precision_(precision)
+        {
         }
 
         explicit variant(int64_t val, const Alloc& a)
@@ -681,25 +686,25 @@ public:
 
         void assign(const object & val)
         {
-			destroy_variant();
-			type_ = value_types::object_t;
-			value_.object_val_ = create_instance<object>(val.get_allocator(), val, object_allocator_type(val.get_allocator()));
-		}
+            destroy_variant();
+            type_ = value_types::object_t;
+            value_.object_val_ = create_instance<object>(val.get_allocator(), val, object_allocator_type(val.get_allocator()));
+        }
 
         void assign(object && val)
         {
-			switch (type_)
-			{
-			case value_types::object_t:
-				value_.object_val_->swap(val);
-				break;
-			default:
-				destroy_variant();
-				type_ = value_types::object_t;
-				value_.object_val_ = create_instance<object>(val.get_allocator(), std::move(val), object_allocator_type(val.get_allocator()));
-				break;
-			}
-		}
+            switch (type_)
+            {
+            case value_types::object_t:
+                value_.object_val_->swap(val);
+                break;
+            default:
+                destroy_variant();
+                type_ = value_types::object_t;
+                value_.object_val_ = create_instance<object>(val.get_allocator(), std::move(val), object_allocator_type(val.get_allocator()));
+                break;
+            }
+        }
 
         void assign(const array& val)
         {
@@ -710,18 +715,18 @@ public:
 
         void assign(array&& val)
         {
-			switch (type_)
-			{
-			case value_types::array_t:
-				value_.array_val_->swap(val);
-				break;
-			default:
-				destroy_variant();
-				type_ = value_types::array_t;
-				value_.array_val_ = create_instance<array>(val.get_allocator(), std::move(val), array_allocator_type(val.get_allocator()));
-				break;
-			}
-		}
+            switch (type_)
+            {
+            case value_types::array_t:
+                value_.array_val_->swap(val);
+                break;
+            default:
+                destroy_variant();
+                type_ = value_types::array_t;
+                value_.array_val_ = create_instance<array>(val.get_allocator(), std::move(val), array_allocator_type(val.get_allocator()));
+                break;
+            }
+        }
 
         void assign(const string_type& s)
         {
@@ -744,19 +749,19 @@ public:
         void assign_string(const char_type* s, size_t length, const Alloc& allocator = Alloc())
         {
             destroy_variant();
-			if (length > variant::small_string_capacity)
-			{
-				type_ = value_types::string_t;
+            if (length > variant::small_string_capacity)
+            {
+                type_ = value_types::string_t;
                 //value_.string_val_ = create_instance<string_type>(allocator, s, length, string_allocator_type(allocator));
                 value_.string_val_ = create_string_data(s, length, string_allocator_type(allocator));
-			}
-			else
-			{
-				type_ = value_types::small_string_t;
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
                 length_or_precision_ = static_cast<uint8_t>(length);
-				std::memcpy(value_.small_string_val_,s,length*sizeof(char_type));
+                std::memcpy(value_.small_string_val_,s,length*sizeof(char_type));
                 value_.small_string_val_[length_or_precision_] = 0;
-			}
+            }
         }
 
         void assign(int64_t val)
@@ -3131,8 +3136,8 @@ public:
 
     array& array_value() 
     {
-		switch (var_.type_)
-		{
+        switch (var_.type_)
+        {
         case value_types::array_t:
             return *(var_.value_.array_val_);
         default:
@@ -3478,7 +3483,7 @@ typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_value(
     {
     case value_types::any_t:
         {
-			return *var_.value_.any_val_;
+            return *var_.value_.any_val_;
         }
     default:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
@@ -3492,7 +3497,7 @@ const typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_
     {
     case value_types::any_t:
         {
-			return *var_.value_.any_val_;
+            return *var_.value_.any_val_;
         }
     default:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
