@@ -1563,19 +1563,13 @@ public:
         return basic_json::array();
     }
 
-    static basic_json make_array(size_t n)
+    static basic_json make_array(size_t n, const array_allocator_type& allocator = array_allocator_type())
     {
-        return basic_json::array(n);
+        return basic_json::array(n,allocator);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val)
-    {
-        return basic_json::array(n,val);
-    }
-
-    template <class T, class Alloc>
-    static basic_json make_array(size_t n, const T& val, const Alloc allocator)
+    static basic_json make_array(size_t n, const T& val, const array_allocator_type& allocator = array_allocator_type())
     {
         return basic_json::array(n, val,allocator);
     }
@@ -1587,13 +1581,7 @@ public:
     }
 
     template <size_t dim, class T>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val)
-    {
-        return array(n,val);
-    }
-
-    template <size_t dim, class T, class Alloc>
-    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Alloc& allocator)
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Alloc& allocator = Alloc())
     {
         return array(n,val,allocator);
     }

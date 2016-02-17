@@ -14,7 +14,9 @@ and `std::allocator<char>` as the allocator type. The `jsoncons` library will al
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`allocator_type`|Allocator
+`allocator_type`|Allocator type
+`array_allocator_type`|Array allocator type
+`object_allocator_type`|Object allocator type
 `member_type`|[member_type](json_member_type) is a class that stores a name and a json value
 `any`|[any](json%20any) can contain any value that supports copy construction and assignment.
 `null_type`|An alias for `jsoncons::null_type`
@@ -51,16 +53,22 @@ Throws [parse_exception](parse_exception) if parsing fails.
 
     static json make_array()
 
-    static json make_array(size_t n)
+    static json make_array(size_t n, const array_allocator_type& allocator = array_allocator_type())
 
     template <typename T>
-    static json make_array(size_ n, T val)
+    static json make_array(size_ n, const T& val)
+
+    template <typename T>
+    static json make_array(size_ n, const T& val, const array_allocator_type& allocator = array_allocator_type())
 
     template <size_t N>
     static json make_array(size_t size1 ... size_t sizeN)
 
     template <size_t N,typename T>
-    static json make_array(size_t size1 ... size_t sizeN, T val)
+    static json make_array(size_t size1 ... size_t sizeN, const T& val)
+
+    template <size_t N,typename T>
+    static json make_array(size_t size1 ... size_t sizeN, const T& val, const array_allocator_type& allocator)
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors

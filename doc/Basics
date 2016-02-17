@@ -561,7 +561,7 @@ vertical-align:1px;
     obj[<span class="pl-s"><span class="pl-pds">"</span>accept_waiver_of_liability<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
 
     <span class="pl-c">// An array value with four elements</span>
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add(json::null_type());
     arr.add(flag);
     arr.add(number);
@@ -676,7 +676,7 @@ vertical-align:1px;
 
 <h3>Iterating over the elements of an array</h3>
 
-<div class="highlight highlight-source-c++"><pre>    json arr = json::make_array();
+<div class="highlight highlight-source-c++"><pre>    json arr = json::array();
     arr.add(<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
     arr.add(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);
     arr.add(<span class="pl-s"><span class="pl-pds">"</span>Ottawa<span class="pl-pds">"</span></span>);

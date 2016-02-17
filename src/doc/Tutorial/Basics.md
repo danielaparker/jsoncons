@@ -92,7 +92,7 @@ Note that the parser accepts and ignores the single line comment that starts wit
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add(json::null_type());
     arr.add(flag);
     arr.add(number);
@@ -204,7 +204,7 @@ The output is
 ```
 ### Iterating over the elements of an array
 ```c++
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");

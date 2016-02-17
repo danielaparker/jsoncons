@@ -92,7 +92,7 @@ the output becomes
 
 You can also add a json `any` value to a `json` array, like this. 
 
-    json arr = make_array();
+    json arr = json::array();
     matrix<double> A(2,2);
     A(0,0) = 1;
     A(0,1) = 2;

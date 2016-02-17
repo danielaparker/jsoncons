@@ -483,7 +483,7 @@ vertical-align:1px;
         json deal;
         deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>] = date(<span class="pl-c1">2014</span>,<span class="pl-c1">10</span>,<span class="pl-c1">14</span>);
 
-        json observation_dates = make_array();
+        json observation_dates = json::array();
         observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">14</span>));
         observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">21</span>));
 
