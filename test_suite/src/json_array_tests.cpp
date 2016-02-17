@@ -150,14 +150,14 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
     cities.add(cities.elements().begin(),"Montreal");
-	BOOST_CHECK(cities.capacity() == 10);
+    BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
     basic_json<std::string,std::allocator<char>> a = basic_json<std::string,std::allocator<char>>::make_array<1>(10,0);
-    /*BOOST_CHECK(a.size() == 10);
+    BOOST_CHECK(a.size() == 10);
     BOOST_CHECK(a[0].as_integer() == 0);
     a[1] = 1;
     a[2] = 2;
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(test_one_dim_array)
 
     BOOST_CHECK(a[1].as<long long>() == 1);
     BOOST_CHECK(a[2].as<long long>() == 2);
-    BOOST_CHECK(a[9].as<long long>() == 0);*/
+    BOOST_CHECK(a[9].as<long long>() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_two_dim_array)

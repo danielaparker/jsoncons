@@ -1558,61 +1558,58 @@ public:
 
     static basic_json parse_file(const std::string& s, basic_parse_error_handler<char_type>& err_handler);
 
-    static basic_json<StringT,Alloc> make_array()
+    static basic_json make_array()
     {
-        return typename basic_json<StringT,Alloc>::array();
+        return basic_json::array();
     }
 
-    static basic_json<StringT,Alloc> make_array(size_t n)
+    static basic_json make_array(size_t n)
     {
-        basic_json<StringT,Alloc> val = make_array();
+        return basic_json::array(n);
+    }
+
+    template <class T>
+    static basic_json make_array(size_t n, const T& val)
+    {
+        return basic_json::array(n,val);
+    }
+
+    template <class T, class Alloc>
+    static basic_json make_array(size_t n, const T& val, const Alloc allocator)
+    {
+        return basic_json::array(n, val,allocator);
+    }
+
+    template <size_t dim>
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n)
+    {
+        return array(n);
+    }
+
+    template <size_t dim, class T>
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val)
+    {
+        return array(n,val);
+    }
+
+    template <size_t dim, class T, class Alloc>
+    static typename std::enable_if<dim==1,basic_json>::type make_array(size_t n, const T& val, const Alloc& allocator)
+    {
+        return array(n,val,allocator);
+    }
+
+    template <size_t dim, typename... Args>
+    static basic_json make_array(size_t n, Args... args)
+    {
+        const size_t dim1 = dim - 1;
+
+        basic_json val = make_array<dim1>(args...);
         val.resize(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            val[i] = make_array<dim1>(args...);
+        }
         return val;
-    }
-
-    template <typename U>
-    static basic_json<StringT,Alloc> make_array(size_t n, U val)
-    {
-        basic_json<StringT,Alloc> a = make_array();
-        a.resize(n,val);
-        return a;
-    }
-
-    template<int size>
-    static typename std::enable_if<size==1,basic_json>::type make_array()
-    {
-        return build_array<StringT,Alloc,size>()();
-    }
-
-    template<size_t size>
-    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n)
-    {
-        return build_array<StringT,Alloc,size>()(n);
-    }
-    template<size_t size,typename T>
-    static typename std::enable_if<size==1,basic_json>::type make_array(size_t n, T val)
-    {
-        return build_array<StringT,Alloc,size>()(n, val);
-    }
-    template<size_t size>
-    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n)
-    {
-        return build_array<StringT,Alloc,size>()(m, n);
-    }
-    template<size_t size,typename T>
-    static typename std::enable_if<size==2,basic_json>::type make_array(size_t m, size_t n, T val)
-    {
-        return build_array<StringT,Alloc,size>()(m, n, val);
-    }
-    template<size_t size>
-    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k)
-    {
-        return build_array<StringT,Alloc,size>()(m, n, k);
-    }
-    template<size_t size,typename T>
-    static typename std::enable_if<size==3,basic_json>::type make_array(size_t m, size_t n, size_t k, T val)
-    {
-        return build_array<StringT,Alloc,size>()(m, n, k, val);
     }
 
     variant var_;
@@ -2995,37 +2992,37 @@ public:
     template<int size>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array()
     {
-        return build_array<StringT,Alloc,size>()();
+        return make_array();
     }
     template<size_t size>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n)
     {
-        return build_array<StringT,Alloc,size>()(n);
+        return make_array(n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==1,basic_json>::type make_multi_array(size_t n, T val)
     {
-        return build_array<StringT,Alloc,size>()(n, val);
+        return make_array(n,val);
     }
     template<size_t size>
     static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n)
     {
-        return build_array<StringT,Alloc,size>()(m, n);
+        return make_array<2>(m, n);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==2,basic_json>::type make_multi_array(size_t m, size_t n, T val)
     {
-        return build_array<StringT,Alloc,size>()(m, n, val);
+        return make_array<2>(m, n, val);
     }
     template<size_t size>
     static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k)
     {
-        return build_array<StringT,Alloc,size>()(m, n, k);
+        return make_array<3>(m, n, k);
     }
     template<size_t size,typename T>
     static typename std::enable_if<size==3,basic_json>::type make_multi_array(size_t m, size_t n, size_t k, T val)
     {
-        return build_array<StringT,Alloc,size>()(m, n, k, val);
+        return make_array<3>(m, n, k, val);
     }
 #endif
 
@@ -3130,56 +3127,6 @@ public:
     }
 
 private:
-
-    template<typename StringT2, typename Allocator2, size_t size>
-    class build_array
-    {};
-    template<typename StringT2, typename Allocator2>
-    class build_array<StringT2,Allocator2,1>
-    {
-    public:
-        basic_json<StringT2,Allocator2> operator() ()
-        {
-            return basic_json<StringT2,Allocator2>::make_array();
-        }
-        basic_json<StringT2,Allocator2> operator() (size_t n)
-        {
-            return basic_json<StringT2,Allocator2>::make_array(n);
-        }
-        template <typename T>
-        basic_json<StringT2,Allocator2> operator() (size_t n, T val)
-        {
-            return basic_json<StringT2,Allocator2>::make_array(n, val);
-        }
-    };
-    template<typename StringT2, typename Allocator2>
-    class build_array<StringT2,Allocator2,2>
-    {
-    public:
-        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n)
-        {
-            return basic_json<StringT2,Allocator2>::make_2d_array(m, n);
-        }
-        template <typename T>
-        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, T val)
-        {
-            return basic_json<StringT2,Allocator2>::make_2d_array(m, n, val);
-        }
-    };
-    template<typename StringT2, typename Allocator2>
-    class build_array<StringT2,Allocator2,3>
-    {
-    public:
-        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, size_t k)
-        {
-            return basic_json<StringT2,Allocator2>::make_3d_array (m, n, k);
-        }
-        template <typename T>
-        basic_json<StringT2,Allocator2> operator() (size_t m, size_t n, size_t k, T val)
-        {
-            return basic_json<StringT2,Allocator2>::make_3d_array (m, n, k, val);
-        }
-    };
 
     friend std::basic_ostream<typename StringT::value_type>& operator<<(std::basic_ostream<typename StringT::value_type>& os, const basic_json<StringT, Alloc>& o)
     {

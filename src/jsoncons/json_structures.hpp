@@ -34,26 +34,13 @@ public:
     typedef typename std::vector<JsonT,Alloc>::iterator iterator;
     typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
 
-    json_array(const Alloc& allocator = Alloc())
+    json_array()
+        : elements_()
+    {
+    }
+
+    explicit json_array(const Alloc& allocator)
         : elements_(allocator)
-    {
-    }
-
-    json_array(const json_array& val)
-        : elements_(val.elements_)
-    {
-    }
-    json_array(json_array&& val)
-        : elements_(std::move(val.elements_))
-    {
-    }
-
-    json_array(const json_array& val, const Alloc& allocator)
-        : elements_(val.elements_,allocator)
-    {
-    }
-    json_array(json_array&& val, const Alloc& allocator)
-        : elements_(std::move(val.elements_),allocator)
     {
     }
 
@@ -73,8 +60,26 @@ public:
     {
     }
 
+    json_array(const json_array& val)
+        : elements_(val.elements_)
+    {
+    }
+
+    json_array(const json_array& val, const Alloc& allocator)
+        : elements_(val.elements_,allocator)
+    {
+    }
+    json_array(json_array&& val)
+        : elements_(std::move(val.elements_))
+    {
+    }
+    json_array(json_array&& val, const Alloc& allocator)
+        : elements_(std::move(val.elements_),allocator)
+    {
+    }
+
     json_array(std::initializer_list<JsonT> init, 
-               const Alloc& allocator = Allocator())
+               const Alloc& allocator = Alloc())
         : elements_(std::move(init),allocator)
     {
     }
@@ -862,10 +867,10 @@ public:
         members_.push_back(std::move(member));
     }
 
-	void end_bulk_insert()
-	{
-		std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
-	}
+    void end_bulk_insert()
+    {
+        std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
+    }
 
     bool operator==(const json_object<StringT,JsonT,Alloc>& rhs) const
     {
