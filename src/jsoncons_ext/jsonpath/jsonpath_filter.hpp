@@ -937,9 +937,6 @@ public:
                 switch (*p_)
                 {
                 case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = filter_states::cr;
-                    break;
                 case '\n':
                     pre_line_break_state_ = state_;
                     state_ = filter_states::lf;
@@ -963,22 +960,8 @@ public:
             case filter_states::oper:
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1081,22 +1064,8 @@ public:
                 {
                     switch (*p_)
                     {
-                    case filter_states::cr:
-                        ++line_;
-                        column_ = 1;
-                        switch (*p_)
-                        {
-                        case '\n':
-                            state_ = pre_line_break_state_;
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            state_ = pre_line_break_state_;
-                            break;
-                        }
-                        break;
-                    case filter_states::lf:
+                    case '\r':
+                    case '\n':
                         ++line_;
                         column_ = 1;
                         state_ = pre_line_break_state_;
@@ -1182,22 +1151,8 @@ public:
                 {
                     switch (*p_)
                     {                   
-                    case filter_states::cr:
-                        ++line_;
-                        column_ = 1;
-                        switch (*p_)
-                        {
-                        case '\n':
-                            state_ = pre_line_break_state_;
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            state_ = pre_line_break_state_;
-                            break;
-                        }
-                        break;
-                    case filter_states::lf:
+                    case '\r':
+                    case '\n':
                         ++line_;
                         column_ = 1;
                         state_ = pre_line_break_state_;
@@ -1241,22 +1196,8 @@ public:
                 {
                     switch (*p_)
                     {                   
-                    case filter_states::cr:
-                        ++line_;
-                        column_ = 1;
-                        switch (*p_)
-                        {
-                        case '\n':
-                            state_ = pre_line_break_state_;
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            state_ = pre_line_break_state_;
-                            break;
-                        }
-                        break;
-                    case filter_states::lf:
+                    case '\r':
+                    case '\n':
                         ++line_;
                         column_ = 1;
                         state_ = pre_line_break_state_;
@@ -1299,22 +1240,8 @@ public:
             case filter_states::expect_path_or_value: 
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1377,22 +1304,8 @@ public:
             case filter_states::expect_oper_or_right_round_bracket: 
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1428,22 +1341,8 @@ public:
             case filter_states::expect_right_round_bracket: 
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1472,22 +1371,8 @@ public:
             case filter_states::path: 
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1539,22 +1424,8 @@ public:
             case filter_states::expect_regex: 
                 switch (*p_)
                 {
-                case filter_states::cr:
-                    ++line_;
-                    column_ = 1;
-                    switch (*p_)
-                    {
-                    case '\n':
-                        state_ = pre_line_break_state_;
-                        ++p_;
-                        ++column_;
-                        break;
-                    default:
-                        state_ = pre_line_break_state_;
-                        break;
-                    }
-                    break;
-                case filter_states::lf:
+                case '\r':
+                case '\n':
                     ++line_;
                     column_ = 1;
                     state_ = pre_line_break_state_;
@@ -1575,22 +1446,8 @@ public:
                 {
                     switch (*p_)
                     {                   
-                    case filter_states::cr:
-                        ++line_;
-                        column_ = 1;
-                        switch (*p_)
-                        {
-                        case '\n':
-                            state_ = pre_line_break_state_;
-                            ++p_;
-                            ++column_;
-                            break;
-                        default:
-                            state_ = pre_line_break_state_;
-                            break;
-                        }
-                        break;
-                    case filter_states::lf:
+                    case '\r':
+                    case '\n':
                         ++line_;
                         column_ = 1;
                         state_ = pre_line_break_state_;

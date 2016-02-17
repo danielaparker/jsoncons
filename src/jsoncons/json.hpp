@@ -32,65 +32,14 @@
 
 namespace jsoncons {
 
-template <class T, class Alloc>
-T* create_instance(const Alloc& allocator)
+template <class T, class Alloc, typename... Args>
+T* create_impl(const Alloc& allocator, Args&& ... args)
 {
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
     T* storage = alloc.allocate(1);
     try
     {
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage);
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
-template <class T, class Alloc, class Arg>
-T* create_instance(const Alloc& allocator, Arg&& val)
-{
-    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-    T* storage = alloc.allocate(1);
-    try
-    {
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg>(val));
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
-template <class T, class Alloc, class Arg1, class Arg2>
-T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2)
-{
-    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-    T* storage = alloc.allocate(1);
-    try
-    {
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2));
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
-template <class T, class Alloc, class Arg1, class Arg2, class Arg3>
-T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3)
-{
-    typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
-    T* storage = alloc.allocate(1);
-    try
-    {
-        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Arg1>(val1), std::forward<Arg2>(val2), std::forward<Arg3>(val3));
+        std::allocator_traits<Alloc>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Args>(args)...);
     }
     catch (...)
     {
@@ -101,7 +50,7 @@ T* create_instance(const Alloc& allocator, Arg1&& val1, Arg2&& val2, Arg3&& val3
 }
 
 template <class T, class Alloc>
-void destroy_instance(const Alloc& allocator, T* p)
+void destroy_impl(const Alloc& allocator, T* p)
 {
     typename std::allocator_traits<Alloc>:: template rebind_alloc<T> alloc(allocator);
     std::allocator_traits<Alloc>:: template rebind_traits<T>::destroy(alloc, p);
@@ -145,14 +94,14 @@ public:
     {
         if (impl_ != nullptr)
         {
-            destroy_instance(allocator_,impl_);
+            destroy_impl(allocator_,impl_);
         }
     }
 
     template<typename T>
     explicit serializable_any(T val)
     {
-        impl_ = create_instance<any_handle_impl<typename type_wrapper<T>::value_type>>(allocator_,val);
+        impl_ = create_impl<any_handle_impl<typename type_wrapper<T>::value_type>>(allocator_,val);
     }
 
     Alloc get_allocator() const
@@ -215,7 +164,7 @@ public:
 
         virtual any_handle* clone(const Alloc& allocator) const
         {
-            return create_instance<any_handle_impl<T>>(allocator, value_);
+            return create_impl<any_handle_impl<T>>(allocator, value_);
         }
 
         virtual void to_stream(basic_json_output_handler<CharT>& os) const
@@ -398,14 +347,14 @@ public:
         variant(const Alloc& a)
             : type_(value_types::object_t)
         {
-            value_.object_val_ = create_instance<object>(a, object_allocator_type(a));
+            value_.object_val_ = create_impl<object>(a, object_allocator_type(a));
         }
 
         variant(std::initializer_list<value_type> init,
                 const Alloc& a)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(a, std::move(init), array_allocator_type(a));
+            value_.array_val_ = create_impl<array>(a, std::move(init), array_allocator_type(a));
         }
 
         explicit variant(variant&& var)
@@ -433,55 +382,55 @@ public:
         variant(const object & val)
             : type_(value_types::object_t)
         {
-            value_.object_val_ = create_instance<object>(val.get_allocator(), val) ;
+            value_.object_val_ = create_impl<object>(val.get_allocator(), val) ;
         }
 
         variant(const object & val, const Alloc& a)
             : type_(value_types::object_t)
         {
-            value_.object_val_ = create_instance<object>(a, val, object_allocator_type(a)) ;
+            value_.object_val_ = create_impl<object>(a, val, object_allocator_type(a)) ;
         }
 
         variant(object&& val)
             : type_(value_types::object_t)
         {
-            value_.object_val_ = create_instance<object>(val.get_allocator(), std::move(val));
+            value_.object_val_ = create_impl<object>(val.get_allocator(), std::move(val));
         }
 
         variant(object&& val, const Alloc& a)
             : type_(value_types::object_t)
         {
-            value_.object_val_ = create_instance<object>(a, std::move(val), object_allocator_type(a));
+            value_.object_val_ = create_impl<object>(a, std::move(val), object_allocator_type(a));
         }
 
         variant(const array& val)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(val.get_allocator(), val);
+            value_.array_val_ = create_impl<array>(val.get_allocator(), val);
         }
 
         variant(const array& val, const Alloc& a)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(a, val, array_allocator_type(a));
+            value_.array_val_ = create_impl<array>(a, val, array_allocator_type(a));
         }
 
         variant(array&& val)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(val.get_allocator(), std::move(val));
+            value_.array_val_ = create_impl<array>(val.get_allocator(), std::move(val));
         }
 
         variant(array&& val, const Alloc& a)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(a, std::move(val), array_allocator_type(a));
+            value_.array_val_ = create_impl<array>(a, std::move(val), array_allocator_type(a));
         }
 
         explicit variant(const any& val, const Alloc& a)
             : type_(value_types::any_t)
         {
-            value_.any_val_ = create_instance<any>(a, val);
+            value_.any_val_ = create_impl<any>(a, val);
         }
 
         explicit variant(null_type)
@@ -518,7 +467,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                //value_.string_val_ = create_instance<string_type>(a, s, string_allocator_type(a));
+                //value_.string_val_ = create_impl<string_type>(a, s, string_allocator_type(a));
                 value_.string_val_ = create_string_data(s.data(), s.length(), string_allocator_type(a));
             }
             else
@@ -536,7 +485,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                //value_.string_val_ = create_instance<string_type>(a, s, string_allocator_type(a));
+                //value_.string_val_ = create_impl<string_type>(a, s, string_allocator_type(a));
                 value_.string_val_ = create_string_data(s, length, string_allocator_type(a));
             }
             else
@@ -553,7 +502,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                //value_.string_val_ = create_instance<string_type>(a, s, length, string_allocator_type(a));
+                //value_.string_val_ = create_impl<string_type>(a, s, length, string_allocator_type(a));
                 value_.string_val_ = create_string_data(s, length, string_allocator_type(a));
             }
             else
@@ -569,7 +518,7 @@ public:
         variant(InputIterator first, InputIterator last, const Alloc& a)
             : type_(value_types::array_t)
         {
-            value_.array_val_ = create_instance<array>(a, first, last, array_allocator_type(a));
+            value_.array_val_ = create_impl<array>(a, first, last, array_allocator_type(a));
         }
 
         void init_variant(const variant& var)
@@ -599,17 +548,17 @@ public:
                 value_.small_string_val_[length_or_precision_] = 0;
                 break;
             case value_types::string_t:
-                //value_.string_val_ = create_instance<string_type>(var.value_.string_val_->get_allocator(), *(var.value_.string_val_), string_allocator_type(var.value_.string_val_->get_allocator()));
+                //value_.string_val_ = create_impl<string_type>(var.value_.string_val_->get_allocator(), *(var.value_.string_val_), string_allocator_type(var.value_.string_val_->get_allocator()));
                 value_.string_val_ = create_string_data(var.value_.string_val_->data(), var.value_.string_val_->length(), string_allocator_type(var.value_.string_val_->get_allocator()));
                 break;
             case value_types::array_t:
-                value_.array_val_ = create_instance<array>(var.value_.array_val_->get_allocator(), *(var.value_.array_val_), array_allocator_type(var.value_.array_val_->get_allocator()));
+                value_.array_val_ = create_impl<array>(var.value_.array_val_->get_allocator(), *(var.value_.array_val_), array_allocator_type(var.value_.array_val_->get_allocator()));
                 break;
             case value_types::object_t:
-                value_.object_val_ = create_instance<object>(var.value_.object_val_->get_allocator(), *(var.value_.object_val_), object_allocator_type(var.value_.object_val_->get_allocator()));
+                value_.object_val_ = create_impl<object>(var.value_.object_val_->get_allocator(), *(var.value_.object_val_), object_allocator_type(var.value_.object_val_->get_allocator()));
                 break;
             case value_types::any_t:
-                value_.any_val_ = create_instance<any>(var.value_.any_val_->get_allocator(), *(var.value_.any_val_));
+                value_.any_val_ = create_impl<any>(var.value_.any_val_->get_allocator(), *(var.value_.any_val_));
                 break;
             default:
                 break;
@@ -626,17 +575,17 @@ public:
             switch (type_)
             {
             case value_types::string_t:
-                //destroy_instance(value_.string_val_->get_allocator(), value_.string_val_);
+                //destroy_impl(value_.string_val_->get_allocator(), value_.string_val_);
                 destroy_string_data(value_.string_val_->get_allocator(), value_.string_val_);
                 break;
             case value_types::array_t:
-                destroy_instance(value_.array_val_->get_allocator(), value_.array_val_);
+                destroy_impl(value_.array_val_->get_allocator(), value_.array_val_);
                 break;
             case value_types::object_t:
-                destroy_instance(value_.object_val_->get_allocator(), value_.object_val_);
+                destroy_impl(value_.object_val_->get_allocator(), value_.object_val_);
                 break;
             case value_types::any_t:
-                destroy_instance(value_.any_val_->get_allocator(), value_.any_val_);
+                destroy_impl(value_.any_val_->get_allocator(), value_.any_val_);
                 break;
             default:
                 break; 
@@ -682,7 +631,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::object_t;
-            value_.object_val_ = create_instance<object>(val.get_allocator(), val, object_allocator_type(val.get_allocator()));
+            value_.object_val_ = create_impl<object>(val.get_allocator(), val, object_allocator_type(val.get_allocator()));
         }
 
         void assign(object && val)
@@ -695,7 +644,7 @@ public:
             default:
                 destroy_variant();
                 type_ = value_types::object_t;
-                value_.object_val_ = create_instance<object>(val.get_allocator(), std::move(val), object_allocator_type(val.get_allocator()));
+                value_.object_val_ = create_impl<object>(val.get_allocator(), std::move(val), object_allocator_type(val.get_allocator()));
                 break;
             }
         }
@@ -704,7 +653,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::array_t;
-            value_.array_val_ = create_instance<array>(val.get_allocator(), val, array_allocator_type(val.get_allocator())) ;
+            value_.array_val_ = create_impl<array>(val.get_allocator(), val, array_allocator_type(val.get_allocator())) ;
         }
 
         void assign(array&& val)
@@ -717,7 +666,7 @@ public:
             default:
                 destroy_variant();
                 type_ = value_types::array_t;
-                value_.array_val_ = create_instance<array>(val.get_allocator(), std::move(val), array_allocator_type(val.get_allocator()));
+                value_.array_val_ = create_impl<array>(val.get_allocator(), std::move(val), array_allocator_type(val.get_allocator()));
                 break;
             }
         }
@@ -728,7 +677,7 @@ public:
             if (s.length() > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                //value_.string_val_ = create_instance<string_type>(s.get_allocator(), s, string_allocator_type(s.get_allocator()));
+                //value_.string_val_ = create_impl<string_type>(s.get_allocator(), s, string_allocator_type(s.get_allocator()));
                 value_.string_val_ = create_string_data(s.data(), s.length(), string_allocator_type(s.get_allocator()));
             }
             else
@@ -746,7 +695,7 @@ public:
             if (length > variant::small_string_capacity)
             {
                 type_ = value_types::string_t;
-                //value_.string_val_ = create_instance<string_type>(allocator, s, length, string_allocator_type(allocator));
+                //value_.string_val_ = create_impl<string_type>(allocator, s, length, string_allocator_type(allocator));
                 value_.string_val_ = create_string_data(s, length, string_allocator_type(allocator));
             }
             else
@@ -797,7 +746,7 @@ public:
         {
             destroy_variant();
             type_ = value_types::any_t;
-            value_.any_val_ = create_instance<any>(rhs.get_allocator(), rhs);
+            value_.any_val_ = create_impl<any>(rhs.get_allocator(), rhs);
         }
 
         bool operator!=(const variant& rhs) const
@@ -2038,7 +1987,7 @@ public:
     void create_object_implicitly()
     {
         var_.type_ = value_types::object_t;
-        var_.value_.object_val_ = create_instance<object>(Alloc(),object_allocator_type(Alloc()));
+        var_.value_.object_val_ = create_impl<object>(Alloc(),object_allocator_type(Alloc()));
     }
 
     template<class U=Alloc,
@@ -2046,7 +1995,7 @@ public:
             >::type* = nullptr>
     void create_object_implicitly() const
     {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Cannot create_instance object implicitly - allocator is not default constructible.");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Cannot create_impl object implicitly - allocator is not default constructible.");
     }
 
     void reserve(size_t n)
