@@ -143,7 +143,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
-    // We could of just done this instead:
+    // We could have just done this instead:
     // json booklist = {std::move(book3), std::move(book4), std::move(book1), std::move(book2)};
 ```
 
@@ -378,7 +378,7 @@ Result:
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
 
-    // We could of just done this instead:
+    // We could have just done this instead:
     // wjson booklist = {std::move(book3), std::move(book4), std::move(book1), std::move(book2)};
 ```
 ```c++
