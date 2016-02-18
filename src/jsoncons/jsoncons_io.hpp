@@ -32,18 +32,18 @@ class buffered_ostream
     std::basic_ostream<CharT>* os_;
     std::vector<CharT> buffer_;
     CharT * const begin_buffer_;
-	const CharT* const end_buffer_;
+    const CharT* const end_buffer_;
     CharT* p_;
 public:
-	buffered_ostream(std::basic_ostream<CharT>& os)
-		: os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
-	{
-	}
-	~buffered_ostream()
-	{
-		os_->write(begin_buffer_, (p_ - begin_buffer_));
-		os_->flush();
-	}
+    buffered_ostream(std::basic_ostream<CharT>& os)
+        : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
+    {
+    }
+    ~buffered_ostream()
+    {
+        os_->write(begin_buffer_, (p_ - begin_buffer_));
+        os_->flush();
+    }
 
     void flush()
     {
@@ -52,40 +52,40 @@ public:
         os_->flush();
     }
 
-	void write(const CharT* s, size_t length)
-	{
-		size_t diff = end_buffer_ - p_;
-		if (diff >= length)
-		{
-			std::memcpy(p_, s, length*sizeof(CharT));
-			p_ += length;
-		}
-		else
-		{
-			os_->write(begin_buffer_, (p_ - begin_buffer_));
-			os_->write(s, length);
-			p_ = begin_buffer_;
-		}
-	}
+    void write(const CharT* s, size_t length)
+    {
+        size_t diff = end_buffer_ - p_;
+        if (diff >= length)
+        {
+            std::memcpy(p_, s, length*sizeof(CharT));
+            p_ += length;
+        }
+        else
+        {
+            os_->write(begin_buffer_, (p_ - begin_buffer_));
+            os_->write(s, length);
+            p_ = begin_buffer_;
+        }
+    }
 
     void write(const std::basic_string<CharT>& s)
     {
-        write(s.c_str(),s.length());
+        write(s.data(),s.length());
     }
 
-	void put(CharT c)
-	{
-		if (p_ < end_buffer_)
-		{
-			*p_++ = c;
-		}
-		else
-		{
-			os_->write(begin_buffer_, (p_-begin_buffer_));
-			p_ = begin_buffer_;
-			*p_++ = c;
-		}
-	}
+    void put(CharT c)
+    {
+        if (p_ < end_buffer_)
+        {
+            *p_++ = c;
+        }
+        else
+        {
+            os_->write(begin_buffer_, (p_-begin_buffer_));
+            p_ = begin_buffer_;
+            *p_++ = c;
+        }
+    }
 
 };
 
@@ -262,8 +262,8 @@ public:
         locale = _create_locale(LC_NUMERIC, "C");
     }
 
-	double read(const char* s, size_t length)
-	{
+    double read(const char* s, size_t length)
+    {
         const char *begin = s;
         char *end = nullptr;
         double val = _strtod_l(begin, &end, locale);
@@ -272,7 +272,7 @@ public:
             throw std::invalid_argument("Invalid float value");
         }
         return val;
-	}
+    }
 };
 
 #else
@@ -281,7 +281,7 @@ class float_reader
 private:
     std::vector<char> buffer_;
     std::string decimal_point_;
-	bool is_dot_;
+    bool is_dot_;
 public:
     float_reader()
         : buffer_()
@@ -289,18 +289,18 @@ public:
         struct lconv * lc = localeconv();
         if (lc != nullptr)
         {
-            decimal_point_ = std::string(lc->decimal_point);	
+            decimal_point_ = std::string(lc->decimal_point);    
         }
         else
         {
             decimal_point_ = std::string("."); 
         }
-		buffer_.reserve(100);
-		is_dot_ = decimal_point_ == ".";
+        buffer_.reserve(100);
+        is_dot_ = decimal_point_ == ".";
     }
 
-	double read(const char* s, size_t length)
-	{
+    double read(const char* s, size_t length)
+    {
         double val;
         if (is_dot_)
         {
@@ -338,8 +338,8 @@ public:
                 throw std::invalid_argument("Invalid float value");
             }
         }
-		return val;
-	}
+        return val;
+    }
 };
 #endif
 

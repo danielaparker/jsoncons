@@ -268,7 +268,7 @@ public:
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    end_string_value(string_buffer_.c_str(),string_buffer_.length());
+                    end_string_value(string_buffer_.data(),string_buffer_.length());
                     string_buffer_.clear();
                 }
                 column_ += (p_ - sb + 1);
@@ -1858,14 +1858,14 @@ private:
         {
             try
             {
-                int64_t d = string_to_integer(is_negative_, number_buffer_.c_str(), number_buffer_.length());
+                int64_t d = string_to_integer(is_negative_, number_buffer_.data(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
             {
                 try
                 {
-                    double d = float_reader_.read(number_buffer_.c_str(), number_buffer_.length());
+                    double d = float_reader_.read(number_buffer_.data(), number_buffer_.length());
                     handler_->value(-d, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)
@@ -1879,14 +1879,14 @@ private:
         {
             try
             {
-                uint64_t d = string_to_uinteger(number_buffer_.c_str(), number_buffer_.length());
+                uint64_t d = string_to_uinteger(number_buffer_.data(), number_buffer_.length());
                 handler_->value(d, *this);
             }
             catch (const std::exception&)
             {
                 try
                 {
-                    double d = float_reader_.read(number_buffer_.c_str(),number_buffer_.length());
+                    double d = float_reader_.read(number_buffer_.data(),number_buffer_.length());
                     handler_->value(d, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)

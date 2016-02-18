@@ -78,7 +78,7 @@ namespace jsoncons { namespace jsonpath {
 template<class JsonT>
 JsonT json_query(const JsonT& root, const typename JsonT::string_type& path)
 {
-    return json_query(root,path.c_str(),path.length());
+    return json_query(root,path.data(),path.length());
 }
 
 template<class JsonT>
@@ -174,7 +174,7 @@ public:
 
     void evaluate(const JsonT& root, const string_type& path)
     {
-        evaluate(root,path.c_str(),path.length());
+        evaluate(root,path.data(),path.length());
     }
     void evaluate(const JsonT& root, const char_type* path)
     {
@@ -873,7 +873,7 @@ public:
         else if (context_val.is_array())
         {
             size_t index = 0;
-            if (try_string_to_index(name.c_str(),name.size(),&index))
+            if (try_string_to_index(name.data(),name.size(),&index))
             {
                 if (index < context_val.size())
                 {

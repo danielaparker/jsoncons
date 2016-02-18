@@ -36,16 +36,16 @@ void print_integer(int64_t value, buffered_ostream<CharT>& os)
 template<typename CharT>
 void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
 {
-	CharT buf[255];
-	CharT* p = buf;
-	do
-	{
-		*p++ = static_cast<CharT>(48 + value % 10);
-	} while (value /= 10);
-	while (--p >= buf)
-	{
-		os.put(*p);
-	}
+    CharT buf[255];
+    CharT* p = buf;
+    do
+    {
+        *p++ = static_cast<CharT>(48 + value % 10);
+    } while (value /= 10);
+    while (--p >= buf)
+    {
+        os.put(*p);
+    }
 }
 
 template <typename CharT>
@@ -88,7 +88,7 @@ public:
 
     void name(const std::basic_string<CharT>& name)
     {
-        do_name(name.c_str(), name.length());
+        do_name(name.data(), name.length());
     }
 
     void name(const CharT* p, size_t length) 
@@ -98,7 +98,7 @@ public:
 
     void value(const std::basic_string<CharT>& value) 
     {
-        do_string_value(value.c_str(), value.length());
+        do_string_value(value.data(), value.length());
     }
 
     void value(const CharT* p, size_t length) 

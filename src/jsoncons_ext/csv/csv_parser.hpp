@@ -569,7 +569,7 @@ private:
             {
                 if (column_index_ < column_labels_.size())
                 {
-                    handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
+                    handler_->name(column_labels_[column_index_].data(), column_labels_[column_index_].length(), *this);
                     if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
                     {
                         handler_->value(jsoncons::null_type(),*this);
@@ -618,7 +618,7 @@ private:
             {
                 if (column_index_ < column_labels_.size())
                 {
-                    handler_->name(column_labels_[column_index_].c_str(), column_labels_[column_index_].length(), *this);
+                    handler_->name(column_labels_[column_index_].data(), column_labels_[column_index_].length(), *this);
                     end_value();
                 }
             }
@@ -677,13 +677,13 @@ private:
                 }
                 break;
             default:
-                handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+                handler_->value(string_buffer_.data(), string_buffer_.length(), *this);
                 break;  
             }
         }
         else
         {
-            handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
+            handler_->value(string_buffer_.data(), string_buffer_.length(), *this);
         }
     }
 

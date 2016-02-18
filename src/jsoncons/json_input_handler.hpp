@@ -102,7 +102,7 @@ public:
 
     void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
     {
-        do_name(name.c_str(), name.length(), context);
+        do_name(name.data(), name.length(), context);
     }
 
     void name(const CharT* p, size_t length, const basic_parsing_context<CharT>& context) 
@@ -112,7 +112,7 @@ public:
 
     void value(const std::basic_string<CharT>& value, const basic_parsing_context<CharT>& context) 
     {
-        do_string_value(value.c_str(), value.length(), context);
+        do_string_value(value.data(), value.length(), context);
     }
 
     void value(const CharT* p, size_t length, const basic_parsing_context<CharT>& context) 

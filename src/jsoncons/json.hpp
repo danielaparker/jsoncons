@@ -286,7 +286,7 @@ public:
 
             bool operator==(const string_data& rhs) const
             {
-                return length() == rhs.length() ? std::char_traits<char_type>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
+                return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
             }
 
             string_data(const string_allocator_type& allocator)
