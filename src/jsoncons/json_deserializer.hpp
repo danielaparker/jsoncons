@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_DESERIALIZER2_HPP
-#define JSONCONS_JSON_DESERIALIZER2_HPP
+#ifndef JSONCONS_JSON_DESERIALIZER_HPP
+#define JSONCONS_JSON_DESERIALIZER_HPP
 
 #include <string>
 #include <sstream>
@@ -26,12 +26,12 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
     typedef typename JsonT::char_type char_type;
     typedef typename JsonT::member_type member_type;
     typedef typename JsonT::string_type string_type;
-    typedef typename string_type::allocator_type string_allocator_type;
+    typedef typename string_type::allocator_type string_allocator;
     typedef typename JsonT::allocator_type allocator_type;
     typedef typename JsonT::array array;
-    typedef typename array::allocator_type array_allocator_type;
+    typedef typename array::allocator_type array_allocator;
     typedef typename JsonT::object object;
-    typedef typename object::allocator_type object_allocator_type;
+    typedef typename object::allocator_type object_allocator;
     typedef typename JsonT::value_type value_type;
 
     struct stack_item
@@ -40,9 +40,9 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
         JsonT value;
     };
 
-    string_allocator_type string_allocator_;
-    object_allocator_type object_allocator_;
-    array_allocator_type array_allocator_;
+    string_allocator sa_;
+    object_allocator oa_;
+    array_allocator aa_;
 
     JsonT result_;
     size_t top_;
@@ -51,11 +51,11 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
     bool is_valid_;
 
 public:
-    basic_json_deserializer(const string_allocator_type& string_allocator = string_allocator_type(),
+    basic_json_deserializer(const string_allocator& sa = string_allocator(),
                             const allocator_type& allocator = allocator_type())
-        : string_allocator_(string_allocator),
-          object_allocator_(allocator),
-          array_allocator_(allocator),
+        : sa_(sa),
+          oa_(allocator),
+          aa_(allocator),
           top_(0),
           stack_(default_stack_size),
           stack2_(),
@@ -104,7 +104,7 @@ private:
     void push_object()
     {
         stack2_.push_back(top_);
-        stack_[top_].value = object(object_allocator_);
+        stack_[top_].value = object(oa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -120,7 +120,7 @@ private:
     void push_array()
     {
         stack2_.push_back(top_);
-        stack_[top_].value = array(array_allocator_);
+        stack_[top_].value = array(aa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -211,12 +211,12 @@ private:
 
     void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name = string_type(p,length,string_allocator_);
+        stack_[top_].name = string_type(p,length,sa_);
     }
 
     void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = JsonT(p,length,string_allocator_);
+        stack_[top_].value = JsonT(p,length,sa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

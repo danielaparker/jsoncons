@@ -155,8 +155,8 @@ public:
     }
 
 private:
-    basic_csv_reader(const basic_csv_reader&); // noop
-    basic_csv_reader& operator = (const basic_csv_reader&); // noop
+    basic_csv_reader(const basic_csv_reader&) = delete; 
+    basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
     basic_csv_parser<CharT> parser_;
     std::basic_istream<CharT>* is_;

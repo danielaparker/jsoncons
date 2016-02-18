@@ -495,12 +495,21 @@ and <code>std::allocator&lt;char&gt;</code> as the allocator type. The <code>jso
 <td>Allocator type</td>
 </tr>
 <tr>
-<td><code>array_allocator_type</code></td>
+<td><code>string_allocator</code></td>
+<td>String allocator type</td>
+</tr>
+<tr>
+<td><code>array_allocator</code></td>
 <td>Array allocator type</td>
 </tr>
 <tr>
-<td><code>object_allocator_type</code></td>
+<td><code>object_allocator</code></td>
 <td>Object allocator type</td>
+</tr>
+<tr>
+<td><code>string_type</code></td>
+<td>Default <code>string_type</code> is <code>std::string</code>
+</td>
 </tr>
 <tr>
 <td><code>member_type</code></td>
@@ -566,8 +575,8 @@ and <code>std::allocator&lt;char&gt;</code> as the allocator type. The <code>jso
 
 <h3>Static member functions</h3>
 
-<pre><code>static json parse(const std::string&amp; s)
-static json parse(const std::string&amp; s, 
+<pre><code>static json parse(const string_type&amp; s)
+static json parse(const string_type&amp; s, 
                   parse_error_handler&amp; err_handler)
 </code></pre>
 
@@ -592,13 +601,13 @@ Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>static json make_array()
 
-static json make_array(size_t n, const array_allocator_type&amp; allocator = array_allocator_type())
+static json make_array(size_t n, const array_allocator&amp; allocator = array_allocator())
 
 template &lt;typename T&gt;
 static json make_array(size_ n, const T&amp; val)
 
 template &lt;typename T&gt;
-static json make_array(size_ n, const T&amp; val, const array_allocator_type&amp; allocator = array_allocator_type())
+static json make_array(size_ n, const T&amp; val, const array_allocator&amp; allocator = array_allocator())
 
 template &lt;size_t N&gt;
 static json make_array(size_t size1 ... size_t sizeN)
@@ -607,7 +616,7 @@ template &lt;size_t N,typename T&gt;
 static json make_array(size_t size1 ... size_t sizeN, const T&amp; val)
 
 template &lt;size_t N,typename T&gt;
-static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const array_allocator_type&amp; allocator)
+static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const array_allocator&amp; allocator)
 </code></pre>
 
 <p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
@@ -730,7 +739,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Accessors</h3>
 
-<pre><code>size_t count(const std::string&amp; name) const
+<pre><code>size_t count(const string_type&amp; name) const
 </code></pre>
 
 <p>Returns the number of object members that match <code>name</code>.    </p>
@@ -762,7 +771,7 @@ bool is&lt;unsigned long long&gt; const noexcept
 
 <p>Return true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;std::string&gt; 
+<pre><code>is&lt;string_type&gt; 
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.  </p>
@@ -818,31 +827,31 @@ const json&amp; operator[](size_t i) const
 <p>Returns a reference to the value at position i in a json object or array.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>json&amp; operator[](const std::string&amp; name)
+<pre><code>json&amp; operator[](const string_type&amp; name)
 </code></pre>
 
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. <br>
 Throws <code>std::runtime_error</code> if not an object.<br>
 If read, throws <code>std::out_of_range</code> if the object does not have a member with the specified name.  </p>
 
-<pre><code>const json&amp; operator[](const std::string&amp; name) const
+<pre><code>const json&amp; operator[](const string_type&amp; name) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
 Throws <code>std::out_of_range</code> if the object does not have a member with the specified name.  </p>
 
-<pre><code>object_iterator find(const std::string&amp; name)
+<pre><code>object_iterator find(const string_type&amp; name)
 object_iterator find(const char* name)
-const_object_iterator find(const std::string&amp; name) const
+const_object_iterator find(const string_type&amp; name) const
 const_object_iterator find(const char* name) const
 </code></pre>
 
 <p>Returns an object iterator to a member whose name compares equal to <code>name</code>. If there is no such member, returns <code>end_member()</code>.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>json&amp; at(const std::string&amp; name)
-const json&amp; at(const std::string&amp; name) const
+<pre><code>json&amp; at(const string_type&amp; name)
+const json&amp; at(const string_type&amp; name) const
 </code></pre>
 
 <p>Returns a reference to the value with the specifed name in a json object.<br>
@@ -858,7 +867,7 @@ Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
 <pre><code>template &lt;typename T&gt;
-const json get(const std::string&amp; name, T&amp;&amp; default_val) const
+const json get(const string_type&amp; name, T&amp;&amp; default_val) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.<br>
@@ -896,7 +905,7 @@ unsigned long long as&lt;unsigned long long&gt; const
 
 <p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
-<pre><code>std::string as&lt;std::string&gt; const noexcept
+<pre><code>string_type as&lt;string_type&gt;(const string_allocator&amp; allocator = string_allocator()) const noexcept
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
@@ -905,7 +914,7 @@ unsigned long long as&lt;unsigned long long&gt; const
 int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
-std::string as_string() const noexcept
+string_type as_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
 </code></pre>
 
 <p>Non-generic versions of <code>as</code> methods</p>
@@ -938,7 +947,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 <p>Remove the members from an object in the range '[first,last)'.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>void erase(const std::string&amp; name)
+<pre><code>void erase(const string_type&amp; name)
 </code></pre>
 
 <p>Remove a member with the specified name from an object<br>
@@ -949,19 +958,19 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 
 <p>Requests the removal of unused capacity.</p>
 
-<pre><code>void set(const std::string&amp; name, const json&amp; val)
-void set(std::string&amp;&amp; name, const json&amp; val)
-void set(const std::string&amp; name, json&amp;&amp; val)
-void set(std::string&amp;&amp; name, json&amp;&amp; val)
+<pre><code>void set(const string_type&amp; name, const json&amp; val)
+void set(string_type&amp;&amp; name, const json&amp; val)
+void set(const string_type&amp; name, json&amp;&amp; val)
+void set(string_type&amp;&amp; name, json&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>object_iterator set(object_iterator hint, const std::string&amp; name, const json&amp; val)
-object_iterator set(object_iterator hint, std::string&amp;&amp; name, const json&amp; val)
-object_iterator set(object_iterator hint, const std::string&amp; name, json&amp;&amp; val)
-object_iterator set(object_iterator hint, std::string&amp;&amp; name, json&amp;&amp; val)
+<pre><code>object_iterator set(object_iterator hint, const string_type&amp; name, const json&amp; val)
+object_iterator set(object_iterator hint, string_type&amp;&amp; name, const json&amp; val)
+object_iterator set(object_iterator hint, const string_type&amp; name, json&amp;&amp; val)
+object_iterator set(object_iterator hint, string_type&amp;&amp; name, json&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
@@ -1004,12 +1013,12 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Serialization</h3>
 
-<pre><code>std::string to_string() const noexcept
+<pre><code>string_type to_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
 </code></pre>
 
 <p>Inserts json value into string.</p>
 
-<pre><code>std::string to_string(const output_format&amp; format) const
+<pre><code>string_type to_string(const output_format&amp; format, const string_allocator&amp; allocator = string_allocator()) const
 </code></pre>
 
 <p>Inserts json value into string using specified <a href="output_format">output_format</a>.</p>
@@ -1104,7 +1113,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> book: booklist.elements())
     {
-        std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::end;
+        std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::end;
     } </pre></div>
 
 <h3>Accessors and defaults</h3>
@@ -1117,8 +1126,8 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
     <span class="pl-k">double</span> x1 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">10.0</span>;
     <span class="pl-k">double</span> x2 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">20.0</span>;
 
-    std::string x3 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
-    std::string x4 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>San Francisco<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
+    string_type x3 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>).as&lt;string_type&gt;();
+    string_type x4 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>San Francisco<span class="pl-pds">"</span></span>).as&lt;string_type&gt;();
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x1=<span class="pl-pds">"</span></span> &lt;&lt; x1 &lt;&lt; std::endl;
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x2=<span class="pl-pds">"</span></span> &lt;&lt; x2 &lt;&lt; std::endl;
@@ -1179,7 +1188,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.members().begin(); it != obj.members().end(); ++it)
     {
-        std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
+        std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
     }</pre></div>
 
 <p>The output is</p>
@@ -1194,7 +1203,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
     <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
-        std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
+        std::cout &lt;&lt; it-&gt;as&lt;string_type&gt;() &lt;&lt; std::endl;
     }</pre></div>
 
 <p>The output is</p>

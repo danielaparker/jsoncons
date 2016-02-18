@@ -472,11 +472,6 @@ public:
 
     typedef json_object_iterator<base_iterator,base_iterator> iterator;
     typedef json_object_iterator<const_base_iterator,base_iterator> const_iterator;
-
-    //typedef typename std::vector<value_type,allocator_type>::iterator iterator;
-    //typedef typename std::vector<value_type,allocator_type>::const_iterator const_iterator;
-    //typedef typename std::vector<value_type,allocator_type>::reference reference;
-    //typedef typename std::vector<value_type,allocator_type>::const_reference const_reference;
 private:
     std::vector<value_type,allocator_type> members_;
 public:

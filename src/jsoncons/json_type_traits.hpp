@@ -40,14 +40,15 @@ class json_type_traits<JsonT, typename JsonT::string_type>
 {
 public:
     typedef typename JsonT::string_type string_type;
+    typedef typename string_type::allocator_type string_allocator;
 
     static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_string();
     }
-    static string_type as(const JsonT& rhs) JSONCONS_NOEXCEPT
+    static string_type as(const JsonT& rhs, const string_allocator& allocator=string_allocator()) JSONCONS_NOEXCEPT
     {
-        return rhs.as_string();
+        return rhs.as_string(allocator);
     }
     static void assign(JsonT& lhs, const string_type& rhs)
     {
@@ -216,8 +217,8 @@ public:
     }
     static typename JsonT::object as(JsonT rhs)
     {
-		JSONCONS_ASSERT(rhs.is_object());
-		return rhs.object_value();
+        JSONCONS_ASSERT(rhs.is_object());
+        return rhs.object_value();
     }
     static void assign(JsonT& lhs, typename JsonT::object rhs)
     {
@@ -235,7 +236,7 @@ public:
     }
     static typename JsonT::array as(const JsonT& rhs)
     {
-		JSONCONS_ASSERT(rhs.is_array());
+        JSONCONS_ASSERT(rhs.is_array());
         return rhs.array_value();
     }
     static void assign(JsonT& lhs, typename JsonT::array rhs)

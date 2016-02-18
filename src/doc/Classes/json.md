@@ -15,8 +15,10 @@ and `std::allocator<char>` as the allocator type. The `jsoncons` library will al
 Member type                         |Definition
 ------------------------------------|------------------------------
 `allocator_type`|Allocator type
-`array_allocator_type`|Array allocator type
-`object_allocator_type`|Object allocator type
+`string_allocator`|String allocator type
+`array_allocator`|Array allocator type
+`object_allocator`|Object allocator type
+`string_type`|Default `string_type` is `std::string`
 `member_type`|[member_type](json_member_type) is a class that stores a name and a json value
 `any`|[any](json%20any) can contain any value that supports copy construction and assignment.
 `null_type`|An alias for `jsoncons::null_type`
@@ -33,8 +35,8 @@ Member type                         |Definition
 
 ### Static member functions
 
-    static json parse(const std::string& s)
-    static json parse(const std::string& s, 
+    static json parse(const string_type& s)
+    static json parse(const string_type& s, 
                       parse_error_handler& err_handler)
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
@@ -53,13 +55,13 @@ Throws [parse_exception](parse_exception) if parsing fails.
 
     static json make_array()
 
-    static json make_array(size_t n, const array_allocator_type& allocator = array_allocator_type())
+    static json make_array(size_t n, const array_allocator& allocator = array_allocator())
 
     template <typename T>
     static json make_array(size_ n, const T& val)
 
     template <typename T>
-    static json make_array(size_ n, const T& val, const array_allocator_type& allocator = array_allocator_type())
+    static json make_array(size_ n, const T& val, const array_allocator& allocator = array_allocator())
 
     template <size_t N>
     static json make_array(size_t size1 ... size_t sizeN)
@@ -68,7 +70,7 @@ Throws [parse_exception](parse_exception) if parsing fails.
     static json make_array(size_t size1 ... size_t sizeN, const T& val)
 
     template <size_t N,typename T>
-    static json make_array(size_t size1 ... size_t sizeN, const T& val, const array_allocator_type& allocator)
+    static json make_array(size_t size1 ... size_t sizeN, const T& val, const array_allocator& allocator)
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
 ### Constructors
@@ -152,7 +154,7 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    size_t count(const std::string& name) const
+    size_t count(const string_type& name) const
 Returns the number of object members that match `name`.    
 
     template <typename T>
@@ -176,7 +178,7 @@ Return `true` if json value is of integral type and within the range of the temp
     is<double> 
 Return true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
 
-    is<std::string> 
+    is<string_type> 
 Returns `true` if the json value is of string type, `false` otherwise.  
 
     is<bool>
@@ -214,25 +216,25 @@ Non-generic versions of `is_` methods
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object.
 
-    json& operator[](const std::string& name)
+    json& operator[](const string_type& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    const json& operator[](const std::string& name) const
+    const json& operator[](const string_type& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    object_iterator find(const std::string& name)
+    object_iterator find(const string_type& name)
     object_iterator find(const char* name)
-    const_object_iterator find(const std::string& name) const
+    const_object_iterator find(const string_type& name) const
     const_object_iterator find(const char* name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
 Throws `std::runtime_error` if not an object.
 
-    json& at(const std::string& name)
-    const json& at(const std::string& name) const
+    json& at(const string_type& name)
+    const json& at(const string_type& name) const
 Returns a reference to the value with the specifed name in a json object.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
@@ -244,7 +246,7 @@ Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <typename T>
-    const json get(const std::string& name, T&& default_val) const
+    const json get(const string_type& name, T&& default_val) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
 Throws `std::runtime_error` if not an object.
 
@@ -272,14 +274,14 @@ If value is double, returns value, if value is signed or unsigned integer, casts
     unsigned long long as<unsigned long long> const 
 Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
-    std::string as<std::string> const noexcept
+    string_type as<string_type>(const string_allocator& allocator = string_allocator()) const noexcept
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const noexcept
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
-    std::string as_string() const noexcept
+    string_type as_string(const string_allocator& allocator = string_allocator()) const noexcept
 Non-generic versions of `as` methods
 
     template <typename T>
@@ -302,24 +304,24 @@ Throws `std::runtime_error` if not an object.
 Remove the members from an object in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 
-    void erase(const std::string& name)
+    void erase(const string_type& name)
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
 
     void shrink_to_fit()
 Requests the removal of unused capacity.
 
-    void set(const std::string& name, const json& val)
-    void set(std::string&& name, const json& val)
-    void set(const std::string& name, json&& val)
-    void set(std::string&& name, json&& val)
+    void set(const string_type& name, const json& val)
+    void set(string_type&& name, const json& val)
+    void set(const string_type& name, json&& val)
+    void set(string_type&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
 
-    object_iterator set(object_iterator hint, const std::string& name, const json& val)
-    object_iterator set(object_iterator hint, std::string&& name, const json& val)
-    object_iterator set(object_iterator hint, const std::string& name, json&& val)
-    object_iterator set(object_iterator hint, std::string&& name, json&& val)
+    object_iterator set(object_iterator hint, const string_type& name, const json& val)
+    object_iterator set(object_iterator hint, string_type&& name, const json& val)
+    object_iterator set(object_iterator hint, const string_type& name, json&& val)
+    object_iterator set(object_iterator hint, string_type&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_terator` pointing at the member that was inserted or updated
@@ -350,10 +352,10 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
-    std::string to_string() const noexcept
+    string_type to_string(const string_allocator& allocator = string_allocator()) const noexcept
 Inserts json value into string.
 
-    std::string to_string(const output_format& format) const
+    string_type to_string(const output_format& format, const string_allocator& allocator = string_allocator()) const
 Inserts json value into string using specified [output_format](output_format).
 
     std::ostream& to_stream(std::ostream& os) const
@@ -430,7 +432,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
     for (auto book: booklist.elements())
     {
-        std::cout << book["title"].as<std::string>() << std::end;
+        std::cout << book["title"].as<string_type>() << std::end;
     } 
 ```    
 ### Accessors and defaults
@@ -443,8 +445,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
     double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
 
-    std::string x3 = obj.get("field3","Montreal").as<std::string>();
-    std::string x4 = obj.get("field4","San Francisco").as<std::string>();
+    string_type x3 = obj.get("field3","Montreal").as<string_type>();
+    string_type x4 = obj.get("field4","San Francisco").as<string_type>();
 
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
@@ -505,7 +507,7 @@ The output is
 
     for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
     {
-        std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
+        std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
     }
 ```
 The output is
@@ -520,7 +522,7 @@ The output is
 
     for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     {
-        std::cout << it->as<std::string>() << std::endl;
+        std::cout << it->as<string_type>() << std::endl;
     }
 ```
 The output is
