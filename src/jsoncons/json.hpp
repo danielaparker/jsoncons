@@ -1605,7 +1605,7 @@ public:
     }
 
     template <size_t dim, typename... Args>
-    static basic_json make_array(size_t n, Args... args)
+    static typename std::enable_if<(dim>1),basic_json>::type make_array(size_t n, Args... args)
     {
         const size_t dim1 = dim - 1;
 
