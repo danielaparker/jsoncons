@@ -76,6 +76,14 @@ namespace jsoncons { namespace jsonpath {
 // here
 
 template<class JsonT>
+JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_t length)
+{
+    jsonpath_evaluator<JsonT> evaluator;
+    evaluator.evaluate(root,path,length);
+    return evaluator.get_values();
+}
+
+template<class JsonT>
 JsonT json_query(const JsonT& root, const typename JsonT::string_type& path)
 {
     return json_query(root,path.data(),path.length());
@@ -85,14 +93,6 @@ template<class JsonT>
 JsonT json_query(const JsonT& root, const typename JsonT::char_type* path)
 {
     return json_query(root,path,std::char_traits<typename JsonT::char_type>::length(path));
-}
-
-template<class JsonT>
-JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_t length)
-{
-    jsonpath_evaluator<JsonT> evaluator;
-    evaluator.evaluate(root,path,length);
-    return evaluator.get_values();
 }
 
 enum class states 
