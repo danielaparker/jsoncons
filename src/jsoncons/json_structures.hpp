@@ -642,8 +642,8 @@ public:
         return erase(name.data(),name.length());
     }
 
-    template<class InputIt>
-    void insert(InputIt first, InputIt last)
+    template<class InputIt, class UnaryPredicate>
+    void insert(InputIt first, InputIt last, UnaryPredicate pred)
     {
         size_t count = std::distance(first,last);
         size_t pos = members_.size();
@@ -651,8 +651,9 @@ public:
         auto d = members_.begin()+pos;
         for (auto s = first; s != last; ++s, ++d)
         {
-            *d = *s;
+            *d = pred(*s);
         }
+        std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
     void set(const char_type* s, size_t length, const JsonT& value)
@@ -839,7 +840,7 @@ public:
 
     iterator set(iterator hint, string_type&& name, JsonT&& value)
     {
-        std::vector<value_type,allocator_type>::iterator it;
+        typename std::vector<value_type,allocator_type>::iterator it;
         if (hint.get() != members_.end() && hint.get()->name() <= name)
         {
             it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
@@ -863,21 +864,6 @@ public:
             it = members_.insert(it,value_type(std::move(name),std::move(value)));
         }
         return iterator(it);
-    }
-
-    void bulk_insert(const value_type& member)
-    {
-        members_.push_back(member);
-    }
-
-    void bulk_insert(value_type&& member)
-    {
-        members_.push_back(std::move(member));
-    }
-
-    void end_bulk_insert()
-    {
-        std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
     bool operator==(const json_object<StringT,JsonT,Alloc>& rhs) const

@@ -34,18 +34,18 @@ class basic_json_deserializer : public basic_json_input_handler<typename JsonT::
     typedef typename object::allocator_type object_allocator;
     typedef typename JsonT::value_type value_type;
 
-    struct stack_item
-    {
-        string_type name;
-        JsonT value;
-    };
-
     string_allocator sa_;
     object_allocator oa_;
     array_allocator aa_;
 
     JsonT result_;
     size_t top_;
+
+    struct stack_item
+    {
+        string_type name_;
+        value_type value_;
+    };
     std::vector<stack_item> stack_;
     std::vector<size_t> stack2_;
     bool is_valid_;
@@ -97,14 +97,14 @@ private:
     void pop_initial()
     {
         JSONCONS_ASSERT(top_ == 1);
-        result_.swap(stack_[0].value);
+        result_.swap(stack_[0].value_);
         --top_;
     }
 
     void push_object()
     {
         stack2_.push_back(top_);
-        stack_[top_].value = object(oa_);
+        stack_[top_].value_ = object(oa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -120,7 +120,7 @@ private:
     void push_array()
     {
         stack2_.push_back(top_);
-        stack_[top_].value = array(aa_);
+        stack_[top_].value_ = array(aa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -152,32 +152,7 @@ private:
 
     void do_end_object(const basic_parsing_context<char_type>&) override
     {
-        JSONCONS_ASSERT(stack2_.size() > 0);
-        if (stack_[stack2_.back()].value.is_object())
-        {
-            size_t count = top_ - (stack2_.back() + 1);
-            stack_[stack2_.back()].value.reserve(count);
-            for (size_t i = 0; i < count; ++i)
-            {
-                stack_[stack2_.back()].value.object_value().bulk_insert(member_type(std::move(stack_[stack2_.back()+1+i].name),std::move(stack_[stack2_.back()+1+i].value)));
-            }
-            stack_[stack2_.back()].value.object_value().end_bulk_insert();
-            top_ -= count;
-        }
-        else
-        {
-            size_t count = top_ - (stack2_.back() + 1);
-            stack_[stack2_.back()].value.resize(count);
-
-            auto s = stack_.begin() + (stack2_.back()+1);
-            auto dend = stack_[stack2_.back()].value.elements().end();
-            for (auto it = stack_[stack2_.back()].value.elements().begin();
-                 it != dend; ++it, ++s)
-            {
-                *it = std::move(s->value);
-            }
-            top_ -= count;
-        }
+        end_structure();
         pop_object();
     }
 
@@ -188,43 +163,53 @@ private:
 
     void do_end_array(const basic_parsing_context<char_type>&) override
     {
+        end_structure();
+        pop_array();
+    }
+
+    static member_type move_pair(stack_item&& val)
+    {
+        return member_type(std::move(val.name_),std::move(val.value_));
+    }
+
+    void end_structure() 
+    {
         JSONCONS_ASSERT(stack2_.size() > 0);
-        if (stack_[stack2_.back()].value.is_object())
+        if (stack_[stack2_.back()].value_.is_object())
         {
             size_t count = top_ - (stack2_.back() + 1);
-            stack_[stack2_.back()].value.reserve(count);
-            for (size_t i = 0; i < count; ++i)
-            {
-                stack_[stack2_.back()].value.object_value().bulk_insert(member_type(std::move(stack_[stack2_.back()+1+i].name),std::move(stack_[stack2_.back()+1+i].value)));
-            }
-            stack_[stack2_.back()].value.object_value().end_bulk_insert();
+            auto s = stack_.begin() + (stack2_.back()+1);
+            auto send = s + count;
+            stack_[stack2_.back()].value_.object_value().insert(
+                std::make_move_iterator(s),
+                std::make_move_iterator(send),
+                move_pair);
             top_ -= count;
         }
         else
         {
             size_t count = top_ - (stack2_.back() + 1);
-            stack_[stack2_.back()].value.resize(count);
+            stack_[stack2_.back()].value_.resize(count);
 
             auto s = stack_.begin() + (stack2_.back()+1);
-            auto dend = stack_[stack2_.back()].value.elements().end();
-            for (auto it = stack_[stack2_.back()].value.elements().begin();
+            auto dend = stack_[stack2_.back()].value_.elements().end();
+            for (auto it = stack_[stack2_.back()].value_.elements().begin();
                  it != dend; ++it, ++s)
             {
-                *it = std::move(s->value);
+                *it = std::move(s->value_);
             }
             top_ -= count;
         }
-        pop_array();
     }
 
     void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name = string_type(p,length,sa_);
+        stack_[top_].name_ = string_type(p,length,sa_);
     }
 
     void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = JsonT(p,length,sa_);
+        stack_[top_].value_ = JsonT(p,length,sa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -233,7 +218,7 @@ private:
 
     void do_integer_value(int64_t value, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = value;
+        stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -242,7 +227,7 @@ private:
 
     void do_uinteger_value(uint64_t value, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = value;
+        stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -251,7 +236,7 @@ private:
 
     void do_double_value(double value, uint8_t precision, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = value_type(value,precision);
+        stack_[top_].value_ = value_type(value,precision);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -260,7 +245,7 @@ private:
 
     void do_bool_value(bool value, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = value;
+        stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -269,7 +254,7 @@ private:
 
     void do_null_value(const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value = null_type();
+        stack_[top_].value_ = null_type();
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

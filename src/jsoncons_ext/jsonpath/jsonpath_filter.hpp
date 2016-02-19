@@ -15,6 +15,7 @@
 #include <memory>
 #include <regex>
 #include "jsoncons/json.hpp"
+#include "jsonpath_error_category.hpp"
 
 namespace jsoncons { namespace jsonpath {
 
@@ -183,7 +184,7 @@ public:
         return type_;
     }
 
-    std::shared_ptr<term<JsonT>> term()
+    std::shared_ptr<term<JsonT>> term_ptr()
     {
         return term_;
     }
@@ -761,7 +762,7 @@ public:
             return expr;
         }
         case token_types::term:
-            return t.term();
+            return t.term_ptr();
         case token_types::exclaim:
         {
             JsonT val = primary(ts)->exclaim();

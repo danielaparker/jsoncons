@@ -2733,7 +2733,6 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef any json_any_type;
-    typedef member_type name_value_pair;
 
     static basic_json parse(std::basic_istream<char_type>& is)
     {
