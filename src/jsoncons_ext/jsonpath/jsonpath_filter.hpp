@@ -164,18 +164,18 @@ template <class JsonT>
 class token
 {
     token_types type_;
-    std::shared_ptr<term<JsonT>> term_;
+    std::shared_ptr<term<JsonT>> term_ptr_;
 public:
     token(token_types type)
         : type_(type)
     {
     }
-    token(token_types type, std::shared_ptr<term<JsonT>> term)
-        : type_(type), term_(term)
+    token(token_types type, std::shared_ptr<term<JsonT>> term_ptr)
+        : type_(type), term_ptr_(term_ptr)
     {
     }
     token(const token& t)
-        : type_(t.type_), term_(t.term_)
+        : type_(t.type_), term_ptr_(t.term_ptr_)
     {
     }
 
@@ -186,14 +186,14 @@ public:
 
     std::shared_ptr<term<JsonT>> term_ptr()
     {
-        return term_;
+        return term_ptr_;
     }
 
     void initialize(const JsonT& context_node)
     {
-        if (term_.get() != nullptr)
+        if (term_ptr_.get() != nullptr)
         {
-            term_->initialize(context_node);
+            term_ptr_->initialize(context_node);
         }
     }
 };
