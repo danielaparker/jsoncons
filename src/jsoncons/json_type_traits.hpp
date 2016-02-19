@@ -46,7 +46,11 @@ public:
     {
         return rhs.is_string();
     }
-    static string_type as(const JsonT& rhs, const string_allocator& allocator=string_allocator()) JSONCONS_NOEXCEPT
+    static string_type as(const JsonT& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.as_string();
+    }
+    static string_type as(const JsonT& rhs, const string_allocator& allocator) JSONCONS_NOEXCEPT
     {
         return rhs.as_string(allocator);
     }

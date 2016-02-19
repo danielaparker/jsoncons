@@ -905,7 +905,8 @@ unsigned long long as&lt;unsigned long long&gt; const
 
 <p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
-<pre><code>string_type as&lt;string_type&gt;(const string_allocator&amp; allocator = string_allocator()) const noexcept
+<pre><code>string_type as&lt;string_type&gt;() const noexcept
+string_type as&lt;string_type&gt;(const string_allocator&amp; allocator) const noexcept
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
@@ -914,7 +915,9 @@ unsigned long long as&lt;unsigned long long&gt; const
 int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
-string_type as_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
+string_type as_string() const noexcept
+string_type as_string(const string_allocator&amp; allocator) const noexcept
+unsigned int as&lt;unsigned int&gt; const 
 </code></pre>
 
 <p>Non-generic versions of <code>as</code> methods</p>

@@ -1082,13 +1082,23 @@ public:
             return evaluate().is_double();
         }
 
-        string_type as_string(const string_allocator& allocator = string_allocator()) const JSONCONS_NOEXCEPT
+        string_type as_string() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().as_string();
+        }
+
+        string_type as_string(const string_allocator& allocator) const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string(allocator);
         }
 
+        string_type as_string(const basic_output_format<char_type>& format) const
+        {
+            return evaluate().as_string(format);
+        }
+
         string_type as_string(const basic_output_format<char_type>& format,
-                              const string_allocator& allocator = string_allocator()) const
+                              const string_allocator& allocator) const
         {
             return evaluate().as_string(format,allocator);
         }
@@ -2131,7 +2141,20 @@ public:
         }
     }
 
-    string_type as_string(const string_allocator& allocator = string_allocator()) const JSONCONS_NOEXCEPT
+    string_type as_string() const JSONCONS_NOEXCEPT
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return string_type(var_.value_.small_string_val_,var_.length_or_precision_);
+        case value_types::string_t:
+            return string_type(var_.value_.string_val_->data(),var_.value_.string_val_->length(),var_.value_.string_val_->get_allocator());
+        default:
+            return to_string();
+        }
+    }
+
+    string_type as_string(const string_allocator& allocator) const JSONCONS_NOEXCEPT
     {
         switch (var_.type_)
         {
@@ -2144,8 +2167,21 @@ public:
         }
     }
 
+    string_type as_string(const basic_output_format<char_type>& format) const 
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return string_type(var_.value_.small_string_val_,var_.length_or_precision_);
+        case value_types::string_t:
+            return string_type(var_.value_.string_val_->data(),var_.value_.string_val_->length(),var_.value_.string_val_->get_allocator());
+        default:
+            return to_string(format);
+        }
+    }
+
     string_type as_string(const basic_output_format<char_type>& format,
-                          const string_allocator& allocator = string_allocator()) const 
+                          const string_allocator& allocator) const 
     {
         switch (var_.type_)
         {

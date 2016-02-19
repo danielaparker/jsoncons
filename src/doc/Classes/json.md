@@ -274,14 +274,17 @@ If value is double, returns value, if value is signed or unsigned integer, casts
     unsigned long long as<unsigned long long> const 
 Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
-    string_type as<string_type>(const string_allocator& allocator = string_allocator()) const noexcept
+    string_type as<string_type>() const noexcept
+    string_type as<string_type>(const string_allocator& allocator) const noexcept
 If value is string, returns value, otherwise returns result of `to_string`.
 
     bool as_bool() const noexcept
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
-    string_type as_string(const string_allocator& allocator = string_allocator()) const noexcept
+    string_type as_string() const noexcept
+    string_type as_string(const string_allocator& allocator) const noexcept
+    unsigned int as<unsigned int> const 
 Non-generic versions of `as` methods
 
     template <typename T>
