@@ -369,7 +369,7 @@ private:
 
     }
 
-    void value(long long val, buffered_ostream<CharT>& os)
+    void value(int64_t val, buffered_ostream<CharT>& os)
     {
         begin_value(os);
 
@@ -380,7 +380,7 @@ private:
         end_value();
     }
 
-    void value(unsigned long long val, buffered_ostream<CharT>& os)
+    void value(uint64_t val, buffered_ostream<CharT>& os)
     {
         begin_value(os);
 
