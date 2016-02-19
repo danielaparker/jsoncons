@@ -782,7 +782,7 @@ public:
 
     std::shared_ptr<term<JsonT>> expression(token_stream<JsonT>& ts)
     {
-        auto left = term(ts);
+        auto left = make_term(ts);
         auto t = ts.get();
         while (true)
         {
@@ -790,14 +790,14 @@ public:
             {
             case token_types::plus:
             {
-                JsonT val = left->plus(*(term(ts)));
+                JsonT val = left->plus(*(make_term(ts)));
                 left = std::make_shared<value_term<JsonT>>(val);
                 t = ts.get();
             }
                 break;
             case token_types::minus:
             {
-                JsonT val = left->minus(*(term(ts)));
+                JsonT val = left->minus(*(make_term(ts)));
                 left = std::make_shared<value_term<JsonT>>(val);
                 t = ts.get();
             }
@@ -810,7 +810,7 @@ public:
         return left;
     }
 
-    std::shared_ptr<term<JsonT>> term(token_stream<JsonT>& ts)
+    std::shared_ptr<term<JsonT>> make_term(token_stream<JsonT>& ts)
     {
         auto left = primary(ts);
         auto t = ts.get();
