@@ -234,11 +234,11 @@ private:
     {
     }
 
-    void do_integer_value(long long) override
+    void do_integer_value(int64_t) override
     {
     }
 
-    void do_uinteger_value(unsigned long long) override
+    void do_uinteger_value(uint64_t) override
     {
     }
 

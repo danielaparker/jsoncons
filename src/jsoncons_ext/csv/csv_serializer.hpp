@@ -125,7 +125,7 @@ public:
        original_format_flags_(),
        header_os_(header_oss_),
        header_(),
-	   fp_(format_.precision())
+       fp_(format_.precision())
     {
     }
 
@@ -271,7 +271,7 @@ private:
         }
     }
 
-    void do_integer_value(long long val) override
+    void do_integer_value(int64_t val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -286,7 +286,7 @@ private:
         }
     }
 
-    void do_uinteger_value(unsigned long long val) override
+    void do_uinteger_value(uint64_t val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
@@ -316,25 +316,25 @@ private:
         }
     }
 
-	void value(const CharT* val, size_t length, buffered_ostream<CharT>& os)
-	{
-		begin_value(os);
+    void value(const CharT* val, size_t length, buffered_ostream<CharT>& os)
+    {
+        begin_value(os);
 
-		bool quote = false;
-		if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
-			(parameters_.quote_style() == quote_styles::minimal && std::char_traits<CharT>::find(val, length, parameters_.field_delimiter()) != nullptr))
-		{
-			quote = true;
-			os.put(parameters_.quote_char());
-		}
-		jsoncons::csv::escape_string<CharT>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
-		if (quote)
-		{
-			os.put(parameters_.quote_char());
-		}
+        bool quote = false;
+        if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
+            (parameters_.quote_style() == quote_styles::minimal && std::char_traits<CharT>::find(val, length, parameters_.field_delimiter()) != nullptr))
+        {
+            quote = true;
+            os.put(parameters_.quote_char());
+        }
+        jsoncons::csv::escape_string<CharT>(val, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
+        if (quote)
+        {
+            os.put(parameters_.quote_char());
+        }
 
-		end_value();
-	}
+        end_value();
+    }
 
     void value(double val, buffered_ostream<CharT>& os)
     {
@@ -373,8 +373,8 @@ private:
     {
         begin_value(os);
 
-		std::basic_ostringstream<CharT> ss;
-		ss << val;
+        std::basic_ostringstream<CharT> ss;
+        ss << val;
         os.write(ss.str());
 
         end_value();
@@ -384,9 +384,9 @@ private:
     {
         begin_value(os);
 
-		std::basic_ostringstream<CharT> ss;
-		ss << val;
-		os.write(ss.str());
+        std::basic_ostringstream<CharT> ss;
+        ss << val;
+        os.write(ss.str());
 
         end_value();
     }
