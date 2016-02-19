@@ -642,6 +642,19 @@ public:
         return erase(name.data(),name.length());
     }
 
+    template<class InputIt>
+    void insert(InputIt first, InputIt last)
+    {
+        size_t count = std::distance(first,last);
+        size_t pos = members_.size();
+        members_.resize(pos+count);
+        auto d = members_.begin()+pos;
+        for (auto s = first; s != last; ++s, ++d)
+        {
+            *d = *s;
+        }
+    }
+
     void set(const char_type* s, size_t length, const JsonT& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));

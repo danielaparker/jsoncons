@@ -168,9 +168,13 @@ private:
         {
             size_t count = top_ - (stack2_.back() + 1);
             stack_[stack2_.back()].value.resize(count);
-            for (size_t i = 0; i < count; ++i)
+
+            auto s = stack_.begin() + (stack2_.back()+1);
+            auto dend = stack_[stack2_.back()].value.elements().end();
+            for (auto it = stack_[stack2_.back()].value.elements().begin();
+                 it != dend; ++it, ++s)
             {
-                stack_[stack2_.back()].value[i] = std::move(stack_[stack2_.back()+1+i].value);
+                *it = std::move(s->value);
             }
             top_ -= count;
         }
@@ -200,9 +204,13 @@ private:
         {
             size_t count = top_ - (stack2_.back() + 1);
             stack_[stack2_.back()].value.resize(count);
-            for (size_t i = 0; i < count; ++i)
+
+            auto s = stack_.begin() + (stack2_.back()+1);
+            auto dend = stack_[stack2_.back()].value.elements().end();
+            for (auto it = stack_[stack2_.back()].value.elements().begin();
+                 it != dend; ++it, ++s)
             {
-                stack_[stack2_.back()].value[i] = std::move(stack_[stack2_.back()+1+i].value);
+                *it = std::move(s->value);
             }
             top_ -= count;
         }
