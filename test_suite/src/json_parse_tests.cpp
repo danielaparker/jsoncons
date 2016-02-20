@@ -89,17 +89,17 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
 {
     json val;
     BOOST_CHECK_NO_THROW((val=json::parse("null")));
-    val == json::null_type();
+    BOOST_CHECK_EQUAL(val,json::null_type());
     BOOST_CHECK_NO_THROW((val=json::parse("false")));
-    val == json(false);
+    BOOST_CHECK_EQUAL(val,json(false));
     BOOST_CHECK_NO_THROW((val=json::parse("true")));
-    val == json(true);
+    BOOST_CHECK_EQUAL(val,json(true));
     BOOST_CHECK_NO_THROW((val=json::parse("10")));
-    val == json(10);
+    BOOST_CHECK_EQUAL(val,json(10));
     BOOST_CHECK_NO_THROW((val=json::parse("1.999")));
-    val == json(1.999);
+    BOOST_CHECK_EQUAL(val,json(1.999));
     BOOST_CHECK_NO_THROW((val=json::parse("\"string\"")));
-    val == json("\"string\"");
+    BOOST_CHECK_EQUAL(val,json("\"string\""));
 }
 
 BOOST_AUTO_TEST_CASE(test_parse_empty_structures)

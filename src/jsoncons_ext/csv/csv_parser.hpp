@@ -205,6 +205,8 @@ public:
             case modes::object:
                 handler_->begin_object(*this);
                 break;
+            default:
+                break;
             }
         }
     }
@@ -231,6 +233,8 @@ public:
                     flip(modes::header, modes::array);
                 }
             }
+            break;
+        default:
             break;
         }
         column_index_ = 0;
@@ -465,6 +469,8 @@ all_states:
                 after_field();
             }
             break;
+        default:
+            break;
         }
         if (column_index_ > 0)
         {
@@ -489,6 +495,8 @@ all_states:
             {
                 err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
             }
+            break;
+        default:
             break;
         }
         handler_->end_array(*this);

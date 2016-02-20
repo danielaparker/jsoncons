@@ -2034,6 +2034,8 @@ public:
         case value_types::array_t:
             var_.value_.array_val_->resize(n);
             break;
+        default:
+            break;
         }
     }
 
@@ -2044,6 +2046,8 @@ public:
         {
         case value_types::array_t:
             var_.value_.array_val_->resize(n, val);
+            break;
+        default:
             break;
         }
     }
