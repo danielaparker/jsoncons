@@ -160,19 +160,29 @@ public:
         return data_types_;
     }
 
+    std::basic_string<CharT> default_values() const
+    {
+        return default_values_;
+    }
+
     std::basic_string<CharT> header() const
     {
         return header_;
     }
 
-    void header(std::basic_string<CharT> value)
+    void header(const std::basic_string<CharT>& value)
     {
         header_ = value;
     }
 
-    void data_types(std::basic_string<CharT> value)
+    void data_types(const std::basic_string<CharT>& value)
     {
         data_types_ = value;
+    }
+
+    void default_values(const std::basic_string<CharT>& value)
+    {
+        default_values_ = value;
     }
 
     CharT field_delimiter() const
@@ -262,6 +272,7 @@ private:
     std::basic_string<CharT> line_delimiter_;
     std::basic_string<CharT> header_;
     std::basic_string<CharT> data_types_;
+    std::basic_string<CharT> default_values_;
 };
 
 typedef basic_csv_parameters<char> csv_parameters;
