@@ -776,6 +776,27 @@ vertical-align:1px;
 <td><em>✓</em></td>
 <td>Use input_handler()</td>
 </tr>
+<tr>
+<td>csv_parameters</td>
+<td><code>header(std::string value)</code></td>
+<td><em>✓</em></td>
+<td>Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td><code>data_types()</code></td>
+<td><em>✓</em></td>
+<td>Use <code>column_types()</code>
+</td>
+</tr>
+<tr>
+<td></td>
+<td><code>data_types(std::string value)</code></td>
+<td><em>✓</em></td>
+<td>Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code>
+</td>
+</tr>
 </tbody>
 </table>
 </body>
