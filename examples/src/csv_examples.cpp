@@ -23,7 +23,7 @@ void read_csv_file1()
 
     csv_parameters params;
     params.assume_header(true);
-    params.data_types("string,string,string,float");
+    params.column_types({ "string","string","string","float" });
     csv_reader reader(is,handler,params);
     reader.read();
     json val = handler.get_result();
@@ -49,7 +49,7 @@ void read_csv_file2()
     params.assume_header(true);
     params.trim(true);
     params.ignore_empty_values(true);
-    params.data_types("integer,string,string,string");
+    params.column_types({"integer","string","string","string"});
     csv_reader reader(is,handler,params);
     reader.read();
     json val = handler.get_result();

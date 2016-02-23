@@ -99,11 +99,11 @@ Note
 
 #### Tab delimited input file
 
-    employee-no	employee-name	dept	salary	note
-    00000001	Smith, Matthew	sales	150,000.00	
-    00000002	Brown, Sarah	sales	89,000.00	
-    00000003	Oberc, Scott	finance	110,000.00	
-    00000004	Scott, Colette	sales	75,000.00	"""Exemplary"" employee
+    employee-no employee-name   dept    salary  note
+    00000001    Smith, Matthew  sales   150,000.00      
+    00000002    Brown, Sarah    sales   89,000.00       
+    00000003    Oberc, Scott    finance 110,000.00      
+    00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
     Dependable, trustworthy"
 
 Note 
@@ -175,7 +175,7 @@ Note
     json_deserializer handler;
 
     csv_parameters params;
-	params.header("Country Code,Name");
+    params.column_names({"Country Code","Name"});
     params.header_lines(1);
 
     csv_reader reader(is,handler,params);

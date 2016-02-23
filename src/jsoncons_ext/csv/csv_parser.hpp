@@ -124,9 +124,9 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     csv_states saved_state_;
     int depth_;
     basic_csv_parameters<CharT> parameters_;
-    std::vector<std::basic_string<CharT>> column_labels_;
+    std::vector<std::basic_string<CharT>> column_names_;
     std::vector<data_types> column_types_;
-    std::vector<std::basic_string<CharT>> default_values_;
+    std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
     csv_filter filter_;
     basic_json_parser<CharT> parser_;
@@ -218,16 +218,6 @@ public:
     {
     }
 
-    const std::vector<std::basic_string<CharT>>& column_labels() const
-    {
-        return column_labels_;
-    }
-
-    void column_labels(const std::vector<std::basic_string<CharT>>& value)
-    {
-        column_labels_ = value;
-    }
-
     const basic_parsing_context<CharT>& parsing_context() const
     {
         return *this;
@@ -236,6 +226,11 @@ public:
     bool done() const
     {
         return state_ == csv_states::done;
+    }
+
+    const std::vector<std::basic_string<CharT>>& column_labels() const
+    {
+        return column_names_;
     }
 
     void after_field()
@@ -274,7 +269,7 @@ public:
         case csv_modes::header:
             if (line_ >= parameters_.header_lines())
             {
-                if (column_labels_.size() > 0)
+                if (column_names_.size() > 0)
                 {
                     flip(csv_modes::header, csv_modes::object);
                 }
@@ -295,7 +290,12 @@ public:
         push(csv_modes::done);
         handler_->begin_json();
 
-        if (parameters_.header().length() > 0)
+        if (parameters_.column_names().size() > 0)
+        {
+            column_names_ = parameters_.column_names();
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
+        else if (parameters_.header().length() > 0)
         {
             basic_empty_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
@@ -307,9 +307,34 @@ public:
             p.begin_parse();
             p.parse(parameters_.header().data(),0,parameters_.header().length());
             p.end_parse();
-            column_labels(p.column_labels());
+            column_names_ = p.column_labels();
         }
-        if (parameters_.data_types().length() > 0)
+#endif
+        if (parameters_.column_types().size() > 0)
+        {
+            column_types_.resize(parameters_.column_types().size());
+            for (size_t i = 0; i < parameters_.column_types().size(); ++i)
+            {
+                if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::string_literal())
+                {
+                    column_types_[i] = data_types::string_t;
+                }
+                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::integer_literal())
+                {
+                    column_types_[i] = data_types::integer_t;
+                }
+                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::float_literal())
+                {
+                    column_types_[i] = data_types::float_t;
+                }
+                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::boolean_literal())
+                {
+                    column_types_[i] = data_types::boolean_t;
+                }
+            }
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
+        else if (parameters_.data_types().length() > 0)
         {
             basic_empty_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
@@ -340,7 +365,13 @@ public:
                 }
             }
         }
-        if (parameters_.default_values().length() > 0)
+#endif
+        if (parameters_.column_defaults().size() > 0)
+        {
+            column_defaults_ = parameters_.column_defaults();
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
+        else if (parameters_.default_values().length() > 0)
         {
             basic_empty_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
@@ -350,12 +381,13 @@ public:
             p.begin_parse();
             p.parse(parameters_.default_values().data(),0,parameters_.default_values().length());
             p.end_parse();
-            default_values_.resize(p.column_labels().size());
+            column_defaults_.resize(p.column_labels().size());
             for (size_t i = 0; i < p.column_labels().size(); ++i)
             {
-                default_values_[i] = p.column_labels()[i];
+                column_defaults_[i] = p.column_labels()[i];
             }
         }
+#endif
         if (parameters_.header_lines() > 0)
         {
             push(csv_modes::header);
@@ -635,15 +667,15 @@ private:
         case csv_modes::header:
             if (parameters_.assume_header() && line_ == 1)
             {
-                column_labels_.push_back(string_buffer_);
+                column_names_.push_back(string_buffer_);
             }
             break;
         case csv_modes::object:
             if (!(parameters_.ignore_empty_values() && string_buffer_.size() == 0))
             {
-                if (column_index_ < column_labels_.size())
+                if (column_index_ < column_names_.size())
                 {
-                    handler_->name(column_labels_[column_index_].data(), column_labels_[column_index_].length(), *this);
+                    handler_->name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
                     if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
                     {
                         handler_->value(jsoncons::null_type(),*this);
@@ -684,15 +716,15 @@ private:
         case csv_modes::header:
             if (parameters_.assume_header() && line_ == 1)
             {
-                column_labels_.push_back(string_buffer_);
+                column_names_.push_back(string_buffer_);
             }
             break;
         case csv_modes::object:
             if (!(parameters_.ignore_empty_values() && string_buffer_.size() == 0))
             {
-                if (column_index_ < column_labels_.size())
+                if (column_index_ < column_names_.size())
                 {
-                    handler_->name(column_labels_[column_index_].data(), column_labels_[column_index_].length(), *this);
+                    handler_->name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
                     end_value();
                 }
             }
@@ -725,10 +757,10 @@ private:
                     }
                     else
                     {
-                        if (column_index_ < default_values_.size() && default_values_[column_index_].length() > 0)
+                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(default_values_[column_index_].data(),0,default_values_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
                             parser_.end_parse();
                         }
                         else
@@ -749,10 +781,10 @@ private:
                     }
                     else
                     {
-                        if (column_index_ < default_values_.size() && default_values_[column_index_].length() > 0)
+                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(default_values_[column_index_].data(),0,default_values_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
                             parser_.end_parse();
                         }
                         else
@@ -782,10 +814,10 @@ private:
                     }
                     else
                     {
-                        if (column_index_ < default_values_.size() && default_values_[column_index_].length() > 0)
+                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(default_values_[column_index_].data(),0,default_values_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
                             parser_.end_parse();
                         }
                         else
@@ -802,10 +834,10 @@ private:
                 }
                 else
                 {
-                    if (column_index_ < default_values_.size() && default_values_[column_index_].length() > 0)
+                    if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
                     {
                         parser_.begin_parse();
-                        parser_.parse(default_values_[column_index_].data(),0,default_values_[column_index_].length());
+                        parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
                         parser_.end_parse();
                     }
                     else

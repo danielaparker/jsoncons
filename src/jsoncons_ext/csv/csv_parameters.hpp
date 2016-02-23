@@ -155,34 +155,34 @@ public:
         unquoted_empty_value_is_null_ = value;
     }
 
-    std::basic_string<CharT> data_types() const
+    std::vector<std::basic_string<CharT>> column_names() const
     {
-        return data_types_;
+        return column_names_;
     }
 
-    std::basic_string<CharT> default_values() const
+    void column_names(const std::vector<std::basic_string<CharT>>& value)
     {
-        return default_values_;
+        column_names_ = value;
     }
 
-    std::basic_string<CharT> header() const
+    std::vector<std::basic_string<CharT>> column_types() const
     {
-        return header_;
+        return column_types_;
     }
 
-    void header(const std::basic_string<CharT>& value)
+    void column_types(const std::vector<std::basic_string<CharT>>& value)
     {
-        header_ = value;
+        column_types_ = value;
     }
 
-    void data_types(const std::basic_string<CharT>& value)
+    std::vector<std::basic_string<CharT>> column_defaults() const
     {
-        data_types_ = value;
+        return column_defaults_;
     }
 
-    void default_values(const std::basic_string<CharT>& value)
+    void column_defaults(const std::vector<std::basic_string<CharT>>& value)
     {
-        default_values_ = value;
+        column_defaults_ = value;
     }
 
     CharT field_delimiter() const
@@ -254,6 +254,39 @@ public:
     {
         max_lines_ = value;
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    std::basic_string<CharT> header() const
+    {
+        return header_;
+    }
+
+    void header(const std::basic_string<CharT>& value)
+    {
+        header_ = value;
+    }
+
+    std::basic_string<CharT> data_types() const
+    {
+        return data_types_;
+    }
+
+    void data_types(const std::basic_string<CharT>& value)
+    {
+        data_types_ = value;
+    }
+
+    std::basic_string<CharT> default_values() const
+    {
+        return default_values_;
+    }
+
+    void default_values(const std::basic_string<CharT>& value)
+    {
+        default_values_ = value;
+    }
+#endif
 private:
     bool assume_header_;
     bool ignore_empty_values_;
@@ -273,6 +306,9 @@ private:
     std::basic_string<CharT> header_;
     std::basic_string<CharT> data_types_;
     std::basic_string<CharT> default_values_;
+    std::vector<std::basic_string<CharT>> column_names_;
+    std::vector<std::basic_string<CharT>> column_types_;
+    std::vector<std::basic_string<CharT>> column_defaults_;
 };
 
 typedef basic_csv_parameters<char> csv_parameters;
