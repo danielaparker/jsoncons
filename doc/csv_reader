@@ -590,10 +590,10 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
 <h4>Tab delimited input file</h4>
 
 <pre><code>employee-no employee-name   dept    salary  note
-00000001    Smith, Matthew  sales   150,000.00  
-00000002    Brown, Sarah    sales   89,000.00   
-00000003    Oberc, Scott    finance 110,000.00  
-00000004    Scott, Colette  sales   75,000.00   """Exemplary"" employee
+00000001    Smith, Matthew  sales   150,000.00      
+00000002    Brown, Sarah    sales   89,000.00       
+00000003    Oberc, Scott    finance 110,000.00      
+00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
 Dependable, trustworthy"
 </code></pre>
 
@@ -671,7 +671,7 @@ std::ifstream is(in_file);
 json_deserializer handler;
 
 csv_parameters params;
-params.header("Country Code,Name");
+params.column_names({"Country Code","Name"});
 params.header_lines(1);
 
 csv_reader reader(is,handler,params);

@@ -682,7 +682,7 @@ using jsoncons::json_deserializer;
     params.assume_header(<span class="pl-c1">true</span>);
     params.trim(<span class="pl-c1">true</span>);
     params.ignore_empty_values(<span class="pl-c1">true</span>);
-    params.data_types(<span class="pl-s"><span class="pl-pds">"</span>integer,string,string,string<span class="pl-pds">"</span></span>);
+    params.column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
 
     csv_reader <span class="pl-en">reader</span>(is,handler,params);
     reader.read();
@@ -733,7 +733,7 @@ using jsoncons::json_deserializer;
 <code>trim</code> <code>true</code> tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.</li>
 <li>
 <code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li>
-<li>The <code>data_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
+<li>The <code>column_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
 </ul>
 
 <h3>Iterators</h3>
@@ -940,7 +940,7 @@ and <code>std::allocator&lt;char&gt;</code> as the allocator type,</p>
 
     boost::gregorian::date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>maturity<span class="pl-pds">"</span></span>].as&lt;boost::gregorian::date&gt;();
 
-    std::cout &lt;&lt; deal &lt;&lt; std::endl; </pre></div>
+    std::cout &lt;&lt; deal &lt;&lt; std::endl;     </pre></div>
 
 <p>producing</p>
 

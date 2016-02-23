@@ -208,7 +208,7 @@ You can read the `CSV` file into a `json` value with the `csv_reader`.
     params.assume_header(true);
     params.trim(true);
     params.ignore_empty_values(true);
-    params.data_types("integer,string,string,string");
+    params.column_types({"integer","string","string","string"});
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -254,7 +254,7 @@ There are a few things to note about the effect of the parameter settings.
 - `assume_header` `true` tells the csv parser to parse the first line of the file for column names, which become object member names.
 - `trim` `true` tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
-- The `data_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
+- The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
 ### Iterators
 
@@ -452,15 +452,15 @@ This class template is extensible, you as a user can extend `json_type_traits` i
 ```c++
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
-	
+        
     json observation_dates = json::array();
     observation_dates.add(boost::gregorian::date(2013,10,21));
     observation_dates.add(boost::gregorian::date(2013,10,28));
     deal["observation_dates"] = std::move(observation_dates);
-	
+        
     boost::gregorian::date maturity = deal["maturity"].as<boost::gregorian::date>();
-	
-    std::cout << deal << std::endl;	
+        
+    std::cout << deal << std::endl;     
 ```
 producing
 ```c++
