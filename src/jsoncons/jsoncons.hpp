@@ -124,9 +124,23 @@ struct json_char_traits<char,1>
         return std::strncmp(s1,s2,n);
     }
 
-    static const std::string null_literal() {return "null";};
+    static std::pair<const char*,size_t> null_literal() 
+    {
+        static const char* value = "null";
+        return std::pair<const char*,size_t>(value,4);
+    }
 
-    static const std::string true_literal() {return "true";};
+    static std::pair<const char*,size_t> true_literal() 
+    {
+        static const char* value = "true";
+        return std::pair<const char*,size_t>(value,4);
+    }
+
+    static std::pair<const char*,size_t> false_literal() 
+    {
+        static const char* value = "false";
+        return std::pair<const char*,size_t>(value,5);
+    }
 
     static uint32_t convert_char_to_codepoint(const char*& it, 
                                               const char*)
@@ -170,8 +184,6 @@ struct json_char_traits<char,1>
         return cp;
     }
 
-    static const std::string false_literal() {return "false";};
-
     static void append_codepoint_to_string(uint32_t cp, std::string& s)
     {
         if (cp <= 0x7f)
@@ -213,11 +225,23 @@ struct json_char_traits<wchar_t,2> // assume utf16
         return std::wcsncmp(s1,s2,n);
     }
 
-    static const std::wstring null_literal() {return L"null";};
+    static std::pair<const wchar_t*,size_t> null_literal() 
+    {
+        static const wchar_t* value = L"null";
+        return std::pair<const wchar_t*,size_t>(value,4);
+    }
 
-    static const std::wstring true_literal() {return L"true";};
+    static std::pair<const wchar_t*,size_t> true_literal() 
+    {
+        static const wchar_t* value = L"true";
+        return std::pair<const wchar_t*,size_t>(value,4);
+    }
 
-    static const std::wstring false_literal() {return L"false";};
+    static std::pair<const wchar_t*,size_t> false_literal() 
+    {
+        static const wchar_t* value = L"false";
+        return std::pair<const wchar_t*,size_t>(value,5);
+    }
 
     static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
     {
@@ -257,11 +281,23 @@ struct json_char_traits<wchar_t,4> // assume utf32
         return std::wcsncmp(s1,s2,n);
     }
 
-    static const std::wstring null_literal() {return L"null";};
+    static std::pair<const wchar_t*,size_t> null_literal() 
+    {
+        static const wchar_t* value = L"null";
+        return std::pair<const wchar_t*,size_t>(value,4);
+    }
 
-    static const std::wstring true_literal() {return L"true";};
+    static std::pair<const wchar_t*,size_t> true_literal() 
+    {
+        static const wchar_t* value = L"true";
+        return std::pair<const wchar_t*,size_t>(value,4);
+    }
 
-    static const std::wstring false_literal() {return L"false";};
+    static std::pair<const wchar_t*,size_t> false_literal() 
+    {
+        static const wchar_t* value = L"false";
+        return std::pair<const wchar_t*,size_t>(value,5);
+    }
 
     static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
     {
