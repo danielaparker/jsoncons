@@ -91,23 +91,6 @@ class basic_csv_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 3;
 
-    class csv_filter : public basic_json_filter<CharT>
-    {
-    public:
-        csv_filter(basic_json_input_handler<CharT>& handler)
-            : json_filter(handler)
-        {
-        }
-    private:
-        void do_begin_json() override
-        {
-        }
-
-        void do_end_json() override
-        {
-        }
-    };
-
     csv_states state_;
     int top_;
     std::vector<csv_modes> stack_;
@@ -128,7 +111,7 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     std::vector<data_types> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
-    csv_filter filter_;
+    basic_begin_end_json_filter<CharT> filter_;
     basic_json_parser<CharT> parser_;
 
 public:
