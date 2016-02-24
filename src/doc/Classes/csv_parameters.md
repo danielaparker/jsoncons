@@ -4,7 +4,7 @@ assume_header      | Assume first row in file is header, use field names to cons
 header_lines      | Number of header lines in the CSV text | 1 if assume_header is true, otherwise 0         
 column_names      | A list of strings containing names corresponding to the fields in the file | {"bool-field","float-field","string-field"}
 column_types      | A list of strings containing data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean | {"bool","float","string"}
-column_defaults      | A list of strings containing default json values corresponding to the columns in the file. | {"false","0.0",""}
+column_defaults      | A list of strings containing default json values corresponding to the columns in the file. | {"false","0.0","\"\""}
 max_lines         | Maximum number of lines to read | Unlimited
 line_delimiter|String to write between records|\n  
 field_delimiter    | Field separator              | ,             

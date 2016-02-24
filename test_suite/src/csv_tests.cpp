@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
     csv_parameters params;
     params.assume_header(true);
     params.column_types({"boolean","integer","float","string"});
-    params.column_defaults({"false","0","0.0",""});
+    params.column_defaults({"false","0","0.0","\"\""});
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -115,6 +115,55 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
     BOOST_CHECK(val[2]["float-f"].is<double>());
     BOOST_CHECK(val[2]["string-f"] == "");
     BOOST_CHECK(val[2]["string-f"].is<std::string>());
+}
+
+BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
+{
+    std::string input = "bool-f,int-f,float-f,string-f"
+"\n,,,,"
+"\ntrue,12,24.7,\"test string\","
+"\n,,,,";
+
+    std::istringstream is(input);
+
+    json_deserializer handler;
+
+    csv_parameters params;
+    params.assume_header(true);
+    params.column_types({"boolean","integer","float","string"});
+    params.column_defaults({"","","",""});
+
+    csv_reader reader(is,handler,params);
+    reader.read();
+    json val = handler.get_result();
+    std::cout << pretty_print(val) << std::endl; 
+
+    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is<null_type>());
+    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is<null_type>());
+    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is<null_type>());
+    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"].is<std::string>());
+
+    BOOST_CHECK(val[1]["bool-f"] == true);
+    BOOST_CHECK(val[1]["bool-f"].is<bool>());
+    BOOST_CHECK(val[1]["int-f"] == 12);
+    BOOST_CHECK(val[1]["int-f"].is<int>());
+    BOOST_CHECK(val[1]["float-f"] == 24.7);
+    BOOST_CHECK(val[1]["float-f"].is<double>());
+    BOOST_CHECK(val[1]["string-f"] == "test string");
+    BOOST_CHECK(val[1]["string-f"].is<std::string>());
+
+    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is<null_type>());
+    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is<null_type>());
+    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is<null_type>());
+    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"].is<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1)
