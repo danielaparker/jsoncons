@@ -57,8 +57,8 @@ namespace modes {
     enum modes_t {
         done,
         header,
-		array,
-		object
+        array,
+        object
     };
 };
 
@@ -68,8 +68,8 @@ namespace states {
         comment,
         expect_value,
         between_fields,
-		quoted_string,
-		unquoted_string,
+        quoted_string,
+        unquoted_string,
         escaped_value,
         minus, 
         zero,  
@@ -251,7 +251,7 @@ public:
             params.field_delimiter(parameters_.field_delimiter());
             params.quote_char(parameters_.quote_char());
             params.quote_escape_char(parameters_.quote_escape_char());
-			params.assume_header(true);
+            params.assume_header(true);
             basic_csv_parser<CharT> p(ih,params);
             p.begin_parse();
             p.parse(parameters_.header().data(),0,parameters_.header().length());
@@ -268,7 +268,7 @@ public:
             p.begin_parse();
             p.parse(&(parameters_.data_types()[0]),0,parameters_.data_types().length());
             p.end_parse();
-			column_types_.resize(p.column_labels().size());
+            column_types_.resize(p.column_labels().size());
             for (size_t i = 0; i < p.column_labels().size(); ++i)
             {
                 if (p.column_labels()[i] == json_csv_parser_traits<CharT>::string_literal())
@@ -648,7 +648,14 @@ private:
                     std::istringstream iss(string_buffer_);
                     long long val;
                     iss >> val;
-                    handler_->value(val, *this);
+                    if (!iss.fail())
+                    {
+                        handler_->value(val, *this);
+                    }
+                    else
+                    {
+                        handler_->value(null_type(), *this);
+                    }
                 }
                 break;
             case data_types::float_t:
@@ -656,7 +663,14 @@ private:
                     std::istringstream iss(string_buffer_);
                     double val;
                     iss >> val;
-                    handler_->value(val, *this);
+                    if (!iss.fail())
+                    {
+                        handler_->value(val, *this);
+                    }
+                    else
+                    {
+                        handler_->value(null_type(), *this);
+                    }
                 }
                 break;
             case data_types::boolean_t:
@@ -677,11 +691,15 @@ private:
                     {
                         handler_->value(true, *this);
                     }
+                    else
+                    {
+                        handler_->value(null_type(), *this);
+                    }
                 }
                 break;
             default:
                 handler_->value(string_buffer_.c_str(), string_buffer_.length(), *this);
-                break;	
+                break;  
             }
         }
         else
@@ -764,7 +782,7 @@ private:
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_labels_;
     std::vector<data_types::column_types_t> column_types_;
-	size_t column_index_;
+    size_t column_index_;
 };
 
 typedef basic_csv_parser<char> csv_parser;

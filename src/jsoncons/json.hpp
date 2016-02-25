@@ -160,7 +160,7 @@ public:
     serializable_any(const serializable_any& val)
         : allocator_(std::allocator_traits<allocator_type>::select_on_container_copy_construction(val.get_allocator()))
     {
-		impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
+        impl_ = val.impl_ != nullptr ? val.impl_->clone(allocator_) : nullptr;
     }
 #else
     serializable_any(const serializable_any& val)
@@ -278,13 +278,13 @@ public:
 template <typename CharT>
 struct string_data
 {
-	const CharT* c_str() const { return p_; }
-	size_t length() const { return length_; }
+    const CharT* c_str() const { return p_; }
+    size_t length() const { return length_; }
 
-	bool operator==(const string_data& rhs) const
-	{
-		return length() == rhs.length() ? std::char_traits<CharT>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
-	}
+    bool operator==(const string_data& rhs) const
+    {
+        return length() == rhs.length() ? std::char_traits<CharT>::compare(c_str(), rhs.c_str(), length()) == 0 : false;
+    }
 
     string_data()
         : p_(nullptr), length_(0)
@@ -292,17 +292,17 @@ struct string_data
     }
 
     CharT* p_;
-	size_t length_;
+    size_t length_;
 private:
-	string_data(const string_data&);
-	string_data& operator=(const string_data&);
+    string_data(const string_data&);
+    string_data& operator=(const string_data&);
 };
 
 template <typename CharT>
 struct string_dataA
 {
-	string_data<CharT> data;
-	CharT c[1];
+    string_data<CharT> data;
+    CharT c[1];
 };
 
 template <typename CharT, class Alloc>
@@ -318,7 +318,7 @@ string_data<CharT>* create_string_data(const Alloc& allocator)
     typename Alloc:: template rebind<char>::other alloc(allocator);
 #endif
 
-	char* storage = alloc.allocate(mem_size);
+    char* storage = alloc.allocate(mem_size);
     string_data<CharT>* ps = new(storage)string_data<CharT>();
     auto psa = reinterpret_cast<string_dataA<CharT>*>(storage); 
 
@@ -499,7 +499,7 @@ public:
         {
             swap(var);
         }
-		
+        
         explicit variant(const Alloc& a, variant&& var)
             : Alloc(a), type_(value_types::null_t)
         {
@@ -748,25 +748,25 @@ public:
 
         void assign(const object & val)
         {
-			destroy_variant();
-			type_ = value_types::object_t;
-			value_.object_value_ = create_instance<object>(get_allocator(), val, object_allocator_type(*this));
-		}
+            destroy_variant();
+            type_ = value_types::object_t;
+            value_.object_value_ = create_instance<object>(get_allocator(), val, object_allocator_type(*this));
+        }
 
         void assign(object && val)
         {
-			switch (type_)
-			{
-			case value_types::object_t:
-				value_.object_value_->swap(val);
-				break;
-			default:
-				destroy_variant();
-				type_ = value_types::object_t;
-				value_.object_value_ = create_instance<object>(get_allocator(), std::move(val), object_allocator_type(*this));
-				break;
-			}
-		}
+            switch (type_)
+            {
+            case value_types::object_t:
+                value_.object_value_->swap(val);
+                break;
+            default:
+                destroy_variant();
+                type_ = value_types::object_t;
+                value_.object_value_ = create_instance<object>(get_allocator(), std::move(val), object_allocator_type(*this));
+                break;
+            }
+        }
 
         void assign(const array& val)
         {
@@ -777,18 +777,18 @@ public:
 
         void assign(array&& val)
         {
-			switch (type_)
-			{
-			case value_types::array_t:
-				value_.array_value_->swap(val);
-				break;
-			default:
-				destroy_variant();
-				type_ = value_types::array_t;
-				value_.array_value_ = create_instance<array>(get_allocator(), std::move(val), array_allocator_type(*this));
-				break;
-			}
-		}
+            switch (type_)
+            {
+            case value_types::array_t:
+                value_.array_value_->swap(val);
+                break;
+            default:
+                destroy_variant();
+                type_ = value_types::array_t;
+                value_.array_value_ = create_instance<array>(get_allocator(), std::move(val), array_allocator_type(*this));
+                break;
+            }
+        }
 
         void assign(const string_type& s)
         {
@@ -810,18 +810,18 @@ public:
         void assign_string(const char_type* s, size_t length)
         {
             destroy_variant();
-			if (length > variant::small_string_capacity)
-			{
-				type_ = value_types::string_t;
-				value_.string_value_ = create_string_data(s,length,get_allocator());
-			}
-			else
-			{
-				type_ = value_types::small_string_t;
-				small_string_length_ = (unsigned char)length;
-				std::memcpy(value_.small_string_value_,s,length*sizeof(char_type));
+            if (length > variant::small_string_capacity)
+            {
+                type_ = value_types::string_t;
+                value_.string_value_ = create_string_data(s,length,get_allocator());
+            }
+            else
+            {
+                type_ = value_types::small_string_t;
+                small_string_length_ = (unsigned char)length;
+                std::memcpy(value_.small_string_value_,s,length*sizeof(char_type));
                 value_.small_string_value_[small_string_length_] = 0;
-			}
+            }
         }
 
         void assign(int64_t val)
@@ -2822,7 +2822,6 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef any json_any_type;
-    typedef member_type name_value_pair;
 
     static const basic_json<StringT,Alloc> an_object;
     static const basic_json<StringT,Alloc> an_array;
@@ -3177,8 +3176,8 @@ public:
 
     array& array_value() 
     {
-		switch (var_.type_)
-		{
+        switch (var_.type_)
+        {
         case value_types::array_t:
             return *(var_.value_.array_value_);
         default:
@@ -3536,7 +3535,7 @@ typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_value(
     {
     case value_types::any_t:
         {
-			return *var_.value_.any_value_;
+            return *var_.value_.any_value_;
         }
     default:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
@@ -3550,7 +3549,7 @@ const typename basic_json<StringT, Alloc>::any& basic_json<StringT, Alloc>::any_
     {
     case value_types::any_t:
         {
-			return *var_.value_.any_value_;
+            return *var_.value_.any_value_;
         }
     default:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");

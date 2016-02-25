@@ -258,7 +258,7 @@ private:
     {
     }
 
-    void do_integer_value(long long, const basic_parsing_context<CharT>&) override
+    void do_integer_value(int64_t, const basic_parsing_context<CharT>&) override
     {
     }
 

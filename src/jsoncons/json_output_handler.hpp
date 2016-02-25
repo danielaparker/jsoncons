@@ -36,16 +36,16 @@ void print_integer(int64_t value, buffered_ostream<CharT>& os)
 template<typename CharT>
 void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
 {
-	CharT buf[255];
-	CharT* p = buf;
-	do
-	{
-		*p++ = static_cast<CharT>(48 + value % 10);
-	} while (value /= 10);
-	while (--p >= buf)
-	{
-		os.put(*p);
-	}
+    CharT buf[255];
+    CharT* p = buf;
+    do
+    {
+        *p++ = static_cast<CharT>(48 + value % 10);
+    } while (value /= 10);
+    while (--p >= buf)
+    {
+        os.put(*p);
+    }
 }
 
 template <typename CharT>
@@ -234,7 +234,7 @@ private:
     {
     }
 
-    void do_integer_value(long long) override
+    void do_integer_value(int64_t) override
     {
     }
 

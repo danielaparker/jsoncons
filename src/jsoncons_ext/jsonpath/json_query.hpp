@@ -76,6 +76,14 @@ namespace jsoncons { namespace jsonpath {
 // here
 
 template<class JsonT>
+JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_t length)
+{
+    jsonpath_evaluator<JsonT> evaluator;
+    evaluator.evaluate(root,path,length);
+    return evaluator.get_values();
+}
+
+template<class JsonT>
 JsonT json_query(const JsonT& root, const typename JsonT::string_type& path)
 {
     return json_query(root,path.c_str(),path.length());
@@ -85,14 +93,6 @@ template<class JsonT>
 JsonT json_query(const JsonT& root, const typename JsonT::char_type* path)
 {
     return json_query(root,path,std::char_traits<typename JsonT::char_type>::length(path));
-}
-
-template<class JsonT>
-JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_t length)
-{
-    jsonpath_evaluator<JsonT> evaluator;
-    evaluator.evaluate(root,path,length);
-    return evaluator.get_values();
 }
 
 namespace states {
@@ -510,8 +510,8 @@ public:
                 case ' ':case '\t':
                     ++p_;
                     ++column_;
-					break;
-				case '(':
+                    break;
+                case '(':
                     {
                         if (stack_.back().size() == 1)
                         {
@@ -613,10 +613,10 @@ public:
                     state_ = states::lf;
                     break;
                 case '[':
-					find(buffer_);
+                    find(buffer_);
                     buffer_.clear();
                     transfer_nodes();
-					start_ = 0;
+                    start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
@@ -842,14 +842,14 @@ public:
 
     void find(const string_type& name)
     {
-		if (name.length() > 0)
-		{
+        if (name.length() > 0)
+        {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
                 find1(*(stack_.back()[i]), name);
             }
             recursive_descent_ = false;
-		}
+        }
     }
 
     void find1(const JsonT& context_val, const string_type& name)
@@ -880,7 +880,7 @@ public:
                 {
                     nodes_.push_back(std::addressof(context_val[index]));
                 }
-			}
+            }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
             {
                 auto q = std::make_shared<JsonT>(context_val.size());
