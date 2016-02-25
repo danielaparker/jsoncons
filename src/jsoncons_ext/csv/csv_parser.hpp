@@ -208,6 +208,8 @@ public:
             case modes::object:
                 handler_->begin_object(*this);
                 break;
+            default:
+                break;
             }
         }
     }
@@ -234,6 +236,8 @@ public:
                     flip(modes::header, modes::array);
                 }
             }
+            break;
+        default:
             break;
         }
         column_index_ = 0;
@@ -467,6 +471,8 @@ all_states:
                 end_quoted_string_value();
                 after_field();
             }
+            break;
+        default:
             break;
         }
         if (column_index_ > 0)
