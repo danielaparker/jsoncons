@@ -1,3 +1,8 @@
+0.98.4.1
+--------
+
+- Fixes contributed by notifications for g++ "4.9.2"
+
 0.98.4
 ------
 
