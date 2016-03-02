@@ -397,12 +397,12 @@ private:
 
         if (val)
         {
-            auto buf = json_char_traits<CharT,sizeof(CharT)>::true_literal();
+            auto buf = json_literals<CharT>::true_literal();
             os.write(buf.first,buf.second);
         }
         else
         {
-            auto buf = json_char_traits<CharT,sizeof(CharT)>::false_literal();
+            auto buf = json_literals<CharT>::false_literal();
             os.write(buf.first,buf.second);
         }
 
@@ -412,7 +412,7 @@ private:
     void do_null_value(buffered_ostream<CharT>& os) 
     {
         begin_value(os);
-        auto buf = json_char_traits<CharT,sizeof(CharT)>::null_literal();
+        auto buf = json_literals<CharT>::null_literal();
         os.write(buf.first,buf.second);
         end_value();
 

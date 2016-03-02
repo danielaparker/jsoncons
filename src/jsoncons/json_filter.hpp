@@ -234,6 +234,87 @@ private:
     }
 };
 
+template <typename CharT>
+class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
+{
+public:
+    basic_json_output_input_adapter(basic_json_input_handler<CharT>& input_handler,
+                                    const basic_parsing_context<CharT>& context)
+        : input_handler_(std::addressof(input_handler)),
+          context_(std::addressof(context))
+    {
+    }
+
+private:
+
+    void do_begin_json() override
+    {
+        input_handler_->begin_json();
+    }
+
+    void do_end_json() override
+    {
+        input_handler_->end_json();
+    }
+
+    void do_begin_object() override
+    {
+        input_handler_->begin_object(*context_);
+    }
+
+    void do_end_object() override
+    {
+        input_handler_->end_object(*context_);
+    }
+
+    void do_begin_array() override
+    {
+        input_handler_->begin_array(*context_);
+    }
+
+    void do_end_array() override
+    {
+        input_handler_->end_array(*context_);
+    }
+
+    void do_name(const CharT* name, size_t length) override
+    {
+        input_handler_->name(name, length, *context_);
+    }
+
+    void do_string_value(const CharT* value, size_t length) override
+    {
+        input_handler_->value(value, length, *context_);
+    }
+
+    void do_integer_value(int64_t value) override
+    {
+        input_handler_->value(value, *context_);
+    }
+
+    void do_uinteger_value(uint64_t value) override
+    {
+        input_handler_->value(value, *context_);
+    }
+
+    void do_double_value(double value, uint8_t precision) override
+    {
+        input_handler_->value(value, precision, *context_);
+    }
+
+    void do_bool_value(bool value) override
+    {
+        input_handler_->value(value, *context_);
+    }
+
+    void do_null_value() override
+    {
+        input_handler_->value(null_type(), *context_);
+    }
+
+    basic_json_input_handler<CharT>* input_handler_;
+    const basic_parsing_context<CharT>* context_;
+};
 
 typedef basic_json_filter<char> json_filter;
 typedef basic_json_filter<wchar_t> wjson_filter;

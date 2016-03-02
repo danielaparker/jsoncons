@@ -399,21 +399,21 @@ public:
                         handler_->begin_json();
                         flip(modes::done, modes::start);
                         state_ = states::f;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         handler_->begin_json();
                         flip(modes::done, modes::start);
                         state_ = states::n;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         handler_->begin_json();
                         flip(modes::done, modes::start);
                         state_ = states::t;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '/':
@@ -764,7 +764,7 @@ public:
                         break;
                     case 'f':
                         state_ = states::f;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         /*if ((p_+4) < end_input_)
                         {
@@ -788,12 +788,12 @@ public:
                         break;
                     case 'n':
                         state_ = states::n;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         state_ = states::t;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case ']':
@@ -900,7 +900,7 @@ public:
                         break;
                     case 'f':
                         state_ = states::f;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         /*if ((p_+4) < end_input_)
                         {
@@ -924,12 +924,12 @@ public:
                         break;
                     case 'n':
                         state_ = states::n;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         state_ = states::t;
-                        literal_ = json_char_traits<CharT, sizeof(CharT)>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '\'':
