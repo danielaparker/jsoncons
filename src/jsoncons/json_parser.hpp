@@ -68,7 +68,8 @@ enum class states
     f,  
     cr,
     lf,
-    done
+    done,
+    scalar
 };
 
 template<typename CharT>
@@ -100,6 +101,8 @@ class basic_json_parser : private basic_parsing_context<CharT>
     uint8_t precision_;
     std::pair<const CharT*,size_t> literal_;
     size_t literal_index_;
+
+    std::vector<states> stack2_;
 
 public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
@@ -174,6 +177,8 @@ public:
         state_ = states::start;
         line_ = 1;
         column_ = 1;
+        stack2_.push_back(states::start);
+        stack2_.push_back(states::scalar);
     }
 
     void check_done(const CharT* input, size_t start, size_t length)
@@ -196,10 +201,11 @@ public:
         }
     }
 
-    void parse_string()
+    bool parse_string(const CharT** first, const CharT** last)
     {
         const CharT* sb = p_;
         bool done = false;
+        bool complete = false;
         while (!done && p_ < end_input_)
         {
             switch (*p_)
@@ -222,8 +228,11 @@ public:
                     string_buffer_.append(sb, p_ - sb + 1);
                     pre_line_break_state_ = state_;
                     state_ = states::cr;
+
                     done = true;
                     ++p_;
+
+                    stack2_.push_back(states::cr);
                 }
                 break;
             case '\n':
@@ -236,6 +245,8 @@ public:
                     state_ = states::lf;
                     done = true;
                     ++p_;
+
+                    stack2_.push_back(states::lf);
                 }
                 break;
             case '\t':
@@ -252,35 +263,42 @@ public:
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
                 state_ = states::escape;
+                stack2_.front() = states::escape;
                 done = true;
                 ++p_;
                 break;
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    end_string_value(sb,p_-sb);
+                    *first = sb;
+                    *last = p_;
+                    //end_string_value(sb,p_-sb);
                 }
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    end_string_value(string_buffer_.data(),string_buffer_.length());
-                    string_buffer_.clear();
+                    *first = string_buffer_.data();
+                    *last = string_buffer_.data() + string_buffer_.length();
+                    //end_string_value(string_buffer_.data(),string_buffer_.length());
+                    //string_buffer_.clear();
                 }
                 column_ += (p_ - sb + 1);
                 done = true;
+                complete = true;
                 ++p_;
                 break;
             default:
                 ++p_;
                 break;
             }
-            //++p_;
         }
         if (!done)
         {
             string_buffer_.append(sb,p_-sb);
             column_ += (p_ - sb + 1);
         }
+
+        return complete;
     }
 
     void parse(const CharT* const input, size_t start, size_t length)
@@ -318,11 +336,15 @@ public:
                     state_ = pre_line_break_state_;
                     break;
                 }
+                JSONCONS_ASSERT(stack2_.size() > 0);
+                stack2_.pop_back();
                 break;
             case states::lf:
                 ++line_;
                 column_ = 1;
                 state_ = pre_line_break_state_;
+                JSONCONS_ASSERT(stack2_.size() > 0);
+                stack2_.pop_back();
                 break;
             case states::start: 
                 {
@@ -331,10 +353,12 @@ public:
                         case '\r':
                             pre_line_break_state_ = state_;
                             state_ = states::cr;
+                            stack2_.push_back(states::cr);
                             break;
                         case '\n':
                             pre_line_break_state_ = state_;
                             state_ = states::lf;
+                            stack2_.push_back(states::lf);
                             break;
                         case ' ':case '\t':
                         {
@@ -361,6 +385,7 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_ = states::object;
+
                         handler_->begin_object(*this);
                         break;
                     case '[':
@@ -442,10 +467,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -542,10 +569,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -606,10 +635,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -657,10 +688,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -703,10 +736,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -824,10 +859,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -944,7 +981,15 @@ public:
                 ++column_;
                 break;
             case states::string: 
-                parse_string();
+                {
+                    const CharT* first;
+                    const CharT* last;
+                    if (parse_string(&first,&last))
+                    {
+                        end_string_value(first,last-first);
+                        string_buffer_.clear();
+                    }
+                }
                 break;
             case states::escape: 
                 {
@@ -1085,10 +1130,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1170,10 +1217,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1261,10 +1310,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1389,10 +1440,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1567,10 +1620,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     case '*':
                         state_ = states::slash_star_star;
@@ -1587,10 +1642,12 @@ public:
                     case '\r':
                         pre_line_break_state_ = saved_state_;
                         state_ = states::cr;
+                        stack2_.push_back(states::cr);
                         break;
                     case '\n':
                         pre_line_break_state_ = saved_state_;
                         state_ = states::lf;
+                        stack2_.push_back(states::lf);
                         break;
                     }
                 }
