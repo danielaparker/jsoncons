@@ -88,7 +88,6 @@ class basic_json_parser : private basic_parsing_context<CharT>
     std::basic_string<CharT> string_buffer_;
     std::basic_string<char> number_buffer_;
     bool is_negative_;
-    states pre_line_break_state_;
     size_t index_;
     int depth_;
     int max_depth_;
@@ -218,8 +217,7 @@ public:
                     err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
-                    pre_line_break_state_ = state_stack_.back();
-                    state_stack_.back() = states::cr;
+                    state_stack_.push_back(states::cr);
                     done = true;
                     ++p_;
                 }
@@ -230,8 +228,7 @@ public:
                     err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
-                    pre_line_break_state_ = state_stack_.back();
-                    state_stack_.back() = states::lf;
+                    state_stack_.push_back(states::lf);
                     done = true;
                     ++p_;
                 }
@@ -308,30 +305,31 @@ public:
                 switch (*p_)
                 {
                 case '\n':
-                    state_stack_.back() = pre_line_break_state_;
+                    JSONCONS_ASSERT(!state_stack_.empty())
+                    state_stack_.pop_back();
                     ++p_;
                     break;
                 default:
-                    state_stack_.back() = pre_line_break_state_;
+                    JSONCONS_ASSERT(!state_stack_.empty())
+                    state_stack_.pop_back();
                     break;
                 }
                 break;
             case states::lf:
                 ++line_;
                 column_ = 1;
-                state_stack_.back() = pre_line_break_state_;
+                JSONCONS_ASSERT(!state_stack_.empty())
+                state_stack_.pop_back();
                 break;
             case states::start: 
                 {
                     switch (*p_)
                     {
                         case '\r':
-                            pre_line_break_state_ = state_stack_.back();
-                            state_stack_.back() = states::cr;
+                            state_stack_.push_back(states::cr);
                             break;
                         case '\n':
-                            pre_line_break_state_ = state_stack_.back();
-                            state_stack_.back() = states::lf;
+                            state_stack_.push_back(states::lf);
                             break;
                         case ' ':case '\t':
                         {
@@ -438,12 +436,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -467,7 +463,9 @@ public:
                         if (peek() == modes::object_member_value)
                         {
                             pop(modes::object_member_value);  
+                            JSONCONS_ASSERT(!state_stack_.empty())
                             state_stack_.pop_back();
+                            JSONCONS_ASSERT(state_stack_.back() == states::object)
 
                             handler_->end_object(*this);
                             if (peek() == modes::done)
@@ -493,7 +491,9 @@ public:
                         if (peek() == modes::array_element)
                         {
                             pop(modes::array_element);                        
+                            JSONCONS_ASSERT(!state_stack_.empty())
                             state_stack_.pop_back();
+                            JSONCONS_ASSERT(state_stack_.back() == states::array)
                             handler_->end_array(*this);
                             if (peek() == modes::done)
                             {
@@ -540,12 +540,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -570,7 +568,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::object)
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -604,12 +604,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -654,12 +652,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -699,12 +695,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -802,12 +796,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -850,7 +842,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::array)
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1046,12 +1040,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1078,7 +1070,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::object)
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1096,7 +1090,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::array)
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1133,12 +1129,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1165,7 +1159,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::object)
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1183,7 +1179,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::array)
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1226,12 +1224,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1258,7 +1254,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::object)
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1276,7 +1274,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::array)
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1356,12 +1356,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case ' ':case '\t':
                         {
@@ -1388,7 +1386,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::object)
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1406,7 +1406,9 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
+                        JSONCONS_ASSERT(state_stack_.back() == states::array)
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1536,12 +1538,10 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::cr;
+                        state_stack_.push_back(states::cr);
                         break;
                     case '\n':
-                        pre_line_break_state_ = state_stack_.back();
-                        state_stack_.back() = states::lf;
+                        state_stack_.push_back(states::lf);
                         break;
                     case '*':
                         state_stack_.back() = states::slash_star_star;
@@ -1556,13 +1556,9 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        state_stack_.pop_back();
-                        pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
-                        state_stack_.pop_back();
-                        pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
                         break;
                     }
@@ -1575,6 +1571,7 @@ public:
                     switch (*p_)
                     {
                     case '/':
+                        JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
                         break;
                     default:    
