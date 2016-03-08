@@ -149,6 +149,7 @@ public:
     void begin_parse()
     {
         state_stack_.clear();
+        state_stack_.reserve(depth_);
         state_stack_.push_back(states::start);
         state_stack_.push_back(states::start);
         line_ = 1;
