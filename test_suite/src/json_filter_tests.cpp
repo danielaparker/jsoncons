@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
     BOOST_CHECK_EQUAL(1,filter.items.size());
     BOOST_CHECK_EQUAL("John", filter.items[0].name);
     BOOST_CHECK_EQUAL(9, filter.items[0].line);
-    BOOST_CHECK_EQUAL(26, filter.items[0].column);
+    BOOST_CHECK_EQUAL(31, filter.items[0].column);
 }
 
 class my_parsing_context : public parsing_context
