@@ -436,25 +436,14 @@ public:
                         }
                         break; 
                     case '}':
-                        if (state_stack_[state_stack_.size()-2] == states::object)
+                        --nesting_depth_;
+                        JSONCONS_ASSERT(!state_stack_.empty())
+                        state_stack_.pop_back();
+                        if (state_stack_.back() == states::object)
                         {
-                            --nesting_depth_;
-                            JSONCONS_ASSERT(!state_stack_.empty())
-                            state_stack_.pop_back();
-                            JSONCONS_ASSERT(state_stack_.back() == states::object)
-
                             handler_->end_object(*this);
-                            if (state_stack_[state_stack_.size()-2] == states::start)
-                            {
-                                state_stack_.back() = states::done;
-                                handler_->end_json();
-                            }
-                            else
-                            {
-                                state_stack_.back() = states::expect_comma_or_end;
-                            }
                         }
-                        else if (state_stack_[state_stack_.size()-2] == states::array)
+                        else if (state_stack_.back() == states::array)
                         {
                             err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
                         }
@@ -462,32 +451,41 @@ public:
                         {
                             err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
                         }
+
+                        if (state_stack_[state_stack_.size()-2] == states::start)
+                        {
+                            state_stack_.back() = states::done;
+                            handler_->end_json();
+                        }
+                        else
+                        {
+                            state_stack_.back() = states::expect_comma_or_end;
+                        }
                         break;
                     case ']':
-                        if (state_stack_[state_stack_.size()-2] == states::array)
+                        --nesting_depth_;
+                        JSONCONS_ASSERT(!state_stack_.empty())
+                        state_stack_.pop_back();
+                        if (state_stack_.back() == states::array)
                         {
-                            --nesting_depth_;
-                            JSONCONS_ASSERT(!state_stack_.empty())
-                            state_stack_.pop_back();
-                            JSONCONS_ASSERT(state_stack_.back() == states::array)
                             handler_->end_array(*this);
-                            if (state_stack_[state_stack_.size()-2] == states::start)
-                            {
-                                state_stack_.back() = states::done;
-                                handler_->end_json();
-                            }
-                            else
-                            {
-                                state_stack_.back() = states::expect_comma_or_end;
-                            }
                         }
-                        else if (state_stack_[state_stack_.size()-2] == states::object)
+                        else if (state_stack_.back() == states::object)
                         {
                             err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
                         }
                         else
                         {
                             err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_bracket, json_error_category()), *this);
+                        }
+                        if (state_stack_[state_stack_.size()-2] == states::start)
+                        {
+                            state_stack_.back() = states::done;
+                            handler_->end_json();
+                        }
+                        else
+                        {
+                            state_stack_.back() = states::expect_comma_or_end;
                         }
                         break;
                     case ',':
