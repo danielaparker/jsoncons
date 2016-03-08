@@ -169,6 +169,7 @@ public:
         }
         state_stack_.clear();
         state_stack_.push_back(states::start);
+        state_stack_.push_back(states::start);
         line_ = 1;
         column_ = 1;
     }
@@ -1670,13 +1671,14 @@ private:
         }
         number_buffer_.clear();
         is_negative_ = false;
-        switch (stack_[top_])
+
+        switch (state_stack_[state_stack_.size()-2])
         {
-        case modes::array_element:
-        case modes::object_member_value:
+        case states::array:
+        case states::object:
             state_stack_.back() = states::expect_comma_or_end;
             break;
-        case modes::start:
+        case states::start:
             flip(modes::start,modes::done);
             state_stack_.back() = states::done;
             handler_->end_json();
@@ -1732,13 +1734,13 @@ private:
             }
         }
 
-        switch (stack_[top_])
+        switch (state_stack_[state_stack_.size()-2])
         {
-        case modes::array_element:
-        case modes::object_member_value:
+        case states::array:
+        case states::object:
             state_stack_.back() = states::expect_comma_or_end;
             break;
-        case modes::start:
+        case states::start:
             flip(modes::start,modes::done);
             state_stack_.back() = states::done;
             handler_->end_json();
