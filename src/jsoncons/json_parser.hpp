@@ -88,7 +88,6 @@ class basic_json_parser : private basic_parsing_context<CharT>
     std::basic_string<CharT> string_buffer_;
     std::basic_string<char> number_buffer_;
     bool is_negative_;
-    states saved_state_;
     states pre_line_break_state_;
     size_t index_;
     int depth_;
@@ -273,7 +272,6 @@ public:
                 ++p_;
                 break;
             }
-            //++p_;
         }
         if (!done)
         {
@@ -418,8 +416,7 @@ public:
                         literal_index_ = 1;
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     case '}':
                         err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
@@ -521,8 +518,7 @@ public:
                         begin_member_or_element();
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     default:
                         if (peek() == modes::array_element)
@@ -590,8 +586,7 @@ public:
                         state_stack_.back() = states::string;
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     case '\'':
                         err_handler_->error(std::error_code(json_parser_errc::single_quote, json_error_category()), *this);
@@ -638,8 +633,7 @@ public:
                         state_stack_.back() = states::string;
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     case '}':
                         err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_error_category()), *this);
@@ -690,8 +684,7 @@ public:
                         state_stack_.back() = states::expect_value;
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     default:
                         err_handler_->error(std::error_code(json_parser_errc::expected_colon, json_error_category()), *this);
@@ -750,8 +743,7 @@ public:
                         handler_->begin_array(*this);
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
 
                     case '\"':
@@ -874,8 +866,7 @@ public:
                         state_stack_.back() = states::string;
                         break;
                     case '/':
-                        saved_state_ = state_stack_.back();
-                        state_stack_.back() = states::slash;
+                        state_stack_.push_back(states::slash);
                         break;
                     case '-':
                         is_negative_ = true;
@@ -1565,11 +1556,13 @@ public:
                     switch (*p_)
                     {
                     case '\r':
-                        pre_line_break_state_ = saved_state_;
+                        state_stack_.pop_back();
+                        pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
-                        pre_line_break_state_ = saved_state_;
+                        state_stack_.pop_back();
+                        pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
                         break;
                     }
@@ -1582,7 +1575,7 @@ public:
                     switch (*p_)
                     {
                     case '/':
-                        state_stack_.back() = saved_state_;
+                        state_stack_.pop_back();
                         break;
                     default:    
                         state_stack_.back() = states::slash_star;
