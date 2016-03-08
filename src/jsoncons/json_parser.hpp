@@ -45,6 +45,7 @@ enum class states
     expect_value,
     array, 
     string,
+    member_name,
     escape, 
     u1, 
     u2, 
@@ -587,7 +588,8 @@ public:
                         }
                         break;
                     case '\"':
-                        state_stack_.back() = states::string;
+                        state_stack_.back() = states::member_name;
+                        state_stack_.push_back(states::string);
                         break;
                     case '/':
                         state_stack_.push_back(states::slash);
@@ -632,7 +634,9 @@ public:
                         }
                         break;
                     case '\"':
-                        state_stack_.back() = states::string;
+                        //state_stack_.back() = states::string;
+                        state_stack_.back() = states::member_name;
+                        state_stack_.push_back(states::string);
                         break;
                     case '/':
                         state_stack_.push_back(states::slash);
@@ -1832,18 +1836,19 @@ private:
 
     void end_string_value(const CharT* s, size_t length) 
     {
-        switch (stack_[top_])
+        switch (state_stack_[state_stack_.size()-2])
         {
-        case modes::object_member_name:
+        case states::member_name:
             handler_->name(s, length, *this);
+            state_stack_.pop_back();
             state_stack_.back() = states::expect_colon;
             break;
-        case modes::array_element:
-        case modes::object_member_value:
+        case states::object:
+        case states::array:
             handler_->value(s, length, *this);
             state_stack_.back() = states::expect_comma_or_end;
             break;
-        case modes::start:
+        case states::start:
             handler_->value(s, length, *this);
             flip(modes::start,modes::done);
             state_stack_.back() = states::done;
@@ -1857,17 +1862,17 @@ private:
 
     void begin_member_or_element() 
     {
-        switch (stack_[top_])
+        switch (state_stack_[state_stack_.size()-2])
         {
-        case modes::object_member_value:
+        case states::object:
             // A comma causes a flip from object_member_value modes to object_member_name modes.
             flip(modes::object_member_value, modes::object_member_name);
             state_stack_.back() = states::expect_member_name;
             break;
-        case modes::array_element:
+        case states::array:
             state_stack_.back() = states::expect_value;
             break;
-        case modes::done:
+        case states::start:
             break;
         default:
             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
