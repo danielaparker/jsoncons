@@ -570,7 +570,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::object)
+                        if (state_stack_.back() != states::object)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -844,7 +847,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::array)
+                        if (state_stack_.back() != states::array)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1072,7 +1078,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::object)
+                        if (state_stack_.back() != states::object)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1092,7 +1101,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::array)
+                        if (state_stack_.back() != states::array)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1161,7 +1173,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::object)
+                        if (state_stack_.back() != states::object)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1181,7 +1196,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::array)
+                        if (state_stack_.back() != states::array)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1256,7 +1274,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::object)
+                        if (state_stack_.back() != states::object)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1276,7 +1297,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::array)
+                        if (state_stack_.back() != states::array)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1388,7 +1412,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::object)
+                        if (state_stack_.back() != states::object)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1408,7 +1435,10 @@ public:
                         }
                         JSONCONS_ASSERT(!state_stack_.empty())
                         state_stack_.pop_back();
-                        JSONCONS_ASSERT(state_stack_.back() == states::array)
+                        if (state_stack_.back() != states::array)
+                        {
+                            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        }
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
