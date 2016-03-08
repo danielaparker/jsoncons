@@ -68,7 +68,8 @@ enum class states
     f,  
     cr,
     lf,
-    done
+    done,
+    scalar
 };
 
 template<typename CharT>
@@ -100,6 +101,8 @@ class basic_json_parser : private basic_parsing_context<CharT>
     uint8_t precision_;
     std::pair<const CharT*,size_t> literal_;
     size_t literal_index_;
+
+    std::vector<states> stack2_;
 
 public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
@@ -173,6 +176,8 @@ public:
         state_stack_.push_back(states::start);
         line_ = 1;
         column_ = 1;
+        stack2_.push_back(states::start);
+        stack2_.push_back(states::scalar);
     }
 
     void check_done(const CharT* input, size_t start, size_t length)
@@ -195,10 +200,11 @@ public:
         }
     }
 
-    void parse_string()
+    bool parse_string(const CharT** first, const CharT** last)
     {
         const CharT* sb = p_;
         bool done = false;
+        bool complete = false;
         while (!done && p_ < end_input_)
         {
             switch (*p_)
@@ -219,10 +225,18 @@ public:
                     err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
+<<<<<<< HEAD
                     pre_line_break_state_ = state_stack_.back();
                     state_stack_.back() = states::cr;
+=======
+                    pre_line_break_state_ = state_;
+                    state_ = states::cr;
+
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                     done = true;
                     ++p_;
+
+                    stack2_.push_back(states::cr);
                 }
                 break;
             case '\n':
@@ -235,6 +249,8 @@ public:
                     state_stack_.back() = states::lf;
                     done = true;
                     ++p_;
+
+                    stack2_.push_back(states::lf);
                 }
                 break;
             case '\t':
@@ -250,36 +266,47 @@ public:
             case '\\': 
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
+<<<<<<< HEAD
                 state_stack_.back() = states::escape;
+=======
+                state_ = states::escape;
+                stack2_.front() = states::escape;
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                 done = true;
                 ++p_;
                 break;
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    end_string_value(sb,p_-sb);
+                    *first = sb;
+                    *last = p_;
+                    //end_string_value(sb,p_-sb);
                 }
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    end_string_value(string_buffer_.data(),string_buffer_.length());
-                    string_buffer_.clear();
+                    *first = string_buffer_.data();
+                    *last = string_buffer_.data() + string_buffer_.length();
+                    //end_string_value(string_buffer_.data(),string_buffer_.length());
+                    //string_buffer_.clear();
                 }
                 column_ += (p_ - sb + 1);
                 done = true;
+                complete = true;
                 ++p_;
                 break;
             default:
                 ++p_;
                 break;
             }
-            //++p_;
         }
         if (!done)
         {
             string_buffer_.append(sb,p_-sb);
             column_ += (p_ - sb + 1);
         }
+
+        return complete;
     }
 
     void parse(const CharT* const input, size_t start, size_t length)
@@ -317,23 +344,42 @@ public:
                     state_stack_.back() = pre_line_break_state_;
                     break;
                 }
+                JSONCONS_ASSERT(stack2_.size() > 0);
+                stack2_.pop_back();
                 break;
             case states::lf:
                 ++line_;
                 column_ = 1;
+<<<<<<< HEAD
                 state_stack_.back() = pre_line_break_state_;
+=======
+                state_ = pre_line_break_state_;
+                JSONCONS_ASSERT(stack2_.size() > 0);
+                stack2_.pop_back();
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                 break;
             case states::start: 
                 {
                     switch (*p_)
                     {
                         case '\r':
+<<<<<<< HEAD
                             pre_line_break_state_ = state_stack_.back();
                             state_stack_.back() = states::cr;
                             break;
                         case '\n':
                             pre_line_break_state_ = state_stack_.back();
                             state_stack_.back() = states::lf;
+=======
+                            pre_line_break_state_ = state_;
+                            state_ = states::cr;
+                            stack2_.push_back(states::cr);
+                            break;
+                        case '\n':
+                            pre_line_break_state_ = state_;
+                            state_ = states::lf;
+                            stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                             break;
                         case ' ':case '\t':
                         {
@@ -359,8 +405,12 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
+<<<<<<< HEAD
                         state_stack_.back() = states::object;
-                        state_stack_.push_back(states::object);
+=======
+                        state_ = states::object;
+
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         handler_->begin_object(*this);
                         break;
                     case '[':
@@ -370,7 +420,6 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_stack_.back() = states::array;
-                        state_stack_.push_back(states::array);
                         handler_->begin_array(*this);
                         break;
                     case '\"':
@@ -441,12 +490,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -469,9 +529,7 @@ public:
                     case '}':
                         if (peek() == modes::object_member_value)
                         {
-                            pop(modes::object_member_value);  
-                            state_stack_.pop_back();
-
+                            pop(modes::object_member_value);                        
                             handler_->end_object(*this);
                             if (peek() == modes::done)
                             {
@@ -496,7 +554,6 @@ public:
                         if (peek() == modes::array_element)
                         {
                             pop(modes::array_element);                        
-                            state_stack_.pop_back();
                             handler_->end_array(*this);
                             if (peek() == modes::done)
                             {
@@ -544,12 +601,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -574,7 +642,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -609,12 +676,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -660,12 +738,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -706,12 +795,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -737,7 +837,6 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_stack_.back() = states::object;
-                        state_stack_.push_back(states::object);
                         handler_->begin_object(*this);
                         break;
                     case '[':
@@ -746,7 +845,6 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_stack_.back() = states::array;
-                        state_stack_.push_back(states::array);
                         handler_->begin_array(*this);
                         break;
                     case '/':
@@ -773,6 +871,25 @@ public:
                         state_stack_.back() = states::f;
                         literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
+                        /*if ((p_+4) < end_input_)
+                        {
+                            if ((*(p_+1) == 'a') & (*(p_+2) == 'l') & (*(p_+3) == 's') & (*(p_+4) == 'e'))
+                            {
+                                p_ += 4;
+                                column_ += 4;
+                                handler_->value(false, *this);
+                                if (peek() == modes::start)
+                                {
+                                    flip(modes::start,modes::done);
+                                    state_stack_.back() = states::done;
+                                    handler_->end_json();
+                                }
+                                else
+                                {
+                                    state_stack_.back() = states::expect_comma_or_end;
+                                }
+                            }
+                        }*/
                         break;
                     case 'n':
                         state_stack_.back() = states::n;
@@ -810,12 +927,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -841,7 +969,6 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_stack_.back() = states::object;
-                        state_stack_.push_back(states::object);
                         handler_->begin_object(*this);
                         break;
                     case '[':
@@ -850,7 +977,6 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         state_stack_.back() = states::array;
-                        state_stack_.push_back(states::array);
                         handler_->begin_array(*this);
                         break;
                     case ']':
@@ -858,7 +984,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -893,6 +1018,25 @@ public:
                         state_stack_.back() = states::f;
                         literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
+                        /*if ((p_+4) < end_input_)
+                        {
+                            if ((*(p_+1) == 'a') & (*(p_+2) == 'l') & (*(p_+3) == 's') & (*(p_+4) == 'e'))
+                            {
+                                p_ += 4;
+                                column_ += 4;
+                                handler_->value(false, *this);
+                                if (peek() == modes::start)
+                                {
+                                    flip(modes::start,modes::done);
+                                    state_stack_.back() = states::done;
+                                    handler_->end_json();
+                                }
+                                else
+                                {
+                                    state_stack_.back() = states::expect_comma_or_end;
+                                }
+                            }
+                        }*/
                         break;
                     case 'n':
                         state_stack_.back() = states::n;
@@ -916,7 +1060,15 @@ public:
                 ++column_;
                 break;
             case states::string: 
-                parse_string();
+                {
+                    const CharT* first;
+                    const CharT* last;
+                    if (parse_string(&first,&last))
+                    {
+                        end_string_value(first,last-first);
+                        string_buffer_.clear();
+                    }
+                }
                 break;
             case states::escape: 
                 {
@@ -1055,12 +1207,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -1087,7 +1250,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1105,7 +1267,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1142,12 +1303,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -1174,7 +1346,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1192,7 +1363,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1235,12 +1405,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -1267,7 +1448,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1285,7 +1465,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1365,12 +1544,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case ' ':case '\t':
                         {
@@ -1397,7 +1587,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_object(*this);
                         if (peek() == modes::done)
                         {
@@ -1415,7 +1604,6 @@ public:
                         {
                             err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
                         }
-                        state_stack_.pop_back();
                         handler_->end_array(*this);
                         if (peek() == modes::done)
                         {
@@ -1545,12 +1733,23 @@ public:
                     switch (*p_)
                     {
                     case '\r':
+<<<<<<< HEAD
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = state_stack_.back();
                         state_stack_.back() = states::lf;
+=======
+                        pre_line_break_state_ = state_;
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     case '*':
                         state_stack_.back() = states::slash_star_star;
@@ -1566,11 +1765,21 @@ public:
                     {
                     case '\r':
                         pre_line_break_state_ = saved_state_;
+<<<<<<< HEAD
                         state_stack_.back() = states::cr;
                         break;
                     case '\n':
                         pre_line_break_state_ = saved_state_;
                         state_stack_.back() = states::lf;
+=======
+                        state_ = states::cr;
+                        stack2_.push_back(states::cr);
+                        break;
+                    case '\n':
+                        pre_line_break_state_ = saved_state_;
+                        state_ = states::lf;
+                        stack2_.push_back(states::lf);
+>>>>>>> 8522df40eb2e2c14a4b40274eedf44dd9d631bb8
                         break;
                     }
                 }
