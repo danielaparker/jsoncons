@@ -3515,8 +3515,8 @@ json_printable<JsonT> pretty_print(const JsonT& val,
     return json_printable<JsonT>(val, true, format);
 }
 
-typedef basic_json<char,std::allocator<char>> json;
-typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson;
+typedef basic_json<char,std::allocator<void>> json;
+typedef basic_json<wchar_t,std::allocator<void>> wjson;
 
 typedef basic_json_deserializer<json> json_deserializer;
 typedef basic_json_deserializer<wjson> wjson_deserializer;
