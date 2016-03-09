@@ -316,7 +316,7 @@ public:
 
         string_data* create_string_data(const char_type* s, size_t length, const string_allocator& allocator)
         {
-            size_t mem_size = aligned_size(length*sizeof(char));
+            size_t mem_size = aligned_size(length*sizeof(char_type));
 
             typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
 
