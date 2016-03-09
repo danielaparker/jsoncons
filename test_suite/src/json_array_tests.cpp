@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 
 BOOST_AUTO_TEST_CASE(test_one_dim_array)
 {
-    basic_json<std::string,std::allocator<char>> a = basic_json<std::string,std::allocator<char>>::make_array<1>(10,0);
+    basic_json<char,std::allocator<char>> a = basic_json<char,std::allocator<char>>::make_array<1>(10,0);
     BOOST_CHECK(a.size() == 10);
     BOOST_CHECK(a[0].as_integer() == 0);
     a[1] = 1;
@@ -226,6 +226,5 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     BOOST_CHECK_EQUAL(val[2].as<std::string>(), std::string("Montreal"));
 
 }
-
 BOOST_AUTO_TEST_SUITE_END()
 

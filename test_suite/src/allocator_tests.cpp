@@ -166,13 +166,13 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     pool a_pool(1024);
     pool_allocator<json> a_pool_allocator(&a_pool); 
 
-    typedef basic_json<std::string,pool_allocator<json>> myjson;
+    typedef basic_json<char,pool_allocator<json>> myjson;
     myjson::array an_array = myjson::array(a_pool_allocator);
     myjson::object an_object = myjson::object(a_pool_allocator);
 
     myjson root = an_object;
     root.reserve(1);
-
+/*
     root.set("field1", 10.0);
     root.set("field2", 20.0);
 
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     {
         myjson& val = it->value();
     }
-    
+*/    
     //BOOST_CHECK_EQUAL(10.0,root["field1"]);
     //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
     //std::cout << root << std::endl; 
