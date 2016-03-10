@@ -23,7 +23,12 @@ void test_error_code(const std::string& text, int ec)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK_MESSAGE(e.code().value() == ec, e.what());
+        if (e.code().value() != ec)
+        {
+            std::cout << text << std::endl;
+            std::cout << e.code().value() << " " << e.what() << std::endl; 
+        }
+        BOOST_CHECK_EQUAL(ec, e.code().value());
     }
 }
 
