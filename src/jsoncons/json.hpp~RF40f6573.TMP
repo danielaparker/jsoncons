@@ -218,7 +218,7 @@ public:
 
     typedef Alloc allocator_type;
 
-    typedef CharT char_type;
+    typedef typename CharT char_type;
     typedef typename std::char_traits<CharT> char_traits_type;
 
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<CharT> string_allocator;
