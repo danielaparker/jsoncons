@@ -1040,7 +1040,7 @@ public:
                 {
                     switch (*p_)
                     {
-                        JSONCONS_CASE_SP_CMT_ACTION((end_integer_value()))
+                        JSONCONS_CASE_SP_CMT_ACTION((end_fraction_value()))
                     case '}':
                         --nesting_depth_;
                         end_fraction_value();
@@ -1150,7 +1150,7 @@ public:
                 {
                     switch (*p_)
                     {
-                        JSONCONS_CASE_SP_CMT_ACTION((end_integer_value()))
+                        JSONCONS_CASE_SP_CMT_ACTION((end_fraction_value()))
                     case '}':
                         --nesting_depth_;
                         end_fraction_value();
