@@ -35,6 +35,7 @@ enum class states
     expect_member_name_or_end, 
     expect_member_name, 
     expect_colon,
+    expect_value_or_end,
     expect_value,
     array, 
     string,
@@ -388,7 +389,7 @@ public:
                         }
                         handler_->begin_json();
                         stack_.back() = states::array;
-                        stack_.push_back(states::array);
+                        stack_.push_back(states::expect_value_or_end);
                         handler_->begin_array(*this);
                         break;
                     case '\"':
@@ -623,7 +624,7 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         stack_.back() = states::array;
-                        stack_.push_back(states::array);
+                        stack_.push_back(states::expect_value_or_end);
                         handler_->begin_array(*this);
                         break;
                     case '\"':
@@ -678,7 +679,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::array: 
+            case states::expect_value_or_end: 
                 {
                     switch (*p_)
                     {
@@ -698,7 +699,7 @@ public:
                             err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
                         }
                         stack_.back() = states::array;
-                        stack_.push_back(states::array);
+                        stack_.push_back(states::expect_value_or_end);
                         handler_->begin_array(*this);
                         break;
                     case ']':
