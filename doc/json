@@ -470,9 +470,9 @@ vertical-align:1px;
 <body>
 <div class="highlight highlight-source-c++"><pre>    jsoncons::json
 
-    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">void</span>&gt;&gt; json</pre></div>
+    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the string type. The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 

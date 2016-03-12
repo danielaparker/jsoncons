@@ -377,13 +377,13 @@ Result:
 The json class is an instantiation of the `basic_json` class template that uses `std::string` as the string type
 and `std::allocator<void>` as the allocator type,
 ```c++
-    typedef basic_json<char,std::allocator<void>> json
+    typedef basic_json<char,std::allocator<char>> json
 ```
 The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
 
 The library includes an instantiation for wide characters as well,
 ```c++
-    typedef basic_json<wchar_t,std::allocator<void>> wjson
+    typedef basic_json<wchar_t,std::allocator<wchar_t>> wjson
 ```
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++

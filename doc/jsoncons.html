@@ -857,13 +857,13 @@ using jsoncons::json_deserializer;
 <p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>std::string</code> as the string type<br>
 and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">void</span>&gt;&gt; json</pre></div>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
 <p>The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
 
 <p>The library includes an instantiation for wide characters as well,</p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,std::allocator&lt;<span class="pl-k">void</span>&gt;&gt; wjson</pre></div>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson</pre></div>
 
 <p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
 

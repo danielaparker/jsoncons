@@ -1,9 +1,9 @@
 ```c++
     jsoncons::json
 
-    typedef basic_json<char,std::allocator<void>> json
+    typedef basic_json<char,std::allocator<char>> json
 ```
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the string type. The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
+The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
 
 ### Header
 
