@@ -13,3 +13,5 @@ examples/build/cmake/build_llvm
 test_suite/src/jcr_tests.cpp
 
 src/jsoncons/json_structures.hpp.orig
+
+examples/build/vs2013/

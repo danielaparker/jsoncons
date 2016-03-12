@@ -62,6 +62,12 @@ void example1()
     )");
 #else
     json book4;
+    book4["category"] = "Fiction";
+    book4["title"] = "Pulp";
+    book4["author"] = "Charles Bukowski";
+    book4["date"] = "2004-07-08";
+    book4["price"] = 22.48;
+    book4["isbn"] = "1852272007";
 #endif
 
     // Construct a booklist array
@@ -224,6 +230,12 @@ void example3()
     )");
 #else
     wjson book4;
+    book4[L"category"] = L"Fiction";
+    book4[L"title"] = L"Pulp";
+    book4[L"author"] = L"Charles Bukowski";
+    book4[L"date"] = L"2004-07-08";
+    book4[L"price"] = 22.48;
+    book4[L"isbn"] = L"1852272007";
 #endif
     // Construct a booklist array
     wjson booklist = wjson::array();

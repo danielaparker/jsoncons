@@ -383,7 +383,7 @@ public:
     }
 
     json_object_iterator(const json_object_iterator<NonConstIteratorT,NonConstIteratorT>& it)
-        : it_(it.it_)
+        : empty_(it.empty_), it_(it.it_)
     {
     }
 
