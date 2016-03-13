@@ -28,6 +28,16 @@ BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
     val.set("A",o);
 }
 
+BOOST_AUTO_TEST_CASE(test_assign_non_const_cstring)
+{
+    json root;
+
+    const char* p = "A string";
+    char* q = const_cast<char*>(p);
+
+    root["Test"] = q;
+}
+
 BOOST_AUTO_TEST_CASE(test_uint8_t)
 {
     json o;

@@ -100,6 +100,27 @@ public:
 };
 
 template<class JsonT>
+class json_type_traits<JsonT, typename type_wrapper<typename JsonT::char_type>::pointer_type>
+{
+public:
+    typedef typename JsonT::char_type char_type;
+
+    static bool is(const JsonT& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_string();
+    }
+    static const char_type* as(const JsonT& rhs)
+    {
+        return rhs.as_cstring();
+    }
+    static void assign(JsonT& lhs, const char_type *rhs)
+    {
+        size_t length = std::char_traits<char_type>::length(rhs);
+        lhs.assign_string(rhs,length);
+    }
+};
+
+template<class JsonT>
 class json_type_traits<JsonT, char>
 {
 public:
