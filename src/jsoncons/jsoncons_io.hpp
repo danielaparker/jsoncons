@@ -277,6 +277,9 @@ public:
         }
         return val;
     }
+
+    float_reader(const float_reader& fr) = delete;
+    float_reader& operator=(const float_reader& fr) = delete;
 };
 
 #else
@@ -344,6 +347,9 @@ public:
         }
         return val;
     }
+
+    float_reader(const float_reader& fr) = delete;
+    float_reader& operator=(const float_reader& fr) = delete;
 };
 #endif
 
