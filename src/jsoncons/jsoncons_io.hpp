@@ -255,18 +255,22 @@ public:
 class float_reader
 {
 private:
-    _locale_t locale;
+    _locale_t locale_;
 public:
     float_reader()
     {
-        locale = _create_locale(LC_NUMERIC, "C");
+        locale_ = _create_locale(LC_NUMERIC, "C");
+    }
+    ~float_reader()
+    {
+        _free_locale(locale_);
     }
 
     double read(const char* s, size_t length)
     {
         const char *begin = s;
         char *end = nullptr;
-        double val = _strtod_l(begin, &end, locale);
+        double val = _strtod_l(begin, &end, locale_);
         if (begin == end)
         {
             throw std::invalid_argument("Invalid float value");
