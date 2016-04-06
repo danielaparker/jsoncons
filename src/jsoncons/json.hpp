@@ -2773,11 +2773,11 @@ public:
 
     static basic_json parse(std::basic_istream<char_type>& is)
     {
-        parse_stream(is);
+        return parse_stream(is);
     }
     static basic_json parse(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler)
     {
-        parse_stream(is,err_handler);
+        return parse_stream(is,err_handler);
     }
 
     static basic_json parse_string(const string_type& s)
