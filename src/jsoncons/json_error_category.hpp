@@ -14,28 +14,28 @@ namespace jsoncons {
 
 namespace json_parser_errc 
 {
-    const int unexpected_eof = 0;
-    const int invalid_json_text = 1;
-    const int extra_character = 2;
-    const int max_depth_exceeded = 3;
-    const int single_quote = 4;
-    const int illegal_character_in_string = 5;
-    const int extra_comma = 6;
-    const int expected_name = 7;
-    const int expected_value = 8;
-    const int invalid_value = 9;
-    const int expected_colon = 10;
-    const int illegal_control_character = 11;
-    const int illegal_escaped_character = 12;
-    const int expected_codepoint_surrogate_pair = 13;
-    const int invalid_hex_escape_sequence = 14;
-    const int invalid_unicode_escape_sequence = 15;
-    const int leading_zero = 16;
-    const int invalid_number = 17;
-    const int expected_comma_or_right_brace = 18;
-    const int expected_comma_or_right_bracket = 19;
-    const int unexpected_right_bracket = 20;
-    const int unexpected_right_brace = 21;
+    const int unexpected_eof = 1;
+    const int invalid_json_text = 2;
+    const int extra_character = 3;
+    const int max_depth_exceeded = 4;
+    const int single_quote = 5;
+    const int illegal_character_in_string = 6;
+    const int extra_comma = 7;
+    const int expected_name = 8;
+    const int expected_value = 9;
+    const int invalid_value = 10;
+    const int expected_colon = 11;
+    const int illegal_control_character = 12;
+    const int illegal_escaped_character = 13;
+    const int expected_codepoint_surrogate_pair = 14;
+    const int invalid_hex_escape_sequence = 15;
+    const int invalid_unicode_escape_sequence = 16;
+    const int leading_zero = 17;
+    const int invalid_number = 18;
+    const int expected_comma_or_right_brace = 19;
+    const int expected_comma_or_right_bracket = 20;
+    const int unexpected_right_bracket = 21;
+    const int unexpected_right_brace = 22;
 }
 
 class json_error_category_impl

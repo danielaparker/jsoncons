@@ -14,16 +14,16 @@ namespace jsoncons { namespace jsonpath {
 
 namespace jsonpath_parser_errc 
 {
-    const int expected_root = 0;
-    const int expected_right_bracket = 1;
-    const int expected_name = 2;
-    const int expected_separator = 3;
-    const int invalid_filter = 4;
-    const int invalid_filter_expected_slash = 5;
-    const int invalid_filter_unbalanced_paren = 6;
-    const int invalid_filter_unsupported_operator = 7;
-    const int invalid_filter_expected_right_brace = 8;
-    const int invalid_filter_expected_primary = 9;
+    const int expected_root = 1;
+    const int expected_right_bracket = 2;
+    const int expected_name = 3;
+    const int expected_separator = 4;
+    const int invalid_filter = 5;
+    const int invalid_filter_expected_slash = 6;
+    const int invalid_filter_unbalanced_paren = 7;
+    const int invalid_filter_unsupported_operator = 8;
+    const int invalid_filter_expected_right_brace = 9;
+    const int invalid_filter_expected_primary = 10;
 }
 
 class jsonpath_error_category_impl
