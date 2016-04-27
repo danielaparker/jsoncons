@@ -27,19 +27,6 @@ The library has a number of features, which are listed below:
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
-What's new on master
-
-- Going forward, support for VC++ 2010 has been dropped - VC++ 2013 or later is required.  
-
-- The deprecated `json` member constants `null`, `an_object`, and `an_array` have been removed, they're incompatible with stateful allocators (see the deprecated list for alternatives.)
-
-- Added `json` `std::initializer_list` constructor for constructing arrays, e.g.
-```c++
-    json image_formats = {"JPEG","PSD","TIFF","DNG"};
-``` 
-
-- When parsing fractional numbers in text, floating point number precision is retained, and made available to serialization to preserve round-trip. The default output precision has been changed from 15 to 16.
-
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

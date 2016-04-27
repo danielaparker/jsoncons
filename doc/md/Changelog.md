@@ -1,3 +1,14 @@
+0.99
+----
+
+- Fixes to deprecated json parse functions (deprecated, but still supposed to work)
+- The Visual C++ specific implementation for reading floating point numbers should have freed a `_locale_t` object, fixed 
+- Added `json_type_traits` specialization to support assignment from non-const strings 
+- When parsing fractional numbers in text, floating point number precision is retained, and made available to serialization to preserve round-trip. The default output precision has been changed from 15 to 16.
+- Added json `std::initializer_list` constructor for constructing arrays
+- The deprecated json member constants null, an_object, and an_array have been removed
+- Microsoft VC++ versions earlier than 2013 are no longer supported
+
 0.98.4
 ------
 
