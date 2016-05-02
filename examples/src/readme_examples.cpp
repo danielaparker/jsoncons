@@ -311,7 +311,7 @@ void example3()
     book[L"ratings"].erase(L"*");
 
     // Serialize the booklist to a file
-    std::wofstream os(L"booklist2.json");
+    std::wofstream os("booklist2.json");
     os << pretty_print(booklist);
 }
 
