@@ -470,47 +470,4 @@ producing
         ["2013-10-21","2013-10-28"]
     }
 ```
-### json any
 
-jsoncons provides a class `json::any` that can contain a value of any type as long as that type supports copy construction and 
-assignment. This allows you to, for example, insert a boost matrix into a `json` object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in
-a `json::any` value, like this:
-```c++
-    #include <boost/numeric/ublas/matrix.hpp>
-
-    using boost::numeric::ublas::matrix;
-
-    json val;
-
-    matrix<double> A(2,2);
-    A(0,0) = 1;
-    A(0,1) = 2;
-    A(1,0) = 3;
-    A(1,1) = 4;
-
-    val.set("A",json::any(A));
-
-    matrix<double>& B = val["A"].any_cast<matrix<double>>();
-```
-By default, if you print `val` on a stream, 
-```c++
-    std::cout << pretty_print(val) << std::endl;
-```
-the template function
-```c++
-    template <typename CharT,class T> inline
-    void serialize(basic_json_output_handler<CharT>& os, const T&)
-    {
-        os.value(null_type());
-    }
-```
-gets called, and produces a `null` value for the matrix. You can however introduce a specialization of `serialize` for `boost::numeric::ublas::matrix` in the `jsoncons` namespace, to produce the output 
-```c++
-    {
-        "A":
-        [
-            [1,2],
-            [3,4]
-        ]
-    }
-```

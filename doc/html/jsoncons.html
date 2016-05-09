@@ -923,7 +923,7 @@ and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
     <span class="pl-k">class</span> <span class="pl-en">json_type_traits</span>
     {
     <span class="pl-k">public:</span>
-        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> JsonT&amp; rhs) noexcept;
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> JsonT&amp; rhs) <span class="pl-k">noexcept</span>;
         <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> JsonT&amp; rhs);
         <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(JsonT&amp; lhs, T rhs);
     };</pre></div>
@@ -948,50 +948,6 @@ and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
         <span class="pl-s"><span class="pl-pds">"</span>maturity<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2015-01-01<span class="pl-pds">"</span></span>,
         <span class="pl-s"><span class="pl-pds">"</span>observation_dates<span class="pl-pds">"</span></span>:
         [<span class="pl-s"><span class="pl-pds">"</span>2013-10-21<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2013-10-28<span class="pl-pds">"</span></span>]
-    }</pre></div>
-
-<h3>json any</h3>
-
-<p>jsoncons provides a class <code>json::any</code> that can contain a value of any type as long as that type supports copy construction and <br>
-assignment. This allows you to, for example, insert a boost matrix into a <code>json</code> object, and to retrieve it back cast to the appropriate type. You can do so by wrapping it in<br>
-a <code>json::any</code> value, like this:</p>
-
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
-
-    <span class="pl-k">using</span> boost::numeric::ublas::matrix;
-
-    json val;
-
-    matrix&lt;<span class="pl-k">double</span>&gt; <span class="pl-en">A</span>(<span class="pl-c1">2</span>,<span class="pl-c1">2</span>);
-    <span class="pl-en">A</span>(<span class="pl-c1">0</span>,<span class="pl-c1">0</span>) = 1;
-    <span class="pl-en">A</span>(<span class="pl-c1">0</span>,<span class="pl-c1">1</span>) = 2;
-    <span class="pl-en">A</span>(<span class="pl-c1">1</span>,<span class="pl-c1">0</span>) = 3;
-    <span class="pl-en">A</span>(<span class="pl-c1">1</span>,<span class="pl-c1">1</span>) = 4;
-
-    val.set(<span class="pl-s"><span class="pl-pds">"</span>A<span class="pl-pds">"</span></span>,json::any(A));
-
-    matrix&lt;<span class="pl-k">double</span>&gt;&amp; B = val[<span class="pl-s"><span class="pl-pds">"</span>A<span class="pl-pds">"</span></span>].any_cast&lt;matrix&lt;<span class="pl-k">double</span>&gt;&gt;();</pre></div>
-
-<p>By default, if you print <code>val</code> on a stream, </p>
-
-<div class="highlight highlight-source-c++"><pre>    std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
-
-<p>the template function</p>
-
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">template </span>&lt;<span class="pl-k">typename</span> CharT,<span class="pl-k">class</span> <span class="pl-en">T</span>&gt; <span class="pl-k">inline</span>
-    <span class="pl-k">void</span> <span class="pl-en">serialize</span>(basic_json_output_handler&lt;CharT&gt;&amp; os, <span class="pl-k">const</span> T&amp;)
-    {
-        os.<span class="pl-c1">value</span>(<span class="pl-c1">null_type</span>());
-    }</pre></div>
-
-<p>gets called, and produces a <code>null</code> value for the matrix. You can however introduce a specialization of <code>serialize</code> for <code>boost::numeric::ublas::matrix</code> in the <code>jsoncons</code> namespace, to produce the output </p>
-
-<div class="highlight highlight-source-c++"><pre>    {
-        <span class="pl-s"><span class="pl-pds">"</span>A<span class="pl-pds">"</span></span>:
-        [
-            [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>],
-            [<span class="pl-c1">3</span>,<span class="pl-c1">4</span>]
-        ]
     }</pre></div>
 </body>
 </html>

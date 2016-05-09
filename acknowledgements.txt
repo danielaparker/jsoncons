@@ -1,6 +1,6 @@
 A big thanks to the following individuals for contributing:
 
-Andrew Hutko (early code review) 	
+Andrew Hutko (early code review)        
 
 Marc Chevrier (contributed clang port, build files, json is<T> and as<T> methods, 
 and make_array template implementation.)
@@ -23,3 +23,4 @@ Milan Burda for fix for clang build error
 Peter Tissen, for reporting and suggesting a fix for get(name,default_val)
 
 Tom Bass for assistance with clang build errors
+

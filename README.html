@@ -490,7 +490,6 @@ vertical-align:1px;
 <li>Supports reading a sequence of JSON texts from a stream</li>
 <li>Supports optional escaping of non-ascii UTF-8 octets</li>
 <li>Allows extensions to the types accepted by the json class accessors and modifiers</li>
-<li>Supports storing "any" values in a json object or array, with specialized serialization</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 <li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>
 </li>
@@ -893,7 +892,7 @@ vertical-align:1px;
 </pre></div>
 
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
-    std::wofstream <span class="pl-en">os</span>(L<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
+    std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
     os &lt;&lt; pretty_print(booklist);</pre></div>
 
 <h3>wjson query</h3>

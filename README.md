@@ -19,7 +19,6 @@ The library has a number of features, which are listed below:
 - Supports reading a sequence of JSON texts from a stream
 - Supports optional escaping of non-ascii UTF-8 octets
 - Allows extensions to the types accepted by the json class accessors and modifiers
-- Supports storing "any" values in a json object or array, with specialized serialization
 - Supports reading (writing) JSON values from (to) CSV files
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
@@ -425,7 +424,7 @@ Result:
 ```
 ```c++
     // Serialize the booklist to a file
-    std::wofstream os(L"booklist2.json");
+    std::wofstream os("booklist2.json");
     os << pretty_print(booklist);
 ```
 ### wjson query

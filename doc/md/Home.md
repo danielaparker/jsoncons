@@ -16,8 +16,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`. Extensions 
 
 [Type Extensibility](Type%20Extensibility)
 
-[Using json any](Using%20json%20any)
-
 [Transforming JSON with filters](Transforming%20JSON%20with%20filters)
 
 ### Classes

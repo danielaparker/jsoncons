@@ -1,3 +1,9 @@
+0.99.1
+------
+
+- Fix to json_filter class
+- Fix to readme_examples
+
 0.99
 ----
 
