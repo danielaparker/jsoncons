@@ -221,7 +221,7 @@ class basic_begin_end_json_filter : public basic_json_filter<CharT>
 {
 public:
     basic_begin_end_json_filter(basic_json_input_handler<CharT>& handler)
-        : basic_json_filter(handler)
+        : basic_json_filter<CharT>(handler)
     {
     }
 private:
