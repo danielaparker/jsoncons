@@ -153,6 +153,20 @@ public:
         elements_.insert(it, std::move(value));
     }
 
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+    iterator add(const_iterator pos, const JsonT& value)
+    {
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.insert(it, value);
+    }
+
+    iterator add(const_iterator pos, JsonT&& value)
+    {
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.insert(it, std::move(value));
+    }
+#else
     iterator add(const_iterator pos, const JsonT& value)
     {
         return elements_.insert(pos, value);
@@ -162,6 +176,7 @@ public:
     {
         return elements_.insert(pos, std::move(value));
     }
+#endif
 
     iterator begin() {return elements_.begin();}
 
