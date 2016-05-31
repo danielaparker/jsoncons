@@ -29,7 +29,7 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), content_indented_(false)
+           : is_object_(is_object), count_(0), indent_(0)
         {
         }
         bool is_object() const
@@ -39,7 +39,7 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
 
         bool is_object_;
         size_t count_;
-        bool content_indented_;
+        int indent_;
     };
     basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
@@ -124,14 +124,38 @@ private:
         end_value();
     }
 
+
     void do_begin_array() override
     {
         begin_structure();
 
-        if (indenting_ && !stack_.empty() && stack_.back().is_object())
+        /*if (indenting_ && !stack_.empty())
         {
-            write_indent();
-        }
+            if (stack_.back().is_object())
+            {
+                if (format_.object_array_block_option() == block_format_options::next_line)
+                {
+                    write_indent();
+                }
+                else if (format_.object_array_block_option() == block_format_options::next_line_indented)
+                {
+                    //indent();
+                    write_indent();
+                }
+            }
+            else
+            {
+                if (format_.array_array_block_option() == block_format_options::next_line)
+                {
+                    write_indent();
+                }
+                else if (format_.array_array_block_option() == block_format_options::next_line_indented)
+                {
+                    //indent();
+                    write_indent();
+                }
+            }
+        }*/
         stack_.push_back(stack_item(false));
         bos_.put('[');
         indent();
@@ -140,11 +164,14 @@ private:
     void do_end_array() override
     {
         unindent();
-        if (indenting_ && !stack_.empty() && stack_.back().content_indented_)
+        if (indenting_ && !stack_.empty() && stack_.back().indent_ > 0)
         {
-            write_indent();
+            stack_.pop_back();
+            if (stack_.back().is_object() || format_.array_array_block_option() != block_format_options::same_line)
+            {
+                write_indent();
+            }
         }
-        stack_.pop_back();
         bos_.put(']');
 
         end_value();
@@ -157,6 +184,7 @@ private:
         escape_string<CharT>(name, length, format_, bos_);
         bos_.put('\"');
         bos_.put(':');
+        bos_.put(' ');
     }
 
     void do_null_value() override
@@ -301,10 +329,19 @@ private:
     {
         if (!stack_.empty())
         {
-            stack_.back().content_indented_ = true;
+            stack_.back().indent_ = indent_;
         }
         bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
+        {
+            bos_. put(' ');
+        }
+    }
+
+    void write_indent(int indent)
+    {
+        bos_. put('\n');
+        for (int i = 0; i < indent; ++i)
         {
             bos_. put(' ');
         }

@@ -15,3 +15,16 @@ test_suite/src/jcr_tests.cpp
 src/jsoncons/json_structures.hpp.orig
 
 examples/build/vs2013/
+
+src/jsoncons/json_serializer2.hpp
+test_suite/build/vs2013/ReadMe.txt
+test_suite/build/vs2013/stdafx.cpp
+test_suite/build/vs2013/stdafx.h
+test_suite/build/vs2013/targetver.h
+test_suite/build/vs2013/vs2013.cpp
+test_suite/build/vs2013/vs2013.sdf
+test_suite/build/vs2013/vs2013.sln
+test_suite/build/vs2013/vs2013.suo
+test_suite/build/vs2013/vs2013.vcxproj
+test_suite/build/vs2013/vs2013.vcxproj.filters
+test_suite/build/vs2013/vs2013.vcxproj.user

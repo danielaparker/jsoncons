@@ -18,6 +18,8 @@
 
 namespace jsoncons {
 
+enum class block_format_options {next_line,next_line_indented,same_line};
+
 template <typename CharT>
 class buffered_ostream;
 
@@ -34,6 +36,8 @@ class basic_output_format
     std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
+    block_format_options object_array_block_option_;
+    block_format_options array_array_block_option_;
 public:
     static const size_t default_indent = 4;
 
@@ -50,11 +54,39 @@ public:
         pos_inf_replacement_(json_literals<CharT>::null_literal().first),
         neg_inf_replacement_(json_literals<CharT>::null_literal().first),
         escape_all_non_ascii_(false),
-        escape_solidus_(false)
+        escape_solidus_(false),
+        object_array_block_option_(block_format_options::next_line),
+        array_array_block_option_(block_format_options::same_line)
     {
     }
 
 //  Accessors
+
+    block_format_options object_array_block_option()
+    {
+        return object_array_block_option_;
+    }
+
+    void object_array_block_option(block_format_options value)
+    {
+        object_array_block_option_ = value;
+    }
+
+    block_format_options array_array_block_option()
+    {
+        return array_array_block_option_;
+    }
+
+    void array_array_block_option(block_format_options value)
+    {
+        array_array_block_option_ = value;
+    }
+
+    void array_block_option(block_format_options value)
+    {
+        object_array_block_option_ = value;
+        array_array_block_option_ = value;
+    }
 
     int indent() const
     {
