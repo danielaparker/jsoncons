@@ -29,7 +29,11 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), indent_(0)
+           : is_object_(is_object), count_(0), option_(block_format_options::next_line)
+        {
+        }
+        stack_item(bool is_object, block_format_options option)
+           : is_object_(is_object), count_(0), option_(option)
         {
         }
         bool is_object() const
@@ -37,9 +41,19 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
             return is_object_;
         }
 
+        bool is_same_line() const
+        {
+            return option_ = block_format_options::same_line;
+        }
+
+        bool is_next_line() const
+        {
+            return option_ == block_format_options::next_line;
+        }
+
         bool is_object_;
         size_t count_;
-        int indent_;
+        block_format_options option_;
     };
     basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
@@ -102,21 +116,27 @@ private:
     {
         begin_structure();
 
-        if (indenting_ && !stack_.empty() && stack_.back().is_object())
+        if (indenting_)
         {
-            write_indent();
+            if (!stack_.empty() && stack_.back().is_object())
+            {
+                write_indent();
+            }
+            indent();
         }
         stack_.push_back(stack_item(true));
         bos_.put('{');
-        indent();
     }
 
     void do_end_object() override
     {
-        unindent();
-        if (indenting_ && !stack_.empty())
+        if (indenting_)
         {
-            write_indent();
+            if (!stack_.empty())
+            {
+                unindent();
+                write_indent();
+            }
         }
         stack_.pop_back();
         bos_.put('}');
@@ -128,58 +148,58 @@ private:
     void do_begin_array() override
     {
         begin_structure();
-
-        /*if (indenting_ && !stack_.empty())
+        if (indenting_)
         {
-            if (stack_.back().is_object())
+            if (!stack_.empty() && stack_.back().is_object())
             {
                 if (format_.object_array_block_option() == block_format_options::next_line)
                 {
                     write_indent();
                 }
-                else if (format_.object_array_block_option() == block_format_options::next_line_indented)
-                {
-                    //indent();
-                    write_indent();
-                }
+                stack_.push_back(stack_item(false,format_.object_array_block_option()));
             }
-            else
+            else if (!stack_.empty())
             {
                 if (format_.array_array_block_option() == block_format_options::next_line)
                 {
                     write_indent();
                 }
-                else if (format_.array_array_block_option() == block_format_options::next_line_indented)
-                {
-                    //indent();
-                    write_indent();
-                }
+                stack_.push_back(stack_item(false,format_.array_array_block_option()));
             }
-        }*/
-        stack_.push_back(stack_item(false));
+            else
+            {
+                stack_.push_back(stack_item(false));
+            }
+            indent();
+        }
+        else
+        {
+            stack_.push_back(stack_item(false));
+        }
         bos_.put('[');
-        indent();
     }
 
     void do_end_array() override
     {
-        unindent();
-        if (indenting_ && !stack_.empty() && stack_.back().indent_ > 0)
+        if (indenting_)
         {
-            stack_.pop_back();
-            if (stack_.back().is_object() || format_.array_array_block_option() != block_format_options::same_line)
+            unindent();
+            if (!stack_.empty())
             {
-                write_indent();
+                if (stack_.back().is_next_line())
+                {
+                    write_indent();
+                }
             }
         }
+        stack_.pop_back();
         bos_.put(']');
-
         end_value();
     }
 
     void do_name(const CharT* name, size_t length) override
     {
-        begin_element();
+        begin_value();
         bos_.put('\"');
         escape_string<CharT>(name, length, format_, bos_);
         bos_.put('\"');
@@ -189,7 +209,10 @@ private:
 
     void do_null_value() override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
 
         auto buf = json_literals<CharT>::null_literal();
         bos_.write(buf.first,buf.second);
@@ -199,7 +222,10 @@ private:
 
     void do_string_value(const CharT* value, size_t length) override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
 
         bos_. put('\"');
         escape_string<CharT>(value, length, format_, bos_);
@@ -210,7 +236,10 @@ private:
 
     void do_double_value(double value, uint8_t precision) override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
 
         if (is_nan(value) && format_.replace_nan())
         {
@@ -224,14 +253,6 @@ private:
         {
             bos_.write(format_.neg_inf_replacement());
         }
-        //else if (format_.floatfield() != 0)
-        //{
-            //std::basic_ostringstream<CharT> os;
-            //os.imbue(std::locale::classic());
-            //os.setf(format_.floatfield(), std::ios::floatfield);
-            //os << std::showpoint << std::setprecision(format_.precision()) << value;
-            //*os_ << os.str();
-        //}
         else
         {
             fp_.print(value,precision,bos_);
@@ -242,21 +263,30 @@ private:
 
     void do_integer_value(int64_t value) override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
         print_integer(value,bos_);
         end_value();
     }
 
     void do_uinteger_value(uint64_t value) override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
         print_uinteger(value,bos_);
         end_value();
     }
 
     void do_bool_value(bool value) override
     {
-        begin_value();
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_value();
+        }
 
         if (value)
         {
@@ -272,7 +302,7 @@ private:
         end_value();
     }
 
-    void begin_element()
+    void begin_value()
     {
         if (!stack_.empty())
         {
@@ -280,21 +310,9 @@ private:
             {
                 bos_. put(',');
             }
-            if (indenting_)
+            if (indenting_ && stack_.back().is_next_line())
             {
                 write_indent();
-            }
-        }
-    }
-
-    void begin_value()
-    {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            //begin_element();
-            if (stack_.back().count_ > 0)
-            {
-                bos_. put(',');
             }
         }
     }
@@ -311,7 +329,7 @@ private:
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
-            begin_element();
+            begin_value();
         }
     }
 
@@ -327,21 +345,8 @@ private:
 
     void write_indent()
     {
-        if (!stack_.empty())
-        {
-            stack_.back().indent_ = indent_;
-        }
         bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
-        {
-            bos_. put(' ');
-        }
-    }
-
-    void write_indent(int indent)
-    {
-        bos_. put('\n');
-        for (int i = 0; i < indent; ++i)
         {
             bos_. put(' ');
         }

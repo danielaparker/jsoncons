@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-enum class block_format_options {next_line,next_line_indented,same_line};
+enum class block_format_options {next_line,same_line};
 
 template <typename CharT>
 class buffered_ostream;
@@ -55,8 +55,8 @@ public:
         neg_inf_replacement_(json_literals<CharT>::null_literal().first),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
-        object_array_block_option_(block_format_options::next_line),
-        array_array_block_option_(block_format_options::same_line)
+        object_array_block_option_(block_format_options::same_line),
+        array_array_block_option_(block_format_options::next_line)
     {
     }
 
