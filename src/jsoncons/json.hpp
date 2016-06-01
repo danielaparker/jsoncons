@@ -1618,7 +1618,7 @@ public:
     variant var_;
 
     basic_json() 
-        : var_()
+        : var_(object())
     {
     }
 
