@@ -133,9 +133,9 @@ The output is
     }
 ```
 
-### Array block formatting
+### Object-array block formatting
 
-```
+```c++
     json val;
 
     val["verts"] = {1, 2, 3};
@@ -157,7 +157,7 @@ The output is
 ```
 
 The output is
-```
+```json
 Default format
 {
     "normals": [1,0,1],
@@ -181,5 +181,68 @@ Object array next line format
 }
 ```
 
+### Array-array block formatting
+```c++
+    json val;
+    val["data"]["id"] = {0,1,2,3,4,5,6,7};
+    val["data"]["item"] = {{2},{4,5,2,3},{4},{4,5,2,3},{2},{4,5,3},{2},{4,3}};
+
+    std::cout << "Default array-array block format" << std::endl;
+    std::cout << pretty_print(val) << std::endl;
+
+    std::cout << "Same line array-array block format" << std::endl;
+    output_format format1;
+    format1.array_array_block_option(block_options::same_line);
+    std::cout << pretty_print(val, format1) << std::endl;
+
+    std::cout << "Next line object-array and same line array-array format" << std::endl;
+    output_format format2;
+    format2.object_array_block_option(block_options::next_line)
+           .array_array_block_option(block_options::same_line);
+    std::cout << pretty_print(val, format2) << std::endl;
+```
+The output is
+```json
+Default array-array block format
+{
+    "data": {
+        "id": [0,1,2,3,4,5,6,7],
+        "item": [
+            [2],
+            [4,5,2,3],
+            [4],
+            [4,5,2,3],
+            [2],
+            [4,5,3],
+            [2],
+            [4,3]
+        ]
+    }
+}
+Same line array-array block format
+{
+    "data": {
+        "id": [0,1,2,3,4,5,6,7],
+        "item": [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
+    }
+}
+Next line object-array and same line array-array format
+{
+    "data": {
+        "id":
+        [0,1,2,3,4,5,6,7],
+        "item":
+        [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
+    }
+}
+block_style("[[",block_options::next_line)
+{
+    "data": {
+        "item": [
+            [2]
+        ]
+    }
+}
+```
 
 

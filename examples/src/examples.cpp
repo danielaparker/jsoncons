@@ -18,6 +18,7 @@ void run_readme_examples();
 void array_examples();
 void json_any_examples();
 void wjson_examples();
+void serialization_examples();
 
 void first_example_a()
 {
@@ -182,11 +183,11 @@ void mulitple_json_objects()
 void more_examples()
 {
     json image_sizing;
-	image_sizing["resize_to_fit"] = true;  // a boolean 
-	image_sizing["resize_unit"] =  "pixels";  // a string
-	image_sizing["resize_what"] =  "long_edge";  // a string
-	image_sizing["dimension1"] = 9.84;  // a double
-	image_sizing["dimension2"] = jsoncons::null_type();  // a null value
+    image_sizing["resize_to_fit"] = true;  // a boolean 
+    image_sizing["resize_unit"] =  "pixels";  // a string
+    image_sizing["resize_what"] =  "long_edge";  // a string
+    image_sizing["dimension1"] = 9.84;  // a double
+    image_sizing["dimension2"] = jsoncons::null_type();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = {"JPEG","PSD","TIFF","DNG"};
@@ -247,15 +248,15 @@ void read_and_write_escaped_unicode()
 
 void parse_exception_example()
 {
-	string s = "[1,2,3,4,]";
+    string s = "[1,2,3,4,]";
     try 
-	{
+    {
         jsoncons::json val = jsoncons::json::parse(s);
     } 
-	catch(const jsoncons::parse_exception& e) 
-	{
+    catch(const jsoncons::parse_exception& e) 
+    {
         std::cout << "Caught parse_exception with category " << e.code().category().name() 
-			      << ", code " << e.code().value() 
+                  << ", code " << e.code().value() 
                   << " and message " << e.what() << std::endl;
     }
 }
@@ -286,6 +287,8 @@ int main()
         wjson_examples();
 
         read_and_write_escaped_unicode();
+
+        serialization_examples();
 
         parse_exception_example();
     }

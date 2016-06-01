@@ -32,3 +32,5 @@ test_suite/output/test.json
 test_suite/output/test.json
 
 test_suite/output/address-book-new.json
+examples/booklist.json
+examples/booklist2.json

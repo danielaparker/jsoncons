@@ -1300,7 +1300,11 @@ public:
                 break;
             }
         }
-        if (stack_.back() != states::done)
+        if (stack_.back() == states::lf || stack_.back() == states::cr)
+        { 
+            stack_.pop_back();
+        }
+        if (!(stack_.back() == states::done || stack_.back() == states::start))
         {
             err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_error_category()), *this);
         }

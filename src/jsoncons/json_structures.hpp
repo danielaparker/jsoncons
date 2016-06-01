@@ -774,7 +774,7 @@ public:
         if (it == members_.end())
         {
             members_.push_back(value_type(string_type(s, length), value));
-            it = members_.end();
+            it = members_.begin() + (members_.size() - 1);
         }
         else if (name_eq_string(it->name(),s,length))
         {
@@ -802,7 +802,7 @@ public:
         if (it == members_.end())
         {
             members_.push_back(value_type(string_type(s, length), std::move(value)));
-            it = members_.end();
+            it = members_.begin() + (members_.size() - 1);
         }
         else if (name_eq_string(it->name(),s,length))
         {
@@ -835,7 +835,7 @@ public:
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), value));
-            it = members_.end();
+            it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {
@@ -868,7 +868,7 @@ public:
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), std::move(value)));
-            it = members_.end();
+            it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {

@@ -326,7 +326,7 @@ Throws `std::runtime_error` if not an object.
     object_iterator set(object_iterator hint, string_type&& name, json&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
-Returns a `member_terator` pointing at the member that was inserted or updated
+Returns a `member_iterator` pointing at the member that was inserted or updated
 Throws `std::runtime_error` if not an object.
 
     void add(const json& val)
