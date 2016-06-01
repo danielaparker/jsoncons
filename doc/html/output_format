@@ -736,14 +736,6 @@ Next line object-array and same line array-array format
         <span class="pl-s"><span class="pl-pds">"</span>item<span class="pl-pds">"</span></span>:
         [[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">4</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">3</span>]]
     }
-}
-block_style(<span class="pl-s"><span class="pl-pds">"</span>[[<span class="pl-pds">"</span></span>,block_options::next_line)
-{
-    <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: {
-        <span class="pl-s"><span class="pl-pds">"</span>item<span class="pl-pds">"</span></span>: [
-            [<span class="pl-c1">2</span>]
-        ]
-    }
 }</pre></div>
 </body>
 </html>

@@ -235,14 +235,6 @@ Next line object-array and same line array-array format
         [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
     }
 }
-block_style("[[",block_options::next_line)
-{
-    "data": {
-        "item": [
-            [2]
-        ]
-    }
-}
 ```
 
 
