@@ -82,6 +82,24 @@ Sets replacement text for negative infinity.
 
     void precision(uint8_t prec)
 
+    void object_object_block_option(block_format_options value)
+Set object block formatting within objects to `block_format_options::same_line` or `block_format_options::next_line`
+
+    void array_object_block_option(block_format_options value)
+Set object block formatting within arrays to `block_format_options::same_line` or `block_format_options::next_line`
+
+    void object_block_option(block_format_options value)
+Set object block formatting to `block_format_options::same_line` or `block_format_options::next_line`
+
+    void object_array_block_option(block_format_options value)
+Set array block formatting within objects to `block_format_options::same_line` or `block_format_options::next_line`
+
+    void array_array_block_option(block_format_options value)
+Set array block formatting within arrays to `block_format_options::same_line` or `block_format_options::next_line`
+
+    void array_block_option(block_format_options value)
+Set array block formatting to `block_format_options::same_line` or `block_format_options::next_line`
+
 ## Examples
 
 ### Default NaN, inf and -inf replacement
@@ -120,4 +138,55 @@ The output is
         "field3":-1e9999
     }
 ```
+
+### Array block formatting
+
+```
+    json val;
+
+    val["verts"] = {1, 2, 3};
+    val["normals"] = {1, 0, 1};
+    val["uvs"] = {0, 0, 1, 1};
+
+    std::cout << "Default format" << std::endl;
+    std::cout << pretty_print(val) << std::endl;
+
+    std::cout << "Array same line format" << std::endl;
+    output_format format1;
+    format1.array_block_option(block_format_options::same_line);
+    std::cout << pretty_print(val,format1) << std::endl;
+
+    std::cout << "Object array next line format" << std::endl;
+    output_format format2;
+    format2.object_array_block_option(block_format_options::next_line);
+    std::cout << pretty_print(val,format2) << std::endl;
+```
+
+The output is
+```
+Default format
+{
+    "normals": [1,0,1],
+    "uvs": [0,0,1,1],
+    "verts": [1,2,3]
+}
+Array same line format
+{
+    "normals": [1,0,1],
+    "uvs": [0,0,1,1],
+    "verts": [1,2,3]
+}
+Object array next line format
+{
+    "normals":
+    [1,0,1],
+    "uvs":
+    [0,0,1,1],
+    "verts":
+    [1,2,3]
+}
+```
+
+### Array in array block formatting
+
 

@@ -38,6 +38,8 @@ class basic_output_format
     bool escape_solidus_;
     block_format_options object_array_block_option_;
     block_format_options array_array_block_option_;
+    block_format_options object_object_block_option_;
+    block_format_options array_object_block_option_;
 public:
     static const size_t default_indent = 4;
 
@@ -56,7 +58,9 @@ public:
         escape_all_non_ascii_(false),
         escape_solidus_(false),
         object_array_block_option_(block_format_options::same_line),
-        array_array_block_option_(block_format_options::next_line)
+        array_array_block_option_(block_format_options::next_line),
+        object_object_block_option_(block_format_options::same_line),
+        array_object_block_option_(block_format_options::next_line)
     {
     }
 
@@ -72,6 +76,16 @@ public:
         object_array_block_option_ = value;
     }
 
+    block_format_options object_object_block_option()
+    {
+        return object_object_block_option_;
+    }
+
+    void object_object_block_option(block_format_options value)
+    {
+        object_object_block_option_ = value;
+    }
+
     block_format_options array_array_block_option()
     {
         return array_array_block_option_;
@@ -82,10 +96,26 @@ public:
         array_array_block_option_ = value;
     }
 
+    block_format_options array_object_block_option()
+    {
+        return array_object_block_option_;
+    }
+
+    void array_object_block_option(block_format_options value)
+    {
+        array_object_block_option_ = value;
+    }
+
     void array_block_option(block_format_options value)
     {
         object_array_block_option_ = value;
         array_array_block_option_ = value;
+    }
+
+    void object_block_option(block_format_options value)
+    {
+        object_object_block_option_ = value;
+        array_object_block_option_ = value;
     }
 
     int indent() const
