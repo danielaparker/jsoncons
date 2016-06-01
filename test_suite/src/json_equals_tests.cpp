@@ -104,6 +104,37 @@ BOOST_AUTO_TEST_CASE(test_object_equals_subtle_offsets)
     BOOST_CHECK(o2 != o1);
 }
 
+BOOST_AUTO_TEST_CASE(test_object_equals_empty_objects)
+{
+    json def_constructed_1;
+    json def_constructed_2;
+    json parsed_1 = json::parse("{}");
+    json parsed_2 = json::parse("{}");
+    json type_constructed_1 = json::object();
+    json type_constructed_2 = json::object();
+
+    BOOST_CHECK(def_constructed_1 == def_constructed_1);
+    BOOST_CHECK(parsed_1 == parsed_2);
+    BOOST_CHECK(type_constructed_1 == type_constructed_2);
+
+    BOOST_CHECK(def_constructed_1 == parsed_1);
+    BOOST_CHECK(def_constructed_1 == type_constructed_1);
+    BOOST_CHECK(parsed_1 == type_constructed_1);
+}
+
+BOOST_AUTO_TEST_CASE(test_object_equals_empty_arrays)
+{
+    json parsed_1 = json::parse("[]");
+    json parsed_2 = json::parse("[]");
+    json type_constructed_1 = json::array();
+    json type_constructed_2 = json::array();
+
+    BOOST_CHECK(parsed_1 == parsed_2);
+    BOOST_CHECK(type_constructed_1 == type_constructed_2);
+
+    BOOST_CHECK(parsed_1 == type_constructed_1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
