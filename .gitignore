@@ -30,3 +30,5 @@ test_suite/build/vs2013/vs2013.vcxproj.filters
 test_suite/build/vs2013/vs2013.vcxproj.user
 test_suite/output/test.json
 test_suite/output/test.json
+
+test_suite/output/address-book-new.json

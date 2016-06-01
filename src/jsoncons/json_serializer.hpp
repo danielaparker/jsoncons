@@ -29,14 +29,14 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), option_(block_format_options::next_line), multiline_(false)
+           : is_object_(is_object), count_(0), option_(block_options::next_line), multiline_(false)
         {
-            scalar_option_ = is_object ? block_format_options::next_line : block_format_options::same_line;
+            scalar_option_ = is_object ? block_options::next_line : block_options::same_line;
         }
-        stack_item(bool is_object, block_format_options option)
+        stack_item(bool is_object, block_options option)
            : is_object_(is_object), count_(0), option_(option), multiline_(false)
         {
-            scalar_option_ = is_object ? block_format_options::next_line : block_format_options::same_line;
+            scalar_option_ = is_object ? block_options::next_line : block_options::same_line;
         }
         bool is_multiline() const
         {
@@ -50,23 +50,23 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
 
         bool is_same_line() const
         {
-            return option_ = block_format_options::same_line;
+            return option_ = block_options::same_line;
         }
 
         bool is_next_line() const
         {
-            return option_ == block_format_options::next_line;
+            return option_ == block_options::next_line;
         }
 
         bool scalar_next_line() const
         {
-            return scalar_option_ == block_format_options::next_line;
+            return scalar_option_ == block_options::next_line;
         }
 
         bool is_object_;
         size_t count_;
-        block_format_options option_;
-        block_format_options scalar_option_;
+        block_options option_;
+        block_options scalar_option_;
         bool multiline_;
     };
     basic_output_format<CharT> format_;
@@ -143,7 +143,7 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                if (format_.object_object_block_option() == block_format_options::next_line)
+                if (format_.object_object_block_option() == block_options::next_line)
                 {
                     write_indent();
                 }
@@ -151,7 +151,7 @@ private:
             }
             else if (!stack_.empty())
             {
-                if (format_.array_object_block_option() == block_format_options::next_line)
+                if (format_.array_object_block_option() == block_options::next_line)
                 {
                     write_indent();
                 }
@@ -201,7 +201,7 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                if (format_.object_array_block_option() == block_format_options::next_line)
+                if (format_.object_array_block_option() == block_options::next_line)
                 {
                     write_indent();
                 }
@@ -209,7 +209,7 @@ private:
             }
             else if (!stack_.empty())
             {
-                if (format_.array_array_block_option() == block_format_options::next_line)
+                if (format_.array_array_block_option() == block_options::next_line)
                 {
                     write_indent();
                 }

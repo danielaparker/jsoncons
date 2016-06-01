@@ -59,46 +59,40 @@ The default is "null"
 
 ### Modifiers
 
-    void indent(int value)
+    output_format& indent(int value)
 
-    void escape_all_non_ascii(bool value)
+    output_format& escape_all_non_ascii(bool value)
 
-    void escape_solidus(bool value)
+    output_format& escape_solidus(bool value)
 
-    void replace_nan(bool replace)
+    output_format& replace_nan(bool replace)
 
-    void replace_inf(bool replace)
+    output_format& replace_inf(bool replace)
 
-    void replace_pos_inf(bool replace)
+    output_format& replace_pos_inf(bool replace)
 
-    void replace_neg_inf(bool replace)
+    output_format& replace_neg_inf(bool replace)
 
-    void nan_replacement(const std::string& replacement)
+    output_format& nan_replacement(const std::string& replacement)
 
-    void pos_inf_replacement(const std::string& replacement)
+    output_format& pos_inf_replacement(const std::string& replacement)
 
-    void neg_inf_replacement(const std::string& replacement)
+    output_format& neg_inf_replacement(const std::string& replacement)
 Sets replacement text for negative infinity.
 
-    void precision(uint8_t prec)
+    output_format& precision(uint8_t prec)
 
-    void object_object_block_option(block_format_options value)
-Set object block formatting within objects to `block_format_options::same_line` or `block_format_options::next_line`
+    output_format& object_object_block_option(block_options value)
+Set object block formatting within objects to `block_options::same_line` or `block_options::next_line`. The default is `block_options::same_line`.
 
-    void array_object_block_option(block_format_options value)
-Set object block formatting within arrays to `block_format_options::same_line` or `block_format_options::next_line`
+    output_format& array_object_block_option(block_options value)
+Set object block formatting within arrays to `block_options::same_line` or `block_options::next_line`.  The default is `block_options::next_line`.
 
-    void object_block_option(block_format_options value)
-Set object block formatting to `block_format_options::same_line` or `block_format_options::next_line`
+    output_format& object_array_block_option(block_options value)
+Set array block formatting within objects to `block_options::same_line` or `block_options::next_line`. The default is `block_options::same_line`.
 
-    void object_array_block_option(block_format_options value)
-Set array block formatting within objects to `block_format_options::same_line` or `block_format_options::next_line`
-
-    void array_array_block_option(block_format_options value)
-Set array block formatting within arrays to `block_format_options::same_line` or `block_format_options::next_line`
-
-    void array_block_option(block_format_options value)
-Set array block formatting to `block_format_options::same_line` or `block_format_options::next_line`
+    output_format& array_array_block_option(block_options value)
+Set array block formatting within arrays to `block_options::same_line` or `block_options::next_line`. The default is `block_options::next_line`.
 
 ## Examples
 
@@ -153,12 +147,12 @@ The output is
 
     std::cout << "Array same line format" << std::endl;
     output_format format1;
-    format1.array_block_option(block_format_options::same_line);
+    format1.array_block_option(block_options::same_line);
     std::cout << pretty_print(val,format1) << std::endl;
 
     std::cout << "Object array next line format" << std::endl;
     output_format format2;
-    format2.object_array_block_option(block_format_options::next_line);
+    format2.object_array_block_option(block_options::next_line);
     std::cout << pretty_print(val,format2) << std::endl;
 ```
 
@@ -187,6 +181,5 @@ Object array next line format
 }
 ```
 
-### Array in array block formatting
 
 
