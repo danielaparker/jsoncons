@@ -164,6 +164,10 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     BOOST_CHECK_EQUAL(json(0),result1);
 }
 
+#if defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9)
+// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(test_jsonpath_filter_regex, 2)
+#endif
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
 {
     size_t line = 1;
