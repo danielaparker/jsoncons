@@ -58,9 +58,10 @@ public:
         return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
     }
 
-    void header_lines(size_t value)
+    basic_csv_parameters<CharT>& header_lines(size_t value)
     {
         header_lines_ = value;
+        return *this;
     }
 
     bool assume_header() const
@@ -68,9 +69,10 @@ public:
         return assume_header_;
     }
 
-    void assume_header(bool value)
+    basic_csv_parameters<CharT>& assume_header(bool value)
     {
         assume_header_ = value;
+        return *this;
     }
 
     bool ignore_empty_values() const
@@ -78,9 +80,10 @@ public:
         return ignore_empty_values_;
     }
 
-    void ignore_empty_values(bool value)
+    basic_csv_parameters<CharT>& ignore_empty_values(bool value)
     {
         ignore_empty_values_ = value;
+        return *this;
     }
 
     bool trim_leading() const
@@ -88,9 +91,10 @@ public:
         return trim_leading_;
     }
 
-    void trim_leading(bool value)
+    basic_csv_parameters<CharT>& trim_leading(bool value)
     {
         trim_leading_ = value;
+        return *this;
     }
 
     bool trim_trailing() const
@@ -98,9 +102,10 @@ public:
         return trim_trailing_;
     }
 
-    void trim_trailing(bool value)
+    basic_csv_parameters<CharT>& trim_trailing(bool value)
     {
         trim_trailing_ = value;
+        return *this;
     }
 
     bool trim_leading_inside_quotes() const
@@ -108,9 +113,10 @@ public:
         return trim_leading_inside_quotes_;
     }
 
-    void trim_leading_inside_quotes(bool value)
+    basic_csv_parameters<CharT>& trim_leading_inside_quotes(bool value)
     {
         trim_leading_inside_quotes_ = value;
+        return *this;
     }
 
     bool trim_trailing_inside_quotes() const
@@ -118,9 +124,10 @@ public:
         return trim_trailing_inside_quotes_;
     }
 
-    void trim_trailing_inside_quotes(bool value)
+    basic_csv_parameters<CharT>& trim_trailing_inside_quotes(bool value)
     {
         trim_trailing_inside_quotes_ = value;
+        return *this;
     }
 
     bool trim() const
@@ -128,10 +135,11 @@ public:
         return trim_leading_ && trim_trailing_;
     }
 
-    void trim(bool value)
+    basic_csv_parameters<CharT>& trim(bool value)
     {
         trim_leading_ = value;
         trim_trailing_ = value;
+        return *this;
     }
 
     bool trim_inside_quotes() const
@@ -139,10 +147,11 @@ public:
         return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
     }
 
-    void trim_inside_quotes(bool value)
+    basic_csv_parameters<CharT>& trim_inside_quotes(bool value)
     {
         trim_leading_inside_quotes_ = value;
         trim_trailing_inside_quotes_ = value;
+        return *this;
     }
 
     bool unquoted_empty_value_is_null() const
@@ -150,9 +159,10 @@ public:
         return unquoted_empty_value_is_null_;
     }
 
-    void unquoted_empty_value_is_null(bool value)
+    basic_csv_parameters<CharT>& unquoted_empty_value_is_null(bool value)
     {
         unquoted_empty_value_is_null_ = value;
+        return *this;
     }
 
     std::vector<std::basic_string<CharT>> column_names() const
@@ -160,9 +170,10 @@ public:
         return column_names_;
     }
 
-    void column_names(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters<CharT>& column_names(const std::vector<std::basic_string<CharT>>& value)
     {
         column_names_ = value;
+        return *this;
     }
 
     std::vector<std::basic_string<CharT>> column_types() const
@@ -170,9 +181,10 @@ public:
         return column_types_;
     }
 
-    void column_types(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters<CharT>& column_types(const std::vector<std::basic_string<CharT>>& value)
     {
         column_types_ = value;
+        return *this;
     }
 
     std::vector<std::basic_string<CharT>> column_defaults() const
@@ -180,9 +192,10 @@ public:
         return column_defaults_;
     }
 
-    void column_defaults(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters<CharT>& column_defaults(const std::vector<std::basic_string<CharT>>& value)
     {
         column_defaults_ = value;
+        return *this;
     }
 
     CharT field_delimiter() const
@@ -190,9 +203,10 @@ public:
         return field_delimiter_;
     }
 
-    void field_delimiter(CharT value)
+    basic_csv_parameters<CharT>& field_delimiter(CharT value)
     {
         field_delimiter_ = value;
+        return *this;
     }
 
     std::basic_string<CharT> line_delimiter() const
@@ -200,9 +214,10 @@ public:
         return line_delimiter_;
     }
 
-    void line_delimiter(std::basic_string<CharT> value)
+    basic_csv_parameters<CharT>& line_delimiter(std::basic_string<CharT> value)
     {
         line_delimiter_ = value;
+        return *this;
     }
 
     CharT quote_char() const
@@ -210,9 +225,10 @@ public:
         return quote_char_;
     }
 
-    void quote_char(CharT value)
+    basic_csv_parameters<CharT>& quote_char(CharT value)
     {
         quote_char_ = value;
+        return *this;
     }
 
     CharT quote_escape_char() const
@@ -220,9 +236,10 @@ public:
         return quote_escape_char_;
     }
 
-    void quote_escape_char(CharT value)
+    basic_csv_parameters<CharT>& quote_escape_char(CharT value)
     {
         quote_escape_char_ = value;
+        return *this;
     }
 
     CharT comment_starter() const
@@ -230,9 +247,10 @@ public:
         return comment_starter_;
     }
 
-    void comment_starter(CharT value)
+    basic_csv_parameters<CharT>& comment_starter(CharT value)
     {
         comment_starter_ = value;
+        return *this;
     }
 
     quote_styles quote_style() const
@@ -240,9 +258,10 @@ public:
         return quote_style_;
     }
 
-    void assume_header(quote_styles value)
+    basic_csv_parameters<CharT>& assume_header(quote_styles value)
     {
         quote_style_ = value;
+        return *this;
     }
 
     unsigned long max_lines() const
@@ -250,9 +269,10 @@ public:
         return max_lines_;
     }
 
-    void max_lines(unsigned long value)
+    basic_csv_parameters<CharT>& max_lines(unsigned long value)
     {
         max_lines_ = value;
+        return *this;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -262,9 +282,10 @@ public:
         return header_;
     }
 
-    void header(const std::basic_string<CharT>& value)
+    basic_csv_parameters<CharT>& header(const std::basic_string<CharT>& value)
     {
         header_ = value;
+        return *this;
     }
 
     std::basic_string<CharT> data_types() const
@@ -272,9 +293,10 @@ public:
         return data_types_;
     }
 
-    void data_types(const std::basic_string<CharT>& value)
+    basic_csv_parameters<CharT>& data_types(const std::basic_string<CharT>& value)
     {
         data_types_ = value;
+        return *this;
     }
 
     std::basic_string<CharT> default_values() const
@@ -282,9 +304,10 @@ public:
         return default_values_;
     }
 
-    void default_values(const std::basic_string<CharT>& value)
+    basic_csv_parameters<CharT>& default_values(const std::basic_string<CharT>& value)
     {
         default_values_ = value;
+        return *this;
     }
 #endif
 private:

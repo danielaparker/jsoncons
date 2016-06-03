@@ -22,8 +22,8 @@ void read_csv_file1()
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(true);
-    params.column_types({ "string","string","string","float" });
+    params.assume_header(true)
+          .column_types({ "string","string","string","float" });
     csv_reader reader(is,handler,params);
     reader.read();
     json val = handler.get_result();
@@ -46,10 +46,10 @@ void read_csv_file2()
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(true);
-    params.trim(true);
-    params.ignore_empty_values(true);
-    params.column_types({"integer","string","string","string"});
+    params.assume_header(true)
+          .trim(true)
+          .ignore_empty_values(true) 
+          .column_types({"integer","string","string","string"});
     csv_reader reader(is,handler,params);
     reader.read();
     json val = handler.get_result();

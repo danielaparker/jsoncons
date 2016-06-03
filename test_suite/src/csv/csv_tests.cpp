@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values)
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(true);
-    params.column_types({"boolean","integer","float","string"});
+    params.assume_header(true)
+          .column_types({"boolean","integer","float","string"});
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(true);
-    params.column_types({"boolean","integer","float","string"});
-    params.column_defaults({"false","0","0.0","\"\""});
+    params.assume_header(true) 
+          .column_types({"boolean","integer","float","string"})
+          .column_defaults({"false","0","0.0","\"\""});
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -129,9 +129,9 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(true);
-    params.column_types({"boolean","integer","float","string"});
-    params.column_defaults({"","","",""});
+    params.assume_header(true)
+          .column_types({"boolean","integer","float","string"})
+          .column_defaults({"","","",""});
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -302,8 +302,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
     json_deserializer handler;
 
     csv_parameters params;
-    params.trim(true);
-    params.unquoted_empty_value_is_null(true);
+    params.trim(true)
+          .unquoted_empty_value_is_null(true);
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -403,8 +403,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
     json_deserializer handler;
 
     csv_parameters params;
-    params.column_names({"x","y","z"});
-    params.header_lines(1);
+    params.column_names({"x","y","z"})
+          .header_lines(1);
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -429,9 +429,9 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
     json_deserializer handler;
 
     csv_parameters params;
-    params.column_names({"x","y","z"});
-    params.column_types({"boolean","boolean","boolean"});
-    params.header_lines(1);
+    params.column_names({"x","y","z"})
+          .column_types({"boolean","boolean","boolean"})
+          .header_lines(1);
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -617,8 +617,8 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
     json_deserializer handler;
 
     csv_parameters params;
-    params.column_names({"Country Code","Name"});
-    params.header_lines(1);
+    params.column_names({"Country Code","Name"})
+          .header_lines(1);
 
     csv_reader reader(is,handler,params);
     reader.read();
@@ -649,8 +649,8 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 
     json_deserializer handler;
     csv_parameters params;
-    params.field_delimiter('\t');
-    params.assume_header(true);
+    params.field_delimiter('\t')
+          .assume_header(true);
 
     csv_reader reader(is,handler,params);
     reader.read();

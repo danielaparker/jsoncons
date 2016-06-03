@@ -60,20 +60,20 @@ Throws [parse_exception](parse_exception) if parsing fails.
 ### Reading a comma delimted file into an array of json values
 
 #### Comma delimited input file 
-
+```
     country_code,name
     ABW,ARUBA
     ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
     VUT,VANUATU
     WLF,WALLIS & FUTUNA ISLANDS
-
+```
 Note 
 
 - The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.
 - The third record has a field value that contains an embedded comma, so it must be quoted.
 
 #### Code
-
+```c++
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
 
@@ -84,9 +84,9 @@ Note
     json countries = handler.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
-
+```
 #### Output 
-
+```
     [
         ["country_code","name"],
         ["ABW","ARUBA"],
@@ -94,41 +94,43 @@ Note
         ["VUT","VANUATU"],
         ["WLF","WALLIS & FUTUNA ISLANDS"]
     ]
-
+```
 ### Reading a tab delimted file into an array of json objects
 
 #### Tab delimited input file
-
+```
     employee-no employee-name   dept    salary  note
     00000001    Smith, Matthew  sales   150,000.00      
     00000002    Brown, Sarah    sales   89,000.00       
     00000003    Oberc, Scott    finance 110,000.00      
     00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
     Dependable, trustworthy"
-
+```
 Note 
 
 - The first record is a header line, which will be used to associate data values with names
 - The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.
 
 #### Code
-
+```c++
     std::string in_file = "employees.txt";
     std::ifstream is(in_file);
 
     json_deserializer handler;
     csv_parameters params;
-    params.field_delimiter = '\t';
-    params.assume_header = true;
+    params.field_delimiter = '\t'
+          .assume_header = true;
 
     csv_reader reader(is,handler,params);
     reader.read();
     json employees = handler.get_result();
 
     std::cout << pretty_print(employees) << std::endl;
+```
 
 #### Output
 
+```json
     [
         {
             "dept":"sales",
@@ -159,7 +161,7 @@ Note
             "salary":"75,000.00"
         }
     ]
-
+```
 
 #### Reading the comma delimited file as an array of objects with user supplied columns names
 
@@ -168,24 +170,25 @@ Note
 - The first record contains a header line, but we're going to ignore that and use our own names for the fields.
 
 #### Code
-
+```c++
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
 
     json_deserializer handler;
 
     csv_parameters params;
-    params.column_names({"Country Code","Name"});
-    params.header_lines(1);
+    params.column_names({"Country Code","Name"})
+          .header_lines(1);
 
     csv_reader reader(is,handler,params);
     reader.read();
     json countries = handler.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
+```
 
 #### Output 
-
+```json
     [
         {
             "Country Code":"ABW",
@@ -204,3 +207,4 @@ Note
             "Name":"WALLIS & FUTUNA ISLANDS"
         }
     ]
+```

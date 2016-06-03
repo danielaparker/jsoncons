@@ -546,11 +546,11 @@ void buffer_capacity(size_t buffer_capacity)
 
 <h4>Comma delimited input file</h4>
 
-<pre><code>country_code,name
-ABW,ARUBA
-ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-VUT,VANUATU
-WLF,WALLIS &amp; FUTUNA ISLANDS
+<pre><code>    country_code,name
+    ABW,ARUBA
+    ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+    VUT,VANUATU
+    WLF,WALLIS &amp; FUTUNA ISLANDS
 </code></pre>
 
 <p>Note </p>
@@ -562,39 +562,38 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 
 <h4>Code</h4>
 
-<pre><code>std::string in_file = "countries.csv";
-std::ifstream is(in_file);
+<div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
+    std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_deserializer handler;
+    json_deserializer handler;
 
-csv_reader reader(is,handler);
-reader.read();
-json countries = handler.get_result();
+    csv_reader <span class="pl-en">reader</span>(is,handler);
+    reader.read();
+    json countries = handler.get_result();
 
-std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 
 <h4>Output</h4>
 
-<pre><code>[
-    ["country_code","name"],
-    ["ABW","ARUBA"],
-    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-    ["VUT","VANUATU"],
-    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
-]
+<pre><code>    [
+        ["country_code","name"],
+        ["ABW","ARUBA"],
+        ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
+        ["VUT","VANUATU"],
+        ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
+    ]
 </code></pre>
 
 <h3>Reading a tab delimted file into an array of json objects</h3>
 
 <h4>Tab delimited input file</h4>
 
-<pre><code>employee-no employee-name   dept    salary  note
-00000001    Smith, Matthew  sales   150,000.00      
-00000002    Brown, Sarah    sales   89,000.00       
-00000003    Oberc, Scott    finance 110,000.00      
-00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
-Dependable, trustworthy"
+<pre><code>    employee-no employee-name   dept    salary  note
+    00000001    Smith, Matthew  sales   150,000.00      
+    00000002    Brown, Sarah    sales   89,000.00       
+    00000003    Oberc, Scott    finance 110,000.00      
+    00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
+    Dependable, trustworthy"
 </code></pre>
 
 <p>Note </p>
@@ -606,54 +605,52 @@ Dependable, trustworthy"
 
 <h4>Code</h4>
 
-<pre><code>std::string in_file = "employees.txt";
-std::ifstream is(in_file);
+<div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>employees.txt<span class="pl-pds">"</span></span>;
+    std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_deserializer handler;
-csv_parameters params;
-params.field_delimiter = '\t';
-params.assume_header = true;
+    json_deserializer handler;
+    csv_parameters params;
+    params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>
+          .assume_header = <span class="pl-c1">true</span>;
 
-csv_reader reader(is,handler,params);
-reader.read();
-json employees = handler.get_result();
+    csv_reader <span class="pl-en">reader</span>(is,handler,params);
+    reader.read();
+    json employees = handler.get_result();
 
-std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;</pre></div>
 
 <h4>Output</h4>
 
-<pre><code>[
-    {
-        "dept":"sales",
-        "employee-name":"Smith, Matthew",
-        "employee-no":"00000001",
-        "note":"",
-        "salary":"150,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Brown, Sarah",
-        "employee-no":"00000002",
-        "note":"",
-        "salary":"89,000.00"
-    },
-    {
-        "dept":"finance",
-        "employee-name":"Oberc, Scott",
-        "employee-no":"00000003",
-        "note":"",
-        "salary":"110,000.00"
-    },
-    {
-        "dept":"sales",
-        "employee-name":"Scott, Colette",
-        "employee-no":"00000004",
-        "note":"\"Exemplary\" employee\nDependable, trustworthy",
-        "salary":"75,000.00"
-    }
-]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>    [
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Smith, Matthew<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000001<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>150,000.00<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Brown, Sarah<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000002<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>89,000.00<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>finance<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Oberc, Scott<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000003<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>110,000.00<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Scott, Colette<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000004<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span>Exemplary<span class="pl-cce">\"</span> employee<span class="pl-cce">\n</span>Dependable, trustworthy<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>75,000.00<span class="pl-pds">"</span></span>
+        }
+    ]</pre></div>
 
 <h4>Reading the comma delimited file as an array of objects with user supplied columns names</h4>
 
@@ -665,43 +662,41 @@ std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;
 
 <h4>Code</h4>
 
-<pre><code>std::string in_file = "countries.csv";
-std::ifstream is(in_file);
+<div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
+    std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_deserializer handler;
+    json_deserializer handler;
 
-csv_parameters params;
-params.column_names({"Country Code","Name"});
-params.header_lines(1);
+    csv_parameters params;
+    params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>})
+          .header_lines(<span class="pl-c1">1</span>);
 
-csv_reader reader(is,handler,params);
-reader.read();
-json countries = handler.get_result();
+    csv_reader <span class="pl-en">reader</span>(is,handler,params);
+    reader.read();
+    json countries = handler.get_result();
 
-std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;
-</code></pre>
+    std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 
 <h4>Output</h4>
 
-<pre><code>[
-    {
-        "Country Code":"ABW",
-        "Name":"ARUBA"
-    },
-    {
-        "Country Code":"ATF",
-        "Name":"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-    },
-    {
-        "Country Code":"VUT",
-        "Name":"VANUATU"
-    },
-    {
-        "Country Code":"WLF",
-        "Name":"WALLIS &amp; FUTUNA ISLANDS"
-    }
-]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>    [
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ABW<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ARUBA<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ATF<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>FRENCH SOUTHERN TERRITORIES, D.R. OF<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>VUT<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>VANUATU<span class="pl-pds">"</span></span>
+        },
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>WLF<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>WALLIS &amp; FUTUNA ISLANDS<span class="pl-pds">"</span></span>
+        }
+    ]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
