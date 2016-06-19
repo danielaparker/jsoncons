@@ -135,6 +135,12 @@ BOOST_AUTO_TEST_CASE(test_object_equals_empty_arrays)
     BOOST_CHECK(parsed_1 == type_constructed_1);
 }
 
+BOOST_AUTO_TEST_CASE(test_empty_object_equal)
+{
+    BOOST_CHECK(json() == json(json::object()));
+    BOOST_CHECK(json(json::object()) == json());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

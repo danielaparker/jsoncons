@@ -1,3 +1,9 @@
+0.99.2
+------
+
+- Included workaround for a C++11 issue in GCC 4.8, contributed by Alex Merry
+- Fixed operator== so that json() == json(json::object())
+
 0.99.1
 ------
 

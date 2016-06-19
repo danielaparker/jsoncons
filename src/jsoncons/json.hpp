@@ -802,29 +802,26 @@ public:
                 }
             }
 
-            if (rhs.type_ != type_)
-            {
-                return false;
-            }
             switch (type_)
             {
             case value_types::bool_t:
-                return value_.bool_val_ == rhs.value_.bool_val_;
+                return type_ == rhs.type_ && value_.bool_val_ == rhs.value_.bool_val_;
             case value_types::null_t:
+                return type_ == rhs.type_;
             case value_types::empty_object_t:
-                return true;
+                return type_ == rhs.type_ || (rhs.type_ == value_types::object_t && rhs.empty());
             case value_types::small_string_t:
-                return length_or_precision_ == rhs.length_or_precision_ ? std::char_traits<char_type>::compare(value_.small_string_val_,rhs.value_.small_string_val_,length_or_precision_) == 0 : false;
+                return type_ == rhs.type_ && length_or_precision_ == rhs.length_or_precision_ ? std::char_traits<char_type>::compare(value_.small_string_val_,rhs.value_.small_string_val_,length_or_precision_) == 0 : false;
             case value_types::string_t:
-                return *(value_.string_val_) == *(rhs.value_.string_val_);
+                return type_ == rhs.type_ &&  *(value_.string_val_) == *(rhs.value_.string_val_);
             case value_types::array_t:
-                return *(value_.array_val_) == *(rhs.value_.array_val_);
+                return type_ == rhs.type_ && *(value_.array_val_) == *(rhs.value_.array_val_);
                 break;
             case value_types::object_t:
-                return *(value_.object_val_) == *(rhs.value_.object_val_);
+                return (type_ == rhs.type_ && *(value_.object_val_) == *(rhs.value_.object_val_)) || (rhs.type_ == value_types::empty_object_t && empty());
                 break;
             case value_types::any_t:
-                break;
+                return type_ == rhs.type_;
             default:
                 // throw
                 break;
@@ -1618,7 +1615,7 @@ public:
     variant var_;
 
     basic_json() 
-        : var_(object())
+        : var_()
     {
     }
 

@@ -19,7 +19,6 @@ Member type                         |Definition
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
 `member_type`|[member_type](json_member_type) is a class that stores a name and a json value
-`any`|[any](json%20any) can contain any value that supports copy construction and assignment.
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
 `array`|json array type
@@ -186,9 +185,6 @@ Returns `true` if the json value is of boolean type, `false` otherwise.
     is<json::null_type>
 Returns `true` if the json value is null, `false` otherwise.  
 
-    is<json::any>
-Returns `true` if the json value is type any, `false` otherwise.
-
     is<json::object> 
 Returns `true` if the json value is an object, `false` otherwise.  
 
@@ -207,7 +203,6 @@ Returns `true` if the json value is an array and each element has type `T`, `fal
     bool is_bool() const noexcept
     bool is_object() const noexcept
     bool is_array() const noexcept
-    bool is_any() const noexcept
 Non-generic versions of `is_` methods
 
     json& operator[](size_t i)
@@ -285,13 +280,6 @@ If value is string, returns value, otherwise returns result of `to_string`.
     string_type as_string(const string_allocator& allocator) const noexcept
     unsigned int as<unsigned int> const 
 Non-generic versions of `as` methods
-
-    template <typename T>
-    const T& any_cast() const
-
-    template <typename T>
-    T& any_cast() 
-If the value does not have type `any`, throws, otherwise casts the value back to the original type.
 
 ### Modifiers
 
