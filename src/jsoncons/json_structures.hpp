@@ -591,7 +591,7 @@ public:
         auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
         return const_iterator(result);
     }
-
+/*
     JsonT& at(const string_type& name) 
     {
         auto it = find(name.data(),name.length());
@@ -611,7 +611,7 @@ public:
         }
         return it->value();
     }
-
+*/
     void erase(iterator first, iterator last) 
     {
         members_.erase(first.get(),last.get());
