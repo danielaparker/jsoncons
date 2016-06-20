@@ -929,7 +929,7 @@ public:
         basic_json<CharT,Alloc>& evaluate_with_default()
         {
             basic_json<CharT,Alloc>& val = parent_.evaluate_with_default();
-            auto it = val.find(name_);
+            auto it = val.find(name_.data(),name_.length());
             if (it == val.members().end())
             {
                 it = val.set(val.members().begin(),name_,object(val.object_value().get_allocator()));            
@@ -1261,6 +1261,16 @@ public:
         const_object_iterator find(const char_type* name) const
         {
             return evaluate().find(name);
+        }
+
+        object_iterator find(const char_type* name, size_t length)
+        {
+            return evaluate().find(name,length);
+        }
+
+        const_object_iterator find(const char_type* name, size_t length) const
+        {
+            return evaluate().find(name,length);
         }
 
         template <typename T>
@@ -1892,7 +1902,7 @@ public:
         {
         case value_types::object_t:
             {
-                auto it = var_.value_.object_val_->find(name);
+                auto it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it == members().end())
                 {
                     return 0;
@@ -2217,7 +2227,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.value_.object_val_->find(name);
+                auto it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it == members().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2275,7 +2285,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.value_.object_val_->find(name);
+                auto it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it == members().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2327,7 +2337,7 @@ public:
         case value_types::empty_object_t:
             return members().end();
         case value_types::object_t:
-            return var_.value_.object_val_->find(name);
+            return var_.value_.object_val_->find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2342,7 +2352,7 @@ public:
         case value_types::empty_object_t:
             return members().end();
         case value_types::object_t:
-            return var_.value_.object_val_->find(name);
+            return var_.value_.object_val_->find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2357,7 +2367,7 @@ public:
         case value_types::empty_object_t:
             return members().end();
         case value_types::object_t:
-            return var_.value_.object_val_->find(name);
+            return var_.value_.object_val_->find(name, std::char_traits<char_type>::length(name));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2372,7 +2382,37 @@ public:
         case value_types::empty_object_t:
             return members().end();
         case value_types::object_t:
-            return var_.value_.object_val_->find(name);
+            return var_.value_.object_val_->find(name, std::char_traits<char_type>::length(name));
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    object_iterator find(const char_type* name, size_t length)
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return members().end();
+        case value_types::object_t:
+            return var_.value_.object_val_->find(name, length);
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    const_object_iterator find(const char_type* name, size_t length) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            return members().end();
+        case value_types::object_t:
+            return var_.value_.object_val_->find(name, length);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2391,7 +2431,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.value_.object_val_->find(name);
+                const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it != members().end())
                 {
                     return it->value();
@@ -2848,7 +2888,7 @@ public:
             return a_null;
         case value_types::object_t:
             {
-                const_object_iterator it = var_.value_.object_val_->find(name);
+                const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
                 return it != members().end() ? it->value() : a_null;
             }
         default:
@@ -2978,7 +3018,7 @@ public:
         {
         case value_types::object_t:
             {
-                const_object_iterator it = var_.value_.object_val_->find(name);
+                const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
                 return it != members().end();
             }
             break;

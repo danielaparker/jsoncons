@@ -576,16 +576,6 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
-    iterator find(const char_type* name)
-    {
-        return find(name, std::char_traits<char_type>::length(name));
-    }
-
-    const_iterator find(const char_type* name) const
-    {
-        return find(name, std::char_traits<char_type>::length(name));
-    }
-
     iterator find(const char_type* name, size_t length)
     {
         member_lt_string<value_type,char_type> comp(length);
@@ -602,19 +592,9 @@ public:
         return const_iterator(result);
     }
 
-    iterator find(const string_type& name)
-    {
-        return find(name.data(), name.length());
-    }
- 
-    const_iterator find(const string_type& name) const
-    {
-        return const_iterator(find(name.data(), name.length()));
-    }
-
     JsonT& at(const string_type& name) 
     {
-        auto it = find(name);
+        auto it = find(name.data(),name.length());
         if (it == members_.end())
         {
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
@@ -624,7 +604,7 @@ public:
 
     const JsonT& at(const string_type& name) const
     {
-        auto it = find(name);
+        auto it = find(name.data(),name.length());
         if (it == members_.end())
         {
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
