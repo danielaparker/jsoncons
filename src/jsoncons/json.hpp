@@ -2517,7 +2517,7 @@ public:
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            var_.value_.object_val_->erase(name);
+            var_.value_.object_val_->erase(name.data(),name.length());
             break;
         default:
             JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3042,11 +3042,11 @@ public:
 
     void remove(const string_type& name)
     {
-        erase(name);
+        erase(name.data(),name.length());
     }
     void remove_member(const string_type& name)
     {
-        erase(name);
+        erase(name.data(),name.length());
     }
     // Removes a member from an object value
 

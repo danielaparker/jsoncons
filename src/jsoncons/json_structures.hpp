@@ -591,35 +591,10 @@ public:
         auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
         return const_iterator(result);
     }
-/*
-    JsonT& at(const string_type& name) 
-    {
-        auto it = find(name.data(),name.length());
-        if (it == members_.end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
-        }
-        return it->value();
-    }
 
-    const JsonT& at(const string_type& name) const
-    {
-        auto it = find(name.data(),name.length());
-        if (it == members_.end())
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Member %s not found.",name);
-        }
-        return it->value();
-    }
-*/
     void erase(iterator first, iterator last) 
     {
         members_.erase(first.get(),last.get());
-    }
-
-    void erase(const char_type* name) 
-    {
-        erase(name, std::char_traits<char_type>::length(name));
     }
 
     void erase(const char_type* name, size_t length) 
@@ -630,11 +605,6 @@ public:
         {
             members_.erase(it);
         }
-    }
-
-    void erase(const string_type& name) 
-    {
-        return erase(name.data(),name.length());
     }
 
     template<class InputIt, class UnaryPredicate>
