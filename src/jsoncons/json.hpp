@@ -16,7 +16,7 @@
 #include <ostream>
 #include <memory>
 #include <typeinfo>
-#include "json_structures.hpp"
+#include "jsoncons/json_structures.hpp"
 #include "jsoncons/jsoncons.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
