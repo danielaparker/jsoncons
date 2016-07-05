@@ -468,6 +468,20 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>0.99.2</h2>
+
+<ul>
+<li>Included workaround for a C++11 issue in GCC 4.8, contributed by Alex Merry</li>
+<li>Fixed operator== so that json() == json(json::object())</li>
+<li>Fixed issue with <code>json</code> assignment to initializer list</li>
+<li>
+<p>Fixed issue with assignment to empty json object with multiple keys, e.g. </p>
+
+<p>json val; <br>
+val["key1"]["key2"] = 1; </p>
+</li>
+</ul>
+
 <h2>0.99.1</h2>
 
 <ul>

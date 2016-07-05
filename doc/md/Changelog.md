@@ -3,6 +3,11 @@
 
 - Included workaround for a C++11 issue in GCC 4.8, contributed by Alex Merry
 - Fixed operator== so that json() == json(json::object())
+- Fixed issue with `json` assignment to initializer list
+- Fixed issue with assignment to empty json object with multiple keys, e.g. 
+
+    json val; 
+    val["key1"]["key2"] = 1; 
 
 0.99.1
 ------
