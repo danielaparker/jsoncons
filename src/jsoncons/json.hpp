@@ -1734,6 +1734,13 @@ public:
         return *this;
     }
 
+    basic_json& operator=(std::initializer_list<value_type> init)
+    {
+        basic_json<CharT,Alloc> val(init);
+        swap(val);
+        return *this;
+    }
+
     template <class T>
     basic_json<CharT, Alloc>& operator=(T val)
     {
