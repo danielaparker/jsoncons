@@ -52,9 +52,9 @@ public:
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
-        nan_replacement_(json_literals<CharT>::null_literal().first),
-        pos_inf_replacement_(json_literals<CharT>::null_literal().first),
-        neg_inf_replacement_(json_literals<CharT>::null_literal().first),
+        nan_replacement_(json_text_traits<CharT>::null_literal().first),
+        pos_inf_replacement_(json_text_traits<CharT>::null_literal().first),
+        neg_inf_replacement_(json_text_traits<CharT>::null_literal().first),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
         object_array_block_option_(block_options::same_line),
@@ -272,7 +272,7 @@ void escape_string(const CharT* s,
             else if (is_control_character(u) || format.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                uint32_t cp = json_char_traits<CharT, sizeof(CharT)>::convert_char_to_codepoint(it, end);
+                uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end);
                 if (is_non_ascii_character(cp) || is_control_character(u))
                 {
                     if (cp > 0xFFFF)
