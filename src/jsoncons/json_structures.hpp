@@ -271,6 +271,26 @@ public:
     }
 };
 
+template <class ValueT,typename CharT>
+class equals_pred
+{
+    const CharT* b_;
+    size_t length_;
+public:
+    equals_pred(const CharT* b, size_t length)
+        : b_(b), length_(length)
+    {
+    }
+
+    bool operator()(const ValueT& a) const
+    {
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
+        int result = std::char_traits<CharT>::compare(a.name().data(),b_,len);
+
+        return result == 0 && a.name().length() == length_;
+    }
+};
+
 template <class StringT, class ValueT>
 class name_value_pair
 {
@@ -835,7 +855,7 @@ public:
         {
 
             auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_lt_member<value_type>());
-            // member_lt_member actually only compares keys, so we need to check the value separately
+            // member_lt_member only compares keys, so we need to check the value separately
             if (rhs_it == rhs.members_.end() || rhs_it->name() != it->name() || rhs_it->value() != it->value())
             {
                 return false;
@@ -846,6 +866,8 @@ public:
 private:
     json_object& operator=(const json_object&) = delete;
 };
+
+// Unsorted
 
 template <class StringT,class JsonT,class Alloc>
 class json_object<StringT,JsonT,false,Alloc>
@@ -895,19 +917,16 @@ public:
 
     iterator begin()
     {
-        //return members_.begin();
         return iterator(members_.begin());
     }
 
     iterator end()
     {
-        //return members_.end();
         return iterator(members_.end());
     }
 
     const_iterator begin() const
     {
-        //return iterator(members.data());
         return const_iterator(members_.begin());
     }
 
@@ -940,18 +959,16 @@ public:
 
     iterator find(const char_type* name, size_t length)
     {
-        member_lt_string<value_type,char_type> comp(length);
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
-        return iterator(result);
+        equals_pred<value_type,char_type> comp(name, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+        return iterator(it);
     }
 
     const_iterator find(const char_type* name, size_t length) const
     {
-        member_lt_string<value_type,char_type> comp(length);
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
-        return const_iterator(result);
+        equals_pred<value_type,char_type> comp(name, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+        return const_iterator(it);
     }
 
     void erase(iterator first, iterator last) 
@@ -961,9 +978,9 @@ public:
 
     void erase(const char_type* name, size_t length) 
     {
-        member_lt_string<value_type,char_type> comp(length);
-        auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        if (it != members_.end() && name_eq_string(it->name(),name,length))
+        equals_pred<value_type,char_type> comp(name, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+        if (it != members_.end())
         {
             members_.erase(it);
         }
@@ -980,57 +997,50 @@ public:
         {
             *d = pred(*s);
         }
-        std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
-    void set(const char_type* s, size_t length, const JsonT& value)
+    void set(const char_type* name, size_t length, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
+        equals_pred<value_type,char_type> comp(name, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s,length),value));
+            members_.push_back(value_type(string_type(name,length),value));
         }
-        else if (name_eq_string(it->name(),s,length))
+        else
         {
             it->value(value);
         }
-        else
-        {
-            members_.insert(it,value_type(string_type(s,length),value));
-        }
     }
 
-    void set(const char_type* s, size_t length, JsonT&& value)
+    void set(const char_type* name, size_t length, JsonT&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
+        equals_pred<value_type,char_type> comp(name, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s,length),std::move(value)));
+            members_.push_back(value_type(string_type(name,length),std::move(value)));
         }
-        else if (name_eq_string(it->name(),s,length))
+        else 
         {
             it->value(std::move(value));
-        }
-        else
-        {
-            members_.insert(it,value_type(string_type(s,length),std::move(value)));
         }
     }
 
     void set(string_type&& name, const JsonT& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        equals_pred<value_type,char_type> comp(s, length);
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), value));
         }
-        else if (it->name() == name)
-        {
-            it->value(value);
-        }
         else
         {
-            members_.insert(it,value_type(std::move(name),value));
+            it->value(value);
         }
     }
 
@@ -1046,18 +1056,16 @@ public:
 
     void set(string_type&& name, JsonT&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        equals_pred<value_type,char_type> comp(name.data(), name.length());
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+
         if (it == members_.end())
         {
             members_.push_back(value_type(std::move(name), std::move(value)));
         }
-        else if (it->name() == name)
-        {
-            it->value(std::move(value));
-        }
         else
         {
-            members_.insert(it,value_type(std::move(name),std::move(value)));
+            it->value(std::move(value));
         }
     }
 
@@ -1071,58 +1079,42 @@ public:
         return set(hint, name, std::char_traits<char_type>::length(name), std::move(value));
     }
 
-    iterator set(iterator hint, const char_type* s, size_t length, const JsonT& value)
+    iterator set(iterator hint, const char_type* name, size_t length, const JsonT& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
-        {
-            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),s, member_lt_string<value_type,char_type>(length));
-        }
+        base_iterator it = hint.get();
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s, length), value));
+            members_.push_back(value_type(string_type(name, length), value));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (name_eq_string(it->name(),s,length))
+        else if (name_eq_string(it->name(),name,length))
         {
             it->value(value);
         }
         else
         {
-           it = members_.insert(it,value_type(string_type(s,length),value));
+           it = members_.insert(it,value_type(string_type(name,length),value));
         }
         return iterator(it);
     }
 
-    iterator set(iterator hint, const char_type* s, size_t length, JsonT&& value)
+    iterator set(iterator hint, const char_type* name, size_t length, JsonT&& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
-        {
-            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),s, member_lt_string<value_type,char_type>(length));
-        }
+        base_iterator it = hint.get();
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s, length), std::move(value)));
+            members_.push_back(value_type(string_type(name, length), std::move(value)));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (name_eq_string(it->name(),s,length))
+        else if (name_eq_string(it->name(),name,length))
         {
             it->value(std::move(value));
         }
         else
         {
-           it = members_.insert(it,value_type(string_type(s,length),std::move(value)));
+           it = members_.insert(it,value_type(string_type(name,length),std::move(value)));
         }
         return iterator(it);
     }
@@ -1134,15 +1126,7 @@ public:
 
     iterator set(iterator hint, string_type&& name, const JsonT& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->name() <= name)
-        {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
-        }
+        base_iterator it = hint.get();
 
         if (it == members_.end())
         {
@@ -1167,15 +1151,7 @@ public:
 
     iterator set(iterator hint, string_type&& name, JsonT&& value)
     {
-        typename std::vector<value_type,allocator_type>::iterator it;
-        if (hint.get() != members_.end() && hint.get()->name() <= name)
-        {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
-        }
+        typename std::vector<value_type,allocator_type>::iterator it = hint.get();
 
         if (it == members_.end())
         {
@@ -1201,8 +1177,8 @@ public:
         }
         for (auto it = members_.begin(); it != members_.end(); ++it)
         {
-
-            auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_lt_member<value_type>());
+            equals_pred<value_type,char_type> comp(it->name().data(), it->name().length());
+            auto rhs_it = std::find_if(rhs.members_.begin(),rhs.members_.end(), comp);
             if (rhs_it == rhs.members_.end() || rhs_it->name() != it->name() || rhs_it->value() != it->value())
             {
                 return false;

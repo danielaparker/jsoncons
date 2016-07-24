@@ -19,6 +19,11 @@ struct json_traits
     static const bool is_object_sorted = true;
 };
 
+struct json_utraits
+{
+    static const bool is_object_sorted = false;
+};
+
 }
 
 #endif

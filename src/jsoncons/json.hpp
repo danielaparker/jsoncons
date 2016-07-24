@@ -3568,6 +3568,9 @@ typedef basic_json<wchar_t,json_traits,std::allocator<wchar_t>> wjson;
 typedef basic_json_deserializer<json> json_deserializer;
 typedef basic_json_deserializer<wjson> wjson_deserializer;
 
+
+typedef basic_json<char,json_utraits,std::allocator<char>> ujson;
+typedef basic_json<wchar_t,json_utraits,std::allocator<wchar_t>> wujson;
 }
 
 #if defined(__GNUC__)
