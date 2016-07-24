@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+<title>ojson</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,55 +468,76 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>.  </p>
+<div class="highlight highlight-source-c++"><pre>    jsoncons::ojson
 
-<h3>Roadmap</h3>
+    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                       JsonTraits = ojson_traits&lt;<span class="pl-k">char</span>&gt;,
+                       Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p><a href="Roadmap">Roadmap</a></p>
+<p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
-<h3>Tutorial</h3>
+<h3>Header</h3>
 
-<p><a href="Basics">Basics</a></p>
+<pre><code>#include "jsoncons/json.hpp"
+</code></pre>
 
-<p><a href="Unicode%20support">Unicode support</a></p>
+<h2>Examples</h2>
 
-<p><a href="Arrays">Arrays</a></p>
+<div class="highlight highlight-source-c++"><pre>    ojson o = ojson::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>street_number<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">100</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>street_name<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Queen St W<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>city<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Toronto<span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>country<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Canada<span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    )<span class="pl-pds">"</span></span>);
 
-<p><a href="Introspection">Introspection</a></p>
+    std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p><a href="Type%20Extensibility">Type Extensibility</a></p>
+<p>The output is</p>
 
-<p><a href="Transforming%20JSON%20with%20filters">Transforming JSON with filters</a></p>
+<div class="highlight highlight-source-json"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>
+    }</pre></div>
 
-<h3>Classes</h3>
+<p>Insert "postal_code" at end</p>
 
-<p><a href="json">json</a><br><br>
-<a href="json_serializer">json_serializer</a><br><br>
-<a href="output_format">output_format</a><br><br>
-<a href="json_reader">json_reader</a><br><br>
-<a href="json_deserializer">json_deserializer</a>  </p>
+<div class="highlight highlight-source-c++"><pre>
+    o.set(<span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>);
 
-<p><a href="wjson">wjson</a><br><br>
-<a href="wjson_serializer">wjson_serializer</a><br><br>
-<a href="woutput_format">woutput_format</a><br><br>
-<a href="wjson_reader">wjson_reader</a><br><br>
-<a href="wjson_deserializer">wjson_deserializer</a>  </p>
+    std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p><a href="ojson">ojson</a>  </p>
+<p>The output is</p>
 
-<p><a href="wojson">wojson</a>  </p>
+<div class="highlight highlight-source-json"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
+    }</pre></div>
 
-<h3>Extensions</h3>
+<p>Insert "province" before "country"</p>
 
-<h4>csv</h4>
+<div class="highlight highlight-source-c++"><pre>
+    <span class="pl-k">auto</span> it = o.find(<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>);
+    o.set(it,<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>);
 
-<p><a href="csv_reader">csv_reader</a></p>
+    std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p><a href="csv_serializer">csv_serializer</a></p>
+<p>The output is</p>
 
-<h4>jsonpath</h4>
-
-<p><a href="json_query">json_query</a></p>
+<div class="highlight highlight-source-json"><pre>    {
+        <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
+    }</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -470,9 +470,11 @@ vertical-align:1px;
 <body>
 <div class="highlight highlight-source-c++"><pre>    jsoncons::json
 
-    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
+    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                       JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
+                       Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 
@@ -514,11 +516,6 @@ vertical-align:1px;
 <td><code>member_type</code></td>
 <td>
 <a href="json_member_type">member_type</a> is a class that stores a name and a json value</td>
-</tr>
-<tr>
-<td><code>any</code></td>
-<td>
-<a href="json%20any">any</a> can contain any value that supports copy construction and assignment.</td>
 </tr>
 <tr>
 <td><code>null_type</code></td>
@@ -602,10 +599,10 @@ Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 static json make_array(size_t n, const array_allocator&amp; allocator = array_allocator())
 
-template &lt;typename T&gt;
+template &lt;class T&gt;
 static json make_array(size_ n, const T&amp; val)
 
-template &lt;typename T&gt;
+template &lt;class T&gt;
 static json make_array(size_ n, const T&amp; val, const array_allocator&amp; allocator = array_allocator())
 
 template &lt;size_t N&gt;
@@ -657,7 +654,7 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 
 <p>Move with allocator</p>
 
-<pre><code>template &lt;typename T&gt;
+<pre><code>template &lt;class T&gt;
 json(T val, const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
@@ -743,7 +740,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <p>Returns the number of object members that match <code>name</code>.    </p>
 
-<pre><code>template &lt;typename T&gt;
+<pre><code>template &lt;class T&gt;
 bool is() const noexcept
 </code></pre>
 
@@ -785,11 +782,6 @@ bool is&lt;unsigned long long&gt; const noexcept
 
 <p>Returns <code>true</code> if the json value is null, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;json::any&gt;
-</code></pre>
-
-<p>Returns <code>true</code> if the json value is type any, <code>false</code> otherwise.</p>
-
 <pre><code>is&lt;json::object&gt; 
 </code></pre>
 
@@ -814,7 +806,6 @@ bool is_double() const noexcept
 bool is_bool() const noexcept
 bool is_object() const noexcept
 bool is_array() const noexcept
-bool is_any() const noexcept
 </code></pre>
 
 <p>Non-generic versions of <code>is_</code> methods</p>
@@ -865,14 +856,14 @@ const json&amp; at(size_t i) const
 Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
-<pre><code>template &lt;typename T&gt;
+<pre><code>template &lt;class T&gt;
 const json get(const string_type&amp; name, T&amp;&amp; default_val) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>template &lt;typename T&gt;
+<pre><code>template &lt;class T&gt;
 T as() const
 </code></pre>
 
@@ -921,15 +912,6 @@ unsigned int as&lt;unsigned int&gt; const
 
 <p>Non-generic versions of <code>as</code> methods</p>
 
-<pre><code>template &lt;typename T&gt;
-const T&amp; any_cast() const
-
-template &lt;typename T&gt;
-T&amp; any_cast() 
-</code></pre>
-
-<p>If the value does not have type <code>any</code>, throws, otherwise casts the value back to the original type.</p>
-
 <h3>Modifiers</h3>
 
 <pre><code>void clear()
@@ -977,7 +959,7 @@ object_iterator set(object_iterator hint, string_type&amp;&amp; name, json&amp;&
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
-Returns a <code>member_terator</code> pointing at the member that was inserted or updated<br>
+Returns a <code>member_iterator</code> pointing at the member that was inserted or updated<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>void add(const json&amp; val)

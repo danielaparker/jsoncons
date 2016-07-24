@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+<title>wojson</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,55 +468,23 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>.  </p>
+<pre><code>jsoncons::wojson
 
-<h3>Roadmap</h3>
+typedef basic_json&lt;wchar_t,
+                   JsonTraits = ojson_traits&lt;wchar_t&gt;,
+                   Allocator = std::allocator&lt;wchar_t&gt;&gt; wojson
+</code></pre>
 
-<p><a href="Roadmap">Roadmap</a></p>
+<p>The <code>wojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
-<h3>Tutorial</h3>
+<h3>Header</h3>
 
-<p><a href="Basics">Basics</a></p>
+<pre><code>#include "jsoncons/json.hpp"
+</code></pre>
 
-<p><a href="Unicode%20support">Unicode support</a></p>
+<h3>Interface</h3>
 
-<p><a href="Arrays">Arrays</a></p>
-
-<p><a href="Introspection">Introspection</a></p>
-
-<p><a href="Type%20Extensibility">Type Extensibility</a></p>
-
-<p><a href="Transforming%20JSON%20with%20filters">Transforming JSON with filters</a></p>
-
-<h3>Classes</h3>
-
-<p><a href="json">json</a><br><br>
-<a href="json_serializer">json_serializer</a><br><br>
-<a href="output_format">output_format</a><br><br>
-<a href="json_reader">json_reader</a><br><br>
-<a href="json_deserializer">json_deserializer</a>  </p>
-
-<p><a href="wjson">wjson</a><br><br>
-<a href="wjson_serializer">wjson_serializer</a><br><br>
-<a href="woutput_format">woutput_format</a><br><br>
-<a href="wjson_reader">wjson_reader</a><br><br>
-<a href="wjson_deserializer">wjson_deserializer</a>  </p>
-
-<p><a href="ojson">ojson</a>  </p>
-
-<p><a href="wojson">wojson</a>  </p>
-
-<h3>Extensions</h3>
-
-<h4>csv</h4>
-
-<p><a href="csv_reader">csv_reader</a></p>
-
-<p><a href="csv_serializer">csv_serializer</a></p>
-
-<h4>jsonpath</h4>
-
-<p><a href="json_query">json_query</a></p>
+<p>The interface is the same as <a href="ojson">ojson</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

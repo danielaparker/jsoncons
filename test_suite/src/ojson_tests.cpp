@@ -26,11 +26,14 @@ BOOST_AUTO_TEST_CASE(test_object)
         "street_number" : "100",
         "street_name" : "Queen St W",
         "city" : "Toronto",
-        "postal_code" : "M5H 2N2"
+        "country" : "Canada"
     }
     )");
 
-    std::cout << o << std::endl;
+    std::cout << pretty_print(o) << std::endl;
+
+    o.set("postal_code", "M5H 2N2");
+    std::cout << pretty_print(o) << std::endl;
 
     ojson o2 = o;
     BOOST_CHECK(o == o2);
@@ -43,17 +46,17 @@ BOOST_AUTO_TEST_CASE(test_object)
     //BOOST_CHECK_EQUAL(2,o["city"].as<int>());
     //BOOST_CHECK_EQUAL(4,o["street_number"].as<int>());
 
-    auto it = o.find("postal_code");
+    auto it = o.find("country");
     BOOST_CHECK(it != o.members().end());
     o.set(it,"province","Ontario");
 
     o.set("unit_type","O");
 
-    std::cout << o << std::endl;
+    std::cout << pretty_print(o) << std::endl;
 
     o.erase("unit_type");
 
-    std::cout << o << std::endl;
+    std::cout << pretty_print(o) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

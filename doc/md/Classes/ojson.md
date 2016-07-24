@@ -11,4 +11,61 @@ The `ojson` class is an instantiation of the `basic_json` class template that us
 
     #include "jsoncons/json.hpp"
 
+## Examples
+```c++
+    ojson o = ojson::parse(R"(
+    {
+        "street_number" : "100",
+        "street_name" : "Queen St W",
+        "city" : "Toronto",
+        "country" : "Canada"
+    }
+    )");
 
+    std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+    {
+        "street_number": "100",
+        "street_name": "Queen St W",
+        "city": "Toronto",
+        "country": "Canada"
+    }
+```
+Insert "postal_code" at end
+```c++
+
+    o.set("postal_code", "M5H 2N2");
+
+    std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+    {
+        "street_number": "100",
+        "street_name": "Queen St W",
+        "city": "Toronto",
+        "country": "Canada",
+        "postal_code": "M5H 2N2"
+    }
+```
+Insert "province" before "country"
+```c++
+
+    auto it = o.find("country");
+    o.set(it,"province","Ontario");
+
+    std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+    {
+        "street_number": "100",
+        "street_name": "Queen St W",
+        "city": "Toronto",
+        "province": "Ontario",
+        "country": "Canada",
+        "postal_code": "M5H 2N2"
+    }
+```
