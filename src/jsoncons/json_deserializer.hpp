@@ -18,27 +18,27 @@
 
 namespace jsoncons {
 
-template <class JsonT>
-class basic_json_deserializer : public basic_json_input_handler<typename JsonT::char_type>
+template <class Json>
+class basic_json_deserializer : public basic_json_input_handler<typename Json::char_type>
 {
     static const int default_stack_size = 1000;
 
-    typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::member_type member_type;
-    typedef typename JsonT::string_type string_type;
+    typedef typename Json::char_type char_type;
+    typedef typename Json::member_type member_type;
+    typedef typename Json::string_type string_type;
     typedef typename string_type::allocator_type string_allocator;
-    typedef typename JsonT::allocator_type allocator_type;
-    typedef typename JsonT::array array;
+    typedef typename Json::allocator_type allocator_type;
+    typedef typename Json::array array;
     typedef typename array::allocator_type array_allocator;
-    typedef typename JsonT::object object;
+    typedef typename Json::object object;
     typedef typename object::allocator_type object_allocator;
-    typedef typename JsonT::value_type value_type;
+    typedef typename Json::value_type value_type;
 
     string_allocator sa_;
     object_allocator oa_;
     array_allocator aa_;
 
-    JsonT result_;
+    Json result_;
     size_t top_;
 
     struct stack_item
@@ -70,14 +70,14 @@ public:
         return is_valid_;
     }
 
-    JsonT get_result()
+    Json get_result()
     {
         is_valid_ = false;
         return std::move(result_);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JsonT& root()
+    Json& root()
     {
         return result_;
     }
@@ -209,7 +209,7 @@ private:
 
     void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value_ = JsonT(p,length,sa_);
+        stack_[top_].value_ = Json(p,length,sa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

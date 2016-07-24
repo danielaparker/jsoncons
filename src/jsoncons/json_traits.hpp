@@ -21,7 +21,7 @@ struct json_traits
 };
 
 template <class CharT>
-struct json_utraits
+struct ojson_traits
 {
     static const bool is_object_sorted = false;
 };

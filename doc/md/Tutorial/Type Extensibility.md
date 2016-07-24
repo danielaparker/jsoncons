@@ -59,11 +59,11 @@ the conversions works. In this implementation the `boost` date values are stored
 ```c++
     namespace jsoncons 
     {
-        template <class JsonT>
-        class json_type_traits<JsonT,boost::gregorian::date>
+        template <class Json>
+        class json_type_traits<Json,boost::gregorian::date>
         {
         public:
-            static bool is(const JsonT& val) noexcept
+            static bool is(const Json& val) noexcept
             {
                 if (!val.is_string())
                 {
@@ -81,13 +81,13 @@ the conversions works. In this implementation the `boost` date values are stored
                 }
             }
 
-            static boost::gregorian::date as(const JsonT& val)
+            static boost::gregorian::date as(const Json& val)
             {
                 std::string s = val.template as<std::string>();
                 return boost::gregorian::from_simple_string(s);
             }
 
-            static void assign(JsonT& lhs, boost::gregorian::date val)
+            static void assign(Json& lhs, boost::gregorian::date val)
             {
                 lhs = to_iso_extended_string(val);
             }

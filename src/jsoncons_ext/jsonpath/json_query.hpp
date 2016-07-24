@@ -75,24 +75,24 @@ namespace jsoncons { namespace jsonpath {
 
 // here
 
-template<class JsonT>
-JsonT json_query(const JsonT& root, const typename JsonT::char_type* path, size_t length)
+template<class Json>
+Json json_query(const Json& root, const typename Json::char_type* path, size_t length)
 {
-    jsonpath_evaluator<JsonT> evaluator;
+    jsonpath_evaluator<Json> evaluator;
     evaluator.evaluate(root,path,length);
     return evaluator.get_values();
 }
 
-template<class JsonT>
-JsonT json_query(const JsonT& root, const typename JsonT::string_type& path)
+template<class Json>
+Json json_query(const Json& root, const typename Json::string_type& path)
 {
     return json_query(root,path.data(),path.length());
 }
 
-template<class JsonT>
-JsonT json_query(const JsonT& root, const typename JsonT::char_type* path)
+template<class Json>
+Json json_query(const Json& root, const typename Json::char_type* path)
 {
-    return json_query(root,path,std::char_traits<typename JsonT::char_type>::length(path));
+    return json_query(root,path,std::char_traits<typename Json::char_type>::length(path));
 }
 
 enum class states 
@@ -115,13 +115,13 @@ enum class states
     dot
 };
 
-template<class JsonT>
-class jsonpath_evaluator : private basic_parsing_context<typename JsonT::char_type>
+template<class Json>
+class jsonpath_evaluator : private basic_parsing_context<typename Json::char_type>
 {
 private:
-    typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::string_type string_type;
-    typedef const JsonT* cjson_ptr;
+    typedef typename Json::char_type char_type;
+    typedef typename Json::string_type string_type;
+    typedef const Json* cjson_ptr;
     typedef std::vector<cjson_ptr> node_set;
 
     basic_parse_error_handler<char_type> *err_handler_;
@@ -137,7 +137,7 @@ private:
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
-    std::vector<std::shared_ptr<JsonT>> temp_;
+    std::vector<std::shared_ptr<Json>> temp_;
     size_t line_;
     size_t column_;
     const char_type* begin_input_;
@@ -157,9 +157,9 @@ public:
     {
     }
 
-    JsonT get_values() const
+    Json get_values() const
     {
-        JsonT result = JsonT::make_array();
+        Json result = Json::make_array();
 
         if (stack_.size() > 0)
         {
@@ -172,16 +172,16 @@ public:
         return result;
     }
 
-    void evaluate(const JsonT& root, const string_type& path)
+    void evaluate(const Json& root, const string_type& path)
     {
         evaluate(root,path.data(),path.length());
     }
-    void evaluate(const JsonT& root, const char_type* path)
+    void evaluate(const Json& root, const char_type* path)
     {
         evaluate(root,path,std::char_traits<char_type>::length(path));
     }
 
-    void evaluate(const JsonT& root, const char_type* path, size_t length)
+    void evaluate(const Json& root, const char_type* path, size_t length)
     {
         begin_input_ = path;
         end_input_ = path + length;
@@ -514,7 +514,7 @@ public:
                     {
                         if (stack_.back().size() == 1)
                         {
-                            jsonpath_filter_parser<JsonT> parser(&p_,&line_,&column_);
+                            jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
                             parser.parse(p_,end_input_);
                             auto index = parser.eval(*(stack_.back()[0]));
                             if (index.template is<size_t>())
@@ -536,7 +536,7 @@ public:
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<JsonT> parser(&p_,&line_,&column_);
+                        jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
                         parser.parse(p_,end_input_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
@@ -701,8 +701,8 @@ public:
         }
     }
 
-    void accept(const JsonT& val,
-                jsonpath_filter_parser<JsonT>& filter)
+    void accept(const Json& val,
+                jsonpath_filter_parser<Json>& filter)
     {
         if (val.is_object())
         {
@@ -851,7 +851,7 @@ public:
         }
     }
 
-    void find1(const JsonT& context_val, const string_type& name)
+    void find1(const Json& context_val, const string_type& name)
     {
         if (context_val.is_object())
         {
@@ -882,7 +882,7 @@ public:
             }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
             {
-                auto q = std::make_shared<JsonT>(context_val.size());
+                auto q = std::make_shared<Json>(context_val.size());
                 temp_.push_back(q);
                 nodes_.push_back(q.get());
             }

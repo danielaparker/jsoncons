@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-template <class JsonT>
+template <class Json>
 class jsonpath_evaluator;
 
 enum class filter_states
@@ -60,21 +60,21 @@ enum class token_types
     done
 };
 
-template <class JsonT>
+template <class Json>
 class term
 {
 public:
-    typedef typename JsonT::string_type string_type;
-    typedef typename JsonT::char_type char_type;
+    typedef typename Json::string_type string_type;
+    typedef typename Json::char_type char_type;
 
-    virtual void initialize(const JsonT& context_node)
+    virtual void initialize(const Json& context_node)
     {
     }
     virtual bool accept_single_node() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT evaluate_single_node() const
+    virtual Json evaluate_single_node() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -86,7 +86,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool eq(const JsonT& rhs) const
+    virtual bool eq(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -94,7 +94,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool ne(const JsonT& rhs) const
+    virtual bool ne(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -110,7 +110,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool ampamp(const JsonT& rhs) const
+    virtual bool ampamp(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -118,7 +118,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool pipepipe(const JsonT& rhs) const
+    virtual bool pipepipe(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -126,7 +126,7 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool lt(const JsonT& rhs) const
+    virtual bool lt(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
@@ -134,43 +134,43 @@ public:
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual bool gt(const JsonT& rhs) const
+    virtual bool gt(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT minus(const term& rhs) const 
+    virtual Json minus(const term& rhs) const 
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT  minus(const JsonT& rhs) const
+    virtual Json  minus(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT  unary_minus() const
+    virtual Json  unary_minus() const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT plus(const term& rhs) const
+    virtual Json plus(const term& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
-    virtual JsonT  plus(const JsonT& rhs) const
+    virtual Json  plus(const Json& rhs) const
     {
         throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
     }
 };
 
-template <class JsonT>
+template <class Json>
 class token
 {
     token_types type_;
-    std::shared_ptr<term<JsonT>> term_ptr_;
+    std::shared_ptr<term<Json>> term_ptr_;
 public:
     token(token_types type)
         : type_(type)
     {
     }
-    token(token_types type, std::shared_ptr<term<JsonT>> term_ptr)
+    token(token_types type, std::shared_ptr<term<Json>> term_ptr)
         : type_(type), term_ptr_(term_ptr)
     {
     }
@@ -184,12 +184,12 @@ public:
         return type_;
     }
 
-    std::shared_ptr<term<JsonT>> term_ptr()
+    std::shared_ptr<term<Json>> term_ptr()
     {
         return term_ptr_;
     }
 
-    void initialize(const JsonT& context_node)
+    void initialize(const Json& context_node)
     {
         if (term_ptr_.get() != nullptr)
         {
@@ -198,20 +198,20 @@ public:
     }
 };
 
-template <class JsonT>
+template <class Json>
 class token_stream
 {
-    std::vector<token<JsonT>>& tokens_;
+    std::vector<token<Json>>& tokens_;
     size_t index_;
 public:
-    token_stream(std::vector<token<JsonT>>& tokens)
+    token_stream(std::vector<token<Json>>& tokens)
         : tokens_(tokens), index_(0)
     {
     }
 
-    token<JsonT> get()
+    token<Json> get()
     {
-        static token<JsonT> done = token<JsonT>(token_types::done);
+        static token<Json> done = token<Json>(token_types::done);
         return index_ < tokens_.size() ? tokens_[index_++] : done;
     }
     void putback()
@@ -220,20 +220,20 @@ public:
     }
 };
 
-template <class JsonT>
-bool ampamp(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+bool ampamp(const Json& lhs, const Json& rhs)
 {
     return lhs.as_bool() && rhs.as_bool();
 }
 
-template <class JsonT>
-bool pipepipe(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+bool pipepipe(const Json& lhs, const Json& rhs)
 {
     return lhs.as_bool() || rhs.as_bool();
 }
 
-template <class JsonT>
-bool lt(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+bool lt(const Json& lhs, const Json& rhs)
 {
     bool result = false;
     if (lhs. template is<unsigned long long>() && rhs. template is<unsigned long long>())
@@ -255,16 +255,16 @@ bool lt(const JsonT& lhs, const JsonT& rhs)
     return result;
 }
 
-template <class JsonT>
-bool gt(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+bool gt(const Json& lhs, const Json& rhs)
 {
     return lt(rhs,lhs);
 }
 
-template <class JsonT>
-JsonT plus(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+Json plus(const Json& lhs, const Json& rhs)
 {
-    JsonT result = jsoncons::null_type();
+    Json result = jsoncons::null_type();
     if (lhs.is_integer() && rhs.is_integer())
     {
         result = ((lhs.as_integer() + rhs.as_integer()));
@@ -280,10 +280,10 @@ JsonT plus(const JsonT& lhs, const JsonT& rhs)
     return result;
 }
 
-template <class JsonT>
-JsonT unary_minus(const JsonT& lhs)
+template <class Json>
+Json unary_minus(const Json& lhs)
 {
-    JsonT result = jsoncons::null_type();
+    Json result = jsoncons::null_type();
     if (lhs.is_integer())
     {
         result = -lhs.as_integer();
@@ -295,10 +295,10 @@ JsonT unary_minus(const JsonT& lhs)
     return result;
 }
 
-template <class JsonT>
-JsonT minus(const JsonT& lhs, const JsonT& rhs)
+template <class Json>
+Json minus(const Json& lhs, const Json& rhs)
 {
-    JsonT result = jsoncons::null_type();
+    Json result = jsoncons::null_type();
     if (lhs.is_integer() && rhs.is_integer())
     {
         result = ((lhs.as_integer() - rhs.as_integer()));
@@ -314,10 +314,10 @@ JsonT minus(const JsonT& lhs, const JsonT& rhs)
     return result;
 }
 
-template <class JsonT>
-class value_term : public term<JsonT>
+template <class Json>
+class value_term : public term<Json>
 {
-    JsonT value_;
+    Json value_;
 public:
     template <class T>
     value_term(const T& value)
@@ -330,7 +330,7 @@ public:
         return value_.as_bool();
     }
 
-    JsonT evaluate_single_node() const override
+    Json evaluate_single_node() const override
     {
         return value_;
     }
@@ -340,96 +340,96 @@ public:
         return !value_.as_bool();
     }
 
-    bool eq(const term<JsonT>& rhs) const override
+    bool eq(const term<Json>& rhs) const override
     {
         return rhs.eq(value_);
     }
 
-    bool eq(const JsonT& rhs) const override
+    bool eq(const Json& rhs) const override
     {
         return value_ == rhs;
     }
 
-    bool ne(const term<JsonT>& rhs) const override
+    bool ne(const term<Json>& rhs) const override
     {
         return rhs.ne(value_);
     }
-    bool ne(const JsonT& rhs) const override
+    bool ne(const Json& rhs) const override
     {
         return value_ != rhs;
     }
-    bool regex(const term<JsonT>& rhs) const override
+    bool regex(const term<Json>& rhs) const override
     {
         return rhs.regex2(value_.as_string());
     }
-    bool ampamp(const term<JsonT>& rhs) const override
+    bool ampamp(const term<Json>& rhs) const override
     {
         return rhs.ampamp(value_);
     }
-    bool ampamp(const JsonT& rhs) const override
+    bool ampamp(const Json& rhs) const override
     {
         return jsoncons::jsonpath::ampamp(value_,rhs);
     }
-    bool pipepipe(const term<JsonT>& rhs) const override
+    bool pipepipe(const term<Json>& rhs) const override
     {
         return rhs.pipepipe(value_);
     }
-    bool pipepipe(const JsonT& rhs) const override
+    bool pipepipe(const Json& rhs) const override
     {
         return jsoncons::jsonpath::pipepipe(value_,rhs);
     }
 
-    bool lt(const term<JsonT>& rhs) const override
+    bool lt(const term<Json>& rhs) const override
     {
         return rhs.gt(value_);
     }
 
-    bool lt(const JsonT& rhs) const override
+    bool lt(const Json& rhs) const override
     {
         return jsoncons::jsonpath::lt(value_,rhs);
     }
 
-    bool gt(const term<JsonT>& rhs) const override
+    bool gt(const term<Json>& rhs) const override
     {
         return rhs.lt(value_);
     }
 
-    bool gt(const JsonT& rhs) const override
+    bool gt(const Json& rhs) const override
     {
         return jsoncons::jsonpath::gt(value_,rhs);
     }
 
-    JsonT minus(const term<JsonT>& rhs) const override
+    Json minus(const term<Json>& rhs) const override
     {
         return jsoncons::jsonpath::plus(rhs.unary_minus(),value_);
     }
 
-    JsonT minus(const JsonT& rhs) const override
+    Json minus(const Json& rhs) const override
     {
         return jsoncons::jsonpath::minus(value_,rhs);
     }
 
-    JsonT unary_minus() const override
+    Json unary_minus() const override
     {
         return jsoncons::jsonpath::unary_minus(value_);
     }
 
-    JsonT plus(const term<JsonT>& rhs) const override
+    Json plus(const term<Json>& rhs) const override
     {
         return rhs.plus(value_);
     }
 
-    JsonT plus(const JsonT& rhs) const override
+    Json plus(const Json& rhs) const override
     {
         return jsoncons::jsonpath::plus(value_,rhs);
     }
 };
 
-template <class JsonT>
-class regex_term : public term<JsonT>
+template <class Json>
+class regex_term : public term<Json>
 {
-    typedef typename JsonT::char_type char_type;
-    typedef typename JsonT::string_type string_type;
+    typedef typename Json::char_type char_type;
+    typedef typename Json::string_type string_type;
     string_type pattern_;
     std::regex::flag_type flags_;
 public:
@@ -446,22 +446,22 @@ public:
     }
 };
 
-template <class JsonT>
-class path_term : public term<JsonT>
+template <class Json>
+class path_term : public term<Json>
 {
-    typedef typename JsonT::string_type string_type;
+    typedef typename Json::string_type string_type;
 
     string_type path_;
-    JsonT nodes_;
+    Json nodes_;
 public:
     path_term(const string_type& path)
         : path_(path)
     {
     }
 
-    void initialize(const JsonT& context_node) override
+    void initialize(const Json& context_node) override
     {
-        jsonpath_evaluator<JsonT> evaluator;
+        jsonpath_evaluator<Json> evaluator;
         evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_values();
     }
@@ -471,7 +471,7 @@ public:
         return nodes_.size() != 0;
     }
 
-    JsonT evaluate_single_node() const override
+    Json evaluate_single_node() const override
     {
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
@@ -481,7 +481,7 @@ public:
         return nodes_.size() == 0;
     }
 
-    bool eq(const term<JsonT>& rhs) const override
+    bool eq(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -495,7 +495,7 @@ public:
         return result;
     }
 
-    bool eq(const JsonT& rhs) const override
+    bool eq(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -509,7 +509,7 @@ public:
         return result;
     }
 
-    bool ne(const term<JsonT>& rhs) const override
+    bool ne(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -523,7 +523,7 @@ public:
         return result;
 
     }
-    bool ne(const JsonT& rhs) const override
+    bool ne(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -536,7 +536,7 @@ public:
         }
         return result;
     }
-    bool regex(const term<JsonT>& rhs) const override
+    bool regex(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -549,7 +549,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const term<JsonT>& rhs) const override
+    bool ampamp(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -562,7 +562,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const JsonT& rhs) const override
+    bool ampamp(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -575,7 +575,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const term<JsonT>& rhs) const override
+    bool pipepipe(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -588,7 +588,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const JsonT& rhs) const override
+    bool pipepipe(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -602,7 +602,7 @@ public:
         return result;
     }
 
-    bool lt(const JsonT& rhs) const override
+    bool lt(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -616,7 +616,7 @@ public:
         return result;
     }
 
-    bool lt(const term<JsonT>& rhs) const override
+    bool lt(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -630,7 +630,7 @@ public:
         return result;
     }
 
-    bool gt(const JsonT& rhs) const override
+    bool gt(const Json& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -644,7 +644,7 @@ public:
         return result;
     }
 
-    bool gt(const term<JsonT>& rhs) const override
+    bool gt(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -658,46 +658,46 @@ public:
         return result;
     }
 
-    JsonT minus(const JsonT& rhs) const override
+    Json minus(const Json& rhs) const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : jsoncons::null_type();
     }
 
-    JsonT minus(const term<JsonT>& rhs) const override
+    Json minus(const term<Json>& rhs) const override
     {
 
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(rhs.unary_minus(),nodes_[0]) : jsoncons::null_type();
     }
 
-    JsonT unary_minus() const override
+    Json unary_minus() const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::unary_minus(nodes_[0]) : jsoncons::null_type();
     }
 
-    JsonT plus(const JsonT& rhs) const override
+    Json plus(const Json& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
-    JsonT plus(const term<JsonT>& rhs) const override
+    Json plus(const term<Json>& rhs) const override
     {
         static auto a_null = jsoncons::null_type();
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
 };
 
-template <class JsonT>
+template <class Json>
 class jsonpath_filter_parser
 {
-    typedef typename JsonT::string_type string_type;
-    typedef typename JsonT::char_type char_type;
+    typedef typename Json::string_type string_type;
+    typedef typename Json::char_type char_type;
 
     size_t& line_;
     size_t& column_;
     filter_states state_;
     string_type buffer_;
-    std::vector<token<JsonT>> tokens_;
+    std::vector<token<Json>> tokens_;
     int depth_;
     const char_type* begin_input_;
     const char_type* end_input_;
@@ -709,7 +709,7 @@ public:
     {
     }
 
-    bool exists(const JsonT& context_node)
+    bool exists(const Json& context_node)
     {
         for (auto it=tokens_.begin(); it != tokens_.end(); ++it)
         {
@@ -717,14 +717,14 @@ public:
         }
         bool result = false;
 
-        token_stream<JsonT> ts(tokens_);
+        token_stream<Json> ts(tokens_);
         auto e = expression(ts);
         result = e->accept_single_node();
 
         return result;
     }
 
-    JsonT eval(const JsonT& context_node)
+    Json eval(const Json& context_node)
     {
         try
         {
@@ -733,9 +733,9 @@ public:
                 it->initialize(context_node);
             }
        
-            token_stream<JsonT> ts(tokens_);
+            token_stream<Json> ts(tokens_);
             auto e = expression(ts);
-            JsonT result = e->evaluate_single_node();
+            Json result = e->evaluate_single_node();
 
             return result;
         }
@@ -745,7 +745,7 @@ public:
         }
     }
 
-    std::shared_ptr<term<JsonT>> primary(token_stream<JsonT>& ts)
+    std::shared_ptr<term<Json>> primary(token_stream<Json>& ts)
     {
         auto t = ts.get();
 
@@ -765,14 +765,14 @@ public:
             return t.term_ptr();
         case token_types::exclaim:
         {
-            JsonT val = primary(ts)->exclaim();
-            auto expr = std::make_shared<value_term<JsonT>>(val);
+            Json val = primary(ts)->exclaim();
+            auto expr = std::make_shared<value_term<Json>>(val);
             return expr;
         }
         case token_types::minus:
         {
-            JsonT val = primary(ts)->unary_minus();
-            auto expr = std::make_shared<value_term<JsonT>>(val);
+            Json val = primary(ts)->unary_minus();
+            auto expr = std::make_shared<value_term<Json>>(val);
             return expr;
         }
         default:
@@ -780,7 +780,7 @@ public:
         }
     }
 
-    std::shared_ptr<term<JsonT>> expression(token_stream<JsonT>& ts)
+    std::shared_ptr<term<Json>> expression(token_stream<Json>& ts)
     {
         auto left = make_term(ts);
         auto t = ts.get();
@@ -790,15 +790,15 @@ public:
             {
             case token_types::plus:
             {
-                JsonT val = left->plus(*(make_term(ts)));
-                left = std::make_shared<value_term<JsonT>>(val);
+                Json val = left->plus(*(make_term(ts)));
+                left = std::make_shared<value_term<Json>>(val);
                 t = ts.get();
             }
                 break;
             case token_types::minus:
             {
-                JsonT val = left->minus(*(make_term(ts)));
-                left = std::make_shared<value_term<JsonT>>(val);
+                Json val = left->minus(*(make_term(ts)));
+                left = std::make_shared<value_term<Json>>(val);
                 t = ts.get();
             }
                 break;
@@ -810,7 +810,7 @@ public:
         return left;
     }
 
-    std::shared_ptr<term<JsonT>> make_term(token_stream<JsonT>& ts)
+    std::shared_ptr<term<Json>> make_term(token_stream<Json>& ts)
     {
         auto left = primary(ts);
         auto t = ts.get();
@@ -821,72 +821,72 @@ public:
             case token_types::eq:
             {
                 bool e = left->eq(*(primary(ts)));
-                JsonT val(e);
-                left = std::make_shared<value_term<JsonT>>(val);
+                Json val(e);
+                left = std::make_shared<value_term<Json>>(val);
                 t = ts.get();
             }
                 break;
             case token_types::ne:
             {
                 bool e = left->ne(*(primary(ts)));
-                JsonT val(e);
-                left = std::make_shared<value_term<JsonT>>(val);
+                Json val(e);
+                left = std::make_shared<value_term<Json>>(val);
                 t = ts.get();
             }
                 break;
             case token_types::regex:
                 {
                     bool e = left->regex(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::ampamp:
                 {
                     bool e = left->ampamp(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::pipepipe:
                 {
                     bool e = left->pipepipe(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::lt:
                 {
                     bool e = left->lt(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::gt:
                 {
                     bool e = left->gt(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::lte:
                 {
                     bool e = left->lt(*(primary(ts))) || left->eq(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
             case token_types::gte:
                 {
                     bool e = left->gt(*(primary(ts))) || left->eq(*(primary(ts)));
-                    JsonT val(e);
-                    left = std::make_shared<value_term<JsonT>>(val);
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
                     t = ts.get();
                 }
                 break;
@@ -945,10 +945,10 @@ public:
                 case '(':
                     state_ = filter_states::expect_path_or_value;
                     ++depth_;
-                    tokens_.push_back(token<JsonT>(token_types::left_paren));
+                    tokens_.push_back(token<Json>(token_types::left_paren));
                     break;
                 case ')':
-                    tokens_.push_back(token<JsonT>(token_types::right_paren));
+                    tokens_.push_back(token<Json>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -973,12 +973,12 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::ne));
+                        tokens_.push_back(token<Json>(token_types::ne));
                     }
                     else
                     {
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::exclaim));
+                        tokens_.push_back(token<Json>(token_types::exclaim));
                     }
                     break;
                 case '&':
@@ -987,7 +987,7 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::ampamp));
+                        tokens_.push_back(token<Json>(token_types::ampamp));
                     }
                     break;
                 case '|':
@@ -996,7 +996,7 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::pipepipe));
+                        tokens_.push_back(token<Json>(token_types::pipepipe));
                     }
                     break;
                 case '=':
@@ -1005,14 +1005,14 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::eq));
+                        tokens_.push_back(token<Json>(token_types::eq));
                     }
                     else if (p_+1  < end_input_ && *(p_+1) == '~')
                     {
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_regex;
-                        tokens_.push_back(token<JsonT>(token_types::regex));
+                        tokens_.push_back(token<Json>(token_types::regex));
                     }
                     break;
                 case '>':
@@ -1021,12 +1021,12 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::gte));
+                        tokens_.push_back(token<Json>(token_types::gte));
                     }
                     else
                     {
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::gt));
+                        tokens_.push_back(token<Json>(token_types::gt));
                     }
                     break;
                 case '<':
@@ -1035,21 +1035,21 @@ public:
                         ++p_;
                         ++column_;
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::lte));
+                        tokens_.push_back(token<Json>(token_types::lte));
                     }
                     else
                     {
                         state_ = filter_states::expect_path_or_value;
-                        tokens_.push_back(token<JsonT>(token_types::lt));
+                        tokens_.push_back(token<Json>(token_types::lt));
                     }
                     break;
                 case '+':
                     state_ = filter_states::expect_path_or_value;
-                    tokens_.push_back(token<JsonT>(token_types::plus));
+                    tokens_.push_back(token<Json>(token_types::plus));
                     break;
                 case '-':
                     state_ = filter_states::expect_path_or_value;
-                    tokens_.push_back(token<JsonT>(token_types::minus));
+                    tokens_.push_back(token<Json>(token_types::minus));
                     break;
                 case ' ':case '\t':
                     break;
@@ -1084,8 +1084,8 @@ public:
                             {
                                 try
                                 {
-                                    auto val = JsonT::parse(buffer_);
-                                    tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
+                                    auto val = Json::parse(buffer_);
+                                    tokens_.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                                 }
                                 catch (const parse_exception& e)
                                 {
@@ -1101,8 +1101,8 @@ public:
                         {
                             try
                             {
-                                auto val = JsonT::parse(buffer_);
-                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
+                                auto val = Json::parse(buffer_);
+                                tokens_.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1110,7 +1110,7 @@ public:
                             }
                             buffer_.clear();
                         }
-                        tokens_.push_back(token<JsonT>(token_types::right_paren));
+                        tokens_.push_back(token<Json>(token_types::right_paren));
                         if (--depth_ == 0)
                         {
                             state_ = filter_states::start;
@@ -1128,8 +1128,8 @@ public:
                         {
                             try
                             {
-                                auto val = JsonT::parse(buffer_);
-                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
+                                auto val = Json::parse(buffer_);
+                                tokens_.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1173,8 +1173,8 @@ public:
                         {
                             try
                             {
-                                auto val = JsonT::parse(buffer_);
-                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
+                                auto val = Json::parse(buffer_);
+                                tokens_.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1218,8 +1218,8 @@ public:
                         {
                             try
                             {
-                                auto val = JsonT::parse(buffer_);
-                                tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<value_term<JsonT>>(val)));
+                                auto val = Json::parse(buffer_);
+                                tokens_.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1282,12 +1282,12 @@ public:
                     break;
                 case '(':
                     ++depth_;
-                    tokens_.push_back(token<JsonT>(token_types::left_paren));
+                    tokens_.push_back(token<Json>(token_types::left_paren));
                     ++p_;
                     ++column_;
                     break;
                 case ')':
-                    tokens_.push_back(token<JsonT>(token_types::right_paren));
+                    tokens_.push_back(token<Json>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1314,7 +1314,7 @@ public:
                 case ' ':case '\t':
                     break;
                 case ')':
-                    tokens_.push_back(token<JsonT>(token_types::right_paren));
+                    tokens_.push_back(token<Json>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1351,7 +1351,7 @@ public:
                 case ' ':case '\t':
                     break;
                 case ')':
-                    tokens_.push_back(token<JsonT>(token_types::right_paren));
+                    tokens_.push_back(token<Json>(token_types::right_paren));
                     if (--depth_ == 0)
                     {
                         done = true;
@@ -1389,7 +1389,7 @@ public:
                     {
                         if (buffer_.length() > 0)
                         {
-                            tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<path_term<JsonT>>(buffer_)));
+                            tokens_.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer_)));
                             buffer_.clear();
                         }
                         state_ = filter_states::oper;
@@ -1399,8 +1399,8 @@ public:
                 case ')':
                     if (buffer_.length() > 0)
                     {
-                        tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<path_term<JsonT>>(buffer_)));
-                        tokens_.push_back(token<JsonT>(token_types::right_paren));
+                        tokens_.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer_)));
+                        tokens_.push_back(token<Json>(token_types::right_paren));
                         buffer_.clear();
                     }
                     if (--depth_ == 0)
@@ -1463,7 +1463,7 @@ public:
                                 ++column_;
                                 flags |= std::regex_constants::icase;
                             }
-                            tokens_.push_back(token<JsonT>(token_types::term,std::make_shared<regex_term<JsonT>>(buffer_,flags)));
+                            tokens_.push_back(token<Json>(token_types::term,std::make_shared<regex_term<Json>>(buffer_,flags)));
                             buffer_.clear();
                         }
                         state_ = filter_states::expect_path_or_value;

@@ -379,7 +379,7 @@ and `std::allocator<void>` as the allocator type,
 ```c++
     typedef basic_json<char,std::allocator<char>> json
 ```
-The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
+The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
 The library includes an instantiation for wide characters as well,
 ```c++
@@ -439,13 +439,13 @@ In the json class, constructors, accessors and modifiers are templated, for exam
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 ```c++
-    template <class JsonT, typename T>
+    template <class Json, class T>
     class json_type_traits
     {
     public:
-        static bool is(const JsonT& rhs) noexcept;
-        static T as(const JsonT& rhs);
-        static void assign(JsonT& lhs, T rhs);
+        static bool is(const Json& rhs) noexcept;
+        static T as(const Json& rhs);
+        static void assign(Json& lhs, T rhs);
     };
 ```
 This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write

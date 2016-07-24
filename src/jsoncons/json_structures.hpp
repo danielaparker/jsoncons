@@ -22,40 +22,40 @@
 
 namespace jsoncons {
 
-template <class JsonT, class Alloc>
+template <class Json, class Allocator>
 class json_array
 {
 public:
-    typedef Alloc allocator_type;
-    typedef JsonT value_type;
-    typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<JsonT> vector_allocator_type;
-    typedef typename std::vector<JsonT,Alloc>::reference reference;
-    typedef typename std::vector<JsonT,Alloc>::const_reference const_reference;
-    typedef typename std::vector<JsonT,Alloc>::iterator iterator;
-    typedef typename std::vector<JsonT,Alloc>::const_iterator const_iterator;
+    typedef Allocator allocator_type;
+    typedef Json value_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Json> vector_allocator_type;
+    typedef typename std::vector<Json,Allocator>::reference reference;
+    typedef typename std::vector<Json,Allocator>::const_reference const_reference;
+    typedef typename std::vector<Json,Allocator>::iterator iterator;
+    typedef typename std::vector<Json,Allocator>::const_iterator const_iterator;
 
     json_array()
         : elements_()
     {
     }
 
-    explicit json_array(const Alloc& allocator)
+    explicit json_array(const Allocator& allocator)
         : elements_(allocator)
     {
     }
 
-    explicit json_array(size_t n, const Alloc& allocator = Alloc())
-        : elements_(n,JsonT(),allocator)
+    explicit json_array(size_t n, const Allocator& allocator = Allocator())
+        : elements_(n,Json(),allocator)
     {
     }
 
-    explicit json_array(size_t n, const JsonT& value, const Alloc& allocator = Alloc())
+    explicit json_array(size_t n, const Json& value, const Allocator& allocator = Allocator())
         : elements_(n,value,allocator)
     {
     }
 
     template <class InputIterator>
-    json_array(InputIterator begin, InputIterator end, const Alloc& allocator = Alloc())
+    json_array(InputIterator begin, InputIterator end, const Allocator& allocator = Allocator())
         : elements_(begin,end,allocator)
     {
     }
@@ -65,7 +65,7 @@ public:
     {
     }
 
-    json_array(const json_array& val, const Alloc& allocator)
+    json_array(const json_array& val, const Allocator& allocator)
         : elements_(val.elements_,allocator)
     {
     }
@@ -73,23 +73,23 @@ public:
         : elements_(std::move(val.elements_))
     {
     }
-    json_array(json_array&& val, const Alloc& allocator)
+    json_array(json_array&& val, const Allocator& allocator)
         : elements_(std::move(val.elements_),allocator)
     {
     }
 
-    json_array(std::initializer_list<JsonT> init, 
-               const Alloc& allocator = Alloc())
+    json_array(std::initializer_list<Json> init, 
+               const Allocator& allocator = Allocator())
         : elements_(std::move(init),allocator)
     {
     }
 
-    Alloc get_allocator() const
+    Allocator get_allocator() const
     {
         return elements_.get_allocator();
     }
 
-    void swap(json_array<JsonT,Alloc>& val)
+    void swap(json_array<Json,Allocator>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -113,7 +113,7 @@ public:
 
     void resize(size_t n) {elements_.resize(n);}
 
-    void resize(size_t n, const JsonT& val) {elements_.resize(n,val);}
+    void resize(size_t n, const Json& val) {elements_.resize(n,val);}
 
     void remove_range(size_t from_index, size_t to_index) 
     {
@@ -127,27 +127,27 @@ public:
         elements_.erase(first,last);
     }
 
-    JsonT& operator[](size_t i) {return elements_[i];}
+    Json& operator[](size_t i) {return elements_[i];}
 
-    const JsonT& operator[](size_t i) const {return elements_[i];}
+    const Json& operator[](size_t i) const {return elements_[i];}
 
-    void push_back(const JsonT& value)
+    void push_back(const Json& value)
     {
         elements_.push_back(value);
     }
 
-    void push_back(JsonT&& value)
+    void push_back(Json&& value)
     {
         elements_.push_back(std::move(value));
     }
 
-    void add(size_t index, const JsonT& value)
+    void add(size_t index, const Json& value)
     {
         auto position = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(position, value);
     }
 
-    void add(size_t index, JsonT&& value)
+    void add(size_t index, Json&& value)
     {
         auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
         elements_.insert(it, std::move(value));
@@ -155,24 +155,24 @@ public:
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
-    iterator add(const_iterator pos, const JsonT& value)
+    iterator add(const_iterator pos, const Json& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.insert(it, value);
     }
 
-    iterator add(const_iterator pos, JsonT&& value)
+    iterator add(const_iterator pos, Json&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.insert(it, std::move(value));
     }
 #else
-    iterator add(const_iterator pos, const JsonT& value)
+    iterator add(const_iterator pos, const Json& value)
     {
         return elements_.insert(pos, value);
     }
 
-    iterator add(const_iterator pos, JsonT&& value)
+    iterator add(const_iterator pos, Json&& value)
     {
         return elements_.insert(pos, std::move(value));
     }
@@ -186,7 +186,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<JsonT,Alloc>& rhs) const
+    bool operator==(const json_array<Json,Allocator>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -202,8 +202,8 @@ public:
         return true;
     }
 private:
-    json_array& operator=(const json_array<JsonT,Alloc>&);
-    std::vector<JsonT,Alloc> elements_;
+    json_array& operator=(const json_array<Json,Allocator>&);
+    std::vector<Json,Allocator> elements_;
 };
 
 template <class ValueT,class CharT>
@@ -494,19 +494,19 @@ public:
     IteratorT it_;
 };
 
-template <class StringT,class JsonT,bool IsSorted,class Alloc>
+template <class StringT,class Json,bool IsSorted,class Allocator>
 class json_object
 {
 };
 
-template <class StringT,class JsonT,class Alloc>
-class json_object<StringT,JsonT,true,Alloc>
+template <class StringT,class Json,class Allocator>
+class json_object<StringT,Json,true,Allocator>
 {
 public:
-    typedef Alloc allocator_type;
-    typedef typename JsonT::char_type char_type;
+    typedef Allocator allocator_type;
+    typedef typename Json::char_type char_type;
     typedef StringT string_type;
-    typedef name_value_pair<StringT,JsonT> value_type;
+    typedef name_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
@@ -540,7 +540,7 @@ public:
     {
     }
 
-    Alloc get_allocator() const
+    Allocator get_allocator() const
     {
         return members_.get_allocator();
     }
@@ -635,7 +635,7 @@ public:
         std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
-    void set(const char_type* s, size_t length, const JsonT& value)
+    void set(const char_type* s, size_t length, const Json& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
@@ -652,7 +652,7 @@ public:
         }
     }
 
-    void set(const char_type* s, size_t length, JsonT&& value)
+    void set(const char_type* s, size_t length, Json&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
@@ -669,7 +669,7 @@ public:
         }
     }
 
-    void set(string_type&& name, const JsonT& value)
+    void set(string_type&& name, const Json& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -686,17 +686,17 @@ public:
         }
     }
 
-    void set(const string_type& name, const JsonT& value)
+    void set(const string_type& name, const Json& value)
     {
         set(name.data(),name.length(),value);
     }
 
-    void set(const string_type& name, JsonT&& value)
+    void set(const string_type& name, Json&& value)
     {
         set(name.data(),name.length(),std::move(value));
     }
 
-    void set(string_type&& name, JsonT&& value)
+    void set(string_type&& name, Json&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -713,17 +713,17 @@ public:
         }
     }
 
-    iterator set(iterator hint, const char_type* name, const JsonT& value)
+    iterator set(iterator hint, const char_type* name, const Json& value)
     {
         return set(hint, name, std::char_traits<char_type>::length(name), value);
     }
 
-    iterator set(iterator hint, const char_type* name, JsonT&& value)
+    iterator set(iterator hint, const char_type* name, Json&& value)
     {
         return set(hint, name, std::char_traits<char_type>::length(name), std::move(value));
     }
 
-    iterator set(iterator hint, const char_type* s, size_t length, const JsonT& value)
+    iterator set(iterator hint, const char_type* s, size_t length, const Json& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
@@ -751,7 +751,7 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const char_type* s, size_t length, JsonT&& value)
+    iterator set(iterator hint, const char_type* s, size_t length, Json&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
@@ -779,12 +779,12 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const string_type& name, const JsonT& value)
+    iterator set(iterator hint, const string_type& name, const Json& value)
     {
         return set(hint,name.data(),name.length(),value);
     }
 
-    iterator set(iterator hint, string_type&& name, const JsonT& value)
+    iterator set(iterator hint, string_type&& name, const Json& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->name() <= name)
@@ -812,12 +812,12 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const string_type& name, JsonT&& value)
+    iterator set(iterator hint, const string_type& name, Json&& value)
     {
         return set(hint,name.data(),name.length(),std::move(value));
     }
 
-    iterator set(iterator hint, string_type&& name, JsonT&& value)
+    iterator set(iterator hint, string_type&& name, Json&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it;
         if (hint.get() != members_.end() && hint.get()->name() <= name)
@@ -869,14 +869,14 @@ private:
 
 // Unsorted
 
-template <class StringT,class JsonT,class Alloc>
-class json_object<StringT,JsonT,false,Alloc>
+template <class StringT,class Json,class Allocator>
+class json_object<StringT,Json,false,Allocator>
 {
 public:
-    typedef Alloc allocator_type;
-    typedef typename JsonT::char_type char_type;
+    typedef Allocator allocator_type;
+    typedef typename Json::char_type char_type;
     typedef StringT string_type;
-    typedef name_value_pair<StringT,JsonT> value_type;
+    typedef name_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
@@ -910,7 +910,7 @@ public:
     {
     }
 
-    Alloc get_allocator() const
+    Allocator get_allocator() const
     {
         return members_.get_allocator();
     }
@@ -999,7 +999,7 @@ public:
         }
     }
 
-    void set(const char_type* name, size_t length, const JsonT& value)
+    void set(const char_type* name, size_t length, const Json& value)
     {
         equals_pred<value_type,char_type> comp(name, length);
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -1014,7 +1014,7 @@ public:
         }
     }
 
-    void set(const char_type* name, size_t length, JsonT&& value)
+    void set(const char_type* name, size_t length, Json&& value)
     {
         equals_pred<value_type,char_type> comp(name, length);
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -1029,7 +1029,7 @@ public:
         }
     }
 
-    void set(string_type&& name, const JsonT& value)
+    void set(string_type&& name, const Json& value)
     {
         equals_pred<value_type,char_type> comp(s, length);
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -1044,17 +1044,17 @@ public:
         }
     }
 
-    void set(const string_type& name, const JsonT& value)
+    void set(const string_type& name, const Json& value)
     {
         set(name.data(),name.length(),value);
     }
 
-    void set(const string_type& name, JsonT&& value)
+    void set(const string_type& name, Json&& value)
     {
         set(name.data(),name.length(),std::move(value));
     }
 
-    void set(string_type&& name, JsonT&& value)
+    void set(string_type&& name, Json&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -1069,17 +1069,17 @@ public:
         }
     }
 
-    iterator set(iterator hint, const char_type* name, const JsonT& value)
+    iterator set(iterator hint, const char_type* name, const Json& value)
     {
         return set(hint, name, std::char_traits<char_type>::length(name), value);
     }
 
-    iterator set(iterator hint, const char_type* name, JsonT&& value)
+    iterator set(iterator hint, const char_type* name, Json&& value)
     {
         return set(hint, name, std::char_traits<char_type>::length(name), std::move(value));
     }
 
-    iterator set(iterator hint, const char_type* name, size_t length, const JsonT& value)
+    iterator set(iterator hint, const char_type* name, size_t length, const Json& value)
     {
         base_iterator it = hint.get();
 
@@ -1099,7 +1099,7 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const char_type* name, size_t length, JsonT&& value)
+    iterator set(iterator hint, const char_type* name, size_t length, Json&& value)
     {
         base_iterator it = hint.get();
 
@@ -1119,12 +1119,12 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const string_type& name, const JsonT& value)
+    iterator set(iterator hint, const string_type& name, const Json& value)
     {
         return set(hint,name.data(),name.length(),value);
     }
 
-    iterator set(iterator hint, string_type&& name, const JsonT& value)
+    iterator set(iterator hint, string_type&& name, const Json& value)
     {
         base_iterator it = hint.get();
 
@@ -1144,12 +1144,12 @@ public:
         return iterator(it);
     }
 
-    iterator set(iterator hint, const string_type& name, JsonT&& value)
+    iterator set(iterator hint, const string_type& name, Json&& value)
     {
         return set(hint,name.data(),name.length(),std::move(value));
     }
 
-    iterator set(iterator hint, string_type&& name, JsonT&& value)
+    iterator set(iterator hint, string_type&& name, Json&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint.get();
 

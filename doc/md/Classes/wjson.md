@@ -1,11 +1,10 @@
     jsoncons::wjson
 
     typedef basic_json<wchar_t,
-                       json_traits<wchar_t>,
-                       std::allocator<wchar_t>> wjson
+                       JsonTraits = json_traits<wchar_t>,
+                       Allocator = std::allocator<wchar_t>> wjson
 
-The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type
-and `std::allocator<void>` as the allocator type. The `jsoncons` library will always rebind the given allocator from the template parameter to internal data structures.
+The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The supplied `JsonTraits` template parameter keeps object members in alphabetically sorted order. The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
 ### Header
 
