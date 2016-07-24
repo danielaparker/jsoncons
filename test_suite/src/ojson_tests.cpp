@@ -23,34 +23,35 @@ BOOST_AUTO_TEST_CASE(test_object)
 {
     ojson o = ojson::parse(R"(
     {
-        "d" : 4,
-        "a" : 1,
-        "b" : 2
+        "street_number" : "100",
+        "street_name" : "Queen St W",
+        "city" : "Toronto",
+        "postal_code" : "M5H 2N2"
     }
     )");
+
+    std::cout << o << std::endl;
 
     ojson o2 = o;
     BOOST_CHECK(o == o2);
 
     ojson o3 = o;
-    o3["a"] = 2;
+    o3["street_name"] = "Queen St W";
     //BOOST_CHECK_EQUAL(o,o3);
 
-    std::cout << o << std::endl;
+    //BOOST_CHECK_EQUAL("Queen St W",o["street_name"].as<std::string>());
+    //BOOST_CHECK_EQUAL(2,o["city"].as<int>());
+    //BOOST_CHECK_EQUAL(4,o["street_number"].as<int>());
 
-    BOOST_CHECK_EQUAL(1,o["a"].as<int>());
-    BOOST_CHECK_EQUAL(2,o["b"].as<int>());
-    BOOST_CHECK_EQUAL(4,o["d"].as<int>());
-
-    o.set("c",3);
-
-    auto it = o.find("b");
+    auto it = o.find("postal_code");
     BOOST_CHECK(it != o.members().end());
-    o.set(it,"e",5);
+    o.set(it,"province","Ontario");
+
+    o.set("unit_type","O");
 
     std::cout << o << std::endl;
 
-    o.erase("d");
+    o.erase("unit_type");
 
     std::cout << o << std::endl;
 }

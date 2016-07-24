@@ -236,7 +236,7 @@ public:
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
 
     typedef json_array<basic_json<CharT,JsonTraits,Allocator>,array_allocator> array;
-    typedef json_object<string_type,basic_json<CharT,JsonTraits,Allocator>,json_traits<CharT>::is_object_sorted,object_allocator> object;
+    typedef json_object<string_type,basic_json<CharT,JsonTraits,Allocator>,json_traits_type::is_object_sorted,object_allocator> object;
     typedef serializable_any<char_type,Allocator> any;
 
     typedef jsoncons::null_type null_type;
