@@ -60,7 +60,7 @@ private:
 
 typedef parse_exception json_parse_exception;
 
-template<typename CharT>
+template<class CharT>
 class basic_parsing_context
 {
 public:
@@ -95,7 +95,7 @@ private:
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;
 
-template <typename CharT>
+template <class CharT>
 class basic_parse_error_handler
 {
 public:
@@ -136,7 +136,7 @@ private:
     }
 };
 
-template <typename CharT>
+template <class CharT>
 class basic_default_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 public:

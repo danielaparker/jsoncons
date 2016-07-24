@@ -15,7 +15,7 @@
 
 namespace jsoncons {
 
-template <typename CharT>
+template <class CharT>
 class basic_json_input_output_adapter : public basic_json_input_handler<CharT>
 {
 public:
@@ -102,7 +102,7 @@ private:
     basic_json_output_handler<CharT>* writer_;
 };
 
-template <typename CharT>
+template <class CharT>
 class basic_json_filter : public basic_json_input_handler<CharT>
 {
 public:
@@ -216,7 +216,7 @@ private:
 };
 
 // Filters out begin_json and end_json events
-template <typename CharT>
+template <class CharT>
 class basic_begin_end_json_filter : public basic_json_filter<CharT>
 {
 public:
@@ -234,7 +234,7 @@ private:
     }
 };
 
-template <typename CharT>
+template <class CharT>
 class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
 {
 public:

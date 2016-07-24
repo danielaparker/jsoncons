@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-template<typename CharT> 
+template<class CharT> 
 void print_integer(int64_t value, buffered_ostream<CharT>& os)
 {
     CharT buf[255];
@@ -33,7 +33,7 @@ void print_integer(int64_t value, buffered_ostream<CharT>& os)
     }
 }
 
-template<typename CharT>
+template<class CharT>
 void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
 {
     CharT buf[255];
@@ -48,7 +48,7 @@ void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
     }
 }
 
-template <typename CharT>
+template <class CharT>
 class basic_json_output_handler
 {
 public:
@@ -185,7 +185,7 @@ private:
     virtual void do_bool_value(bool value) = 0;
 };
 
-template <typename CharT>
+template <class CharT>
 class null_json_output_handler_impl : public basic_json_output_handler<CharT>
 {
 private:
@@ -248,7 +248,7 @@ private:
 
 };
 
-template<typename CharT>
+template<class CharT>
 basic_json_output_handler<CharT>& null_json_output_handler()
 {
     static null_json_output_handler_impl<CharT> instance;

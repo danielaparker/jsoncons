@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-template<typename CharT>
+template<class CharT>
 uint64_t string_to_uinteger(const CharT *s, size_t length) throw(std::overflow_error)
 {
     static const uint64_t max_value = std::numeric_limits<uint64_t>::max JSONCONS_NO_MACRO_EXP();
@@ -36,7 +36,7 @@ uint64_t string_to_uinteger(const CharT *s, size_t length) throw(std::overflow_e
     return n;
 }
 
-template<typename CharT>
+template<class CharT>
 int64_t string_to_integer(bool has_neg, const CharT *s, size_t length) throw(std::overflow_error)
 {
     const long long max_value = std::numeric_limits<int64_t>::max JSONCONS_NO_MACRO_EXP();
@@ -61,10 +61,10 @@ int64_t string_to_integer(bool has_neg, const CharT *s, size_t length) throw(std
     return has_neg ? -n : n;
 }
 
-template <typename CharT>
+template <class CharT>
 class basic_parsing_context;
 
-template <typename CharT>
+template <class CharT>
 class basic_json_input_handler
 {
 public:
@@ -204,7 +204,7 @@ private:
 };
 
 
-template <typename CharT>
+template <class CharT>
 class basic_empty_json_input_handler : public basic_json_input_handler<CharT>
 {
 public:

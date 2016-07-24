@@ -66,7 +66,7 @@ enum class states
     done
 };
 
-template<typename CharT>
+template<class CharT>
 class basic_json_parser : private basic_parsing_context<CharT>
 {
     static const int default_initial_stack_capacity_ = 100;

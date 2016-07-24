@@ -17,7 +17,7 @@
 
 namespace jsoncons 
 {
-    template <typename JsonT>
+    template <class JsonT>
     class json_type_traits<JsonT,boost::gregorian::date>
     {
     public:

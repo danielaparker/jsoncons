@@ -58,7 +58,7 @@ void destroy_impl(const Alloc& allocator, T* p)
     alloc.deallocate(p,1);
 }
 
-template <typename CharT, class Alloc>
+template <class CharT, class Alloc>
 class serializable_any
 {
 public:
@@ -99,7 +99,7 @@ public:
         }
     }
 
-    template<typename T>
+    template<class T>
     explicit serializable_any(T val)
     {
         impl_ = create_impl<any_handle_impl<typename type_wrapper<T>::value_type>>(allocator_,val);
@@ -110,7 +110,7 @@ public:
         return allocator_;
     }
 
-    template <typename T>
+    template <class T>
     typename type_wrapper<T>::reference cast() 
     {
         if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
@@ -120,7 +120,7 @@ public:
         return static_cast<any_handle_impl<typename type_wrapper<T>::value_type>&>(*impl_).value_;
     }
 
-    template <typename T>
+    template <class T>
     typename type_wrapper<T>::const_reference cast() const
     {
         if (typeid(*impl_) != typeid(any_handle_impl<typename type_wrapper<T>::value_type>))
@@ -180,13 +180,13 @@ public:
     any_handle* impl_;
 };
 
-template <typename CharT,class T> inline
+template <class CharT,class T> inline
 void serialize(basic_json_output_handler<CharT>& os, const T&)
 {
     os.value(null_type());
 }
 
-template <typename CharT>
+template <class CharT>
 class basic_parse_error_handler;
 
 enum class value_types : uint8_t 
@@ -212,7 +212,9 @@ bool is_simple(value_types type)
     return type < value_types::string_t;
 }
 
-template <typename CharT, class JsonTraits, typename Alloc = std::allocator<CharT>>
+template <class CharT, 
+          class JsonTraits = json_traits<CharT>, 
+          class Alloc = std::allocator<CharT>>
 class basic_json
 {
 public:
@@ -234,7 +236,7 @@ public:
     typedef typename std::allocator_traits<Alloc>:: template rebind_alloc<member_type> object_allocator;
 
     typedef json_array<basic_json<CharT,JsonTraits,Alloc>,array_allocator> array;
-    typedef json_object<string_type,basic_json<CharT,JsonTraits,Alloc>,json_traits_type::is_object_sorted,object_allocator> object;
+    typedef json_object<string_type,basic_json<CharT,JsonTraits,Alloc>,json_traits<CharT>::is_object_sorted,object_allocator> object;
     typedef serializable_any<char_type,Alloc> any;
 
     typedef jsoncons::null_type null_type;
@@ -1023,13 +1025,13 @@ public:
             evaluate().resize(n);
         }
 
-        template <typename T>
+        template <class T>
         void resize(size_t n, T val)
         {
             evaluate().resize(n,val);
         }
 
-        template<typename T>
+        template<class T>
         bool is() const
         {
             return evaluate().template is<T>();
@@ -1100,13 +1102,13 @@ public:
             return evaluate().as_string(format,allocator);
         }
 
-        template<typename T>
+        template<class T>
         T as() const
         {
             return evaluate().template as<T>();
         }
 
-        template<typename T>
+        template<class T>
         typename std::enable_if<std::is_same<string_type,T>::value>::type as(const string_allocator& allocator) const
         {
             return evaluate().template as<T>(allocator);
@@ -1177,7 +1179,7 @@ public:
             return evaluate();
         }
 
-        template <typename T>
+        template <class T>
         json_proxy& operator=(T val)
         {
             parent_.evaluate_with_default().set(name_, val);
@@ -1276,7 +1278,7 @@ public:
             return evaluate().find(name,length);
         }
 
-        template <typename T>
+        template <class T>
         basic_json<CharT,JsonTraits,Alloc> get(const string_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
@@ -1420,7 +1422,7 @@ public:
             evaluate().resize_array(n);
         }
 
-        template <typename T>
+        template <class T>
         void resize_array(size_t n, T val)
         {
             evaluate().resize_array(n,val);
@@ -1689,7 +1691,7 @@ public:
     {
     }
 
-    template <typename T>
+    template <class T>
     basic_json(T val)
         : var_(null_type())
     {
@@ -1701,7 +1703,7 @@ public:
     {
     }
 
-    template <typename T>
+    template <class T>
     basic_json(T val, const Alloc& allocator)
         : var_(allocator)
     {
@@ -1931,7 +1933,7 @@ public:
         }
     }
 
-    template<typename T>
+    template<class T>
     bool is() const
     {
         return json_type_traits<value_type,T>::is(*this);
@@ -2053,7 +2055,7 @@ public:
         }
     }
 
-    template <typename T>
+    template <class T>
     void resize(size_t n, T val)
     {
         switch (var_.type_)
@@ -2066,13 +2068,13 @@ public:
         }
     }
 
-    template<typename T>
+    template<class T>
     T as() const
     {
         return json_type_traits<value_type,T>::as(*this);
     }
 
-    template<typename T>
+    template<class T>
     typename std::enable_if<std::is_same<string_type,T>::value>::type as(const string_allocator& allocator) const
     {
         return json_type_traits<value_type,T>::as(*this,allocator);
@@ -2430,7 +2432,7 @@ public:
         }
     }
 
-    template<typename T>
+    template<class T>
     basic_json<CharT,JsonTraits,Alloc> get(const string_type& name, T&& default_val) const
     {
         switch (var_.type_)
@@ -2771,7 +2773,7 @@ public:
         var_.assign(null_type());
     }
 
-    template <typename T>
+    template <class T>
     const T& any_cast() const
     {
         if (var_.type_ != value_types::any_t)
@@ -2780,7 +2782,7 @@ public:
         }
         return var_.value_.any_val_->template cast<T>();
     }
-    template <typename T>
+    template <class T>
     T& any_cast() 
     {
         if (var_.type_ != value_types::any_t)
@@ -2807,12 +2809,12 @@ public:
 
     static basic_json make_2d_array(size_t m, size_t n);
 
-    template <typename T>
+    template <class T>
     static basic_json make_2d_array(size_t m, size_t n, T val);
 
     static basic_json make_3d_array(size_t m, size_t n, size_t k);
 
-    template <typename T>
+    template <class T>
     static basic_json make_3d_array(size_t m, size_t n, size_t k, T val);
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -2842,7 +2844,7 @@ public:
         resize(n);
     }
 
-    template <typename T>
+    template <class T>
     void resize_array(size_t n, T val)
     {
         resize(n,val);
@@ -3244,19 +3246,19 @@ void swap(typename JsonT::member_type& a, typename JsonT::member_type& b)
     a.swap(b);
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 bool basic_json<CharT,JsonTraits,Alloc>::operator!=(const basic_json<CharT,JsonTraits,Alloc>& rhs) const
 {
     return !(*this == rhs);
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 bool basic_json<CharT,JsonTraits,Alloc>::operator==(const basic_json<CharT,JsonTraits,Alloc>& rhs) const
 {
     return var_ == rhs.var_;
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_2d_array(size_t m, size_t n)
 {
     basic_json<CharT,JsonTraits,Alloc> a = basic_json<CharT,JsonTraits,Alloc>::array();
@@ -3268,8 +3270,8 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_2d_a
     return a;
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
-template<typename T>
+template<class CharT,class JsonTraits,class Alloc>
+template<class T>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_2d_array(size_t m, size_t n, T val)
 {
     basic_json<CharT,JsonTraits,Alloc> v;
@@ -3282,7 +3284,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_2d_a
     return a;
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_3d_array(size_t m, size_t n, size_t k)
 {
     basic_json<CharT,JsonTraits,Alloc> a = basic_json<CharT,JsonTraits,Alloc>::array();
@@ -3294,8 +3296,8 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_3d_a
     return a;
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
-template<typename T>
+template<class CharT,class JsonTraits,class Alloc>
+template<class T>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_3d_array(size_t m, size_t n, size_t k, T val)
 {
     basic_json<CharT,JsonTraits,Alloc> v;
@@ -3308,7 +3310,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::make_3d_a
     return a;
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_stream(std::basic_istream<char_type>& is)
 {
     basic_json_deserializer<basic_json<CharT,JsonTraits,Alloc>> handler;
@@ -3322,7 +3324,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_str
     return handler.get_result();
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_stream(std::basic_istream<char_type>& is, 
                                                               basic_parse_error_handler<char_type>& err_handler)
 {
@@ -3337,7 +3339,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_str
     return handler.get_result();
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_file(const std::string& filename)
 {
     FILE* fp;
@@ -3395,7 +3397,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_fil
     return handler.get_result();
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_file(const std::string& filename, 
                                                             basic_parse_error_handler<char_type>& err_handler)
 {
@@ -3455,7 +3457,7 @@ basic_json<CharT,JsonTraits,Alloc> basic_json<CharT,JsonTraits,Alloc>::parse_fil
     return handler.get_result();
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 typename basic_json<CharT,JsonTraits,Alloc>::any& basic_json<CharT,JsonTraits,Alloc>::any_value()
 {
     switch (var_.type_)
@@ -3469,7 +3471,7 @@ typename basic_json<CharT,JsonTraits,Alloc>::any& basic_json<CharT,JsonTraits,Al
     }
 }
 
-template<typename CharT,typename JsonTraits,typename Alloc>
+template<class CharT,class JsonTraits,class Alloc>
 const typename basic_json<CharT,JsonTraits,Alloc>::any& basic_json<CharT,JsonTraits,Alloc>::any_value() const
 {
     switch (var_.type_)
@@ -3483,7 +3485,7 @@ const typename basic_json<CharT,JsonTraits,Alloc>::any& basic_json<CharT,JsonTra
     }
 }
 
-template <typename JsonT>
+template <class JsonT>
 std::basic_istream<typename JsonT::char_type>& operator>>(std::basic_istream<typename JsonT::char_type>& is, JsonT& o)
 {
     basic_json_deserializer<JsonT> handler;
@@ -3498,7 +3500,7 @@ std::basic_istream<typename JsonT::char_type>& operator>>(std::basic_istream<typ
     return is;
 }
 
-template<typename JsonT>
+template<class JsonT>
 class json_printable
 {
 public:
@@ -3536,7 +3538,7 @@ private:
     json_printable();
 };
 
-template<typename JsonT>
+template<class JsonT>
 json_printable<JsonT> print(const JsonT& val)
 {
     return json_printable<JsonT>(val,false);
@@ -3555,22 +3557,24 @@ json_printable<JsonT> pretty_print(const JsonT& val)
     return json_printable<JsonT>(val,true);
 }
 
-template<typename JsonT>
+template<class JsonT>
 json_printable<JsonT> pretty_print(const JsonT& val,
                                    const basic_output_format<typename JsonT::char_type>& format)
 {
     return json_printable<JsonT>(val, true, format);
 }
 
-typedef basic_json<char,json_traits,std::allocator<char>> json;
-typedef basic_json<wchar_t,json_traits,std::allocator<wchar_t>> wjson;
+typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
+typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
 
 typedef basic_json_deserializer<json> json_deserializer;
 typedef basic_json_deserializer<wjson> wjson_deserializer;
 
+typedef basic_json<char,json_utraits<char>,std::allocator<char>> ojson;
+typedef basic_json<wchar_t,json_utraits<wchar_t>,std::allocator<wchar_t>> wojson;
 
-typedef basic_json<char,json_utraits,std::allocator<char>> ujson;
-typedef basic_json<wchar_t,json_utraits,std::allocator<wchar_t>> wujson;
+typedef basic_json_deserializer<ojson> ojson_deserializer;
+typedef basic_json_deserializer<wojson> wojson_deserializer;
 }
 
 #if defined(__GNUC__)

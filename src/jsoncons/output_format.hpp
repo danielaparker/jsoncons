@@ -20,10 +20,10 @@ namespace jsoncons {
 
 enum class block_options {next_line,same_line};
 
-template <typename CharT>
+template <class CharT>
 class buffered_ostream;
 
-template <typename CharT>
+template <class CharT>
 class basic_output_format
 {
     int indent_;
@@ -221,7 +221,7 @@ public:
     }
 };
 
-template<typename CharT>
+template<class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    const basic_output_format<CharT>& format,

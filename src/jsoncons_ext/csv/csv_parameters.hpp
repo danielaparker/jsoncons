@@ -23,7 +23,7 @@ enum class quote_styles
     all,minimal,none,nonnumeric
 };
 
-template <typename CharT>
+template <class CharT>
 class basic_csv_parameters
 {
 public:

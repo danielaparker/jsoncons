@@ -24,7 +24,7 @@
 namespace jsoncons
 {
 
-template <typename CharT>
+template <class CharT>
 class buffered_ostream
 {
     static const size_t default_buffer_length = 16384;
@@ -91,7 +91,7 @@ public:
 
 #ifdef _MSC_VER
 
-template <typename CharT>
+template <class CharT>
 class float_printer
 {
     uint8_t precision_;
@@ -199,7 +199,7 @@ public:
 
 #else
 
-template <typename CharT>
+template <class CharT>
 class float_printer
 {
     jsoncons::basic_ovectorstream<CharT> vs_;

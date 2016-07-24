@@ -206,7 +206,7 @@ private:
     std::vector<JsonT,Alloc> elements_;
 };
 
-template <class ValueT,typename CharT>
+template <class ValueT,class CharT>
 class member_lt_string
 {
     size_t length_;
@@ -229,7 +229,7 @@ public:
     }
 };
 
-template <class StringT,typename CharT>
+template <class StringT,class CharT>
 bool name_le_string(const StringT& a, const CharT* b, size_t length)
 {
     size_t min_len = std::min JSONCONS_NO_MACRO_EXP(a.length(),length);
@@ -242,7 +242,7 @@ bool name_le_string(const StringT& a, const CharT* b, size_t length)
     return a.length() <= length;
 }
 
-template <class StringT,typename CharT>
+template <class StringT,class CharT>
 bool name_eq_string(const StringT& a, const CharT* b, size_t length)
 {
     return a.length() == length && std::char_traits<CharT>::compare(a.data(),b,length) == 0;
@@ -271,7 +271,7 @@ public:
     }
 };
 
-template <class ValueT,typename CharT>
+template <class ValueT,class CharT>
 class equals_pred
 {
     const CharT* b_;

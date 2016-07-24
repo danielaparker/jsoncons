@@ -422,19 +422,19 @@ which prints
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
-    template <typename T>
+    template <class T>
     explicit json(T val)
 
-    template<typename T>
+    template<class T>
     bool is() const
 
-    template<typename T>
+    template<class T>
     T as() const
 
-    template <typename T>
+    template <class T>
     basic_json& operator=(T val)
 
-    template <typename T>
+    template <class T>
     void add(T val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`

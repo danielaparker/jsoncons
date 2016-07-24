@@ -21,7 +21,7 @@
 
 namespace jsoncons {
 
-template<typename CharT>
+template<class CharT>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
     static const size_t default_buffer_length = 16384;

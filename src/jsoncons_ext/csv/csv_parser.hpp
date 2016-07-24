@@ -26,7 +26,7 @@
 
 namespace jsoncons { namespace csv {
 
-template <typename CharT>
+template <class CharT>
 struct json_csv_parser_traits
 {
 };
@@ -86,7 +86,7 @@ enum class data_types
     string_t,integer_t,float_t,boolean_t
 };
 
-template<typename CharT>
+template<class CharT>
 class basic_csv_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 3;

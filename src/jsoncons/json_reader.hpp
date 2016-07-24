@@ -22,7 +22,7 @@
 
 namespace jsoncons {
 
-template<typename CharT>
+template<class CharT>
 class basic_json_reader 
 {
     static const size_t default_max_buffer_length = 16384;

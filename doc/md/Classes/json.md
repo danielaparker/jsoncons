@@ -55,10 +55,10 @@ Throws [parse_exception](parse_exception) if parsing fails.
 
     static json make_array(size_t n, const array_allocator& allocator = array_allocator())
 
-    template <typename T>
+    template <class T>
     static json make_array(size_ n, const T& val)
 
-    template <typename T>
+    template <class T>
     static json make_array(size_ n, const T& val, const array_allocator& allocator = array_allocator())
 
     template <size_t N>
@@ -94,7 +94,7 @@ Acquires the contents of val, leaving val a `null` value
     json(json&& val, const allocator_type& allocator)
 Move with allocator
 
-    template <typename T>
+    template <class T>
     json(T val, const allocator_type& allocator=allocator_type())
 Constructs a `json` value for types supported in `json_type_traits`
 
@@ -155,7 +155,7 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
     size_t count(const string_type& name) const
 Returns the number of object members that match `name`.    
 
-    template <typename T>
+    template <class T>
     bool is() const noexcept
 Returns `true` if json value has type `T`, `false` otherwise.  
 
@@ -239,12 +239,12 @@ Returns a reference to the element at index `i` in a json array.
 Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
-    template <typename T>
+    template <class T>
     const json get(const string_type& name, T&& default_val) const
 If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
 Throws `std::runtime_error` if not an object.
 
-    template <typename T>
+    template <class T>
     T as() const
 Attempts to coerce the json value to the template type
 

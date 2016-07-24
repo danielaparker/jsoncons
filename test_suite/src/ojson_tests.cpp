@@ -17,11 +17,11 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(ujson_test_suite)
+BOOST_AUTO_TEST_SUITE(ojson_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_object)
 {
-    ujson o = ujson::parse(R"(
+    ojson o = ojson::parse(R"(
     {
         "d" : 4,
         "a" : 1,
@@ -29,10 +29,10 @@ BOOST_AUTO_TEST_CASE(test_object)
     }
     )");
 
-    ujson o2 = o;
+    ojson o2 = o;
     BOOST_CHECK(o == o2);
 
-    ujson o3 = o;
+    ojson o3 = o;
     o3["a"] = 2;
     //BOOST_CHECK_EQUAL(o,o3);
 

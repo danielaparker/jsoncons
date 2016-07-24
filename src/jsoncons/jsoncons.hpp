@@ -34,7 +34,7 @@ public:
     virtual const char* what() const JSONCONS_NOEXCEPT = 0;
 };
 
-template <typename Base>
+template <class Base>
 class json_exception_0 : public Base, public virtual json_exception
 {
 public:
@@ -53,7 +53,7 @@ private:
     std::string message_;
 };
 
-template <typename Base>
+template <class Base>
 class json_exception_1 : public Base, public virtual json_exception
 {
 public:
@@ -106,7 +106,7 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
-template <typename CharT>
+template <class CharT>
 struct json_text_traits
 {
 };
@@ -202,7 +202,7 @@ struct json_text_traits<char>
 
 };
 
-template <typename CharT,size_t Size>
+template <class CharT,size_t Size>
 struct json_wchar_traits
 {
 };
@@ -309,7 +309,7 @@ bool is_non_ascii_character(uint32_t c)
     return c >= 0x80;
 }
 
-template <typename T>
+template <class T>
 struct type_wrapper
 {
     typedef T* pointer_type;
@@ -319,7 +319,7 @@ struct type_wrapper
     typedef const T& const_reference;
 };
 
-template <typename T>
+template <class T>
 struct type_wrapper<const T>
 {
     typedef T* pointer_type;
@@ -329,7 +329,7 @@ struct type_wrapper<const T>
     typedef const T& const_reference;
 };
 
-template <typename T>
+template <class T>
 struct type_wrapper<T&>
 {
     typedef T* pointer_type;
@@ -339,7 +339,7 @@ struct type_wrapper<T&>
     typedef const T& const_reference;
 };
 
-template <typename T>
+template <class T>
 struct type_wrapper<const T&>
 {
     typedef T* pointer_type;

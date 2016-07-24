@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace csv {
 
-template <typename CharT>
+template <class CharT>
 struct csv_char_traits
 {
 };
@@ -49,7 +49,7 @@ struct csv_char_traits<wchar_t>
     static const std::wstring nonnumeric_literal() {return L"nonumeric";};
 };
  
-template <typename CharT>
+template <class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    CharT quote_char, CharT quote_escape_char,
@@ -72,7 +72,7 @@ void escape_string(const CharT* s,
     }
 }
 
-template<typename CharT>
+template<class CharT>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
     struct stack_item

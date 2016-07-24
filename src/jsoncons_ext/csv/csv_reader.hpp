@@ -22,7 +22,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<typename CharT>
+template<class CharT>
 class basic_csv_reader 
 {
     struct stack_item

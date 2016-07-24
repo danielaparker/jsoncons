@@ -59,7 +59,7 @@ the conversions works. In this implementation the `boost` date values are stored
 ```c++
     namespace jsoncons 
     {
-        template <typename JsonT>
+        template <class JsonT>
         class json_type_traits<JsonT,boost::gregorian::date>
         {
         public:

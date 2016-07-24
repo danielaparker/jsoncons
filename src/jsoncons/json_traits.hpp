@@ -14,11 +14,13 @@
 
 namespace jsoncons {
 
+template <class CharT>
 struct json_traits
 {
     static const bool is_object_sorted = true;
 };
 
+template <class CharT>
 struct json_utraits
 {
     static const bool is_object_sorted = false;

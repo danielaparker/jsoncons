@@ -10,7 +10,7 @@
 
     any(any&& val)
 
-    template<typename T>
+    template<class T>
     explicit any(T val, typename std::enable_if<!std::is_same<any, typename std::decay<T>::type>::value,int>::type* = 0)
 
 ### Destructor
@@ -24,10 +24,10 @@ Supports copy and move assignment
 
 ### Accessors
     
-    template <typename T>
+    template <class T>
     const T& cast() const
 
-    template <typename T>
+    template <class T>
     T& cast() 
 
 ### Example

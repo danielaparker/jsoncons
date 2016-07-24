@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-    template<typename CharT>
+    template<class CharT>
     bool try_string_to_index(const CharT *s, size_t length, size_t* value)
     {
         static const size_t max_value = std::numeric_limits<size_t>::max JSONCONS_NO_MACRO_EXP();
@@ -56,7 +56,7 @@ namespace jsoncons { namespace jsonpath {
         return true;
     }
 
-    template <typename CharT>
+    template <class CharT>
     struct json_jsonpath_traits
     {
     };

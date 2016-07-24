@@ -89,7 +89,7 @@ public:
     }
 }; 
 
-template<typename T> 
+template<class T> 
 class pool_allocator 
 { 
 public: 
@@ -150,12 +150,12 @@ public:
     pool* pool_ptr_; 
 }; 
 
-template<typename T> 
+template<class T> 
 bool operator==(const pool_allocator<T> &s0, const pool_allocator<T> &s1) 
 {
     return s0.pool_ptr_ == s1.pool_ptr_;
 } 
-template<typename T> 
+template<class T> 
 bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1) 
 {
     return s0.pool_ptr_ != s1.pool_ptr_;
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     pool a_pool(1024);
     pool_allocator<json> a_pool_allocator(&a_pool); 
 
-    typedef basic_json<char,json_traits,pool_allocator<json>> myjson;
+    typedef basic_json<char,json_traits<char>,pool_allocator<json>> myjson;
     myjson::array an_array = myjson::array(a_pool_allocator);
     myjson::object an_object = myjson::object(a_pool_allocator);
 
