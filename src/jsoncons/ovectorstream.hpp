@@ -18,7 +18,7 @@ namespace jsoncons {
 
 template< 
     class CharT, 
-    class JsonTraits = std::char_traits<CharT>
+    class Traits = std::char_traits<CharT>
 > class basic_ovectorstream;
 
 template<class CharT, class CharTraits>

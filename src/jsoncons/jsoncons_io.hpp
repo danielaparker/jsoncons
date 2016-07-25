@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
+#include <locale.h>
 #include <limits> // std::numeric_limits
 #include "jsoncons_config.hpp"
 #include "ovectorstream.hpp"
@@ -251,7 +252,7 @@ public:
 #endif
 
 // string_to_float only requires narrow char
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 class float_reader
 {
 private:
@@ -281,7 +282,36 @@ public:
     float_reader(const float_reader& fr) = delete;
     float_reader& operator=(const float_reader& fr) = delete;
 };
+#elif defined(ANDROID) || defined(__ANDROID__)
+class float_reader
+{
+private:
+    locale_t locale_;
+public:
+    float_reader()
+    {
+        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+    }
+    ~float_reader()
+    {
+        free(locale_);
+    }
 
+    double read(const char* s, size_t length)
+    {
+        const char *begin = s;
+        char *end = nullptr;
+        double val = strtod_l(begin, &end, locale_);
+        if (begin == end)
+        {
+            throw std::invalid_argument("Invalid float value");
+        }
+        return val;
+    }
+
+    float_reader(const float_reader& fr) = delete;
+    float_reader& operator=(const float_reader& fr) = delete;
+};
 #else
 class float_reader
 {
