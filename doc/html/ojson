@@ -474,7 +474,9 @@ vertical-align:1px;
                    JsonTraits = ojson_traits&lt;<span class="pl-k">char</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
+<p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
+
+<p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 

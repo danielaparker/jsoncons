@@ -474,7 +474,9 @@ vertical-align:1px;
                    JsonTraits = ojson_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wojson</pre></div>
 
-<p>The <code>wojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
+<p>The <code>wojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
+
+<p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 
@@ -482,7 +484,7 @@ vertical-align:1px;
 
 <h3>Interface</h3>
 
-<p>The interface is the same as <a href="ojson">ojson</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
+<p>The interface is the same as <a href="json">json</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
 
 <h3>See also</h3>
 

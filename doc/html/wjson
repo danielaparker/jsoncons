@@ -474,7 +474,7 @@ vertical-align:1px;
                    JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson</pre></div>
 
-<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use <a href="wojson">wojson</a> instead.</p>
+<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use <a href="wojson">wojson</a> instead.</p>
 
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
