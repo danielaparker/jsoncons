@@ -472,7 +472,7 @@ vertical-align:1px;
 
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
 
-<p>jsoncons uses some features that are new to C++ 11, particularly <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, and recent versions of clang and gcc. </p>
+<p>jsoncons uses some features that are new to C++ 11, particularly <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported.</p>
 
 <h2>Using the jsoncons library</h2>
 
@@ -488,7 +488,6 @@ vertical-align:1px;
 <p>and, for convenience,</p>
 
 <pre><code>using jsoncons::json;
-using jsoncons::json_deserializer;
 </code></pre>
 
 <h3>Reading JSON text from a file</h3>
@@ -673,16 +672,17 @@ using jsoncons::json_deserializer;
 
     <span class="pl-k">using</span> jsoncons::csv::csv_parameters;
     <span class="pl-k">using</span> jsoncons::csv::csv_reader;
+    <span class="pl-k">using</span> jsoncons::json_deserializer;
 
     std::fstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>tasks.csv<span class="pl-pds">"</span></span>);
 
     json_deserializer handler;
 
     csv_parameters params;
-    params.assume_header(<span class="pl-c1">true</span>);
-    params.trim(<span class="pl-c1">true</span>);
-    params.ignore_empty_values(<span class="pl-c1">true</span>);
-    params.column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
+    params.assume_header(<span class="pl-c1">true</span>)
+          .trim(<span class="pl-c1">true</span>)
+          .ignore_empty_values(<span class="pl-c1">true</span>)
+          .column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
 
     csv_reader <span class="pl-en">reader</span>(is,handler,params);
     reader.read();
@@ -854,16 +854,22 @@ using jsoncons::json_deserializer;
 
 <h3>About jsoncons::json</h3>
 
-<p>The json class is an instantiation of the <code>basic_json</code> class template that uses <code>std::string</code> as the string type<br>
-and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
+and sorts object members in alphabetically order.</p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                       JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
+                       Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p>The <code>jsoncons</code> library will always rebind the given allocator from the template parameter to internal data structures.</p>
+<p>If you prefer to retain the original insertion order, use <code>ojson</code> instead.</p>
 
 <p>The library includes an instantiation for wide characters as well,</p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson</pre></div>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
+                       JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
+                       Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson</pre></div>
+
+<p>If you prefer to retain the original insertion order, use <code>wojson</code> instead.</p>
 
 <p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
 
@@ -902,30 +908,30 @@ and <code>std::allocator&lt;void&gt;</code> as the allocator type,</p>
 
 <p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">template </span>&lt;<span class="pl-k">typename</span> T&gt;
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
     <span class="pl-k">explicit</span> <span class="pl-en">json</span>(T val)
 
-    template&lt;typename T&gt;
+    template&lt;class T&gt;
     bool is() <span class="pl-k">const</span>
 
-    template&lt;typename T&gt;
+    template&lt;class T&gt;
     T as() <span class="pl-k">const</span>
 
-    template &lt;typename T&gt;
+    template &lt;class T&gt;
     basic_json&amp; operator=(T val)
 
-    template &lt;typename T&gt;
+    template &lt;class T&gt;
     void add(T val)</pre></div>
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">JsonT</span>, <span class="pl-k">typename</span> T&gt;
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
     <span class="pl-k">class</span> <span class="pl-en">json_type_traits</span>
     {
     <span class="pl-k">public:</span>
-        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> JsonT&amp; rhs) <span class="pl-k">noexcept</span>;
-        <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> JsonT&amp; rhs);
-        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(JsonT&amp; lhs, T rhs);
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>;
+        <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
     };</pre></div>
 
 <p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. You can, for example, extend <code>json_type_traits</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>, and in your code, write</p>
