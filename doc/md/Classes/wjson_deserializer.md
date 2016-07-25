@@ -12,4 +12,3 @@ The `wjson_deserializer` class is an instantiation of the `basic_json_deserializ
 
 The interface is the same as [json_deserializer](json_deserializer), substituting wide character instantiations of classes - `std::wstring`, etc. - for narrow character ones.
 
-

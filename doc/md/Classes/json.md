@@ -1,11 +1,13 @@
 ```c++
-    jsoncons::json
+jsoncons::json
 
-    typedef basic_json<char,
-                       JsonTraits = json_traits<char>,
-                       Allocator = std::allocator<char>> json
+typedef basic_json<char,
+                   JsonTraits = json_traits<char>,
+                   Allocator = std::allocator<char>> json
 ```
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The supplied `JsonTraits` template parameter keeps object members in alphabetically sorted order. The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
+The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The supplied `JsonTraits` template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use [ojson](ojson) instead.
+
+The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
 ### Header
 
@@ -382,183 +384,191 @@ Exchanges the values of `a` and `b`
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
+### See also
+
+- [ojson](ojson) constructs a json value that retains the original name-value insertion order
+
+- [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
+
+- [wojson](wojson) constructs a wide character json value that retains the original name-value insertion order
+
 ## Examples
 
 ### Range-based for loop over members of an object
 ```c++
-    json book = json::parse(R"(
-    {
-        "category" : "Fiction",
-        "title" : "Pulp",
-        "author" : "Charles Bukowski",
-        "date" : "2004-07-08",
-        "price" : 22.48,
-        "isbn" : "1852272007"  
-    }
-    )");
+json book = json::parse(R"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
 
-    for (auto member: book.members())
-    {
-        std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
-    } 
+for (auto member: book.members())
+{
+    std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
+} 
 ```
 ### Range-based for loop over elements of an array
 ```c++
-    json book1;    
-    book1["category"] = "Fiction";
-    book1["title"] = "A Wild Sheep Chase: A Novel";
-    book1["author"] = "Haruki Murakami";
+json book1;    
+book1["category"] = "Fiction";
+book1["title"] = "A Wild Sheep Chase: A Novel";
+book1["author"] = "Haruki Murakami";
 
-    json book2;    
-    book2["category"] = "History";
-    book2["title"] = "Charlie Wilson's War";
-    book2["author"] = "George Crile";
+json book2;    
+book2["category"] = "History";
+book2["title"] = "Charlie Wilson's War";
+book2["author"] = "George Crile";
 
-    json book3;    
-    book3["category"] = "Fiction";
-    book3["title"] = "Kafka on the Shore";
-    book3["author"] = "Haruki Murakami";
+json book3;    
+book3["category"] = "Fiction";
+book3["title"] = "Kafka on the Shore";
+book3["author"] = "Haruki Murakami";
 
-    // Constructing a json array with an initializer list 
-    json booklist = {book1, book2, book3};    
+// Constructing a json array with an initializer list 
+json booklist = {book1, book2, book3};    
 
-    for (auto book: booklist.elements())
-    {
-        std::cout << book["title"].as<string_type>() << std::end;
-    } 
-```    
+for (auto book: booklist.elements())
+{
+    std::cout << book["title"].as<string_type>() << std::end;
+} 
+   
 ### Accessors and defaults
 ```c++
-    json obj;
+json obj;
 
-    obj["field1"] = 1;
-    obj["field3"] = "Toronto";
+obj["field1"] = 1;
+obj["field3"] = "Toronto";
 
-    double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
-    double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
+double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
+double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
 
-    string_type x3 = obj.get("field3","Montreal").as<string_type>();
-    string_type x4 = obj.get("field4","San Francisco").as<string_type>();
+string_type x3 = obj.get("field3","Montreal").as<string_type>();
+string_type x4 = obj.get("field4","San Francisco").as<string_type>();
 
-    std::cout << "x1=" << x1 << std::endl;
-    std::cout << "x2=" << x2 << std::endl;
-    std::cout << "x3=" << x3 << std::endl;
-    std::cout << "x4=" << x4 << std::endl;
+std::cout << "x1=" << x1 << std::endl;
+std::cout << "x2=" << x2 << std::endl;
+std::cout << "x3=" << x3 << std::endl;
+std::cout << "x4=" << x4 << std::endl;
 ```
 The output is
 ```c++
-    x1=1
-    x2=20
-    x3=Toronto
-    x4=San Francisco
+x1=1
+x2=20
+x3=Toronto
+x4=San Francisco
 ```
 ### Nulls
 ```c++
-    json obj;
-    obj["field1"] = json::null_type();
-    std::cout << obj << std::endl;
+json obj;
+obj["field1"] = json::null_type();
+std::cout << obj << std::endl;
 ```
 The output is 
 ```json
-    {"field1":null}
+{"field1":null}
 ```
 ### Array
 ```c++
-    json arr = json::make_array();
-    arr.add(10);
-    arr.add(20);
-    arr.add(30);
+json arr = json::make_array();
+arr.add(10);
+arr.add(20);
+arr.add(30);
 
-    std::cout << arr << std::endl;
+std::cout << arr << std::endl;
 ```
 The output is 
 ```json
-    [10,20,30]
+[10,20,30]
 ```
 ### Array from std::vector
 ```c++
-    std::vector<int> v;
-    v.push_back(10);
-    v.push_back(20);
-    v.push_back(30);
+std::vector<int> v;
+v.push_back(10);
+v.push_back(20);
+v.push_back(30);
 
-    json arr(v.begin(),v.end());
+json arr(v.begin(),v.end());
 
-    std::cout << arr << std::endl;
+std::cout << arr << std::endl;
 ```
 The output is 
 ```c++
-    [10,20,30]
+[10,20,30]
 ```
 ### Object iterator
 ```c++
-    json obj;
-    obj["city"] = "Toronto";
-    obj["province"] = "Ontario";
-    obj["country"] = "Canada";
+json obj;
+obj["city"] = "Toronto";
+obj["province"] = "Ontario";
+obj["country"] = "Canada";
 
-    for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
-    {
-        std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
-    }
+for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
+{
+    std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
+}
 ```
 The output is
 ```c++
-    city=Toronto
-    country=Canada
-    province=Ontario
+city=Toronto
+country=Canada
+province=Ontario
 ```
 ### Array iterator
 ```c++
-    json arr = {"Toronto", "Vancouver", "Montreal"};
+json arr = {"Toronto", "Vancouver", "Montreal"};
 
-    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
-    {
-        std::cout << it->as<string_type>() << std::endl;
-    }
+for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
+{
+    std::cout << it->as<string_type>() << std::endl;
+}
 ```
 The output is
 ```json
-    Toronto
-    Vancouver 
-    Montreal
+Toronto
+Vancouver 
+Montreal
 ```
 ### Constructing json structures
 ```c++
-    json root;
+json root;
 
-    root["persons"] = json::make_array();
+root["persons"] = json::make_array();
 
-    json person;
-    person["first_name"] = "John";
-    person["last_name"] = "Smith";
-    person["birth_date"] = "1972-01-30";
-    
-    json address;
-    address["city"] = "Toronto";
-    address["country"] = "Canada";
-    
-    person["address"] = std::move(address);
+json person;
+person["first_name"] = "John";
+person["last_name"] = "Smith";
+person["birth_date"] = "1972-01-30";
 
-    root["persons"].add(std::move(person));
+json address;
+address["city"] = "Toronto";
+address["country"] = "Canada";
 
-    std::cout << pretty_print(root) << std::endl;
+person["address"] = std::move(address);
+
+root["persons"].add(std::move(person));
+
+std::cout << pretty_print(root) << std::endl;
 ```
 The output is
 ```c++
-    {
-        "persons":
-        [
+{
+    "persons":
+    [
+        {
+            "address":
             {
-                "address":
-                {
-                    "city":"Toronto",
-                    "country":"Canada"
-                },
-                "birth_date":"1972-01-30",
-                "first_name":"John",
-                "last_name":"Smith"
-            }
-        ]
-    }
+                "city":"Toronto",
+                "country":"Canada"
+            },
+            "birth_date":"1972-01-30",
+            "first_name":"John",
+            "last_name":"Smith"
+        }
+    ]
+}
 ```

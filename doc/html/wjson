@@ -468,23 +468,31 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::wjson
+<div class="highlight highlight-source-c++"><pre>jsoncons::wjson
 
-typedef basic_json&lt;wchar_t,
-                   JsonTraits = json_traits&lt;wchar_t&gt;,
-                   Allocator = std::allocator&lt;wchar_t&gt;&gt; wjson
-</code></pre>
+<span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
+                   JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
+                   Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson</pre></div>
 
-<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
+<p>The <code>wjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use <a href="wojson">wojson</a> instead.</p>
+
+<p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/json.hpp"
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span></pre></div>
 
 <h3>Interface</h3>
 
 <p>The interface is the same as <a href="json">json</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
+
+<h3>See also</h3>
+
+<ul>
+<li><p><a href="wojson">wojson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
+<li><p><a href="ojson">ojson</a> constructs a narrow character json value that retains the original name-value insertion order</p></li>
+</ul>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
