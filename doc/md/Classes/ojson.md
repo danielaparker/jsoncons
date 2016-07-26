@@ -3,7 +3,7 @@ jsoncons::ojson
 
 typedef basic_json<char,
                    JsonTraits = ojson_traits<char>,
-                   Allocator = std::allocator<char>> json
+                   Allocator = std::allocator<char>> ojson
 ```
 The `ojson` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The supplied `JsonTraits` template parameter keeps object members in their original order. 
 

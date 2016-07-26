@@ -472,7 +472,7 @@ vertical-align:1px;
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
                    JsonTraits = ojson_traits&lt;<span class="pl-k">char</span>&gt;,
-                   Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
+                   Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; ojson</pre></div>
 
 <p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
 
