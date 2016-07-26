@@ -594,7 +594,7 @@ public:
         bool result = rhs.is_array();
         for (size_t i = 0; result && i < rhs.size(); ++i)
         {
-            if (!rhs[i].is<bool>())
+            if (!rhs[i].template is<bool>())
             {
                 result = false;
             }
@@ -606,7 +606,7 @@ public:
         std::vector<bool> v(rhs.size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = rhs[i].as<bool>();
+            v[i] = rhs[i].template as<bool>();
         }
         return v;
     }
