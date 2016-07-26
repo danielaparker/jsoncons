@@ -254,5 +254,22 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
 
 }
 
+BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
+{
+    std::vector<bool> vec;
+    vec.push_back(true);
+    vec.push_back(false);
+    vec.push_back(true);
+
+    json val;
+    val = vec;
+
+    BOOST_CHECK(val.size() == 3);
+    BOOST_CHECK_EQUAL(val[0].as<bool>(), true);
+    BOOST_CHECK_EQUAL(val[1].as<bool>(), false);
+    BOOST_CHECK_EQUAL(val[2].as<bool>(), true);
+
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -60,6 +60,34 @@ BOOST_AUTO_TEST_CASE(test_unsupported_type)
     // compile error
 }
 
+BOOST_AUTO_TEST_CASE(test_as_vector_of_bool)
+{
+    json a = json::parse("[true,false,true]");
+
+    std::vector<bool> v = a.as<std::vector<bool>>();
+
+    BOOST_CHECK_EQUAL(v[0],true);
+    BOOST_CHECK_EQUAL(v[1],false);
+    BOOST_CHECK_EQUAL(v[2],true);
+}
+
+BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
+{
+    std::vector<bool> v = {true,false,true};
+    json a = v;
+
+    BOOST_CHECK_EQUAL(a[0],true);
+    BOOST_CHECK_EQUAL(a[1],false);
+    BOOST_CHECK_EQUAL(a[2],true);
+
+    json b;
+    b = v;
+
+    BOOST_CHECK_EQUAL(b[0],true);
+    BOOST_CHECK_EQUAL(b[1],false);
+    BOOST_CHECK_EQUAL(b[2],true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
