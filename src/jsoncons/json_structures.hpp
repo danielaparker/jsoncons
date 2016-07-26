@@ -1031,7 +1031,7 @@ public:
 
     void set(string_type&& name, const Json& value)
     {
-        equals_pred<value_type,char_type> comp(s, length);
+        equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
 
         if (it == members_.end())
