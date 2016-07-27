@@ -308,6 +308,24 @@ public:
 };
 
 template<class Json>
+class json_type_traits<Json, std::vector<bool>::reference>
+{
+public:
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_bool();
+    }
+    static bool as(const Json& rhs)
+    {
+        return rhs.as_bool();
+    }
+    static void assign(Json& lhs, std::vector<bool>::reference rhs)
+    {
+        lhs.assign_bool(rhs);
+    }
+};
+
+template<class Json>
 class json_type_traits<Json, short>
 {
 public:
@@ -580,37 +598,6 @@ public:
         return v;
     }
     static void assign(Json& lhs, const std::vector<T>& rhs)
-    {
-        lhs = Json(rhs.begin(), rhs.end());
-    }
-};
-
-template<class Json>
-class json_type_traits<Json, std::vector<bool>>
-{
-public:
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        bool result = rhs.is_array();
-        for (size_t i = 0; result && i < rhs.size(); ++i)
-        {
-            if (!rhs[i].template is<bool>())
-            {
-                result = false;
-            }
-        }
-        return result;
-    }
-    static std::vector<bool> as(const Json& rhs)
-    {
-        std::vector<bool> v(rhs.size());
-        for (size_t i = 0; i < v.size(); ++i)
-        {
-            v[i] = rhs[i].template as<bool>();
-        }
-        return v;
-    }
-    static void assign(Json& lhs, const std::vector<bool>& rhs)
     {
         lhs = Json(rhs.begin(), rhs.end());
     }
