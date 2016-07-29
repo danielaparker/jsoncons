@@ -472,7 +472,7 @@ vertical-align:1px;
 
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
 
-<p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, and recent versions of clang and gcc.</p>
+<p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported.</p>
 
 <p>The <a href="https://github.com/danielaparker/jsoncons">code repository</a> and <a href="https://github.com/danielaparker/jsoncons/releases">releases</a> are on github. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
 
@@ -499,6 +499,14 @@ vertical-align:1px;
 </ul>
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
+
+<h2>What's new on master</h2>
+
+<ul>
+<li><p>A new template parameter, <code>JsonTraits</code>, has been added to the <code>basic_json</code> class template. </p></li>
+<li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
+<li><p>Added <code>std::map&lt;std::string,T&gt;</code> to <code>json_type_traits</code>, enabling 'isstd::map&lt;std::string,T&gt;', 'asstd::map&lt;std::string,T&gt;', construction, and assignment. </p></li>
+</ul>
 
 <h2>Benchmarks</h2>
 

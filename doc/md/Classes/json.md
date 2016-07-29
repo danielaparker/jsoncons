@@ -195,8 +195,11 @@ Returns `true` if the json value is an object, `false` otherwise.
     is<json::array> 
 Returns `true` if the json value is an array, `false` otherwise.  
 
-    is<json::std::vector<T>>
+    is<std::vector<T>>
 Returns `true` if the json value is an array and each element has type `T`, `false` otherwise.
+
+    is<json::std::map<std::string,T>>
+Returns `true` if the json value is an object and each mapped value has type `T`, `false` otherwise.
 
     bool is_null() const noexcept
     bool is_string() const noexcept
@@ -275,6 +278,12 @@ Return integer value if value has integral type, performs cast if value has doub
     string_type as<string_type>() const noexcept
     string_type as<string_type>(const string_allocator& allocator) const noexcept
 If value is string, returns value, otherwise returns result of `to_string`.
+
+    as<std::vector<T>>()
+Returns `json` value as an `std::vector<T>`.
+
+    as<json::std::map<std::string,T>>()
+Returns `json` object value as an `std::map`.
 
     bool as_bool() const noexcept
     int64_t as_integer() const

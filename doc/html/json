@@ -794,10 +794,15 @@ bool is&lt;unsigned long long&gt; const noexcept
 
 <p>Returns <code>true</code> if the json value is an array, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;json::std::vector&lt;T&gt;&gt;
+<pre><code>is&lt;std::vector&lt;T&gt;&gt;
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is an array and each element has type <code>T</code>, <code>false</code> otherwise.</p>
+
+<pre><code>is&lt;json::std::map&lt;std::string,T&gt;&gt;
+</code></pre>
+
+<p>Returns <code>true</code> if the json value is an object and each mapped value has type <code>T</code>, <code>false</code> otherwise.</p>
 
 <pre><code>bool is_null() const noexcept
 bool is_string() const noexcept
@@ -902,6 +907,16 @@ string_type as&lt;string_type&gt;(const string_allocator&amp; allocator) const n
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
+
+<pre><code>as&lt;std::vector&lt;T&gt;&gt;()
+</code></pre>
+
+<p>Returns <code>json</code> value as an <code>std::vector&lt;T&gt;</code>.</p>
+
+<pre><code>as&lt;json::std::map&lt;std::string,T&gt;&gt;()
+</code></pre>
+
+<p>Returns <code>json</code> object value as an <code>std::map</code>.</p>
 
 <pre><code>bool as_bool() const noexcept
 int64_t as_integer() const

@@ -624,6 +624,44 @@ public:
     }
 };
 
+template<class Json, typename T>
+class json_type_traits<Json, std::map<typename Json::string_type,T>>
+{
+public:
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        bool result = rhs.is_object();
+        for (auto member : rhs.members())
+        {
+            if (!member.value().template is<T>())
+            {
+                result = false;
+            }
+        }
+        return result;
+    }
+    static std::map<typename Json::string_type,T> as(const Json& rhs)
+    {
+        std::map<typename Json::string_type,T> v;
+        for (auto member : rhs.members())
+        {
+            v.insert(std::make_pair(member.name(),member.value().template as<T>()));
+        }
+        return v;
+    }
+
+    static void assign(Json& lhs, const std::map<typename Json::string_type,T>& rhs)
+    {
+        Json val;
+        val.reserve(rhs.size());
+        for (auto p: rhs)
+        {
+            val.set(p.first,json_type_traits<Json,T>::as(p.second));
+        }
+        lhs = std::move(val);
+    }
+};
+
 }
 
 #if defined(__GNUC__)

@@ -32,6 +32,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - New instantiations of `basic_json`, `ojson` and `wojson`, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.
 
+- Added `std::map<std::string,T>` to `json_type_traits`, enabling 'is<std::map<std::string,T>>', 'as<std::map<std::string,T>>', construction, and assignment. 
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

@@ -1,5 +1,6 @@
 test_suite/build/cmake/build_vc140x64
 test_suite/build/vs2015
+test_suite/build/vs2013
 test_suite/build/vs2010sp1
 
 examples/build/cmake/build_vc140x64
