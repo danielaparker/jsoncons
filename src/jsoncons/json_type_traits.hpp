@@ -25,7 +25,7 @@
 
 namespace jsoncons {
 
-template <class Json, class T>
+template <class Json, class T, class Enable=void>
 class json_type_traits
 {
 public:
@@ -291,6 +291,27 @@ public:
 
 template<class Json>
 class json_type_traits<Json, bool>
+{
+public:
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_bool();
+    }
+    static bool as(const Json& rhs)
+    {
+        return rhs.as_bool();
+    }
+    static void assign(Json& lhs, bool rhs)
+    {
+        lhs.assign_bool(rhs);
+    }
+};
+
+template<class Json,class T>
+class json_type_traits<Json, T, typename std::enable_if<std::is_same<T, 
+    std::conditional<!std::is_same<bool,std::vector<bool>::const_reference>::value,
+                     std::vector<bool>::const_reference,
+                     void>::type>::value>::type>
 {
 public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
