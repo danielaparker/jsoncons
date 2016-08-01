@@ -20,8 +20,16 @@ BOOST_AUTO_TEST_SUITE(json_type_traits_stl_suite)
 
 BOOST_AUTO_TEST_CASE(test_characters)
 {
-    json a = "short";
-    json b = "a long string";
+    const json a = "short";
+    const json b = "a long string";
+
+    for (auto ch: a.characters())
+    {
+    }
+
+    for (auto ch: b.characters())
+    {
+    }
 
     BOOST_CHECK_EQUAL(true, a.is<std::string>());
     BOOST_CHECK_EQUAL(true, b.is<std::string>());
