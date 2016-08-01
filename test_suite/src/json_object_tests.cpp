@@ -267,40 +267,6 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
     BOOST_CHECK(member.value() == json("value1"));
 }
 
-BOOST_AUTO_TEST_CASE(test_as_map)
-{
-    json o;
-    o["first"] = "first";
-    o["second"] = "second";
-
-    auto m = o.as<std::map<std::string,std::string>>();
-    BOOST_CHECK_EQUAL(std::string("first"),m.at("first"));
-    BOOST_CHECK_EQUAL(std::string("second"),m.at("second"));
-
-    json o2(m);
-    BOOST_CHECK_EQUAL(o,o2);
-
-    json o3;
-    o3 = m;
-    BOOST_CHECK_EQUAL(o,o3);
-}
-
-BOOST_AUTO_TEST_CASE(test_as_map2)
-{
-    json o;
-    o["first"] = 1;
-    o["second"] = true;
-    o["third"] = jsoncons::null_type();
-
-    auto m = o.as<std::map<std::string,std::string>>();
-    BOOST_CHECK_EQUAL(std::string("1"),m.at("first"));
-    BOOST_CHECK_EQUAL(std::string("true"),m.at("second"));
-    BOOST_CHECK_EQUAL(std::string("null"),m.at("third"));
-
-    json o2(m);
-    BOOST_CHECK_EQUAL("1",o2["first"]);
-}
-
 BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
 {
     json a;

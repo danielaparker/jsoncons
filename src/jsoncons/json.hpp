@@ -245,6 +245,8 @@ public:
     typedef typename object::const_iterator const_object_iterator;
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
+    typedef typename string_type::pointer string_iterator;
+    typedef typename string_type::const_pointer const_string_iterator;
 
     template <typename IteratorT>
     class range 
@@ -274,6 +276,8 @@ public:
     typedef range<const_object_iterator> const_object_range;
     typedef range<array_iterator> array_range;
     typedef range<const_array_iterator> const_array_range;
+    typedef range<string_iterator> string_range;
+    typedef range<const_string_iterator> const_string_range;
 
     struct variant
     {
@@ -983,6 +987,16 @@ public:
         const_array_range elements() const
         {
             return evaluate().elements();
+        }
+
+        string_range characters()
+        {
+            return evaluate().characters();
+        }
+
+        const_array_range characters() const
+        {
+            return evaluate().characters();
         }
 
         size_t size() const JSONCONS_NOEXCEPT
@@ -3162,6 +3176,32 @@ public:
             return const_array_range(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
+        }
+    }
+
+    string_range characters()
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return string_range(var_.value_.small_string_val_,var_.value_.small_string_val_+var_.length_or_precision_);
+        case value_types::string_t:
+            return string_range(var_.value_.string_val_->data(),var_.value_.string_val_->data()+var_.value_.string_val_->length());
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
+        }
+    }
+
+    const_string_range characters() const
+    {
+        switch (var_.type_)
+        {
+        case value_types::small_string_t:
+            return const_string_range(var_.value_.small_string_val_,var_.value_.small_string_val_+var_.length_or_precision_);
+        case value_types::string_t:
+            return const_string_range(var_.value_.string_val_->data(),var_.value_.string_val_->data()+var_.value_.string_val_->length());
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
         }
     }
 

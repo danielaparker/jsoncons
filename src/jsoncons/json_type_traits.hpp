@@ -26,9 +26,8 @@
 namespace jsoncons {
 
 template <class Json, class T, class Enable=void>
-class json_type_traits
+struct json_type_traits
 {
-public:
     static bool is(const Json&)
     {
         return false;
@@ -36,9 +35,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename Json::string_type>
+struct json_type_traits<Json, typename Json::string_type>
 {
-public:
     typedef typename Json::string_type string_type;
     typedef typename string_type::allocator_type string_allocator;
 
@@ -61,9 +59,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename Json::any>
+struct json_type_traits<Json, typename Json::any>
 {
-public:
     static bool is(const Json& lhs) JSONCONS_NOEXCEPT
     {
         return lhs.is_any();
@@ -79,9 +76,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
+struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
 {
-public:
     typedef typename Json::char_type char_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
@@ -100,9 +96,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
+struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
 {
-public:
     typedef typename Json::char_type char_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
@@ -121,9 +116,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, char>
+struct json_type_traits<Json, char>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -146,9 +140,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, unsigned char>
+struct json_type_traits<Json, unsigned char>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -175,9 +168,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, signed char>
+struct json_type_traits<Json, signed char>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -204,9 +196,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, wchar_t>
+struct json_type_traits<Json, wchar_t>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -233,9 +224,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename Json::object>
+struct json_type_traits<Json, typename Json::object>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_object();
@@ -252,9 +242,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, typename Json::array>
+struct json_type_traits<Json, typename Json::array>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_array();
@@ -271,9 +260,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, jsoncons::null_type>
+struct json_type_traits<Json, jsoncons::null_type>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_null();
@@ -290,9 +278,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, bool>
+struct json_type_traits<Json, bool>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -308,12 +295,11 @@ public:
 };
 
 template<class Json,class T>
-class json_type_traits<Json, T, typename std::enable_if<std::is_same<T, 
+struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T, 
     std::conditional<!std::is_same<bool,std::vector<bool>::const_reference>::value,
                      std::vector<bool>::const_reference,
                      void>::type>::value>::type>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -329,9 +315,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, std::vector<bool>::reference>
+struct json_type_traits<Json, std::vector<bool>::reference>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -347,9 +332,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, short>
+struct json_type_traits<Json, short>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -376,9 +360,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, unsigned short>
+struct json_type_traits<Json, unsigned short>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -405,9 +388,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, int>
+struct json_type_traits<Json, int>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -434,9 +416,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, unsigned int>
+struct json_type_traits<Json, unsigned int>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -463,9 +444,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, long>
+struct json_type_traits<Json, long>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -492,9 +472,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, unsigned long>
+struct json_type_traits<Json, unsigned long>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -521,9 +500,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, long long>
+struct json_type_traits<Json, long long>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_integer();
@@ -539,9 +517,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, unsigned long long>
+struct json_type_traits<Json, unsigned long long>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_uinteger();
@@ -557,9 +534,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, double>
+struct json_type_traits<Json, double>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
@@ -576,9 +552,8 @@ public:
 };
 
 template<class Json>
-class json_type_traits<Json, float>
+struct json_type_traits<Json, float>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
@@ -594,9 +569,8 @@ public:
 };
 
 template<class Json, typename T>
-class json_type_traits<Json, std::vector<T>>
+struct json_type_traits<Json, std::vector<T>>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_array();
@@ -625,9 +599,8 @@ public:
 };
 
 template<class Json, typename T>
-class json_type_traits<Json, std::map<typename Json::string_type,T>>
+struct json_type_traits<Json, std::map<typename Json::string_type,T>>
 {
-public:
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_object();
@@ -658,7 +631,7 @@ public:
         {
             val.set(p.first,json_type_traits<Json,T>::as(p.second));
         }
-        lhs = std::move(val);
+        lhs.swap(val);
     }
 };
 
