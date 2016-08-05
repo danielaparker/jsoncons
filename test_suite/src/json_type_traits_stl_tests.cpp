@@ -22,6 +22,8 @@ BOOST_AUTO_TEST_CASE(test_characters)
 {
     const json a = "short";
     const json b = "a long string";
+ 
+    std::string s(a.characters().begin(),a.characters().end());
 
     for (auto ch: a.characters())
     {
@@ -30,12 +32,11 @@ BOOST_AUTO_TEST_CASE(test_characters)
     for (auto ch: b.characters())
     {
     }
-
     BOOST_CHECK_EQUAL(true, a.is<std::string>());
     BOOST_CHECK_EQUAL(true, b.is<std::string>());
 
-    std::string s = a.as<std::string>();
-    std::string t = b.as<std::string>();
+    std::string s2 = a.as<std::string>();
+    std::string t2 = b.as<std::string>();
 
     json c = { "short","a long string" };
     auto u = c.as<std::vector<std::string>>();

@@ -26,17 +26,186 @@
 namespace jsoncons {
 
 template <class Json, class T, class Enable=void>
+struct json_string_type_traits
+{
+    typedef void char_traits_type;
+};
+
+template <class Json, class T>
+struct json_string_type_traits<Json, T, typename std::enable_if<std::is_same<typename T::traits_type,typename Json::char_traits_type>::value>::type>
+{
+    typedef typename Json::char_traits_type char_traits_type;
+};
+
+template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
+    static const bool is_compatible = false;
+
     static bool is(const Json&)
     {
         return false;
     }
 };
 
-template<class Json>
-struct json_type_traits<Json, typename Json::string_type>
+template <class Json, class T>
+class json_array_input_iterator
 {
+public:
+    typedef typename Json::const_array_iterator base_iterator;
+    typedef typename std::iterator_traits<base_iterator>::value_type value_type;
+    typedef typename std::iterator_traits<base_iterator>::difference_type difference_type;
+    typedef typename std::iterator_traits<base_iterator>::pointer pointer;
+    typedef T reference;
+    typedef std::input_iterator_tag iterator_category;
+
+    json_array_input_iterator()
+    {
+    }
+
+    json_array_input_iterator(base_iterator it)
+        : it_(it)
+    {
+    }
+
+    json_array_input_iterator& operator=(json_array_input_iterator rhs)
+    {
+        swap(*this,rhs);
+        return *this;
+    }
+
+    json_array_input_iterator& operator++()
+    {
+        ++it_;
+        return *this;
+    }
+
+    json_array_input_iterator operator++(int) // postfix increment
+    {
+        json_array_input_iterator temp(*this);
+        ++it_;
+        return temp;
+    }
+
+    json_array_input_iterator& operator--()
+    {
+        --it_;
+        return *this;
+    }
+
+    json_array_input_iterator operator--(int)
+    {
+        json_array_input_iterator temp(*this);
+        --it_;
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        return json_type_traits<Json,T>::as(*it_);
+    }
+
+    friend bool operator==(const json_array_input_iterator& it1, const json_array_input_iterator& it2)
+    {
+        return it1.it_ == it2.it_;
+    }
+    friend bool operator!=(const json_array_input_iterator& it1, const json_array_input_iterator& it2)
+    {
+        return !(it1.it_ == it2.it_);
+    }
+    friend void swap(json_array_input_iterator& lhs, json_array_input_iterator& rhs)
+    {
+        using std::swap;
+        swap(lhs.it_,rhs.it_);
+        swap(lhs.empty_,rhs.empty_);
+    }
+
+private:
+    base_iterator it_;
+};
+
+template <class Json, class T>
+class json_object_input_iterator
+{
+public:
+    typedef typename Json::const_object_iterator base_iterator;
+    typedef typename std::iterator_traits<base_iterator>::value_type value_type;
+    typedef typename std::iterator_traits<base_iterator>::difference_type difference_type;
+    typedef typename std::iterator_traits<base_iterator>::pointer pointer;
+    typedef T reference;
+    typedef std::input_iterator_tag iterator_category;
+    typedef typename T::second_type mapped_type;
+
+    json_object_input_iterator()
+    {
+    }
+
+    json_object_input_iterator(base_iterator it)
+        : it_(it)
+    {
+    }
+
+    json_object_input_iterator& operator=(json_object_input_iterator rhs)
+    {
+        swap(*this,rhs);
+        return *this;
+    }
+
+    json_object_input_iterator& operator++()
+    {
+        ++it_;
+        return *this;
+    }
+
+    json_object_input_iterator operator++(int) // postfix increment
+    {
+        json_object_input_iterator temp(*this);
+        ++it_;
+        return temp;
+    }
+
+    json_object_input_iterator& operator--()
+    {
+        --it_;
+        return *this;
+    }
+
+    json_object_input_iterator operator--(int)
+    {
+        json_object_input_iterator temp(*this);
+        --it_;
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        return T(it_->name(),json_type_traits<Json,mapped_type>::as(it_->value()));
+    }
+
+    friend bool operator==(const json_object_input_iterator& it1, const json_object_input_iterator& it2)
+    {
+        return it1.it_ == it2.it_;
+    }
+    friend bool operator!=(const json_object_input_iterator& it1, const json_object_input_iterator& it2)
+    {
+        return !(it1.it_ == it2.it_);
+    }
+    friend void swap(json_object_input_iterator& lhs, json_object_input_iterator& rhs)
+    {
+        using std::swap;
+        swap(lhs.it_,rhs.it_);
+        swap(lhs.empty_,rhs.empty_);
+    }
+
+private:
+    base_iterator it_;
+};
+/*
+template<class Json>
+struct json_type_traits<Json, typename Json::string_type> 
+{
+    static const bool is_compatible = true;
+
     typedef typename Json::string_type string_type;
     typedef typename string_type::allocator_type string_allocator;
 
@@ -57,10 +226,12 @@ struct json_type_traits<Json, typename Json::string_type>
         lhs.assign_string(rhs);
     }
 };
-
+*/
 template<class Json>
 struct json_type_traits<Json, typename Json::any>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& lhs) JSONCONS_NOEXCEPT
     {
         return lhs.is_any();
@@ -78,6 +249,8 @@ struct json_type_traits<Json, typename Json::any>
 template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
 {
+    static const bool is_compatible = true;
+
     typedef typename Json::char_type char_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
@@ -98,6 +271,8 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
 template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
 {
+    static const bool is_compatible = true;
+
     typedef typename Json::char_type char_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
@@ -118,6 +293,8 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
 template<class Json>
 struct json_type_traits<Json, char>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -142,6 +319,8 @@ struct json_type_traits<Json, char>
 template<class Json>
 struct json_type_traits<Json, unsigned char>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -170,6 +349,8 @@ struct json_type_traits<Json, unsigned char>
 template<class Json>
 struct json_type_traits<Json, signed char>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -198,6 +379,8 @@ struct json_type_traits<Json, signed char>
 template<class Json>
 struct json_type_traits<Json, wchar_t>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -226,6 +409,8 @@ struct json_type_traits<Json, wchar_t>
 template<class Json>
 struct json_type_traits<Json, typename Json::object>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_object();
@@ -244,6 +429,8 @@ struct json_type_traits<Json, typename Json::object>
 template<class Json>
 struct json_type_traits<Json, typename Json::array>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_array();
@@ -262,6 +449,8 @@ struct json_type_traits<Json, typename Json::array>
 template<class Json>
 struct json_type_traits<Json, jsoncons::null_type>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_null();
@@ -280,6 +469,8 @@ struct json_type_traits<Json, jsoncons::null_type>
 template<class Json>
 struct json_type_traits<Json, bool>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -300,6 +491,8 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
                      std::vector<bool>::const_reference,
                      void>::type>::value>::type>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -317,6 +510,8 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
 template<class Json>
 struct json_type_traits<Json, std::vector<bool>::reference>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -334,6 +529,8 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 template<class Json>
 struct json_type_traits<Json, short>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -362,6 +559,8 @@ struct json_type_traits<Json, short>
 template<class Json>
 struct json_type_traits<Json, unsigned short>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -390,6 +589,8 @@ struct json_type_traits<Json, unsigned short>
 template<class Json>
 struct json_type_traits<Json, int>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -418,6 +619,8 @@ struct json_type_traits<Json, int>
 template<class Json>
 struct json_type_traits<Json, unsigned int>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -446,6 +649,8 @@ struct json_type_traits<Json, unsigned int>
 template<class Json>
 struct json_type_traits<Json, long>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -474,6 +679,8 @@ struct json_type_traits<Json, long>
 template<class Json>
 struct json_type_traits<Json, unsigned long>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -502,6 +709,8 @@ struct json_type_traits<Json, unsigned long>
 template<class Json>
 struct json_type_traits<Json, long long>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_integer();
@@ -519,6 +728,8 @@ struct json_type_traits<Json, long long>
 template<class Json>
 struct json_type_traits<Json, unsigned long long>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_uinteger();
@@ -536,6 +747,8 @@ struct json_type_traits<Json, unsigned long long>
 template<class Json>
 struct json_type_traits<Json, double>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
@@ -554,6 +767,8 @@ struct json_type_traits<Json, double>
 template<class Json>
 struct json_type_traits<Json, float>
 {
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
@@ -569,67 +784,119 @@ struct json_type_traits<Json, float>
 };
 
 template<class Json, typename T>
-struct json_type_traits<Json, std::vector<T>>
+struct json_type_traits<Json, T, 
+                        typename std::enable_if<
+std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_compatible 
+               && json_type_traits<Json, typename T::const_iterator::value_type>::is_compatible>::value
+>::type>
 {
+    typedef typename T::iterator::value_type element_type;
+
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_array();
-        for (size_t i = 0; result && i < rhs.size(); ++i)
+        if (result)
         {
-            if (!rhs[i].template is<T>())
+            for (auto e : rhs.elements())
             {
-                result = false;
+                if (!e.template is<element_type>())
+                {
+                    result = false;
+                    break;
+                }
             }
         }
         return result;
     }
-    static std::vector<T> as(const Json& rhs)
+
+    static T as(const Json& rhs)
     {
-        std::vector<T> v(rhs.size());
-        for (size_t i = 0; i < v.size(); ++i)
+        if (rhs.is_array())
         {
-            v[i] = rhs[i].template as<T>();
+            T v(json_array_input_iterator<Json, element_type>(rhs.elements().begin()),
+                json_array_input_iterator<Json, element_type>(rhs.elements().end()));
+            return v;
         }
-        return v;
+        else
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempt to cast json non-array to array");
+        }
     }
-    static void assign(Json& lhs, const std::vector<T>& rhs)
+
+    static void assign(Json& lhs, const T& rhs)
     {
-        lhs = Json(rhs.begin(), rhs.end());
+        lhs = Json(std::begin(rhs), std::end(rhs));
     }
 };
 
 template<class Json, typename T>
-struct json_type_traits<Json, std::map<typename Json::string_type,T>>
+struct json_type_traits<Json, T, 
+                        typename std::enable_if<
+    !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+                                               //typename std::is_same<typename T::iterator::value_type,typename Json::char_type>::value && 
+std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_compatible &&
+                             json_type_traits<Json, typename T::const_iterator::value_type>::is_compatible>::value>::type>
 {
+    typedef typename T::iterator::value_type element_type;
+
+    static const bool is_compatible = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_string();
+    }
+
+    static T as(const Json& rhs)
+    {
+        return rhs.as_string();
+    }
+
+    static void assign(Json& lhs, const T& rhs)
+    {
+        lhs.assign_string(rhs);
+    }
+};
+
+template<class Json, typename T>
+struct json_type_traits<Json, T, 
+                      typename std::enable_if<std::integral_constant<bool, json_type_traits<Json, typename T::mapped_type>::is_compatible>::value>::type>
+{
+    typedef typename T::key_type key_type;
+    typedef typename T::mapped_type mapped_type;
+    typedef typename T::value_type value_type;
+
+    static const bool is_compatible = true;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_object();
         for (auto member : rhs.members())
         {
-            if (!member.value().template is<T>())
+            if (!member.value().template is<mapped_type>())
             {
                 result = false;
             }
         }
         return result;
     }
-    static std::map<typename Json::string_type,T> as(const Json& rhs)
+
+    static T as(const Json& rhs)
     {
-        std::map<typename Json::string_type,T> v;
-        for (auto member : rhs.members())
-        {
-            v.insert(std::make_pair(member.name(),member.value().template as<T>()));
-        }
+        T v(json_object_input_iterator<Json,value_type>(rhs.members().begin()),
+            json_object_input_iterator<Json,value_type>(rhs.members().end()));
         return v;
     }
 
-    static void assign(Json& lhs, const std::map<typename Json::string_type,T>& rhs)
+    static void assign(Json& lhs, const T& rhs)
     {
         Json val;
-        val.reserve(rhs.size());
+        //val.reserve(rhs.end() - rhs.begin());
         for (auto p: rhs)
         {
-            val.set(p.first,json_type_traits<Json,T>::as(p.second));
+            val.set(p.first,p.second);
         }
         lhs.swap(val);
     }
