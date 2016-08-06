@@ -925,12 +925,19 @@ void add(T val)</pre></div>
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-<span class="pl-k">class</span> <span class="pl-en">json_type_traits</span>
+<div class="highlight highlight-source-c++"><pre>
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Enable</span>=<span class="pl-k">void</span>&gt;
+<span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>
 {
-<span class="pl-k">public:</span>
-    <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>;
+    <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">false</span>;
+
+    <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp;)
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
     <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
+
     <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
 };</pre></div>
 

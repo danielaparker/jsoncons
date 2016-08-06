@@ -40,12 +40,16 @@ struct json_string_type_traits<Json, T, typename std::enable_if<std::is_same<typ
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
-    static const bool is_compatible = false;
+    static const bool is_assignable = false;
 
     static bool is(const Json&)
     {
         return false;
     }
+
+    static T as(const Json& rhs);
+
+    static void assign(Json& lhs, T rhs);
 };
 
 template <class Json, class T>
@@ -200,37 +204,11 @@ public:
 private:
     base_iterator it_;
 };
-/*
-template<class Json>
-struct json_type_traits<Json, typename Json::string_type> 
-{
-    static const bool is_compatible = true;
 
-    typedef typename Json::string_type string_type;
-    typedef typename string_type::allocator_type string_allocator;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_string();
-    }
-    static string_type as(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.as_string();
-    }
-    static string_type as(const Json& rhs, const string_allocator& allocator) JSONCONS_NOEXCEPT
-    {
-        return rhs.as_string(allocator);
-    }
-    static void assign(Json& lhs, const string_type& rhs)
-    {
-        lhs.assign_string(rhs);
-    }
-};
-*/
 template<class Json>
 struct json_type_traits<Json, typename Json::any>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& lhs) JSONCONS_NOEXCEPT
     {
@@ -249,7 +227,7 @@ struct json_type_traits<Json, typename Json::any>
 template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     typedef typename Json::char_type char_type;
 
@@ -271,7 +249,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
 template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     typedef typename Json::char_type char_type;
 
@@ -293,7 +271,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
 template<class Json>
 struct json_type_traits<Json, char>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -319,7 +297,7 @@ struct json_type_traits<Json, char>
 template<class Json>
 struct json_type_traits<Json, unsigned char>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -349,7 +327,7 @@ struct json_type_traits<Json, unsigned char>
 template<class Json>
 struct json_type_traits<Json, signed char>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -379,7 +357,7 @@ struct json_type_traits<Json, signed char>
 template<class Json>
 struct json_type_traits<Json, wchar_t>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -409,7 +387,7 @@ struct json_type_traits<Json, wchar_t>
 template<class Json>
 struct json_type_traits<Json, typename Json::object>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -429,7 +407,7 @@ struct json_type_traits<Json, typename Json::object>
 template<class Json>
 struct json_type_traits<Json, typename Json::array>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -449,7 +427,7 @@ struct json_type_traits<Json, typename Json::array>
 template<class Json>
 struct json_type_traits<Json, jsoncons::null_type>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -469,7 +447,7 @@ struct json_type_traits<Json, jsoncons::null_type>
 template<class Json>
 struct json_type_traits<Json, bool>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -491,7 +469,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
                      std::vector<bool>::const_reference,
                      void>::type>::value>::type>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -510,7 +488,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
 template<class Json>
 struct json_type_traits<Json, std::vector<bool>::reference>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -529,7 +507,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 template<class Json>
 struct json_type_traits<Json, short>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -559,7 +537,7 @@ struct json_type_traits<Json, short>
 template<class Json>
 struct json_type_traits<Json, unsigned short>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -589,7 +567,7 @@ struct json_type_traits<Json, unsigned short>
 template<class Json>
 struct json_type_traits<Json, int>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -619,7 +597,7 @@ struct json_type_traits<Json, int>
 template<class Json>
 struct json_type_traits<Json, unsigned int>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -649,7 +627,7 @@ struct json_type_traits<Json, unsigned int>
 template<class Json>
 struct json_type_traits<Json, long>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -679,7 +657,7 @@ struct json_type_traits<Json, long>
 template<class Json>
 struct json_type_traits<Json, unsigned long>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -709,7 +687,7 @@ struct json_type_traits<Json, unsigned long>
 template<class Json>
 struct json_type_traits<Json, long long>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -728,7 +706,7 @@ struct json_type_traits<Json, long long>
 template<class Json>
 struct json_type_traits<Json, unsigned long long>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -747,7 +725,7 @@ struct json_type_traits<Json, unsigned long long>
 template<class Json>
 struct json_type_traits<Json, double>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -767,7 +745,7 @@ struct json_type_traits<Json, double>
 template<class Json>
 struct json_type_traits<Json, float>
 {
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -787,13 +765,13 @@ template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<
 std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_compatible 
-               && json_type_traits<Json, typename T::const_iterator::value_type>::is_compatible>::value
+std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
+                             json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value
 >::type>
 {
     typedef typename T::iterator::value_type element_type;
 
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -836,13 +814,12 @@ template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<
     !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-                                               //typename std::is_same<typename T::iterator::value_type,typename Json::char_type>::value && 
-std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_compatible &&
-                             json_type_traits<Json, typename T::const_iterator::value_type>::is_compatible>::value>::type>
+std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
+                             json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value>::type>
 {
     typedef typename T::iterator::value_type element_type;
 
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -862,13 +839,13 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                      typename std::enable_if<std::integral_constant<bool, json_type_traits<Json, typename T::mapped_type>::is_compatible>::value>::type>
+                       typename std::enable_if<std::integral_constant<bool, json_type_traits<Json, typename T::mapped_type>::is_assignable>::value>::type>
 {
     typedef typename T::key_type key_type;
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
 
-    static const bool is_compatible = true;
+    static const bool is_assignable = true;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -893,7 +870,7 @@ struct json_type_traits<Json, T,
     static void assign(Json& lhs, const T& rhs)
     {
         Json val;
-        //val.reserve(rhs.end() - rhs.begin());
+        val.reserve(rhs.size());
         for (auto p: rhs)
         {
             val.set(p.first,p.second);

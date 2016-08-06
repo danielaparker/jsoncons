@@ -445,12 +445,19 @@ void add(T val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 ```c++
-template <class Json, class T>
-class json_type_traits
+
+template <class Json, class T, class Enable=void>
+struct json_type_traits
 {
-public:
-    static bool is(const Json& rhs) noexcept;
+    static const bool is_assignable = false;
+
+    static bool is(const Json&)
+    {
+        return false;
+    }
+
     static T as(const Json& rhs);
+
     static void assign(Json& lhs, T rhs);
 };
 ```

@@ -529,11 +529,12 @@ the conversions works. In this implementation the <code>boost</code> date values
 
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
     {
-        <span class="pl-k">template </span>&lt;<span class="pl-k">typename</span> JsonT&gt;
-        <span class="pl-k">class</span> <span class="pl-en">json_type_traits</span>&lt;JsonT,boost::gregorian::date&gt;
+        <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+        <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
         {
-        <span class="pl-k">public:</span>
-            <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> JsonT&amp; val) noexcept
+            <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">true</span>;
+
+            <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
             {
                 <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
                 {
@@ -551,15 +552,15 @@ the conversions works. In this implementation the <code>boost</code> date values
                 }
             }
 
-            <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> JsonT&amp; val)
+            <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
             {
                 std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
                 <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
             }
 
-            <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(JsonT&amp; lhs, boost::gregorian::date val)
+            <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
             {
-                lhs = <span class="pl-c1">to_iso_extended_string</span>(val);
+                lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
             }
         };
     }</pre></div>

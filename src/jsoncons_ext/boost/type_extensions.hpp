@@ -18,9 +18,10 @@
 namespace jsoncons 
 {
     template <class Json>
-    class json_type_traits<Json,boost::gregorian::date>
+    struct json_type_traits<Json,boost::gregorian::date>
     {
-    public:
+        static const bool is_assignable = true;
+
         static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_string())
@@ -47,7 +48,7 @@ namespace jsoncons
 
         static void assign(Json& lhs, boost::gregorian::date val)
         {
-            lhs = to_iso_extended_string(val);
+            lhs.assign_string(to_iso_extended_string(val));
         }
     };
 }
