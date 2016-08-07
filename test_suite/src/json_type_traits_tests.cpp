@@ -60,6 +60,20 @@ BOOST_AUTO_TEST_CASE(test_unsupported_type)
     // compile error
 }
 
+BOOST_AUTO_TEST_CASE(test_as_json_value)
+{
+    json a;
+
+    a["first"] = "first"; 
+    a["second"] = "second"; 
+
+    BOOST_CHECK_EQUAL(true,a.is<json>());
+    
+    json b = a.as<json>();
+    BOOST_CHECK_EQUAL("first",b["first"].as<std::string>());
+    BOOST_CHECK_EQUAL("second",b["second"].as<std::string>());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

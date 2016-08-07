@@ -100,7 +100,7 @@ Move with allocator
 
     template <class T>
     json(T val, const allocator_type& allocator=allocator_type())
-Constructs a `json` value for types supported in `json_type_traits`
+Constructs a `json` value for types supported in `json_type_traits`.
 
     template <class InputIterator>
     json(InputIterator first, InputIterator last, 
@@ -161,7 +161,7 @@ Returns the number of object members that match `name`.
 
     template <class T>
     bool is() const noexcept
-Returns `true` if json value has type `T`, `false` otherwise.  
+Returns `true` if the json value is compatible with value type `T`, `false` otherwise.  
 
     bool is<char> const noexcept 
     bool is<signed char> const noexcept
@@ -253,7 +253,7 @@ Throws `std::runtime_error` if not an object.
 
     template <class T>
     T as() const
-Attempts to coerce the json value to the template type
+Attempts to convert the json value to the template value type
 
     as<bool>
 Returns `false` if value is `false` or `null`, if value is a zero length string, or if value is a zero length array or object. Everything else returns `true`.

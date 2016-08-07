@@ -405,6 +405,25 @@ struct json_type_traits<Json, typename Json::object>
 };
 
 template<class Json>
+struct json_type_traits<Json, Json>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return true;
+    }
+    static Json as(Json rhs)
+    {
+        return rhs;
+    }
+    static void assign(Json& lhs, Json rhs)
+    {
+        lhs.swap(rhs);
+    }
+};
+
+template<class Json>
 struct json_type_traits<Json, typename Json::array>
 {
     static const bool is_assignable = true;
@@ -762,7 +781,7 @@ struct json_type_traits<Json, float>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<
+                        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
 std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
 std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
                              json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value
@@ -811,7 +830,7 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<
+                        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
     !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
 std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
                              json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value>::type>
