@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
+#include <type_traits>
 #include "jsoncons/jsoncons.hpp"
 
 #if defined(__GNUC__)
@@ -259,7 +260,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     }
     static const char_type* as(const Json& rhs)
     {
-        return rhs.as_cstring();
+        static_assert(0, "as<char*> not supported. Did you mean as<const char*>()?");
     }
     static void assign(Json& lhs, const char_type *rhs)
     {
@@ -395,8 +396,7 @@ struct json_type_traits<Json, typename Json::object>
     }
     static typename Json::object as(Json rhs)
     {
-        JSONCONS_ASSERT(rhs.is_object());
-        return rhs.object_value();
+        static_assert(0,"as<Json::object> not supported");
     }
     static void assign(Json& lhs, typename Json::object rhs)
     {
@@ -415,8 +415,7 @@ struct json_type_traits<Json, typename Json::array>
     }
     static typename Json::array as(const Json& rhs)
     {
-        JSONCONS_ASSERT(rhs.is_array());
-        return rhs.array_value();
+        static_assert(0, "as<Json::array> not supported");
     }
     static void assign(Json& lhs, typename Json::array rhs)
     {
