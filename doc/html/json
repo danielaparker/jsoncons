@@ -660,7 +660,7 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 json(T val, const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
-<p>Constructs a <code>json</code> value for types supported in <code>json_type_traits</code></p>
+<p>Constructs a <code>json</code> value for types supported in <a href="json_type_traits">json_type_traits</a>.</p>
 
 <pre><code>template &lt;class InputIterator&gt;
 json(InputIterator first, InputIterator last, 
@@ -746,7 +746,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 bool is() const noexcept
 </code></pre>
 
-<p>Returns <code>true</code> if json value has type <code>T</code>, <code>false</code> otherwise.  </p>
+<p>Returns <code>true</code> if the json value is compatible with value type <code>T</code>, <code>false</code> otherwise.  </p>
 
 <pre><code>bool is&lt;char&gt; const noexcept 
 bool is&lt;signed char&gt; const noexcept
@@ -874,7 +874,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 T as() const
 </code></pre>
 
-<p>Attempts to coerce the json value to the template type</p>
+<p>Attempts to convert the json value to the template value type</p>
 
 <pre><code>as&lt;bool&gt;
 </code></pre>

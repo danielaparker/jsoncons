@@ -741,6 +741,25 @@ struct json_type_traits<Json, unsigned long long>
 };
 
 template<class Json>
+struct json_type_traits<Json, float>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_double();
+    }
+    static double as(const Json& rhs)
+    {
+        return static_cast<float>(rhs.as_double());
+    }
+    static void assign(Json& lhs, float rhs)
+    {
+        lhs.assign_double(static_cast<double>(rhs));
+    }
+};
+
+template<class Json>
 struct json_type_traits<Json, double>
 {
     static const bool is_assignable = true;
@@ -757,25 +776,6 @@ struct json_type_traits<Json, double>
     static void assign(Json& lhs, double rhs)
     {
         lhs.assign_double(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, float>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_double();
-    }
-    static double as(const Json& rhs)
-    {
-        return static_cast<float>(rhs.as_double());
-    }
-    static void assign(Json& lhs, float rhs)
-    {
-        lhs.assign_double(static_cast<double>(rhs));
     }
 };
 

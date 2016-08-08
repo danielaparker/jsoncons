@@ -100,7 +100,7 @@ Move with allocator
 
     template <class T>
     json(T val, const allocator_type& allocator=allocator_type())
-Constructs a `json` value for types supported in `json_type_traits`.
+Constructs a `json` value for types supported in [json_type_traits](json_type_traits).
 
     template <class InputIterator>
     json(InputIterator first, InputIterator last, 
