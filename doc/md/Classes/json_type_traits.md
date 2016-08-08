@@ -21,7 +21,7 @@ struct json_type_traits
 };
 ```
 
-## Specialization
+## Specializations
 `T`|`is<T>`|`as<T>`|Assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>
