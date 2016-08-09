@@ -680,12 +680,15 @@ json(InputIterator first, InputIterator last,
 
 <pre><code>json&amp; operator=(const json&amp; rhs)
 json&amp; operator=(json&amp;&amp; rhs)
+</code></pre>
 
-template &lt;class T&gt;
+<p>Assigns a new <code>json</code> value to a <code>json</code> variable, replacing it's current contents.</p>
+
+<pre><code>template &lt;class T&gt;
 json&amp; operator=(T rhs)
 </code></pre>
 
-<p>Assigns a new value to a <code>json</code> variable, replacing it's current contents.</p>
+<p>Assigns the templated value to a <code>json</code> variable using <a href="json_type_traits">json_type_traits</a>.</p>
 
 <h3>Ranges and Iterators</h3>
 
@@ -746,7 +749,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 bool is() const noexcept
 </code></pre>
 
-<p>Returns <code>true</code> if the json value is compatible with value type <code>T</code>, <code>false</code> otherwise.  </p>
+<p>Returns <code>true</code> if the json value is compatible with value type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.  </p>
 
 <pre><code>bool is&lt;char&gt; const noexcept 
 bool is&lt;signed char&gt; const noexcept
@@ -874,7 +877,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 T as() const
 </code></pre>
 
-<p>Attempts to convert the json value to the template value type</p>
+<p>Attempts to convert the json value to the template value type using <a href="json_type_traits">json_type_traits</a>.</p>
 
 <pre><code>as&lt;bool&gt;
 </code></pre>

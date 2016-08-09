@@ -543,7 +543,7 @@ the conversions works. In this implementation the <code>boost</code> date values
                 std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
                 <span class="pl-k">try</span>
                 {
-                    <span class="pl-c1">boost::gregorian::date_from_iso_string</span>(s);
+                    <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
                     <span class="pl-k">return</span> <span class="pl-c1">true</span>;
                 }
                 <span class="pl-k">catch</span> (...)

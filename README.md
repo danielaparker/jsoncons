@@ -9,6 +9,8 @@ The [code repository](https://github.com/danielaparker/jsoncons) and [releases](
 The library has a number of features, which are listed below:
 
 - Uses the standard C++ input/output streams library
+- Supports converting to and from the standard library sequence and associative containers
+- Supports object members sorted alphabetically by name or in original order
 - Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
 - Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
 - Correctly handles surrogate pairs in \uXXXX escape sequences

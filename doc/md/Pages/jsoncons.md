@@ -1,6 +1,6 @@
 # jsoncons: a C++ library for json construction
 
-jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
+jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
 
 jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported.
 
@@ -11,9 +11,9 @@ The jsoncons library is header-only: it consists solely of header files containi
 To install the jsoncons library, download the zip file, extract the zipped files, look under `src` for the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
 The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
- 
-    #include "jsoncons/json.hpp"
-
+```c++ 
+#include "jsoncons/json.hpp"
+```
 and, for convenience,
 
     using jsoncons::json;
@@ -31,7 +31,7 @@ Here is a sample file, `books.json`:
     {
         "title" : "Women: A Novel",
         "author" : "Charles Bukowski",
-        "price" : 12.00
+        "price" : 12.0
     },
     {
         "title" : "Cutter's Way",
@@ -47,20 +47,10 @@ std::ifstream is("books.json");
 json books;
 is >> books;
 ```
-Loop through the book array elements, using either a range-based for loop
+Loop through the book array elements, using a range-based for loop
 ```c++
 for (auto book : books.elements())
 {
-    std::string author = book["author"].as<std::string>();
-    std::string title = book["title"].as<std::string>();
-    std::cout << author << ", " << title << std::endl;
-}
-```
-or a traditional for loop
-```c++
-for (size_t i = 0; i < books.size(); ++i)
-{
-    json& book = books[i];
     std::string author = book["author"].as<std::string>();
     std::string title = book["title"].as<std::string>();
     std::cout << author << ", " << title << std::endl;
@@ -77,12 +67,48 @@ for (auto it = books.elements().begin();
     std::cout << author << ", " << title << std::endl;
 } 
 ```
+or a traditional for loop
+```c++
+for (size_t i = 0; i < books.size(); ++i)
+{
+    json& book = books[i];
+    std::string author = book["author"].as<std::string>();
+    std::string title = book["title"].as<std::string>();
+    std::cout << author << ", " << title << std::endl;
+}
+```
 The output is
 ```
 Haruki Murakami, Kafka on the Shore
 Charles Bukowski, Women: A Novel
 Ivan Passer, Cutter's Way
 ```
+
+Loop through the members of the third book element, using a range-based for loop
+
+```c++
+for (auto member : books[2].members())
+{
+    std::cout << member.name() << "=" << member.value() << std::endl;
+}
+```
+
+or begin-end iterators:
+
+```c++
+for (auto it = books[2].members().begin(); 
+     it != books[2].members().end();
+     ++it)
+{
+    std::cout << (*it).name() << "=" << (*it).value() << std::endl;
+} 
+```
+The output is
+```
+author=Ivan Passer
+title=Cutter's Way
+```
+
 Note that the third book, Cutter's Way, is missing a price.
 
 You have a choice of object member accessors:
@@ -181,6 +207,64 @@ produces
     }
 }
 ```
+### Converting to and from standard library containers
+
+The jsoncons library supports converting to and from the standard library sequence and associative containers.
+
+```c++
+std::vector<int> v = {1,2,3,4};
+json j(v);
+std::cout << j << std::endl;
+```
+The output is
+```json
+[1,2,3,4]
+```
+
+```c++
+json j = {1,true,"last"};
+auto d = j.as<std::deque<std::string>>();
+for (auto x : d)
+{
+    std::cout << x << std::endl;
+}
+```
+The output is
+```
+1
+true
+last
+```
+
+```c++
+std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
+json j(m);
+std::cout << j << std::endl;
+```
+The output is
+```json
+{"one": 1,"three": 3,"two": 2}
+```
+
+```c++
+json j;
+j["one"] = 1;
+j["two"] = 2;
+j["three"] = 3;
+
+auto um = j.as<std::unordered_map<std::string,int>>();
+for (auto x : um)
+{
+    std::cout << x.first << "=" << x.second << std::endl;
+}
+```
+The output is
+```
+one=1
+three=3
+two=2
+```
+
 ### Converting CSV files to json
 
 Here is a sample CSV file (tasks.csv):
@@ -256,37 +340,6 @@ There are a few things to note about the effect of the parameter settings.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
-### Iterators
-
-`jsoncons::json` supports iterators for accessing the members of json objects and the elements of json arrays.
-
-An example of iterating over the name-value pairs of a json object:
-```c++
-json person;
-person["first_name"] = "Jane";
-person["last_name"] = "Roe";
-person["events_attended"] = 10;
-person["accept_waiver_of_liability"] = true;
-
-for (auto it = person.members().begin(); it != person.members().end(); ++it)
-{
-    std::cout << "name=" << it->name() 
-              << ", value=" << it->value().as<std::string>() << std::endl;
-}
-```
-An example of iterating over the elements of a json array:
-```c++
-json cities = json::array();
-cities.add("Montreal");
-cities.add("Toronto");
-cities.add("Ottawa");
-cities.add("Vancouver");
-
-for (auto it = cities.elements().begin(); it != cities.elements().end(); ++it)
-{
-    std::cout << it->as<std::string>() << std::endl;
-}
-```
 ### jsonpath
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
@@ -424,12 +477,71 @@ which prints
 ```c++
 {"field1":"test","field2":3.9,"field3":true}
 ```
+### ojson and wojson
+
+The `ojson` (wojson) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+```c++
+ojson o = ojson::parse(R"(
+{
+    "street_number" : "100",
+    "street_name" : "Queen St W",
+    "city" : "Toronto",
+    "country" : "Canada"
+}
+)");
+
+std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "country": "Canada"
+}
+```
+Insert "postal_code" at end
+```c++
+o.set("postal_code", "M5H 2N2");
+
+std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "country": "Canada",
+    "postal_code": "M5H 2N2"
+}
+```
+Insert "province" before "country"
+```c++
+auto it = o.find("country");
+o.set(it,"province","Ontario");
+
+std::cout << pretty_print(o) << std::endl;
+```
+The output is
+```json
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "province": "Ontario",
+    "country": "Canada",
+    "postal_code": "M5H 2N2"
+}
+```
+
 ### Type extensibility
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
 template <class T>
-explicit json(T val)
+json(T val)
 
 template<class T>
 bool is() const
@@ -461,26 +573,86 @@ struct json_type_traits
     static void assign(Json& lhs, T rhs);
 };
 ```
-This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`, and in your code, write
+This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. 
+
+You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`.
+
 ```c++
-json deal;
-deal["maturity"] = boost::gregorian::date(2015,1,1);
-    
-json observation_dates = json::array();
-observation_dates.add(boost::gregorian::date(2013,10,21));
-observation_dates.add(boost::gregorian::date(2013,10,28));
-deal["observation_dates"] = std::move(observation_dates);
-    
-boost::gregorian::date maturity = deal["maturity"].as<boost::gregorian::date>();
-    
-std::cout << deal << std::endl;     
-```
-producing
-```c++
+#include "jsoncons/json.hpp"
+#include "boost/date_time/gregorian/gregorian.hpp"
+
+namespace jsoncons 
 {
-    "maturity":"2015-01-01",
-    "observation_dates":
-    ["2013-10-21","2013-10-28"]
+    template <class Json>
+    struct json_type_traits<Json,boost::gregorian::date>
+    {
+        static const bool is_assignable = true;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!val.is_string())
+            {
+                return false;
+            }
+            std::string s = val.template as<std::string>();
+            try
+            {
+                boost::gregorian::from_simple_string(s);
+                return true;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        }
+
+        static boost::gregorian::date as(const Json& val)
+        {
+            std::string s = val.template as<std::string>();
+            return boost::gregorian::from_simple_string(s);
+        }
+
+        static void assign(Json& lhs, boost::gregorian::date val)
+        {
+            lhs.assign_string(to_iso_extended_string(val));
+        }
+    };
 }
 ```
+```c++
+namespace my_ns
+{
+    using jsoncons::json;
+    using boost::gregorian::date;
 
+    json deal = json::parse(R"(
+    {
+        "Maturity":"2014-10-14",
+        "ObservationDates": ["2014-02-14","2014-02-21"]
+    }
+    )");
+
+    deal["ObservationDates"].add(date(2014,2,28));    
+
+    date maturity = deal["Maturity"].as<date>();
+    std::cout << "Maturity: " << maturity << std::endl << std::endl;
+
+    std::cout << "Observation dates: " << std::endl << std::endl;
+
+    for (auto observation_date: deal["ObservationDates"].elements())
+    {
+        std::cout << observation_date << std::endl;
+    }
+    std::cout << std::endl;
+}
+```
+The output is
+```
+Maturity: 2014-Oct-14
+
+Observation dates:
+
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
+```

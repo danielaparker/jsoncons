@@ -3,11 +3,48 @@
 
 #include <string>
 #include "jsoncons/json.hpp"
+#include <deque>
+#include <map>
+#include <unordered_map>
 
 using jsoncons::json;
 using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
+
+void array_example1()
+{
+    {
+        std::vector<int> v = {1,2,3,4};
+        json a(v);
+        std::cout << a << std::endl;
+    }
+    {
+        json j = {1,true,"last"};
+        auto d = j.as<std::deque<std::string>>();
+        for (auto x : d)
+        {
+            std::cout << x << std::endl;
+        }
+    }
+    {
+        std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
+        json j(m);
+        std::cout << j << std::endl;
+    }
+    {
+        json j;
+        j["one"] = 1;
+        j["two"] = 2;
+        j["three"] = 3;
+
+        auto um = j.as<std::unordered_map<std::string,int>>();
+        for (auto x : um)
+        {
+            std::cout << x.first << "=" << x.second << std::endl;
+        }
+    }
+}
 
 void accessing_a_json_value_as_a_vector()
 {
@@ -139,6 +176,8 @@ void make_3_dimensional_array()
 void array_examples()
 {
     std::cout << "Array examples\n" << std::endl;
+    array_example1();
+
     construct_json_from_vector();
     add_element_to_array();
     reserve_array_capacity();

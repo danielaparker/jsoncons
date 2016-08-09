@@ -117,10 +117,11 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
 
     json& operator=(const json& rhs)
     json& operator=(json&& rhs)
+Assigns a new `json` value to a `json` variable, replacing it's current contents.
 
     template <class T>
     json& operator=(T rhs)
-Assigns a new value to a `json` variable, replacing it's current contents.
+Assigns the templated value to a `json` variable using [json_type_traits](json_type_traits).
 
 ### Ranges and Iterators
 
@@ -161,7 +162,7 @@ Returns the number of object members that match `name`.
 
     template <class T>
     bool is() const noexcept
-Returns `true` if the json value is compatible with value type `T`, `false` otherwise.  
+Returns `true` if the json value is compatible with value type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
 
     bool is<char> const noexcept 
     bool is<signed char> const noexcept
@@ -253,7 +254,7 @@ Throws `std::runtime_error` if not an object.
 
     template <class T>
     T as() const
-Attempts to convert the json value to the template value type
+Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
 
     as<bool>
 Returns `false` if value is `false` or `null`, if value is a zero length string, or if value is a zero length array or object. Everything else returns `true`.

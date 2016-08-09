@@ -489,7 +489,7 @@ vertical-align:1px;
     <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
 };</pre></div>
 
-<h2>Specialization</h2>
+<h2>Specializations</h2>
 
 <table>
 <thead>
@@ -693,7 +693,7 @@ vertical-align:1px;
 <td><em>✓</em></td>
 </tr>
 <tr>
-<td>STL sequence container (other than string)</td>
+<td>STL sequence container (other than string) e.g. std::vector</td>
 <td>
 <code>true</code> if array and each value is assignable to a <code>Json</code> value, otherwise <code>false</code>
 </td>
@@ -701,7 +701,7 @@ vertical-align:1px;
 <td><em>✓</em></td>
 </tr>
 <tr>
-<td>STL associative container</td>
+<td>STL associative container e.g. std::map</td>
 <td>
 <code>true</code> if object and each <code>mapped_type</code> is assignable to <code>Json</code>, otherwise <code>false</code>
 </td>
@@ -710,6 +710,90 @@ vertical-align:1px;
 </tr>
 </tbody>
 </table>
+
+<h2>Extensibility</h2>
+
+<p>You can interact with a new type using <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, construction and assignment by extending <code>json_type_traits</code> in the <code>jsoncons</code> namespace.</p>
+
+<p>For example, you can access and modify <code>json</code> values with <code>boost::gregorian</code> dates.</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
+{
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">true</span>;
+
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
+        {
+            <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">try</span>
+            {
+                <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+                <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+            }
+            <span class="pl-k">catch</span> (...)
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+        }
+
+        <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
+        {
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+        }
+
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
+        {
+            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+        }
+    };
+}</pre></div>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">namespace</span> <span class="pl-en">my_ns</span>
+{
+    <span class="pl-k">using</span> jsoncons::json;
+    <span class="pl-k">using</span> boost::gregorian::date;
+
+    json deal = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>Maturity<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">10</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
+<span class="pl-s">        <span class="pl-pds">"</span></span>ObservationDates<span class="pl-s"><span class="pl-pds">"</span>: [<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">21</span><span class="pl-s"><span class="pl-pds">"</span>]</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    )<span class="pl-pds">"</span></span>);
+
+    deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">28</span>));    
+
+    date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>].as&lt;date&gt;();
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Maturity: <span class="pl-pds">"</span></span> &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
+
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].elements())
+    {
+        std::cout &lt;&lt; observation_date &lt;&lt; std::endl;
+    }
+    std::cout &lt;&lt; std::endl;
+}</pre></div>
+
+<p>The output is</p>
+
+<pre><code>Maturity: 2014-Oct-14
+
+Observation dates:
+
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

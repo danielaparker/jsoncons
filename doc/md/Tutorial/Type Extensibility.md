@@ -73,7 +73,7 @@ the conversions works. In this implementation the `boost` date values are stored
                 std::string s = val.template as<std::string>();
                 try
                 {
-                    boost::gregorian::date_from_iso_string(s);
+                    boost::gregorian::from_simple_string(s);
                     return true;
                 }
                 catch (...)
