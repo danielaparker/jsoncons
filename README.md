@@ -34,9 +34,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - New instantiations of `basic_json`, `ojson` and `wojson`, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.
 
-- Added `std::map<std::string,T>` to `json_type_traits`, enabling `is<std::map<std::string,T>>`, `as<std::map<std::string,T>>`, construction, and assignment. 
-
-- Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (std::set, std::multiset, std::unordered_set, std::unordered_multiset.)
+- Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
 
 ## Benchmarks
 

@@ -89,7 +89,8 @@ Loop through the members of the third book element, using a range-based for loop
 ```c++
 for (auto member : books[2].members())
 {
-    std::cout << member.name() << "=" << member.value() << std::endl;
+    std::cout << member.name() << "=" 
+              << member.value() << std::endl;
 }
 ```
 
@@ -100,7 +101,8 @@ for (auto it = books[2].members().begin();
      it != books[2].members().end();
      ++it)
 {
-    std::cout << (*it).name() << "=" << (*it).value() << std::endl;
+    std::cout << (*it).name() << "=" 
+              << (*it).value() << std::endl;
 } 
 ```
 The output is
@@ -112,10 +114,10 @@ title=Cutter's Way
 Note that the third book, Cutter's Way, is missing a price.
 
 You have a choice of object member accessors:
-```c++
-book["price"] will throw a `json_exception` if there is no price
-book.get("price",default_value) will return `default_value` if there is no price
-```
+
+- `book["price"]` will throw `std::out_of_range` if there is no price
+- `book.get("price",default_value)` will return `default_value` if there is no price
+
 So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++
 std::string price = book.get("price","n/a").as<std::string>();
@@ -460,7 +462,7 @@ This results in a json value being constucted with all memory being allocated fr
 
 Note that the underlying memory pool used by the `boost::fast_pool_allocator` is never freed. 
 
-## Wide character support
+### Wide character support
 
 jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
 ```c++
