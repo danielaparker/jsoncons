@@ -559,7 +559,8 @@ Ivan Passer, Cutter's Way
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">auto</span> member : books[<span class="pl-c1">2</span>].members())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+    std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+              &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }</pre></div>
 
 <p>or begin-end iterators:</p>
@@ -568,7 +569,8 @@ Ivan Passer, Cutter's Way
      it != books[<span class="pl-c1">2</span>].members().end();
      ++it)
 {
-    std::cout &lt;&lt; (*it).<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; (*it).<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+    std::cout &lt;&lt; (*it).<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+              &lt;&lt; (*it).<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 } </pre></div>
 
 <p>The output is</p>
@@ -581,8 +583,12 @@ title=Cutter's Way
 
 <p>You have a choice of object member accessors:</p>
 
-<div class="highlight highlight-source-c++"><pre>book[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] will <span class="pl-k">throw</span> a `json_exception` <span class="pl-k">if</span> there is no price
-book.get(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,default_value) will <span class="pl-k">return</span> `default_value` <span class="pl-k">if</span> there is no price</pre></div>
+<ul>
+<li>
+<code>book["price"]</code> will throw <code>std::out_of_range</code> if there is no price</li>
+<li>
+<code>book.get("price",default_value)</code> will return <code>default_value</code> if there is no price</li>
+</ul>
 
 <p>So if you want to show "n/a" for the missing price, you can use this accessor</p>
 
@@ -809,7 +815,7 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 <li>The <code>column_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
 </ul>
 
-<h3>jsonpath</h3>
+<h3>JsonPath</h3>
 
 <p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
 
@@ -843,7 +849,7 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
   }
 }</pre></div>
 
-<p>The following code returns all authors whose books are cheaper than $10. </p>
+<p>JsonPath examples:</p>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
@@ -929,7 +935,7 @@ o.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
 
 <p>Note that the underlying memory pool used by the <code>boost::fast_pool_allocator</code> is never freed. </p>
 
-<h2>Wide character support</h2>
+<h3>Wide character support</h3>
 
 <p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It supports <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4. You can construct a <code>wjson</code> value in exactly the same way as a <code>json</code> value, for instance:</p>
 

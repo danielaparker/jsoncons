@@ -494,6 +494,10 @@ vertical-align:1px;
 </thead>
 <tbody>
 <tr>
+<td><code>json_type</code></td>
+<td>json type</td>
+</tr>
+<tr>
 <td><code>allocator_type</code></td>
 <td>Allocator type</td>
 </tr>

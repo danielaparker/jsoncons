@@ -342,7 +342,7 @@ There are a few things to note about the effect of the parameter settings.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
-### jsonpath
+### JsonPath
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
 
@@ -376,7 +376,7 @@ Here is a sample JSON file (store.json):
   }
 }
 ```
-The following code returns all authors whose books are cheaper than $10. 
+JsonPath examples:
 ```c++    
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
@@ -657,4 +657,4 @@ Observation dates:
 2014-Feb-14
 2014-Feb-21
 2014-Feb-28
-```
+``` 

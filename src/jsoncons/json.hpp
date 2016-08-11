@@ -228,8 +228,8 @@ public:
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> string_allocator;
     typedef std::basic_string<CharT,char_traits_type,string_allocator> string_type;
-    typedef basic_json<CharT,JsonTraits,Allocator> value_type;
-    typedef name_value_pair<string_type,value_type> member_type;
+    typedef basic_json<CharT,JsonTraits,Allocator> json_type;
+    typedef name_value_pair<string_type,json_type> member_type;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<basic_json<CharT,JsonTraits,Allocator>> array_allocator;
 
@@ -357,7 +357,7 @@ public:
             value_.object_val_ = create_impl<object>(a, object_allocator(a));
         }
 
-        variant(std::initializer_list<value_type> init,
+        variant(std::initializer_list<json_type> init,
                 const Allocator& a)
             : type_(value_types::array_t)
         {
@@ -1653,7 +1653,7 @@ public:
     {
     }
 
-    basic_json(std::initializer_list<value_type> init,
+    basic_json(std::initializer_list<json_type> init,
                const Allocator& allocator = Allocator()) 
         : var_(std::move(init), allocator)
     {
@@ -1709,7 +1709,7 @@ public:
     basic_json(T val)
         : var_(null_type())
     {
-        json_type_traits<value_type,T>::assign(*this,val);
+        json_type_traits<json_type,T>::assign(*this,val);
     }
 
     basic_json(double val, uint8_t precision)
@@ -1721,7 +1721,7 @@ public:
     basic_json(T val, const Allocator& allocator)
         : var_(allocator)
     {
-        json_type_traits<value_type,T>::assign(*this,val);
+        json_type_traits<json_type,T>::assign(*this,val);
     }
 
     basic_json(const char_type *s, size_t length, const Allocator& allocator = Allocator())
@@ -1753,7 +1753,7 @@ public:
         return *this;
     }
 
-    basic_json& operator=(std::initializer_list<value_type> init)
+    basic_json& operator=(std::initializer_list<json_type> init)
     {
         basic_json<CharT,JsonTraits,Allocator> val(init);
         swap(val);
@@ -1763,7 +1763,7 @@ public:
     template <class T>
     basic_json<CharT,JsonTraits,Allocator>& operator=(T val)
     {
-        json_type_traits<value_type,T>::assign(*this,val);
+        json_type_traits<json_type,T>::assign(*this,val);
         return *this;
     }
 
@@ -1950,7 +1950,7 @@ public:
     template<class T>
     bool is() const
     {
-        return json_type_traits<value_type,T>::is(*this);
+        return json_type_traits<json_type,T>::is(*this);
     }
 
     bool is_string() const JSONCONS_NOEXCEPT
@@ -2085,13 +2085,13 @@ public:
     template<class T>
     T as() const
     {
-        return json_type_traits<value_type,T>::as(*this);
+        return json_type_traits<json_type,T>::as(*this);
     }
 
     template<class T>
     typename std::enable_if<std::is_same<string_type,T>::value>::type as(const string_allocator& allocator) const
     {
-        return json_type_traits<value_type,T>::as(*this,allocator);
+        return json_type_traits<json_type,T>::as(*this,allocator);
     }
 
     bool as_bool() const JSONCONS_NOEXCEPT
@@ -2742,7 +2742,7 @@ public:
         std::vector<T> v(size());
         for (size_t i = 0; i < v.size(); ++i)
         {
-            v[i] = json_type_traits<value_type,T>::as(at(i));
+            v[i] = json_type_traits<json_type,T>::as(at(i));
         }
         return v;
     }
@@ -3248,7 +3248,7 @@ public:
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            const_cast<value_type*>(this)->create_object_implicitly(); // HERE
+            const_cast<json_type*>(this)->create_object_implicitly(); // HERE
         case value_types::object_t:
             return *(var_.value_.object_val_);
         default:

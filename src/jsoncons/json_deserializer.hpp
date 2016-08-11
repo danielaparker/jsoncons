@@ -32,7 +32,7 @@ class basic_json_deserializer : public basic_json_input_handler<typename Json::c
     typedef typename array::allocator_type array_allocator;
     typedef typename Json::object object;
     typedef typename object::allocator_type object_allocator;
-    typedef typename Json::value_type value_type;
+    typedef typename Json::json_type value_type;
 
     string_allocator sa_;
     object_allocator oa_;

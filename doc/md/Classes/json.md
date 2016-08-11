@@ -17,6 +17,7 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 Member type                         |Definition
 ------------------------------------|------------------------------
+`json_type`|json type
 `allocator_type`|Allocator type
 `string_allocator`|String allocator type
 `array_allocator`|Array allocator type
