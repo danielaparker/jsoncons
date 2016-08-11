@@ -2335,6 +2335,8 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
             return var_.value_.array_val_->operator[](i);
+        case value_types::object_t:
+            return var_.value_.object_val_->at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
@@ -2350,6 +2352,8 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
             return var_.value_.array_val_->operator[](i);
+        case value_types::object_t:
+            return var_.value_.object_val_->at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }

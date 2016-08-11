@@ -582,6 +582,16 @@ public:
 
     void reserve(size_t n) {members_.reserve(n);}
 
+    Json& at(size_t) 
+    {
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
+    }
+
+    const Json& at(size_t) const 
+    {
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
+    }
+
     iterator find(const char_type* name, size_t length)
     {
         member_lt_string<value_type,char_type> comp(length);
@@ -946,6 +956,24 @@ public:
     }
 
     void reserve(size_t n) {members_.reserve(n);}
+
+    Json& at(size_t i) 
+    {
+        if (i >= members_.size())
+        {
+            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+        }
+        return members_[i].value();
+    }
+
+    const Json& at(size_t i) const 
+    {
+        if (i >= members_.size())
+        {
+            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+        }
+        return members_[i].value();
+    }
 
     iterator find(const char_type* name, size_t length)
     {

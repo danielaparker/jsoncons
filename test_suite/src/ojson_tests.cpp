@@ -19,6 +19,28 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(ojson_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_index)
+{
+    ojson o = ojson::parse(R"(
+    {
+        "street_number" : "100",
+        "street_name" : "Queen St W",
+        "city" : "Toronto",
+        "country" : "Canada"
+    }
+    )");
+
+    BOOST_CHECK_EQUAL("100", o[0].as<std::string>());
+    BOOST_CHECK_EQUAL("Queen St W", o[1].as<std::string>());
+    BOOST_CHECK_EQUAL("Toronto", o[2].as<std::string>());
+    BOOST_CHECK_EQUAL("Canada", o[3].as<std::string>());
+
+    BOOST_CHECK_EQUAL("100", o.at(0).as<std::string>());
+    BOOST_CHECK_EQUAL("Queen St W", o.at(1).as<std::string>());
+    BOOST_CHECK_EQUAL("Toronto", o.at(2).as<std::string>());
+    BOOST_CHECK_EQUAL("Canada", o.at(3).as<std::string>());
+}
+
 BOOST_AUTO_TEST_CASE(test_object)
 {
     ojson o = ojson::parse(R"(
