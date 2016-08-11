@@ -29,15 +29,6 @@ BOOST_AUTO_TEST_CASE(test_characters)
     const json a = "short";
     const json b = "a long string";
  
-    std::string s(a.characters().begin(),a.characters().end());
-
-    for (auto ch: a.characters())
-    {
-    }
-
-    for (auto ch: b.characters())
-    {
-    }
     BOOST_CHECK_EQUAL(true, a.is<std::string>());
     BOOST_CHECK_EQUAL(true, b.is<std::string>());
 

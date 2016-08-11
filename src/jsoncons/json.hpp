@@ -988,16 +988,6 @@ public:
             return evaluate().elements();
         }
 
-        string_range characters()
-        {
-            return evaluate().characters();
-        }
-
-        const_array_range characters() const
-        {
-            return evaluate().characters();
-        }
-
         size_t size() const JSONCONS_NOEXCEPT
         {
             return evaluate().size();
@@ -3181,32 +3171,6 @@ public:
             return const_array_range(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-        }
-    }
-
-    string_range characters()
-    {
-        switch (var_.type_)
-        {
-        case value_types::small_string_t:
-            return string_range(var_.value_.small_string_val_,var_.value_.small_string_val_+var_.length_or_precision_);
-        case value_types::string_t:
-            return string_range(var_.value_.string_val_->data(),var_.value_.string_val_->data()+var_.value_.string_val_->length());
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
-        }
-    }
-
-    const_string_range characters() const
-    {
-        switch (var_.type_)
-        {
-        case value_types::small_string_t:
-            return const_string_range(var_.value_.small_string_val_,var_.value_.small_string_val_+var_.length_or_precision_);
-        case value_types::string_t:
-            return const_string_range(var_.value_.string_val_->data(),var_.value_.string_val_->data()+var_.value_.string_val_->length());
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
         }
     }
 
