@@ -12,18 +12,27 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
+#include <jsoncons/output_format.hpp>
+#include <jsoncons/parse_error_handler.hpp>
+
 namespace jsoncons {
 
 template <class CharT>
 struct json_traits
 {
     static const bool is_object_sorted = true;
+
+    typedef basic_output_format<CharT> output_format_type;
+    typedef basic_parse_error_handler<CharT> parse_error_handler_type;
 };
 
 template <class CharT>
-struct ojson_traits
+struct ojson_traits 
 {
     static const bool is_object_sorted = false;
+
+    typedef basic_output_format<CharT> output_format_type;
+    typedef basic_parse_error_handler<CharT> parse_error_handler_type;
 };
 
 }

@@ -186,9 +186,6 @@ void serialize(basic_json_output_handler<CharT>& os, const T&)
     os.value(null_type());
 }
 
-template <class CharT>
-class basic_parse_error_handler;
-
 enum class value_types : uint8_t 
 {
     // Simple types
@@ -222,6 +219,8 @@ public:
     typedef Allocator allocator_type;
 
     typedef JsonTraits json_traits_type;
+
+    typedef typename JsonTraits::parse_error_handler_type parse_error_handler_type;
 
     typedef CharT char_type;
     typedef typename std::char_traits<CharT> char_traits_type;
@@ -3133,10 +3132,11 @@ public:
 
     object_range members()
     {
+        static json_type empty_object = object();
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return object_range(object_iterator(true),object_iterator(true));
+            return object_range(empty_object.members().begin(), empty_object.members().end());
         case value_types::object_t:
             return object_range(object_value().begin(),object_value().end());
         default:
@@ -3146,10 +3146,11 @@ public:
 
     const_object_range members() const
     {
+        static const json_type empty_object = object();
         switch (var_.type_)
         {
         case value_types::empty_object_t:
-            return const_object_range(const_object_iterator(true),const_object_iterator(true));
+            return const_object_range(empty_object.members().begin(), empty_object.members().end());
         case value_types::object_t:
             return const_object_range(object_value().begin(),object_value().end());
         default:
