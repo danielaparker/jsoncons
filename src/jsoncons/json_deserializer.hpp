@@ -32,7 +32,6 @@ class basic_json_deserializer : public basic_json_input_handler<typename Json::c
     typedef typename array::allocator_type array_allocator;
     typedef typename Json::object object;
     typedef typename object::allocator_type object_allocator;
-    typedef typename Json::json_type value_type;
 
     string_allocator sa_;
     object_allocator oa_;
@@ -44,7 +43,7 @@ class basic_json_deserializer : public basic_json_input_handler<typename Json::c
     struct stack_item
     {
         string_type name_;
-        value_type value_;
+        Json value_;
     };
     std::vector<stack_item> stack_;
     std::vector<size_t> stack2_;
@@ -236,7 +235,7 @@ private:
 
     void do_double_value(double value, uint8_t precision, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value_ = value_type(value,precision);
+        stack_[top_].value_ = Json(value,precision);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
