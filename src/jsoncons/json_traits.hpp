@@ -22,8 +22,7 @@ struct json_traits
 {
     static const bool is_object_sorted = true;
 
-    typedef basic_output_format<CharT> output_format_type;
-    typedef basic_parse_error_handler<CharT> parse_error_handler_type;
+    typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };
 
 template <class CharT>
@@ -31,8 +30,7 @@ struct ojson_traits
 {
     static const bool is_object_sorted = false;
 
-    typedef basic_output_format<CharT> output_format_type;
-    typedef basic_parse_error_handler<CharT> parse_error_handler_type;
+    typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };
 
 }

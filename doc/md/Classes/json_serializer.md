@@ -1,7 +1,8 @@
-    jsoncons::json_serializer
+```c++
+jsoncons::json_serializer
 
-    typedef basic_json_serializer<char> json_serializer
-
+typedef basic_json_serializer<char> json_serializer
+```
 The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses `char` as the character type. It implements [json_output_handler](json_output_handler) and supports pretty print serialization.
 
 ### Header
@@ -37,44 +38,46 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 ### Examples
 
 ### Feeding json events directly to a `json_serializer`
+```c++
+#include <iostream>
+#include <boost/numeric/ublas/matrix.hpp>
+#include "jsoncons/json_serializer.hpp"
 
-    #include <iostream>
-    #include <boost/numeric/ublas/matrix.hpp>
-    #include "jsoncons/json_serializer.hpp"
+using boost::numeric::ublas::matrix;
+using jsoncons::json_serializer;
+using jsoncons::output_format;
 
-    using boost::numeric::ublas::matrix;
-    using jsoncons::json_serializer;
-    using jsoncons::output_format;
+int main()
+{
+    matrix<double> A(2, 2);
+    A(0, 0) = 1;
+    A(0, 1) = 2;
+    A(1, 0) = 3;
+    A(1, 1) = 4;
 
-    int main()
+    output_format format;
+    json_serializer os(std::cout, format, true); // pretty printing
+    os.begin_array();
+    for (size_t i = 0; i < A.size1(); ++i)
     {
-        matrix<double> A(2, 2);
-        A(0, 0) = 1;
-        A(0, 1) = 2;
-        A(1, 0) = 3;
-        A(1, 1) = 4;
-
-        output_format format;
-        json_serializer os(std::cout, format, true); // pretty printing
         os.begin_array();
-        for (size_t i = 0; i < A.size1(); ++i)
+        for (size_t j = 0; j < A.size2(); ++j)
         {
-            os.begin_array();
-            for (size_t j = 0; j < A.size2(); ++j)
-            {
-                os.value(A(i, j));
-            }
-            os.end_array();
+            os.value(A(i, j));
         }
         os.end_array();
-
-        return 0;
     }
+    os.end_array();
+
+    return 0;
+}
+```
 
 The output is
 
-    [
-        [1,2],
-        [3,4]
-    ]
-
+```json
+[
+    [1,2],
+    [3,4]
+]
+```

@@ -1556,17 +1556,8 @@ public:
 
     static basic_json parse(const string_type& s)
     {
-        basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
-        basic_json_parser<char_type> parser(handler);
-        parser.begin_parse();
-        parser.parse(s.data(),0,s.length());
-        parser.end_parse();
-        parser.check_done(s.data(),parser.index(),s.length());
-        if (!handler.is_valid())
-        {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-        }
-        return handler.get_result();
+        parse_error_handler_type err_handler;
+        return parse(s,err_handler);
     }
 
     static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
@@ -3322,20 +3313,13 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::m
 template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is)
 {
-    basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
-    basic_json_reader<char_type> reader(is, handler);
-    reader.read_next();
-    reader.check_done();
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
-    }
-    return handler.get_result();
+    parse_error_handler_type err_handler;
+    return parse_stream(is,err_handler);
 }
 
 template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is, 
-                                                              basic_parse_error_handler<char_type>& err_handler)
+                                                                                            basic_parse_error_handler<char_type>& err_handler)
 {
     basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);
@@ -3351,64 +3335,13 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
 template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename)
 {
-    FILE* fp;
-
-#if defined(JSONCONS_HAS_FOPEN_S)
-    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
-    if (err != 0) 
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#else
-    fp = std::fopen(filename.c_str(), "rb");
-    if (fp == nullptr)
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#endif
-    basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
-    try
-    {
-        // obtain file size:
-        std::fseek (fp , 0 , SEEK_END);
-        long size = std::ftell (fp);
-        std::rewind(fp);
-
-        if (size > 0)
-        {
-            std::vector<char_type> buffer(size);
-
-            // copy the file into the buffer:
-            size_t result = std::fread (buffer.data(),1,size,fp);
-            if (result != static_cast<unsigned long long>(size))
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
-            }
-
-            basic_json_parser<char_type> parser(handler);
-            parser.begin_parse();
-            parser.parse(buffer.data(),0,buffer.size());
-            parser.end_parse();
-            parser.check_done(buffer.data(),parser.index(),buffer.size());
-        }
-
-        std::fclose (fp);
-    }
-    catch (...)
-    {
-        std::fclose (fp);
-        throw;
-    }
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
-    }
-    return handler.get_result();
+    parse_error_handler_type err_handler;
+    return parse_file(filename,err_handler);
 }
 
 template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename, 
-                                                            basic_parse_error_handler<char_type>& err_handler)
+                                                                                          basic_parse_error_handler<char_type>& err_handler)
 {
     FILE* fp;
 
