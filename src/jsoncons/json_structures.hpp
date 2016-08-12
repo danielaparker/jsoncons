@@ -986,7 +986,7 @@ public:
     {
         equals_pred<value_type,char_type> comp(name, length);
         auto it = std::find_if(members_.begin(),members_.end(), comp);
-        return const_it;
+        return it;
     }
 
     void erase(iterator first, iterator last) 
