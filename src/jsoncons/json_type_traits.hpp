@@ -260,7 +260,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     }
     static const char_type* as(const Json& rhs)
     {
-        static_assert(0, "as<char*> not supported. Did you mean as<const char*>()?");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"as<char*> not supported. Did you mean as<const char*>()?");
     }
     static void assign(Json& lhs, const char_type *rhs)
     {
@@ -396,7 +396,7 @@ struct json_type_traits<Json, typename Json::object>
     }
     static typename Json::object as(Json rhs)
     {
-        static_assert(0,"as<Json::object> not supported");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"as<Json::object> not supported");
     }
     static void assign(Json& lhs, typename Json::object rhs)
     {
@@ -434,7 +434,7 @@ struct json_type_traits<Json, typename Json::array>
     }
     static typename Json::array as(const Json& rhs)
     {
-        static_assert(0, "as<Json::array> not supported");
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"as<Json::array> not supported");
     }
     static void assign(Json& lhs, typename Json::array rhs)
     {
