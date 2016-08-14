@@ -1572,6 +1572,12 @@ public:
         return parse(s,err_handler);
     }
 
+    static basic_json parse(const char_type* s, size_t length)
+    {
+        parse_error_handler_type err_handler;
+        return parse(s,length,err_handler);
+    }
+
     static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
     {
         basic_json_deserializer<json_type> handler;
@@ -1580,6 +1586,21 @@ public:
         parser.parse(s.data(),0,s.length());
         parser.end_parse();
         parser.check_done(s.data(),parser.index(),s.length());
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
+        }
+        return handler.get_result();
+    }
+
+    static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
+    {
+        basic_json_deserializer<json_type> handler;
+        basic_json_parser<char_type> parser(handler,err_handler);
+        parser.begin_parse();
+        parser.parse(s,0,length);
+        parser.end_parse();
+        parser.check_done(s,parser.index(),length);
         if (!handler.is_valid())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");

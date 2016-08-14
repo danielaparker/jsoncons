@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
 {
     json val;
     BOOST_CHECK_NO_THROW((val=json::parse("null")));
-    BOOST_CHECK_EQUAL(val,json(json::null()));
+    BOOST_CHECK_EQUAL(val,json::null());
     BOOST_CHECK_NO_THROW((val=json::parse("false")));
     BOOST_CHECK_EQUAL(val,json(false));
     BOOST_CHECK_NO_THROW((val=json::parse("true")));

@@ -537,6 +537,23 @@ vertical-align:1px;
 <pre><code>jsoncons/examples/build/cmake/README.txt
 </code></pre>
 
+<h2>About jsoncons::basic_json</h2>
+
+<p>The jsoncons library provides a <code>basic_json</code> class template, which is the generalization of a <code>json</code> value for different character types, different policies for ordering name-value pairs, etc.</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                   JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
+                   Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json;</pre></div>
+
+<p>The library includes four instantiations of <code>basic_json</code>:</p>
+
+<ul>
+<li><p><code>json</code> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
+<li><p><code>ojson</code> constructs a narrow character json value that retains the original name-value insertion order</p></li>
+<li><p><code>wjson</code> constructs a wide character json value that sorts name-value members alphabetically</p></li>
+<li><p><code>wojson</code> constructs a wide character json value that retains the original name-value insertion order</p></li>
+</ul>
+
 <h2>Examples</h2>
 
 <p>The examples below illustrate the use of the <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> function.</p>
