@@ -187,7 +187,7 @@ void more_examples()
     image_sizing["resize_unit"] =  "pixels";  // a string
     image_sizing["resize_what"] =  "long_edge";  // a string
     image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = jsoncons::null_type();  // a null value
+    image_sizing["dimension2"] = json::null();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = {"JPEG","PSD","TIFF","DNG"};

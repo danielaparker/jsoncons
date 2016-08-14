@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["false"].is_bool());
     BOOST_CHECK(obj["false"].is<bool>());
 
-    obj["null1"] = json::null_type();
+    obj["null1"] = json::null();
     BOOST_CHECK(obj["null1"].is_null());
 
     obj["object"] = json();

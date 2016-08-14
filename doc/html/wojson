@@ -484,7 +484,27 @@ vertical-align:1px;
 
 <h3>Interface</h3>
 
-<p>The interface is the same as <a href="json">json</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
+<p>The interface is the same as <a href="wjson">wjson</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
+
+<ul>
+<li>In <code>wojson</code>, <code>object_allocator</code> is a random access iterator, so object members can be accessed by position, e.g.</li>
+</ul>
+
+<pre><code>wojson o = wojson::parse(R"(
+{
+    "street_number" : "100",
+    "street_name" : "Queen St W"
+}
+)");
+
+wojson::member_type member = o.members().begin()[1];
+std::cout &lt;&lt; member.name() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
+</code></pre>
+
+<ul>
+<li><p><code>wojson</code>, like <code>wjson</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>wjson</code> that parameter is just a hint that allows optimization, with <code>wojson</code> it is the actual location where to insert the member.</p></li>
+<li><p>In <code>wojson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p></li>
+</ul>
 
 <h3>See also</h3>
 

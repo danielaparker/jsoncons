@@ -130,12 +130,12 @@ BOOST_AUTO_TEST_CASE(example)
 
 BOOST_AUTO_TEST_CASE(test_null)
 {
-    json nullval = json::null_type();
+    json nullval = json::null();
     BOOST_CHECK(nullval.is_null());
     BOOST_CHECK(nullval.is<json::null_type>());
 
     json obj;
-    obj["field"] = json::null_type();
+    obj["field"] = json::null();
     std::cout << obj << std::endl;
 }
 

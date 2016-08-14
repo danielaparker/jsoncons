@@ -155,8 +155,8 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
 
     std::string s1 = a["object1"].at("field1").as<std::string>();
     std::string s1a = a["object1"].at("field1").as<std::string>();
-    std::string s2 = a["object1"].get("field2",json::null_type()).as<std::string>();
-    a["object1"].get("field2", json::null_type()).is_null();
+    std::string s2 = a["object1"].get("field2",json::null()).as<std::string>();
+    a["object1"].get("field2", json::null()).is_null();
     //std::cout << s2 << std::endl;
     BOOST_REQUIRE_THROW(a["object1"].at("field2").as<std::string>(), std::out_of_range);
 

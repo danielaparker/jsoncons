@@ -15,7 +15,24 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 ```
 ### Interface
 
-The interface is the same as [json](json), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
+The interface is the same as [wjson](wjson), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
+
+- In `wojson`, `object_allocator` is a random access iterator, so object members can be accessed by position, e.g.
+
+```
+wojson o = wojson::parse(R"(
+{
+    "street_number" : "100",
+    "street_name" : "Queen St W"
+}
+)");
+
+wojson::member_type member = o.members().begin()[1];
+std::cout << member.name() << "=" << member.value() << std::endl;
+```
+- `wojson`, like `wjson`, supports object member `set` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `wojson` it is the actual location where to insert the member.
+
+- In `wojson`, the `set` members that just take a name and a value always insert the member at the end.
 
 ### See also
 
