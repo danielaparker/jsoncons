@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(test_add_null)
 BOOST_AUTO_TEST_CASE(test_construction_in_code)
 {
     // A null value
-    json null_val = jsoncons::null_type();
+    json null_val = json::null();
 
     // A boolean value
     json flag(true);

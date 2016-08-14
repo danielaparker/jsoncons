@@ -93,7 +93,7 @@ Note that the parser accepts and ignores the single line comment that starts wit
 
     // An array value with four elements
     json arr = json::array();
-    arr.add(json::null_type());
+    arr.add(json::null());
     arr.add(flag);
     arr.add(number);
     arr.add(obj);

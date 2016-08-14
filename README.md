@@ -36,6 +36,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
 
+- Added static method `null()` to `json` class to return null value
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

@@ -40,31 +40,31 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values)
     json val = handler.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
-    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is_null());
     BOOST_CHECK(val[0]["bool-f"].is<null_type>());
-    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is_null());
     BOOST_CHECK(val[0]["int-f"].is<null_type>());
-    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is_null());
     BOOST_CHECK(val[0]["float-f"].is<null_type>());
-    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"].as<std::string>() == "");
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[1]["bool-f"] == true);
+    BOOST_CHECK(val[1]["bool-f"] .as<bool>()== true);
     BOOST_CHECK(val[1]["bool-f"].is<bool>());
-    BOOST_CHECK(val[1]["int-f"] == 12);
+    BOOST_CHECK(val[1]["int-f"] .as<int>()== 12);
     BOOST_CHECK(val[1]["int-f"].is<int>());
-    BOOST_CHECK(val[1]["float-f"] == 24.7);
+    BOOST_CHECK(val[1]["float-f"] .as<double>()== 24.7);
     BOOST_CHECK(val[1]["float-f"].is<double>());
-    BOOST_CHECK(val[1]["string-f"] == "test string");
+    BOOST_CHECK(val[1]["string-f"].as<std::string>() == "test string");
     BOOST_CHECK(val[1]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is_null());
     BOOST_CHECK(val[0]["bool-f"].is<null_type>());
-    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is_null());
     BOOST_CHECK(val[0]["int-f"].is<null_type>());
-    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is_null());
     BOOST_CHECK(val[0]["float-f"].is<null_type>());
-    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"] .as<std::string>() == "");
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 }
 
@@ -89,31 +89,31 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
     json val = handler.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
-    BOOST_CHECK(val[0]["bool-f"] == false);
+    BOOST_CHECK(val[0]["bool-f"].as<bool>() == false);
     BOOST_CHECK(val[0]["bool-f"].is<bool>());
-    BOOST_CHECK(val[0]["int-f"] == 0);
+    BOOST_CHECK(val[0]["int-f"] .as<int>()== 0);
     BOOST_CHECK(val[0]["int-f"].is<int>());
-    BOOST_CHECK(val[0]["float-f"] == 0.0);
+    BOOST_CHECK(val[0]["float-f"].as<double>() == 0.0);
     BOOST_CHECK(val[0]["float-f"].is<double>());
-    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"] .as<std::string>() == "");
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[1]["bool-f"] == true);
+    BOOST_CHECK(val[1]["bool-f"] .as<bool>()== true);
     BOOST_CHECK(val[1]["bool-f"].is<bool>());
-    BOOST_CHECK(val[1]["int-f"] == 12);
+    BOOST_CHECK(val[1]["int-f"] .as<int>()== 12);
     BOOST_CHECK(val[1]["int-f"].is<int>());
-    BOOST_CHECK(val[1]["float-f"] == 24.7);
+    BOOST_CHECK(val[1]["float-f"] .as<double>()== 24.7);
     BOOST_CHECK(val[1]["float-f"].is<double>());
-    BOOST_CHECK(val[1]["string-f"] == "test string");
+    BOOST_CHECK(val[1]["string-f"].as<std::string>() == "test string");
     BOOST_CHECK(val[1]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[2]["bool-f"] == false);
+    BOOST_CHECK(val[2]["bool-f"].as<bool>() == false);
     BOOST_CHECK(val[2]["bool-f"].is<bool>());
-    BOOST_CHECK(val[2]["int-f"] == 0);
+    BOOST_CHECK(val[2]["int-f"] .as<int>()== 0);
     BOOST_CHECK(val[2]["int-f"].is<int>());
-    BOOST_CHECK(val[2]["float-f"] == 0.0);
+    BOOST_CHECK(val[2]["float-f"].as<double>() == 0.0);
     BOOST_CHECK(val[2]["float-f"].is<double>());
-    BOOST_CHECK(val[2]["string-f"] == "");
+    BOOST_CHECK(val[2]["string-f"].as<std::string>() == "");
     BOOST_CHECK(val[2]["string-f"].is<std::string>());
 }
 
@@ -138,31 +138,31 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
     json val = handler.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
-    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is_null());
     BOOST_CHECK(val[0]["bool-f"].is<null_type>());
-    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is_null());
     BOOST_CHECK(val[0]["int-f"].is<null_type>());
-    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is_null());
     BOOST_CHECK(val[0]["float-f"].is<null_type>());
-    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"] .as<std::string>() == "");
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[1]["bool-f"] == true);
+    BOOST_CHECK(val[1]["bool-f"] .as<bool>() == true);
     BOOST_CHECK(val[1]["bool-f"].is<bool>());
-    BOOST_CHECK(val[1]["int-f"] == 12);
+    BOOST_CHECK(val[1]["int-f"] .as<int>()== 12);
     BOOST_CHECK(val[1]["int-f"].is<int>());
-    BOOST_CHECK(val[1]["float-f"] == 24.7);
+    BOOST_CHECK(val[1]["float-f"] .as<double>()== 24.7);
     BOOST_CHECK(val[1]["float-f"].is<double>());
-    BOOST_CHECK(val[1]["string-f"] == "test string");
+    BOOST_CHECK(val[1]["string-f"].as<std::string>() == "test string");
     BOOST_CHECK(val[1]["string-f"].is<std::string>());
 
-    BOOST_CHECK(val[0]["bool-f"] == null_type());
+    BOOST_CHECK(val[0]["bool-f"].is_null());
     BOOST_CHECK(val[0]["bool-f"].is<null_type>());
-    BOOST_CHECK(val[0]["int-f"] == null_type());
+    BOOST_CHECK(val[0]["int-f"].is_null());
     BOOST_CHECK(val[0]["int-f"].is<null_type>());
-    BOOST_CHECK(val[0]["float-f"] == null_type());
+    BOOST_CHECK(val[0]["float-f"].is_null());
     BOOST_CHECK(val[0]["float-f"].is<null_type>());
-    BOOST_CHECK(val[0]["string-f"] == "");
+    BOOST_CHECK(val[0]["string-f"] .as<std::string>() == "");
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 }
 

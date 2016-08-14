@@ -508,6 +508,7 @@ vertical-align:1px;
 <li><p>A new template parameter, <code>JsonTraits</code>, has been added to the <code>basic_json</code> class template. </p></li>
 <li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
 <li><p>Added support for <code>json</code> <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, constructor, and assignment operator for any sequence container (<code>std::array</code>, <code>std::vector</code>, <code>std::deque</code>, <code>std::forward_list</code>, <code>std::list</code>) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (<code>std::set</code>, <code>std::multiset</code>, <code>std::unordered_set</code>, <code>std::unordered_multiset</code>.)</p></li>
+<li><p>Added static method <code>null()</code> to <code>json</code> class to return null value</p></li>
 </ul>
 
 <h2>Benchmarks</h2>

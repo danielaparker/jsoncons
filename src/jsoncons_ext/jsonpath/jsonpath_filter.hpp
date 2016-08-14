@@ -264,18 +264,18 @@ bool gt(const Json& lhs, const Json& rhs)
 template <class Json>
 Json plus(const Json& lhs, const Json& rhs)
 {
-    Json result = jsoncons::null_type();
+    Json result = Json(jsoncons::null_type());
     if (lhs.is_integer() && rhs.is_integer())
     {
-        result = ((lhs.as_integer() + rhs.as_integer()));
+        result = Json(((lhs.as_integer() + rhs.as_integer())));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
-        result = (lhs.as_double() + rhs.as_double());
+        result = Json((lhs.as_double() + rhs.as_double()));
     }
     else if (lhs.is_uinteger() && rhs.is_uinteger())
     {
-        result = (lhs.as_uinteger() + rhs.as_uinteger());
+        result = Json((lhs.as_uinteger() + rhs.as_uinteger()));
     }
     return result;
 }
@@ -283,7 +283,7 @@ Json plus(const Json& lhs, const Json& rhs)
 template <class Json>
 Json unary_minus(const Json& lhs)
 {
-    Json result = jsoncons::null_type();
+    Json result = Json::null();
     if (lhs.is_integer())
     {
         result = -lhs.as_integer();
@@ -298,7 +298,7 @@ Json unary_minus(const Json& lhs)
 template <class Json>
 Json minus(const Json& lhs, const Json& rhs)
 {
-    Json result = jsoncons::null_type();
+    Json result = Json::null();
     if (lhs.is_integer() && rhs.is_integer())
     {
         result = ((lhs.as_integer() - rhs.as_integer()));
@@ -660,29 +660,29 @@ public:
 
     Json minus(const Json& rhs) const override
     {
-        return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : jsoncons::null_type();
+        return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : Json(jsoncons::null_type());
     }
 
     Json minus(const term<Json>& rhs) const override
     {
 
-        return nodes_.size() == 1 ? jsoncons::jsonpath::plus(rhs.unary_minus(),nodes_[0]) : jsoncons::null_type();
+        return nodes_.size() == 1 ? jsoncons::jsonpath::plus(rhs.unary_minus(),nodes_[0]) : Json(jsoncons::null_type());
     }
 
     Json unary_minus() const override
     {
-        return nodes_.size() == 1 ? jsoncons::jsonpath::unary_minus(nodes_[0]) : jsoncons::null_type();
+        return nodes_.size() == 1 ? jsoncons::jsonpath::unary_minus(nodes_[0]) : Json::null();
     }
 
     Json plus(const Json& rhs) const override
     {
-        static auto a_null = jsoncons::null_type();
+        static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
     Json plus(const term<Json>& rhs) const override
     {
-        static auto a_null = jsoncons::null_type();
+        static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
 };
@@ -765,7 +765,7 @@ public:
             return t.term_ptr();
         case token_types::exclaim:
         {
-            Json val = primary(ts)->exclaim();
+            Json val = Json(primary(ts)->exclaim());
             auto expr = std::make_shared<value_term<Json>>(val);
             return expr;
         }

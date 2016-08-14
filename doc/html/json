@@ -623,6 +623,11 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 
 <p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
 
+<pre><code>static const json&amp; null()
+</code></pre>
+
+<p>Returns a null value        </p>
+
 <h3>Constructors</h3>
 
 <pre><code>json()
@@ -1160,7 +1165,7 @@ x4=San Francisco</pre></div>
 <h3>Nulls</h3>
 
 <div class="highlight highlight-source-c++"><pre>json obj;
-obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = json::null_type();
+obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = json::null();
 std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 
 <p>The output is </p>

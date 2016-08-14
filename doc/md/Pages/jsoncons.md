@@ -154,7 +154,7 @@ image_sizing["resize_to_fit"] = true;  // a boolean
 image_sizing["resize_unit"]   = "pixels";  // a string
 image_sizing["resize_what"]   = "long_edge";  // a string
 image_sizing["dimension1"]    = 9.84;  // a double
-image_sizing["dimension2"]    = json::null_type();  // a null
+image_sizing["dimension2"]    = json::null();  // a null
 ```
 Serializing again, this time with pretty print,
 ```c++

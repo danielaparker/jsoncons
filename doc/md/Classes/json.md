@@ -76,6 +76,9 @@ Throws [parse_exception](parse_exception) if parsing fails.
     static json make_array(size_t size1 ... size_t sizeN, const T& val, const array_allocator& allocator)
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
+    static const json& null()
+Returns a null value        
+
 ### Constructors
 
     json()
@@ -476,7 +479,7 @@ x4=San Francisco
 ### Nulls
 ```c++
 json obj;
-obj["field1"] = json::null_type();
+obj["field1"] = json::null();
 std::cout << obj << std::endl;
 ```
 The output is 

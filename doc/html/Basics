@@ -562,7 +562,7 @@ vertical-align:1px;
 
     <span class="pl-c">// An array value with four elements</span>
     json arr = json::array();
-    arr.add(json::null_type());
+    arr.add(json::null());
     arr.add(flag);
     arr.add(number);
     arr.add(obj);

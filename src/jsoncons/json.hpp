@@ -230,12 +230,12 @@ public:
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef name_value_pair<string_type,json_type> member_type;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<basic_json<CharT,JsonTraits,Allocator>> array_allocator;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_type> array_allocator;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
 
-    typedef json_array<basic_json<CharT,JsonTraits,Allocator>,array_allocator> array;
-    typedef json_object<string_type,basic_json<CharT,JsonTraits,Allocator>,json_traits_type::is_object_sorted,object_allocator> object;
+    typedef json_array<json_type,array_allocator> array;
+    typedef json_object<string_type,json_type,json_traits_type::is_object_sorted,object_allocator> object;
     typedef serializable_any<char_type,Allocator> any;
 
     typedef jsoncons::null_type null_type;
@@ -259,7 +259,7 @@ public:
         }
 
     public:
-        friend class basic_json<CharT,JsonTraits,Allocator>;
+        friend class json_type;
 
         IteratorT begin()
         {
@@ -924,19 +924,19 @@ public:
         {
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& evaluate() 
+        json_type& evaluate() 
         {
             return parent_.evaluate(name_);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& evaluate() const
+        const json_type& evaluate() const
         {
             return parent_.evaluate(name_);
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& evaluate_with_default()
+        json_type& evaluate_with_default()
         {
-            basic_json<CharT,JsonTraits,Allocator>& val = parent_.evaluate_with_default();
+            json_type& val = parent_.evaluate_with_default();
             auto it = val.find(name_.data(),name_.length());
             if (it == val.members().end())
             {
@@ -945,28 +945,28 @@ public:
             return it->value();
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& evaluate(size_t index)
+        json_type& evaluate(size_t index)
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& evaluate(size_t index) const
+        const json_type& evaluate(size_t index) const
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& evaluate(const string_type& index)
+        json_type& evaluate(const string_type& index)
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& evaluate(const string_type& index) const
+        const json_type& evaluate(const string_type& index) const
         {
             return parent_.evaluate(name_).at(index);
         }
     public:
 
-        friend class basic_json<CharT,JsonTraits,Allocator>;
+        friend class json_type;
 
         object_range members()
         {
@@ -1185,7 +1185,7 @@ public:
         template <class T>
         json_proxy& operator=(T val)
         {
-            parent_.evaluate_with_default().set(name_, val);
+            parent_.evaluate_with_default().set(name_, json_type(val));
             return *this;
         }
 
@@ -1211,12 +1211,12 @@ public:
             return evaluate() != val;
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& operator[](size_t i)
+        json_type& operator[](size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& operator[](size_t i) const
+        const json_type& operator[](size_t i) const
         {
             return evaluate().at(i);
         }
@@ -1231,22 +1231,22 @@ public:
             return json_proxy<proxy_type>(*this,name);
         }
 
-        basic_json<CharT,JsonTraits,Allocator>& at(const string_type& name)
+        json_type& at(const string_type& name)
         {
             return evaluate().at(name);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& at(const string_type& name) const
+        const json_type& at(const string_type& name) const
         {
             return evaluate().at(name);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& at(size_t index)
+        const json_type& at(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& at(size_t index) const
+        const json_type& at(size_t index) const
         {
             return evaluate().at(index);
         }
@@ -1282,7 +1282,7 @@ public:
         }
 
         template <class T>
-        basic_json<CharT,JsonTraits,Allocator> get(const string_type& name, T&& default_val) const
+        json_type get(const string_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1316,68 +1316,80 @@ public:
 
        // Remove a member from an object 
 
-        void set(const string_type& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+        void set(const string_type& name, const json_type& value)
         {
             evaluate().set(name,value);
         }
 
-        void set(string_type&& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+        void set(string_type&& name, const json_type& value)
 
         {
             evaluate().set(std::move(name),value);
         }
 
-        void set(const string_type& name, basic_json<CharT,JsonTraits,Allocator>&& value)
+        void set(const string_type& name, json_type&& value)
 
         {
             evaluate().set(name,std::move(value));
         }
 
-        void set(string_type&& name, basic_json<CharT,JsonTraits,Allocator>&& value)
+        void set(string_type&& name, json_type&& value)
 
         {
             evaluate().set(std::move(name),std::move(value));
         }
 
-        object_iterator set(object_iterator hint, const string_type& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+        object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
         {
             return evaluate().set(hint, name,value);
         }
 
-        object_iterator set(object_iterator hint, string_type&& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+        object_iterator set(object_iterator hint, string_type&& name, const json_type& value)
 
         {
             return evaluate().set(hint, std::move(name),value);
         }
 
-        object_iterator set(object_iterator hint, const string_type& name, basic_json<CharT,JsonTraits,Allocator>&& value)
+        object_iterator set(object_iterator hint, const string_type& name, json_type&& value)
 
         {
             return evaluate().set(hint, name,std::move(value));
         }
 
-        object_iterator set(object_iterator hint, string_type&& name, basic_json<CharT,JsonTraits,Allocator>&& value)
+        object_iterator set(object_iterator hint, string_type&& name, json_type&& value)
 
         {
             return evaluate().set(hint, std::move(name),std::move(value));
         }
 
-        void add(basic_json<CharT,JsonTraits,Allocator>&& value)
+        template <class T>
+        void add(const T& value)
+        {
+            evaluate_with_default().add(json_type(value));
+        }
+
+        void add(json_type&& value)
         {
             evaluate_with_default().add(std::move(value));
         }
 
-        void add(const basic_json<CharT,JsonTraits,Allocator>& value)
+        void add(const json_type& value)
         {
             evaluate_with_default().add(value);
         }
 
-        array_iterator add(const_array_iterator pos, const basic_json<CharT,JsonTraits,Allocator>& value)
+        template <class T>
+        array_iterator add(const_array_iterator pos, const T& value)
+        {
+            return evaluate_with_default().add(pos, json_type(value));
+        }
+
+        array_iterator add(const_array_iterator pos, const json_type& value)
         {
             return evaluate_with_default().add(pos, value);
         }
 
-        array_iterator add(const_array_iterator pos, basic_json<CharT,JsonTraits,Allocator>&& value)
+        array_iterator add(const_array_iterator pos, json_type&& value)
         {
             return evaluate_with_default().add(pos, std::move(value));
         }
@@ -1407,7 +1419,7 @@ public:
             evaluate().to_stream(os,format,indenting);
         }
 
-        void swap(basic_json<CharT,JsonTraits,Allocator>& val)
+        void swap(json_type& val)
         {
             evaluate_with_default().swap(val);
         }
@@ -1471,7 +1483,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const basic_json<CharT,JsonTraits,Allocator>& get(const string_type& name) const
+        const json_type& get(const string_type& name) const
         {
             return evaluate().get(name);
         }
@@ -1511,12 +1523,12 @@ public:
             return evaluate().as_longlong();
         }
 
-        void add(size_t index, const basic_json<CharT,JsonTraits,Allocator>& value)
+        void add(size_t index, const json_type& value)
         {
             evaluate_with_default().add(index, value);
         }
 
-        void add(size_t index, basic_json<CharT,JsonTraits,Allocator>&& value)
+        void add(size_t index, json_type&& value)
         {
             evaluate_with_default().add(index, std::move(value));
         }
@@ -1562,7 +1574,7 @@ public:
 
     static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
     {
-        basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
+        basic_json_deserializer<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s.data(),0,s.length());
@@ -1621,6 +1633,12 @@ public:
         return val;
     }
 
+    static const json_type& null()
+    {
+        static json_type a_null = json_type(null_type());
+        return a_null;
+    }
+
     variant var_;
 
     basic_json() 
@@ -1639,22 +1657,22 @@ public:
     {
     }
 
-    basic_json(const basic_json<CharT,JsonTraits,Allocator>& val)
+    basic_json(const json_type& val)
         : var_(val.var_)
     {
     }
 
-    basic_json(const basic_json<CharT,JsonTraits,Allocator>& val, const Allocator& allocator)
+    basic_json(const json_type& val, const Allocator& allocator)
         : var_(val.var_,allocator)
     {
     }
 
-    basic_json(basic_json<CharT,JsonTraits,Allocator>&& other)
+    basic_json(json_type&& other)
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(basic_json<CharT,JsonTraits,Allocator>&& other, const Allocator& allocator)
+    basic_json(json_type&& other, const Allocator& allocator)
         : var_(std::move(other.var_),allocator)
     {
     }
@@ -1718,13 +1736,13 @@ public:
     {
     }
 
-    basic_json& operator=(const basic_json<CharT,JsonTraits,Allocator>& rhs)
+    basic_json& operator=(const json_type& rhs)
     {
         var_ = rhs.var_;
         return *this;
     }
 
-    basic_json& operator=(basic_json<CharT,JsonTraits,Allocator>&& rhs)
+    basic_json& operator=(json_type&& rhs)
     {
         if (this != &rhs)
         {
@@ -1735,21 +1753,21 @@ public:
 
     basic_json& operator=(std::initializer_list<json_type> init)
     {
-        basic_json<CharT,JsonTraits,Allocator> val(init);
+        json_type val(init);
         swap(val);
         return *this;
     }
 
     template <class T>
-    basic_json<CharT,JsonTraits,Allocator>& operator=(T val)
+    json_type& operator=(T val)
     {
         json_type_traits<json_type,T>::assign(*this,val);
         return *this;
     }
 
-    bool operator!=(const basic_json<CharT,JsonTraits,Allocator>& rhs) const;
+    bool operator!=(const json_type& rhs) const;
 
-    bool operator==(const basic_json<CharT,JsonTraits,Allocator>& rhs) const;
+    bool operator==(const json_type& rhs) const;
 
     size_t size() const JSONCONS_NOEXCEPT
     {
@@ -1766,24 +1784,24 @@ public:
         }
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& operator[](size_t i)
+    json_type& operator[](size_t i)
     {
         return at(i);
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& operator[](size_t i) const
+    const json_type& operator[](size_t i) const
     {
         return at(i);
     }
 
-    json_proxy<basic_json<CharT,JsonTraits,Allocator>> operator[](const string_type& name)
+    json_proxy<json_type> operator[](const string_type& name)
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<basic_json<CharT,JsonTraits,Allocator>>(*this, name);
+            return json_proxy<json_type>(*this, name);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -1791,7 +1809,7 @@ public:
         }
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& operator[](const string_type& name) const
+    const json_type& operator[](const string_type& name) const
     {
         return at(name);
     }
@@ -2225,7 +2243,7 @@ public:
 
     const any& any_value() const;
 
-    basic_json<CharT,JsonTraits,Allocator>& at(const string_type& name)
+    json_type& at(const string_type& name)
     {
         switch (var_.type_)
         {
@@ -2248,42 +2266,42 @@ public:
         }
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& evaluate() 
+    json_type& evaluate() 
     {
         return *this;
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& evaluate_with_default() 
+    json_type& evaluate_with_default() 
     {
         return *this;
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& evaluate() const
+    const json_type& evaluate() const
     {
         return *this;
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& evaluate(size_t i) 
+    json_type& evaluate(size_t i) 
     {
         return at(i);
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& evaluate(size_t i) const
+    const json_type& evaluate(size_t i) const
     {
         return at(i);
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& evaluate(const string_type& name) 
+    json_type& evaluate(const string_type& name) 
     {
         return at(name);
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& evaluate(const string_type& name) const
+    const json_type& evaluate(const string_type& name) const
     {
         return at(name);
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& at(const string_type& name) const
+    const json_type& at(const string_type& name) const
     {
         switch (var_.type_)
         {
@@ -2306,7 +2324,7 @@ public:
         }
     }
 
-    basic_json<CharT,JsonTraits,Allocator>& at(size_t i)
+    json_type& at(size_t i)
     {
         switch (var_.type_)
         {
@@ -2323,7 +2341,7 @@ public:
         }
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& at(size_t i) const
+    const json_type& at(size_t i) const
     {
         switch (var_.type_)
         {
@@ -2431,13 +2449,13 @@ public:
     }
 
     template<class T>
-    basic_json<CharT,JsonTraits,Allocator> get(const string_type& name, T&& default_val) const
+    json_type get(const string_type& name, T&& default_val) const
     {
         switch (var_.type_)
         {
         case value_types::empty_object_t:
             {
-                return basic_json<CharT,JsonTraits,Allocator>(std::forward<T>(default_val));
+                return json_type(std::forward<T>(default_val));
             }
         case value_types::object_t:
             {
@@ -2448,7 +2466,7 @@ public:
                 }
                 else
                 {
-                    return basic_json<CharT,JsonTraits,Allocator>(std::forward<T>(default_val));
+                    return json_type(std::forward<T>(default_val));
                 }
             }
         default:
@@ -2535,7 +2553,19 @@ public:
         }
     }
 
-    void set(const string_type& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+    template <class T>
+    void set(const string_type& name, const T& value)
+    {
+        set(name,json_type(value));
+    }
+
+    template <class T>
+    void set(string_type&& name, const T& value)
+    {
+        set(name,json_type(value));
+    }
+
+    void set(const string_type& name, const json_type& value)
     {
         switch (var_.type_)
         {
@@ -2551,7 +2581,7 @@ public:
         }
     }
 
-    void set(string_type&& name, const basic_json<CharT,JsonTraits,Allocator>& value){
+    void set(string_type&& name, const json_type& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             create_object_implicitly();
@@ -2565,7 +2595,7 @@ public:
         }
     }
 
-    void set(const string_type& name, basic_json<CharT,JsonTraits,Allocator>&& value){
+    void set(const string_type& name, json_type&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             create_object_implicitly();
@@ -2579,7 +2609,7 @@ public:
         }
     }
 
-    void set(string_type&& name, basic_json<CharT,JsonTraits,Allocator>&& value)
+    void set(string_type&& name, json_type&& value)
     {
         switch (var_.type_)
         {
@@ -2595,7 +2625,19 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, const string_type& name, const basic_json<CharT,JsonTraits,Allocator>& value)
+    template <class T>
+    object_iterator set(object_iterator hint, const string_type& name, const T& value)
+    {
+        return set(hint,name,json_type(value));
+    }
+
+    template <class T>
+    object_iterator set(object_iterator hint, string_type&& name, const T& value)
+    {
+        return set(hint,name,json_type(value));
+    }
+
+    object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
     {
         switch (var_.type_)
         {
@@ -2611,7 +2653,7 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, string_type&& name, const basic_json<CharT,JsonTraits,Allocator>& value){
+    object_iterator set(object_iterator hint, string_type&& name, const json_type& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             create_object_implicitly();
@@ -2625,7 +2667,7 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, const string_type& name, basic_json<CharT,JsonTraits,Allocator>&& value){
+    object_iterator set(object_iterator hint, const string_type& name, json_type&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             create_object_implicitly();
@@ -2639,7 +2681,7 @@ public:
         }
     } 
 
-    object_iterator set(object_iterator hint, string_type&& name, basic_json<CharT,JsonTraits,Allocator>&& value){
+    object_iterator set(object_iterator hint, string_type&& name, json_type&& value){
         switch (var_.type_){
         case value_types::empty_object_t:
             create_object_implicitly();
@@ -2653,7 +2695,13 @@ public:
         }
     }
 
-    void add(const basic_json<CharT,JsonTraits,Allocator>& value)
+    template <class T>
+    void add(const T& value)
+    {
+        add(json_type(value));
+    }
+
+    void add(const json_type& value)
     {
         switch (var_.type_)
         {
@@ -2667,7 +2715,7 @@ public:
         }
     }
 
-    void add(basic_json<CharT,JsonTraits,Allocator>&& value){
+    void add(json_type&& value){
         switch (var_.type_){
         case value_types::array_t:
             var_.value_.array_val_->push_back(std::move(value));
@@ -2679,7 +2727,13 @@ public:
         }
     }
 
-    array_iterator add(const_array_iterator pos, const basic_json<CharT,JsonTraits,Allocator>& value)
+    template <class T>
+    array_iterator add(const_array_iterator pos, const T& value)
+    {
+        return add(pos,json_type(value));
+    }
+
+    array_iterator add(const_array_iterator pos, const json_type& value)
     {
         switch (var_.type_)
         {
@@ -2693,7 +2747,7 @@ public:
         }
     }
 
-    array_iterator add(const_array_iterator pos, basic_json<CharT,JsonTraits,Allocator>&& value){
+    array_iterator add(const_array_iterator pos, json_type&& value){
         switch (var_.type_){
         case value_types::array_t:
             return var_.value_.array_val_->add(pos, std::move(value));
@@ -2715,7 +2769,7 @@ public:
         return var_.length_or_precision_;
     }
 
-    void swap(basic_json<CharT,JsonTraits,Allocator>& b)
+    void swap(json_type& b)
     {
         var_.swap(b.var_);
     }
@@ -2731,12 +2785,12 @@ public:
         return v;
     }
 
-    friend void swap(basic_json<CharT,JsonTraits,Allocator>& a, basic_json<CharT,JsonTraits,Allocator>& b)
+    friend void swap(json_type& a, json_type& b)
     {
         a.swap(b);
     }
 
-    void assign_any(const typename basic_json<CharT,JsonTraits,Allocator>::any& rhs)
+    void assign_any(const typename json_type::any& rhs)
     {
         var_.assign(rhs);
     }
@@ -2888,9 +2942,9 @@ public:
         return elements().end();
     }
 
-    const basic_json<CharT,JsonTraits,Allocator>& get(const string_type& name) const
+    const json_type& get(const string_type& name) const
     {
-        static const basic_json<CharT,JsonTraits,Allocator> a_null = null_type();
+        static const json_type a_null = null_type();
 
         switch (var_.type_)
         {
@@ -2996,7 +3050,7 @@ public:
         }
     }
 
-    void add(size_t index, const basic_json<CharT,JsonTraits,Allocator>& value)
+    void add(size_t index, const json_type& value)
     {
         switch (var_.type_)
         {
@@ -3010,7 +3064,7 @@ public:
         }
     }
 
-    void add(size_t index, basic_json<CharT,JsonTraits,Allocator>&& value){
+    void add(size_t index, json_type&& value){
         switch (var_.type_){
         case value_types::array_t:
             var_.value_.array_val_->add(index, std::move(value));
@@ -3219,15 +3273,15 @@ public:
 
 private:
 
-    friend std::basic_ostream<typename string_type::value_type>& operator<<(std::basic_ostream<typename string_type::value_type>& os, const basic_json<CharT,JsonTraits,Allocator>& o)
+    friend std::basic_ostream<typename string_type::value_type>& operator<<(std::basic_ostream<typename string_type::value_type>& os, const json_type& o)
     {
         o.to_stream(os);
         return os;
     }
 
-    friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, basic_json<CharT,JsonTraits,Allocator>& o)
+    friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
     {
-        basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
+        basic_json_deserializer<json_type> handler;
         basic_json_reader<typename string_type::value_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
