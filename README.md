@@ -72,13 +72,13 @@ typedef basic_json<char,
 ```
 The library includes four instantiations of `basic_json`:
 
-- [json](json) constructs a narrow character json value that sorts name-value members alphabetically
+- [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a narrow character json value that sorts name-value members alphabetically
 
-- [ojson](ojson) constructs a narrow character json value that retains the original name-value insertion order
+- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that retains the original name-value insertion order
 
-- [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
+- [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [wojson](wojson) constructs a wide character json value that retains the original name-value insertion order
+- [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) constructs a wide character json value that retains the original name-value insertion order
 
 ## Examples
 
