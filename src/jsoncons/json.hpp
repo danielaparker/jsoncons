@@ -259,7 +259,7 @@ public:
         }
 
     public:
-        friend class json_type;
+        friend class basic_json<CharT,JsonTraits,Allocator>;
 
         IteratorT begin()
         {
@@ -966,7 +966,7 @@ public:
         }
     public:
 
-        friend class json_type;
+        friend class basic_json<CharT,JsonTraits,Allocator>;
 
         object_range members()
         {

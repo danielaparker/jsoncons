@@ -61,6 +61,35 @@ int64_t string_to_integer(bool has_neg, const CharT *s, size_t length) throw(std
     return has_neg ? -n : n;
 }
 
+template<class CharT>
+bool try_string_to_integer(bool is_neg, const CharT *s, size_t length, int64_t& val) 
+{
+    const long long max_value = std::numeric_limits<int64_t>::max JSONCONS_NO_MACRO_EXP();
+    const long long max_value_div_10 = max_value / 10;
+
+    val = (int64_t)0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        int64_t x = s[i] - '0';
+        if (val > max_value_div_10)
+        {
+            return false;
+        }
+        val = val * 10;
+        if (val > max_value - x)
+        {
+            return false;
+        }
+
+        val += x;
+    }
+    if (is_neg)
+    {
+        val = -val;
+    }
+    return true;
+}
+
 template <class CharT>
 class basic_parsing_context;
 
