@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(json_array_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_initializer_list_of_integers)
 {
-    json arr = {0,1,2,3};
+    json arr = json::array{0,1,2,3};
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 4);
     for (size_t i = 0; i < arr.size(); ++i)
@@ -31,15 +31,15 @@ BOOST_AUTO_TEST_CASE(test_initializer_list_of_integers)
 
 BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list)
 {
-    /*json arr = json::array();
+    json arr = json::array({0,1,2,3});
 
-    arr = {0,1,2,3};
+    arr = json::array{0,1,2,3};
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 4);
     for (size_t i = 0; i < arr.size(); ++i)
     {
         BOOST_CHECK_EQUAL(i,arr[i].as<size_t>());
-    }*/
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)
@@ -49,10 +49,10 @@ BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)
     json transaction;
     transaction["Debit"] = 10000;
 
-    /*arr = {transaction};
+    arr = json::array{transaction};
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 1);
-    BOOST_CHECK_EQUAL(arr[0], transaction);*/
+    BOOST_CHECK_EQUAL(arr[0], transaction);
 }
 
 BOOST_AUTO_TEST_CASE(test_initializer_list_of_objects)
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_initializer_list_of_objects)
     book2["author"] = "Jones";
     book2["title"] = "New Things";
 
-    json arr = {book1, book2};
+    json arr = json::array{book1, book2};
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.size() == 2);
 

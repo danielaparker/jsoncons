@@ -190,7 +190,7 @@ void more_examples()
     image_sizing["dimension2"] = json::null();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
-    json image_formats = {"JPEG","PSD","TIFF","DNG"};
+    json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 
     json color_spaces = json::array();
     color_spaces.add("sRGB");

@@ -444,7 +444,7 @@ book3["title"] = "Kafka on the Shore";
 book3["author"] = "Haruki Murakami";
 
 // Constructing a json array with an initializer list 
-json booklist = {book1, book2, book3};    
+json booklist = json::array{book1, book2, book3};    
 
 for (auto book: booklist.elements())
 {
@@ -534,7 +534,7 @@ province=Ontario
 ```
 ### Array iterator
 ```c++
-json arr = {"Toronto", "Vancouver", "Montreal"};
+json arr = json::array{"Toronto", "Vancouver", "Montreal"};
 
 for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
 {

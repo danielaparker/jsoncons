@@ -26,7 +26,7 @@ The library has a number of features, which are listed below:
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## What's new on master
 
@@ -37,6 +37,12 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
 
 - Added static method `null()` to `json` class to return null value
+
+- For json array list initialization, please replace
+
+`json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
+
+`json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
 
 ## Benchmarks
 
@@ -141,10 +147,6 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
 
     // Construct a booklist array
 
-    // The short way:
-    // json booklist = {book3, book4, book1, book2};
-
-    // The long way:
     json booklist = json::array();
 
     // For efficiency, reserve memory, to avoid reallocations
@@ -378,10 +380,6 @@ Result:
 
     // Construct a booklist array
 
-    // The short way:
-    // wjson booklist = {book3, book4, book1, book2};
-
-    // The long way:    
     wjson booklist = wjson::array();
 
     // For efficiency, reserve memory, to avoid reallocations

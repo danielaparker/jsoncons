@@ -20,7 +20,7 @@ void array_example1()
         std::cout << a << std::endl;
     }
     {
-        json j = {1,true,"last"};
+        json j = json::array{1,true,"last"};
         auto d = j.as<std::deque<std::string>>();
         for (auto x : d)
         {

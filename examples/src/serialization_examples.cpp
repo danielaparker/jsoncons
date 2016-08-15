@@ -64,9 +64,9 @@ void serialization_example2()
 
     json val;
 
-    val["verts"] = {1, 2, 3};
-    val["normals"] = {1, 0, 1};
-    val["uvs"] = {0, 0, 1, 1};
+    val["verts"] = json::array{1, 2, 3};
+    val["normals"] = json::array{1, 0, 1};
+    val["uvs"] = json::array{0, 0, 1, 1};
 
     std::cout << "Default format" << std::endl;
     std::cout << pretty_print(val) << std::endl;
@@ -153,8 +153,15 @@ void serialization_example3()
 void serialization_example4()
 {
     json val;
-    val["data"]["id"] = {0,1,2,3,4,5,6,7};
-    val["data"]["item"] = {{2},{4,5,2,3},{4},{4,5,2,3},{2},{4,5,3},{2},{4,3}};
+    val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
+    val["data"]["item"] = json::array{json::array{2},
+                                      json::array{4,5,2,3},
+                                      json::array{4},
+                                      json::array{4,5,2,3},
+                                      json::array{2},
+                                      json::array{4,5,3},
+                                      json::array{2},
+                                      json::array{4,3}};
 
     std::cout << "Default array-array block format" << std::endl;
     std::cout << pretty_print(val) << std::endl;

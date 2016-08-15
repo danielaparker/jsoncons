@@ -644,7 +644,7 @@ image_sizing[<span class="pl-s"><span class="pl-pds">"</span>dimension2<span cla
 
 <p>To construct a json array, use an initializer list:</p>
 
-<div class="highlight highlight-source-c++"><pre>json image_formats = {<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
+<div class="highlight highlight-source-c++"><pre>json image_formats = json::array{<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
 
 <p>or initialize with the array type and use the <code>add</code> function:</p>
 
@@ -693,7 +693,7 @@ std::cout &lt;&lt; j &lt;&lt; std::endl;</pre></div>
 
 <div class="highlight highlight-source-json"><pre>[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>]</pre></div>
 
-<div class="highlight highlight-source-c++"><pre>json j = {<span class="pl-c1">1</span>,<span class="pl-c1">true</span>,<span class="pl-s"><span class="pl-pds">"</span>last<span class="pl-pds">"</span></span>};
+<div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">true</span>,<span class="pl-s"><span class="pl-pds">"</span>last<span class="pl-pds">"</span></span>};
 <span class="pl-k">auto</span> d = j.as&lt;std::deque&lt;std::string&gt;&gt;();
 <span class="pl-k">for</span> (<span class="pl-k">auto</span> x : d)
 {

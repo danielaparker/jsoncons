@@ -172,7 +172,7 @@ produces
 ```
 To construct a json array, use an initializer list:
 ```c++
-json image_formats = {"JPEG","PSD","TIFF","DNG"};
+json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
 or initialize with the array type and use the `add` function:
 ```c++
@@ -224,7 +224,7 @@ The output is
 ```
 
 ```c++
-json j = {1,true,"last"};
+json j = json::array{1,true,"last"};
 auto d = j.as<std::deque<std::string>>();
 for (auto x : d)
 {
