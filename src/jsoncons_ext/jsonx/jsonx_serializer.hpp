@@ -23,6 +23,7 @@ namespace jsoncons { namespace jsonx {
 template <class CharT>
 void escape_attribute(const CharT* s,
                       size_t length,
+                      const basic_output_format<CharT>& format,
                       buffered_ostream<CharT>& bos)
 {
     const CharT* begin = s;
@@ -42,7 +43,55 @@ void escape_attribute(const CharT* s,
             bos.write("&#34;");
             break;
         default:
-            bos.put(c);
+            uint32_t u(c >= 0 ? c : 256 + c);
+            if (is_control_character(u) || format.escape_all_non_ascii())
+            {
+                // convert utf8 to codepoint
+                uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end);
+                if (is_non_ascii_character(cp) || is_control_character(u))
+                {
+                    if (cp > 0xFFFF)
+                    {
+                        cp -= 0x10000;
+                        uint32_t first = (cp >> 10) + 0xD800;
+                        uint32_t second = ((cp & 0x03FF) + 0xDC00);
+
+                        bos.put('&');
+                        bos.put('#');
+                        bos.put('x');
+                        bos.put(to_hex_character(first >> 12 & 0x000F));
+                        bos.put(to_hex_character(first >> 8  & 0x000F));
+                        bos.put(to_hex_character(first >> 4  & 0x000F));
+                        bos.put(to_hex_character(first     & 0x000F));
+                        bos.put(';');
+                        bos.put('&');
+                        bos.put('#');
+                        bos.put('x');
+                        bos.put(to_hex_character(second >> 12 & 0x000F));
+                        bos.put(to_hex_character(second >> 8  & 0x000F));
+                        bos.put(to_hex_character(second >> 4  & 0x000F));
+                        bos.put(to_hex_character(second     & 0x000F));
+                        bos.put(';');
+                    }
+                    else
+                    {
+                        bos.put('\\');
+                        bos.put('u');
+                        bos.put(to_hex_character(cp >> 12 & 0x000F));
+                        bos.put(to_hex_character(cp >> 8  & 0x000F));
+                        bos.put(to_hex_character(cp >> 4  & 0x000F));
+                        bos.put(to_hex_character(cp     & 0x000F));
+                    }
+                }
+                else
+                {
+                    bos.put(c);
+                }
+            }
+            else
+            {
+                bos.put(c);
+            }
         }
     }
 }
@@ -50,6 +99,7 @@ void escape_attribute(const CharT* s,
 template <class CharT>
 void escape_value(const CharT* s,
                   size_t length,
+                  const basic_output_format<CharT>& format,
                   buffered_ostream<CharT>& bos)
 {
     const CharT* begin = s;
@@ -69,7 +119,55 @@ void escape_value(const CharT* s,
             bos.write("&lt;");
             break;
         default:
-            bos.put(c);
+            uint32_t u(c >= 0 ? c : 256 + c);
+            if (is_control_character(u) || format.escape_all_non_ascii())
+            {
+                // convert utf8 to codepoint
+                uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end);
+                if (is_non_ascii_character(cp) || is_control_character(u))
+                {
+                    if (cp > 0xFFFF)
+                    {
+                        cp -= 0x10000;
+                        uint32_t first = (cp >> 10) + 0xD800;
+                        uint32_t second = ((cp & 0x03FF) + 0xDC00);
+
+                        bos.put('&');
+                        bos.put('#');
+                        bos.put('x');
+                        bos.put(to_hex_character(first >> 12 & 0x000F));
+                        bos.put(to_hex_character(first >> 8  & 0x000F));
+                        bos.put(to_hex_character(first >> 4  & 0x000F));
+                        bos.put(to_hex_character(first     & 0x000F));
+                        bos.put(';');
+                        bos.put('&');
+                        bos.put('#');
+                        bos.put('x');
+                        bos.put(to_hex_character(second >> 12 & 0x000F));
+                        bos.put(to_hex_character(second >> 8  & 0x000F));
+                        bos.put(to_hex_character(second >> 4  & 0x000F));
+                        bos.put(to_hex_character(second     & 0x000F));
+                        bos.put(';');
+                    }
+                    else
+                    {
+                        bos.put('\\');
+                        bos.put('u');
+                        bos.put(to_hex_character(cp >> 12 & 0x000F));
+                        bos.put(to_hex_character(cp >> 8  & 0x000F));
+                        bos.put(to_hex_character(cp >> 4  & 0x000F));
+                        bos.put(to_hex_character(cp     & 0x000F));
+                    }
+                }
+                else
+                {
+                    bos.put(c);
+                }
+            }
+            else
+            {
+                bos.put(c);
+            }
         }
     }
 }
@@ -209,7 +307,10 @@ private:
             if (stack_.back().is_object())
             {
                 bos_.write("<json:object name=\"");
-                bos_.write(stack_.back().name_);
+                escape_attribute(stack_.back().name_.data(),
+                                 stack_.back().name_.length(),
+                                 format_,
+                                 bos_);
                 bos_.write("\">");
             }
             else
@@ -255,7 +356,10 @@ private:
             if (stack_.back().is_object())
             {
                 bos_.write("<json:array name=\"");
-                bos_.write(stack_.back().name_);
+                escape_attribute(stack_.back().name_.data(),
+                                 stack_.back().name_.length(),
+                                 format_,
+                                 bos_);
                 bos_.write("\">");
             }
             else
@@ -298,7 +402,10 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:null name=\"");
-            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
@@ -320,16 +427,17 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:string name=\"");
-            bos_.write(stack_.back().name_);
             escape_attribute(stack_.back().name_.data(),
-                             stack_.back().name_.length(),bos_);
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
         {
             bos_.write("<json:string>");
         }
-        escape_value(val,length,bos_);
+        escape_value(val,length,format_,bos_);
         bos_.write("</json:string>");     
     }
 
@@ -343,7 +451,10 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:number name=\"");
-            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
@@ -379,7 +490,10 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:number name=\"");
-            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
@@ -400,7 +514,10 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:number name=\"");
-            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
@@ -421,7 +538,10 @@ private:
         if (stack_.back().is_object())
         {
             bos_.write("<json:boolean name=\"");
-            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),
+                             format_,
+                             bos_);
             bos_.write("\">");
         }
         else
