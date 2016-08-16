@@ -1405,6 +1405,11 @@ public:
             return evaluate().to_string(format,allocator);
         }
 
+        void serialize(basic_json_output_handler<char_type>& handler) const
+        {
+            evaluate().serialize(handler);
+        }
+
         void to_stream(std::basic_ostream<char_type>& os) const
         {
             evaluate().to_stream(os);
@@ -1858,6 +1863,13 @@ public:
         return os.str();
     }
 
+    void serialize(basic_json_output_handler<char_type>& handler) const
+    {
+        handler.begin_json();
+        to_stream(handler);
+        handler.end_json();
+    }
+
     void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_)
@@ -1921,19 +1933,19 @@ public:
     void to_stream(std::basic_ostream<char_type>& os) const
     {
         basic_json_serializer<char_type> serializer(os);
-        to_stream(serializer);
+        serializer(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
     {
         basic_json_serializer<char_type> serializer(os, format);
-        to_stream(serializer);
+        serializer(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
     {
         basic_json_serializer<char_type> serializer(os, format, indenting);
-        to_stream(serializer);
+        serializer(serializer);
     }
 
     bool is_null() const JSONCONS_NOEXCEPT

@@ -19,6 +19,7 @@
 #include "jsoncons_ext/csv/csv_error_category.hpp"
 #include "jsoncons_ext/csv/csv_parser.hpp"
 #include "jsoncons/json.hpp"
+#include "jsoncons_ext/csv/csv_parameters.hpp"
 
 namespace jsoncons { namespace csv {
 

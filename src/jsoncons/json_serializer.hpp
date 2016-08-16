@@ -73,7 +73,6 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     std::vector<stack_item> stack_;
     int indent_;
     std::streamsize original_precision_;
-    std::ios_base::fmtflags original_format_flags_;
     bool indenting_;
     float_printer<CharT> fp_;
     buffered_ostream<CharT> bos_;
