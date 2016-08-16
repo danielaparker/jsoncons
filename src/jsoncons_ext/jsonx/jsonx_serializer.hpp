@@ -19,6 +19,60 @@
 #include <limits> // std::numeric_limits
 
 namespace jsoncons { namespace jsonx {
+ 
+template <class CharT>
+void escape_attribute(const CharT* s,
+                      size_t length,
+                      buffered_ostream<CharT>& bos)
+{
+    const CharT* begin = s;
+    const CharT* end = s + length;
+    for (const CharT* it = begin; it != end; ++it)
+    {
+        CharT c = *it;
+        switch (c)
+        {
+        case '&':
+            bos.write("&amp;");
+            break;
+        case '<':
+            bos.write("&lt;");
+            break;
+        case '\"':
+            bos.write("&#34;");
+            break;
+        default:
+            bos.put(c);
+        }
+    }
+}
+ 
+template <class CharT>
+void escape_value(const CharT* s,
+                  size_t length,
+                  buffered_ostream<CharT>& bos)
+{
+    const CharT* begin = s;
+    const CharT* end = s + length;
+    for (const CharT* it = begin; it != end; ++it)
+    {
+        CharT c = *it;
+        switch (c)
+        {
+        case '&':
+            bos.write("&amp;");
+            break;
+        case '<':
+            bos.write("&lt;");
+            break;
+        case '\"':
+            bos.write("&lt;");
+            break;
+        default:
+            bos.put(c);
+        }
+    }
+}
 
 template <class CharT>
 struct jsonx_char_traits
@@ -78,7 +132,7 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), skip_(false)
+           : is_object_(is_object)
         {
         }
         bool is_object() const
@@ -87,8 +141,6 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
         }
 
         bool is_object_;
-        size_t count_;
-        bool skip_;
         std::basic_string<CharT> name_;
     };
     buffered_ostream<CharT> bos_;
@@ -97,6 +149,8 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
     float_printer<CharT> fp_;
+    bool indenting_;
+    int indent_;
 public:
     basic_jsonx_serializer(std::basic_ostream<CharT>& os)
        :
@@ -105,7 +159,21 @@ public:
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       fp_(format_.precision())
+       fp_(format_.precision()),
+       indenting_(false),
+       indent_(0)
+    {
+    }
+    basic_jsonx_serializer(std::basic_ostream<CharT>& os, bool indenting)
+       :
+       bos_(os),
+       format_(),
+       stack_(),
+       original_precision_(),
+       original_format_flags_(),
+       fp_(format_.precision()),
+       indenting_(indenting),
+       indent_(0)
     {
     }
     ~basic_jsonx_serializer()
@@ -131,10 +199,13 @@ private:
             bos_.write(R"(<json:object xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)");
-            bos_.put('\n');
         }
         else 
         {
+            if (indenting_)
+            {
+                write_indent();
+            }
             if (stack_.back().is_object())
             {
                 bos_.write("<json:object name=\"");
@@ -145,15 +216,23 @@ private:
             {
                 bos_.write("<json:object>");
             }
-            bos_.put('\n');
+        }
+        if (indenting_)
+        {
+            indent();
         }
         stack_.push_back(stack_item(true));
     }
 
     void do_end_object() override
     {
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
+        {
+            unindent();
+            write_indent();
+        }
         bos_.write("</json:object>");
-        bos_.put('\n');
         stack_.pop_back();
     }
 
@@ -169,6 +248,10 @@ private:
         }
         else 
         {
+            if (indenting_)
+            {
+                write_indent();
+            }
             if (stack_.back().is_object())
             {
                 bos_.write("<json:array name=\"");
@@ -181,177 +264,199 @@ private:
             }
             stack_.push_back(stack_item(false));
         }
+        if (indenting_)
+        {
+            indent();
+        }
     }
 
     void do_end_array() override
     {
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
+        {
+            unindent();
+            write_indent();
+        }
         bos_.write("</json:array>");
         stack_.pop_back();
     }
 
     void do_name(const CharT* name, size_t length) override
     {
-        if (stack_.size() > 0)
-        {
-            stack_.back().name_ = std::basic_string<CharT>(name,length);
-        }
+        JSONCONS_ASSERT(!stack_.empty());
+        stack_.back().name_ = std::basic_string<CharT>(name,length);
     }
 
     void do_null_value() override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-            }
-            else
-            {
-            }
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:null name=\"");
+            bos_.write(stack_.back().name_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:number>");
+        }
+        auto buf = json_text_traits<CharT>::null_literal();
+        bos_.write(buf.first,buf.second);
+        bos_.write("</json:null>");
     }
 
     void do_string_value(const CharT* val, size_t length) override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:string name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:string>");
-            }
-            bos_.write(val,length);
-            bos_.write("</json:string>");
-            bos_.put('\n');
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:string name=\"");
+            bos_.write(stack_.back().name_);
+            escape_attribute(stack_.back().name_.data(),
+                             stack_.back().name_.length(),bos_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:string>");
+        }
+        escape_value(val,length,bos_);
+        bos_.write("</json:string>");     
     }
 
     void do_double_value(double value, uint8_t precision) override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:number name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:number>");
-            }
-            if (is_nan(value) && format_.replace_nan())
-            {
-                bos_.write(format_.nan_replacement());
-            }
-            else if (is_pos_inf(value) && format_.replace_pos_inf())
-            {
-                bos_.write(format_.pos_inf_replacement());
-            }
-            else if (is_neg_inf(value) && format_.replace_neg_inf())
-            {
-                bos_.write(format_.neg_inf_replacement());
-            }
-            else
-            {
-                fp_.print(value,precision,bos_);
-            }
-            bos_.write("</json:number>");
-            bos_.put('\n');
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:number name=\"");
+            bos_.write(stack_.back().name_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:number>");
+        }
+        if (is_nan(value) && format_.replace_nan())
+        {
+            bos_.write(format_.nan_replacement());
+        }
+        else if (is_pos_inf(value) && format_.replace_pos_inf())
+        {
+            bos_.write(format_.pos_inf_replacement());
+        }
+        else if (is_neg_inf(value) && format_.replace_neg_inf())
+        {
+            bos_.write(format_.neg_inf_replacement());
+        }
+        else
+        {
+            fp_.print(value,precision,bos_);
+        }
+        bos_.write("</json:number>");
     }
 
     void do_integer_value(int64_t value) override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:number name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:number>");
-            }
-            print_integer(value,bos_);
-            bos_.write("</json:number>");
-            bos_.put('\n');
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:number name=\"");
+            bos_.write(stack_.back().name_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:number>");
+        }
+        print_integer(value,bos_);
+        bos_.write("</json:number>");
     }
 
     void do_uinteger_value(uint64_t value) override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:number name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:number>");
-            }
-            print_integer(value,bos_);
-            bos_.write("</json:number>");
-            bos_.put('\n');
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:number name=\"");
+            bos_.write(stack_.back().name_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:number>");
+        }
+        print_integer(value,bos_);
+        bos_.write("</json:number>");
     }
 
     void do_bool_value(bool value) override
     {
-        if (stack_.size() > 0)
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:boolean name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:boolean>");
-            }
-            if (value)
-            {
-                auto buf = json_text_traits<CharT>::true_literal();
-                bos_.write(buf.first,buf.second);
-            }
-            else
-            {
-                auto buf = json_text_traits<CharT>::false_literal();
-                bos_.write(buf.first,buf.second);
-            }
-            bos_.write("</json:boolean>");
-            bos_.put('\n');
+            write_indent();
         }
+        if (stack_.back().is_object())
+        {
+            bos_.write("<json:boolean name=\"");
+            bos_.write(stack_.back().name_);
+            bos_.write("\">");
+        }
+        else
+        {
+            bos_.write("<json:boolean>");
+        }
+        if (value)
+        {
+            auto buf = json_text_traits<CharT>::true_literal();
+            bos_.write(buf.first,buf.second);
+        }
+        else
+        {
+            auto buf = json_text_traits<CharT>::false_literal();
+            bos_.write(buf.first,buf.second);
+        }
+        bos_.write("</json:boolean>");
     }
 
-    void do_null_value(buffered_ostream<CharT>& os) 
+    void indent()
     {
-        if (stack_.size() > 0)
+        indent_ += static_cast<int>(format_.indent());
+    }
+
+    void unindent()
+    {
+        indent_ -= static_cast<int>(format_.indent());
+    }
+
+    void write_indent()
+    {
+        bos_. put('\n');
+        for (int i = 0; i < indent_; ++i)
         {
-            if (stack_.back().is_object())
-            {
-                bos_.write("<json:null name=\"");
-                bos_.write(stack_.back().name_);
-                bos_.write("\">");
-            }
-            else
-            {
-                bos_.write("<json:number>");
-            }
-            auto buf = json_text_traits<CharT>::null_literal();
-            os.write(buf.first,buf.second);
-            bos_.write("</json:null>");
-            bos_.put('\n');
+            bos_. put(' ');
         }
     }
 };

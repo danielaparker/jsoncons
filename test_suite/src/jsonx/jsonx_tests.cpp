@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 }
     )");
 
-    jsonx_serializer serializer(std::cout);
+    jsonx_serializer serializer(std::cout,true);
 
     employees.serialize(serializer);
 }
