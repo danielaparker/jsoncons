@@ -49,7 +49,7 @@ is >> books;
 ```
 Loop through the book array elements, using a range-based for loop
 ```c++
-for (auto book : books.elements())
+for (const auto& book : books.elements())
 {
     std::string author = book["author"].as<std::string>();
     std::string title = book["title"].as<std::string>();
@@ -87,7 +87,7 @@ Ivan Passer, Cutter's Way
 Loop through the members of the third book element, using a range-based for loop
 
 ```c++
-for (auto member : books[2].members())
+for (const auto& member : books[2].members())
 {
     std::cout << member.name() << "=" 
               << member.value() << std::endl;
@@ -255,7 +255,7 @@ j["two"] = 2;
 j["three"] = 3;
 
 auto um = j.as<std::unordered_map<std::string,int>>();
-for (auto x : um)
+for (const auto& x : um)
 {
     std::cout << x.first << "=" << x.second << std::endl;
 }

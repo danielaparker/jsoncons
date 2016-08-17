@@ -424,7 +424,7 @@ json book = json::parse(R"(
 }
 )");
 
-for (auto member: book.members())
+for (const auto& member: book.members())
 {
     std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
 } 
@@ -449,7 +449,7 @@ book3["author"] = "Haruki Murakami";
 // Constructing a json array with an initializer list 
 json booklist = json::array{book1, book2, book3};    
 
-for (auto book: booklist.elements())
+for (const auto& book: booklist.elements())
 {
     std::cout << book["title"].as<string_type>() << std::end;
 } 

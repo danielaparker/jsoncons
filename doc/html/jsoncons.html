@@ -520,7 +520,7 @@ is &gt;&gt; books;</pre></div>
 
 <p>Loop through the book array elements, using a range-based for loop</p>
 
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">auto</span> book : books.elements())
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : books.elements())
 {
     std::string author = book[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
     std::string title = book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
@@ -557,7 +557,7 @@ Ivan Passer, Cutter's Way
 
 <p>Loop through the members of the third book element, using a range-based for loop</p>
 
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">auto</span> member : books[<span class="pl-c1">2</span>].members())
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : books[<span class="pl-c1">2</span>].members())
 {
     std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
@@ -721,7 +721,7 @@ j[<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</spa
 j[<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>] = <span class="pl-c1">3</span>;
 
 <span class="pl-k">auto</span> um = j.as&lt;std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt;&gt;();
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> x : um)
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; x : um)
 {
     std::cout &lt;&lt; x.<span class="pl-smi">first</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; x.<span class="pl-smi">second</span> &lt;&lt; std::endl;
 }</pre></div>

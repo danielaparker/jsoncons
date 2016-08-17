@@ -172,7 +172,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
 
 ```c++
     //Loop through the booklist elements using a range-based for loop    
-    for (auto book : booklist.elements())
+    for (const auto& book : booklist.elements())
     {
         std::cout << book["title"].as<std::string>()
                   << ","
@@ -183,7 +183,7 @@ The examples below illustrate the use of the [json](https://github.com/danielapa
     json& book = booklist[1];
 
     //Loop through the book's name-value pairs using a range-based for loop    
-    for (auto member : book.members())
+    for (const auto& member : book.members())
     {
         std::cout << member.name()
                   << ","
@@ -404,7 +404,7 @@ Result:
 ```
 ```c++
     //Loop through the booklist elements using a range-based for loop    
-    for (auto book : booklist.elements())
+    for (const auto& book : booklist.elements())
     {
         std::wcout << book[L"title"].as<std::wstring>()
                    << L","
@@ -415,7 +415,7 @@ Result:
     wjson& book = booklist[1];
 
     //Loop through the book's name-value pairs using a range-based for loop    
-    for (auto member : book.members())
+    for (const auto& member : book.members())
     {
         std::wcout << member.name()
                    << L","

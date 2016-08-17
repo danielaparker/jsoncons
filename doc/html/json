@@ -1112,7 +1112,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 <span class="pl-s">}</span>
 <span class="pl-s">)<span class="pl-pds">"</span></span>);
 
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> member: book.members())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.members())
 {
     std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
 } </pre></div>
@@ -1137,7 +1137,7 @@ book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds"
 <span class="pl-c">// Constructing a json array with an initializer list </span>
 json booklist = json::array{book1, book2, book3};    
 
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> book: booklist.elements())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.elements())
 {
     std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::end;
 } 

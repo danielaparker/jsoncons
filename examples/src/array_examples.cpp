@@ -39,7 +39,7 @@ void array_example1()
         j["three"] = 3;
 
         auto um = j.as<std::unordered_map<std::string,int>>();
-        for (auto x : um)
+        for (const auto& x : um)
         {
             std::cout << x.first << "=" << x.second << std::endl;
         }
