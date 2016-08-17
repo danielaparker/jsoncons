@@ -56,7 +56,7 @@ Note
 
     csv_serializer serializer(std::cout);
 
-    countries.serialize(serializer);
+    countries.to_stream(serializer);
 
 #### Output 
 
@@ -121,7 +121,7 @@ Note
 
     csv_serializer serializer(std::cout,params);
 
-    employees.serialize(serializer);
+    employees.to_stream(serializer);
 
 #### Tab delimited output file
 

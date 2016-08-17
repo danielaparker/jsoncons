@@ -68,7 +68,7 @@ json person = json::parse(R"(
 
 jsonx_serializer serializer(std::cout,true);
 
-person.serialize(serializer);
+person.to_stream(serializer);
 ```
 
 The output is
@@ -110,7 +110,7 @@ ojson special_chars = ojson::parse(R"(
 
 jsonx_serializer serializer(std::cout,true);
 
-special_chars.serialize(serializer);
+special_chars.to_stream(serializer);
 ```
 
 The output is

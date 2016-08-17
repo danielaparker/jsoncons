@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(serialize_jsonx)
 
     jsonx_serializer serializer(std::cout,true);
 
-    person.serialize(serializer);
+    person.to_stream(serializer);
 }
 
 BOOST_AUTO_TEST_CASE(serialize_special_characters)
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(serialize_special_characters)
 
     jsonx_serializer serializer(std::cout,true);
 
-    special_chars.serialize(serializer);
+    special_chars.to_stream(serializer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

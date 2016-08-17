@@ -360,8 +360,8 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
-    void serialize(basic_json_output_handler<char_type>& handler) const
-Serializes json value to output handler
+    void to_stream(basic_json_output_handler<char_type>& output_handler) const
+Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, and calls `end_json()` on `output_handler`.
 
     string_type to_string(const string_allocator& allocator = string_allocator()) const noexcept
 Inserts json value into string.
@@ -375,8 +375,8 @@ Inserts json value into stream with default output format.
     std::ostream& to_stream(std::ostream<CharT> os, const output_format& format) const
 Inserts json value into stream using specified [output_format](output_format).
 
-    void to_stream(json_output_handler& handler) const
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
+    void emit(json_output_handler& handler) const
+Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
 ### Non member functions
 

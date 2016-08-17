@@ -1405,9 +1405,9 @@ public:
             return evaluate().to_string(format,allocator);
         }
 
-        void serialize(basic_json_output_handler<char_type>& handler) const
+        void to_stream(basic_json_output_handler<char_type>& handler) const
         {
-            evaluate().serialize(handler);
+            evaluate().to_stream(handler);
         }
 
         void to_stream(std::basic_ostream<char_type>& os) const
@@ -1846,7 +1846,7 @@ public:
         std::basic_ostringstream<char_type,char_traits_type,string_allocator> os(s);
         {
             basic_json_serializer<char_type> serializer(os);
-            to_stream(serializer);
+            emit(serializer);
         }
         return os.str();
     }
@@ -1858,19 +1858,19 @@ public:
         std::basic_ostringstream<char_type> os(s);
         {
             basic_json_serializer<char_type> serializer(os, format);
-            to_stream(serializer);
+            emit(serializer);
         }
         return os.str();
     }
 
-    void serialize(basic_json_output_handler<char_type>& handler) const
+    void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        to_stream(handler);
+        emit(handler);
         handler.end_json();
     }
 
-    void to_stream(basic_json_output_handler<char_type>& handler) const
+    void emit(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_)
         {
@@ -1906,7 +1906,7 @@ public:
                 for (const_object_iterator it = o->begin(); it != o->end(); ++it)
                 {
                     handler.name((it->name()).data(),it->name().length());
-                    it->value().to_stream(handler);
+                    it->value().emit(handler);
                 }
                 handler.end_object();
             }
@@ -1917,7 +1917,7 @@ public:
                 array *o = var_.value_.array_val_;
                 for (const_array_iterator it = o->begin(); it != o->end(); ++it)
                 {
-                    it->to_stream(handler);
+                    it->emit(handler);
                 }
                 handler.end_array();
             }
@@ -1933,19 +1933,19 @@ public:
     void to_stream(std::basic_ostream<char_type>& os) const
     {
         basic_json_serializer<char_type> serializer(os);
-        serialize(serializer);
+        to_stream(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
     {
         basic_json_serializer<char_type> serializer(os, format);
-        serialize(serializer);
+        to_stream(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
     {
         basic_json_serializer<char_type> serializer(os, format, indenting);
-        serialize(serializer);
+        to_stream(serializer);
     }
 
     bool is_null() const JSONCONS_NOEXCEPT
