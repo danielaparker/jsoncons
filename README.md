@@ -22,6 +22,7 @@ The library has a number of features, which are listed below:
 - Supports optional escaping of non-ascii UTF-8 octets
 - Allows extensions to the types accepted by the json class accessors and modifiers
 - Supports reading (writing) JSON values from (to) CSV files
+- Supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
@@ -29,6 +30,8 @@ The library has a number of features, which are listed below:
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## What's new on master
+
+- A new extension jsonx that supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 
 - A new template parameter, `JsonTraits`, has been added to the `basic_json` class template. 
 

@@ -1933,19 +1933,19 @@ public:
     void to_stream(std::basic_ostream<char_type>& os) const
     {
         basic_json_serializer<char_type> serializer(os);
-        serializer(serializer);
+        serialize(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
     {
         basic_json_serializer<char_type> serializer(os, format);
-        serializer(serializer);
+        serialize(serializer);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
     {
         basic_json_serializer<char_type> serializer(os, format, indenting);
-        serializer(serializer);
+        serialize(serializer);
     }
 
     bool is_null() const JSONCONS_NOEXCEPT

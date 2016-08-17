@@ -19,9 +19,9 @@ using namespace jsoncons::jsonx;
 
 BOOST_AUTO_TEST_SUITE(jsonx_test_suite)
 
-BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
+BOOST_AUTO_TEST_CASE(serialize_jsonx)
 {
-    json employees = json::parse(R"(
+    json person = json::parse(R"(
 {
   "name":"John Smith",
   "address": {
@@ -43,7 +43,25 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     jsonx_serializer serializer(std::cout,true);
 
-    employees.serialize(serializer);
+    person.serialize(serializer);
+}
+
+BOOST_AUTO_TEST_CASE(serialize_special_characters)
+{
+    ojson special_chars = ojson::parse(R"(
+{
+  "&":"&",
+  "<":"<",
+  ">":">",
+  "\"":"\"",
+  "'":"'",
+  "\u00A9":""
+}
+    )");
+
+    jsonx_serializer serializer(std::cout,true);
+
+    special_chars.serialize(serializer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

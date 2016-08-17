@@ -360,6 +360,9 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
+    void serialize(basic_json_output_handler<char_type>& handler) const
+Serializes json value to output handler
+
     string_type to_string(const string_allocator& allocator = string_allocator()) const noexcept
 Inserts json value into string.
 

@@ -1026,6 +1026,11 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Serialization</h3>
 
+<pre><code>void serialize(basic_json_output_handler&lt;char_type&gt;&amp; handler) const
+</code></pre>
+
+<p>Serializes json value to output handler</p>
+
 <pre><code>string_type to_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
 </code></pre>
 

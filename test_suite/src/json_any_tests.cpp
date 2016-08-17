@@ -36,11 +36,11 @@ BOOST_AUTO_TEST_CASE(test_any_const_ref)
 
     const matrix<double>& B = obj["A"].any_cast<const matrix<double>&>();
 
-	BOOST_CHECK_CLOSE(B(0,0),1.0,0.0000001);
+    BOOST_CHECK_CLOSE(B(0,0),1.0,0.0000001);
 
     const matrix<double> C = obj["A"].any_cast<const matrix<double>>();
 
-	BOOST_CHECK_CLOSE(C(0,0),1.0,0.0000001);
+    BOOST_CHECK_CLOSE(C(0,0),1.0,0.0000001);
 
     BOOST_CHECK_EXCEPTION(obj["A"].any_cast<const matrix<int>>(), jsoncons::json_exception, check_any_exception);
 }

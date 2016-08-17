@@ -535,7 +535,7 @@ json countries = handler.get_result();
 
 csv_serializer serializer(std::cout);
 
-countries.to_stream(serializer);
+countries.serialize(serializer);
 </code></pre>
 
 <h4>Output</h4>
@@ -605,7 +605,7 @@ json employees = handler.get_result();
 
 csv_serializer serializer(std::cout,params);
 
-employees.to_stream(serializer);
+employees.serialize(serializer);
 </code></pre>
 
 <h4>Tab delimited output file</h4>

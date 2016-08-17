@@ -493,6 +493,7 @@ vertical-align:1px;
 <li>Supports optional escaping of non-ascii UTF-8 octets</li>
 <li>Allows extensions to the types accepted by the json class accessors and modifiers</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
+<li>Supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</li>
 <li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>
 </li>
 <li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
@@ -505,6 +506,7 @@ vertical-align:1px;
 <h2>What's new on master</h2>
 
 <ul>
+<li><p>A new extension jsonx that supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</p></li>
 <li><p>A new template parameter, <code>JsonTraits</code>, has been added to the <code>basic_json</code> class template. </p></li>
 <li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
 <li><p>Added support for <code>json</code> <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, constructor, and assignment operator for any sequence container (<code>std::array</code>, <code>std::vector</code>, <code>std::deque</code>, <code>std::forward_list</code>, <code>std::list</code>) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (<code>std::set</code>, <code>std::multiset</code>, <code>std::unordered_set</code>, <code>std::unordered_multiset</code>.)</p></li>
