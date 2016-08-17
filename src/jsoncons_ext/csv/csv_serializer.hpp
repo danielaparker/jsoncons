@@ -95,8 +95,6 @@ class basic_csv_serializer : public basic_json_output_handler<CharT>
     basic_csv_parameters<CharT> parameters_;
     basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
-    std::streamsize original_precision_;
-    std::ios_base::fmtflags original_format_flags_;
     std::basic_ostringstream<CharT> header_oss_;
     buffered_ostream<CharT> header_os_;
     std::map<std::basic_string<CharT>,size_t> header_;
@@ -107,8 +105,6 @@ public:
        os_(os),
        format_(),
        stack_(),
-       original_precision_(),
-       original_format_flags_(),
        header_os_(header_oss_),
        header_(),
        fp_(format_.precision())
@@ -122,8 +118,6 @@ public:
        parameters_(params),
        format_(),
        stack_(),
-       original_precision_(),
-       original_format_flags_(),
        header_os_(header_oss_),
        header_(),
        fp_(format_.precision())
@@ -353,14 +347,6 @@ private:
         {
             os.write(format_.neg_inf_replacement());
         }
-        //else if (format_.floatfield() != 0)
-        //{
-        //    std::basic_ostringstream<CharT> ss;
-        //    ss.imbue(std::locale::classic());
-        //    ss.setf(format_.floatfield(), std::ios::floatfield);
-        //    ss << std::showpoint << std::setprecision(format_.precision()) << val;
-        //    os.write(ss.str());
-        //}
         else
         {
             fp_.print(val,format_.precision(),os);
