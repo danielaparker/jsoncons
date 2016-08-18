@@ -511,12 +511,18 @@ vertical-align:1px;
 <li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
 <li><p>Added support for <code>json</code> <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, constructor, and assignment operator for any sequence container (<code>std::array</code>, <code>std::vector</code>, <code>std::deque</code>, <code>std::forward_list</code>, <code>std::list</code>) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (<code>std::set</code>, <code>std::multiset</code>, <code>std::unordered_set</code>, <code>std::unordered_multiset</code>.)</p></li>
 <li><p>Added static method <code>null()</code> to <code>json</code> class to return null value</p></li>
-<li><p>For json array list initialization, please replace</p></li>
+<li><p>The json list initialization constructor has been deprecated, please replace</p></li>
 </ul>
 
 <p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
 
 <p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
+
+<ul>
+<li>jsoncons now supports creating json objects with list initialization, e.g.</li>
+</ul>
+
+<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,<span class="pl-c1">2</span>}};</pre></div>
 
 <h2>Benchmarks</h2>
 

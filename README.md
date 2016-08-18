@@ -49,7 +49,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - jsoncons now supports creating json objects with list initialization, e.g.
 ```c++
-json j = json::object{{"first",1},{"second"},2};
+json j = json::object{{"first",1},{"second",2}};
 ```
 ## Benchmarks
 
