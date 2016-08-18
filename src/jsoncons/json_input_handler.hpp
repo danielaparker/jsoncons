@@ -12,8 +12,8 @@
 
 namespace jsoncons {
 
-template<class CharT>
-uint64_t string_to_uinteger(const CharT *s, size_t length) throw(std::overflow_error)
+template<class CharT> inline
+bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
 {
     static const uint64_t max_value = std::numeric_limits<uint64_t>::max JSONCONS_NO_MACRO_EXP();
     static const uint64_t max_value_div_10 = max_value / 10;
@@ -23,24 +23,25 @@ uint64_t string_to_uinteger(const CharT *s, size_t length) throw(std::overflow_e
         uint64_t x = s[i] - '0';
         if (n > max_value_div_10)
         {
-            throw std::overflow_error("Unsigned overflow");
+            return false;
         }
         n = n * 10;
         if (n > max_value - x)
         {
-            throw std::overflow_error("Unsigned overflow");
+            return false;
         }
 
         n += x;
     }
-    return n;
+    result = n;
+    return true;
 }
 
-template<class CharT>
-int64_t string_to_integer(bool has_neg, const CharT *s, size_t length) throw(std::overflow_error)
+template<class CharT> inline
+bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t& result)
 {
-    const int64_t max_value = std::numeric_limits<int64_t>::max JSONCONS_NO_MACRO_EXP();
-    const int64_t max_value_div_10 = max_value / 10;
+    static const int64_t max_value = std::numeric_limits<int64_t>::max JSONCONS_NO_MACRO_EXP();
+    static const int64_t max_value_div_10 = max_value / 10;
 
     int64_t n = 0;
     const CharT* end = s+length; 
@@ -49,17 +50,18 @@ int64_t string_to_integer(bool has_neg, const CharT *s, size_t length) throw(std
         int64_t x = *p - '0';
         if (n > max_value_div_10)
         {
-            throw std::overflow_error("Integer overflow");
+            return false;
         }
         n = n * 10;
         if (n > max_value - x)
         {
-            throw std::overflow_error("Integer overflow");
+            return false;
         }
 
         n += x;
     }
-    return has_neg ? -n : n;
+    result = has_neg ? -n : n;
+    return true;
 }
 
 template <class CharT>

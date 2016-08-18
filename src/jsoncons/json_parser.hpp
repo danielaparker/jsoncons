@@ -1358,12 +1358,12 @@ private:
     {
         if (is_negative_)
         {
-            try
+            int64_t d;
+            if (try_string_to_integer(is_negative_, number_buffer_.data(), number_buffer_.length(),d))
             {
-                int64_t d = string_to_integer(is_negative_, number_buffer_.data(), number_buffer_.length());
                 handler_->value(d, *this);
             }
-            catch (const std::exception&)
+            else
             {
                 try
                 {
@@ -1379,12 +1379,12 @@ private:
         }
         else
         {
-            try
+            uint64_t d;
+            if (try_string_to_uinteger(number_buffer_.data(), number_buffer_.length(),d))
             {
-                uint64_t d = string_to_uinteger(number_buffer_.data(), number_buffer_.length());
                 handler_->value(d, *this);
             }
-            catch (const std::exception&)
+            else
             {
                 try
                 {
