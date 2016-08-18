@@ -532,6 +532,23 @@ public:
     {
     }
 
+    json_object(std::initializer_list<typename Json::array> init, 
+               const Allocator& allocator = Allocator())
+    {
+        for (const auto& element : init)
+        {
+            if (element.size() != 2 || !element[0].is_string())
+            {
+                JSONCONS_THROW_EXCEPTION("Cannot create object from initializer list");
+                break;
+            }
+        }
+        for (auto& element : init)
+        {
+            set(element[0].as_string(), std::move(element[1]));
+        }
+    }
+
     Allocator get_allocator() const
     {
         return members_.get_allocator();

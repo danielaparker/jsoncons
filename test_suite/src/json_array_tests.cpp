@@ -1,6 +1,6 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
-
+#define JSONCONS_NO_DEPRECATED
 #ifdef __linux__
 #define BOOST_TEST_DYN_LINK
 #endif
@@ -40,6 +40,39 @@ BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list)
     {
         BOOST_CHECK_EQUAL(i,arr[i].as<size_t>());
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list2)
+{
+    json val;
+    val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
+    val["data"]["item"] = json::array{json::array{2},
+                                      json::array{4,5,2,3},
+                                      json::array{4},
+                                      json::array{4,5,2,3},
+                                      json::array{2},
+                                      json::array{4,5,3},
+                                      json::array{2},
+                                      json::array{4,3}};
+
+    BOOST_CHECK(val["data"]["item"][0][0] == json(2));
+    BOOST_CHECK(val["data"]["item"][1][0] == json(4));
+    BOOST_CHECK(val["data"]["item"][2][0] == json(4));
+    BOOST_CHECK(val["data"]["item"][3][0] == json(4));
+    BOOST_CHECK(val["data"]["item"][4][0] == json(2));
+    BOOST_CHECK(val["data"]["item"][5][0] == json(4));
+    BOOST_CHECK(val["data"]["item"][6][0] == json(2));
+    BOOST_CHECK(val["data"]["item"][7][0] == json(4));
+    BOOST_CHECK(val["data"]["item"][7][1] == json(3));
+}
+
+BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list3)
+{
+    json val;
+    val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
+    val["data"]["item"] = json::array{json::object{{"first",1},{"second",2}}};
+
+    std::cout << val << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)

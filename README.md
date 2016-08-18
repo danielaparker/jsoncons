@@ -41,12 +41,16 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - Added static method `null()` to `json` class to return null value
 
-- For json array list initialization, please replace
+- The json list initialization constructor has been deprecated, please replace
 
 `json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
 
 `json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
 
+- jsoncons now supports creating json objects with list initialization, e.g.
+```c++
+json j = json::object{{"first",1},{"second"},2};
+```
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
