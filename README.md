@@ -30,7 +30,7 @@ The library has a number of features, which are listed below:
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## Note
-
+```
 - The json initializer list constructor has been deprecated, please replace
 
 `json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
@@ -38,6 +38,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 `json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
 
 ```
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

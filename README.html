@@ -505,46 +505,47 @@ vertical-align:1px;
 
 <h2>Note</h2>
 
-<ul>
-<li>The json initializer list constructor has been deprecated, please replace</li>
-</ul>
+<pre><code>- The json initializer list constructor has been deprecated, please replace
 
-<p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
+`json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
 
-<p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
+`json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
 
-<pre><code>## Benchmarks
-
-[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
-
-## Using the jsoncons library
-
-The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
-
-To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
-
-For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons).
-
-## Building the test suite and examples with CMake
-
-[CMake](https://cmake.org/) is a C++ Makefiles/Solution generator for cross-platform software development. 
-
-Instructions for building the test suite with CMake may be found in
-
-    jsoncons/test_suite/build/cmake/README.txt
-
-Instructions for building the examples with CMake may be found in
-
-    jsoncons/examples/build/cmake/README.txt
-
-## About jsoncons::basic_json
-
-The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different character types, different policies for ordering name-value pairs, etc.
-```c++
-typedef basic_json&lt;char,
-                   JsonTraits = json_traits&lt;char&gt;,
-                   Allocator = std::allocator&lt;char&gt;&gt; json;
 </code></pre>
+
+<h2>Benchmarks</h2>
+
+<p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
+
+<h2>Using the jsoncons library</h2>
+
+<p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
+
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
+
+<p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>.</p>
+
+<h2>Building the test suite and examples with CMake</h2>
+
+<p><a href="https://cmake.org/">CMake</a> is a C++ Makefiles/Solution generator for cross-platform software development. </p>
+
+<p>Instructions for building the test suite with CMake may be found in</p>
+
+<pre><code>jsoncons/test_suite/build/cmake/README.txt
+</code></pre>
+
+<p>Instructions for building the examples with CMake may be found in</p>
+
+<pre><code>jsoncons/examples/build/cmake/README.txt
+</code></pre>
+
+<h2>About jsoncons::basic_json</h2>
+
+<p>The jsoncons library provides a <code>basic_json</code> class template, which is the generalization of a <code>json</code> value for different character types, different policies for ordering name-value pairs, etc.</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                   JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
+                   Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json;</pre></div>
 
 <p>The library includes four instantiations of <code>basic_json</code>:</p>
 
