@@ -639,7 +639,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 
     csv_serializer serializer(std::cout);
 
-    countries.to_stream(serializer);
+    countries.write(serializer);
 }
 
 BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
@@ -674,7 +674,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     csv_serializer serializer(std::cout,params);
 
-    employees.to_stream(serializer);
+    employees.write(serializer);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

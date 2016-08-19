@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>deprecated</title>
+<title>csv_serializer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,343 +468,155 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>Deprecated Features</h1>
+<pre><code>jsoncons::csv::csv_serializer
+</code></pre>
 
-<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
+<p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
 
-<p>In the table, <em>✓</em> indicates that the old name is still supported.</p>
+<h3>Header</h3>
 
-<table>
-<thead>
-<tr>
-<th>Category</th>
-<th>Old name, now deprecated</th>
-<th><em>✓</em></th>
-<th>Recommendation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>class json</td>
-<td>add(size_t index, const json&amp; val)</td>
-<td><em>✓</em></td>
-<td>Use add(array_iterator pos, const json&amp; val)</td>
-</tr>
-<tr>
-<td></td>
-<td>add(size_t index, json&amp;&amp; val)</td>
-<td><em>✓</em></td>
-<td>Use add(array_iterator pos, json&amp;&amp; val)</td>
-</tr>
-<tr>
-<td></td>
-<td>remove_range(size_t from_index, size_t to_index)</td>
-<td><em>✓</em></td>
-<td>erase(array_iterator first, array_iterator last)</td>
-</tr>
-<tr>
-<td></td>
-<td>remove(const std::string&amp; name)</td>
-<td><em>✓</em></td>
-<td>Use erase(const std::string&amp; name)</td>
-</tr>
-<tr>
-<td></td>
-<td>parse(std::istream&amp; is)</td>
-<td><em>✓</em></td>
-<td>Use parse_stream(std::istream&amp; is)</td>
-</tr>
-<tr>
-<td></td>
-<td>parse(std::istream&amp; is, parse_error_handler&amp; err_handler)</td>
-<td><em>✓</em></td>
-<td>Use parse_stream(std::istream&amp; is, parse_error_handler&amp; err_handler)</td>
-</tr>
-<tr>
-<td></td>
-<td>as_int() const</td>
-<td><em>✓</em></td>
-<td>Use <code>as&lt;int&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>as_uint() const</td>
-<td><em>✓</em></td>
-<td>Use <code>as&lt;unsigned int&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>as_long() const</td>
-<td><em>✓</em></td>
-<td>Use <code>as&lt;long&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>as_ulong() const</td>
-<td><em>✓</em></td>
-<td>Use <code>as&lt;unsigned long&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>as_longlong() const</td>
-<td><em>✓</em></td>
-<td>Use as_integer or <code>as&lt;long long&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>as_ulonglong() const</td>
-<td><em>✓</em></td>
-<td>Use as_uinteger or <code>as&lt;unsigned long long&gt;</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>is_longlong() const</td>
-<td><em>✓</em></td>
-<td>Use is_integer() or is()</td>
-</tr>
-<tr>
-<td></td>
-<td>is_ulonglong() const</td>
-<td><em>✓</em></td>
-<td>Use is_uinteger() or is()</td>
-</tr>
-<tr>
-<td></td>
-<td>is_numeric() const</td>
-<td><em>✓</em></td>
-<td>Use <code>is_number()</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>remove_member(const std::string&amp; name)</td>
-<td><em>✓</em></td>
-<td>Use erase(const std::string&amp; name)</td>
-</tr>
-<tr>
-<td></td>
-<td>const json&amp; get(const std::string&amp; name) const</td>
-<td><em>✓</em></td>
-<td>Use const json get(const std::string&amp; name, T default_val) const with default <code>json::null_type()</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>has_member(const std::string&amp; name) const</td>
-<td><em>✓</em></td>
-<td>Use count(const std::string&amp; name)</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_members()</td>
-<td><em>✓</em></td>
-<td>Use members().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_members() const</td>
-<td><em>✓</em></td>
-<td>Use members().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_members()</td>
-<td><em>✓</em></td>
-<td>Use members().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_members() const</td>
-<td><em>✓</em></td>
-<td>Use members().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_elements()</td>
-<td><em>✓</em></td>
-<td>Use elements().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_elements() const</td>
-<td><em>✓</em></td>
-<td>Use elements().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_elements()</td>
-<td><em>✓</em></td>
-<td>Use elements().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_elements() const</td>
-<td><em>✓</em></td>
-<td>Use elements().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>is_empty() const</td>
-<td><em>✓</em></td>
-<td>Use <code>empty()</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>parse_string(const std::string&amp; s)</td>
-<td><em>✓</em></td>
-<td>parse(const std::string&amp; s)</td>
-</tr>
-<tr>
-<td></td>
-<td>parse_string(const std::string&amp; s,parse_error_handler&amp; err_handler)</td>
-<td><em>✓</em></td>
-<td>Use parse(const std::string&amp; s,parse_error_handler&amp; err_handler)</td>
-</tr>
-<tr>
-<td></td>
-<td>resize_array(size_t n)</td>
-<td><em>✓</em></td>
-<td>resize(size_t n)</td>
-</tr>
-<tr>
-<td></td>
-<td>resize_array(size_t n, const json&amp; val)</td>
-<td><em>✓</em></td>
-<td>Use resize(size_t n, const json&amp; val)</td>
-</tr>
-<tr>
-<td></td>
-<td>to_stream</td>
-<td><em>✓</em></td>
-<td>Use write</td>
-</tr>
-<tr>
-<td>json member constants</td>
-<td>null</td>
-<td></td>
-<td>Use static member function <code>json::null()</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td>an_object</td>
-<td></td>
-<td>Use the default constructor <code>json()</code> instead.</td>
-</tr>
-<tr>
-<td></td>
-<td>an_array</td>
-<td></td>
-<td>Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</td>
-</tr>
-<tr>
-<td>class json_deserializer</td>
-<td>json&amp; root()</td>
-<td><em>✓</em></td>
-<td>json get_result()</td>
-</tr>
-<tr>
-<td>class json_reader</td>
-<td>read()</td>
-<td><em>✓</em></td>
-<td>Use read_next()</td>
-</tr>
-<tr>
-<td></td>
-<td>max_depth() const</td>
-<td><em>✓</em></td>
-<td>Use max_nesting_depth() const</td>
-</tr>
-<tr>
-<td></td>
-<td>max_depth(depth)</td>
-<td><em>✓</em></td>
-<td>Use max_nesting_depth() const</td>
-</tr>
-<tr>
-<td></td>
-<td>json_input_handler&amp; parent()</td>
-<td><em>✓</em></td>
-<td>Use json_input_handler&amp; input_handler()</td>
-</tr>
-<tr>
-<td>json_input_handler class</td>
-<td>do_longlong_value(long long value, const parsing_context&amp; context)</td>
-<td></td>
-<td>Override do_integer_value(int64_t value, const parsing_context&amp; context)</td>
-</tr>
-<tr>
-<td></td>
-<td>do_ulonglong_value(unsigned long long value, const parsing_context&amp; context)</td>
-<td></td>
-<td>Removed, override do_uinteger_value(uint64_t value, const parsing_context&amp; context)</td>
-</tr>
-<tr>
-<td></td>
-<td>do_double_value(double value, const basic_parsing_context&amp; context)</td>
-<td></td>
-<td>Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context&amp; context)</td>
-</tr>
-<tr>
-<td>json_output_handler class</td>
-<td>do_longlong_value(long long value)</td>
-<td></td>
-<td>Removed, override do_integer_value(int64_t value)</td>
-</tr>
-<tr>
-<td></td>
-<td>do_ulonglong_value(unsigned long long value)</td>
-<td></td>
-<td>Removed, override do_uinteger_value(uint64_t value)</td>
-</tr>
-<tr>
-<td></td>
-<td>do_double_value(double value)</td>
-<td></td>
-<td>Removed, override do_double_value(double value, uint8_t precision)</td>
-</tr>
-<tr>
-<td>basic_parsing_context</td>
-<td>last_char()</td>
-<td><em>✓</em></td>
-<td>Use current_char()</td>
-</tr>
-<tr>
-<td>json_filter</td>
-<td>parent()</td>
-<td><em>✓</em></td>
-<td>Use input_handler()</td>
-</tr>
-<tr>
-<td>csv_parameters</td>
-<td><code>header(std::string value)</code></td>
-<td><em>✓</em></td>
-<td>Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td><code>data_types()</code></td>
-<td><em>✓</em></td>
-<td>Use <code>column_types()</code>
-</td>
-</tr>
-<tr>
-<td></td>
-<td><code>data_types(std::string value)</code></td>
-<td><em>✓</em></td>
-<td>Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code>
-</td>
-</tr>
-</tbody>
-</table>
+<pre><code>#include "jsoncons_ext/csv/csv_serializer.hpp"
+</code></pre>
+
+<h3>Constructors</h3>
+
+<pre><code>csv_serializer(std::ostream&amp; os)
+</code></pre>
+
+<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
+<code>os</code>. Uses default <a href="csv_parameters">csv_parameters</a>.<br>
+You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+
+<pre><code>csv_serializer(std::ostream&amp; os,
+               const csv_parameters&amp; params)
+</code></pre>
+
+<p>Constructs a <code>csv_serializer</code> that is associated with an output stream<br>
+<code>os</code> and <a href="csv_parameters">csv_parameters</a>.<br>
+You must ensure that the output stream exists as long as does <code>csv_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
+
+<h3>Member functions</h3>
+
+<h3>Destructor</h3>
+
+<pre><code>virtual ~json_serializer()
+</code></pre>
+
+<h3>Examples</h3>
+
+<h3>Serializing an array of json values to a comma delimted file</h3>
+
+<h4>JSON input file</h4>
+
+<pre><code>[
+    ["country_code","name"],
+    ["ABW","ARUBA"],
+    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
+    ["VUT","VANUATU"],
+    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
+]
+</code></pre>
+
+<p>Note </p>
+
+<ul>
+<li>The third array element has a value that contains a comma, in the CSV file this value will be quoted.</li>
+</ul>
+
+<h4>Serializing the comma delimited file with csv_serializer</h4>
+
+<pre><code>std::string in_file = "input/countries.json";
+std::ifstream is(in_file);
+
+json_deserializer handler;
+json_reader reader(is,handler);
+reader.read_next();
+json countries = handler.get_result();
+
+csv_serializer serializer(std::cout);
+
+countries.write(serializer);
+</code></pre>
+
+<h4>Output</h4>
+
+<pre><code>country_code,name
+ABW,ARUBA
+ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+VUT,VANUATU
+WLF,WALLIS &amp; FUTUNA ISLANDS
+</code></pre>
+
+<h3>Serializing an array of json objects to a tab delimted file</h3>
+
+<h4>JSON input file</h4>
+
+<pre><code>[
+    {
+        "dept":"sales",
+        "employee-name":"Smith, Matthew",
+        "employee-no":"00000001",
+        "note":"",
+        "salary":"150,000.00"
+    },
+    {
+        "dept":"sales",
+        "employee-name":"Brown, Sarah",
+        "employee-no":"00000002",
+        "note":"",
+        "salary":"89,000.00"
+    },
+    {
+        "dept":"finance",
+        "employee-name":"Oberc, Scott",
+        "employee-no":"00000003",
+        "salary":"110,000.00"
+    },
+    {
+        "dept":"sales",
+        "employee-name":"Scott, Colette",
+        "employee-no":"00000004",
+        "note":"\"Exemplary\" employee\nDependable, trustworthy",
+        "comment":"Team player",
+        "salary":"75,000.00"
+    }
+]
+</code></pre>
+
+<p>Note </p>
+
+<ul>
+<li>The names in the first object in the array will be used for the header row of the CSV file</li>
+<li>The fourth object has a <code>note</code> member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.</li>
+</ul>
+
+<h4>Reading the tab delimited file with csv_serializer</h4>
+
+<pre><code>std::string in_file = "input/employees.json";
+std::ifstream is(in_file);
+
+json_deserializer handler;
+csv_parameters params;
+params.field_delimiter = '\t';
+
+json_reader reader(is,handler);
+reader.read_next();
+json employees = handler.get_result();
+
+csv_serializer serializer(std::cout,params);
+
+employees.write(serializer);
+</code></pre>
+
+<h4>Tab delimited output file</h4>
+
+<pre><code>dept    employee-name   employee-no     note    salary
+sales   Smith, Matthew  00000001                150,000.00
+sales   Brown, Sarah    00000002                89,000.00
+finance Oberc, Scott    00000003                110,000.00
+sales   Scott, Colette  00000004        ""Exemplary"" employee
+Dependable, trustworthy 75,000.00
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

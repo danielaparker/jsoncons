@@ -1,3 +1,29 @@
+Next release (0.99.3)
+---------------------
+
+- The json initializer list constructor will be removed, please replace
+
+`json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
+
+`json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
+
+- The json method `to_stream` has been renamed to `write`, the old name is still supported.
+
+- A new extension jsonx that supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
+
+- A new template parameter, `JsonTraits`, has been added to the `basic_json` class template. 
+
+- New instantiations of `basic_json`, `ojson` and `wojson`, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.
+
+- Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
+
+- Added static method `null()` to `json` class to return null value
+
+- jsoncons now supports creating json objects with list initialization, e.g.
+```c++
+json j = json::object{{"first",1},{"second",2}};
+```
+
 0.99.2
 ------
 

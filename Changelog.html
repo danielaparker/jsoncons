@@ -468,6 +468,28 @@ vertical-align:1px;
 </style>
 </head>
 <body>
+<h2>Next release (0.99.3)</h2>
+
+<ul>
+<li>The json initializer list constructor will be removed, please replace</li>
+</ul>
+
+<p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
+
+<p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
+
+<ul>
+<li><p>The json method <code>to_stream</code> has been renamed to <code>write</code>, the old name is still supported.</p></li>
+<li><p>A new extension jsonx that supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</p></li>
+<li><p>A new template parameter, <code>JsonTraits</code>, has been added to the <code>basic_json</code> class template. </p></li>
+<li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
+<li><p>Added support for <code>json</code> <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, constructor, and assignment operator for any sequence container (<code>std::array</code>, <code>std::vector</code>, <code>std::deque</code>, <code>std::forward_list</code>, <code>std::list</code>) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (<code>std::set</code>, <code>std::multiset</code>, <code>std::unordered_set</code>, <code>std::unordered_multiset</code>.)</p></li>
+<li><p>Added static method <code>null()</code> to <code>json</code> class to return null value</p></li>
+<li><p>jsoncons now supports creating json objects with list initialization, e.g.</p></li>
+</ul>
+
+<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,<span class="pl-c1">2</span>}};</pre></div>
+
 <h2>0.99.2</h2>
 
 <ul>

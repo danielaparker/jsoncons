@@ -1026,11 +1026,6 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Serialization</h3>
 
-<pre><code>void to_stream(basic_json_output_handler&lt;char_type&gt;&amp; output_handler) const
-</code></pre>
-
-<p>Calls <code>begin_json()</code> on <code>output_handler</code>, emits json value to <code>output_handler</code>, and calls <code>end_json()</code> on <code>output_handler</code>.</p>
-
 <pre><code>string_type to_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
 </code></pre>
 
@@ -1041,17 +1036,22 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <p>Inserts json value into string using specified <a href="output_format">output_format</a>.</p>
 
-<pre><code>std::ostream&amp; to_stream(std::ostream&amp; os) const
+<pre><code>void write(basic_json_output_handler&lt;char_type&gt;&amp; output_handler) const
+</code></pre>
+
+<p>Calls <code>begin_json()</code> on <code>output_handler</code>, emits json value to <code>output_handler</code>, and calls <code>end_json()</code> on <code>output_handler</code>.</p>
+
+<pre><code>write write(std::ostream&amp; os) const
 </code></pre>
 
 <p>Inserts json value into stream with default output format.</p>
 
-<pre><code>std::ostream&amp; to_stream(std::ostream&lt;CharT&gt; os, const output_format&amp; format) const
+<pre><code>write write(std::ostream&lt;CharT&gt; os, const output_format&amp; format) const
 </code></pre>
 
 <p>Inserts json value into stream using specified <a href="output_format">output_format</a>.</p>
 
-<pre><code>void emit(json_output_handler&amp; handler) const
+<pre><code>void write_fragment(json_output_handler&amp; handler) const
 </code></pre>
 
 <p>Emits JSON events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json_output_handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>

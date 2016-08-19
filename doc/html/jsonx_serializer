@@ -548,7 +548,7 @@ using namespace jsoncons::jsonx;
 
 jsonx_serializer <span class="pl-en">serializer</span>(std::cout,<span class="pl-c1">true</span>);
 
-person.to_stream(serializer);</pre></div>
+person.write(serializer);</pre></div>
 
 <p>The output is</p>
 
@@ -588,7 +588,7 @@ person.to_stream(serializer);</pre></div>
 <span class="pl-s"></span>
 <span class="pl-s">jsonx_serializer serializer(std::cout,true);</span>
 <span class="pl-s"></span>
-<span class="pl-s">special_chars.to_stream(serializer);</span></pre></div>
+<span class="pl-s">special_chars.write(serializer);</span></pre></div>
 
 <p>The output is</p>
 

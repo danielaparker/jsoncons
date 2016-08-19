@@ -539,7 +539,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW_EXCEPTION("Cannot create object from initializer list");
+                JSONCONS_THROW_EXCEPTION(std::runtime_error, "Cannot create object from initializer list");
                 break;
             }
         }

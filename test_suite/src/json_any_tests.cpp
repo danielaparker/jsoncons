@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(test_any)
     BOOST_CHECK(A.size2() == B.size2());
 
     std::ostringstream os;
-    obj.to_stream(os);
+    obj.write(os);
     json obj2 = json::parse(os.str());
 
     BOOST_CHECK(A.size1() == obj2["A"].size());

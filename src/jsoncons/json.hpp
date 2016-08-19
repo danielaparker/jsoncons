@@ -1404,7 +1404,26 @@ public:
         {
             return evaluate().to_string(format,allocator);
         }
+        void write(basic_json_output_handler<char_type>& handler) const
+        {
+            evaluate().write(handler);
+        }
 
+        void write(std::basic_ostream<char_type>& os) const
+        {
+            evaluate().write(os);
+        }
+
+        void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+        {
+            evaluate().write(os,format);
+        }
+
+        void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+        {
+            evaluate().write(os,format,indenting);
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
         void to_stream(basic_json_output_handler<char_type>& handler) const
         {
             evaluate().to_stream(handler);
@@ -1424,7 +1443,7 @@ public:
         {
             evaluate().to_stream(os,format,indenting);
         }
-
+#endif
         void swap(json_type& val)
         {
             evaluate_with_default().swap(val);
@@ -1846,7 +1865,7 @@ public:
         std::basic_ostringstream<char_type,char_traits_type,string_allocator> os(s);
         {
             basic_json_serializer<char_type> serializer(os);
-            emit(serializer);
+            write_fragment(serializer);
         }
         return os.str();
     }
@@ -1858,19 +1877,12 @@ public:
         std::basic_ostringstream<char_type> os(s);
         {
             basic_json_serializer<char_type> serializer(os, format);
-            emit(serializer);
+            write_fragment(serializer);
         }
         return os.str();
     }
 
-    void to_stream(basic_json_output_handler<char_type>& handler) const
-    {
-        handler.begin_json();
-        emit(handler);
-        handler.end_json();
-    }
-
-    void emit(basic_json_output_handler<char_type>& handler) const
+    void write_fragment(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_)
         {
@@ -1906,7 +1918,7 @@ public:
                 for (const_object_iterator it = o->begin(); it != o->end(); ++it)
                 {
                     handler.name((it->name()).data(),it->name().length());
-                    it->value().emit(handler);
+                    it->value().write_fragment(handler);
                 }
                 handler.end_object();
             }
@@ -1917,7 +1929,7 @@ public:
                 array *o = var_.value_.array_val_;
                 for (const_array_iterator it = o->begin(); it != o->end(); ++it)
                 {
-                    it->emit(handler);
+                    it->write_fragment(handler);
                 }
                 handler.end_array();
             }
@@ -1928,6 +1940,38 @@ public:
         default:
             break;
         }
+    }
+    void write(basic_json_output_handler<char_type>& handler) const
+    {
+        handler.begin_json();
+        write_fragment(handler);
+        handler.end_json();
+    }
+
+    void write(std::basic_ostream<char_type>& os) const
+    {
+        basic_json_serializer<char_type> serializer(os);
+        write(serializer);
+    }
+
+    void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+    {
+        basic_json_serializer<char_type> serializer(os, format);
+        write(serializer);
+    }
+
+    void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+    {
+        basic_json_serializer<char_type> serializer(os, format, indenting);
+        write(serializer);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    void to_stream(basic_json_output_handler<char_type>& handler) const
+    {
+        handler.begin_json();
+        write_fragment(handler);
+        handler.end_json();
     }
 
     void to_stream(std::basic_ostream<char_type>& os) const
@@ -1947,7 +1991,7 @@ public:
         basic_json_serializer<char_type> serializer(os, format, indenting);
         to_stream(serializer);
     }
-
+#endif
     bool is_null() const JSONCONS_NOEXCEPT
     {
         return var_.is_null();
@@ -3308,7 +3352,7 @@ private:
 
     friend std::basic_ostream<typename string_type::value_type>& operator<<(std::basic_ostream<typename string_type::value_type>& os, const json_type& o)
     {
-        o.to_stream(os);
+        o.write(os);
         return os;
     }
 
@@ -3549,14 +3593,14 @@ public:
         ;
     }
 
-    void to_stream(std::basic_ostream<char_type>& os) const
+    void write(std::basic_ostream<char_type>& os) const
     {
-        o_->to_stream(os, format_, is_pretty_print_);
+        o_->write(os, format_, is_pretty_print_);
     }
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
     {
-        o.to_stream(os);
+        o.write(os);
         return os;
     }
 
