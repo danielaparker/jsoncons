@@ -1850,7 +1850,7 @@ public:
         std::basic_ostringstream<char_type,char_traits_type,string_allocator> os(s);
         {
             basic_json_serializer<char_type> serializer(os);
-            write_fragment(serializer);
+            write_body(serializer);
         }
         return os.str();
     }
@@ -1862,12 +1862,12 @@ public:
         std::basic_ostringstream<char_type> os(s);
         {
             basic_json_serializer<char_type> serializer(os, format);
-            write_fragment(serializer);
+            write_body(serializer);
         }
         return os.str();
     }
 
-    void write_fragment(basic_json_output_handler<char_type>& handler) const
+    void write_body(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_)
         {
@@ -1903,7 +1903,7 @@ public:
                 for (const_object_iterator it = o->begin(); it != o->end(); ++it)
                 {
                     handler.name((it->name()).data(),it->name().length());
-                    it->value().write_fragment(handler);
+                    it->value().write_body(handler);
                 }
                 handler.end_object();
             }
@@ -1914,7 +1914,7 @@ public:
                 array *o = var_.value_.array_val_;
                 for (const_array_iterator it = o->begin(); it != o->end(); ++it)
                 {
-                    it->write_fragment(handler);
+                    it->write_body(handler);
                 }
                 handler.end_array();
             }
@@ -1929,7 +1929,7 @@ public:
     void write(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        write_fragment(handler);
+        write_body(handler);
         handler.end_json();
     }
 
@@ -1955,7 +1955,7 @@ public:
     void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        write_fragment(handler);
+        write_body(handler);
         handler.end_json();
     }
 

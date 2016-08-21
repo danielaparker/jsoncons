@@ -375,7 +375,7 @@ Inserts json value into stream with default output format.
     write write(std::ostream<CharT> os, const output_format& format) const
 Inserts json value into stream using specified [output_format](output_format).
 
-    void write_fragment(json_output_handler& handler) const
+    void write_body(json_output_handler& handler) const
 Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
 ### Non member functions
