@@ -176,7 +176,7 @@ json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
 or initialize with the array type and use the `add` function:
 ```c++
-json color_spaces{json::array()};
+json color_spaces = json::array();
 color_spaces.add("sRGB");
 color_spaces.add("AdobeRGB");
 color_spaces.add("ProPhoto RGB");
