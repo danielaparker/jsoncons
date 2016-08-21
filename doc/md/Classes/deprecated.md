@@ -5,7 +5,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
 Category|Old name, now deprecated|<em>&#x2713;</em>|Recommendation
---------|-----------|--------------|---
+--------|-----------|--------------|------------------------
 class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator pos, const json& val)
     |add(size_t index, json&& val)|<em>&#x2713;</em>|Use add(array_iterator pos, json&& val)
     |remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|erase(array_iterator first, array_iterator last)
@@ -38,6 +38,7 @@ class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_it
     |resize_array(size_t n)|<em>&#x2713;</em>|resize(size_t n)
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
     |to_stream|<em>&#x2713;</em>|Use write
+    |`json` initializer-list constructor||Construct from `json::array` with initializer-list
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.
     |an_array||Use assignment to `json::array()` or `json::make_array()` instead.

@@ -686,6 +686,13 @@ vertical-align:1px;
 <td>Use write</td>
 </tr>
 <tr>
+<td></td>
+<td>
+<code>json</code> initializer-list constructor</td>
+<td></td>
+<td>Construct from <code>json::array</code> with initializer-list</td>
+</tr>
+<tr>
 <td>json member constants</td>
 <td>null</td>
 <td></td>
