@@ -1,11 +1,19 @@
 Next release (0.99.3)
 ---------------------
 
-- The json initializer list constructor will be removed, please replace
+The `json` initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (`json`). Please replace
 
+```c++
 `json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
 
 `json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
+
+```
+
+- Initializer-list constructors are now supported in `json::object` as well as `json::array`, e.g.
+```c++
+json j = json::object{{"first",1},{"second",json::array{1,2,3}}};
+```
 
 - The json method `to_stream` has been renamed to `write`, the old name is still supported.
 
@@ -18,11 +26,6 @@ Next release (0.99.3)
 - Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
 
 - Added static method `null()` to `json` class to return null value
-
-- jsoncons now supports creating json objects with list initialization, e.g.
-```c++
-json j = json::object{{"first",1},{"second",2}};
-```
 
 0.99.2
 ------

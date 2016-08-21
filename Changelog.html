@@ -470,13 +470,18 @@ vertical-align:1px;
 <body>
 <h2>Next release (0.99.3)</h2>
 
+<p>The <code>json</code> initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (<code>json</code>). Please replace</p>
+
+<div class="highlight highlight-source-c++"><pre>`json j = {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}` with `json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}`, <span class="pl-k">and</span> 
+
+`json j = {{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}` with `json j = json::array{json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},json::array{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}`
+</pre></div>
+
 <ul>
-<li>The json initializer list constructor will be removed, please replace</li>
+<li>Initializer-list constructors are now supported in <code>json::object</code> as well as <code>json::array</code>, e.g.</li>
 </ul>
 
-<p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
-
-<p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
+<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}}};</pre></div>
 
 <ul>
 <li><p>The json method <code>to_stream</code> has been renamed to <code>write</code>, the old name is still supported.</p></li>
@@ -485,10 +490,7 @@ vertical-align:1px;
 <li><p>New instantiations of <code>basic_json</code>, <code>ojson</code> and <code>wojson</code>, have been added for users who wish to preserve the alphabetical sort of parsed json text and to insert new members in arbitrary name order.</p></li>
 <li><p>Added support for <code>json</code> <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, constructor, and assignment operator for any sequence container (<code>std::array</code>, <code>std::vector</code>, <code>std::deque</code>, <code>std::forward_list</code>, <code>std::list</code>) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (<code>std::set</code>, <code>std::multiset</code>, <code>std::unordered_set</code>, <code>std::unordered_multiset</code>.)</p></li>
 <li><p>Added static method <code>null()</code> to <code>json</code> class to return null value</p></li>
-<li><p>jsoncons now supports creating json objects with list initialization, e.g.</p></li>
 </ul>
-
-<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,<span class="pl-c1">2</span>}};</pre></div>
 
 <h2>0.99.2</h2>
 

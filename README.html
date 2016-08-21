@@ -470,7 +470,7 @@ vertical-align:1px;
 <body>
 <h1>jsoncons: a C++ library for json construction</h1>
 
-<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
+<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. </p>
 
 <p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported.</p>
 
@@ -505,13 +505,16 @@ vertical-align:1px;
 
 <h2>Note</h2>
 
-<pre><code>- The json initializer list constructor has been deprecated, please replace
+<p>The <code>json</code> initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (<code>json</code>). Please replace</p>
 
-`json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
+<div class="highlight highlight-source-c++"><pre>`json j = {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}` with `json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}`, <span class="pl-k">and</span> 
 
-`json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
+`json j = {{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}` with `json j = json::array{json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},json::array{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}`
+</pre></div>
 
-</code></pre>
+<p>Initializer-list constructors are now supported in <code>json::object</code> as well as <code>json::array</code>, e.g.</p>
+
+<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}}};</pre></div>
 
 <h2>Benchmarks</h2>
 
@@ -523,7 +526,7 @@ vertical-align:1px;
 
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
 
-<p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>.</p>
+<p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
 
 <h2>Building the test suite and examples with CMake</h2>
 

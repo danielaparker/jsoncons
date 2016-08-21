@@ -356,14 +356,6 @@ public:
             value_.object_val_ = create_impl<object>(a, object_allocator(a));
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        variant(std::initializer_list<json_type> init,
-                const Allocator& a)
-            : type_(value_types::array_t)
-        {
-            value_.array_val_ = create_impl<array>(a, std::move(init), array_allocator(a));
-        }
-#endif
         explicit variant(variant&& var)
             : type_(value_types::null_t)
         {
@@ -1702,13 +1694,6 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    basic_json(std::initializer_list<json_type> init,
-               const Allocator& allocator = Allocator()) 
-        : var_(std::move(init), allocator)
-    {
-    }
-#endif
     basic_json(const json_type& val)
         : var_(val.var_)
     {
