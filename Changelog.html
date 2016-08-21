@@ -472,10 +472,9 @@ vertical-align:1px;
 
 <p>The <code>json</code> initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (<code>json</code>). Please replace</p>
 
-<div class="highlight highlight-source-c++"><pre>`json j = {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}` with `json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}`, <span class="pl-k">and</span> 
+<p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
 
-`json j = {{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}` with `json j = json::array{json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>},json::array{<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>}}`
-</pre></div>
+<p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
 
 <ul>
 <li>Initializer-list constructors are now supported in <code>json::object</code> as well as <code>json::array</code>, e.g.</li>

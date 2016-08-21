@@ -32,12 +32,10 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 ## Note
 The `json` initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (`json`). Please replace
 
-```c++
 `json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
 
 `json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
 
-```
 Initializer-list constructors are now supported in `json::object` as well as `json::array`, e.g.
 ```c++
 json j = json::object{{"first",1},{"second",json::array{1,2,3}}};
