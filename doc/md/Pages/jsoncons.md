@@ -159,7 +159,7 @@ Or, use an object initializer list:
 json file_settings = json::object{
     {"Image Format", "JPEG"},
     {"Color Space", "sRGB"},
-    { "Limit File Size", true},
+    {"Limit File Size", true},
     {"Limit File Size To", 10000}
 };
 ```
