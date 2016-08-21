@@ -20,7 +20,7 @@ The library has a number of features, which are listed below:
 - Supports Nan, Inf and -Inf replacement
 - Supports reading a sequence of JSON texts from a stream
 - Supports optional escaping of non-ascii UTF-8 octets
-- Allows extensions to the types accepted by the json class accessors and modifiers
+- Allows extensions to the types accepted by the json class constructors, accessors and modifiers
 - Supports reading (writing) JSON values from (to) CSV files
 - Supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
