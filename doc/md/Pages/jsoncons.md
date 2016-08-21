@@ -136,57 +136,57 @@ else
 ```
 ### Constructing json values in C++
 
-To construct an empty json object, use the default constructor:
+The default `json` constructor produces an empty json object. For example 
 ```c++
 json image_sizing;
-```
-Serializing to standard out
-```c++
 std::cout << image_sizing << std::endl;
 ```
 produces
 ```json
 {}
 ```
-Setting some name-value pairs,
+To construct a json object, take an empty json object and set some name-value pairs
 ```c++
-image_sizing["resize_to_fit"] = true;  // a boolean 
-image_sizing["resize_unit"]   = "pixels";  // a string
-image_sizing["resize_what"]   = "long_edge";  // a string
-image_sizing["dimension1"]    = 9.84;  // a double
-image_sizing["dimension2"]    = json::null();  // a null
+image_sizing["Resize To Fit"] = true;  // a boolean 
+image_sizing["Resize Unit"] =  "pixels";  // a string
+image_sizing["Resize What"] =  "long_edge";  // a string
+image_sizing["Dimension 1"] = 9.84;  // a double
+image_sizing["Dimension 2"] = json::null();  // a null value
 ```
-Serializing again, this time with pretty print,
+
+Or, use an object initializer list:
 ```c++
-std::cout << pretty_print(image_sizing) << std::endl;
+json file_settings = json::object{
+    {"Image Format", "JPEG"},
+    {"Color Space", "sRGB"},
+    { "Limit File Size", true},
+    {"Limit File Size To", 10000}
+};
 ```
-produces
-```json
-{
-    "dimension1":9.84,
-    "dimension2":null,
-    "resize_to_fit":true,
-    "resize_unit":"pixels",
-    "resize_what":"long_edge"
-}
-```
-To construct a json array, use an initializer list:
-```c++
-json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
-```
-or initialize with the array type and use the `add` function:
+
+To construct a json array, initialize with the array type 
 ```c++
 json color_spaces = json::array();
+```
+and use the `add` function to add elements
+```c++
 color_spaces.add("sRGB");
 color_spaces.add("AdobeRGB");
 color_spaces.add("ProPhoto RGB");
 ```
-Combining these three 
+
+Or, use an array initializer list:
+```c++
+json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+```
+
+Combining these four 
 ```c++
 json file_export;
-file_export["image_sizing"] = std::move(image_sizing);
-file_export["image_formats"] = std::move(image_formats);
-file_export["color_spaces"] = std::move(color_spaces);
+file_export["Image Formats"] = std::move(image_formats);
+file_export["File Settings"] = std::move(file_settings);
+file_export["Color Spaces"] = std::move(color_spaces);
+file_export["Image Sizing"] = std::move(image_sizing);
 ```
 and serializing
 ```c++
@@ -195,17 +195,20 @@ std::cout << pretty_print(file_export) << std::endl;
 produces
 ```json
 {
-    "color_spaces":
-    ["sRGB","AdobeRGB","ProPhoto RGB"],
-    "image_formats":
-    ["JPEG","PSD","TIFF","DNG"],
-    "image_sizing":
-    {
-        "dimension1":9.84,
-        "dimension2":null,
-        "resize_to_fit":true,
-        "resize_unit":"pixels",
-        "resize_what":"long_edge"
+    "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"],
+    "File Settings": {
+        "Color Space": "sRGB",
+        "Image Format": "JPEG",
+        "Limit File Size": true,
+        "Limit File Size To": 10000
+    },
+    "Image Formats": ["JPEG","PSD","TIFF","DNG"],
+    "Image Sizing": {
+        "Dimension 1": 9.84,
+        "Dimension 2": null,
+        "Resize To Fit": true,
+        "Resize Unit": "pixels",
+        "Resize What": "long_edge"
     }
 }
 ```

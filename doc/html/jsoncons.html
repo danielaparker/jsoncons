@@ -608,57 +608,53 @@ title=Cutter's Way
 
 <h3>Constructing json values in C++</h3>
 
-<p>To construct an empty json object, use the default constructor:</p>
+<p>The default <code>json</code> constructor produces an empty json object. For example </p>
 
-<div class="highlight highlight-source-c++"><pre>json image_sizing;</pre></div>
-
-<p>Serializing to standard out</p>
-
-<div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;</pre></div>
+<div class="highlight highlight-source-c++"><pre>json image_sizing;
+std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;</pre></div>
 
 <p>produces</p>
 
 <div class="highlight highlight-source-json"><pre>{}</pre></div>
 
-<p>Setting some name-value pairs,</p>
+<p>To construct a json object, take an empty json object and set some name-value pairs</p>
 
-<div class="highlight highlight-source-c++"><pre>image_sizing[<span class="pl-s"><span class="pl-pds">"</span>resize_to_fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;  <span class="pl-c">// a boolean </span>
-image_sizing[<span class="pl-s"><span class="pl-pds">"</span>resize_unit<span class="pl-pds">"</span></span>]   = <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>;  <span class="pl-c">// a string</span>
-image_sizing[<span class="pl-s"><span class="pl-pds">"</span>resize_what<span class="pl-pds">"</span></span>]   = <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>;  <span class="pl-c">// a string</span>
-image_sizing[<span class="pl-s"><span class="pl-pds">"</span>dimension1<span class="pl-pds">"</span></span>]    = <span class="pl-c1">9.84</span>;  <span class="pl-c">// a double</span>
-image_sizing[<span class="pl-s"><span class="pl-pds">"</span>dimension2<span class="pl-pds">"</span></span>]    = json::null();  <span class="pl-c">// a null</span></pre></div>
+<div class="highlight highlight-source-c++"><pre>image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;  <span class="pl-c">// a boolean </span>
+image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] =  <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>;  <span class="pl-c">// a string</span>
+image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>] =  <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>;  <span class="pl-c">// a string</span>
+image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>;  <span class="pl-c">// a double</span>
+image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>] = json::null();  <span class="pl-c">// a null value</span></pre></div>
 
-<p>Serializing again, this time with pretty print,</p>
+<p>Or, use an object initializer list:</p>
 
-<div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; pretty_print(image_sizing) &lt;&lt; std::endl;</pre></div>
+<div class="highlight highlight-source-c++"><pre>json file_settings = json::object{
+    {<span class="pl-s"><span class="pl-pds">"</span>Image Format<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Color Space<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>},
+    { <span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Limit File Size To<span class="pl-pds">"</span></span>, <span class="pl-c1">10000</span>}
+};</pre></div>
 
-<p>produces</p>
+<p>To construct a json array, initialize with the array type </p>
 
-<div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>dimension1<span class="pl-pds">"</span></span>:<span class="pl-c1">9.84</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>dimension2<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>resize_to_fit<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>resize_unit<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>,
-    <span class="pl-s"><span class="pl-pds">"</span>resize_what<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>
-}</pre></div>
+<div class="highlight highlight-source-c++"><pre>json color_spaces = json::array();</pre></div>
 
-<p>To construct a json array, use an initializer list:</p>
+<p>and use the <code>add</code> function to add elements</p>
 
-<div class="highlight highlight-source-c++"><pre>json image_formats = json::array{<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
-
-<p>or initialize with the array type and use the <code>add</code> function:</p>
-
-<div class="highlight highlight-source-c++"><pre>json color_spaces = json::array();
-color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-c++"><pre>color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
 color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
 color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);</pre></div>
 
-<p>Combining these three </p>
+<p>Or, use an array initializer list:</p>
+
+<div class="highlight highlight-source-c++"><pre>json image_formats = json::array{<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
+
+<p>Combining these four </p>
 
 <div class="highlight highlight-source-c++"><pre>json file_export;
-file_export[<span class="pl-s"><span class="pl-pds">"</span>image_sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);
-file_export[<span class="pl-s"><span class="pl-pds">"</span>image_formats<span class="pl-pds">"</span></span>] = std::move(image_formats);
-file_export[<span class="pl-s"><span class="pl-pds">"</span>color_spaces<span class="pl-pds">"</span></span>] = std::move(color_spaces);</pre></div>
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Formats<span class="pl-pds">"</span></span>] = std::move(image_formats);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>File Settings<span class="pl-pds">"</span></span>] = std::move(file_settings);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = std::move(color_spaces);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);</pre></div>
 
 <p>and serializing</p>
 
@@ -667,17 +663,20 @@ file_export[<span class="pl-s"><span class="pl-pds">"</span>color_spaces<span cl
 <p>produces</p>
 
 <div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>color_spaces<span class="pl-pds">"</span></span>:
-    [<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>],
-    <span class="pl-s"><span class="pl-pds">"</span>image_formats<span class="pl-pds">"</span></span>:
-    [<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>],
-    <span class="pl-s"><span class="pl-pds">"</span>image_sizing<span class="pl-pds">"</span></span>:
-    {
-        <span class="pl-s"><span class="pl-pds">"</span>dimension1<span class="pl-pds">"</span></span>:<span class="pl-c1">9.84</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>dimension2<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>resize_to_fit<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>resize_unit<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>resize_what<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>File Settings<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Color Space<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Image Format<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Limit File Size To<span class="pl-pds">"</span></span>: <span class="pl-c1">10000</span>
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>Image Formats<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>: <span class="pl-c1">9.84</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>
     }
 }</pre></div>
 

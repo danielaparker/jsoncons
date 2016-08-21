@@ -182,12 +182,19 @@ void mulitple_json_objects()
 
 void more_examples()
 {
+    json file_settings = json::object{
+        {"Image Format", "JPEG"},
+        {"Color Space", "sRGB"},
+        { "Limit File Size", true},
+        {"Limit File Size To", 10000}
+    };
+
     json image_sizing;
-    image_sizing["resize_to_fit"] = true;  // a boolean 
-    image_sizing["resize_unit"] =  "pixels";  // a string
-    image_sizing["resize_what"] =  "long_edge";  // a string
-    image_sizing["dimension1"] = 9.84;  // a double
-    image_sizing["dimension2"] = json::null();  // a null value
+    image_sizing["Resize To Fit"] = true;  // a boolean 
+    image_sizing["Resize Unit"] =  "pixels";  // a string
+    image_sizing["Resize What"] =  "long_edge";  // a string
+    image_sizing["Dimension 1"] = 9.84;  // a double
+    image_sizing["Dimension 2"] = json::null();  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
@@ -198,9 +205,10 @@ void more_examples()
     color_spaces.add("ProPhoto RGB");
 
     json file_export;
-    file_export["image_formats"] = std::move(image_formats);
-    file_export["image_sizing"] = std::move(image_sizing);
-    file_export["color_spaces"] = std::move(color_spaces);
+    file_export["Image Formats"] = std::move(image_formats);
+    file_export["File Settings"] = std::move(file_settings);
+    file_export["Color Spaces"] = std::move(color_spaces);
+    file_export["Image Sizing"] = std::move(image_sizing);
     std::cout << pretty_print(file_export) << std::endl;
 
     size_t n = 10, m = 3;
