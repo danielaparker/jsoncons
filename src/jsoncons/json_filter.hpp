@@ -217,10 +217,10 @@ private:
 
 // Filters out begin_json and end_json events
 template <class CharT>
-class basic_begin_end_json_filter : public basic_json_filter<CharT>
+class basic_json_body_filter : public basic_json_filter<CharT>
 {
 public:
-    basic_begin_end_json_filter(basic_json_input_handler<CharT>& handler)
+    basic_json_body_filter(basic_json_input_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler)
     {
     }

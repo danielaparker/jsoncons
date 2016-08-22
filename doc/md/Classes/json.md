@@ -88,7 +88,7 @@ Constructs an empty json object.
 Constructs a json object. 
 
     json(std::initializer_list<json> list, const allocator_type& allocator)
-Constructs a json array with the elements of the initializer list `init`. 
+Constructs a json array with the elements of the initializer-list `init`. 
 
     json(const json& val)
 Constructs a copy of val
@@ -446,7 +446,7 @@ book3["category"] = "Fiction";
 book3["title"] = "Kafka on the Shore";
 book3["author"] = "Haruki Murakami";
 
-// Constructing a json array with an initializer list 
+// Constructing a json array with an initializer-list 
 json booklist = json::array{book1, book2, book3};    
 
 for (const auto& book: booklist.elements())

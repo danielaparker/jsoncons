@@ -643,7 +643,7 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 <pre><code>json(std::initializer_list&lt;json&gt; list, const allocator_type&amp; allocator)
 </code></pre>
 
-<p>Constructs a json array with the elements of the initializer list <code>init</code>. </p>
+<p>Constructs a json array with the elements of the initializer-list <code>init</code>. </p>
 
 <pre><code>json(const json&amp; val)
 </code></pre>
@@ -1134,7 +1134,7 @@ book3[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pd
 book3[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>;
 book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
 
-<span class="pl-c">// Constructing a json array with an initializer list </span>
+<span class="pl-c">// Constructing a json array with an initializer-list </span>
 json booklist = json::array{book1, book2, book3};    
 
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.elements())

@@ -145,7 +145,7 @@ produces
 ```json
 {}
 ```
-To construct a json object, take an empty json object and set some name-value pairs
+To construct a json object with members, take an empty json object and set some name-value pairs
 ```c++
 image_sizing["Resize To Fit"] = true;  // a boolean 
 image_sizing["Resize Unit"] =  "pixels";  // a string
@@ -154,7 +154,7 @@ image_sizing["Dimension 1"] = 9.84;  // a double
 image_sizing["Dimension 2"] = json::null();  // a null value
 ```
 
-Or, use an object initializer list:
+Or, use an object initializer-list:
 ```c++
 json file_settings = json::object{
     {"Image Format", "JPEG"},
@@ -175,7 +175,7 @@ color_spaces.add("AdobeRGB");
 color_spaces.add("ProPhoto RGB");
 ```
 
-Or, use an array initializer list:
+Or, use an array initializer-list:
 ```c++
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```

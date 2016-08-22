@@ -111,7 +111,7 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     std::vector<data_types> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
-    basic_begin_end_json_filter<CharT> filter_;
+    basic_json_body_filter<CharT> filter_;
     basic_json_parser<CharT> parser_;
 
 public:

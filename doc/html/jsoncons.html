@@ -617,7 +617,7 @@ std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;</pre></div>
 
 <div class="highlight highlight-source-json"><pre>{}</pre></div>
 
-<p>To construct a json object, take an empty json object and set some name-value pairs</p>
+<p>To construct a json object with members, take an empty json object and set some name-value pairs</p>
 
 <div class="highlight highlight-source-c++"><pre>image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;  <span class="pl-c">// a boolean </span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] =  <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>;  <span class="pl-c">// a string</span>
@@ -625,12 +625,12 @@ image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span cl
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>;  <span class="pl-c">// a double</span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>] = json::null();  <span class="pl-c">// a null value</span></pre></div>
 
-<p>Or, use an object initializer list:</p>
+<p>Or, use an object initializer-list:</p>
 
 <div class="highlight highlight-source-c++"><pre>json file_settings = json::object{
     {<span class="pl-s"><span class="pl-pds">"</span>Image Format<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>},
     {<span class="pl-s"><span class="pl-pds">"</span>Color Space<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>},
-    { <span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>},
     {<span class="pl-s"><span class="pl-pds">"</span>Limit File Size To<span class="pl-pds">"</span></span>, <span class="pl-c1">10000</span>}
 };</pre></div>
 
@@ -644,7 +644,7 @@ image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span cl
 color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
 color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);</pre></div>
 
-<p>Or, use an array initializer list:</p>
+<p>Or, use an array initializer-list:</p>
 
 <div class="highlight highlight-source-c++"><pre>json image_formats = json::array{<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
 
