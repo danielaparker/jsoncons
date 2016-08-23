@@ -103,12 +103,6 @@ public:
     {
     }
 
-    void warning(std::error_code ec,
-                 const basic_parsing_context<CharT>& context) throw (parse_exception) 
-    {
-        do_warning(ec,context);
-    }
-
     void error(std::error_code ec,
                const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
@@ -123,9 +117,6 @@ public:
     }
 
 private:
-    virtual void do_warning(std::error_code,
-                            const basic_parsing_context<CharT>& context) throw (parse_exception) = 0;
-
     virtual void do_error(std::error_code,
                           const basic_parsing_context<CharT>& context) throw (parse_exception) = 0;
 

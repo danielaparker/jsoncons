@@ -22,20 +22,13 @@ BOOST_AUTO_TEST_SUITE(error_recovery_test_suite)
 class my_parse_error_handler : public parse_error_handler
 {
 private:
-    virtual void do_warning(std::error_code ec,
-                            const parsing_context& context) throw(parse_exception)
-    {
-    }
 
-    virtual void do_error(std::error_code ec,
-                          const parsing_context& context) throw(parse_exception)
+    void do_error(std::error_code ec,
+                  const parsing_context& context) throw(parse_exception) override
     {
-        if (ec.category() == json_error_category())
+        if (ec == jsoncons::json_parser_errc::extra_comma && (context.current_char() == ']' || context.current_char() == '}'))
         {
-            if (ec.value() != jsoncons::json_parser_errc::extra_comma && (context.current_char() == ']' || context.current_char() == '}'))
-            {
-                default_parse_error_handler::instance().error(ec,context);
-            }
+            default_parse_error_handler::instance().error(ec,context);
         }
     }
 };

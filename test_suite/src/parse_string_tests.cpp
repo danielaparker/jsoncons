@@ -21,27 +21,19 @@ struct jsonpath_filter_fixture
 class lenient_error_handler : public parse_error_handler
 {
 public:
-	lenient_error_handler(int value)
-		: value_(value)
-	{
-	}
-private:
-    int value_;
-
-    virtual void do_warning(std::error_code ec,
-                            const parsing_context& context) throw(parse_exception)
+    lenient_error_handler(std::error_code value)
+        : value_(value)
     {
     }
+private:
+    std::error_code value_;
 
-    virtual void do_error(std::error_code ec,
-                          const parsing_context& context) throw(parse_exception)
+    void do_error(std::error_code ec,
+                  const parsing_context& context) throw(parse_exception) override
     {
-        if (ec.category() == json_error_category())
+        if (ec != value_)
         {
-            if (ec.value() != value_)
-            {
-                default_parse_error_handler::instance().error(ec,context);
-            }
+            default_parse_error_handler::instance().error(ec,context);
         }
     }
 };
@@ -65,24 +57,24 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string1)
 
 BOOST_AUTO_TEST_CASE(test_parse_small_string2)
 {
-	std::string input = "\"Str\\\"ing\"";
-	std::istringstream is(input);
+    std::string input = "\"Str\\\"ing\"";
+    std::istringstream is(input);
 
-	json_deserializer handler;
-	try
-	{
-		json_reader reader(is, handler);
-		reader.read_next();
-	}
-	catch (const json_exception&)
-	{
-	}
-	BOOST_CHECK(handler.is_valid());
+    json_deserializer handler;
+    try
+    {
+        json_reader reader(is, handler);
+        reader.read_next();
+    }
+    catch (const json_exception&)
+    {
+    }
+    BOOST_CHECK(handler.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_parse_small_string4)
 {
-	std::string input = "\"Str\\\"ing\"";
+    std::string input = "\"Str\\\"ing\"";
 
     for (size_t i = 2; i < input.length(); ++i)
     {
@@ -103,7 +95,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
 }
 BOOST_AUTO_TEST_CASE(test_parse_big_string1)
 {
-	std::string input = "\"Big Str\\\"ing\"";
+    std::string input = "\"Big Str\\\"ing\"";
 
     for (size_t i = 2; i < input.length(); ++i)
     {
@@ -125,13 +117,13 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
 
 BOOST_AUTO_TEST_CASE(test_parse_big_string2)
 {
-	std::string input = "\"Big\t Str\\\"ing\"";
+    std::string input = "\"Big\t Str\\\"ing\"";
 
     //for (size_t i = 2; i < input.length(); ++i)
     //{
         std::istringstream is(input);
         json_deserializer handler;
-        lenient_error_handler err_handler(jsoncons::json_parser_errc::illegal_character_in_string);
+        lenient_error_handler err_handler(json_parser_errc::illegal_character_in_string);
         try
         {
             json_reader reader(is, handler, err_handler);

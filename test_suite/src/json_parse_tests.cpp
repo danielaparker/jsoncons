@@ -14,7 +14,7 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_parse_test_suite)
 
-void test_error_code(const std::string& text, int ec)
+void test_error_code(const std::string& text, std::error_code ec)
 {
     try
     {
@@ -23,12 +23,12 @@ void test_error_code(const std::string& text, int ec)
     }
     catch (const parse_exception& e)
     {
-        if (e.code().value() != ec)
+        if (e.code() != ec)
         {
             std::cout << text << std::endl;
             std::cout << e.code().value() << " " << e.what() << std::endl; 
         }
-        BOOST_CHECK_EQUAL(ec, e.code().value());
+        BOOST_CHECK_EQUAL(ec, e.code());
     }
 }
 
