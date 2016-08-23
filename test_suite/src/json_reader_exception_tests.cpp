@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::expected_comma_or_right_bracket == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::expected_comma_or_right_bracket);
         BOOST_CHECK_EQUAL(14,e.line_number());
         BOOST_CHECK_EQUAL(30,e.column_number());
     }
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     catch (const parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
-        BOOST_CHECK(json_parser_errc::expected_comma_or_right_brace == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::expected_comma_or_right_brace);
         BOOST_CHECK_EQUAL(17,e.line_number());
         BOOST_CHECK_EQUAL(9, e.column_number());
     }
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
     catch (const parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
     catch (const parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
     catch (const parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
     catch (const parse_exception& e)
     {
         //std::cout << e.what() << std::endl;
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(7,e.column_number());
     }
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(test_exception)
     }
     catch (const parse_exception& e)
     {
-        BOOST_CHECK(json_parser_errc::unexpected_eof == e.code());
+        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(2,e.line_number());
         BOOST_CHECK_EQUAL(9,e.column_number());
     }
