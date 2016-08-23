@@ -12,31 +12,31 @@
 
 namespace jsoncons {
 
-namespace json_parser_errc 
-{
-    const int unexpected_eof = 1;
-    const int invalid_json_text = 2;
-    const int extra_character = 3;
-    const int max_depth_exceeded = 4;
-    const int single_quote = 5;
-    const int illegal_character_in_string = 6;
-    const int extra_comma = 7;
-    const int expected_name = 8;
-    const int expected_value = 9;
-    const int invalid_value = 10;
-    const int expected_colon = 11;
-    const int illegal_control_character = 12;
-    const int illegal_escaped_character = 13;
-    const int expected_codepoint_surrogate_pair = 14;
-    const int invalid_hex_escape_sequence = 15;
-    const int invalid_unicode_escape_sequence = 16;
-    const int leading_zero = 17;
-    const int invalid_number = 18;
-    const int expected_comma_or_right_brace = 19;
-    const int expected_comma_or_right_bracket = 20;
-    const int unexpected_right_bracket = 21;
-    const int unexpected_right_brace = 22;
-}
+    enum class json_parser_errc
+    {
+        unexpected_eof = 1,
+        invalid_json_text = 2,
+        extra_character = 3,
+        max_depth_exceeded = 4,
+        single_quote = 5,
+        illegal_character_in_string = 6,
+        extra_comma = 7,
+        expected_name = 8,
+        expected_value = 9,
+        invalid_value = 10,
+        expected_colon = 11,
+        illegal_control_character = 12,
+        illegal_escaped_character = 13,
+        expected_codepoint_surrogate_pair = 14,
+        invalid_hex_escape_sequence = 15,
+        invalid_unicode_escape_sequence = 16,
+        leading_zero = 17,
+        invalid_number = 18,
+        expected_comma_or_right_brace = 19,
+        expected_comma_or_right_bracket = 20,
+        unexpected_right_bracket = 21,
+        unexpected_right_brace = 22
+    };
 
 class json_error_category_impl
    : public std::error_category
@@ -107,5 +107,20 @@ const std::error_category& json_error_category()
   return instance;
 }
 
+inline 
+std::error_code make_error_code(json_parser_errc result)
+{
+    return std::error_code(static_cast<int>(result),json_error_category());
 }
+
+
+}
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::json_parser_errc> : public true_type
+    {
+    };
+}
+
 #endif

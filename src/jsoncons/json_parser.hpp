@@ -164,7 +164,7 @@ public:
     {
         if (++nesting_depth_ >= max_depth_)
         {
-            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::max_depth_exceeded, *this);
         }
         stack_.back() = states::object;
         stack_.push_back(states::expect_member_name_or_end);
@@ -182,11 +182,11 @@ public:
         }
         else if (stack_.back() == states::array)
         {
-            err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
+            err_handler_->fatal_error(json_parser_errc::expected_comma_or_right_bracket, *this);
         }
         else
         {
-            err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
+            err_handler_->fatal_error(json_parser_errc::unexpected_right_brace, *this);
         }
 
         JSONCONS_ASSERT(stack_.size() >= 2);
@@ -205,7 +205,7 @@ public:
     {
         if (++nesting_depth_ >= max_depth_)
         {
-            err_handler_->error(std::error_code(json_parser_errc::max_depth_exceeded, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::max_depth_exceeded, *this);
         }
         stack_.back() = states::array;
         stack_.push_back(states::expect_value_or_end);
@@ -223,11 +223,11 @@ public:
         }
         else if (stack_.back() == states::object)
         {
-            err_handler_->fatal_error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
+            err_handler_->fatal_error(json_parser_errc::expected_comma_or_right_brace, *this);
         }
         else
         {
-            err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_bracket, json_error_category()), *this);
+            err_handler_->fatal_error(json_parser_errc::unexpected_right_bracket, *this);
         }
         JSONCONS_ASSERT(stack_.size() >= 2);
         if (parent() == states::root)
@@ -266,7 +266,7 @@ public:
             case ' ':
                 break;
             default:
-                err_handler_->error(std::error_code(json_parser_errc::extra_character, json_error_category()), *this);
+                err_handler_->error(json_parser_errc::extra_character, *this);
                 break;
             }
         }
@@ -285,7 +285,7 @@ public:
             case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
-                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
+                err_handler_->error(json_parser_errc::illegal_control_character, *this);
                 // recovery - skip
                 done = true;
                 ++p_;
@@ -293,7 +293,7 @@ public:
             case '\r':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     stack_.push_back(states::cr);
@@ -304,7 +304,7 @@ public:
             case '\n':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     stack_.push_back(states::lf);
@@ -315,7 +315,7 @@ public:
             case '\t':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_->error(std::error_code(json_parser_errc::illegal_character_in_string, json_error_category()), *this);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     done = true;
@@ -370,7 +370,7 @@ public:
             case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
             case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
             case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                err_handler_->error(std::error_code(json_parser_errc::illegal_control_character, json_error_category()), *this);
+                err_handler_->error(json_parser_errc::illegal_control_character, *this);
                 break;
             default:
                 break;
@@ -462,13 +462,13 @@ public:
                         literal_index_ = 1;
                         break;
                     case '}':
-                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_brace, json_error_category()), *this);
+                        err_handler_->fatal_error(json_parser_errc::unexpected_right_brace, *this);
                         break;
                     case ']':
-                        err_handler_->fatal_error(std::error_code(json_parser_errc::unexpected_right_bracket, json_error_category()), *this);
+                        err_handler_->fatal_error(json_parser_errc::unexpected_right_bracket, *this);
                         break;
                     default:
-                        err_handler_->fatal_error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        err_handler_->fatal_error(json_parser_errc::invalid_json_text, *this);
                         break;
                     }
                 }
@@ -505,11 +505,11 @@ public:
                         JSONCONS_ASSERT(stack_.size() >= 2);
                         if (parent() == states::array)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_bracket, json_error_category()), *this);
+                            err_handler_->error(json_parser_errc::expected_comma_or_right_bracket, *this);
                         }
                         else if (parent() == states::object)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::expected_comma_or_right_brace, json_error_category()), *this);
+                            err_handler_->error(json_parser_errc::expected_comma_or_right_brace, *this);
                         }
                         break;
                     }
@@ -541,10 +541,10 @@ public:
                         stack_.push_back(states::string);
                         break;
                     case '\'':
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::single_quote, *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_name, *this);
                         break;
                     }
                 }
@@ -574,13 +574,13 @@ public:
                         break;
                     case '}':
                         --nesting_depth_;
-                        err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::extra_comma, *this);
                         break;
                     case '\'':
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::single_quote, *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_name, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_name, *this);
                         break;
                     }
                 }
@@ -607,7 +607,7 @@ public:
                         stack_.back() = states::expect_value;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_colon, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_colon, *this);
                         break;
                     }
                 }
@@ -670,18 +670,18 @@ public:
                         JSONCONS_ASSERT(stack_.size() >= 2);
                         if (parent() == states::array)
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::extra_comma, json_error_category()), *this);
+                            err_handler_->error(json_parser_errc::extra_comma, *this);
                         }
                         else
                         {
-                            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                            err_handler_->error(json_parser_errc::expected_value, *this);
                         }
                         break;
                     case '\'':
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::single_quote, *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_value, *this);
                         break;
                     }
                 }
@@ -744,10 +744,10 @@ public:
                         literal_index_ = 1;
                         break;
                     case '\'':
-                        err_handler_->error(std::error_code(json_parser_errc::single_quote, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::single_quote, *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_value, *this);
                         break;
                     }
                 }
@@ -813,7 +813,7 @@ public:
                         stack_.back() = states::expect_surrogate_pair2;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
                         break;
                     }
                 }
@@ -828,7 +828,7 @@ public:
                         stack_.back() = states::u6;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_codepoint_surrogate_pair, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
                         break;
                     }
                 }
@@ -882,7 +882,7 @@ public:
                         stack_.back() = states::integer;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_value, *this);
                         break;
                     }
                 }
@@ -927,10 +927,10 @@ public:
                         begin_member_or_element();
                         break;
                     case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        err_handler_->error(std::error_code(json_parser_errc::leading_zero, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::leading_zero, *this);
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_number, *this);
                         break;
                     }
                 }
@@ -984,7 +984,7 @@ public:
                         stack_.back() = states::exp1;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_number, *this);
                         break;
                     }
                 }
@@ -1034,7 +1034,7 @@ public:
                         stack_.back() = states::exp1;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_number, *this);
                         break;
                     }
                 }
@@ -1058,7 +1058,7 @@ public:
                         stack_.back() = states::exp3;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_value, *this);
                         break;
                     }
                 }
@@ -1075,7 +1075,7 @@ public:
                         stack_.back() = states::exp3;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::expected_value, *this);
                         break;
                     }
                 }
@@ -1120,7 +1120,7 @@ public:
                         stack_.back() = states::exp3;
                         break;
                     default:
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_number, *this);
                         break;
                     }
                 }
@@ -1132,7 +1132,7 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_value, *this);
                     }
                     ++p_;
                     ++literal_index_;
@@ -1158,7 +1158,7 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_value, *this);
                     }
                     ++p_;
                     ++literal_index_;
@@ -1184,7 +1184,7 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_value, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_value, *this);
                     }
                     ++p_;
                     ++literal_index_;
@@ -1216,7 +1216,7 @@ public:
                         stack_.back() = states::slash_slash;
                         break;
                     default:    
-                        err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+                        err_handler_->error(json_parser_errc::invalid_json_text, *this);
                         break;
                     }
                 }
@@ -1306,7 +1306,7 @@ public:
         }
         if (!(stack_.back() == states::done || stack_.back() == states::start))
         {
-            err_handler_->error(std::error_code(json_parser_errc::unexpected_eof, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::unexpected_eof, *this);
         }
     }
 
@@ -1331,7 +1331,7 @@ private:
         }
         catch (...)
         {
-            err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_number, *this);
             handler_->value(null_type(), *this); // recovery
         }
         number_buffer_.clear();
@@ -1349,7 +1349,7 @@ private:
             handler_->end_json();
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_json_text, *this);
             break;
         }
     }
@@ -1372,7 +1372,7 @@ private:
                 }
                 catch (...)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                    err_handler_->error(json_parser_errc::invalid_number, *this);
                     handler_->value(null_type(), *this);
                 }
             }
@@ -1393,7 +1393,7 @@ private:
                 }
                 catch (...)
                 {
-                    err_handler_->error(std::error_code(json_parser_errc::invalid_number, json_error_category()), *this);
+                    err_handler_->error(json_parser_errc::invalid_number, *this);
                     handler_->value(null_type(), *this);
                 }
             }
@@ -1411,7 +1411,7 @@ private:
             handler_->end_json();
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_json_text, *this);
             break;
         }
         number_buffer_.clear();
@@ -1428,7 +1428,7 @@ private:
             cp_ = append_to_codepoint(cp_, c);
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::expected_value, *this);
             break;
         }
     }
@@ -1444,7 +1444,7 @@ private:
             cp2_ = append_to_codepoint(cp2_, c);
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::expected_value, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::expected_value, *this);
             break;
         }
     }
@@ -1490,7 +1490,7 @@ private:
             stack_.back() = states::u1;
             break;
         default:    
-            err_handler_->error(std::error_code(json_parser_errc::illegal_escaped_character, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::illegal_escaped_character, *this);
             break;
         }
     }
@@ -1516,7 +1516,7 @@ private:
             handler_->end_json();
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_json_text, *this);
             break;
         }
     }
@@ -1535,7 +1535,7 @@ private:
         case states::root:
             break;
         default:
-            err_handler_->error(std::error_code(json_parser_errc::invalid_json_text, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_json_text, *this);
             break;
         }
     }
@@ -1557,7 +1557,7 @@ private:
         }
         else
         {
-            err_handler_->error(std::error_code(json_parser_errc::invalid_hex_escape_sequence, json_error_category()), *this);
+            err_handler_->error(json_parser_errc::invalid_hex_escape_sequence, *this);
         }
         return cp;
     }
