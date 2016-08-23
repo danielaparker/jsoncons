@@ -491,20 +491,11 @@ typedef basic_default_parse_error_handler&lt;char&gt; default_parse_error_handle
 
 <h3>Private virtual implementation methods</h3>
 
-<pre><code>virtual void do_warning(const std::string&amp; error_code,
-                        std::error_code ec,
-                        const parsing_context&amp; context) throw (parse_exception)
+<pre><code> bool do_error(std::error_code ec,
+               const parsing_context&amp; context) override
 </code></pre>
 
-<p>Does nothing</p>
-
-<pre><code>virtual void do_error(const std::string&amp; error_code,
-                      std::error_code ec,
-                      const parsing_context&amp; context) throw (parse_exception)
-</code></pre>
-
-<p>Throws a <a href="parse_exception">parse_exception</a> with the message and the line <br>
-number and column number taken from the <a href="parsing_context">context</a> parameter.</p>
+<p>Returns <code>true</code></p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

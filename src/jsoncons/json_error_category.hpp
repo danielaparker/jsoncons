@@ -48,7 +48,7 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (ev)
+        switch (static_cast<json_parser_errc>(ev))
         {
         case json_parser_errc::unexpected_eof:
             return "Unexpected end of file";

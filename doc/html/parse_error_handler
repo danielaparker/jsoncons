@@ -490,45 +490,29 @@ will then report all warnings and errors through this interface.</p>
 
 <h3>Public interface methods</h3>
 
-<pre><code>void warning(std::error_code ec,
-             const parsing_context&amp; context) throw (parse_exception) = 0
-</code></pre>
-
-<p>Send a warning event. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">context</a> parameter. Uses <code>do_warning</code>.</p>
-
 <pre><code>void error(std::error_code ec,
            const parsing_context&amp; context) throw (parse_exception) = 0
 </code></pre>
 
-<p>Send an error event, possibly recoverable. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">context</a> parameter.  Calls <code>do_error</code>.</p>
+<p>Called for recoverable errors. Calls <code>do_error</code>, if <code>do_error</code> returns <code>true</code>, throws a <a href="parse_exception">parse_exception</a>, otherwise an attempt is made to recover.</p>
 
 <pre><code>void fatal_error(std::error_code ec,
-           const parsing_context&amp; context) throw (parse_exception) = 0
+                 const parsing_context&amp; context) throw (parse_exception) = 0
 </code></pre>
 
-<p>Send an unrecoverable error. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">context</a> parameter.  Calls <code>do_fatal_error</code> and throws a <a href="parse_exception">parse_exception</a>.</p>
+<p>Called for unrecoverable errors. Calls <code>do_fatal_error</code> and throws a <a href="parse_exception">parse_exception</a>.</p>
 
 <h3>Private virtual implementation methods</h3>
 
-<pre><code>virtual void do_warning(std::error_code ec,
-                        const parsing_context&amp; context) throw (parse_exception) = 0
-</code></pre>
-
-<p>Receive a warning event. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">context</a> parameter.</p>
-
-<pre><code>virtual void do_error(std::error_code ec,
-                      const parsing_context&amp; context) throw (parse_exception) = 0
+<pre><code>virtual bool do_error(std::error_code ec,
+                      const parsing_context&amp; context) = 0
 </code></pre>
 
 <p>Receive an error event, possibly recoverable. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">context</a> parameter. </p>
+line and column information is provided in the <a href="parsing_context">context</a> parameter. Returns <code>true</code> to fail, <code>false</code> to attempt recovery.</p>
 
 <pre><code>virtual void do_fatal_error(std::error_code ec,
-                            const parsing_context&amp; context) throw (parse_exception) = 0
+                            const parsing_context&amp; context) = 0
 </code></pre>
 
 <p>Receives a non recoverable error. An <a href="json_error_category">error_code</a> indicates the type of error. Contextual information including<br>

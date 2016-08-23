@@ -36,7 +36,7 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (ev)
+        switch (static_cast<jsonpath_parser_errc>(ev))
         {
         case jsonpath_parser_errc::expected_root:
             return "Expected $";

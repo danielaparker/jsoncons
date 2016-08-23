@@ -30,7 +30,7 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (ev)
+        switch (static_cast<csv_parser_errc>(ev))
         {
         case csv_parser_errc::unexpected_eof:
             return "Unexpected end of file";
