@@ -72,91 +72,91 @@ public:
     }
     virtual bool accept_single_node() const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json evaluate_single_node() const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool exclaim() const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool eq(const term& rhs) const 
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool eq(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool ne(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool ne(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool regex(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool regex2(const string_type& subject) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool ampamp(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool ampamp(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool pipepipe(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool pipepipe(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool lt(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool lt(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool gt(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual bool gt(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json minus(const term& rhs) const 
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json  minus(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json  unary_minus() const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json plus(const term& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json  plus(const Json& rhs) const
     {
-        throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unsupported_operator, jsonpath_error_category()),1,1);
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
 };
 
@@ -757,7 +757,7 @@ public:
             t = ts.get();
             if (t.type() != token_types::right_paren)
             {
-                throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_right_brace, jsonpath_error_category()),line_,column_);
+                throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_right_brace,line_,column_);
             }
             return expr;
         }
@@ -776,7 +776,7 @@ public:
             return expr;
         }
         default:
-            throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_primary, jsonpath_error_category()),line_,column_);
+            throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_primary,line_,column_);
         }
     }
 
@@ -1054,7 +1054,7 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
+                    throw parse_exception(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
 
                 }
@@ -1335,7 +1335,7 @@ public:
                     }
                     break;
                 default: 
-                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
+                    throw parse_exception(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
                 };
                 break;
@@ -1363,7 +1363,7 @@ public:
                     }
                     break;
                 default: 
-                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter, jsonpath_error_category()),line_,column_);
+                    throw parse_exception(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
                 };
                 ++p_;
@@ -1437,7 +1437,7 @@ public:
                 case ' ':case '\t':
                     break;
                 default: 
-                    throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_expected_slash, jsonpath_error_category()),line_,column_);
+                    throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_slash,line_,column_);
                     break;
                 };
                 ++p_;
@@ -1485,7 +1485,7 @@ public:
         }
         if (depth_ != 0)
         {
-            throw parse_exception(std::error_code(jsonpath_parser_errc::invalid_filter_unbalanced_paren, jsonpath_error_category()),line_,column_);
+            throw parse_exception(jsonpath_parser_errc::invalid_filter_unbalanced_paren,line_,column_);
         }
     }
 };

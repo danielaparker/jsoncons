@@ -12,19 +12,19 @@
 
 namespace jsoncons { namespace jsonpath {
 
-namespace jsonpath_parser_errc 
+enum class jsonpath_parser_errc 
 {
-    const int expected_root = 1;
-    const int expected_right_bracket = 2;
-    const int expected_name = 3;
-    const int expected_separator = 4;
-    const int invalid_filter = 5;
-    const int invalid_filter_expected_slash = 6;
-    const int invalid_filter_unbalanced_paren = 7;
-    const int invalid_filter_unsupported_operator = 8;
-    const int invalid_filter_expected_right_brace = 9;
-    const int invalid_filter_expected_primary = 10;
-}
+    expected_root = 1,
+    expected_right_bracket = 2,
+    expected_name = 3,
+    expected_separator = 4,
+    invalid_filter = 5,
+    invalid_filter_expected_slash = 6,
+    invalid_filter_unbalanced_paren = 7,
+    invalid_filter_unsupported_operator = 8,
+    invalid_filter_expected_right_brace = 9,
+    invalid_filter_expected_primary = 10
+};
 
 class jsonpath_error_category_impl
    : public std::error_category
@@ -71,5 +71,19 @@ const std::error_category& jsonpath_error_category()
   return instance;
 }
 
+inline 
+std::error_code make_error_code(jsonpath_parser_errc result)
+{
+    return std::error_code(static_cast<int>(result),jsonpath_error_category());
+}
+
 }}
+
+namespace std {
+    template<>
+    struct is_error_code_enum<jsoncons::jsonpath::jsonpath_parser_errc> : public true_type
+    {
+    };
+}
+
 #endif

@@ -505,7 +505,7 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_->error(std::error_code(csv_parser_errc::invalid_state, csv_error_category()), *this);
+                err_handler_->error(csv_parser_errc::invalid_state, *this);
                 break;
             }
             if (line_ > parameters_.max_lines())
@@ -562,19 +562,19 @@ all_csv_states:
         case csv_modes::array:
             if (!pop(csv_modes::array))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
+                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         case csv_modes::object:
             if (!pop(csv_modes::object))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
+                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         case csv_modes::header:
             if (!pop(csv_modes::header))
             {
-                err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
+                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         default:
@@ -583,7 +583,7 @@ all_csv_states:
         handler_->end_array(*this);
         if (!pop(csv_modes::done))
         {
-            err_handler_->error(std::error_code(csv_parser_errc::unexpected_eof, csv_error_category()), *this);
+            err_handler_->error(csv_parser_errc::unexpected_eof, *this);
         }
         handler_->end_json();
     }
@@ -681,7 +681,7 @@ private:
             }
             break;
         default:
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_error_category()), *this);
+            err_handler_->error(csv_parser_errc::invalid_csv_text, *this);
             break;
         }
         state_ = csv_states::expect_value;
@@ -716,7 +716,7 @@ private:
             end_value();
             break;
         default:
-            err_handler_->error(std::error_code(csv_parser_errc::invalid_csv_text, csv_error_category()), *this);
+            err_handler_->error(csv_parser_errc::invalid_csv_text, *this);
             break;
         }
         state_ = csv_states::expect_value;

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_TEXT_ERROR_CATEGORY_HPP
-#define JSONCONS_JSON_TEXT_ERROR_CATEGORY_HPP
+#ifndef JSONCONS_JSON_ERROR_CATEGORY_HPP
+#define JSONCONS_JSON_ERROR_CATEGORY_HPP
 
 #include "jsoncons/jsoncons.hpp"
 #include <system_error>

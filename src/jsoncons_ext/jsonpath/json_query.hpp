@@ -249,7 +249,7 @@ public:
                     }
                     break;
                 default:
-                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_root, jsonpath_error_category()), *this);
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_root, *this);
                     break;
                 };
                 ++p_;
@@ -281,7 +281,7 @@ public:
                     state_ = states::lf;
                     break;
                 case '.':
-                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_name, jsonpath_error_category()), *this);
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_name, *this);
                     ++p_;
                     ++column_;
                     break;
@@ -319,7 +319,7 @@ public:
                     state_ = states::left_bracket;
                     break;
                 default:
-                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_separator, jsonpath_error_category()), *this);
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_separator, *this);
                     break;
                 };
                 ++p_;
@@ -346,7 +346,7 @@ public:
                 case ' ':case '\t':
                     break;
                 default:
-                    err_handler_->fatal_error(std::error_code(jsonpath_parser_errc::expected_right_bracket, jsonpath_error_category()), *this);
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_right_bracket, *this);
                     break;
                 }
                 ++p_;

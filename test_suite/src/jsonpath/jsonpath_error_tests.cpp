@@ -86,28 +86,28 @@ BOOST_AUTO_TEST_CASE(test_root_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,jsonpath_error_category(),1,1);
+    test_error_code(root, "..*", jsonpath_parser_errc::expected_root,1,1);
 }
 
 BOOST_AUTO_TEST_CASE(test_right_bracket_error)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,jsonpath_error_category(),1,18);
+    test_error_code(root, "$['store']['book'[*]", jsonpath_parser_errc::expected_right_bracket,1,18);
 }
 
 BOOST_AUTO_TEST_CASE(test_dot_dot_dot)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,jsonpath_error_category(),1,10);
+    test_error_code(root, "$.store...price", jsonpath_parser_errc::expected_name,1,10);
 }
 
 BOOST_AUTO_TEST_CASE(test_dot_star_name)
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store.*price", jsonpath_parser_errc::expected_separator, jsonpath_error_category(),1,10);
+    test_error_code(root, "$.store.*price", jsonpath_parser_errc::expected_separator,1,10);
 }
 
 BOOST_AUTO_TEST_CASE(test_filter_error)
