@@ -568,13 +568,12 @@ public:
                         stack_.push_back(states::slash);
                         break;
                     case '\"':
-                        //stack_.back() = states::string;
                         stack_.back() = states::member_name;
                         stack_.push_back(states::string);
                         break;
                     case '}':
-                        --nesting_depth_;
                         err_handler_->error(json_parser_errc::extra_comma, *this);
+                        do_end_object();  // Recover
                         break;
                     case '\'':
                         err_handler_->error(json_parser_errc::single_quote, *this);
@@ -671,6 +670,7 @@ public:
                         if (parent() == states::array)
                         {
                             err_handler_->error(json_parser_errc::extra_comma, *this);
+                            do_end_array();  // Recover
                         }
                         else
                         {

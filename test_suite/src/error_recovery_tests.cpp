@@ -34,13 +34,43 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
+BOOST_AUTO_TEST_CASE(test_array_extra_comma)
 {
-    //my_parse_error_handler err_handler;
+    my_parse_error_handler err_handler;
 
-    //json val = json::parse("[1,2,3,]", err_handler);
+    json val = json::parse("[1,2,3,]", err_handler);
 
-    //std::cout << val << std::endl;
+    std::cout << val << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_object_extra_comma)
+{
+    my_parse_error_handler err_handler;
+
+    json val = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2,
+    }
+    )", 
+    err_handler);
+
+    std::cout << val << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_name_without_quotes)
+{
+    my_parse_error_handler err_handler;
+
+    /*json val = json::parse(R"(
+    {
+        first : 1,
+        second : 2
+    }
+    )", 
+    err_handler);
+
+    std::cout << val << std::endl;*/
 }
 
 
