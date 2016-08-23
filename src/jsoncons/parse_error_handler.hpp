@@ -106,7 +106,11 @@ public:
     void error(std::error_code ec,
                const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
-        do_error(ec,context);
+        if (do_error(ec,context))
+        {
+            throw parse_exception(ec,context.line_number(),context.column_number());
+        }
+        // else attempt recovery
     }
 
     void fatal_error(std::error_code ec,
@@ -117,11 +121,11 @@ public:
     }
 
 private:
-    virtual void do_error(std::error_code,
-                          const basic_parsing_context<CharT>& context) throw (parse_exception) = 0;
+    virtual bool do_error(std::error_code,
+                          const basic_parsing_context<CharT>& context) = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<CharT>& context) throw (parse_exception)
+                                const basic_parsing_context<CharT>& context)
     {
         (void)context;
     }
@@ -137,16 +141,10 @@ public:
         return instance;
     }
 private:
-    virtual void do_warning(std::error_code,
-                            const basic_parsing_context<CharT>& context) throw (parse_exception) 
+    virtual bool do_error(std::error_code ec,
+                          const basic_parsing_context<CharT>& context) 
     {
-        (void)context;
-    }
-
-    virtual void do_error(std::error_code ec,
-                          const basic_parsing_context<CharT>& context) throw (parse_exception)
-    {
-        throw parse_exception(ec,context.line_number(),context.column_number());
+        return true;
     }
 };
 

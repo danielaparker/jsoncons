@@ -23,23 +23,24 @@ class my_parse_error_handler : public parse_error_handler
 {
 private:
 
-    void do_error(std::error_code ec,
-                  const parsing_context& context) throw(parse_exception) override
+    bool do_error(std::error_code ec,
+                  const parsing_context& context) override
     {
-        if (ec == jsoncons::json_parser_errc::extra_comma && (context.current_char() == ']' || context.current_char() == '}'))
+        if (ec == jsoncons::json_parser_errc::extra_comma)
         {
-            default_parse_error_handler::instance().error(ec,context);
+            return false;
         }
+        return true;
     }
 };
 
 BOOST_AUTO_TEST_CASE(test_accept_trailing_value_separator)
 {
-    /*my_parse_error_handler err_handler;
+    //my_parse_error_handler err_handler;
 
-    json val = json::parse("[1,2,3,]", err_handler);
+    //json val = json::parse("[1,2,3,]", err_handler);
 
-    std::cout << val << std::endl;*/
+    //std::cout << val << std::endl;
 }
 
 

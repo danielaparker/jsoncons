@@ -28,13 +28,9 @@ public:
 private:
     std::error_code value_;
 
-    void do_error(std::error_code ec,
-                  const parsing_context& context) throw(parse_exception) override
+    bool do_error(std::error_code ec, const parsing_context& context) 
     {
-        if (ec != value_)
-        {
-            default_parse_error_handler::instance().error(ec,context);
-        }
+        return (ec != value_) ? true: false;
     }
 };
 
