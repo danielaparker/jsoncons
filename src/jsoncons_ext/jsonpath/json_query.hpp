@@ -649,12 +649,6 @@ public:
                     state_ = states::lf;
                     ++p_; ++column_;
                     break;
-                case ' ':case '\t':
-                    find(buffer_);
-                    buffer_.clear();
-                    ++p_; ++column_;
-                    state_ = states::expect_comma_or_right_bracket;
-                    break;
                 case ',':
                 case ']':
                     find(buffer_);
