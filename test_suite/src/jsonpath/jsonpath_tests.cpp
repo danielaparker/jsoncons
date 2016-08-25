@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_category_eq_reference)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
 {
-	jsonpath_fixture fixture;
+    jsonpath_fixture fixture;
 
     json root = json::parse(jsonpath_fixture::store_text());
 
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
             expected.add(books[i]);
         }
     }
-	//std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
     //std::cout << pretty_print(expected) << std::endl;
 
     BOOST_CHECK_EQUAL(expected,result);
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
 {
-	jsonpath_fixture fixture;
+    jsonpath_fixture fixture;
 
     json root = json::parse(jsonpath_fixture::store_text());
 
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_empty_isbn)
 {
-	jsonpath_fixture fixture;
+    jsonpath_fixture fixture;
 
     json root = json::parse(jsonpath_fixture::store_text_empty_isbn());
 
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_empty_isbn)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
 {
-	jsonpath_fixture fixture;
+    jsonpath_fixture fixture;
 
     json root = json::parse(jsonpath_fixture::store_text());
 
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter4)
             expected.add(books[i]);
         }
     }
-	//std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
     //std::cout << pretty_print(expected) << std::endl;
 
     BOOST_CHECK_EQUAL(expected,result);
@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_array_length)
 
     json result = json_query(root,"$..book.length");
 
-	//std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 
     BOOST_CHECK_EQUAL(1,result.size());
     BOOST_CHECK_EQUAL(root["store"]["book"].size(),result[0].as<size_t>());
@@ -577,6 +577,44 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_everything_in_store)
  
     json expected = json::array();
     expected.add(root["store"]);
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_last_of_two_arrays)
+{
+    json val = json::parse(R"(
+{ "store": {
+    "book": [ 
+          { "author": "Nigel Rees"
+          },
+          { "author": "Evelyn Waugh"
+          },
+          { "author": "Herman Melville"
+          }
+        ]
+    },
+    "Roman": {
+    "book": [ 
+          { "author": "Tolstoy L"
+          },
+          { "author": "Tretyakovskiy R"
+          },
+          { "author": "Kulik M"
+          }
+        ]
+    }  
+}
+    )");
+
+    json expected = json::parse(R"(
+[
+    { "author": "Kulik M"},
+    { "author": "Herman Melville"}
+]
+    )");
+
+    json result = json_query(val, "$..book[(@.length - 1)]");
 
     BOOST_CHECK_EQUAL(expected,result);
 }

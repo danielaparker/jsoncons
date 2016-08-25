@@ -760,10 +760,12 @@ public:
             cjson_ptr p = stack_.back()[i];
             if (p->is_array() && start_ < p->size())
             {
-                nodes_.push_back(std::addressof((*p)[start_]));
+                size_t index = positive_start_ ? start_ : p->size() - start_;
+                nodes_.push_back(std::addressof((*p)[index]));
             }
         }
         start_ = 0;
+        positive_start_ = true;
     }
 
     void end_array_slice()
