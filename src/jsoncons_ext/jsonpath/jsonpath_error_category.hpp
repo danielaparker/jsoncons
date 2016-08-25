@@ -23,7 +23,8 @@ enum class jsonpath_parser_errc
     invalid_filter_unbalanced_paren = 7,
     invalid_filter_unsupported_operator = 8,
     invalid_filter_expected_right_brace = 9,
-    invalid_filter_expected_primary = 10
+    invalid_filter_expected_primary = 10,
+    expected_index = 11
 };
 
 class jsonpath_error_category_impl
@@ -44,6 +45,8 @@ public:
             return "Expected ]";
         case jsonpath_parser_errc::expected_name:
             return "Expected a name following a dot";
+        case jsonpath_parser_errc::expected_index:
+            return "Expected index";
         case jsonpath_parser_errc::expected_separator:
             return "Expected dot or left bracket separator";
         case jsonpath_parser_errc::invalid_filter:

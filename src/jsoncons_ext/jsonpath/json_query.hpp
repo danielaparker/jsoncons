@@ -103,8 +103,8 @@ enum class states
     expect_separator,
     expect_unquoted_name,
     unquoted_name,
-    single_quoted_name,
-    double_quoted_name,
+    left_bracket_single_quoted_string,
+    left_bracket_double_quoted_string,
     left_bracket,
     left_bracket_quoteless_string,
     left_bracket_start,
@@ -545,6 +545,7 @@ public:
                         {
                             accept(*(stack_.back()[j]),parser);
                         }
+                        state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
                     
@@ -552,11 +553,6 @@ public:
                     step_ = 1;
                     end_undefined_ = true;
                     state_ = states::left_bracket_end;
-                    ++p_;
-                    ++column_;
-                    break;
-                case ',':
-                    find_elements();
                     ++p_;
                     ++column_;
                     break;
@@ -572,26 +568,25 @@ public:
                     ++p_;
                     ++column_;
                     break;
+                case ',':
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
+                    break;
                 case ']':
-                    transfer_nodes();
-                    state_ = states::expect_separator;
-                    ++p_;
-                    ++column_;
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
                     break;
                 case '*':
                     end_all();
-                    //transfer_nodes();
                     state_ = states::expect_comma_or_right_bracket;
                     ++p_;
                     ++column_;
                     break;
                 case '\'':
-                    state_ = states::single_quoted_name;
+                    state_ = states::left_bracket_single_quoted_string;
                     ++p_;
                     ++column_;
                     break;
                 case '\"':
-                    state_ = states::double_quoted_name;
+                    state_ = states::left_bracket_double_quoted_string;
                     ++p_;
                     ++column_;
                     break;
@@ -672,7 +667,7 @@ public:
                     break;
                 };
                 break;
-            case states::single_quoted_name: 
+            case states::left_bracket_single_quoted_string: 
                 switch (*p_)
                 {
                 case '\'':
@@ -696,7 +691,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::double_quoted_name: 
+            case states::left_bracket_double_quoted_string: 
                 switch (*p_)
                 {
                 case '\"':

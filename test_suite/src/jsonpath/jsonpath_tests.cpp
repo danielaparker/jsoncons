@@ -686,9 +686,14 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)
 ["John","doe"]
 )");
 
-    json result = json_query(val, "$[firstName,lastName]");
+    json result1 = json_query(val, "$[firstName,lastName]");
+    BOOST_CHECK_EQUAL(expected,result1);
 
-    BOOST_CHECK_EQUAL(expected,result);
+    json result2 = json_query(val, "$['firstName','lastName']");
+    BOOST_CHECK_EQUAL(expected,result2);
+
+    json result3 = json_query(val, "$[\"firstName\",\"lastName\"]");
+    BOOST_CHECK_EQUAL(expected,result3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
