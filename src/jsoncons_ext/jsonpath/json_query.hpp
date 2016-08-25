@@ -106,7 +106,7 @@ enum class states
     single_quoted_name,
     double_quoted_name,
     left_bracket,
-    left_bracket_quoteless_name,
+    left_bracket_quoteless_string,
     left_bracket_start,
     left_bracket_end,
     left_bracket_end2,
@@ -598,7 +598,7 @@ public:
                 default:
                     if ((*p_ >= 'a' && *p_ <= 'z') || (*p_ >= 'A' && *p_ <= 'Z') || *p_ == '_')
                     {
-                        state_ = states::left_bracket_quoteless_name;
+                        state_ = states::left_bracket_quoteless_string;
                     }
                     else
                     {
@@ -641,7 +641,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::left_bracket_quoteless_name: 
+            case states::left_bracket_quoteless_string: 
                 switch (*p_)
                 {
                 case '\r':
