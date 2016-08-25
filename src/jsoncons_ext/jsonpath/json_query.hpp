@@ -106,12 +106,13 @@ enum class states
     single_quoted_name,
     double_quoted_name,
     left_bracket,
+    left_bracket_quoteless_name,
     left_bracket_start,
     left_bracket_end,
     left_bracket_end2,
     left_bracket_step,
     left_bracket_step2,
-    expect_right_bracket,
+    expect_comma_or_right_bracket,
     dot
 };
 
@@ -325,7 +326,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::expect_right_bracket:
+            case states::expect_comma_or_right_bracket:
                 switch (*p_)
                 {
                 case '\r':
@@ -532,6 +533,7 @@ public:
                                 //find(index.as_string());
                             }
                         }
+                        state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
                 case '?':
@@ -571,7 +573,6 @@ public:
                     ++column_;
                     break;
                 case ']':
-                    //find_elements();
                     transfer_nodes();
                     state_ = states::expect_separator;
                     ++p_;
@@ -580,7 +581,7 @@ public:
                 case '*':
                     end_all();
                     //transfer_nodes();
-                    state_ = states::expect_right_bracket;
+                    state_ = states::expect_comma_or_right_bracket;
                     ++p_;
                     ++column_;
                     break;
@@ -595,8 +596,15 @@ public:
                     ++column_;
                     break;
                 default:
-                    ++p_;
-                    ++column_;
+                    if ((*p_ >= 'a' && *p_ <= 'z') || (*p_ >= 'A' && *p_ <= 'Z') || *p_ == '_')
+                    {
+                        state_ = states::left_bracket_quoteless_name;
+                    }
+                    else
+                    {
+                        ++p_;
+                        ++column_;
+                    }
                     break;
                 }
                 break;
@@ -633,13 +641,44 @@ public:
                 ++p_;
                 ++column_;
                 break;
+            case states::left_bracket_quoteless_name: 
+                switch (*p_)
+                {
+                case '\r':
+                    pre_line_break_state_ = state_;
+                    state_ = states::cr;
+                    ++p_; ++column_;
+                    break;
+                case '\n':
+                    pre_line_break_state_ = state_;
+                    state_ = states::lf;
+                    ++p_; ++column_;
+                    break;
+                case ' ':case '\t':
+                    find(buffer_);
+                    buffer_.clear();
+                    ++p_; ++column_;
+                    state_ = states::expect_comma_or_right_bracket;
+                    break;
+                case ',':
+                case ']':
+                    find(buffer_);
+                    buffer_.clear();
+                    state_ = states::expect_comma_or_right_bracket;
+                    break;
+                default:
+                    buffer_.push_back(*p_);
+                    ++p_; ++column_;
+                    break;
+                };
+                break;
             case states::single_quoted_name: 
                 switch (*p_)
                 {
                 case '\'':
                     find(buffer_);
                     buffer_.clear();
-                    state_ = states::expect_right_bracket;
+                    state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
                     buffer_.push_back(*p_);
@@ -663,7 +702,7 @@ public:
                 case '\"':
                     find(buffer_);
                     buffer_.clear();
-                    state_ = states::expect_right_bracket;
+                    state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
                     buffer_.push_back(*p_);
