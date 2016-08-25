@@ -73,7 +73,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
     BOOST_CHECK_EQUAL(json(1), result3);
 
 }
-
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 {
     size_t line = 1;
@@ -95,9 +94,12 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
     BOOST_CHECK_EQUAL(json(true),result2);
 }
 
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_index_expression)
 {
     json root = json::parse(jsonpath_filter_fixture::store_text());
+    std::cout << pretty_print(root) << std::endl;
+    std::cout << "$..book[(@.length-1)]" << std::endl;
 
     json result = json_query(root,"$..book[(@.length-1)]");
 

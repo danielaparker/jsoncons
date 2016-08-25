@@ -512,25 +512,25 @@ public:
                     break;
                 case '(':
                     {
-                        if (stack_.back().size() == 1)
+                        jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
+                        parser.parse(p_,end_input_);
+                        for (size_t i = 0; i < stack_.back().size(); ++i)
                         {
-                            jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
-                            parser.parse(p_,end_input_);
-                            auto index = parser.eval(*(stack_.back()[0]));
+                            auto index = parser.eval(*(stack_.back()[i]));
                             if (index.template is<size_t>())
                             {
                                 start_ = index. template as<size_t>();
-                                find_elements();
+                                cjson_ptr p = stack_.back()[i];
+                                if (p->is_array() && start_ < p->size())
+                                {
+                                    nodes_.push_back(std::addressof((*p)[start_]));
+                                }
                             }
                             else if (index.is_string())
                             {
-                                find(index.as_string());
+                                find1(*(stack_.back()[i]), index.as_string());
+                                //find(index.as_string());
                             }
-                        }
-                        else
-                        {
-                            ++p_;
-                            ++column_;
                         }
                     }
                     break;
@@ -760,12 +760,12 @@ public:
             cjson_ptr p = stack_.back()[i];
             if (p->is_array() && start_ < p->size())
             {
-                size_t index = positive_start_ ? start_ : p->size() - start_;
-                nodes_.push_back(std::addressof((*p)[index]));
+                //size_t index = positive_start_ ? start_ : p->size() - start_;
+                nodes_.push_back(std::addressof((*p)[start_]));
             }
         }
         start_ = 0;
-        positive_start_ = true;
+        //positive_start_ = true;
     }
 
     void end_array_slice()
