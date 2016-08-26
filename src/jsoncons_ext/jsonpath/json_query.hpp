@@ -539,7 +539,6 @@ public:
                                 select_values(*(stack_.back()[i]), index.as_string());
                             }
                         }
-                        recursive_descent_ = false;
                         buffer_.clear();
                         state_ = states::expect_comma_or_right_bracket;
                     }
@@ -867,7 +866,6 @@ public:
                 select_values(*(stack_.back()[i]), name);
             }
         }
-        recursive_descent_ = false;
         buffer_.clear();
     }
 
