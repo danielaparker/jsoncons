@@ -67,6 +67,8 @@ public:
     typedef typename Json::string_type string_type;
     typedef typename Json::char_type char_type;
 
+    virtual ~term() {}
+
     virtual void initialize(const Json&)
     {
     }
