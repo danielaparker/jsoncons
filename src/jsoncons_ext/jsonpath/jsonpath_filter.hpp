@@ -67,7 +67,7 @@ public:
     typedef typename Json::string_type string_type;
     typedef typename Json::char_type char_type;
 
-    virtual void initialize(const Json& context_node)
+    virtual void initialize(const Json&)
     {
     }
     virtual bool accept_single_node() const
@@ -82,67 +82,67 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool eq(const term& rhs) const 
+    virtual bool eq(const term&) const 
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool eq(const Json& rhs) const
+    virtual bool eq(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ne(const term& rhs) const
+    virtual bool ne(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ne(const Json& rhs) const
+    virtual bool ne(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool regex(const term& rhs) const
+    virtual bool regex(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool regex2(const string_type& subject) const
+    virtual bool regex2(const string_type&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ampamp(const term& rhs) const
+    virtual bool ampamp(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ampamp(const Json& rhs) const
+    virtual bool ampamp(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool pipepipe(const term& rhs) const
+    virtual bool pipepipe(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool pipepipe(const Json& rhs) const
+    virtual bool pipepipe(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool lt(const term& rhs) const
+    virtual bool lt(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool lt(const Json& rhs) const
+    virtual bool lt(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool gt(const term& rhs) const
+    virtual bool gt(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool gt(const Json& rhs) const
+    virtual bool gt(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json minus(const term& rhs) const 
+    virtual Json minus(const term&) const 
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json  minus(const Json& rhs) const
+    virtual Json  minus(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -150,11 +150,11 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json plus(const term& rhs) const
+    virtual Json plus(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json  plus(const Json& rhs) const
+    virtual Json  plus(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }

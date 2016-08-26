@@ -655,6 +655,17 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_next_to_last_of_two_arrays)
     json result = json_query(val, "$..book[(@.length - 2)]");
 
     BOOST_CHECK_EQUAL(expected,result);
+
+    json expected2 = json::parse(R"(
+[
+    "Tolstoy L",
+    "Nigel Rees"
+]
+    )");
+    std::string path2 = "$..[0].author";
+    json result2 = json_query(val, path2);
+    BOOST_CHECK_EQUAL(expected2,result2);
+
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)

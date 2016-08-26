@@ -401,7 +401,7 @@ struct json_type_traits<Json, Json>
 {
     static const bool is_assignable = true;
 
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    static bool is(const Json&) JSONCONS_NOEXCEPT
     {
         return true;
     }

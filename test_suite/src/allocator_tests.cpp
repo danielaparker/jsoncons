@@ -62,9 +62,9 @@ public:
     { 
         while (head_) 
         { 
-            node_type* curr_ = head_->next_ptr_; 
+            node_type* curr2_ = head_->next_ptr_; 
             dealloc(head_); 
-            head_ = curr_; 
+            head_ = curr2_; 
         } 
     } 
     void* allocate(size_t n)
@@ -132,7 +132,7 @@ public:
     {
         return static_cast<T*>(pool_ptr_->allocate(n * sizeof(T)));
     } 
-    void deallocate(pointer p, size_type) 
+    void deallocate(pointer, size_type) 
     {
     }
     size_type max_size() const throw() 

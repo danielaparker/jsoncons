@@ -1367,8 +1367,8 @@ private:
             {
                 try
                 {
-                    double d = float_reader_.read(number_buffer_.data(), number_buffer_.length());
-                    handler_->value(-d, static_cast<uint8_t>(number_buffer_.length()), *this);
+                    double d2 = float_reader_.read(number_buffer_.data(), number_buffer_.length());
+                    handler_->value(-d2, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1388,8 +1388,8 @@ private:
             {
                 try
                 {
-                    double d = float_reader_.read(number_buffer_.data(),number_buffer_.length());
-                    handler_->value(d, static_cast<uint8_t>(number_buffer_.length()), *this);
+                    double d2 = float_reader_.read(number_buffer_.data(),number_buffer_.length());
+                    handler_->value(d2, static_cast<uint8_t>(number_buffer_.length()), *this);
                 }
                 catch (...)
                 {

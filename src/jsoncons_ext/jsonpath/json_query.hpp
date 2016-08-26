@@ -100,13 +100,13 @@ enum class states
     start,
     cr,
     lf,
-    expect_separator,
-    expect_unquoted_name,
+    expect_dot_or_left_bracket,
+    expect_unquoted_name_or_left_bracket,
     unquoted_name,
     left_bracket_single_quoted_string,
     left_bracket_double_quoted_string,
     left_bracket,
-    left_bracket_quoteless_string,
+    left_bracket_unquoted_string,
     left_bracket_start,
     left_bracket_end,
     left_bracket_end2,
@@ -246,7 +246,7 @@ public:
                         node_set v;
                         v.push_back(std::addressof(root));
                         stack_.push_back(v);
-                        state_ = states::expect_separator;
+                        state_ = states::expect_dot_or_left_bracket;
                     }
                     break;
                 default:
@@ -263,14 +263,14 @@ public:
                     recursive_descent_ = true;
                     ++p_;
                     ++column_;
-                    state_ = states::expect_unquoted_name;
+                    state_ = states::expect_unquoted_name_or_left_bracket;
                     break;
                 default:
-                    state_ = states::expect_unquoted_name;
+                    state_ = states::expect_unquoted_name_or_left_bracket;
                     break;
                 }
                 break;
-            case states::expect_unquoted_name:
+            case states::expect_unquoted_name_or_left_bracket:
                 switch (*p_)
                 {
                 case '\r':
@@ -289,7 +289,12 @@ public:
                 case '*':
                     end_all();
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
+                    ++p_;
+                    ++column_;
+                    break;
+                case '[':
+                    state_ = states::left_bracket;
                     ++p_;
                     ++column_;
                     break;
@@ -298,7 +303,7 @@ public:
                     break;
                 }
                 break;
-            case states::expect_separator: 
+            case states::expect_dot_or_left_bracket: 
                 switch (*p_)
                 {
                 case '\r':
@@ -342,7 +347,7 @@ public:
                     break;
                 case ']':
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 case ' ':case '\t':
                     break;
@@ -375,7 +380,7 @@ public:
                 case ']':
                     end_array_slice();
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
@@ -398,7 +403,7 @@ public:
                 case ']':
                     end_array_slice();
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
@@ -431,7 +436,7 @@ public:
                 case ']':
                     end_array_slice();
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
@@ -459,7 +464,7 @@ public:
                 case ']':
                     end_array_slice();
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
@@ -482,15 +487,17 @@ public:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    find_elements();
+                    select_values(buffer_);
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = start_*10 + static_cast<size_t>(*p_-'0');
+                    buffer_.clear();
+                    buffer_.push_back(*p_);
                     break;
                 case ']':
-                    find_elements();
+                    select_values(buffer_);
                     transfer_nodes();
-                    state_ = states::expect_separator;
+                    state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
@@ -529,10 +536,11 @@ public:
                             }
                             else if (index.is_string())
                             {
-                                find1(*(stack_.back()[i]), index.as_string());
-                                //find(index.as_string());
+                                select_values(*(stack_.back()[i]), index.as_string());
                             }
                         }
+                        recursive_descent_ = false;
+                        buffer_.clear();
                         state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
@@ -564,6 +572,8 @@ public:
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = static_cast<size_t>(*p_-'0');
+                    buffer_.clear();
+                    buffer_.push_back(*p_);
                     state_ = states::left_bracket_start;
                     ++p_;
                     ++column_;
@@ -593,7 +603,7 @@ public:
                 default:
                     if ((*p_ >= 'a' && *p_ <= 'z') || (*p_ >= 'A' && *p_ <= 'Z') || *p_ == '_')
                     {
-                        state_ = states::left_bracket_quoteless_string;
+                        state_ = states::left_bracket_unquoted_string;
                     }
                     else
                     {
@@ -615,15 +625,13 @@ public:
                     state_ = states::lf;
                     break;
                 case '[':
-                    find(buffer_);
-                    buffer_.clear();
+                    select_values(buffer_);
                     transfer_nodes();
                     start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
-                    find(buffer_);
-                    buffer_.clear();
+                    select_values(buffer_);
                     transfer_nodes();
                     state_ = states::dot;
                     break;
@@ -636,7 +644,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::left_bracket_quoteless_string: 
+            case states::left_bracket_unquoted_string: 
                 switch (*p_)
                 {
                 case '\r':
@@ -651,8 +659,7 @@ public:
                     break;
                 case ',':
                 case ']':
-                    find(buffer_);
-                    buffer_.clear();
+                    select_values(buffer_);
                     state_ = states::expect_comma_or_right_bracket;
                     break;
                 default:
@@ -665,8 +672,7 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    find(buffer_);
-                    buffer_.clear();
+                    select_values(buffer_);
                     state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
@@ -689,8 +695,7 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    find(buffer_);
-                    buffer_.clear();
+                    select_values(buffer_);
                     state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
@@ -719,8 +724,7 @@ public:
         {
         case states::unquoted_name: 
             {
-                find(buffer_);
-                buffer_.clear();
+                select_values(buffer_);
                 transfer_nodes();
             }
             break;
@@ -779,21 +783,6 @@ public:
 
         }
         start_ = 0;
-    }
-
-    void find_elements()
-    {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
-        {
-            cjson_ptr p = stack_.back()[i];
-            if (p->is_array() && start_ < p->size())
-            {
-                //size_t index = positive_start_ ? start_ : p->size() - start_;
-                nodes_.push_back(std::addressof((*p)[start_]));
-            }
-        }
-        start_ = 0;
-        //positive_start_ = true;
     }
 
     void end_array_slice()
@@ -869,19 +858,20 @@ public:
         }
     }
 
-    void find(const string_type& name)
+    void select_values(const string_type& name)
     {
         if (name.length() > 0)
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                find1(*(stack_.back()[i]), name);
+                select_values(*(stack_.back()[i]), name);
             }
-            recursive_descent_ = false;
         }
+        recursive_descent_ = false;
+        buffer_.clear();
     }
 
-    void find1(const Json& context_val, const string_type& name)
+    void select_values(const Json& context_val, const string_type& name)
     {
         if (context_val.is_object())
         {
@@ -895,16 +885,17 @@ public:
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
-                        find1(it->value(), name);
+                        select_values(it->value(), name);
                     }
                 }
             }
         }
         else if (context_val.is_array())
         {
-            size_t index = 0;
-            if (try_string_to_index(name.data(),name.size(),&index))
+            size_t pos = 0;
+            if (try_string_to_index(name.data(),name.size(),&pos))
             {
+                size_t index = positive_start_ ? pos : context_val.size() - pos;
                 if (index < context_val.size())
                 {
                     nodes_.push_back(std::addressof(context_val[index]));
@@ -922,7 +913,7 @@ public:
                 {
                     if (it->is_object() || it->is_array())
                     {
-                        find1(*it, name);
+                        select_values(*it, name);
                     }
                 }
             }

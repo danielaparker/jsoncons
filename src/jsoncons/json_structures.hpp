@@ -535,6 +535,7 @@ public:
     json_object(std::initializer_list<typename Json::array> init, 
                const Allocator& allocator = Allocator())
     {
+        (void)allocator;
         for (const auto& element : init)
         {
             if (element.size() != 2 || !element[0].is_string())

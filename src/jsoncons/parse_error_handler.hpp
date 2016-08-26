@@ -141,8 +141,8 @@ public:
         return instance;
     }
 private:
-    virtual bool do_error(std::error_code ec,
-                          const basic_parsing_context<CharT>& context) 
+    virtual bool do_error(std::error_code,
+                          const basic_parsing_context<CharT>&) 
     {
         return true;
     }

@@ -433,7 +433,7 @@ all_csv_states:
                 {
                     if (curr_char_ == parameters_.quote_char())
                     {
-                        string_buffer_.push_back(curr_char_);
+                        string_buffer_.push_back(static_cast<CharT>(curr_char_));
                         state_ = csv_states::quoted_string;
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
@@ -461,7 +461,7 @@ all_csv_states:
                     }
                     else
                     {
-                        string_buffer_.push_back(curr_char_);
+                        string_buffer_.push_back(static_cast<CharT>(curr_char_));
                     }
                 }
                 break;
@@ -500,7 +500,7 @@ all_csv_states:
                     }
                     else
                     {
-                        string_buffer_.push_back(curr_char_);
+                        string_buffer_.push_back(static_cast<CharT>(curr_char_));
                     }
                 }
                 break;

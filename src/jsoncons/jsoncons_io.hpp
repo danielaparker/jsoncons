@@ -97,7 +97,7 @@ class float_printer
 {
     uint8_t precision_;
 public:
-    float_printer(int precision)
+    float_printer(uint8_t precision)
         : precision_(precision)
     {
     }
@@ -153,7 +153,7 @@ public:
             for(;;) 
             {
                 i = decimal_point / k;
-                os.put(i + '0');
+                os.put(static_cast<CharT>(i) + '0');
                 if (--j <= 0)
                     break;
                 decimal_point -= i*k;
@@ -267,7 +267,7 @@ public:
         _free_locale(locale_);
     }
 
-    double read(const char* s, size_t length)
+    double read(const char* s, size_t)
     {
         const char *begin = s;
         char *end = nullptr;

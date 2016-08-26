@@ -19,7 +19,7 @@ using namespace jsoncons;
 BOOST_AUTO_TEST_SUITE(double_to_string_test_suite)
 
 template<class CharT>
-std::basic_string<CharT> float_to_string(double val, int precision)
+std::basic_string<CharT> float_to_string(double val, uint8_t precision)
 {
     std::basic_ostringstream<CharT> ss;
     ss.imbue(std::locale::classic());

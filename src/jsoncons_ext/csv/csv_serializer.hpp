@@ -253,6 +253,8 @@ private:
 
     void do_double_value(double val, uint8_t precision) override
     {
+        (void)precision;
+
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0)

@@ -372,7 +372,7 @@ public:
         {
             init_variant(var);
         }
-        explicit variant(const variant& var, const Allocator& a)
+        explicit variant(const variant& var, const Allocator&)
             : type_(var.type_)
         {
             init_variant(var);
@@ -765,9 +765,9 @@ public:
                     case value_types::integer_t:
                         return value_.integer_val_ == rhs.value_.integer_val_;
                     case value_types::uinteger_t:
-                        return value_.integer_val_ == rhs.value_.uinteger_val_;
+                        return value_.integer_val_ >= 0 && (static_cast<uint64_t>(value_.integer_val_) == rhs.value_.uinteger_val_);
                     case value_types::double_t:
-                        return value_.integer_val_ == rhs.value_.double_val_;
+                        return static_cast<double>(value_.integer_val_) == rhs.value_.double_val_;
                     default:
                         break;
                     }
@@ -776,11 +776,11 @@ public:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.uinteger_val_ == rhs.value_.integer_val_;
+                        return value_.uinteger_val_ == static_cast<uint64_t>(rhs.value_.integer_val_) && rhs.value_.integer_val_ >= 0;
                     case value_types::uinteger_t:
                         return value_.uinteger_val_ == rhs.value_.uinteger_val_;
                     case value_types::double_t:
-                        return value_.uinteger_val_ == rhs.value_.double_val_;
+                        return static_cast<double>(value_.uinteger_val_) == rhs.value_.double_val_;
                     default:
                         break;
                     }
@@ -789,9 +789,9 @@ public:
                     switch (rhs.type_)
                     {
                     case value_types::integer_t:
-                        return value_.double_val_ == rhs.value_.integer_val_;
+                        return value_.double_val_ == static_cast<double>(rhs.value_.integer_val_);
                     case value_types::uinteger_t:
-                        return value_.double_val_ == rhs.value_.uinteger_val_;
+                        return value_.double_val_ == static_cast<double>(rhs.value_.uinteger_val_);
                     case value_types::double_t:
                         return value_.double_val_ == rhs.value_.double_val_;
                     default:

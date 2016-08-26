@@ -26,6 +26,8 @@ void escape_attribute(const CharT* s,
                       const basic_output_format<CharT>& format,
                       buffered_ostream<CharT>& bos)
 {
+    (void)format;
+
     const CharT* begin = s;
     const CharT* end = s + length;
     for (const CharT* it = begin; it != end; ++it)
@@ -98,6 +100,8 @@ void escape_value(const CharT* s,
                   const basic_output_format<CharT>& format,
                   buffered_ostream<CharT>& bos)
 {
+    (void)format;
+
     const CharT* begin = s;
     const CharT* end = s + length;
     for (const CharT* it = begin; it != end; ++it)

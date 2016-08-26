@@ -24,7 +24,7 @@ class my_parse_error_handler : public parse_error_handler
 private:
 
     bool do_error(std::error_code ec,
-                  const parsing_context& context) override
+                  const parsing_context&) override
     {
         if (ec == jsoncons::json_parser_errc::extra_comma)
         {
