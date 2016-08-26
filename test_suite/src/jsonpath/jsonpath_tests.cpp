@@ -698,15 +698,22 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)
 )");
 
     json result1 = json_query(val, "$[firstName,lastName]");
-    BOOST_CHECK_EQUAL(expected,result1);
+    BOOST_CHECK_EQUAL(expected, result1);
 
     json result2 = json_query(val, "$['firstName','lastName']");
-    BOOST_CHECK_EQUAL(expected,result2);
+    BOOST_CHECK_EQUAL(expected, result2);
 
     json result3 = json_query(val, "$[\"firstName\",\"lastName\"]");
-    BOOST_CHECK_EQUAL(expected,result3);
-}
+    BOOST_CHECK_EQUAL(expected, result3);
 
+    json expected4 = json::parse(R"(
+["John","Nara"]
+)");
+    std::string path4 = "$..['firstName','city']";
+
+    json result4 = json_query(val, path4);
+    BOOST_CHECK_EQUAL(expected4, result4);
+}
 BOOST_AUTO_TEST_SUITE_END()
 
 
