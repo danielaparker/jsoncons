@@ -488,6 +488,7 @@ public:
                     break;
                 case ',':
                     select_values(buffer_);
+                    state_ = states::left_bracket;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = start_*10 + static_cast<size_t>(*p_-'0');
