@@ -144,7 +144,6 @@ private:
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
-    states pre_line_break_state_;
 
     void transfer_nodes()
     {
@@ -205,37 +204,9 @@ public:
         {
             switch (state_)
             {
-            case states::cr:
-                ++line_;
-                column_ = 1;
-                switch (*p_)
-                {
-                case '\n':
-                    state_ = pre_line_break_state_;
-                    ++p_;
-                    ++column_;
-                    break;
-                default:
-                    state_ = pre_line_break_state_;
-                    break;
-                }
-                break;
-            case states::lf:
-                ++line_;
-                column_ = 1;
-                state_ = pre_line_break_state_;
-                break;
             case states::start: 
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ' ':case '\t':
                     ++p_;
                     ++column_;
@@ -273,14 +244,6 @@ public:
             case states::expect_unquoted_name_or_left_bracket:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case '.':
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_name, *this);
                     ++p_;
@@ -306,14 +269,6 @@ public:
             case states::expect_dot_or_left_bracket: 
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ' ':case '\t':
                     ++p_;
                     ++column_;
@@ -334,14 +289,6 @@ public:
             case states::expect_comma_or_right_bracket:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ',':
                     state_ = states::left_bracket;
                     break;
@@ -361,14 +308,6 @@ public:
             case states::left_bracket_step:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case '-':
                     positive_step_ = false;
                     state_ = states::left_bracket_step2;
@@ -389,14 +328,6 @@ public:
             case states::left_bracket_step2:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
@@ -412,14 +343,6 @@ public:
             case states::left_bracket_end:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case '-':
                     positive_end_ = false;
                     state_ = states::left_bracket_end2;
@@ -445,14 +368,6 @@ public:
             case states::left_bracket_end2:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ':':
                     step_ = 0;
                     state_ = states::left_bracket_step;
@@ -473,14 +388,6 @@ public:
             case states::left_bracket_start:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ':':
                     step_ = 1;
                     end_undefined_ = true;
@@ -507,14 +414,6 @@ public:
             case states::left_bracket:
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case ' ':case '\t':
                     ++p_;
                     ++column_;
@@ -578,12 +477,6 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case ',':
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
-                    break;
-                case ']':
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
-                    break;
                 case '*':
                     end_all();
                     state_ = states::expect_comma_or_right_bracket;
@@ -601,29 +494,13 @@ public:
                     ++column_;
                     break;
                 default:
-                    if ((*p_ >= 'a' && *p_ <= 'z') || (*p_ >= 'A' && *p_ <= 'Z') || *p_ == '_')
-                    {
-                        state_ = states::left_bracket_unquoted_string;
-                    }
-                    else
-                    {
-                        ++p_;
-                        ++column_;
-                    }
+                    err_handler_->fatal_error(jsonpath_parser_errc::left_bracket_invalid_char, *this);
                     break;
                 }
                 break;
             case states::unquoted_name: 
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    break;
                 case '[':
                     select_values(buffer_);
                     transfer_nodes();
@@ -647,16 +524,6 @@ public:
             case states::left_bracket_unquoted_string: 
                 switch (*p_)
                 {
-                case '\r':
-                    pre_line_break_state_ = state_;
-                    state_ = states::cr;
-                    ++p_; ++column_;
-                    break;
-                case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = states::lf;
-                    ++p_; ++column_;
-                    break;
                 case ',':
                 case ']':
                     select_values(buffer_);
