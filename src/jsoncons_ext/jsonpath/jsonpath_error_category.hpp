@@ -25,7 +25,7 @@ enum class jsonpath_parser_errc
     invalid_filter_expected_right_brace = 9,
     invalid_filter_expected_primary = 10,
     expected_index = 11,
-    left_bracket_invalid_char = 12
+    expected_left_bracket_token = 12
 };
 
 class jsonpath_error_category_impl
@@ -62,7 +62,7 @@ public:
             return "Invalid path filter, expected right brace }";
         case jsonpath_parser_errc::invalid_filter_expected_primary:
             return "Invalid path filter, expected primary expression.";
-        case jsonpath_parser_errc::left_bracket_invalid_char:
+        case jsonpath_parser_errc::expected_left_bracket_token:
             return "Expected ?,',\",0-9,*";
         default:
             return "Unknown jsonpath parser error";

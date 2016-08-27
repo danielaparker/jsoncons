@@ -494,7 +494,7 @@ public:
                     ++column_;
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_parser_errc::left_bracket_invalid_char, *this);
+                    err_handler_->fatal_error(jsonpath_parser_errc::expected_left_bracket_token, *this);
                     break;
                 }
                 break;
