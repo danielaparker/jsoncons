@@ -106,7 +106,6 @@ enum class states
     left_bracket_single_quoted_string,
     left_bracket_double_quoted_string,
     left_bracket,
-    left_bracket_unquoted_string,
     left_bracket_start,
     left_bracket_end,
     left_bracket_end2,
@@ -520,20 +519,6 @@ public:
                 };
                 ++p_;
                 ++column_;
-                break;
-            case states::left_bracket_unquoted_string: 
-                switch (*p_)
-                {
-                case ',':
-                case ']':
-                    select_values(buffer_);
-                    state_ = states::expect_comma_or_right_bracket;
-                    break;
-                default:
-                    buffer_.push_back(*p_);
-                    ++p_; ++column_;
-                    break;
-                };
                 break;
             case states::left_bracket_single_quoted_string: 
                 switch (*p_)
