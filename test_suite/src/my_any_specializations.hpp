@@ -12,6 +12,8 @@
 
 namespace jsoncons {
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 template<> inline 
 void serialize(json_output_handler& os, const boost::numeric::ublas::matrix<double>& A)
 {
@@ -27,6 +29,7 @@ void serialize(json_output_handler& os, const boost::numeric::ublas::matrix<doub
     }
     os.end_array();
 }
+#endif
 
 }
 

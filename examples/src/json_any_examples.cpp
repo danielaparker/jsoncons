@@ -12,6 +12,8 @@ using std::string;
 
 void put_any_value_in_object()
 {
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     json obj;
     std::vector<double> v(4);
     v[0] = 0;
@@ -28,10 +30,13 @@ void put_any_value_in_object()
         std::cout << v1[i] << " ";
     }
     std::cout << std::endl;
+#endif
 }
 
 void put_any_value_in_arry()
 {
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     json arr = json::make_array();
     std::vector<double> v(4);
     v[0] = 0;
@@ -50,6 +55,7 @@ void put_any_value_in_arry()
         std::cout << v1[i] << " ";
     }
     std::cout << std::endl;
+#endif
 }
 
 void json_any_examples()

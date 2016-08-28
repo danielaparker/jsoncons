@@ -19,6 +19,8 @@
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 BOOST_AUTO_TEST_SUITE(json_any_test_suite)
 
 bool check_any_exception( jsoncons::json_exception const& ex ) { return true; }
@@ -133,5 +135,5 @@ BOOST_AUTO_TEST_CASE(test_any_array)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
+#endif
 

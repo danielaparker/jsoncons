@@ -251,10 +251,12 @@ BOOST_AUTO_TEST_CASE(test_is_type)
     BOOST_CHECK(obj["array"].is_array());
     BOOST_CHECK(obj["array"].is<json::array>());
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     matrix<double> A;
     obj.set("my-any",json::any(A));
     BOOST_CHECK(obj["my-any"].is<json::any>());
-
+#endif
     // tests for json is_type methods
 
     json str = obj["string"];

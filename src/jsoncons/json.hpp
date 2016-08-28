@@ -58,6 +58,8 @@ void destroy_impl(const Allocator& allocator, T* p)
     alloc.deallocate(p,1);
 }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
 template <class CharT, class Allocator>
 class serializable_any
 {
@@ -185,6 +187,7 @@ void serialize(basic_json_output_handler<CharT>& os, const T&)
 {
     os.value(null_type());
 }
+#endif
 
 enum class value_types : uint8_t 
 {
@@ -199,8 +202,11 @@ enum class value_types : uint8_t
     // Non simple types
     string_t,
     object_t,
-    array_t,
+    array_t
+#if !defined(JSONCONS_NO_DEPRECATED)
+    ,
     any_t
+#endif
 };
 
 inline
@@ -236,7 +242,10 @@ public:
 
     typedef json_array<json_type,array_allocator> array;
     typedef json_object<string_type,json_type,json_traits_type::is_object_sorted,object_allocator> object;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
     typedef serializable_any<char_type,Allocator> any;
+#endif
 
     typedef jsoncons::null_type null_type;
 
@@ -426,12 +435,13 @@ public:
             value_.array_val_ = create_impl<array>(a, std::move(val), array_allocator(a));
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
         explicit variant(const any& val, const Allocator& a)
             : type_(value_types::any_t)
         {
             value_.any_val_ = create_impl<any>(a, val);
         }
-
+#endif
         explicit variant(null_type)
             : type_(value_types::null_t)
         {
@@ -556,9 +566,12 @@ public:
             case value_types::object_t:
                 value_.object_val_ = create_impl<object>(var.value_.object_val_->get_allocator(), *(var.value_.object_val_), object_allocator(var.value_.object_val_->get_allocator()));
                 break;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
             case value_types::any_t:
                 value_.any_val_ = create_impl<any>(var.value_.any_val_->get_allocator(), *(var.value_.any_val_));
                 break;
+#endif
             default:
                 break;
             }
@@ -583,9 +596,12 @@ public:
             case value_types::object_t:
                 destroy_impl(value_.object_val_->get_allocator(), value_.object_val_);
                 break;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
             case value_types::any_t:
                 destroy_impl(value_.any_val_->get_allocator(), value_.any_val_);
                 break;
+#endif
             default:
                 break; 
             }
@@ -741,13 +757,14 @@ public:
             type_ = value_types::null_t;
         }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
         void assign(const any& rhs)
         {
             destroy_variant();
             type_ = value_types::any_t;
             value_.any_val_ = create_impl<any>(rhs.get_allocator(), rhs);
         }
-
+#endif
         bool operator!=(const variant& rhs) const
         {
             return !(*this == rhs);
@@ -821,8 +838,11 @@ public:
             case value_types::object_t:
                 return (type_ == rhs.type_ && *(value_.object_val_) == *(rhs.value_.object_val_)) || (rhs.type_ == value_types::empty_object_t && empty());
                 break;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
             case value_types::any_t:
                 return type_ == rhs.type_;
+#endif
             default:
                 // throw
                 break;
@@ -894,7 +914,9 @@ public:
             bool bool_val_;
             object* object_val_;
             array* array_val_;
+#if !defined(JSONCONS_NO_DEPRECATED)
             any* any_val_;
+#endif
             string_data* string_val_;
             char_type small_string_val_[sizeof(int64_t)/sizeof(char_type)];
         } value_;
@@ -1056,12 +1078,13 @@ public:
         {
             return evaluate().is_array();
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
  
         bool is_any() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_any();
         }
-
+#endif
         bool is_integer() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_integer();
@@ -1109,6 +1132,7 @@ public:
         {
             return evaluate().template as<T>(allocator);
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
         any& any_value()
         {
@@ -1119,7 +1143,7 @@ public:
         {
             return evaluate().any_value();
         }
-
+#endif
         bool as_bool() const JSONCONS_NOEXCEPT
         {
             return evaluate().as_bool();
@@ -1150,6 +1174,7 @@ public:
         {
             return evaluate().as_uinteger();
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
         template <class T>
         const T& any_cast() const
@@ -1164,7 +1189,7 @@ public:
             return evaluate().template any_cast<T>();
         }
         // Returns a reference to the custom data associated with name
-
+#endif
         operator basic_json&()
         {
             return evaluate();
@@ -1443,7 +1468,7 @@ public:
 
         friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_proxy& o)
         {
-            o.to_stream(os);
+            o.write(os);
             return os;
         }
 
@@ -1919,9 +1944,11 @@ public:
                 handler.end_array();
             }
             break;
+#if !defined(JSONCONS_NO_DEPRECATED)
         case value_types::any_t:
             var_.value_.any_val_->to_stream(handler);
             break;
+#endif
         default:
             break;
         }
@@ -2034,11 +2061,12 @@ public:
         return var_.type_ == value_types::array_t;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     bool is_any() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::any_t;
     }
-
+#endif 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
         return var_.type_ == value_types::integer_t || (var_.type_ == value_types::uinteger_t && (as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP())));
@@ -2177,8 +2205,10 @@ public:
             return var_.value_.array_val_->size() != 0;
         case value_types::object_t:
             return var_.value_.object_val_->size() != 0;
+#if !defined(JSONCONS_NO_DEPRECATED)
         case value_types::any_t:
             return true;
+#endif
         default:
             return false;
         }
@@ -2300,11 +2330,12 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
         }
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
     any& any_value();
 
     const any& any_value() const;
-
+#endif
     json_type& at(const string_type& name)
     {
         switch (var_.type_)
@@ -2851,12 +2882,13 @@ public:
     {
         a.swap(b);
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
     void assign_any(const typename json_type::any& rhs)
     {
         var_.assign(rhs);
     }
-
+#endif
     void assign_string(const string_type& rhs)
     {
         var_.assign(rhs);
@@ -2887,6 +2919,7 @@ public:
         var_.assign(null_type());
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     template <class T>
     const T& any_cast() const
     {
@@ -2905,7 +2938,7 @@ public:
         }
         return var_.value_.any_val_->template cast<T>();
     }
-
+#endif 
     void assign_integer(int64_t rhs)
     {
         var_.assign(rhs);
@@ -3514,6 +3547,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
     }
     return handler.get_result();
 }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
 template<class CharT,class JsonTraits,class Allocator>
 typename basic_json<CharT,JsonTraits,Allocator>::any& basic_json<CharT,JsonTraits,Allocator>::any_value()
@@ -3542,7 +3576,7 @@ const typename basic_json<CharT,JsonTraits,Allocator>::any& basic_json<CharT,Jso
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an any value");
     }
 }
-
+#endif
 template <class Json>
 std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
 {
