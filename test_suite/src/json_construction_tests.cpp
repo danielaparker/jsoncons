@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 
     std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
-    bool first_aid_certification = obj.get("first_aid_certification",false).as<bool>();
+    bool first_aid_certification = obj.get_with_default("first_aid_certification",false);
 
     std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
 }

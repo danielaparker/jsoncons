@@ -477,13 +477,13 @@ vertical-align:1px;
 
 <h3>From a string</h3>
 
-<div class="highlight highlight-source-c++"><pre>    std::string input = R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>    std::string input = <span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">    {</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>first_name<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>Jane<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>last_name<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>Roe<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>events_attended<span class="pl-s"><span class="pl-pds">"</span>:10</span>
+<span class="pl-s">        "first_name":"Jane",</span>
+<span class="pl-s">        "last_name":"Roe",</span>
+<span class="pl-s">        "events_attended":10</span>
 <span class="pl-s">    }</span>
-<span class="pl-s">    )<span class="pl-pds">"</span></span>;
+<span class="pl-s">    <span class="pl-pds">)"</span></span>;
 
     json val = json::parse(input);
 
@@ -643,7 +643,7 @@ vertical-align:1px;
 
     std::string experience = obj.count(<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].as&lt;std::string&gt;() : <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
 
-    <span class="pl-k">bool</span> first_aid_certification = obj.get(<span class="pl-s"><span class="pl-pds">"</span>first_aid_certification<span class="pl-pds">"</span></span>,<span class="pl-c1">false</span>).as&lt;<span class="pl-k">bool</span>&gt;();
+    <span class="pl-k">bool</span> first_aid_certification = obj.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>first_aid_certification<span class="pl-pds">"</span></span>,<span class="pl-c1">false</span>);
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>experience=<span class="pl-pds">"</span></span> &lt;&lt; experience &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, first_aid_certification=<span class="pl-pds">"</span></span> &lt;&lt; first_aid_certification &lt;&lt; std::endl;</pre></div>
 

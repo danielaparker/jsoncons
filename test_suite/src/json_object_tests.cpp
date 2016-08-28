@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_get)
 
     std::string s1 = a.at("field1").as<std::string>();
     std::string s1a = a.at("field1").as<std::string>();
-    std::string s2 = a.get("field2","null").as<std::string>();
+    std::string s2 = a.get_with_default("field2","null");
     BOOST_REQUIRE_THROW(a.at("field2"), json_exception);
 
     BOOST_CHECK(s1 == std::string("value1"));

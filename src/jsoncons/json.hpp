@@ -1305,6 +1305,17 @@ public:
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
+        template <class T>
+        T get_with_default(const string_type& name, const T& default_val) const
+        {
+            return evaluate().get_with_default(name,default_val);
+        }
+
+        const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+        {
+            return evaluate().get_with_default(name,default_val);
+        }
+
         void shrink_to_fit()
         {
             evaluate_with_default().shrink_to_fit();
@@ -2560,6 +2571,61 @@ public:
                 else
                 {
                     return json_type(std::forward<T>(default_val));
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    template<class T>
+    T get_with_default(const string_type& name, const T& default_val) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            {
+                return default_val;
+            }
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
+                if (it != members().end())
+                {
+                    return it->value().as<T>();
+                }
+                else
+                {
+                    return default_val;
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+            }
+        }
+    }
+
+    const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+    {
+        switch (var_.type_)
+        {
+        case value_types::empty_object_t:
+            {
+                return default_val;
+            }
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
+                if (it != members().end())
+                {
+                    return it->value().as<const CharT*>();
+                }
+                else
+                {
+                    return default_val;
                 }
             }
         default:

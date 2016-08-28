@@ -587,12 +587,12 @@ title=Cutter's Way
 <li>
 <code>book["price"]</code> will throw <code>std::out_of_range</code> if there is no price</li>
 <li>
-<code>book.get("price",default_value)</code> will return <code>default_value</code> if there is no price</li>
+<code>book.get_with_default("price","n/a")</code> will return the price converted into a string, or "n/a" if there is no price.</li>
 </ul>
 
 <p>So if you want to show "n/a" for the missing price, you can use this accessor</p>
 
-<div class="highlight highlight-source-c++"><pre>std::string price = book.get(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();</pre></div>
+<div class="highlight highlight-source-c++"><pre>std::string price = book.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>);</pre></div>
 
 <p>Or you can check if book has a member "price" with the method <code>count</code>, and output accordingly,</p>
 
@@ -941,11 +941,11 @@ o.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::wjson;
 
 wjson root;
-root[L<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>;
-root[L<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">3.9</span>;
-root[L<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field1<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>test<span class="pl-pds">"</span></span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">3.9</span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
 
-std::wcout &lt;&lt; root &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
+std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
 
 <p>which prints</p>
 
@@ -955,14 +955,14 @@ std::wcout &lt;&lt; root &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</sp
 
 <p>The <code>ojson</code> (wojson) class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> (<code>wchar_t</code>) as the character type and keeps object members in their original order. </p>
 
-<div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>street_number<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">100</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>street_name<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Queen St W<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>city<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Toronto<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>country<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Canada<span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">    "street_number" : "100",</span>
+<span class="pl-s">    "street_name" : "Queen St W",</span>
+<span class="pl-s">    "city" : "Toronto",</span>
+<span class="pl-s">    "country" : "Canada"</span>
 <span class="pl-s">}</span>
-<span class="pl-s">)<span class="pl-pds">"</span></span>);
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
@@ -1096,12 +1096,12 @@ void add(T val)</pre></div>
     <span class="pl-k">using</span> jsoncons::json;
     <span class="pl-k">using</span> boost::gregorian::date;
 
-    json deal = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+    json deal = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">    {</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>Maturity<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">10</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>ObservationDates<span class="pl-s"><span class="pl-pds">"</span>: [<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">21</span><span class="pl-s"><span class="pl-pds">"</span>]</span>
+<span class="pl-s">        "Maturity":"2014-10-14",</span>
+<span class="pl-s">        "ObservationDates": ["2014-02-14","2014-02-21"]</span>
 <span class="pl-s">    }</span>
-<span class="pl-s">    )<span class="pl-pds">"</span></span>);
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
 
     deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">28</span>));    
 

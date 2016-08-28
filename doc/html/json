@@ -883,6 +883,18 @@ const json get(const string_type&amp; name, T&amp;&amp; default_val) const
 Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>template &lt;class T&gt;
+T get_with_default(const string_type&amp; name, const T&amp; default_val) const
+</code></pre>
+
+<p>If <code>name</code> matches the name of a member in the json object, returns the member value converted into the specified type, otherwise returns <code>default_val</code>.<br>
+Throws <code>std::runtime_error</code> if not an object.</p>
+
+<pre><code>const char_type* get_with_default(const string_type&amp; name, const char_type* default_val) const
+</code></pre>
+
+<p>Make <code>get_with_default</code> do the right thing for string literals.</p>
+
+<pre><code>template &lt;class T&gt;
 T as() const
 </code></pre>
 
@@ -1101,16 +1113,16 @@ std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT
 
 <h3>Range-based for loop over members of an object</h3>
 
-<div class="highlight highlight-source-c++"><pre>json book = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>json book = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>category<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Fiction<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>title<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Pulp<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>author<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Charles Bukowski<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>date<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">2004</span>-<span class="pl-c1">07</span>-<span class="pl-c1">08</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>price<span class="pl-s"><span class="pl-pds">"</span> : 22.48,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>isbn<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">1852272007</span><span class="pl-s"><span class="pl-pds">"</span>  </span>
+<span class="pl-s">    "category" : "Fiction",</span>
+<span class="pl-s">    "title" : "Pulp",</span>
+<span class="pl-s">    "author" : "Charles Bukowski",</span>
+<span class="pl-s">    "date" : "2004-07-08",</span>
+<span class="pl-s">    "price" : 22.48,</span>
+<span class="pl-s">    "isbn" : "1852272007"  </span>
 <span class="pl-s">}</span>
-<span class="pl-s">)<span class="pl-pds">"</span></span>);
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.members())
 {
@@ -1152,8 +1164,8 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"
 <span class="pl-k">double</span> x1 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">10.0</span>;
 <span class="pl-k">double</span> x2 = obj.count(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span> ? obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() : <span class="pl-c1">20.0</span>;
 
-string_type x3 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>).as&lt;string_type&gt;();
-string_type x4 = obj.get(<span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>San Francisco<span class="pl-pds">"</span></span>).as&lt;string_type&gt;();
+std::string x3 = obj.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
+std::string x4 = obj.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>San Francisco<span class="pl-pds">"</span></span>);
 
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x1=<span class="pl-pds">"</span></span> &lt;&lt; x1 &lt;&lt; std::endl;
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x2=<span class="pl-pds">"</span></span> &lt;&lt; x2 &lt;&lt; std::endl;

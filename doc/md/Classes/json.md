@@ -257,6 +257,14 @@ If `name` matches the name of a member in the json object, returns a copy of the
 Throws `std::runtime_error` if not an object.
 
     template <class T>
+    T get_with_default(const string_type& name, const T& default_val) const
+If `name` matches the name of a member in the json object, returns the member value converted into the specified type, otherwise returns `default_val`.
+Throws `std::runtime_error` if not an object.
+
+    const char_type* get_with_default(const string_type& name, const char_type* default_val) const
+Make `get_with_default` do the right thing for string literals.
+
+    template <class T>
     T as() const
 Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
 
@@ -464,8 +472,8 @@ obj["field3"] = "Toronto";
 double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
 double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
 
-string_type x3 = obj.get("field3","Montreal").as<string_type>();
-string_type x4 = obj.get("field4","San Francisco").as<string_type>();
+std::string x3 = obj.get_with_default("field3","Montreal");
+std::string x4 = obj.get_with_default("field4","San Francisco");
 
 std::cout << "x1=" << x1 << std::endl;
 std::cout << "x2=" << x2 << std::endl;

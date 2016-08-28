@@ -372,11 +372,14 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     std::cout << "x1=" << x1 << std::endl;
     std::cout << "x2=" << x2 << std::endl;
 
-    std::string x3 = obj.get("field3", "Montreal").as<std::string>();
-    std::string x4 = obj.get("field4", "San Francisco").as<std::string>();
+    std::string s1 = obj.get_with_default("field3", "Montreal");
+    std::string s2 = obj.get_with_default("field4", "San Francisco");
 
-    std::cout << "x3=" << x3 << std::endl;
-    std::cout << "x4=" << x4 << std::endl;
+    BOOST_CHECK_EQUAL(s1,"Toronto");
+    BOOST_CHECK_EQUAL(s2,"San Francisco");
+
+    //std::cout << "x3=" << x3 << std::endl;
+    //std::cout << "x4=" << x4 << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_big_file)
