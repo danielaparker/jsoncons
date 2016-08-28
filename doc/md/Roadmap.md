@@ -1,10 +1,6 @@
-For next release (0.99):
+- Support [JSON Content Rules v07](https://raw.githubusercontent.com/arineng/jcr/07/draft-newton-json-content-rules.txt) for schema validation in `jsoncons_ext`
 
-- Full support for AllocatorAwareContainer concept
-
-For subsequent releases:
-
-- Support [JSON Content Rules](http://www.ietf.org/id/draft-newton-json-content-rules-05.txt) for schema validation in `jsoncons_ext`
+- Enhanced support for stateful allocators
 
 - Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) 
 
