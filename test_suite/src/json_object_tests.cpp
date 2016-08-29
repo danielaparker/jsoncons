@@ -165,6 +165,18 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     BOOST_CHECK_EQUAL(std::string("null"),s2);
 }
 
+BOOST_AUTO_TEST_CASE(test_set_and_proxy_set)
+{
+    json a;
+
+    a.set("object1",json());
+    a.set("field1","value1");
+    a["object1"].set("field2","value2");
+
+    BOOST_CHECK_EQUAL(std::string("value1"),a["field1"].as<std::string>());
+    BOOST_CHECK_EQUAL(std::string("value2"),a["object1"]["field2"].as<std::string>());
+}
+
 BOOST_AUTO_TEST_CASE(test_const_member_read)
 {
     json a;
