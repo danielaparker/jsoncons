@@ -666,10 +666,16 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 <p>Move with allocator</p>
 
 <pre><code>template &lt;class T&gt;
-json(T val, const allocator_type&amp; allocator=allocator_type())
+json(const T&amp; val, const allocator_type&amp; allocator=allocator_type())
 </code></pre>
 
 <p>Constructs a <code>json</code> value for types supported in <a href="json_type_traits">json_type_traits</a>.</p>
+
+<pre><code>template &lt;class T&gt;
+json(const CharT* val, const allocator_type&amp; allocator=allocator_type())
+</code></pre>
+
+<p>Constructs a <code>json</code> value for string literals.</p>
 
 <pre><code>template &lt;class InputIterator&gt;
 json(InputIterator first, InputIterator last, 
@@ -694,10 +700,13 @@ json&amp; operator=(json&amp;&amp; rhs)
 <p>Assigns a new <code>json</code> value to a <code>json</code> variable, replacing it's current contents.</p>
 
 <pre><code>template &lt;class T&gt;
-json&amp; operator=(T rhs)
+json&amp; operator=(const T&amp; rhs)
 </code></pre>
 
 <p>Assigns the templated value to a <code>json</code> variable using <a href="json_type_traits">json_type_traits</a>.</p>
+
+<pre><code>json&amp; operator=(const char_type* rhs)
+</code></pre>
 
 <h3>Ranges and Iterators</h3>
 

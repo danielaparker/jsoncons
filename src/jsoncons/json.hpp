@@ -1192,9 +1192,15 @@ public:
 #endif
 
         template <class T>
-        json_proxy& operator=(T val)
+        json_proxy& operator=(const T& val)
         {
             parent_.evaluate_with_default().set(name_, json_type(val));
+            return *this;
+        }
+
+        json_proxy& operator=(const char_type* s)
+        {
+            parent_.evaluate_with_default().set(name_, json_type(s));
             return *this;
         }
 
@@ -1821,9 +1827,16 @@ public:
     }
 
     template <class T>
-    json_type& operator=(T val)
+    json_type& operator=(const T& val)
     {
         json_type_traits<json_type,T>::assign(*this,val);
+        return *this;
+    }
+
+    json_type& operator=(const char_type* s)
+    {
+        size_t length = std::char_traits<char_type>::length(s);
+        assign_string(s,length);
         return *this;
     }
 

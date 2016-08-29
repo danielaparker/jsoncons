@@ -103,8 +103,12 @@ Acquires the contents of val, leaving val a `null` value
 Move with allocator
 
     template <class T>
-    json(T val, const allocator_type& allocator=allocator_type())
+    json(const T& val, const allocator_type& allocator=allocator_type())
 Constructs a `json` value for types supported in [json_type_traits](json_type_traits).
+
+    template <class T>
+    json(const CharT* val, const allocator_type& allocator=allocator_type())
+Constructs a `json` value for string literals.
 
     template <class InputIterator>
     json(InputIterator first, InputIterator last, 
@@ -124,8 +128,10 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
 Assigns a new `json` value to a `json` variable, replacing it's current contents.
 
     template <class T>
-    json& operator=(T rhs)
+    json& operator=(const T& rhs)
 Assigns the templated value to a `json` variable using [json_type_traits](json_type_traits).
+
+    json& operator=(const char_type* rhs)
 
 ### Ranges and Iterators
 
