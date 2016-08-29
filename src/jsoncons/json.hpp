@@ -1190,15 +1190,6 @@ public:
         }
         // Returns a reference to the custom data associated with name
 #endif
-        operator basic_json&()
-        {
-            return evaluate();
-        }
-
-        operator const basic_json&() const
-        {
-            return evaluate();
-        }
 
         template <class T>
         json_proxy& operator=(T val)
@@ -1777,10 +1768,15 @@ public:
     }
 
     template <class T>
-    basic_json(T val)
+    basic_json(const T& val)
         : var_(null_type())
     {
         json_type_traits<json_type,T>::assign(*this,val);
+    }
+
+    basic_json(const char_type* s, const Allocator& allocator = Allocator())
+        : var_(s,allocator)
+    {
     }
 
     basic_json(double val, uint8_t precision)
