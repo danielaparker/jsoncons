@@ -148,6 +148,7 @@ private:
     {
         stack_.push_back(nodes_);
         nodes_.clear();
+        recursive_descent_ = false;
     }
 
 public:
