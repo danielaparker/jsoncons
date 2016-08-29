@@ -116,7 +116,7 @@ Note that the third book, Cutter's Way, is missing a price.
 You have a choice of object member accessors:
 
 - `book["price"]` will throw `std::out_of_range` if there is no price
-- `book.get_with_default("price","n/a")` will return the price converted into a string, or "n/a" if there is no price.
+- `book.get_with_default("price","n/a")` will return the price converted to the default's data type, or "n/a" if there is no price.
 
 So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++

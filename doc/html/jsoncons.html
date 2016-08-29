@@ -587,7 +587,7 @@ title=Cutter's Way
 <li>
 <code>book["price"]</code> will throw <code>std::out_of_range</code> if there is no price</li>
 <li>
-<code>book.get_with_default("price","n/a")</code> will return the price converted into a string, or "n/a" if there is no price.</li>
+<code>book.get_with_default("price","n/a")</code> will return the price converted to the default's data type, or "n/a" if there is no price.</li>
 </ul>
 
 <p>So if you want to show "n/a" for the missing price, you can use this accessor</p>

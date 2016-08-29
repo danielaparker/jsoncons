@@ -886,7 +886,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 T get_with_default(const string_type&amp; name, const T&amp; default_val) const
 </code></pre>
 
-<p>If <code>name</code> matches the name of a member in the json object, returns the member value converted into the specified type, otherwise returns <code>default_val</code>.<br>
+<p>If <code>name</code> matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns <code>default_val</code>.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>const char_type* get_with_default(const string_type&amp; name, const char_type* default_val) const

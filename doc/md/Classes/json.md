@@ -258,7 +258,7 @@ Throws `std::runtime_error` if not an object.
 
     template <class T>
     T get_with_default(const string_type& name, const T& default_val) const
-If `name` matches the name of a member in the json object, returns the member value converted into the specified type, otherwise returns `default_val`.
+If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.
 
     const char_type* get_with_default(const string_type& name, const char_type* default_val) const
