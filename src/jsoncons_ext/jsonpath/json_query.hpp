@@ -143,6 +143,7 @@ private:
     const char_type* begin_input_;
     const char_type* end_input_;
     const char_type* p_;
+    std::vector<string_type> names_;
 
     void transfer_nodes()
     {
@@ -293,6 +294,7 @@ public:
                     state_ = states::left_bracket;
                     break;
                 case ']':
+                    select_values1();
                     transfer_nodes();
                     state_ = states::expect_dot_or_left_bracket;
                     break;
@@ -525,7 +527,9 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    select_values(buffer_);
+                    //select_values(buffer_);
+                    names_.push_back(buffer_);
+                    buffer_.clear();
                     state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
@@ -548,7 +552,9 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    select_values(buffer_);
+                    //select_values(buffer_);
+                    names_.push_back(buffer_);
+                    buffer_.clear();
                     state_ = states::expect_comma_or_right_bracket;
                     break;
                 case '\\':
@@ -721,6 +727,73 @@ public:
             }
         }
         buffer_.clear();
+    }
+
+    void select_values1()
+    {
+        if (names_.size() > 0)
+        {
+            for (size_t i = 0; i < stack_.back().size(); ++i)
+            {
+                select_values2(*(stack_.back()[i]));
+            }
+            names_.clear();
+        }
+    }
+
+    void select_values2(const Json& context_val)
+    {
+        if (context_val.is_object())
+        {
+            for (const auto& name : names_)
+            {
+                if (context_val.count(name) > 0)
+                {
+                    nodes_.push_back(std::addressof(context_val.at(name)));
+                }
+            }
+            if (recursive_descent_)
+            {
+                for (auto it = context_val.members().begin(); it != context_val.members().end(); ++it)
+                {
+                    if (it->value().is_object() || it->value().is_array())
+                    {
+                        select_values2(it->value());
+                    }
+                }
+            }
+        }
+        else if (context_val.is_array())
+        {
+            for (const auto& name : names_)
+            {
+                size_t pos = 0;
+                if (try_string_to_index(name.data(),name.size(),&pos))
+                {
+                    size_t index = positive_start_ ? pos : context_val.size() - pos;
+                    if (index < context_val.size())
+                    {
+                        nodes_.push_back(std::addressof(context_val[index]));
+                    }
+                }
+                else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
+                {
+                    auto q = std::make_shared<Json>(context_val.size());
+                    temp_.push_back(q);
+                    nodes_.push_back(q.get());
+                }
+            }
+            if (recursive_descent_)
+            {
+                for (auto it = context_val.elements().begin(); it != context_val.elements().end(); ++it)
+                {
+                    if (it->is_object() || it->is_array())
+                    {
+                        select_values2(*it);
+                    }
+                }
+            }
+        }
     }
 
     void select_values(const Json& context_val, const string_type& name)

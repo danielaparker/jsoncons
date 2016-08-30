@@ -38,6 +38,10 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
         {
             scalar_option_ = is_object ? block_options::next_line : block_options::same_line;
         }
+        stack_item(bool is_object, block_options option, block_options scalar_option)
+           : is_object_(is_object), count_(0), option_(option), scalar_option_(scalar_option), multiline_(false)
+        {
+        }
         bool is_multiline() const
         {
             return multiline_;
@@ -156,6 +160,10 @@ private:
                 }
                 stack_.push_back(stack_item(true,format_.array_object_block_option()));
             }
+            else if (format_.root_object_block_option() == block_options::next_line)
+            {
+                stack_.push_back(stack_item(true,format_.root_object_block_option()));
+            }
             else
             {
                 stack_.push_back(stack_item(true));
@@ -213,6 +221,10 @@ private:
                     write_indent();
                 }
                 stack_.push_back(stack_item(false,format_.array_array_block_option()));
+            }
+            else if (format_.root_array_block_option() == block_options::next_line)
+            {
+                stack_.push_back(stack_item(false,format_.root_array_block_option(),format_.root_array_block_option()));
             }
             else
             {

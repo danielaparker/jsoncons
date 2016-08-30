@@ -37,8 +37,10 @@ class basic_output_format
     std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
+    block_options root_array_block_option_;
     block_options object_array_block_option_;
     block_options array_array_block_option_;
+    block_options root_object_block_option_;
     block_options object_object_block_option_;
     block_options array_object_block_option_;
 public:
@@ -58,8 +60,10 @@ public:
         neg_inf_replacement_(json_text_traits<CharT>::null_literal().first),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
+        root_array_block_option_(block_options::same_line),
         object_array_block_option_(block_options::same_line),
         array_array_block_option_(block_options::next_line),
+        root_object_block_option_(block_options::same_line),
         object_object_block_option_(block_options::same_line),
         array_object_block_option_(block_options::next_line)
     {
@@ -67,25 +71,14 @@ public:
 
 //  Accessors
 
-    block_options object_array_block_option()
+    block_options root_array_block_option()
     {
-        return object_array_block_option_;
+        return root_array_block_option_;
     }
 
-    basic_output_format<CharT>& object_array_block_option(block_options value)
+    basic_output_format<CharT>& root_array_block_option(block_options value)
     {
-        object_array_block_option_ = value;
-        return *this;
-    }
-
-    block_options object_object_block_option()
-    {
-        return object_object_block_option_;
-    }
-
-    basic_output_format<CharT>& object_object_block_option(block_options value)
-    {
-        object_object_block_option_ = value;
+        root_array_block_option_ = value;
         return *this;
     }
 
@@ -108,6 +101,39 @@ public:
     basic_output_format<CharT>& array_object_block_option(block_options value)
     {
         array_object_block_option_ = value;
+        return *this;
+    }
+
+    block_options root_object_block_option()
+    {
+        return root_object_block_option_;
+    }
+
+    basic_output_format<CharT>& root_object_block_option(block_options value)
+    {
+        root_object_block_option_ = value;
+        return *this;
+    }
+
+    block_options object_array_block_option()
+    {
+        return object_array_block_option_;
+    }
+
+    basic_output_format<CharT>& object_array_block_option(block_options value)
+    {
+        object_array_block_option_ = value;
+        return *this;
+    }
+
+    block_options object_object_block_option()
+    {
+        return object_object_block_option_;
+    }
+
+    basic_output_format<CharT>& object_object_block_option(block_options value)
+    {
+        object_object_block_option_ = value;
         return *this;
     }
 
