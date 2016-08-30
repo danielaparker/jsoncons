@@ -2603,7 +2603,7 @@ public:
                 const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it != members().end())
                 {
-                    return it->value().as<T>();
+                    return it->value().template as<T>();
                 }
                 else
                 {
@@ -2630,7 +2630,7 @@ public:
                 const_object_iterator it = var_.value_.object_val_->find(name.data(),name.length());
                 if (it != members().end())
                 {
-                    return it->value().as<const CharT*>();
+                    return it->value().template as<const CharT*>();
                 }
                 else
                 {
