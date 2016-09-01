@@ -336,11 +336,6 @@ void escape_string(const CharT* s,
                     os.put(c);
                 }
             }
-            else if (format.escape_solidus() && c == '/')
-            {
-                os.put('\\');
-                os.put('/');
-            }
             else
             {
                 os.put(c);

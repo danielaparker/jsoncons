@@ -355,100 +355,101 @@ public:
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
         variant()
-            : type_(value_types::empty_object_t)
+            : type_(value_types::empty_object_t), length_or_precision_(0)
         {
         }
 
         variant(const Allocator& a)
-            : type_(value_types::object_t)
+            : type_(value_types::object_t), length_or_precision_(0)
         {
             value_.object_val_ = create_impl<object>(a, object_allocator(a));
         }
 
         explicit variant(variant&& var)
-            : type_(value_types::null_t)
+            : type_(value_types::null_t), length_or_precision_(0)
         {
             swap(var);
         }
         
         explicit variant(variant&& var, const Allocator& a)
-            : type_(value_types::null_t)
+            : type_(value_types::null_t), length_or_precision_(0)
         {
             swap(var);
         }
 
         explicit variant(const variant& var)
+            : length_or_precision_(0)
         {
             init_variant(var);
         }
         explicit variant(const variant& var, const Allocator&)
-            : type_(var.type_)
+            : type_(var.type_), length_or_precision_(0)
         {
             init_variant(var);
         }
 
         variant(const object & val)
-            : type_(value_types::object_t)
+            : type_(value_types::object_t), length_or_precision_(0)
         {
             value_.object_val_ = create_impl<object>(val.get_allocator(), val) ;
         }
 
         variant(const object & val, const Allocator& a)
-            : type_(value_types::object_t)
+            : type_(value_types::object_t), length_or_precision_(0)
         {
             value_.object_val_ = create_impl<object>(a, val, object_allocator(a)) ;
         }
 
         variant(object&& val)
-            : type_(value_types::object_t)
+            : type_(value_types::object_t), length_or_precision_(0)
         {
             value_.object_val_ = create_impl<object>(val.get_allocator(), std::move(val));
         }
 
         variant(object&& val, const Allocator& a)
-            : type_(value_types::object_t)
+            : type_(value_types::object_t), length_or_precision_(0)
         {
             value_.object_val_ = create_impl<object>(a, std::move(val), object_allocator(a));
         }
 
         variant(const array& val)
-            : type_(value_types::array_t)
+            : type_(value_types::array_t), length_or_precision_(0)
         {
             value_.array_val_ = create_impl<array>(val.get_allocator(), val);
         }
 
         variant(const array& val, const Allocator& a)
-            : type_(value_types::array_t)
+            : type_(value_types::array_t), length_or_precision_(0)
         {
             value_.array_val_ = create_impl<array>(a, val, array_allocator(a));
         }
 
         variant(array&& val)
-            : type_(value_types::array_t)
+            : type_(value_types::array_t), length_or_precision_(0)
         {
             value_.array_val_ = create_impl<array>(val.get_allocator(), std::move(val));
         }
 
         variant(array&& val, const Allocator& a)
-            : type_(value_types::array_t)
+            : type_(value_types::array_t), length_or_precision_(0)
         {
             value_.array_val_ = create_impl<array>(a, std::move(val), array_allocator(a));
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
         explicit variant(const any& val, const Allocator& a)
-            : type_(value_types::any_t)
+            : type_(value_types::any_t), length_or_precision_(0)
         {
             value_.any_val_ = create_impl<any>(a, val);
         }
 #endif
         explicit variant(null_type)
-            : type_(value_types::null_t)
+            : type_(value_types::null_t), length_or_precision_(0)
         {
         }
 
         explicit variant(bool val)
-            : type_(value_types::bool_t)
+            : type_(value_types::bool_t), length_or_precision_(0)
         {
             value_.bool_val_ = val;
         }
@@ -460,18 +461,19 @@ public:
         }
 
         explicit variant(int64_t val)
-            : type_(value_types::integer_t)
+            : type_(value_types::integer_t), length_or_precision_(0)
         {
             value_.integer_val_ = val;
         }
 
         explicit variant(uint64_t val)
-            : type_(value_types::uinteger_t)
+            : type_(value_types::uinteger_t), length_or_precision_(0)
         {
             value_.uinteger_val_ = val;
         }
 
         explicit variant(const string_type& s, const Allocator& a)
+            : length_or_precision_(0)
         {
             if (s.length() > variant::small_string_capacity)
             {
@@ -489,6 +491,7 @@ public:
         }
 
         explicit variant(const char_type* s, const Allocator& a)
+            : length_or_precision_(0)
         {
             size_t length = std::char_traits<char_type>::length(s);
             if (length > variant::small_string_capacity)
@@ -507,6 +510,7 @@ public:
         }
 
         explicit variant(const char_type* s, size_t length, const Allocator& a)
+            : length_or_precision_(0)
         {
             if (length > variant::small_string_capacity)
             {
@@ -525,7 +529,7 @@ public:
 
         template<class InputIterator>
         variant(InputIterator first, InputIterator last, const Allocator& a)
-            : type_(value_types::array_t)
+            : type_(value_types::array_t), length_or_precision_(0)
         {
             value_.array_val_ = create_impl<array>(a, first, last, array_allocator(a));
         }

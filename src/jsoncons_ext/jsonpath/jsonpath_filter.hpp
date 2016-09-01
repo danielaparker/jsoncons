@@ -707,7 +707,7 @@ class jsonpath_filter_parser
     filter_states pre_line_break_state_;
 public:
     jsonpath_filter_parser(const char_type** expr, size_t* line,size_t* column)
-        : line_(*line), column_(*column),p_(*expr)
+        : line_(*line), column_(*column), depth_(0), p_(*expr)
     {
     }
 

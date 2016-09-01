@@ -83,14 +83,14 @@ class basic_json_parser : private basic_parsing_context<CharT>
     bool is_negative_;
     size_t index_;
     int initial_stack_capacity_;
-    int nesting_depth_;
     int max_depth_;
     float_reader float_reader_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
-    uint8_t precision_;
     std::pair<const CharT*,size_t> literal_;
+    int nesting_depth_;
+    uint8_t precision_;
     size_t literal_index_;
 
 public:
@@ -100,9 +100,13 @@ public:
          column_(0),
          line_(0),
          cp_(0),
+         cp2_(0),
          is_negative_(false),
          index_(0),
-         initial_stack_capacity_(default_initial_stack_capacity_)
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         nesting_depth_(0), 
+         precision_(0), 
+         literal_index_(0)
     {
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
@@ -114,10 +118,13 @@ public:
          column_(0),
          line_(0),
          cp_(0),
+         cp2_(0),
          is_negative_(false),
          index_(0),
-         initial_stack_capacity_(default_initial_stack_capacity_)
-
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         nesting_depth_(0), 
+         precision_(0), 
+         literal_index_(0)
     {
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
