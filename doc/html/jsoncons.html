@@ -814,6 +814,75 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 <li>The <code>column_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
 </ul>
 
+<h3>Pretty print</h3>
+
+<p>The <code>pretty_print</code> function applies stylistic formatting to JSON text. For example</p>
+
+<div class="highlight highlight-source-c++"><pre>    json val;
+
+    val[<span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>};
+    val[<span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>};
+    val[<span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>};
+
+    std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>]
+}</pre></div>
+
+<p>By default, array values in objects are displayed on the same line.</p>
+
+<p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/output_format">output_format</a>, that allows custom formatting of output.<br>
+To display array values in objects on a new line, set the <code>object_array_split_lines</code> property to <code>line_split_kind::new_line</code>. The code</p>
+
+<div class="highlight highlight-source-c++"><pre>    output_format format1;
+    format1.object_array_split_lines(line_split_kind::new_line);
+    std::cout &lt;&lt; pretty_print(val,format1) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>
+    ]
+}
+To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
+```c++
+    output_format format<span class="pl-c1">2</span>;
+    format<span class="pl-c1">2</span>.object_array_split_lines(line_split_kind::multi_line);
+    std::cout &lt;&lt; pretty_print(val,format<span class="pl-c1">2</span>) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">2</span>,
+        <span class="pl-c1">3</span>
+    ]
+}</pre></div>
+
 <h3>JsonPath</h3>
 
 <p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
@@ -901,22 +970,22 @@ std::cout &lt;&lt; result &lt;&lt; std::endl;</pre></div>
 
 <h3>About jsoncons::json</h3>
 
-<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
+<p>The <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
 and sorts object members in alphabetically order.</p>
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
                    JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json;</pre></div>
 
-<p>If you prefer to retain the original insertion order, use <code>ojson</code> instead.</p>
+<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> instead.</p>
 
-<p>The library includes an instantiation for wide characters as well,</p>
+<p>The library includes an instantiation for wide characters as well, <a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a></p>
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
                    JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson;</pre></div>
 
-<p>If you prefer to retain the original insertion order, use <code>wojson</code> instead.</p>
+<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/wojson">wojson</a> instead.</p>
 
 <p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
 

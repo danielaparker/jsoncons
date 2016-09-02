@@ -345,6 +345,78 @@ There are a few things to note about the effect of the parameter settings.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
+### Pretty print
+
+The `pretty_print` function applies stylistic formatting to JSON text. For example
+
+```c++
+    json val;
+
+    val["verts"] = json::array{1, 2, 3};
+    val["normals"] = json::array{1, 0, 1};
+    val["uvs"] = json::array{0, 0, 1, 1};
+
+    std::cout << pretty_print(val) << std::endl;
+```
+produces
+
+```json
+{
+    "normals": [1,0,1],
+    "uvs": [0,0,1,1],
+    "verts": [1,2,3]
+}
+```
+By default, array values in objects are displayed on the same line.
+
+The `pretty_print` function takes an optional second parameter, [output_format](https://github.com/danielaparker/jsoncons/wiki/output_format), that allows custom formatting of output.
+To display array values in objects on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
+```c++
+    output_format format1;
+    format1.object_array_split_lines(line_split_kind::new_line);
+    std::cout << pretty_print(val,format1) << std::endl;
+```
+produces
+```json
+{
+    "normals": [
+        1,0,1
+    ],
+    "uvs": [
+        0,0,1,1
+    ],
+    "verts": [
+        1,2,3
+    ]
+}
+To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
+```c++
+    output_format format2;
+    format2.object_array_split_lines(line_split_kind::multi_line);
+    std::cout << pretty_print(val,format2) << std::endl;
+```
+produces
+```json
+{
+    "normals": [
+        1,
+        0,
+        1
+    ],
+    "uvs": [
+        0,
+        0,
+        1,
+        1
+    ],
+    "verts": [
+        1,
+        2,
+        3
+    ]
+}
+```
+
 ### JsonPath
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
@@ -432,22 +504,22 @@ Result:
 ```
 ### About jsoncons::json
 
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The [json](https://github.com/danielaparker/jsoncons/wiki/json) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
 ```c++
 typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json;
 ```
-If you prefer to retain the original insertion order, use `ojson` instead.
+If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) instead.
 
-The library includes an instantiation for wide characters as well,
+The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson)
 ```c++
 typedef basic_json<wchar_t,
                    JsonTraits = json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use `wojson` instead.
+If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++
