@@ -114,6 +114,22 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle)
     //    std::cout << pretty_print(result) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_union)
+{
+    jsonpath_fixture fixture;
+
+    json root = json::parse(jsonpath_fixture::store_text());
+
+    json result = json_query(root,"$['store']..['author','title']");
+    std::cout << pretty_print(result) << std::endl;
+    //json expected = json::array();
+    //expected.add(fixture.book());
+    //expected.add(fixture.bicycle());
+    //BOOST_CHECK_EQUAL(expected,result);
+
+    //    std::cout << pretty_print(result) << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_star)
 {
     jsonpath_fixture fixture;

@@ -564,127 +564,129 @@ vertical-align:1px;
 
 <h3>json construction</h3>
 
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 
-    <span class="pl-c">// For convenience</span>
-    <span class="pl-k">using</span> jsoncons::json;
+<span class="pl-c">// For convenience</span>
+<span class="pl-k">using</span> jsoncons::json;
 
-    <span class="pl-c">// Construct a book object</span>
-    json book1;
+<span class="pl-c">// Construct a book object</span>
+json book1;
 
-    book1[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
-    book1[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
-    book1[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
-    book1[<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>;
-    book1[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.01</span>;
-    book1[<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>;  
+book1[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.01</span>;
+book1[<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>;  
 
-    <span class="pl-c">// Construct another using the set function</span>
-    json book2;
+<span class="pl-c">// Construct another using the set function</span>
+json book2;
 
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>);
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>);
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>);
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2007-11-06<span class="pl-pds">"</span></span>);
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">10.50</span>);
-    book2.set(<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>0802143415<span class="pl-pds">"</span></span>);  
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2007-11-06<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">10.50</span>);
+book2.set(<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>0802143415<span class="pl-pds">"</span></span>);  
 
-    <span class="pl-c">// Use set again, but more efficiently</span>
-    json book3;
+<span class="pl-c">// Use set again, but more efficiently</span>
+json book3;
 
-    <span class="pl-c">// Reserve memory, to avoid reallocations</span>
-    book3.reserve(<span class="pl-c1">6</span>);
+<span class="pl-c">// Reserve memory, to avoid reallocations</span>
+book3.reserve(<span class="pl-c1">6</span>);
 
-    <span class="pl-c">// Insert in name alphabetical order</span>
-    <span class="pl-c">// Give set a hint where to insert the next member</span>
-    <span class="pl-k">auto</span> hint = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);  
-    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
-    hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Insert in name alphabetical order</span>
+<span class="pl-c">// Give set a hint where to insert the next member</span>
+<span class="pl-k">auto</span> hint = book3.set(book3.members().begin(),<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);  
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
 
-    <span class="pl-c">// Construct a fourth from a string</span>
-    json book4 = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
-<span class="pl-s">    {</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>category<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Fiction<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>title<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Pulp<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>author<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Charles Bukowski<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>date<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">2004</span>-<span class="pl-c1">07</span>-<span class="pl-c1">08</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>price<span class="pl-s"><span class="pl-pds">"</span> : 22.48,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>isbn<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">1852272007</span><span class="pl-s"><span class="pl-pds">"</span>  </span>
-<span class="pl-s">    }</span>
-<span class="pl-s">    )<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Construct a fourth from a string</span>
+json book4 = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "category" : "Fiction",</span>
+<span class="pl-s">    "title" : "Pulp",</span>
+<span class="pl-s">    "author" : "Charles Bukowski",</span>
+<span class="pl-s">    "date" : "2004-07-08",</span>
+<span class="pl-s">    "price" : 22.48,</span>
+<span class="pl-s">    "isbn" : "1852272007"  </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-    <span class="pl-c">// Construct a booklist array</span>
+<span class="pl-c">// Construct a booklist array</span>
 
-    json booklist = json::array();
+json booklist = json::array();
 
-    <span class="pl-c">// For efficiency, reserve memory, to avoid reallocations</span>
-    booklist.reserve(<span class="pl-c1">4</span>);
+<span class="pl-c">// For efficiency, reserve memory, to avoid reallocations</span>
+booklist.reserve(<span class="pl-c1">4</span>);
 
-    <span class="pl-c">// For efficency, tell jsoncons to move the contents </span>
-    <span class="pl-c">// of the four book objects into the array</span>
-    booklist.add(std::move(book1));    
-    booklist.add(std::move(book2));    
+<span class="pl-c">// For efficency, tell jsoncons to move the contents </span>
+<span class="pl-c">// of the four book objects into the array</span>
+booklist.add(std::move(book1));    
+booklist.add(std::move(book2));    
 
-    <span class="pl-c">// Add the third book to the front</span>
-    <span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
+<span class="pl-c">// Add the third book to the front</span>
+<span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
 
-    <span class="pl-c">// and the last one immediately after</span>
-    booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
+<span class="pl-c">// and the last one immediately after</span>
+booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
 
-    <span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
-    std::cout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;</pre></div>
+<span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
+std::cout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c">//Loop through the booklist elements using a range-based for loop    </span>
-    <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : booklist.elements())
-    {
-        std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;()
-                  &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                  &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; std::endl;
-    }
 
-    <span class="pl-c">// The second book</span>
-    json&amp; book = booklist[<span class="pl-c1">1</span>];
+++
+<span class="pl-c">//Loop through the booklist elements using a range-based for loop    </span>
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : booklist.elements())
+{
+    std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;()
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
+              &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; std::endl;
+}
 
-    <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
-    <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.members())
-    {
-        std::cout &lt;&lt; member.<span class="pl-c1">name</span>()
-                  &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                  &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
-    }
+<span class="pl-c">// The second book</span>
+json&amp; book = booklist[<span class="pl-c1">1</span>];
 
-    <span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);
-    <span class="pl-k">if</span> (it != book.members().end())
-    {
-        <span class="pl-c">// member "author" found</span>
-    }
+<span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.members())
+{
+    std::cout &lt;&lt; member.<span class="pl-c1">name</span>()
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
+              &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+}
 
-    <span class="pl-k">if</span> (book.count(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
-    {
-        <span class="pl-c">// book has a member "author"</span>
-    }
+<span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);
+<span class="pl-k">if</span> (it != book.members().end())
+{
+    <span class="pl-c">// member "author" found</span>
+}
 
-    book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+<span class="pl-k">if</span> (book.count(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
+{
+    <span class="pl-c">// book has a member "author"</span>
+}
 
-    <span class="pl-k">try</span>
-    {
-        book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
-    }
-    <span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
-    {
-        <span class="pl-c">// member "ratings" not found</span>
-    }
+book.get(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::string&gt;();
+<span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
 
-    <span class="pl-c">// Add ratings</span>
-    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
-    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+<span class="pl-k">try</span>
+{
+    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+}
+<span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
+{
+    <span class="pl-c">// member "ratings" not found</span>
+}
 
-    <span class="pl-c">// Delete one-star ratings</span>
-    book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Add ratings</span>
+book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
+book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+
+<span class="pl-c">// Delete one-star ratings</span>
+book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
 </pre></div>
 
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
@@ -693,279 +695,308 @@ vertical-align:1px;
 
 <p>The JSON output <code>booklist.json</code></p>
 
-<div class="highlight highlight-source-json"><pre>    [
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">13.45</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2004-07-08<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1852272007<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">22.48</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>:
         {
-            <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">13.45</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>
+            <span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>
         },
-        {
-            <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2004-07-08<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1852272007<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">22.48</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>:
-            {
-                <span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>
-            },
-            <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Pulp<span class="pl-pds">"</span></span>
-        },
-        {
-            <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">9.01</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>
-        },
-        {
-            <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2007-11-06<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>0802143415<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">10.5</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>
-        }
-    ]</pre></div>
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Pulp<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">9.01</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2007-11-06<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>0802143415<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">10.5</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
 
 <h3>json query</h3>
 
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
-    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
-    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
-    <span class="pl-c">// For convenience</span>
-    <span class="pl-k">using</span> jsoncons::json;
-    <span class="pl-k">using</span> jsoncons::jsonpath::json_query;
+<span class="pl-c">// For convenience</span>
+<span class="pl-k">using</span> jsoncons::json;
+<span class="pl-k">using</span> jsoncons::jsonpath::json_query;
 
-    <span class="pl-c">// Deserialize the booklist</span>
-    std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
-    json booklist;
-    is &gt;&gt; booklist;
+<span class="pl-c">// Deserialize the booklist</span>
+std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
+json booklist;
+is &gt;&gt; booklist;
 
-    <span class="pl-c">// Use a JsonPath expression to find </span>
-    <span class="pl-c">//  </span>
-    <span class="pl-c">// (1) The authors of books that cost less than $12</span>
-    json result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// Use a JsonPath expression to find </span>
+<span class="pl-c">//  </span>
+<span class="pl-c">// (1) The authors of books that cost less than $12</span>
+json result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (2) The number of books</span>
-    result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// (2) The number of books</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (3) The third book</span>
-    result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+<span class="pl-c">// (3) The third book</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; std::endl &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 
-    <span class="pl-c">// (4) The authors of books that were published in 2004</span>
-    result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// (4) The authors of books that were published in 2004</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (5) The titles of all books that have ratings</span>
-    result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
+<span class="pl-c">// (5) The titles of all books that have ratings</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; result &lt;&lt; std::endl;
+
+<span class="pl-c">// (6) All authors and titles of books</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
 
 <p>Result:</p>
 
-<pre><code>    (1) ["Haruki Murakami","George Crile"]
-    (2) [4]
-    (3)
-    [
-        {
-            "author":"Haruki Murakami",
-            "category":"Fiction",
-            "date":"2002-04-09",
-            "isbn":"037571894X",
-            "price":9.01,
-            "title":"A Wild Sheep Chase: A Novel"
-        }
-    ]
-    (4) ["Charles Bukowski"]
-    (5) ["Pulp"]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
+(<span class="pl-c1">3</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">9.01</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">4</span>) [<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">5</span>) [<span class="pl-s"><span class="pl-pds">"</span>Pulp<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">6</span>) 
+[
+    <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
+]</pre></div>
 
 <h2>Once again, this time with wide characters</h2>
 
 <h3>wjson construction</h3>
 
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 
-    <span class="pl-c">// For convenience</span>
-    <span class="pl-k">using</span> jsoncons::wjson;
+<span class="pl-c">// For convenience</span>
+<span class="pl-k">using</span> jsoncons::wjson;
 
-    <span class="pl-c">// Construct a book object</span>
-    wjson book1;
+<span class="pl-c">// Construct a book object</span>
+wjson book1;
 
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>;
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.01</span>;
-    book1[L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>] = L<span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>Fiction<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>date<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>2002-04-09<span class="pl-pds">"</span></span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>price<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.01</span>;
+book1[<span class="pl-s"><span class="pl-pds">L"</span>isbn<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>037571894X<span class="pl-pds">"</span></span>;
 
-    <span class="pl-c">// Construct another using the set function</span>
-    wjson book2;
+<span class="pl-c">// Construct another using the set function</span>
+wjson book2;
 
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>);
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>);
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>);
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>2007-11-06<span class="pl-pds">"</span></span>);
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">10.50</span>);
-    book2.set(L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>0802143415<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>History<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>George Crile<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>2007-11-06<span class="pl-pds">"</span></span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">10.50</span>);
+book2.set(<span class="pl-s"><span class="pl-pds">L"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>0802143415<span class="pl-pds">"</span></span>);
 
-    <span class="pl-c">// Use set again, but more efficiently</span>
-    wjson book3;
+<span class="pl-c">// Use set again, but more efficiently</span>
+wjson book3;
 
-    <span class="pl-c">// Reserve memory, to avoid reallocations</span>
-    book3.reserve(<span class="pl-c1">6</span>);
+<span class="pl-c">// Reserve memory, to avoid reallocations</span>
+book3.reserve(<span class="pl-c1">6</span>);
 
-    <span class="pl-c">// Insert in name alphabetical order</span>
-    <span class="pl-c">// Give set a hint where to insert the next member</span>
-    <span class="pl-k">auto</span> hint = book3.set(book3.members().begin(), L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>2006-01-03<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>1400079276<span class="pl-pds">"</span></span>);
-    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
-    hint = book3.set(hint, L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Insert in name alphabetical order</span>
+<span class="pl-c">// Give set a hint where to insert the next member</span>
+<span class="pl-k">auto</span> hint = book3.set(book3.members().begin(), <span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>Haruki Murakami<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">L"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>Fiction<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">L"</span>date<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>2006-01-03<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">L"</span>isbn<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>1400079276<span class="pl-pds">"</span></span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">L"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">13.45</span>);
+hint = book3.set(hint, <span class="pl-s"><span class="pl-pds">L"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>Kafka on the Shore<span class="pl-pds">"</span></span>);
 
-    <span class="pl-c">// Construct a fourth from a string</span>
-    wjson book4 = wjson::parse(LR<span class="pl-s"><span class="pl-pds">"</span>(</span>
-<span class="pl-s">    {</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>category<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Fiction<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>title<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Pulp<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>author<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Charles Bukowski<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>date<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">2004</span>-<span class="pl-c1">07</span>-<span class="pl-c1">08</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>price<span class="pl-s"><span class="pl-pds">"</span> : 22.48,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>isbn<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">1852272007</span><span class="pl-s"><span class="pl-pds">"</span>  </span>
-<span class="pl-s">    }</span>
-<span class="pl-s">    )<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Construct a fourth from a string</span>
+wjson book4 = wjson::parse(<span class="pl-s"><span class="pl-pds">LR"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "category" : "Fiction",</span>
+<span class="pl-s">    "title" : "Pulp",</span>
+<span class="pl-s">    "author" : "Charles Bukowski",</span>
+<span class="pl-s">    "date" : "2004-07-08",</span>
+<span class="pl-s">    "price" : 22.48,</span>
+<span class="pl-s">    "isbn" : "1852272007"  </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-    <span class="pl-c">// Construct a booklist array</span>
+<span class="pl-c">// Construct a booklist array</span>
 
-    wjson booklist = wjson::array();
+wjson booklist = wjson::array();
 
-    <span class="pl-c">// For efficiency, reserve memory, to avoid reallocations</span>
-    booklist.reserve(<span class="pl-c1">4</span>);
+<span class="pl-c">// For efficiency, reserve memory, to avoid reallocations</span>
+booklist.reserve(<span class="pl-c1">4</span>);
 
-    <span class="pl-c">// For efficency, tell jsoncons to move the contents </span>
-    <span class="pl-c">// of the four book objects into the array</span>
-    booklist.add(std::move(book1));
-    booklist.add(std::move(book2));
+<span class="pl-c">// For efficency, tell jsoncons to move the contents </span>
+<span class="pl-c">// of the four book objects into the array</span>
+booklist.add(std::move(book1));
+booklist.add(std::move(book2));
 
-    <span class="pl-c">// Add the third book to the front</span>
-    <span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
+<span class="pl-c">// Add the third book to the front</span>
+<span class="pl-k">auto</span> pos = booklist.add(booklist.elements().begin(),std::move(book3));
 
-    <span class="pl-c">// and the last one immediately after</span>
-    booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
+<span class="pl-c">// and the last one immediately after</span>
+booklist.add(pos+<span class="pl-c1">1</span>,std::move(book4));    
 
-    <span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
-    std::wcout &lt;&lt; book1 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;</pre></div>
+<span class="pl-c">// See what's left of book1, 2, 3 and 4 (expect nulls)</span>
+std::wcout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book2 &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book3 &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span> &lt;&lt; book4 &lt;&lt; std::endl;
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c">//Loop through the booklist elements using a range-based for loop    </span>
-    <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : booklist.elements())
-    {
-        std::wcout &lt;&lt; book[L<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;()
-                   &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                   &lt;&lt; book[L<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; std::endl;
-    }
+++
+<span class="pl-c">//Loop through the booklist elements using a range-based for loop    </span>
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : booklist.elements())
+{
+    std::wcout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">L"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;()
+               &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span>
+               &lt;&lt; book[<span class="pl-s"><span class="pl-pds">L"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; std::endl;
+}
 
-    <span class="pl-c">// The second book</span>
-    wjson&amp; book = booklist[<span class="pl-c1">1</span>];
+<span class="pl-c">// The second book</span>
+wjson&amp; book = booklist[<span class="pl-c1">1</span>];
 
-    <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
-    <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.members())
-    {
-        std::wcout &lt;&lt; member.<span class="pl-c1">name</span>()
-                   &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-                   &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
-    }
+<span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.members())
+{
+    std::wcout &lt;&lt; member.<span class="pl-c1">name</span>()
+               &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span>
+               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+}
 
-    <span class="pl-k">auto</span> it = book.find(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);
-    <span class="pl-k">if</span> (it != book.members().end())
-    {
-        <span class="pl-c">// member "author" found</span>
-    }
+<span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>);
+<span class="pl-k">if</span> (it != book.members().end())
+{
+    <span class="pl-c">// member "author" found</span>
+}
 
-    <span class="pl-k">if</span> (book.count(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
-    {
-        <span class="pl-c">// book has a member "author"</span>
-    }
+<span class="pl-k">if</span> (book.count(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
+{
+    <span class="pl-c">// book has a member "author"</span>
+}
 
-    book.get(L<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, L<span class="pl-s"><span class="pl-pds">"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();
-    <span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
+book.get(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">L"</span>author unknown<span class="pl-pds">"</span></span>).as&lt;std::wstring&gt;();
+<span class="pl-c">// Returns author if found, otherwise "author unknown"</span>
 
-    <span class="pl-k">try</span>
-    {
-        book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;();
-    }
-    <span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
-    {
-        <span class="pl-c">// member "ratings" not found</span>
-    }
+<span class="pl-k">try</span>
+{
+    book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::wstring&gt;();
+}
+<span class="pl-k">catch</span> (<span class="pl-k">const</span> std::out_of_range&amp; e)
+{
+    <span class="pl-c">// member "ratings" not found</span>
+}
 
-    <span class="pl-c">// Add ratings</span>
-    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][L<span class="pl-s"><span class="pl-pds">"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
-    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>][L<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+<span class="pl-c">// Add ratings</span>
+book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">L"</span>*****<span class="pl-pds">"</span></span>] = <span class="pl-c1">4</span>;
+book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">L"</span>*<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
 
-    <span class="pl-c">// Delete one-star ratings</span>
-    book[L<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(L<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
+<span class="pl-c">// Delete one-star ratings</span>
+book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">L"</span>*<span class="pl-pds">"</span></span>);
 </pre></div>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
-    std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
-    os &lt;&lt; pretty_print(booklist);</pre></div>
+<div class="highlight highlight-source-c++"><pre><span class="pl-c">// Serialize the booklist to a file</span>
+std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
+os &lt;&lt; pretty_print(booklist);</pre></div>
 
 <h3>wjson query</h3>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Deserialize the booklist</span>
-    std::wifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
-    wjson booklist;
-    is &gt;&gt; booklist;
+<div class="highlight highlight-source-c++"><pre><span class="pl-c">// Deserialize the booklist</span>
+std::wifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
+wjson booklist;
+is &gt;&gt; booklist;
 
-    <span class="pl-c">// Use a JsonPath expression to find </span>
-    <span class="pl-c">//  </span>
-    <span class="pl-c">// (1) The authors of books that cost less than $12</span>
-    wjson result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// Use a JsonPath expression to find </span>
+<span class="pl-c">//  </span>
+<span class="pl-c">// (1) The authors of books that cost less than $12</span>
+wjson result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (2) The number of books</span>
-    result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// (2) The number of books</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$.length<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (3) The third book</span>
-    result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
+<span class="pl-c">// (3) The third book</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$[2]<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 
-    <span class="pl-c">// (4) The authors of books that were published in 2004</span>
-    result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;
+<span class="pl-c">// (4) The authors of books that were published in 2004</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; result &lt;&lt; std::endl;
 
-    <span class="pl-c">// (5) The titles of all books that have ratings</span>
-    result = json_query(booklist, L<span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
-    std::wcout &lt;&lt; L<span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result &lt;&lt; std::endl;</pre></div>
+<span class="pl-c">// (5) The titles of all books that have ratings</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; result &lt;&lt; std::endl;
+
+<span class="pl-c">// (6) All authors and titles of books</span>
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
+std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
 
 <p>Result:</p>
 
-<pre><code>    (1) ["Haruki Murakami","George Crile"]
-    (2) [4]
-    (3)
-    [
-        {
-            "author":"Haruki Murakami",
-            "category":"Fiction",
-            "date":"2002-04-09",
-            "isbn":"037571894X",
-            "price":9.01,
-            "title":"A Wild Sheep Chase: A Novel"
-        }
-    ]
-    (4) ["Charles Bukowski"]
-    (5) ["Pulp"]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
+(<span class="pl-c1">3</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2002-04-09<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>037571894X<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>:<span class="pl-c1">9.01</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">4</span>) [<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">5</span>) [<span class="pl-s"><span class="pl-pds">"</span>Pulp<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">6</span>) 
+[
+    <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
+]</pre></div>
 
 <h2>Acknowledgements</h2>
 

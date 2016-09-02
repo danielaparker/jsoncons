@@ -477,9 +477,9 @@ vertical-align:1px;
 
 <pre><code>#include "jsoncons/jsonpath/json_query.hpp"
 
-template&lt;JsonT&gt;
-basic_json&lt;JsonT&gt; json_query(const JsonT&amp; root, 
-                             const typename JsonT::string_type&amp; path);
+template&lt;Json&gt;
+Json json_query(const Json&amp; root, 
+                const typename Json::string_type&amp; path);
 </code></pre>
 
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. </p>
@@ -811,14 +811,19 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <td></td>
 </tr>
 <tr>
-<td><code>$.store.book[ ?((@.author =~ /evelyn.*?/i))]</code></td>
+<td><code>$.store.book[?((@.author =~ /evelyn.*?/i))]</code></td>
 <td>All books whose author's name starts with Evelyn, evelyn etc.</td>
 <td>
 <code>i</code> indicates case insensitive</td>
 </tr>
 <tr>
-<td><code>$.store.book[ ?(!(@.author =~ /Evelyn.*?/))]</code></td>
+<td><code>$.store.book[?(!(@.author =~ /Evelyn.*?/))]</code></td>
 <td>All books whose author's name does not start with Evelyn</td>
+<td></td>
+</tr>
+<tr>
+<td><code>$['store']['book']..['author','title']</code></td>
+<td>All authors and titles of books in the store</td>
 <td></td>
 </tr>
 </tbody>
