@@ -2,7 +2,7 @@
 
 jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
 
-jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported.
+jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
 
 ## Using the jsoncons library
 
@@ -147,11 +147,11 @@ produces
 ```
 To construct a json object with members, take an empty json object and set some name-value pairs
 ```c++
-image_sizing["Resize To Fit"] = true;  // a boolean 
-image_sizing["Resize Unit"] =  "pixels";  // a string
-image_sizing["Resize What"] =  "long_edge";  // a string
-image_sizing["Dimension 1"] = 9.84;  // a double
-image_sizing["Dimension 2"] = json::null();  // a null value
+image_sizing.set("Resize To Fit",true);  // a boolean 
+image_sizing.set("Resize Unit", "pixels");  // a string
+image_sizing.set("Resize What", "long_edge");  // a string
+image_sizing.set("Dimension 1",9.84);  // a double
+image_sizing.set("Dimension 2",json::null());  // a null value
 ```
 
 Or, use an object initializer-list:
@@ -168,7 +168,7 @@ To construct a json array, initialize with the array type
 ```c++
 json color_spaces = json::array();
 ```
-and use the `add` function to add elements
+and add some elements
 ```c++
 color_spaces.add("sRGB");
 color_spaces.add("AdobeRGB");
@@ -180,29 +180,31 @@ Or, use an array initializer-list:
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
 
-Combining these four 
+The `operator[]` provides another way for setting name-value pairs:
 ```c++
 json file_export;
-file_export["Image Formats"] = std::move(image_formats);
+file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces);
+file_export["File Format Options"]["Image Formats"] = std::move(image_formats);
 file_export["File Settings"] = std::move(file_settings);
-file_export["Color Spaces"] = std::move(color_spaces);
 file_export["Image Sizing"] = std::move(image_sizing);
 ```
-and serializing
+Serializing
 ```c++
 std::cout << pretty_print(file_export) << std::endl;
 ```
 produces
 ```json
 {
-    "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"],
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"],
+        "Image Formats": ["JPEG","PSD","TIFF","DNG"]
+    },
     "File Settings": {
         "Color Space": "sRGB",
         "Image Format": "JPEG",
         "Limit File Size": true,
         "Limit File Size To": 10000
     },
-    "Image Formats": ["JPEG","PSD","TIFF","DNG"],
     "Image Sizing": {
         "Dimension 1": 9.84,
         "Dimension 2": null,
@@ -367,10 +369,10 @@ produces
     "verts": [1,2,3]
 }
 ```
-By default, array values in objects are displayed on the same line.
+By default, within objects, array scalar values are displayed on the same line.
 
 The `pretty_print` function takes an optional second parameter, [output_format](https://github.com/danielaparker/jsoncons/wiki/output_format), that allows custom formatting of output.
-To display array values in objects on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
+To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
 output_format format;
 format.object_array_split_lines(line_split_kind::new_line);
@@ -479,6 +481,10 @@ std::cout << pretty_print(result) << std::endl;
 // (5) The titles of all books that have isbn number
 json result = json_query(root,"$..book[?(@.isbn)]/title");
 std::cout << result << std::endl;
+
+// (6) All authors and titles of books
+result = json_query(booklist, "$['store']['book']..['author','title']");
+std::cout << pretty_print(result) << std::endl;
 ```
 Result:
 ```json
@@ -502,6 +508,17 @@ Result:
         }
     ]
 (5) ["Moby Dick","The Lord of the Rings"] 
+(6) 
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
 ```
 ### About jsoncons::json
 
@@ -557,7 +574,7 @@ which prints
 ```
 ### ojson and wojson
 
-The `ojson` (wojson) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([wojson](https://github.com/danielaparker/jsoncons/wiki/wojson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```c++
 ojson o = ojson::parse(R"(
 {

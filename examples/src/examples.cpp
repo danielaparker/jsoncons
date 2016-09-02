@@ -190,11 +190,11 @@ void more_examples()
     };
 
     json image_sizing;
-    image_sizing["Resize To Fit"] = true;  // a boolean 
-    image_sizing["Resize Unit"] =  "pixels";  // a string
-    image_sizing["Resize What"] =  "long_edge";  // a string
-    image_sizing["Dimension 1"] = 9.84;  // a double
-    image_sizing["Dimension 2"] = json::null();  // a null value
+    image_sizing.set("Resize To Fit",true);  // a boolean 
+    image_sizing.set("Resize Unit", "pixels");  // a string
+    image_sizing.set("Resize What", "long_edge");  // a string
+    image_sizing.set("Dimension 1",9.84);  // a double
+    image_sizing.set("Dimension 2",json::null());  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
@@ -205,9 +205,9 @@ void more_examples()
     color_spaces.add("ProPhoto RGB");
 
     json file_export;
-    file_export["Image Formats"] = std::move(image_formats);
+    file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces);
+    file_export["File Format Options"]["Image Formats"] = std::move(image_formats);
     file_export["File Settings"] = std::move(file_settings);
-    file_export["Color Spaces"] = std::move(color_spaces);
     file_export["Image Sizing"] = std::move(image_sizing);
     std::cout << pretty_print(file_export) << std::endl;
 
