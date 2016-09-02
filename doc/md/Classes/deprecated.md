@@ -6,7 +6,7 @@ In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
 Category|Old name, now deprecated|<em>&#x2713;</em>|Recommendation
 --------|-----------|--------------|------------------------
-class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator pos, const json& val)
+json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator pos, const json& val)
     |add(size_t index, json&& val)|<em>&#x2713;</em>|Use add(array_iterator pos, json&& val)
     |remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|erase(array_iterator first, array_iterator last)
     |remove(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
@@ -39,11 +39,12 @@ class json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_it
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
     |to_stream|<em>&#x2713;</em>|Use write
     |`json` initializer-list constructor||Construct from `json::array` with initializer-list
+json member types|any|<em>&#x2713;</em>|
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.
     |an_array||Use assignment to `json::array()` or `json::make_array()` instead.
-class json_deserializer|json& root()|<em>&#x2713;</em>|json get_result()
-class json_reader|read()|<em>&#x2713;</em>|Use read_next()
+json_deserializer|json& root()|<em>&#x2713;</em>|json get_result()
+json_reader|read()|<em>&#x2713;</em>|Use read_next()
     |max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
     |max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const
     |json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
@@ -58,3 +59,7 @@ json_filter|parent()|<em>&#x2713;</em>|Use input_handler()
 csv_parameters|`header(std::string value)`|<em>&#x2713;</em>|Use `column_names(std::vector<std::string>> value)`
     |`data_types()`|<em>&#x2713;</em>|Use `column_types()`
     |`data_types(std::string value)`|<em>&#x2713;</em>|Use `column_types(std::vector<std::string>> value)`
+output_format|`array_array_block_option accessor and modifier` accessor and modifier|<em>&#x2713;</em>|Use `array_array_split_lines` accessor and modifier
+    |`array_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `array_object_split_lines` accessor and modifier
+    |`object_array_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_array_split_lines` accessor and modifier
+    |`object_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_object_split_lines` accessor and modifier

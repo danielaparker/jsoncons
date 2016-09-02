@@ -121,8 +121,6 @@ void make_empty_array()
 {
     std::cout << "empty array" <<std::endl;
     json a = json::make_array();
-    a.add(1);
-    a.add(2);
     std::cout << pretty_print(a) << std::endl;
 }
 
@@ -141,6 +139,7 @@ void make_1_dimensional_array_2()
     json a = json::make_array<1>(10,0);
     a[1] = 1;
     a[2] = 2;
+    a[3] = json::make_array();
     std::cout << pretty_print(a) << std::endl;
 }
 

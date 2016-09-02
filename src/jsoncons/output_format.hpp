@@ -19,10 +19,14 @@
 
 namespace jsoncons {
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 enum class block_options {next_line,same_line};
+#endif
 
 template <class CharT>
 class buffered_ostream;
+
+enum class line_split_kind{same_line,new_line,multi_line};
 
 template <class CharT>
 class basic_output_format
@@ -37,12 +41,11 @@ class basic_output_format
     std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
-    block_options root_array_block_option_;
-    block_options object_array_block_option_;
-    block_options array_array_block_option_;
-    block_options root_object_block_option_;
-    block_options object_object_block_option_;
-    block_options array_object_block_option_;
+
+    line_split_kind array_array_split_lines_;
+    line_split_kind object_array_split_lines_;
+    line_split_kind object_object_split_lines_;
+    line_split_kind array_object_split_lines_;
 public:
     static const size_t default_indent = 4;
 
@@ -60,82 +63,69 @@ public:
         neg_inf_replacement_(json_text_traits<CharT>::null_literal().first),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
-        root_array_block_option_(block_options::same_line),
-        object_array_block_option_(block_options::same_line),
-        array_array_block_option_(block_options::next_line),
-        root_object_block_option_(block_options::same_line),
-        object_object_block_option_(block_options::same_line),
-        array_object_block_option_(block_options::next_line)
+        object_object_split_lines_(line_split_kind::multi_line),
+        array_object_split_lines_(line_split_kind::multi_line),
+        object_array_split_lines_(line_split_kind::same_line),
+        array_array_split_lines_(line_split_kind::new_line)
     {
     }
 
 //  Accessors
+    line_split_kind object_object_split_lines() const {return object_object_split_lines_;}
+    line_split_kind array_object_split_lines() const {return array_object_split_lines_;}
+    line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
+    line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
 
-    block_options root_array_block_option()
-    {
-        return root_array_block_option_;
-    }
+    basic_output_format<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
+    basic_output_format<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
+    basic_output_format<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
+    basic_output_format<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
 
-    basic_output_format<CharT>& root_array_block_option(block_options value)
-    {
-        root_array_block_option_ = value;
-        return *this;
-    }
-
+#if !defined(JSONCONS_NO_DEPRECATED)
     block_options array_array_block_option()
     {
-        return array_array_block_option_;
+        return array_array_split_lines_ ? block_options::next_line : block_options::same_line;
     }
 
     basic_output_format<CharT>& array_array_block_option(block_options value)
     {
-        array_array_block_option_ = value;
+        array_array_split_lines_ = value == block_options::next_line ? true : false;
         return *this;
     }
 
     block_options array_object_block_option()
     {
-        return array_object_block_option_;
+        return array_object_split_lines_ ? block_options::next_line : block_options::same_line;
     }
 
     basic_output_format<CharT>& array_object_block_option(block_options value)
     {
-        array_object_block_option_ = value;
-        return *this;
-    }
-
-    block_options root_object_block_option()
-    {
-        return root_object_block_option_;
-    }
-
-    basic_output_format<CharT>& root_object_block_option(block_options value)
-    {
-        root_object_block_option_ = value;
+        array_object_split_lines_ = value == block_options::next_line ? true : false;
         return *this;
     }
 
     block_options object_array_block_option()
     {
-        return object_array_block_option_;
+        return object_array_split_lines_ ? block_options::next_line : block_options::same_line;
     }
 
     basic_output_format<CharT>& object_array_block_option(block_options value)
     {
-        object_array_block_option_ = value;
+        object_array_split_lines_ = value == block_options::next_line ? true : false;
         return *this;
     }
 
     block_options object_object_block_option()
     {
-        return object_object_block_option_;
+        return object_object_split_lines_ ? block_options::next_line : block_options::same_line;
     }
 
     basic_output_format<CharT>& object_object_block_option(block_options value)
     {
-        object_object_block_option_ = value;
+        object_object_split_lines_ = value == block_options::next_line ? true : false;
         return *this;
     }
+#endif
 
     int indent() const
     {

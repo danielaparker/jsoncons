@@ -485,7 +485,7 @@ vertical-align:1px;
 </thead>
 <tbody>
 <tr>
-<td>class json</td>
+<td>json</td>
 <td>add(size_t index, const json&amp; val)</td>
 <td><em>✓</em></td>
 <td>Use add(array_iterator pos, const json&amp; val)</td>
@@ -693,6 +693,12 @@ vertical-align:1px;
 <td>Construct from <code>json::array</code> with initializer-list</td>
 </tr>
 <tr>
+<td>json member types</td>
+<td>any</td>
+<td><em>✓</em></td>
+<td></td>
+</tr>
+<tr>
 <td>json member constants</td>
 <td>null</td>
 <td></td>
@@ -712,13 +718,13 @@ vertical-align:1px;
 <td>Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</td>
 </tr>
 <tr>
-<td>class json_deserializer</td>
+<td>json_deserializer</td>
 <td>json&amp; root()</td>
 <td><em>✓</em></td>
 <td>json get_result()</td>
 </tr>
 <tr>
-<td>class json_reader</td>
+<td>json_reader</td>
 <td>read()</td>
 <td><em>✓</em></td>
 <td>Use read_next()</td>
@@ -809,6 +815,31 @@ vertical-align:1px;
 <td><em>✓</em></td>
 <td>Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code>
 </td>
+</tr>
+<tr>
+<td>output_format</td>
+<td>
+<code>array_array_block_option accessor and modifier</code> accessor and modifier</td>
+<td><em>✓</em></td>
+<td>Use <code>array_array_split_lines</code> accessor and modifier</td>
+</tr>
+<tr>
+<td></td>
+<td><code>array_object_block_option accessor and modifier</code></td>
+<td><em>✓</em></td>
+<td>Use <code>array_object_split_lines</code> accessor and modifier</td>
+</tr>
+<tr>
+<td></td>
+<td><code>object_array_block_option accessor and modifier</code></td>
+<td><em>✓</em></td>
+<td>Use <code>object_array_split_lines</code> accessor and modifier</td>
+</tr>
+<tr>
+<td></td>
+<td><code>object_object_block_option accessor and modifier</code></td>
+<td><em>✓</em></td>
+<td>Use <code>object_object_split_lines</code> accessor and modifier</td>
 </tr>
 </tbody>
 </table>

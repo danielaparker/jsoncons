@@ -51,12 +51,14 @@ void serialization_example1()
     std::cout << pretty_print(val) << std::endl;
 
 
-    std::cout << "block_style(\"[[\",block_options::next_line)" << std::endl;
-    std::cout << "array_object_block_option(block_options::next_line)" << std::endl;
-    output_format format1;
-    format1.array_array_block_option(block_options::next_line)
-           .array_object_block_option(block_options::next_line);
-    std::cout << pretty_print(val,format1) << std::endl;
+    std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_object_split_lines(line_split_kind::new_line)" << std::endl;
+
+    output_format format;
+
+    format.array_array_split_lines(line_split_kind::new_line)
+          .array_object_split_lines(line_split_kind::new_line);
+    std::cout << pretty_print(val,format) << std::endl;
 }
 
 void serialization_example2()
@@ -68,73 +70,97 @@ void serialization_example2()
     val["normals"] = json::array{1, 0, 1};
     val["uvs"] = json::array{0, 0, 1, 1};
 
-    std::cout << "Default format" << std::endl;
+    std::cout << "Default object-array same line format" << std::endl;
     std::cout << pretty_print(val) << std::endl;
 
-    std::cout << "Array same line format" << std::endl;
+    std::cout << "object_array_split_lines(line_split_kind::same_line)" << std::endl;
     output_format format1;
-    format1.array_array_block_option(block_options::same_line);
+    format1.object_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val,format1) << std::endl;
 
-    std::cout << "Object array next line format" << std::endl;
+    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
     output_format format2;
-    format2.object_array_block_option(block_options::next_line);
+    format2.object_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val,format2) << std::endl;
+
+    std::cout << "object_array_split_lines(line_split_kind::multi_line)" << std::endl;
+    output_format format3;
+    format3.object_array_split_lines(line_split_kind::multi_line);
+    std::cout << pretty_print(val,format3) << std::endl;
 }
 
 void serialization_example3()
 {
-
-    json val = json::parse(R"({
-       "verts" : [1, 2, 3],
-
-       "normals" : [1, 0, 1],
-
-       "uvs" : [ 0, 0, 1, 1 ]
-    }
-)");
-    std::cout << "Default" << std::endl;
-    std::cout << print(val) << std::endl;
-
-    std::cout << "Default pretty print" << std::endl;
-    std::cout << pretty_print(val) << std::endl;
-
-    output_format format1;
-    format1.array_array_block_option(block_options::same_line);
-    std::cout << pretty_print(val,format1) << std::endl;
-
-    output_format format;
-    format.object_object_block_option(block_options::next_line);
-    std::cout << pretty_print(val,format) << std::endl;
-
-    json val2 = json::parse(R"(
     {
-   "data":
-   {
-       "item": [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]],    //A two-dimensional array 
-                                                                                           //blank line
-       "id": [0,1,2,3,4,5,6,7]                                                   //A one-dimensional array 
-   }
+        json val = json::parse(R"(
+        [
+            {"first-name" : "John",
+             "last-name" : "Doe"},
+            {"first-name" : "Jane",
+             "last-name" : "Doe"}
+        ]
+        )");
+
+        output_format format;
+        format.array_object_split_lines(line_split_kind::same_line);
+        std::cout << "array_object_split_lines(line_split_kind::same_line)" << std::endl;
+        std::cout << pretty_print(val,format) << std::endl;
     }
-)");
 
-    std::cout << "Default" << std::endl;
-    std::cout << pretty_print(val2) << std::endl;
- 
-    std::cout << "object_block_style(\"[[\",block_options::next_line)" << std::endl;
-    output_format format2;
-    format2.array_array_block_option(block_options::next_line);
-    std::cout << pretty_print(val2,format2) << std::endl;
+    {
+        json val = json::parse(R"({
+           "verts" : [1, 2, 3],
 
-    std::cout << "object_block_style(\"[[\",block_options::same_line)" << std::endl;
-    output_format format4;
-    format4.array_array_block_option(block_options::same_line);
-    std::cout << pretty_print(val2, format4) << std::endl;
+           "normals" : [1, 0, 1],
 
-    std::cout << "array_block_style(\"[[\",block_options::same_line)" << std::endl;
-    output_format format5;
-    format5.array_array_block_option(block_options::same_line);
-    std::cout << pretty_print(val2, format5) << std::endl;
+           "uvs" : [ 0, 0, 1, 1 ]
+        }
+    )");
+        std::cout << "Default print" << std::endl;
+        std::cout << print(val) << std::endl;
+
+        std::cout << "Default pretty print" << std::endl;
+        std::cout << pretty_print(val) << std::endl;
+
+        output_format format1;
+        format1.array_array_split_lines(line_split_kind::same_line);
+        std::cout << pretty_print(val,format1) << std::endl;
+
+        output_format format;
+        format.object_object_split_lines(line_split_kind::new_line);
+        std::cout << pretty_print(val,format) << std::endl;
+    }
+
+    {
+        json val2 = json::parse(R"(
+        {
+       "data":
+       {
+           "item": [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]],    //A two-dimensional array 
+                                                                                               //blank line
+           "id": [0,1,2,3,4,5,6,7]                                                   //A one-dimensional array 
+       }
+        }
+    )");
+
+        std::cout << "Default" << std::endl;
+        std::cout << pretty_print(val2) << std::endl;
+     
+        std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
+        output_format format2;
+        format2.array_array_split_lines(line_split_kind::new_line);
+        std::cout << pretty_print(val2,format2) << std::endl;
+
+        std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
+        output_format format4;
+        format4.array_array_split_lines(line_split_kind::same_line);
+        std::cout << pretty_print(val2, format4) << std::endl;
+
+        std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
+        output_format format5;
+        format5.array_array_split_lines(line_split_kind::same_line);
+        std::cout << pretty_print(val2, format5) << std::endl;
+    }
 
     json val3 = json::parse(R"(
     {
@@ -144,9 +170,9 @@ void serialization_example3()
    }
     }
 )");
-    std::cout << "block_style(\"[[\",block_options::next_line)" << std::endl;
+    std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
     output_format format6;
-    format6.array_array_block_option(block_options::next_line);
+    format6.array_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val3,format6) << std::endl;
 }
 
@@ -163,32 +189,79 @@ void serialization_example4()
                                       json::array{2},
                                       json::array{4,3}};
 
-    std::cout << "Default array-array block format" << std::endl;
+    std::cout << "Default array-array split line format" << std::endl;
     std::cout << pretty_print(val) << std::endl;
 
-    std::cout << "Same line array-array block format" << std::endl;
+    std::cout << "Array-array same line format" << std::endl;
     output_format format1;
-    format1.array_array_block_option(block_options::same_line);
+    format1.array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format1) << std::endl;
 
-    std::cout << "Next line object-array and same line array-array format" << std::endl;
+    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
     output_format format2;
-    format2.object_array_block_option(block_options::next_line)
-           .array_array_block_option(block_options::same_line);
+    format2.object_array_split_lines(line_split_kind::new_line)
+           .array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format2) << std::endl;
 
-    json val3 = json::parse(R"(
+    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_split_lines(line_split_kind::multi_line)" << std::endl;
+    output_format format3;
+    format3.object_array_split_lines(line_split_kind::new_line)
+           .array_array_split_lines(line_split_kind::multi_line);
+    std::cout << pretty_print(val, format3) << std::endl;
+
     {
-   "data":
-   {
-       "item": [[2]]    //A two-dimensional array 
-   }
+        json val = json::parse(R"(
+        {
+       "header" : {"properties": {}},
+       "data":
+       {
+           "tags" : [],
+           "id" : [1,2,3],
+           "item": [[1,2,3]]    
+       }
+        }
+    )");
+        std::cout << "Default" << std::endl;
+        std::cout << pretty_print(val) << std::endl;
+
+        std::string style1 = "array_array_split_lines(line_split_kind:same_line)";
+        std::cout << style1 << std::endl;
+        output_format format1;
+        format1.array_array_split_lines(line_split_kind::same_line);
+        std::cout << pretty_print(val,format1) << std::endl;
+
+        std::string style2 = "array_array_split_lines(line_split_kind::new_line)";
+        std::cout << style2 << std::endl;
+        output_format format2;
+        format2.array_array_split_lines(line_split_kind::new_line);
+        std::cout << pretty_print(val,format2) << std::endl;
+
+        std::string style3 = "array_array_split_lines(line_split_kind::multi_line)";
+        std::cout << style3 << std::endl;
+        output_format format3;
+        format3.array_array_split_lines(line_split_kind::multi_line);
+        std::cout << pretty_print(val,format3) << std::endl;
+
+        std::string style4 = "object_array_split_lines(line_split_kind:same_line)";
+        std::cout << style4 << std::endl;
+        output_format format4;
+        format4.object_array_split_lines(line_split_kind::same_line);
+        std::cout << pretty_print(val,format4) << std::endl;
+
+        std::string style5 = "object_array_split_lines(line_split_kind::new_line)";
+        std::cout << style5 << std::endl;
+        output_format format5;
+        format5.object_array_split_lines(line_split_kind::new_line);
+        std::cout << pretty_print(val,format5) << std::endl;
+
+        std::string style6 = "object_array_split_lines(line_split_kind::multi_line)";
+        std::cout << style6 << std::endl;
+        output_format format6;
+        format6.object_array_split_lines(line_split_kind::multi_line);
+        std::cout << pretty_print(val,format6) << std::endl;
     }
-)");
-    std::cout << "block_style(\"[[\",block_options::next_line)" << std::endl;
-    output_format format6;
-    format6.array_array_block_option(block_options::next_line);
-    std::cout << pretty_print(val3,format6) << std::endl;
 }
 
 void serialization_examples()

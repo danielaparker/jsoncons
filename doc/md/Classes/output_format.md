@@ -82,17 +82,17 @@ Sets replacement text for negative infinity.
 
     output_format& precision(uint8_t prec)
 
-    output_format& object_object_block_option(block_options value)
-Set object block formatting within objects to `block_options::same_line` or `block_options::next_line`. The default is `block_options::same_line`.
+    output_format& object_object_split_lines(line_split_kind value)
+For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
 
-    output_format& array_object_block_option(block_options value)
-Set object block formatting within arrays to `block_options::same_line` or `block_options::next_line`.  The default is `block_options::next_line`.
+    output_format& array_object_split_lines(line_split_kind value)
+For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
 
-    output_format& object_array_block_option(block_options value)
-Set array block formatting within objects to `block_options::same_line` or `block_options::next_line`. The default is `block_options::same_line`.
+    output_format& object_array_split_lines(line_split_kind value)
+For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind).
 
-    output_format& array_array_block_option(block_options value)
-Set array block formatting within arrays to `block_options::same_line` or `block_options::next_line`. The default is `block_options::next_line`.
+    output_format& array_array_split_lines(line_split_kind value)
+For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
 
 ## Examples
 
@@ -142,46 +142,71 @@ The output is
     val["normals"] = json::array{1, 0, 1};
     val["uvs"] = json::array{0, 0, 1, 1};
 
-    std::cout << "Default format" << std::endl;
+    std::cout << "Default (same line)" << std::endl;
     std::cout << pretty_print(val) << std::endl;
 
-    std::cout << "Array same line format" << std::endl;
+    std::cout << "New line" << std::endl;
     output_format format1;
-    format1.array_block_option(block_options::same_line);
+    format1.object_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val,format1) << std::endl;
 
-    std::cout << "Object array next line format" << std::endl;
+    std::cout << "Multi line" << std::endl;
     output_format format2;
-    format2.object_array_block_option(block_options::next_line);
+    format2.object_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val,format2) << std::endl;
 ```
 
 The output is
+
+Default (same line)
+
 ```json
-Default format
 {
     "normals": [1,0,1],
     "uvs": [0,0,1,1],
     "verts": [1,2,3]
 }
-Array same line format
+```
+
+New line
+
+```json
 {
-    "normals": [1,0,1],
-    "uvs": [0,0,1,1],
-    "verts": [1,2,3]
+    "normals": [
+        1,0,1
+    ],
+    "uvs": [
+        0,0,1,1
+    ],
+    "verts": [
+        1,2,3
+    ]
 }
-Object array next line format
+```
+Multi line
+```json
 {
-    "normals":
-    [1,0,1],
-    "uvs":
-    [0,0,1,1],
-    "verts":
-    [1,2,3]
+    "normals": [
+        1,
+        0,
+        1
+    ],
+    "uvs": [
+        0,
+        0,
+        1,
+        1
+    ],
+    "verts": [
+        1,
+        2,
+        3
+    ]
 }
 ```
 
 ### Array-array block formatting
+
 ```c++
     json val;
     val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
@@ -194,23 +219,25 @@ Object array next line format
                                       json::array{2},
                                       json::array{4,3}};
 
-    std::cout << "Default array-array block format" << std::endl;
+    std::cout << "Default (new line)" << std::endl;
     std::cout << pretty_print(val) << std::endl;
 
-    std::cout << "Same line array-array block format" << std::endl;
+    std::cout << "Same line" << std::endl;
     output_format format1;
-    format1.array_array_block_option(block_options::same_line);
+    format1.array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format1) << std::endl;
 
-    std::cout << "Next line object-array and same line array-array format" << std::endl;
+    std::cout << "Multi line" << std::endl;
     output_format format2;
-    format2.object_array_block_option(block_options::next_line)
-           .array_array_block_option(block_options::same_line);
+    format2.array_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val, format2) << std::endl;
 ```
+
 The output is
+
+Default (new line)
+
 ```json
-Default array-array block format
 {
     "data": {
         "id": [0,1,2,3,4,5,6,7],
@@ -226,22 +253,62 @@ Default array-array block format
         ]
     }
 }
-Same line array-array block format
+```
+Same line
+
+```json
 {
     "data": {
         "id": [0,1,2,3,4,5,6,7],
         "item": [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
     }
 }
-Next line object-array and same line array-array format
+```
+
+Multi line
+
+```json
 {
     "data": {
-        "id":
-        [0,1,2,3,4,5,6,7],
-        "item":
-        [[2],[4,5,2,3],[4],[4,5,2,3],[2],[4,5,3],[2],[4,3]]
+        "id": [
+            0,1,2,3,4,5,6,7
+        ],
+        "item": [
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                4
+            ],
+            [
+                4,
+                5,
+                2,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                5,
+                3
+            ],
+            [
+                2
+            ],
+            [
+                4,
+                3
+            ]
+        ]
     }
 }
 ```
-
 

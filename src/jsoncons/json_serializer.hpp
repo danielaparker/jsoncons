@@ -29,22 +29,22 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0), option_(block_options::next_line), multiline_(false)
-        {
-            scalar_option_ = is_object ? block_options::next_line : block_options::same_line;
-        }
-        stack_item(bool is_object, block_options option)
-           : is_object_(is_object), count_(0), option_(option), multiline_(false)
-        {
-            scalar_option_ = is_object ? block_options::next_line : block_options::same_line;
-        }
-        stack_item(bool is_object, block_options option, block_options scalar_option)
-           : is_object_(is_object), count_(0), option_(option), scalar_option_(scalar_option), multiline_(false)
+           : is_object_(is_object), count_(0), split_lines_(line_split_kind::same_line), indent_once_(false), unindent_at_end_(false)
         {
         }
-        bool is_multiline() const
+        stack_item(bool is_object, line_split_kind split_lines, bool indent_once = false)
+           : is_object_(is_object), count_(0), split_lines_(split_lines), indent_once_(indent_once), unindent_at_end_(false)
         {
-            return multiline_;
+        }
+
+        size_t count() const
+        {
+            return count_;
+        }
+
+        bool unindent_at_end() const
+        {
+            return unindent_at_end_;
         }
 
         bool is_object() const
@@ -52,26 +52,26 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
             return is_object_;
         }
 
-        bool is_same_line() const
+        bool is_new_line() const
         {
-            return option_ = block_options::same_line;
+            return split_lines_ != line_split_kind::same_line;
         }
 
-        bool is_next_line() const
+        bool is_multi_line() const
         {
-            return option_ == block_options::next_line;
+            return split_lines_ == line_split_kind::multi_line;
         }
 
-        bool scalar_next_line() const
+        bool is_indent_once() const
         {
-            return scalar_option_ == block_options::next_line;
+            return count_ == 0 ? indent_once_ : false;
         }
 
         bool is_object_;
         size_t count_;
-        block_options option_;
-        block_options scalar_option_;
-        bool multiline_;
+        line_split_kind split_lines_;
+        bool unindent_at_end_;
+        bool indent_once_;
     };
     basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
@@ -145,27 +145,24 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                if (format_.object_object_block_option() == block_options::next_line)
-                {
-                    write_indent();
-                }
-                stack_.push_back(stack_item(true,format_.object_object_block_option()));
+                stack_.push_back(stack_item(true,format_.object_object_split_lines(), false));
             }
             else if (!stack_.empty())
             {
-                if (format_.array_object_block_option() == block_options::next_line)
+                if (format_.array_object_split_lines() != line_split_kind::same_line)
                 {
-                    write_indent();
+                    stack_.back().unindent_at_end_ = true;
+                    stack_.push_back(stack_item(true,format_.array_object_split_lines(), false));
+                    write_indent1();
                 }
-                stack_.push_back(stack_item(true,format_.array_object_block_option()));
+                else
+                {
+                    stack_.push_back(stack_item(true,format_.array_object_split_lines(), false));
+                }
             }
-            else if (format_.root_object_block_option() == block_options::next_line)
+            else 
             {
-                stack_.push_back(stack_item(true,format_.root_object_block_option()));
-            }
-            else
-            {
-                stack_.push_back(stack_item(true));
+                stack_.push_back(stack_item(true, line_split_kind::multi_line, false));
             }
             indent();
         }
@@ -182,7 +179,10 @@ private:
         if (indenting_)
         {
             unindent();
-            write_indent();
+            if (stack_.back().unindent_at_end())
+            {
+                write_indent();
+            }
         }
         stack_.pop_back();
         bos_.put('}');
@@ -207,35 +207,39 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                if (format_.object_array_block_option() == block_options::next_line)
+                bos_.put('[');
+                indent();
+                if (format_.object_array_split_lines() != line_split_kind::same_line)
                 {
-                    write_indent();
+                    stack_.push_back(stack_item(false,format_.object_array_split_lines(),true));
                 }
-                stack_.push_back(stack_item(false,format_.object_array_block_option()));
+                else
+                {
+                    stack_.push_back(stack_item(false,format_.object_array_split_lines(),false));
+                }
             }
             else if (!stack_.empty())
             {
-                if (format_.array_array_block_option() == block_options::next_line)
+                if (format_.array_array_split_lines() != line_split_kind::same_line)
                 {
                     write_indent();
                 }
-                stack_.push_back(stack_item(false,format_.array_array_block_option()));
+                stack_.push_back(stack_item(false,format_.array_array_split_lines(), false));
+                indent();
+                bos_.put('[');
             }
-            else if (format_.root_array_block_option() == block_options::next_line)
+            else 
             {
-                stack_.push_back(stack_item(false,format_.root_array_block_option(),format_.root_array_block_option()));
+                stack_.push_back(stack_item(false, line_split_kind::multi_line, false));
+                indent();
+                bos_.put('[');
             }
-            else
-            {
-                stack_.push_back(stack_item(false));
-            }
-            indent();
         }
         else
         {
             stack_.push_back(stack_item(false));
+            bos_.put('[');
         }
-        bos_.put('[');
     }
 
     void do_end_array() override
@@ -244,7 +248,7 @@ private:
         if (indenting_)
         {
             unindent();
-            if (stack_.back().is_multiline())
+            if (stack_.back().unindent_at_end())
             {
                 write_indent();
             }
@@ -264,7 +268,7 @@ private:
             }
             if (indenting_)
             {
-                if (stack_.back().scalar_next_line())
+                if (stack_.back().is_multi_line())
                 {
                     write_indent();
                 }
@@ -383,7 +387,7 @@ private:
             }
             if (indenting_)
             {
-                if (stack_.back().scalar_next_line())
+                if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
                 {
                     write_indent();
                 }
@@ -399,9 +403,12 @@ private:
             {
                 bos_. put(',');
             }
-            if (indenting_ && stack_.back().is_next_line())
+            if (indenting_)
             {
-                write_indent();
+                if (stack_.back().is_new_line())
+                {
+                    write_indent();
+                }
             }
         }
     }
@@ -428,8 +435,17 @@ private:
     {
         if (!stack_.empty())
         {
-            stack_.back().multiline_ = true;
+            stack_.back().unindent_at_end_ = true;
         }
+        bos_. put('\n');
+        for (int i = 0; i < indent_; ++i)
+        {
+            bos_. put(' ');
+        }
+    }
+
+    void write_indent1()
+    {
         bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
         {
