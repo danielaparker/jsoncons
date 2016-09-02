@@ -966,7 +966,7 @@ result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$
 std::wcout &lt;&lt; result &lt;&lt; std::endl;
 
 <span class="pl-c">// (6) All authors and titles of books</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
+result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$..['author','title']<span class="pl-pds">"</span></span>);
 std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
 
 <p>Result:</p>

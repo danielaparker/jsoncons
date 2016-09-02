@@ -498,7 +498,7 @@ result = json_query(booklist, L"$[*][?(@.ratings)].title");
 std::wcout << result << std::endl;
 
 // (6) All authors and titles of books
-result = json_query(booklist, "$..['author','title']");
+result = json_query(booklist, L"$..['author','title']");
 std::wcout << pretty_print(result) << std::endl;
 ```
 Result:
