@@ -372,9 +372,9 @@ By default, array values in objects are displayed on the same line.
 The `pretty_print` function takes an optional second parameter, [output_format](https://github.com/danielaparker/jsoncons/wiki/output_format), that allows custom formatting of output.
 To display array values in objects on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
-    output_format format1;
-    format1.object_array_split_lines(line_split_kind::new_line);
-    std::cout << pretty_print(val,format1) << std::endl;
+output_format format;
+format.object_array_split_lines(line_split_kind::new_line);
+std::cout << pretty_print(val,format) << std::endl;
 ```
 produces
 ```json
@@ -389,11 +389,12 @@ produces
         1,2,3
     ]
 }
+```
 To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
 ```c++
-    output_format format2;
-    format2.object_array_split_lines(line_split_kind::multi_line);
-    std::cout << pretty_print(val,format2) << std::endl;
+output_format format;
+format.object_array_split_lines(line_split_kind::multi_line);
+std::cout << pretty_print(val,format) << std::endl;
 ```
 produces
 ```json

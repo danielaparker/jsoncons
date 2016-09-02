@@ -839,9 +839,9 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 <p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/output_format">output_format</a>, that allows custom formatting of output.<br>
 To display array values in objects on a new line, set the <code>object_array_split_lines</code> property to <code>line_split_kind::new_line</code>. The code</p>
 
-<div class="highlight highlight-source-c++"><pre>    output_format format1;
-    format1.object_array_split_lines(line_split_kind::new_line);
-    std::cout &lt;&lt; pretty_print(val,format1) &lt;&lt; std::endl;</pre></div>
+<div class="highlight highlight-source-c++"><pre>output_format format;
+format.object_array_split_lines(line_split_kind::new_line);
+std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
 <p>produces</p>
 
@@ -855,12 +855,13 @@ To display array values in objects on a new line, set the <code>object_array_spl
     <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [
         <span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>
     ]
-}
-To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
-```c++
-    output_format format<span class="pl-c1">2</span>;
-    format<span class="pl-c1">2</span>.object_array_split_lines(line_split_kind::multi_line);
-    std::cout &lt;&lt; pretty_print(val,format<span class="pl-c1">2</span>) &lt;&lt; std::endl;</pre></div>
+}</pre></div>
+
+<p>To display the elements of array values on multiple lines, set the <code>object_array_split_lines</code> property to <code>line_split_kind::multi_line</code>. The code</p>
+
+<div class="highlight highlight-source-c++"><pre>output_format format;
+format.object_array_split_lines(line_split_kind::multi_line);
+std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
 <p>produces</p>
 
