@@ -369,7 +369,7 @@ produces
     "verts": [1,2,3]
 }
 ```
-By default, within objects, array scalar values are displayed on the same line.
+By default, within objects, arrays of scalar values are displayed on the same line.
 
 The `pretty_print` function takes an optional second parameter, [output_format](https://github.com/danielaparker/jsoncons/wiki/output_format), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code

@@ -35,13 +35,11 @@ public:
     typedef typename CharTraits::pos_type                 pos_type;
     typedef typename CharTraits::off_type                 off_type;
     typedef CharTraits                                    traits_type;
-    typedef std::basic_streambuf<char_type, traits_type>  base_streambuf;
 
 public:
 
     explicit basic_ovectorbuf(std::size_t length) JSONCONS_NOEXCEPT
-        : base_streambuf(), 
-          mode_(std::ios_base::out | std::ios_base::binary), 
+        : mode_(std::ios_base::out | std::ios_base::binary), 
           buf_(length)
     {  
         // Set write position to beginning of buffer.
@@ -183,16 +181,14 @@ public:
     typedef typename std::basic_ios<char_type, CharTraits>::traits_type  traits_type;
 
 private:
-    typedef basic_ovectorbuf<CharT, CharTraits>         base_ouputbuf;
+    typedef basic_ovectorbuf<CharT, CharTraits>        base_ouputbuf;
     typedef std::basic_ios<char_type, CharTraits>      base_ios;
-    typedef std::basic_ostream<char_type, CharTraits>  base_streambuf;
     base_ouputbuf& get_buf() {return *this;}
     const base_ouputbuf& get_buf() const {return *this;}
 
 public:
     basic_ovectorstream(std::size_t length) JSONCONS_NOEXCEPT
-        : base_ouputbuf(length),  
-          base_streambuf(&get_buf())
+        : base_ouputbuf(length)
     {}
 
     ~basic_ovectorstream() {}
