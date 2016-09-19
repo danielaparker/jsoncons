@@ -355,24 +355,24 @@ public:
         static const size_t small_string_capacity = (sizeof(int64_t)/sizeof(char_type)) - 1;
 
         variant()
-            : type_(value_types::empty_object_t), length_or_precision_(0)
+            : type_(value_types::empty_object_t), length_or_precision_(0), value_()
         {
         }
 
         variant(const Allocator& a)
-            : type_(value_types::object_t), length_or_precision_(0)
+            : type_(value_types::object_t), length_or_precision_(0), value_()
         {
             value_.object_val_ = create_impl<object>(a, object_allocator(a));
         }
 
         explicit variant(variant&& var)
-            : type_(value_types::null_t), length_or_precision_(0)
+            : type_(value_types::null_t), length_or_precision_(0), value_()
         {
             swap(var);
         }
         
         explicit variant(variant&& var, const Allocator& a)
-            : type_(value_types::null_t), length_or_precision_(0)
+            : type_(value_types::null_t), length_or_precision_(0), value_()
         {
             swap(var);
         }
@@ -444,7 +444,7 @@ public:
         }
 #endif
         explicit variant(null_type)
-            : type_(value_types::null_t), length_or_precision_(0)
+            : type_(value_types::null_t), length_or_precision_(0), value_()
         {
         }
 

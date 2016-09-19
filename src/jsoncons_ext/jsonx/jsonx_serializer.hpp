@@ -47,7 +47,13 @@ void escape_attribute(const CharT* s,
         default:
             uint32_t u(c >= 0 ? c : 256 + c);
             // convert utf8 to codepoint
-            uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end);
+            const CharT* stop = nullptr;
+            uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end, stop);
+            if (it == stop)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
+            }
+            it = stop - 1;
             if (is_non_ascii_character(cp) || is_control_character(u))
             {
                 if (cp > 0xFFFF)

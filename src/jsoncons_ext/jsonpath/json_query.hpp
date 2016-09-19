@@ -137,7 +137,7 @@ private:
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
-    std::vector<std::shared_ptr<Json>> temp_;
+    std::vector<std::shared_ptr<Json>> temp_json_values_;
     size_t line_;
     size_t column_;
     const char_type* begin_input_;
@@ -154,7 +154,13 @@ private:
 
 public:
     jsonpath_evaluator()
-        : err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance()))
+        : state_(states::start), 
+          start_(0), end_(0), step_(0),
+          positive_start_(0),positive_end_(0), positive_step_(0),
+          end_undefined_(false), recursive_descent_(false),
+          line_(0), column_(0),
+          begin_input_(nullptr), end_input_(nullptr), p_(nullptr),
+          err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance()))
     {
     }
 
@@ -781,9 +787,9 @@ public:
                 }
                 else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
                 {
-                    auto q = std::make_shared<Json>(context_val.size());
-                    temp_.push_back(q);
-                    nodes_.push_back(q.get());
+                    auto temp = std::make_shared<Json>(context_val.size());
+                    temp_json_values_.push_back(temp);
+                    nodes_.push_back(temp.get());
                 }
             }
             if (recursive_descent_)
@@ -808,16 +814,20 @@ public:
                     size_t index = positive_start_ ? pos : s.size() - pos;
                     if (index < s.size())
                     {
-                        auto q = std::make_shared<Json>(s.substr(index,index+1));
-                        temp_.push_back(q);
-                        nodes_.push_back(q.get());
+                        uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(),s.data()+s.size(),pos);
+                        string_type cps;
+                        json_text_traits<char_type>::append_codepoint_to_string(cp,cps);
+                        auto temp = std::make_shared<Json>(cps);
+                        temp_json_values_.push_back(temp);
+                        nodes_.push_back(temp.get());
                     }
                 }
                 else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
                 {
-                    auto q = std::make_shared<Json>(s.size());
-                    temp_.push_back(q);
-                    nodes_.push_back(q.get());
+                    size_t count = json_text_traits<char_type>::codepoint_count(s.data(),s.data()+s.size());
+                    auto temp = std::make_shared<Json>(count);
+                    temp_json_values_.push_back(temp);
+                    nodes_.push_back(temp.get());
                 }
             }
         }
@@ -855,9 +865,9 @@ public:
             }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && context_val.size() > 0)
             {
-                auto q = std::make_shared<Json>(context_val.size());
-                temp_.push_back(q);
-                nodes_.push_back(q.get());
+                auto temp = std::make_shared<Json>(context_val.size());
+                temp_json_values_.push_back(temp);
+                nodes_.push_back(temp.get());
             }
             if (recursive_descent_)
             {
@@ -876,19 +886,19 @@ public:
             size_t pos = 0;
             if (try_string_to_index(name.data(),name.size(),&pos))
             {
-                size_t index = positive_start_ ? pos : s.size() - pos;
-                if (index < s.size())
-                {
-                    auto q = std::make_shared<Json>(s.substr(index,index+1));
-                    temp_.push_back(q);
-                    nodes_.push_back(q.get());
-                }
+                uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(),s.data()+s.size(),pos);
+                string_type cps;
+                json_text_traits<char_type>::append_codepoint_to_string(cp,cps);
+                auto temp = std::make_shared<Json>(cps);
+                temp_json_values_.push_back(temp);
+                nodes_.push_back(temp.get());
             }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
             {
-                auto q = std::make_shared<Json>(s.size());
-                temp_.push_back(q);
-                nodes_.push_back(q.get());
+                size_t count = json_text_traits<char_type>::codepoint_count(s.data(),s.data()+s.size());
+                auto temp = std::make_shared<Json>(count);
+                temp_json_values_.push_back(temp);
+                nodes_.push_back(temp.get());
             }
         }
     }
