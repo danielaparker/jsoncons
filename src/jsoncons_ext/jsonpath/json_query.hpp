@@ -680,9 +680,32 @@ public:
                 }
                 for (size_t j = start; j < end; j += step_)
                 {
-                    if (p->is_array() && j < p->size())
+                    if (j < p->size())
                     {
                         nodes_.push_back(std::addressof((*p)[j]));
+                    }
+                }
+            }
+            else if (p->is_string())
+            {
+                string_type s = p->as_string();
+                size_t start = positive_start_ ? start_ : s.length() - start_;
+                size_t end;
+                if (!end_undefined_)
+                {
+                    end = positive_end_ ? end_ : s.length() - end_;
+                }
+                else
+                {
+                    end = s.length();
+                }
+                for (size_t j = start; j < end; j += step_)
+                {
+                    if (j < s.length())
+                    {
+                        auto q = std::make_shared<Json>(s.substr(j,j+1));
+                        temp_.push_back(q);
+                        nodes_.push_back(q.get());
                     }
                 }
             }
@@ -694,24 +717,53 @@ public:
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             cjson_ptr p = stack_.back()[i];
-            size_t start = positive_start_ ? start_ : p->size() - start_;
-            size_t end;
-            if (!end_undefined_)
+            if (p->is_array())
             {
-                end = positive_end_ ? end_ : p->size() - end_;
-            }
-            else
-            {
-                end = p->size();
-            }
-
-            size_t j = end + step_ - 1;
-            while (j > (start+step_-1))
-            {
-                j -= step_;
-                if (p->is_array() && j < p->size())
+                size_t start = positive_start_ ? start_ : p->size() - start_;
+                size_t end;
+                if (!end_undefined_)
                 {
-                    nodes_.push_back(std::addressof((*p)[j]));
+                    end = positive_end_ ? end_ : p->size() - end_;
+                }
+                else
+                {
+                    end = p->size();
+                }
+
+                size_t j = end + step_ - 1;
+                while (j > (start+step_-1))
+                {
+                    j -= step_;
+                    if (j < p->size())
+                    {
+                        nodes_.push_back(std::addressof((*p)[j]));
+                    }
+                }
+            }
+            else if (p->is_string())
+            {
+                string_type s = p->as_string();
+                size_t start = positive_start_ ? start_ : s.length() - start_;
+                size_t end;
+                if (!end_undefined_)
+                {
+                    end = positive_end_ ? end_ : s.length() - end_;
+                }
+                else
+                {
+                    end = s.length();
+                }
+
+                size_t j = end + step_ - 1;
+                while (j > (start+step_-1))
+                {
+                    j -= step_;
+                    if (j < s.length())
+                    {
+                        auto q = std::make_shared<Json>(s.substr(j,j+1));
+                        temp_.push_back(q);
+                        nodes_.push_back(q.get());
+                    }
                 }
             }
         }
@@ -794,6 +846,30 @@ public:
                 }
             }
         }
+        else if (context_val.is_string())
+        {
+            for (const auto& name : names_)
+            {
+                size_t pos = 0;
+                string_type s = context_val.as_string();
+                if (try_string_to_index(name.data(),name.size(),&pos))
+                {
+                    size_t index = positive_start_ ? pos : s.size() - pos;
+                    if (index < s.size())
+                    {
+                        auto q = std::make_shared<Json>(s.substr(index,index+1));
+                        temp_.push_back(q);
+                        nodes_.push_back(q.get());
+                    }
+                }
+                else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
+                {
+                    auto q = std::make_shared<Json>(s.size());
+                    temp_.push_back(q);
+                    nodes_.push_back(q.get());
+                }
+            }
+        }
     }
 
     void select_values(const Json& context_val, const string_type& name)
@@ -841,6 +917,27 @@ public:
                         select_values(*it, name);
                     }
                 }
+            }
+        }
+        else if (context_val.is_string())
+        {
+            string_type s = context_val.as_string();
+            size_t pos = 0;
+            if (try_string_to_index(name.data(),name.size(),&pos))
+            {
+                size_t index = positive_start_ ? pos : s.size() - pos;
+                if (index < s.size())
+                {
+                    auto q = std::make_shared<Json>(s.substr(index,index+1));
+                    temp_.push_back(q);
+                    nodes_.push_back(q.get());
+                }
+            }
+            else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
+            {
+                auto q = std::make_shared<Json>(s.size());
+                temp_.push_back(q);
+                nodes_.push_back(q.get());
             }
         }
     }

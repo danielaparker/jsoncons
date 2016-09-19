@@ -727,6 +727,63 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)
     json result4 = json_query(val, path4);
     BOOST_CHECK_EQUAL(expected4, result4);
 }
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_string_indexation)
+{
+    json val = json::parse(R"(
+{
+    "_id": "57bed9c61a3bd20f785a6d0d",
+    "index": 0,
+    "guid": "8b9ab973-6db1-452d-a47c-3264529446a0",
+    "isActive": true,
+    "balance": "$1,056.69",
+    "picture": "http://placehold.it/32x32",
+    "age": 40,
+    "eyeColor": "brown",
+    "name": "Staci Marquez",
+    "gender": "female",
+    "company": "AFFLUEX",
+    "email": "stacimarquez@affluex.com",
+    "phone": "+1 (804) 473-2774",
+    "address": "397 Keap Street, Trinway, Nevada, 5380",
+    "about": "Incididunt esse Lorem anim quis laborum quis pariatur anim eu ut do officia nostrud. Labore ullamco quis laboris ea laborum ut aliquip proident enim consequat et fugiat dolore aliqua. Reprehenderit irure magna quis fugiat amet velit. Elit consequat officia adipisicing ad officia occaecat ipsum velit et. Irure pariatur est duis fugiat ipsum in.\r\n",
+    "registered": "2015-12-02T10:10:54 -05:00",
+    "latitude": -8.179164,
+    "longitude": -119.038608,
+    "tags": [
+      "aute",
+      "nostrud",
+      "laboris",
+      "tempor",
+      "aliqua",
+      "enim",
+      "nostrud"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Norman Mcgee"
+      },
+      {
+        "id": 1,
+        "name": "Judy Juarez"
+      },
+      {
+        "id": 2,
+        "name": "Whitehead Conway"
+      }
+    ],
+    "greeting": "Hello, Staci Marquez! You have 5 unread messages.",
+    "favoriteFruit": "strawberry"
+  }
+    )");
+
+    json expected = json::array(1,"I");
+
+    json result = json_query(val, "$..about[0]");
+    BOOST_CHECK_EQUAL(expected, result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
