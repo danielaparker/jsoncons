@@ -187,8 +187,13 @@ private:
     const base_ouputbuf& get_buf() const {return *this;}
 
 public:
+    basic_ovectorstream() JSONCONS_NOEXCEPT
+        : basic_ovectorbuf<CharT, CharTraits>(),
+          std::basic_ostream<CharT, CharTraits>()
+    {}
     basic_ovectorstream(std::size_t length) JSONCONS_NOEXCEPT
-        : base_ouputbuf(length)
+        : basic_ovectorbuf<CharT, CharTraits>(length),
+          std::basic_ostream<CharT, CharTraits>()
     {}
 
     ~basic_ovectorstream() {}
