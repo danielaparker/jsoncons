@@ -686,29 +686,6 @@ public:
                     }
                 }
             }
-            else if (p->is_string())
-            {
-                string_type s = p->as_string();
-                size_t start = positive_start_ ? start_ : s.length() - start_;
-                size_t end;
-                if (!end_undefined_)
-                {
-                    end = positive_end_ ? end_ : s.length() - end_;
-                }
-                else
-                {
-                    end = s.length();
-                }
-                for (size_t j = start; j < end; j += step_)
-                {
-                    if (j < s.length())
-                    {
-                        auto q = std::make_shared<Json>(s.substr(j,j+1));
-                        temp_.push_back(q);
-                        nodes_.push_back(q.get());
-                    }
-                }
-            }
         }
     }
 
@@ -737,32 +714,6 @@ public:
                     if (j < p->size())
                     {
                         nodes_.push_back(std::addressof((*p)[j]));
-                    }
-                }
-            }
-            else if (p->is_string())
-            {
-                string_type s = p->as_string();
-                size_t start = positive_start_ ? start_ : s.length() - start_;
-                size_t end;
-                if (!end_undefined_)
-                {
-                    end = positive_end_ ? end_ : s.length() - end_;
-                }
-                else
-                {
-                    end = s.length();
-                }
-
-                size_t j = end + step_ - 1;
-                while (j > (start+step_-1))
-                {
-                    j -= step_;
-                    if (j < s.length())
-                    {
-                        auto q = std::make_shared<Json>(s.substr(j,j+1));
-                        temp_.push_back(q);
-                        nodes_.push_back(q.get());
                     }
                 }
             }
