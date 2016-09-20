@@ -130,12 +130,12 @@ private:
         virtual void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
-    class index_selector : public selector
+    class expr_selector : public selector
     {
     private:
          jsonpath_filter_parser<Json> parser_;
     public:
-        index_selector(const char_type** p, size_t* line, size_t* column,
+        expr_selector(const char_type** p, size_t* line, size_t* column,
                        const char_type* expr, const char_type* end)
             : parser_(p,line,column)
         {
@@ -579,26 +579,7 @@ public:
                     {
                         //jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
                         //parser.parse(p_,end_input_);
-                        selectors_.push_back(std::make_shared<index_selector>(&p_,&line_,&column_,p_,end_input_));
-                        /*for (size_t i = 0; i < stack_.back().size(); ++i)
-                        {
-                            auto index = parser.eval(*(stack_.back()[i]));
-                            if (index.template is<size_t>())
-                            {
-                                start_ = index. template as<size_t>();
-                                cjson_ptr p = stack_.back()[i];
-                                if (p->is_array() && start_ < p->size())
-                                {
-                                    nodes_.push_back(std::addressof((*p)[start_]));
-                                }
-                            }
-                            else if (index.is_string())
-                            {
-                                select_values(*(stack_.back()[i]), index.as_string());
-                            }
-                        }
-                        */
-                        buffer_.clear();
+                        selectors_.push_back(std::make_shared<expr_selector>(&p_,&line_,&column_,p_,end_input_));
                         state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
