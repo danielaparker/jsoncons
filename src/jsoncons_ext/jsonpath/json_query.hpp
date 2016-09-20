@@ -137,9 +137,9 @@ private:
     public:
         expr_selector(const char_type** p, size_t* line, size_t* column,
                        const char_type* expr, const char_type* end)
-            : parser_(p,line,column)
+            : parser_(line,column)
         {
-            parser_.parse(expr,end);
+            parser_.parse(expr,end,p);
         }
 
         void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
@@ -585,8 +585,8 @@ public:
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
-                        parser.parse(p_,end_input_);
+                        jsonpath_filter_parser<Json> parser(&line_,&column_);
+                        parser.parse(p_,end_input_,&p_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {

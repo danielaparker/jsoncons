@@ -703,11 +703,11 @@ class jsonpath_filter_parser
     int depth_;
     const char_type* begin_input_;
     const char_type* end_input_;
-    const char_type*& p_;
+    const char_type* p_;
     filter_states pre_line_break_state_;
 public:
-    jsonpath_filter_parser(const char_type** expr, size_t* line,size_t* column)
-        : line_(*line), column_(*column), depth_(0), p_(*expr)
+    jsonpath_filter_parser(size_t* line,size_t* column)
+        : line_(*line), column_(*column), depth_(0), p_(nullptr)
     {
     }
 
@@ -899,12 +899,12 @@ public:
         }
     }
 
-    void parse(const char_type* expr, size_t length)
+    void parse(const char_type* expr, size_t length, const char_type** end_ptr)
     {
-        parse(expr,expr+length);
+        parse(expr,expr+length, end_ptr);
     }
 
-    void parse(const char_type* expr, const char_type* end_expr)
+    void parse(const char_type* expr, const char_type* end_expr, const char_type** end_ptr)
     {
         p_ = expr;
         end_input_ = end_expr;
@@ -1489,6 +1489,7 @@ public:
         {
             throw parse_exception(jsonpath_parser_errc::invalid_filter_unbalanced_paren,line_,column_);
         }
+        *end_ptr = p_;
     }
 };
 
