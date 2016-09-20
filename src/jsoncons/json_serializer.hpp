@@ -279,7 +279,10 @@ private:
         escape_string<CharT>(name, length, format_, bos_);
         bos_.put('\"');
         bos_.put(':');
-        bos_.put(' ');
+        if (indenting_)
+        {
+            bos_.put(' ');
+        }
     }
 
     void do_null_value() override
