@@ -155,55 +155,8 @@ private:
             }
             else if (index.is_string())
             {
-                size_t positive_start = true;
-                string_type name = index.as_string();
-                if (context.is_object() && context.count(name) > 0)
-                {
-                    nodes.push_back(std::addressof(context.at(name)));
-                }
-                else if (context.is_array())
-                {
-                    size_t pos = 0;
-                    if (try_string_to_index(name.data(), name.size(), &pos))
-                    {
-                        size_t i = positive_start ? pos : context.size() - pos;
-                        if (i < context.size())
-                        {
-                            nodes.push_back(std::addressof(context[i]));
-                        }
-                    }
-                    else if (name == json_jsonpath_traits<char_type>::length_literal() && context.size() > 0)
-                    {
-                        auto temp = std::make_shared<Json>(context.size());
-                        temp_json_values.push_back(temp);
-                        nodes.push_back(temp.get());
-                    }
-                }
-                else if (context.is_string())
-                {
-                    size_t pos = 0;
-                    string_type s = context.as_string();
-                    if (try_string_to_index(name.data(), name.size(), &pos))
-                    {
-                        size_t i = positive_start ? pos : s.size() - pos;
-                        if (i < s.size())
-                        {
-                            uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(), s.data() + s.size(), pos);
-                            string_type cps;
-                            json_text_traits<char_type>::append_codepoint_to_string(cp, cps);
-                            auto temp = std::make_shared<Json>(cps);
-                            temp_json_values.push_back(temp);
-                            nodes.push_back(temp.get());
-                        }
-                    }
-                    else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
-                    {
-                        size_t count = json_text_traits<char_type>::codepoint_count(s.data(), s.data() + s.size());
-                        auto temp = std::make_shared<Json>(count);
-                        temp_json_values.push_back(temp);
-                        nodes.push_back(temp.get());
-                    }
-                }
+                name_selector selector(true,index.as_string());
+                selector.select(context, nodes, temp_json_values);
             }
         }
     };
@@ -577,8 +530,8 @@ public:
                     break;
                 case '(':
                     {
-                        //jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
-                        //parser.parse(p_,end_input_);
+                        //jsonpath_filter_parser<Json> parser(&line_,&column_);
+                        //parser.parse(p_,end_input_,&p_);
                         selectors_.push_back(std::make_shared<expr_selector>(&p_,&line_,&column_,p_,end_input_));
                         state_ = states::expect_comma_or_right_bracket;
                     }

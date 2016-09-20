@@ -711,6 +711,16 @@ public:
     {
     }
 
+    size_t line() const
+    {
+        return line_;
+    }
+
+    size_t column() const
+    {
+        return column_;
+    }
+
     bool exists(const Json& context_node)
     {
         for (auto it=tokens_.begin(); it != tokens_.end(); ++it)
