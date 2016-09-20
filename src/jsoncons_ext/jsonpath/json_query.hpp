@@ -133,18 +133,16 @@ private:
     class expr_selector : public selector
     {
     private:
-         jsonpath_filter_parser<Json> parser_;
+         jsonpath_filter_result<Json> result_;
     public:
-        expr_selector(const char_type** p, size_t* line, size_t* column,
-                       const char_type* expr, const char_type* end)
-            : parser_(line,column)
+        expr_selector(const jsonpath_filter_result<Json>& result)
+            : result_(result)
         {
-            parser_.parse(expr,end,p);
         }
 
         void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
-            auto index = parser_.eval(context);
+            auto index = result_.eval(context);
             if (index.template is<size_t>())
             {
                 size_t start = index. template as<size_t>();
@@ -530,20 +528,20 @@ public:
                     break;
                 case '(':
                     {
-                        //jsonpath_filter_parser<Json> parser(&line_,&column_);
-                        //parser.parse(p_,end_input_,&p_);
-                        selectors_.push_back(std::make_shared<expr_selector>(&p_,&line_,&column_,p_,end_input_));
+                        jsonpath_filter_parser<Json> parser(&line_,&column_);
+                        auto result = parser.parse(p_,end_input_,&p_);
+                        selectors_.push_back(std::make_shared<expr_selector>(result));
                         state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
                 case '?':
                     {
                         jsonpath_filter_parser<Json> parser(&line_,&column_);
-                        parser.parse(p_,end_input_,&p_);
+                        auto result = parser.parse(p_,end_input_,&p_);
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {
-                            accept(*(stack_.back()[j]),parser);
+                            accept(*(stack_.back()[j]),result);
                         }
                         state_ = states::expect_comma_or_right_bracket;
                     }
@@ -682,7 +680,7 @@ public:
     }
 
     void accept(const Json& val,
-                jsonpath_filter_parser<Json>& filter)
+                jsonpath_filter_result<Json>& filter)
     {
         if (val.is_object())
         {
