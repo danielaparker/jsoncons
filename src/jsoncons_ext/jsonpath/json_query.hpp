@@ -127,16 +127,84 @@ private:
     class selector
     {
     public:
-        virtual void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) const = 0;
+        virtual void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
     class index_selector : public selector
     {
     private:
-        size_t index_;
+         jsonpath_filter_parser<Json> parser_;
     public:
-        void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) const override
+        index_selector(const char_type** p, size_t* line, size_t* column,
+                       const char_type* expr, const char_type* end)
+            : parser_(p,line,column)
         {
+            parser_.parse(expr,end);
+        }
+
+        void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
+        {
+            auto index = parser_.eval(context);
+            if (index.template is<size_t>())
+            {
+                size_t start = index. template as<size_t>();
+                if (context.is_array() && start < context.size())
+                {
+                    nodes.push_back(std::addressof(context[start]));
+                }
+            }
+            else if (index.is_string())
+            {
+                size_t positive_start = true;
+                string_type name = index.as_string();
+                if (context.is_object() && context.count(name) > 0)
+                {
+                    nodes.push_back(std::addressof(context.at(name)));
+                }
+                else if (context.is_array())
+                {
+                    size_t pos = 0;
+                    if (try_string_to_index(name.data(), name.size(), &pos))
+                    {
+                        size_t i = positive_start ? pos : context.size() - pos;
+                        if (i < context.size())
+                        {
+                            nodes.push_back(std::addressof(context[i]));
+                        }
+                    }
+                    else if (name == json_jsonpath_traits<char_type>::length_literal() && context.size() > 0)
+                    {
+                        auto temp = std::make_shared<Json>(context.size());
+                        temp_json_values.push_back(temp);
+                        nodes.push_back(temp.get());
+                    }
+                }
+                else if (context.is_string())
+                {
+                    size_t pos = 0;
+                    string_type s = context.as_string();
+                    if (try_string_to_index(name.data(), name.size(), &pos))
+                    {
+                        size_t i = positive_start ? pos : s.size() - pos;
+                        if (i < s.size())
+                        {
+                            uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(), s.data() + s.size(), pos);
+                            string_type cps;
+                            json_text_traits<char_type>::append_codepoint_to_string(cp, cps);
+                            auto temp = std::make_shared<Json>(cps);
+                            temp_json_values.push_back(temp);
+                            nodes.push_back(temp.get());
+                        }
+                    }
+                    else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
+                    {
+                        size_t count = json_text_traits<char_type>::codepoint_count(s.data(), s.data() + s.size());
+                        auto temp = std::make_shared<Json>(count);
+                        temp_json_values.push_back(temp);
+                        nodes.push_back(temp.get());
+                    }
+                }
+            }
         }
     };
 
@@ -153,7 +221,7 @@ private:
 
         void select(const Json& context,
             std::vector<cjson_ptr>& nodes,
-            std::vector<std::shared_ptr<Json>>& temp_json_values) const override
+            std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             if (context.is_object() && context.count(name_) > 0)
             {
@@ -509,9 +577,10 @@ public:
                     break;
                 case '(':
                     {
-                        jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
-                        parser.parse(p_,end_input_);
-                        for (size_t i = 0; i < stack_.back().size(); ++i)
+                        //jsonpath_filter_parser<Json> parser(&p_,&line_,&column_);
+                        //parser.parse(p_,end_input_);
+                        selectors_.push_back(std::make_shared<index_selector>(&p_,&line_,&column_,p_,end_input_));
+                        /*for (size_t i = 0; i < stack_.back().size(); ++i)
                         {
                             auto index = parser.eval(*(stack_.back()[i]));
                             if (index.template is<size_t>())
@@ -528,6 +597,7 @@ public:
                                 select_values(*(stack_.back()[i]), index.as_string());
                             }
                         }
+                        */
                         buffer_.clear();
                         state_ = states::expect_comma_or_right_bracket;
                     }

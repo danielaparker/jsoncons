@@ -684,6 +684,27 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_next_to_last_of_two_arrays)
     BOOST_CHECK_EQUAL(expected2,result2);
 
 }
+BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation2)
+{
+    json val = json::parse(R"(
+{ "store": {
+    "book": [ 
+          { "author": "Nigel Rees"
+          },
+          { "author": "Evelyn Waugh"
+          },
+          { "author": "Herman Melville"
+          }
+        ]
+    }  
+}
+    )");
+
+    json result = json_query(val, "$..book[(@.length - 1),(@.length - 2)]");
+
+    std::cout << "$..book[(@.length - 1),(@.length - 2)]" << std::endl;
+    std::cout << result << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)
 {
@@ -727,6 +748,40 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation)
 
     json result4 = json_query(val, path4);
     BOOST_CHECK_EQUAL(expected4, result4);
+}
+
+BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation3)
+{
+    json val = json::parse(R"(
+{
+  "firstName": "John",
+  "lastName" : "doe",
+  "age"      : 26,
+  "address"  : {
+    "streetAddress": "naist street",
+    "city"         : "Nara",
+    "postalCode"   : "630-0192"
+  },
+  "phoneNumbers": [
+    {
+      "type"  : "iPhone",
+      "number": "0123-4567-8888"
+    },
+    {
+      "type"  : "home",
+      "number": "0123-4567-8910"
+    }
+  ]
+}
+    )");
+
+    json expected = json::parse(R"(
+["John","doe"]
+)");
+
+    json result2 = json_query(val, "$..[('type'),('number')]");
+    //BOOST_CHECK_EQUAL(expected, result2);
+    std::cout << pretty_print(result2) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_string_indexation)
