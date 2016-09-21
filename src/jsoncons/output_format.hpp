@@ -290,7 +290,7 @@ void escape_string(const CharT* s,
             {
                 // convert utf8 to codepoint
                 const CharT* stop = nullptr;
-                uint32_t cp = json_text_traits<CharT>::convert_char_to_codepoint(it, end, &stop);
+                uint32_t cp = json_text_traits<CharT>::char_sequence_to_codepoint(it, end, &stop);
                 if (it == stop)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");

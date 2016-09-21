@@ -197,12 +197,10 @@ private:
                 if (try_string_to_index(name_.data(), name_.size(), &pos))
                 {
                     size_t index = positive_start_ ? pos : s.size() - pos;
-                    if (index < s.size())
+                    auto sequence = json_text_traits<char_type>::char_sequence_at(s.data(), s.data() + s.size(), index);
+                    if (sequence.second > 0)
                     {
-                        uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(), s.data() + s.size(), pos);
-                        string_type cps;
-                        json_text_traits<char_type>::append_codepoint_to_string(cp, cps);
-                        auto temp = std::make_shared<Json>(cps);
+                        auto temp = std::make_shared<Json>(sequence.first,sequence.second);
                         temp_json_values.push_back(temp);
                         nodes.push_back(temp.get());
                     }
@@ -863,12 +861,13 @@ public:
             size_t pos = 0;
             if (try_string_to_index(name.data(),name.size(),&pos))
             {
-                uint32_t cp = json_text_traits<char_type>::codepoint_at(s.data(),s.data()+s.size(),pos);
-                string_type cps;
-                json_text_traits<char_type>::append_codepoint_to_string(cp,cps);
-                auto temp = std::make_shared<Json>(cps);
-                temp_json_values_.push_back(temp);
-                nodes_.push_back(temp.get());
+                auto sequence = json_text_traits<char_type>::char_sequence_at(s.data(), s.data() + s.size(), pos);
+                if (sequence.second > 0)
+                {
+                    auto temp = std::make_shared<Json>(sequence.first,sequence.second);
+                    temp_json_values_.push_back(temp);
+                    nodes_.push_back(temp.get());
+                }
             }
             else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
             {
