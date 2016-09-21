@@ -934,7 +934,6 @@ public:
         p_ = expr;
         end_input_ = end_expr;
         depth_ = 0;
-        tokens.clear();
         state_ = filter_states::start;
         bool done = false;
         while (!done && p_ < end_input_)
