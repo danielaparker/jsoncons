@@ -690,14 +690,14 @@ public:
 };
 
 template <class Json>
-class jsonpath_filter_result
+class jsonpath_filter_expr
 {
     std::vector<token<Json>> tokens_;
     size_t line_;
     size_t column_;
 public:
 
-    jsonpath_filter_result(const std::vector<token<Json>>& tokens, size_t line, size_t column)
+    jsonpath_filter_expr(const std::vector<token<Json>>& tokens, size_t line, size_t column)
         : tokens_(tokens), line_(line), column_(column)
     {
     }
@@ -897,18 +897,15 @@ class jsonpath_filter_parser
     typedef typename Json::string_type string_type;
     typedef typename Json::char_type char_type;
 
-    size_t& line_;
-    size_t& column_;
-    filter_states state_;
-    string_type buffer_;
-    int depth_;
-    const char_type* begin_input_;
-    const char_type* end_input_;
-    const char_type* p_;
-    filter_states pre_line_break_state_;
+    size_t line_;
+    size_t column_;
 public:
-    jsonpath_filter_parser(size_t* line,size_t* column)
-        : line_(*line), column_(*column), depth_(0), p_(nullptr)
+    jsonpath_filter_parser()
+        : line_(1), column_(1)
+    {
+    }
+    jsonpath_filter_parser(size_t line, size_t column)
+        : line_(line), column_(column)
     {
     }
 
@@ -922,159 +919,159 @@ public:
         return column_;
     }
 
-    jsonpath_filter_result<Json> parse(const char_type* expr, size_t length, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(const char_type* p, size_t length, const char_type** end_ptr)
     {
         return parse(expr,expr+length, end_ptr);
     }
 
-    jsonpath_filter_result<Json> parse(const char_type* expr, const char_type* end_expr, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
         std::vector<token<Json>> tokens;
+        string_type buffer;
+        filter_states pre_line_break_state = filter_states::start;
 
-        p_ = expr;
-        end_input_ = end_expr;
-        depth_ = 0;
-        state_ = filter_states::start;
+        int depth = 0;
+        filter_states state = filter_states::start;
         bool done = false;
-        while (!done && p_ < end_input_)
+        while (!done && p < end_expr)
         {
-            switch (state_)
+            switch (state)
             {
             case filter_states::cr:
                 ++line_;
                 column_ = 1;
-                switch (*p_)
+                switch (*p)
                 {
                 case '\n':
-                    state_ = pre_line_break_state_;
-                    ++p_;
+                    state = pre_line_break_state;
+                    ++p;
                     ++column_;
                     break;
                 default:
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 }
                 break;
             case filter_states::lf:
                 ++line_;
                 column_ = 1;
-                state_ = pre_line_break_state_;
+                state = pre_line_break_state;
                 break;
             case filter_states::start:
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
-                    pre_line_break_state_ = state_;
-                    state_ = filter_states::lf;
+                    pre_line_break_state = state;
+                    state = filter_states::lf;
                     break;
                 case '(':
-                    state_ = filter_states::expect_path_or_value;
-                    ++depth_;
+                    state = filter_states::expect_path_or_value;
+                    ++depth;
                     tokens.push_back(token<Json>(token_types::left_paren));
                     break;
                 case ')':
                     tokens.push_back(token<Json>(token_types::right_paren));
-                    if (--depth_ == 0)
+                    if (--depth == 0)
                     {
                         done = true;
                     }
                     break;
                 }
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::oper:
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case '!':
-                    if (p_+1  < end_input_ && *(p_+1) == '=')
+                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::ne));
                     }
                     else
                     {
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::exclaim));
                     }
                     break;
                 case '&':
-                    if (p_+1  < end_input_ && *(p_+1) == '&')
+                    if (p+1  < end_expr && *(p+1) == '&')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::ampamp));
                     }
                     break;
                 case '|':
-                    if (p_+1  < end_input_ && *(p_+1) == '|')
+                    if (p+1  < end_expr && *(p+1) == '|')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::pipepipe));
                     }
                     break;
                 case '=':
-                    if (p_+1  < end_input_ && *(p_+1) == '=')
+                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::eq));
                     }
-                    else if (p_+1  < end_input_ && *(p_+1) == '~')
+                    else if (p+1  < end_expr && *(p+1) == '~')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_regex;
+                        state = filter_states::expect_regex;
                         tokens.push_back(token<Json>(token_types::regex));
                     }
                     break;
                 case '>':
-                    if (p_+1  < end_input_ && *(p_+1) == '=')
+                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::gte));
                     }
                     else
                     {
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::gt));
                     }
                     break;
                 case '<':
-                    if (p_+1  < end_input_ && *(p_+1) == '=')
+                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p_;
+                        ++p;
                         ++column_;
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::lte));
                     }
                     else
                     {
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         tokens.push_back(token<Json>(token_types::lt));
                     }
                     break;
                 case '+':
-                    state_ = filter_states::expect_path_or_value;
+                    state = filter_states::expect_path_or_value;
                     tokens.push_back(token<Json>(token_types::plus));
                     break;
                 case '-':
-                    state_ = filter_states::expect_path_or_value;
+                    state = filter_states::expect_path_or_value;
                     tokens.push_back(token<Json>(token_types::minus));
                     break;
                 case ' ':case '\t':
@@ -1084,18 +1081,18 @@ public:
                     break;
 
                 }
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::unquoted_text: 
                 {
-                    switch (*p_)
+                    switch (*p)
                     {
                     case '\r':
                     case '\n':
                         ++line_;
                         column_ = 1;
-                        state_ = pre_line_break_state_;
+                        state = pre_line_break_state;
                         break;
                     case '<':
                     case '>':
@@ -1106,69 +1103,69 @@ public:
                     case '+':
                     case '-':
                         {
-                            if (buffer_.length() > 0)
+                            if (buffer.length() > 0)
                             {
                                 try
                                 {
-                                    auto val = Json::parse(buffer_);
+                                    auto val = Json::parse(buffer);
                                     tokens.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                                 }
                                 catch (const parse_exception& e)
                                 {
                                     throw parse_exception(e.code(),line_,column_);
                                 }
-                                buffer_.clear();
+                                buffer.clear();
                             }
-                            state_ = filter_states::oper;
+                            state = filter_states::oper;
                         }
                         break;
                     case ')':
-                        if (buffer_.length() > 0)
+                        if (buffer.length() > 0)
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 tokens.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
                                 throw parse_exception(e.code(),line_,column_);
                             }
-                            buffer_.clear();
+                            buffer.clear();
                         }
                         tokens.push_back(token<Json>(token_types::right_paren));
-                        if (--depth_ == 0)
+                        if (--depth == 0)
                         {
-                            state_ = filter_states::start;
+                            state = filter_states::start;
                             done = true;
                         }
                         else
                         {
-                            state_ = filter_states::expect_path_or_value;
+                            state = filter_states::expect_path_or_value;
                         }
-                        ++p_;
+                        ++p;
                         ++column_;
                         break;
                     case ' ':case '\t':
-                        if (buffer_.length() > 0)
+                        if (buffer.length() > 0)
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 tokens.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
                                 throw parse_exception(e.code(),line_,column_);
                             }
-                            buffer_.clear();
+                            buffer.clear();
                         }
-                        ++p_;
+                        ++p;
                         ++column_;
                         break; 
                     default: 
-                        buffer_.push_back(*p_);
-                        ++p_;
+                        buffer.push_back(*p);
+                        ++p;
                         ++column_;
                         break;
                     }
@@ -1176,102 +1173,102 @@ public:
                 break;
             case filter_states::single_quoted_text: 
                 {
-                    switch (*p_)
+                    switch (*p)
                     {                   
                     case '\r':
                     case '\n':
                         ++line_;
                         column_ = 1;
-                        state_ = pre_line_break_state_;
+                        state = pre_line_break_state;
                         break;
                     case '\\':
-                        buffer_.push_back(*p_);
-                        if (p_+1 < end_input_)
+                        buffer.push_back(*p);
+                        if (p+1 < end_expr)
                         {
-                            ++p_;
+                            ++p;
                             ++column_;
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p);
                         }
                         break;
                     case '\'':
-                        buffer_.push_back('\"');
-                        //if (buffer_.length() > 0)
+                        buffer.push_back('\"');
+                        //if (buffer.length() > 0)
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 tokens.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
                                 throw parse_exception(e.code(),line_,column_);
                             }
-                            buffer_.clear();
+                            buffer.clear();
                         }
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         break;
 
                     default: 
-                        buffer_.push_back(*p_);
+                        buffer.push_back(*p);
                         break;
                     }
                 }
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::double_quoted_text: 
                 {
-                    switch (*p_)
+                    switch (*p)
                     {                   
                     case '\r':
                     case '\n':
                         ++line_;
                         column_ = 1;
-                        state_ = pre_line_break_state_;
+                        state = pre_line_break_state;
                         break;
                     case '\\':
-                        buffer_.push_back(*p_);
-                        if (p_+1 < end_input_)
+                        buffer.push_back(*p);
+                        if (p+1 < end_expr)
                         {
-                            ++p_;
+                            ++p;
                             ++column_;
-                            buffer_.push_back(*p_);
+                            buffer.push_back(*p);
                         }
                         break;
                     case '\"':
-                        buffer_.push_back(*p_);
-                        //if (buffer_.length() > 0)
+                        buffer.push_back(*p);
+                        //if (buffer.length() > 0)
                         {
                             try
                             {
-                                auto val = Json::parse(buffer_);
+                                auto val = Json::parse(buffer);
                                 tokens.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
                                 throw parse_exception(e.code(),line_,column_);
                             }
-                            buffer_.clear();
+                            buffer.clear();
                         }
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         break;
 
                     default: 
-                        buffer_.push_back(*p_);
+                        buffer.push_back(*p);
                         break;
                     }
                 }
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::expect_path_or_value: 
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case '<':
                 case '>':
@@ -1281,70 +1278,70 @@ public:
                 case '|':
                 case '+':
                 case '-':
-                    state_ = filter_states::oper;
+                    state = filter_states::oper;
                     // don't increment
                     break;
                 case '@':
-                    buffer_.push_back(*p_);
-                    state_ = filter_states::path;
-                    ++p_;
+                    buffer.push_back(*p);
+                    state = filter_states::path;
+                    ++p;
                     ++column_;
                     break;
                 case ' ':case '\t':
-                    ++p_;
+                    ++p;
                     ++column_;
                     break;
                 case '\'':
-                    buffer_.push_back('\"');
-                    state_ = filter_states::single_quoted_text;
-                    ++p_;
+                    buffer.push_back('\"');
+                    state = filter_states::single_quoted_text;
+                    ++p;
                     ++column_;
                     break;
                 case '\"':
-                    buffer_.push_back(*p_);
-                    state_ = filter_states::double_quoted_text;
-                    ++p_;
+                    buffer.push_back(*p);
+                    state = filter_states::double_quoted_text;
+                    ++p;
                     ++column_;
                     break;
                 case '(':
-                    ++depth_;
+                    ++depth;
                     tokens.push_back(token<Json>(token_types::left_paren));
-                    ++p_;
+                    ++p;
                     ++column_;
                     break;
                 case ')':
                     tokens.push_back(token<Json>(token_types::right_paren));
-                    if (--depth_ == 0)
+                    if (--depth == 0)
                     {
                         done = true;
-                        state_ = filter_states::start;
+                        state = filter_states::start;
                     }
-                    ++p_;
+                    ++p;
                     ++column_;
                     break;
                 default: 
                     // don't increment
-                    state_ = filter_states::unquoted_text;
+                    state = filter_states::unquoted_text;
                     break;
                 };
                 break;
             case filter_states::expect_oper_or_right_round_bracket: 
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case ' ':case '\t':
                     break;
                 case ')':
                     tokens.push_back(token<Json>(token_types::right_paren));
-                    if (--depth_ == 0)
+                    if (--depth == 0)
                     {
                         done = true;
-                        state_ = filter_states::start;
+                        state = filter_states::start;
                     }
                     break;
                 case '<':
@@ -1356,7 +1353,7 @@ public:
                 case '+':
                 case '-':
                     {
-                        state_ = filter_states::oper;
+                        state = filter_states::oper;
                         // don't increment p
                     }
                     break;
@@ -1366,43 +1363,43 @@ public:
                 };
                 break;
             case filter_states::expect_right_round_bracket: 
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case ' ':case '\t':
                     break;
                 case ')':
                     tokens.push_back(token<Json>(token_types::right_paren));
-                    if (--depth_ == 0)
+                    if (--depth == 0)
                     {
                         done = true;
-                        state_ = filter_states::start;
+                        state = filter_states::start;
                     }
                     else 
                     {
-                        state_ = filter_states::expect_oper_or_right_round_bracket;
+                        state = filter_states::expect_oper_or_right_round_bracket;
                     }
                     break;
                 default: 
                     throw parse_exception(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
                 };
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::path: 
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case '<':
                 case '>':
@@ -1413,52 +1410,52 @@ public:
                 case '+':
                 case '-':
                     {
-                        if (buffer_.length() > 0)
+                        if (buffer.length() > 0)
                         {
-                            tokens.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer_)));
-                            buffer_.clear();
+                            tokens.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer)));
+                            buffer.clear();
                         }
-                        state_ = filter_states::oper;
+                        state = filter_states::oper;
                         // don't increment
                     }
                     break;
                 case ')':
-                    if (buffer_.length() > 0)
+                    if (buffer.length() > 0)
                     {
-                        tokens.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer_)));
+                        tokens.push_back(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer)));
                         tokens.push_back(token<Json>(token_types::right_paren));
-                        buffer_.clear();
+                        buffer.clear();
                     }
-                    if (--depth_ == 0)
+                    if (--depth == 0)
                     {
-                        state_ = filter_states::start;
+                        state = filter_states::start;
                         done = true;
                     }
                     else
                     {
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                     }
-                    ++p_;
+                    ++p;
                     ++column_;
                     break;
                 default:
-                    buffer_.push_back(*p_);
-                    ++p_;
+                    buffer.push_back(*p);
+                    ++p;
                     ++column_;
                     break;
                 };
                 break;
             case filter_states::expect_regex: 
-                switch (*p_)
+                switch (*p)
                 {
                 case '\r':
                 case '\n':
                     ++line_;
                     column_ = 1;
-                    state_ = pre_line_break_state_;
+                    state = pre_line_break_state;
                     break;
                 case '/':
-                    state_ = filter_states::regex;
+                    state = filter_states::regex;
                     break;
                 case ' ':case '\t':
                     break;
@@ -1466,56 +1463,56 @@ public:
                     throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_slash,line_,column_);
                     break;
                 };
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             case filter_states::regex: 
                 {
-                    switch (*p_)
+                    switch (*p)
                     {                   
                     case '\r':
                     case '\n':
                         ++line_;
                         column_ = 1;
-                        state_ = pre_line_break_state_;
+                        state = pre_line_break_state;
                         break;
                     case '/':
-                        //if (buffer_.length() > 0)
+                        //if (buffer.length() > 0)
                         {
                             std::regex::flag_type flags = std::regex_constants::ECMAScript; 
-                            if (p_+1  < end_input_ && *(p_+1) == 'i')
+                            if (p+1  < end_expr && *(p+1) == 'i')
                             {
-                                ++p_;
+                                ++p;
                                 ++column_;
                                 flags |= std::regex_constants::icase;
                             }
-                            tokens.push_back(token<Json>(token_types::term,std::make_shared<regex_term<Json>>(buffer_,flags)));
-                            buffer_.clear();
+                            tokens.push_back(token<Json>(token_types::term,std::make_shared<regex_term<Json>>(buffer,flags)));
+                            buffer.clear();
                         }
-                        state_ = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value;
                         break;
 
                     default: 
-                        buffer_.push_back(*p_);
+                        buffer.push_back(*p);
                         break;
                     }
                 }
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             default:
-                ++p_;
+                ++p;
                 ++column_;
                 break;
             }
         }
-        if (depth_ != 0)
+        if (depth != 0)
         {
             throw parse_exception(jsonpath_parser_errc::invalid_filter_unbalanced_paren,line_,column_);
         }
-        *end_ptr = p_;
+        *end_ptr = p;
 
-        return jsonpath_filter_result<Json>(tokens,line_,column_);
+        return jsonpath_filter_expr<Json>(tokens,line_,column_);
     }
 };
 

@@ -133,9 +133,9 @@ private:
     class expr_selector : public selector
     {
     private:
-         jsonpath_filter_result<Json> result_;
+         jsonpath_filter_expr<Json> result_;
     public:
-        expr_selector(const jsonpath_filter_result<Json>& result)
+        expr_selector(const jsonpath_filter_expr<Json>& result)
             : result_(result)
         {
         }
@@ -528,16 +528,20 @@ public:
                     break;
                 case '(':
                     {
-                        jsonpath_filter_parser<Json> parser(&line_,&column_);
+                        jsonpath_filter_parser<Json> parser(line_,column_);
                         auto result = parser.parse(p_,end_input_,&p_);
+                        line_ = parser.line();
+                        column_ = parser.column();
                         selectors_.push_back(std::make_shared<expr_selector>(result));
                         state_ = states::expect_comma_or_right_bracket;
                     }
                     break;
                 case '?':
                     {
-                        jsonpath_filter_parser<Json> parser(&line_,&column_);
+                        jsonpath_filter_parser<Json> parser(line_,column_);
                         auto result = parser.parse(p_,end_input_,&p_);
+                        line_ = parser.line();
+                        column_ = parser.column();
                         nodes_.clear();
                         for (size_t j = 0; j < stack_.back().size(); ++j)
                         {
@@ -680,7 +684,7 @@ public:
     }
 
     void accept(const Json& val,
-                jsonpath_filter_result<Json>& filter)
+                jsonpath_filter_expr<Json>& filter)
     {
         if (val.is_object())
         {
