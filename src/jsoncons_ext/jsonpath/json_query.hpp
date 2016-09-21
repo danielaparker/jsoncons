@@ -189,12 +189,6 @@ private:
                         nodes.push_back(std::addressof(context[index]));
                     }
                 }
-                else if (name_ == json_jsonpath_traits<char_type>::length_literal() && context.size() > 0)
-                {
-                    auto temp = std::make_shared<Json>(context.size());
-                    temp_json_values.push_back(temp);
-                    nodes.push_back(temp.get());
-                }
             }
             else if (context.is_string())
             {
@@ -212,13 +206,6 @@ private:
                         temp_json_values.push_back(temp);
                         nodes.push_back(temp.get());
                     }
-                }
-                else if (name_ == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
-                {
-                    size_t count = json_text_traits<char_type>::codepoint_count(s.data(), s.data() + s.size());
-                    auto temp = std::make_shared<Json>(count);
-                    temp_json_values.push_back(temp);
-                    nodes.push_back(temp.get());
                 }
             }
         }
@@ -400,7 +387,7 @@ public:
                     state_ = states::left_bracket;
                     break;
                 case ']':
-                    select_values1();
+                    apply_selectors();
                     transfer_nodes();
                     state_ = states::expect_dot_or_left_bracket;
                     break;
@@ -502,7 +489,7 @@ public:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    select_values(buffer_);
+                    apply_unquoted_string(buffer_);
                     state_ = states::left_bracket;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -511,7 +498,7 @@ public:
                     buffer_.push_back(*p_);
                     break;
                 case ']':
-                    select_values(buffer_);
+                    apply_unquoted_string(buffer_);
                     transfer_nodes();
                     state_ = states::expect_dot_or_left_bracket;
                     break;
@@ -597,13 +584,13 @@ public:
                 switch (*p_)
                 {
                 case '[':
-                    select_values(buffer_);
+                    apply_unquoted_string(buffer_);
                     transfer_nodes();
                     start_ = 0;
                     state_ = states::left_bracket;
                     break;
                 case '.':
-                    select_values(buffer_);
+                    apply_unquoted_string(buffer_);
                     transfer_nodes();
                     state_ = states::dot;
                     break;
@@ -674,7 +661,7 @@ public:
         {
         case states::unquoted_name: 
             {
-                select_values(buffer_);
+                apply_unquoted_string(buffer_);
                 transfer_nodes();
             }
             break;
@@ -811,62 +798,19 @@ public:
         }
     }
 
-    void select_values(const string_type& name)
+    void apply_unquoted_string(const string_type& name)
     {
         if (name.length() > 0)
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                select_values(*(stack_.back()[i]), name);
+                apply_unquoted_string(*(stack_.back()[i]), name);
             }
         }
         buffer_.clear();
     }
 
-    void select_values1()
-    {
-        if (selectors_.size() > 0)
-        {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
-            {
-                select_values2(*(stack_.back()[i]));
-            }
-            selectors_.clear();
-        }
-    }
-
-    void select_values2(const Json& context_val)
-    {
-        for (const auto& selector : selectors_)
-        {
-            selector->select(context_val,nodes_,temp_json_values_);
-        }
-        if (recursive_descent_)
-        {
-            if (context_val.is_object())
-            {
-                for (auto it = context_val.members().begin(); it != context_val.members().end(); ++it)
-                {
-                    if (it->value().is_object() || it->value().is_array())
-                    {
-                        select_values2(it->value());
-                    }
-                }
-            }
-            else if (context_val.is_array())
-            {
-                for (auto it = context_val.elements().begin(); it != context_val.elements().end(); ++it)
-                {
-                    if (it->is_object() || it->is_array())
-                    {
-                        select_values2(*it);
-                    }
-                }
-            }
-        }
-    }
-
-    void select_values(const Json& context_val, const string_type& name)
+    void apply_unquoted_string(const Json& context_val, const string_type& name)
     {
         if (context_val.is_object())
         {
@@ -880,7 +824,7 @@ public:
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
-                        select_values(it->value(), name);
+                        apply_unquoted_string(it->value(), name);
                     }
                 }
             }
@@ -908,7 +852,7 @@ public:
                 {
                     if (it->is_object() || it->is_array())
                     {
-                        select_values(*it, name);
+                        apply_unquoted_string(*it, name);
                     }
                 }
             }
@@ -932,6 +876,49 @@ public:
                 auto temp = std::make_shared<Json>(count);
                 temp_json_values_.push_back(temp);
                 nodes_.push_back(temp.get());
+            }
+        }
+    }
+
+    void apply_selectors()
+    {
+        if (selectors_.size() > 0)
+        {
+            for (size_t i = 0; i < stack_.back().size(); ++i)
+            {
+                apply_selectors(*(stack_.back()[i]));
+            }
+            selectors_.clear();
+        }
+    }
+
+    void apply_selectors(const Json& context_val)
+    {
+        for (const auto& selector : selectors_)
+        {
+            selector->select(context_val,nodes_,temp_json_values_);
+        }
+        if (recursive_descent_)
+        {
+            if (context_val.is_object())
+            {
+                for (auto it = context_val.members().begin(); it != context_val.members().end(); ++it)
+                {
+                    if (it->value().is_object() || it->value().is_array())
+                    {
+                        apply_selectors(it->value());
+                    }
+                }
+            }
+            else if (context_val.is_array())
+            {
+                for (auto it = context_val.elements().begin(); it != context_val.elements().end(); ++it)
+                {
+                    if (it->is_object() || it->is_array())
+                    {
+                        apply_selectors(*it);
+                    }
+                }
             }
         }
     }
