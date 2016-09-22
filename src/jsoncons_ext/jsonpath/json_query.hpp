@@ -490,7 +490,9 @@ public:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    apply_unquoted_string(buffer_);
+                    //apply_unquoted_string(buffer_);
+                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
+                    buffer_.clear();
                     state_ = states::left_bracket;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -499,7 +501,10 @@ public:
                     buffer_.push_back(*p_);
                     break;
                 case ']':
-                    apply_unquoted_string(buffer_);
+                    //apply_unquoted_string(buffer_);
+                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
+                    buffer_.clear();
+                    apply_selectors();
                     transfer_nodes();
                     state_ = states::expect_dot_or_left_bracket;
                     break;

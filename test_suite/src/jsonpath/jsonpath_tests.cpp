@@ -808,6 +808,69 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_string_indexation)
     BOOST_CHECK_EQUAL(expected4, result4);
 }
 
+BOOST_AUTO_TEST_CASE(test_union_array_elements)
+{
+    json val = json::parse(R"(
+{ "store": {
+    "book": [ 
+          { "author": "Nigel Rees"
+          },
+          { "author": "Evelyn Waugh"
+          },
+          { "author": "Herman Melville"
+          }
+        ]
+    },
+  "Roman": {
+    "book": [ 
+          { "author": "Tolstoy L"
+          },
+          { "author": "Tretyakovskiy R"
+          },
+          { "author": "Kulik M"
+          }
+        ]
+    }  
+}
+    )");
+
+    json expected1 = json::parse(R"(
+[
+    { "author": "Kulik M"},
+    { "author": "Herman Melville"}
+]
+    )");
+    json result1 = json_query(val, "$..book[-1]");
+    BOOST_CHECK_EQUAL(expected1,result1);
+
+    json expected2 = json::parse(R"(
+[
+    {
+        "author": "Kulik M"
+    },
+    {
+        "author": "Tolstoy L"
+    },
+    {
+        "author": "Herman Melville"
+    },
+    {
+        "author": "Nigel Rees"
+    }
+]
+    )");
+    json result2 = json_query(val, "$..book[-1,-3]");
+    BOOST_CHECK_EQUAL(expected2,result2);
+
+    json expected3 = expected2;
+    json result3 = json_query(val, "$..book[-1,(@.length - 3)]");
+    BOOST_CHECK_EQUAL(expected3,result3);
+
+    json expected4 = expected2;
+    json result4 = json_query(val, "$..book[(@.length - 1),-3]");
+    BOOST_CHECK_EQUAL(expected4,result4);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

@@ -181,6 +181,13 @@ public:
     {
     }
 
+    token<Json>& operator=(const token<Json>& val)
+    {
+        type_ = val.type_;
+        term_ptr_ = val.term_ptr_;
+        return *this;
+    }
+
     token_types type() const
     {
         return type_;
