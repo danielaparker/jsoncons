@@ -23,7 +23,12 @@ public:
           column_number_(column)
     {
     }
-
+    parse_exception(const parse_exception& other)
+        : error_code_(other.error_code_),
+          line_number_(other.line_number_),
+          column_number_(other.column_number_)
+    {
+    }
     const char* what() const JSONCONS_NOEXCEPT
     {
         std::ostringstream os;
@@ -45,6 +50,14 @@ public:
     size_t column_number() const
     {
         return column_number_;
+    }
+
+    parse_exception& operator=(const parse_exception& e)
+    {
+        error_code_ = e.error_code_;
+        line_number_ = e.line_number_;
+        column_number_ = e.column_number_;
+        return *this;
     }
 private:
     std::error_code error_code_;
