@@ -127,6 +127,9 @@ private:
     class selector
     {
     public:
+        virtual ~selector()
+        {
+        }
         virtual void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
