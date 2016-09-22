@@ -921,7 +921,7 @@ public:
 
     jsonpath_filter_expr<Json> parse(const char_type* p, size_t length, const char_type** end_ptr)
     {
-        return parse(expr,expr+length, end_ptr);
+        return parse(p,p+length, end_ptr);
     }
 
     jsonpath_filter_expr<Json> parse(const char_type* p, const char_type* end_expr, const char_type** end_ptr)
