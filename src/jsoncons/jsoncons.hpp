@@ -174,7 +174,7 @@ struct json_text_traits<char>
             ++count;
         }
         size_t len = codepoint_length(p,end);
-        return (count == index) ? std::make_pair(p,len) : std::make_pair(it,0);
+        return (count == index) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
     }
 
     static uint32_t char_sequence_to_codepoint(const char* it, 
@@ -408,7 +408,7 @@ struct json_text_traits<wchar_t>
             ++count;
         }
         size_t len = codepoint_length(p,end);
-        return (count == index) ? std::make_pair(p,len) : std::make_pair(it,0);
+        return (count == index) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
     }
 
     static uint32_t codepoint_at(const wchar_t* it, 
