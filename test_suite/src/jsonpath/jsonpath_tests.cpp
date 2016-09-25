@@ -873,7 +873,7 @@ BOOST_AUTO_TEST_CASE(test_union_array_elements)
 #endif
 BOOST_AUTO_TEST_CASE(test_array_slice_operator)
 {
-    jsonpath_fixture fixture;
+    //jsonpath_fixture fixture;
 
     json root = json::parse(jsonpath_fixture::store_text());
 
@@ -897,6 +897,17 @@ BOOST_AUTO_TEST_CASE(test_array_slice_operator)
 ]    
     )");
     BOOST_CHECK_EQUAL(expected3,result3);
+
+    json result4 = json_query(root,"$..book[1:4:2,0].author");
+    json expected4 = json::parse(R"(
+[
+   "Evelyn Waugh",
+   "J. R. R. Tolkien"
+]    
+    )");
+
+    std::cout << pretty_print(result4) << std::endl;
+    //BOOST_CHECK_EQUAL(expected4,result4);
 
 }
 

@@ -165,10 +165,10 @@ private:
     class name_selector : public selector
     {
     private:
-        size_t positive_start_;
+        bool positive_start_;
         string_type name_;
     public:
-        name_selector(size_t positive_start, string_type name)
+        name_selector(bool positive_start, string_type name)
             : positive_start_(positive_start), name_(name)
         {
         }
@@ -206,6 +206,96 @@ private:
                         auto temp = std::make_shared<Json>(sequence.first,sequence.second);
                         temp_json_values.push_back(temp);
                         nodes.push_back(temp.get());
+                    }
+                }
+            }
+        }
+    };
+
+    class array_slice_selector : public selector
+    {
+    private:
+        size_t start_;
+        size_t end_;
+        size_t step_;
+        bool positive_start_;
+        bool positive_end_;
+        bool positive_step_;
+        bool end_undefined_;
+    public:
+        array_slice_selector(size_t start, bool positive_start, 
+                             size_t end, bool positive_end,
+                             size_t step, bool positive_step,
+                             bool end_undefined)
+            : start_(start), positive_start_(positive_start),
+              end_(end), positive_end_(positive_end),
+              step_(step), positive_step_(positive_step),
+              end_undefined_(end_undefined) 
+        {
+        }
+
+        void select(const Json& context,
+            std::vector<cjson_ptr>& nodes,
+            std::vector<std::shared_ptr<Json>>&) override
+        {
+            if (positive_step_)
+            {
+                end_array_slice1(context,nodes);
+            }
+            else
+            {
+                end_array_slice2(context,nodes);
+            }
+        }
+
+        void end_array_slice1(const Json& context,
+                              std::vector<cjson_ptr>& nodes)
+        {
+            if (context.is_array())
+            {
+                size_t start = positive_start_ ? start_ : context.size() - start_;
+                size_t end;
+                if (!end_undefined_)
+                {
+                    end = positive_end_ ? end_ : context.size() - end_;
+                }
+                else
+                {
+                    end = context.size();
+                }
+                for (size_t j = start; j < end; j += step_)
+                {
+                    if (j < context.size())
+                    {
+                        nodes.push_back(std::addressof(context[j]));
+                    }
+                }
+            }
+        }
+
+        void end_array_slice2(const Json& context,
+                              std::vector<cjson_ptr>& nodes)
+        {
+            if (context.is_array())
+            {
+                size_t start = positive_start_ ? start_ : context.size() - start_;
+                size_t end;
+                if (!end_undefined_)
+                {
+                    end = positive_end_ ? end_ : context.size() - end_;
+                }
+                else
+                {
+                    end = context.size();
+                }
+
+                size_t j = end + step_ - 1;
+                while (j > (start+step_-1))
+                {
+                    j -= step_;
+                    if (j < context.size())
+                    {
+                        nodes.push_back(std::addressof(context[j]));
                     }
                 }
             }
@@ -414,8 +504,11 @@ public:
                     state_ = states::left_bracket_step2;
                     break;
                 case ']':
-                    end_array_slice();
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    apply_selectors();
                     transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -429,8 +522,11 @@ public:
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ']':
-                    end_array_slice();
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    apply_selectors();
                     transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -454,8 +550,11 @@ public:
                     state_ = states::left_bracket_end2;
                     break;
                 case ']':
-                    end_array_slice();
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    apply_selectors();
                     transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -474,8 +573,11 @@ public:
                     end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
                 case ']':
-                    end_array_slice();
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    apply_selectors();
                     transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -727,82 +829,6 @@ public:
 
         }
         start_ = 0;
-    }
-
-    void end_array_slice()
-    {
-        if (positive_step_)
-        {
-            end_array_slice1();
-        }
-        else
-        {
-            end_array_slice2();
-        }
-        start_ = 0;
-        end_ = 0;
-        step_ = 1;
-        positive_start_ = positive_end_ = positive_step_ = true;
-        end_undefined_ = true;
-    }
-
-    void end_array_slice1()
-    {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
-        {
-            cjson_ptr p = stack_.back()[i];
-            if (p->is_array())
-            {
-                size_t start = positive_start_ ? start_ : p->size() - start_;
-                size_t end;
-                if (!end_undefined_)
-                {
-                    end = positive_end_ ? end_ : p->size() - end_;
-                }
-                else
-                {
-                    end = p->size();
-                }
-                for (size_t j = start; j < end; j += step_)
-                {
-                    if (j < p->size())
-                    {
-                        nodes_.push_back(std::addressof((*p)[j]));
-                    }
-                }
-            }
-        }
-    }
-
-    void end_array_slice2()
-    {
-        for (size_t i = 0; i < stack_.back().size(); ++i)
-        {
-            cjson_ptr p = stack_.back()[i];
-            if (p->is_array())
-            {
-                size_t start = positive_start_ ? start_ : p->size() - start_;
-                size_t end;
-                if (!end_undefined_)
-                {
-                    end = positive_end_ ? end_ : p->size() - end_;
-                }
-                else
-                {
-                    end = p->size();
-                }
-
-                size_t j = end + step_ - 1;
-                while (j > (start+step_-1))
-                {
-                    j -= step_;
-                    if (j < p->size())
-                    {
-                        nodes_.push_back(std::addressof((*p)[j]));
-                    }
-                }
-            }
-        }
     }
 
     void apply_unquoted_string(const string_type& name)
