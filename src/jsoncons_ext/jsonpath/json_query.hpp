@@ -20,40 +20,60 @@
 namespace jsoncons { namespace jsonpath {
 
     template<class CharT>
-    bool try_string_to_index(const CharT *s, size_t length, size_t* value)
+    bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
     {
         static const size_t max_value = std::numeric_limits<size_t>::max JSONCONS_NO_MACRO_EXP();
         static const size_t max_value_div_10 = max_value / 10;
 
+        size_t start = 0;
         size_t n = 0;
-        for (size_t i = 0; i < length; ++i)
+        if (length > 0)
         {
-            CharT c = s[i];
-            switch (c)
+            if (s[start] == '-')
             {
-            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                {
-                    size_t x = c - '0';
-                    if (n > max_value_div_10)
-                    {
-                        return false;
-                    }
-                    n = n * 10;
-                    if (n > max_value - x)
-                    {
-                        return false;
-                    }
-
-                    n += x;
-                }
-                break;
-            default:
-                return false;
-                break;
+                *positive = false;
+                ++start;
+            }
+            else
+            {
+                *positive = true;
             }
         }
-        *value = n;
-        return true;
+        if (length > start)
+        {
+            for (size_t i = start; i < length; ++i)
+            {
+                CharT c = s[i];
+                switch (c)
+                {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    {
+                        size_t x = c - '0';
+                        if (n > max_value_div_10)
+                        {
+                            return false;
+                        }
+                        n = n * 10;
+                        if (n > max_value - x)
+                        {
+                            return false;
+                        }
+
+                        n += x;
+                    }
+                    break;
+                default:
+                    return false;
+                    break;
+                }
+            }
+            *value = n;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     template <class CharT>
@@ -156,7 +176,7 @@ private:
             }
             else if (index.is_string())
             {
-                name_selector selector(true,index.as_string());
+                name_selector selector(index.as_string(),true);
                 selector.select(context, nodes, temp_json_values);
             }
         }
@@ -165,11 +185,11 @@ private:
     class name_selector : public selector
     {
     private:
-        bool positive_start_;
         string_type name_;
+        bool positive_start_;
     public:
-        name_selector(bool positive_start, string_type name)
-            : positive_start_(positive_start), name_(name)
+        name_selector(string_type name, bool positive_start)
+            : name_(name), positive_start_(positive_start)
         {
         }
 
@@ -184,7 +204,7 @@ private:
             else if (context.is_array())
             {
                 size_t pos = 0;
-                if (try_string_to_index(name_.data(), name_.size(), &pos))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
                 {
                     size_t index = positive_start_ ? pos : context.size() - pos;
                     if (index < context.size())
@@ -197,7 +217,7 @@ private:
             {
                 size_t pos = 0;
                 string_type s = context.as_string();
-                if (try_string_to_index(name_.data(), name_.size(), &pos))
+                if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
                 {
                     size_t index = positive_start_ ? pos : s.size() - pos;
                     auto sequence = json_text_traits<char_type>::char_sequence_at(s.data(), s.data() + s.size(), index);
@@ -221,16 +241,16 @@ private:
         bool positive_start_;
         bool positive_end_;
         bool positive_step_;
-        bool end_undefined_;
+        bool undefined_end_;
     public:
         array_slice_selector(size_t start, bool positive_start, 
                              size_t end, bool positive_end,
                              size_t step, bool positive_step,
-                             bool end_undefined)
+                             bool undefined_end)
             : start_(start), positive_start_(positive_start),
               end_(end), positive_end_(positive_end),
               step_(step), positive_step_(positive_step),
-              end_undefined_(end_undefined) 
+              undefined_end_(undefined_end) 
         {
         }
 
@@ -255,7 +275,7 @@ private:
             {
                 size_t start = positive_start_ ? start_ : context.size() - start_;
                 size_t end;
-                if (!end_undefined_)
+                if (!undefined_end_)
                 {
                     end = positive_end_ ? end_ : context.size() - end_;
                 }
@@ -280,7 +300,7 @@ private:
             {
                 size_t start = positive_start_ ? start_ : context.size() - start_;
                 size_t end;
-                if (!end_undefined_)
+                if (!undefined_end_)
                 {
                     end = positive_end_ ? end_ : context.size() - end_;
                 }
@@ -311,7 +331,7 @@ private:
     bool positive_start_;
     bool positive_end_;
     bool positive_step_;
-    bool end_undefined_;
+    bool undefined_end_;
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
@@ -328,7 +348,7 @@ public:
         : state_(states::start), 
           start_(0), end_(0), step_(0),
           positive_start_(true),positive_end_(true), positive_step_(true),
-          end_undefined_(false), recursive_descent_(false),
+          undefined_end_(false), recursive_descent_(false),
           line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr), p_(nullptr),
           err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance()))
@@ -376,7 +396,7 @@ public:
         positive_start_ = true;
         positive_end_ = true;
         positive_step_ = true;
-        end_undefined_ = false;
+        undefined_end_ = false;
 
         while (p_ < end_input_)
         {
@@ -485,154 +505,6 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::left_bracket_step:
-                switch (*p_)
-                {
-                case '-':
-                    positive_step_ = false;
-                    state_ = states::left_bracket_step2;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = static_cast<size_t>(*p_-'0');
-                    state_ = states::left_bracket_step2;
-                    break;
-                case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    buffer_.clear();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    apply_selectors();
-                    transfer_nodes();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::expect_dot_or_left_bracket;
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case states::left_bracket_step2:
-                switch (*p_)
-                {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    step_ = step_*10 + static_cast<size_t>(*p_-'0');
-                    break;
-                case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    buffer_.clear();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    apply_selectors();
-                    transfer_nodes();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::expect_dot_or_left_bracket;
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case states::left_bracket_end:
-                switch (*p_)
-                {
-                case '-':
-                    positive_end_ = false;
-                    state_ = states::left_bracket_end2;
-                    break;
-                case ':':
-                    step_ = 0;
-                    state_ = states::left_bracket_step;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    end_undefined_ = false;
-                    end_ = static_cast<size_t>(*p_-'0');
-                    state_ = states::left_bracket_end2;
-                    break;
-                case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    buffer_.clear();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    apply_selectors();
-                    transfer_nodes();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::expect_dot_or_left_bracket;
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case states::left_bracket_end2:
-                switch (*p_)
-                {
-                case ':':
-                    step_ = 0;
-                    state_ = states::left_bracket_step;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    end_undefined_ = false;
-                    end_ = end_*10 + static_cast<size_t>(*p_-'0');
-                    break;
-                case ',':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    buffer_.clear();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::left_bracket;
-                    break;
-                case ']':
-                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
-                    apply_selectors();
-                    transfer_nodes();
-                    start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
-                    state_ = states::expect_dot_or_left_bracket;
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
-            case states::left_bracket_start:
-                switch (*p_)
-                {
-                case ':':
-                    step_ = 1;
-                    end_undefined_ = true;
-                    state_ = states::left_bracket_end;
-                    break;
-                case ',':
-                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
-                    buffer_.clear();
-                    state_ = states::left_bracket;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    start_ = start_*10 + static_cast<size_t>(*p_-'0');
-                    buffer_.push_back(*p_);
-                    break;
-                case ']':
-                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
-                    buffer_.clear();
-                    apply_selectors();
-                    transfer_nodes();
-                    state_ = states::expect_dot_or_left_bracket;
-                    break;
-                }
-                ++p_;
-                ++column_;
-                break;
             case states::left_bracket:
                 switch (*p_)
                 {
@@ -663,23 +535,18 @@ public:
                         }
                         state_ = states::expect_comma_or_right_bracket;
                     }
-                    break;
-                    
+                    break;                   
                 case ':':
+                    start_ = 0;
+                    positive_start_ = true;
+                    undefined_end_ = true;
                     step_ = 1;
-                    end_undefined_ = true;
+                    positive_step_ = true;
                     state_ = states::left_bracket_end;
                     ++p_;
                     ++column_;
                     break;
-                case '-':
-                    positive_start_ = false;
-                    state_ = states::left_bracket_start;
-                    ++p_;
-                    ++column_;
-                    break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    start_ = static_cast<size_t>(*p_-'0');
+                case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     buffer_.clear();
                     buffer_.push_back(*p_);
                     state_ = states::left_bracket_start;
@@ -706,6 +573,158 @@ public:
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_left_bracket_token, *this);
                     break;
                 }
+                break;
+            case states::left_bracket_start:
+                switch (*p_)
+                {
+                case ':':
+                    if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
+                    {
+                        err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
+                    }
+                    step_ = 1;
+                    positive_step_ = true;
+                    undefined_end_ = true;
+                    state_ = states::left_bracket_end;
+                    break;
+                case ',':
+                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    buffer_.clear();
+                    state_ = states::left_bracket;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    buffer_.push_back(*p_);
+                    break;
+                case ']':
+                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
+                    buffer_.clear();
+                    apply_selectors();
+                    transfer_nodes();
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case states::left_bracket_end:
+                switch (*p_)
+                {
+                case '-':
+                    positive_end_ = false;
+                    state_ = states::left_bracket_end2;
+                    break;
+                case ':':
+                    step_ = 0;
+                    state_ = states::left_bracket_step;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    undefined_end_ = false;
+                    end_ = static_cast<size_t>(*p_-'0');
+                    state_ = states::left_bracket_end2;
+                    break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::left_bracket;
+                    break;
+                case ']':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors();
+                    transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case states::left_bracket_end2:
+                switch (*p_)
+                {
+                case ':':
+                    step_ = 0;
+                    state_ = states::left_bracket_step;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    undefined_end_ = false;
+                    end_ = end_*10 + static_cast<size_t>(*p_-'0');
+                    break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::left_bracket;
+                    break;
+                case ']':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors();
+                    transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case states::left_bracket_step:
+                switch (*p_)
+                {
+                case '-':
+                    positive_step_ = false;
+                    state_ = states::left_bracket_step2;
+                    break;
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    step_ = static_cast<size_t>(*p_-'0');
+                    state_ = states::left_bracket_step2;
+                    break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::left_bracket;
+                    break;
+                case ']':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors();
+                    transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case states::left_bracket_step2:
+                switch (*p_)
+                {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                    step_ = step_*10 + static_cast<size_t>(*p_-'0');
+                    break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::left_bracket;
+                    break;
+                case ']':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
+                    apply_selectors();
+                    transfer_nodes();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = undefined_end_ = true;
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                }
+                ++p_;
+                ++column_;
                 break;
             case states::unquoted_name: 
                 switch (*p_)
@@ -734,7 +753,7 @@ public:
                 switch (*p_)
                 {
                 case '\'':
-                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
+                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = states::expect_comma_or_right_bracket;
                     break;
@@ -758,7 +777,7 @@ public:
                 switch (*p_)
                 {
                 case '\"':
-                    selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
+                    selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     state_ = states::expect_comma_or_right_bracket;
                     break;
@@ -883,7 +902,7 @@ public:
         else if (context_val.is_array())
         {
             size_t pos = 0;
-            if (try_string_to_index(name.data(),name.size(),&pos))
+            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
             {
                 size_t index = positive_start_ ? pos : context_val.size() - pos;
                 if (index < context_val.size())
@@ -912,7 +931,7 @@ public:
         {
             string_type s = context_val.as_string();
             size_t pos = 0;
-            if (try_string_to_index(name.data(),name.size(),&pos))
+            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
             {
                 auto sequence = json_text_traits<char_type>::char_sequence_at(s.data(), s.data() + s.size(), pos);
                 if (sequence.second > 0)
