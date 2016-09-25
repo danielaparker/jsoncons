@@ -357,6 +357,7 @@ public:
                     ++column_;
                     break;
                 default:
+                    buffer_.clear();
                     state_ = states::unquoted_name;
                     break;
                 }
