@@ -52,7 +52,7 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_jsonpath)
 {
     jsonpath_fixture fixture;
@@ -870,7 +870,7 @@ BOOST_AUTO_TEST_CASE(test_union_array_elements)
     json result4 = json_query(val, "$..book[(@.length - 1),-3]");
     BOOST_CHECK_EQUAL(expected4,result4);
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(test_array_slice_operator)
 {
     //jsonpath_fixture fixture;
@@ -901,13 +901,13 @@ BOOST_AUTO_TEST_CASE(test_array_slice_operator)
     json result4 = json_query(root,"$..book[1:4:2,0].author");
     json expected4 = json::parse(R"(
 [
-   "Evelyn Waugh",
-   "J. R. R. Tolkien"
+    "Evelyn Waugh",
+    "J. R. R. Tolkien",
+    "Nigel Rees"
 ]    
     )");
 
-    std::cout << pretty_print(result4) << std::endl;
-    //BOOST_CHECK_EQUAL(expected4,result4);
+    BOOST_CHECK_EQUAL(expected4,result4);
 
 }
 

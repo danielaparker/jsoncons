@@ -334,7 +334,7 @@ public:
     jsonpath_evaluator()
         : state_(states::start), 
           start_(0), end_(0), step_(0),
-          positive_start_(0),positive_end_(0), positive_step_(0),
+          positive_start_(true),positive_end_(true), positive_step_(true),
           end_undefined_(false), recursive_descent_(false),
           line_(0), column_(0),
           begin_input_(nullptr), end_input_(nullptr), p_(nullptr),
@@ -503,12 +503,19 @@ public:
                     step_ = static_cast<size_t>(*p_-'0');
                     state_ = states::left_bracket_step2;
                     break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
+                    state_ = states::left_bracket;
+                    break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
                     apply_selectors();
                     transfer_nodes();
                     start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -521,12 +528,19 @@ public:
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     step_ = step_*10 + static_cast<size_t>(*p_-'0');
                     break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
+                    state_ = states::left_bracket;
+                    break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
                     apply_selectors();
                     transfer_nodes();
                     start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -549,12 +563,19 @@ public:
                     end_ = static_cast<size_t>(*p_-'0');
                     state_ = states::left_bracket_end2;
                     break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
+                    state_ = states::left_bracket;
+                    break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
                     apply_selectors();
                     transfer_nodes();
                     start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -572,12 +593,19 @@ public:
                     end_undefined_ = false;
                     end_ = end_*10 + static_cast<size_t>(*p_-'0');
                     break;
+                case ',':
+                    selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
+                    buffer_.clear();
+                    start_ = end_ = step_ = 0U;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
+                    state_ = states::left_bracket;
+                    break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,end_undefined_));
                     apply_selectors();
                     transfer_nodes();
                     start_ = end_ = step_ = 0U;
-                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = false;
+                    positive_start_ = positive_end_ = positive_step_ = end_undefined_ = true;
                     state_ = states::expect_dot_or_left_bracket;
                     break;
                 }
@@ -593,18 +621,16 @@ public:
                     state_ = states::left_bracket_end;
                     break;
                 case ',':
-                    //apply_unquoted_string(buffer_);
                     selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
                     buffer_.clear();
                     state_ = states::left_bracket;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = start_*10 + static_cast<size_t>(*p_-'0');
-                    buffer_.clear();
+                    //buffer_.clear();
                     buffer_.push_back(*p_);
                     break;
                 case ']':
-                    //apply_unquoted_string(buffer_);
                     selectors_.push_back(std::make_shared<name_selector>(positive_start_,buffer_));
                     buffer_.clear();
                     apply_selectors();
