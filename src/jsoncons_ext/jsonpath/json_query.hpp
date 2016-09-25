@@ -323,13 +323,6 @@ private:
     const char_type* p_;
     std::vector<std::shared_ptr<selector>> selectors_;
 
-    void transfer_nodes()
-    {
-        stack_.push_back(nodes_);
-        nodes_.clear();
-        recursive_descent_ = false;
-    }
-
 public:
     jsonpath_evaluator()
         : state_(states::start), 
@@ -627,7 +620,6 @@ public:
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     start_ = start_*10 + static_cast<size_t>(*p_-'0');
-                    //buffer_.clear();
                     buffer_.push_back(*p_);
                     break;
                 case ']':
@@ -981,6 +973,13 @@ public:
                 }
             }
         }
+    }
+
+    void transfer_nodes()
+    {
+        stack_.push_back(nodes_);
+        nodes_.clear();
+        recursive_descent_ = false;
     }
 
     size_t do_line_number() const override
