@@ -906,8 +906,17 @@ BOOST_AUTO_TEST_CASE(test_array_slice_operator)
     "Nigel Rees"
 ]    
     )");
-
     BOOST_CHECK_EQUAL(expected4,result4);
+
+    json result5 = json_query(root,"$..book[1::2,0].author");
+    json expected5 = json::parse(R"(
+[
+    "Evelyn Waugh",
+    "J. R. R. Tolkien",
+    "Nigel Rees"
+]    
+    )");
+    BOOST_CHECK_EQUAL(expected5,result5);
 
 }
 
