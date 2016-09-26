@@ -1,5 +1,5 @@
-Next release (0.99.3)
----------------------
+0.99.3
+------
 
 The `json` initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (`json`). Please replace
 
@@ -12,7 +12,11 @@ The `json` initializer-list constructor has been removed, it gives inconsistent 
 json j = json::object{{"first",1},{"second",json::array{1,2,3}}};
 ```
 
+- json::any has been deprecated and will be removed in the future
+
 - The json method `to_stream` has been renamed to `write`, the old name is still supported.
+
+- A new method `get_with_default`, with return type that of the default, has been added to `json`
 
 - A new extension jsonx that supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 
@@ -23,6 +27,8 @@ json j = json::object{{"first",1},{"second",json::array{1,2,3}}};
 - Added support for `json` `is<T>`, `as<T>`, constructor, and assignment operator for any sequence container (`std::array`, `std::vector`, `std::deque`, `std::forward_list`, `std::list`) whose values are assignable to JSON types (e.g., ints, doubles, bools, strings, STL containers of same) and for associative containers (`std::set`, `std::multiset`, `std::unordered_set`, `std::unordered_multiset`.)
 
 - Added static method `null()` to `json` class to return null value
+
+- Includes fixes to the `jsonpath` extension, including the union operator and applying index operations to string values
 
 0.99.2
 ------
