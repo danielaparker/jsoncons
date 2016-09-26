@@ -83,9 +83,13 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                 else if (dir_itr->path().extension() == ".jsonpath")
                 {
                     std::string s;
+                    char buffer[4096];
                     boost::filesystem::ifstream is(dir_itr->path());
-                    is >> s;
-                    jsonpath_dictionary[dir_itr->path().stem()] = s;
+                    while (is.read(buffer, sizeof(buffer)))
+                    {
+                        s.append(buffer, sizeof(buffer));
+                    }
+                    s.append(buffer, is.gcount());
                     std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
                 }
                 else if (dir_itr->path().extension() == ".json")

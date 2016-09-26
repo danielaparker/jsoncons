@@ -1342,6 +1342,8 @@ public:
                     state = pre_line_break_state;
                     break;
                 case ' ':case '\t':
+                    ++p;
+                    ++column_;
                     break;
                 case ')':
                     tokens.push_back(token<Json>(token_types::right_paren));

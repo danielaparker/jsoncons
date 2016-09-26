@@ -426,8 +426,6 @@ public:
                 switch (*p_)
                 {
                 case ' ':case '\t':
-                    ++p_;
-                    ++column_;
                     break;
                 case '$':
                 case '@':
@@ -489,8 +487,6 @@ public:
                 switch (*p_)
                 {
                 case ' ':case '\t':
-                    ++p_;
-                    ++column_;
                     break;
                 case '.':
                     state_ = states::dot;
