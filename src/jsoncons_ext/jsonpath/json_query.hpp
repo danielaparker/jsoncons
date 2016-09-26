@@ -567,13 +567,6 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    buffer_.clear();
-                    buffer_.push_back(*p_);
-                    state_ = states::left_bracket_start;
-                    ++p_;
-                    ++column_;
-                    break;
                 case '*':
                     end_all();
                     state_ = states::expect_comma_or_right_bracket;
@@ -591,7 +584,11 @@ public:
                     ++column_;
                     break;
                 default:
-                    err_handler_->fatal_error(jsonpath_parser_errc::expected_left_bracket_token, *this);
+                    buffer_.clear();
+                    buffer_.push_back(*p_);
+                    state_ = states::left_bracket_start;
+                    ++p_;
+                    ++column_;
                     break;
                 }
                 break;
@@ -613,15 +610,15 @@ public:
                     buffer_.clear();
                     state_ = states::left_bracket;
                     break;
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    buffer_.push_back(*p_);
-                    break;
                 case ']':
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     apply_selectors();
                     transfer_nodes();
                     state_ = states::expect_dot_or_left_bracket;
+                    break;
+                default:
+                    buffer_.push_back(*p_);
                     break;
                 }
                 ++p_;
