@@ -406,6 +406,8 @@ public:
 
     void evaluate(const Json& root, const char_type* path, size_t length)
     {
+        states pre_line_break_state = states::start;
+
         begin_input_ = path;
         end_input_ = path + length;
         p_ = begin_input_;
@@ -422,6 +424,26 @@ public:
         {
             switch (state_)
             {
+            case states::cr:
+                ++line_;
+                column_ = 1;
+                switch (*p_)
+                {
+                case '\n':
+                    state_ = pre_line_break_state;
+                    ++p_;
+                    ++column_;
+                    break;
+                default:
+                    state_ = pre_line_break_state;
+                    break;
+                }
+                break;
+            case states::lf:
+                ++line_;
+                column_ = 1;
+                state_ = pre_line_break_state;
+                break;
             case states::start: 
                 switch (*p_)
                 {
@@ -723,6 +745,21 @@ public:
                     state_ = states::dot;
                     break;
                 case ' ':case '\t':
+                    apply_unquoted_string(buffer_);
+                    transfer_nodes();
+                    state_ = states::expect_dot_or_left_bracket;
+                    break;
+                case '\r':
+                    apply_unquoted_string(buffer_);
+                    transfer_nodes();
+                    pre_line_break_state = states::expect_dot_or_left_bracket;
+                    state_= states::cr;
+                    break;
+                case '\n':
+                    apply_unquoted_string(buffer_);
+                    transfer_nodes();
+                    pre_line_break_state = states::expect_dot_or_left_bracket;
+                    state_= states::lf;
                     break;
                 default:
                     buffer_.push_back(*p_);
