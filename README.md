@@ -29,18 +29,6 @@ The library has a number of features, which are listed below:
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
-## Note
-The `json` initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (`json`). Please replace
-
-`json j = {1,2,3}` with `json j = json::array{1,2,3}`, and 
-
-`json j = {{1,2,3},{4,5,6}}` with `json j = json::array{json::array{1,2,3},json::array{4,5,6}}`
-
-Initializer-list constructors are now supported in `json::object` as well as `json::array`, e.g.
-```c++
-json j = json::object{{"first",1},{"second",json::array{1,2,3}}};
-```
-
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.

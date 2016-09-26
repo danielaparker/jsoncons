@@ -503,18 +503,6 @@ vertical-align:1px;
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
 
-<h2>Note</h2>
-
-<p>The <code>json</code> initializer-list constructor has been removed, it gives inconsistent results when an initializer has zero elements, or one element of the type being initialized (<code>json</code>). Please replace</p>
-
-<p><code>json j = {1,2,3}</code> with <code>json j = json::array{1,2,3}</code>, and </p>
-
-<p><code>json j = {{1,2,3},{4,5,6}}</code> with <code>json j = json::array{json::array{1,2,3},json::array{4,5,6}}</code></p>
-
-<p>Initializer-list constructors are now supported in <code>json::object</code> as well as <code>json::array</code>, e.g.</p>
-
-<div class="highlight highlight-source-c++"><pre>json j = json::object{{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>,json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>}}};</pre></div>
-
 <h2>Benchmarks</h2>
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
