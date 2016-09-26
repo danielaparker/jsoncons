@@ -497,15 +497,20 @@ Json json_query(const Json&amp; root,
 
 <p>or the bracket–notation </p>
 
-<pre><code>$['store']['book'][0]['title']
+<pre><code>$[store][book][0][title]
 </code></pre>
 
 <p>or </p>
 
+<pre><code>$['store']['book'][0]['title']
+</code></pre>
+
+<p>or</p>
+
 <pre><code>$["store"]["book"][0]["title"]
 </code></pre>
 
-<p>Note that Stefan Goessner's original implementation only supports single quotes inside of JSONPath expressions, the jsoncons implementation supports both single quotes and double quotes.</p>
+<p>Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.</p>
 
 <table>
 <thead>

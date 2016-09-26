@@ -24,13 +24,19 @@ JSONPath expressions can use the dot–notation
 
 or the bracket–notation 
 
-    $['store']['book'][0]['title']
+
+    $[store][book][0][title]
 
 or 
 
+    $['store']['book'][0]['title']
+
+or
+
     $["store"]["book"][0]["title"]
 
-Note that Stefan Goessner's original implementation only supports single quotes inside of JSONPath expressions, the jsoncons implementation supports both single quotes and double quotes.
+
+Note that Stefan Goessner's original implementation supports unquoted or single quoted names inside of square brackets, the jsoncons implementation in addition supports double quoted names.
 
 JSONPath|       Description
 --------|--------------------------------
