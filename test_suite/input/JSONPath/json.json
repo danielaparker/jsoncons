@@ -33,29 +33,28 @@
        }]
     }]
   },
-  "Roman": {
+  "boutique": {
     "book": [ 
-      { "category": "reference",
-        "author": "Tolstoy L",
-        "title": "Sayings of the Century",
-        "price": 8.95
+      { "category": "fiction",
+        "author": "Victor Hugo",
+        "title": "Les Miserables",
+        "price": 6.02
+      },
+      { "category": "cooking",
+        "author": "Paula Haney",
+        "title": "The Hoosier Mama Book of Pie",
+        "price": 13.77
       },
       { "category": "fiction",
-        "author": "Tretyakovskiy R",
-        "title": "Sword of Honour",
-        "price": 12.99
+        "author": " David Lindsay",
+        "title": "A Voyage to Arcturus",
+        "price": 6.99
       },
-      { "category": "fiction",
-        "author": "Kulik M",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      { "category": "fiction",
-        "author": "Rotov K.K.",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
+      { "category": "travel",
+        "author": "Gillian Price",
+        "title": "Trekking in the Dolomites",
+        "isbn": "978 1 85284 563 6",
+        "price": 18.55
       }
     ],
     "bicycle": [{

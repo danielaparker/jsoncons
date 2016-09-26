@@ -76,9 +76,16 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
             {
                 if (dir_itr->path().filename() == "json.json")
                 {
-                    boost::filesystem::ifstream is(dir_itr->path());
-                    is >> document;
-                    std::cout << dir_itr->path().filename() << '\n';
+                    try
+                    {
+                        boost::filesystem::ifstream is(dir_itr->path());
+                        is >> document;
+                        std::cout << dir_itr->path().filename() << '\n';
+                    }
+                    catch (const jsoncons::parse_exception& e)
+                    {
+                        std::cerr << dir_itr->path() << " " << e.what() << std::endl;
+                    }
                 }
                 else if (dir_itr->path().extension() == ".jsonpath")
                 {
@@ -90,15 +97,23 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                         s.append(buffer, sizeof(buffer));
                     }
                     s.append(buffer, is.gcount());
+                    jsonpath_dictionary[dir_itr->path().stem()] = s;
                     std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
                 }
                 else if (dir_itr->path().extension() == ".json")
                 {
-                    ojson j;
-                    boost::filesystem::ifstream is(dir_itr->path());
-                    is >> j;
-                    expected_dictionary[dir_itr->path().stem()] = j;
-                    std::cout << ".json " << dir_itr->path() << '\n';
+                    try
+                    {
+                        ojson j;
+                        boost::filesystem::ifstream is(dir_itr->path());
+                        is >> j;
+                        expected_dictionary[dir_itr->path().stem()] = j;
+                        std::cout << ".json " << dir_itr->path() << '\n';
+                    }
+                    catch (const jsoncons::parse_exception& e)
+                    {
+                        std::cerr << dir_itr->path() << " " << e.what() << std::endl;
+                    }
                 }
             }
         }
@@ -107,9 +122,21 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
             auto it = expected_dictionary.find(pair.first);
             if (it != expected_dictionary.end())
             {
-                std::cout << pair.second << '\n';
-                ojson result = json_query(document,pair.second);
-                BOOST_CHECK_EQUAL(it->second,result);
+                try
+                {
+                    std::cout << pair.second << '\n';
+                    ojson result = json_query(document, pair.second);
+                    if (it->second != result)
+                    {
+                        std::cout << pair.first << '\n';
+                        BOOST_CHECK_EQUAL(it->second,result);
+                    }
+                }
+                catch (const jsoncons::parse_exception& e)
+                {
+                    std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
+                }
+
             }
             else
             {

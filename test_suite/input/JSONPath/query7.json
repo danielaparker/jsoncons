@@ -8,9 +8,8 @@
    },
    {
       "category" : "fiction",
-      "author" : "Kulik M",
-      "title" : "Moby Dick",
-      "isbn" : "0-553-21311-3",
-      "price" : 8.99
+      "author" : " David Lindsay",
+      "title" : "A Voyage to Arcturus",
+      "price" : 6.99
    }
 ]
