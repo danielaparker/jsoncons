@@ -182,6 +182,31 @@ private:
         }
     };
 
+    class filter_selector : public selector
+    {
+    private:
+         jsonpath_filter_expr<Json> result_;
+    public:
+        filter_selector(const jsonpath_filter_expr<Json>& result)
+            : result_(result)
+        {
+        }
+
+        void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>&) override
+        {
+            if (context.is_array())
+            {
+                for (const auto& element : context.elements())
+                {
+                    if (result_.exists(element))
+                    {
+                        nodes.push_back(std::addressof(element));
+                    }
+                }
+            }
+        }
+    };
+
     class name_selector : public selector
     {
     private:
@@ -528,11 +553,7 @@ public:
                         auto result = parser.parse(p_,end_input_,&p_);
                         line_ = parser.line();
                         column_ = parser.column();
-                        nodes_.clear();
-                        for (size_t j = 0; j < stack_.back().size(); ++j)
-                        {
-                            accept(*(stack_.back()[j]),result);
-                        }
+                        selectors_.push_back(std::make_shared<filter_selector>(result));
                         state_ = states::expect_comma_or_right_bracket;
                     }
                     break;                   
@@ -816,34 +837,6 @@ public:
         }
     }
 
-    void accept(const Json& val,
-                jsonpath_filter_expr<Json>& filter)
-    {
-        if (val.is_object())
-        {
-            if (recursive_descent_ && val.is_object())
-            {
-                for (auto it = val.members().begin(); it != val.members().end(); ++it)
-                {
-                    accept(it->value(),filter);
-                }
-            }
-            if (filter.exists(val))
-            {
-                nodes_.push_back(std::addressof(val));
-            }
-        }
-        else if (val.is_array())
-        {
-            for (auto it = val.elements().begin(); it != val.elements().end(); ++it)
-            {
-                accept(*it,filter);
-            }
-        }
-    }
-
-   
-
     void end_all()
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
@@ -963,17 +956,17 @@ public:
         }
     }
 
-    void apply_selectors(const Json& context_val)
+    void apply_selectors(const Json& context)
     {
         for (const auto& selector : selectors_)
         {
-            selector->select(context_val,nodes_,temp_json_values_);
+            selector->select(context,nodes_,temp_json_values_);
         }
         if (recursive_descent_)
         {
-            if (context_val.is_object())
+            if (context.is_object())
             {
-                for (auto it = context_val.members().begin(); it != context_val.members().end(); ++it)
+                for (auto it = context.members().begin(); it != context.members().end(); ++it)
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
@@ -981,9 +974,9 @@ public:
                     }
                 }
             }
-            else if (context_val.is_array())
+            else if (context.is_array())
             {
-                for (auto it = context_val.elements().begin(); it != context_val.elements().end(); ++it)
+                for (auto it = context.elements().begin(); it != context.elements().end(); ++it)
                 {
                     if (it->is_object() || it->is_array())
                     {
