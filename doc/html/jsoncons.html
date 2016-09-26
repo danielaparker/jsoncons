@@ -714,7 +714,7 @@ std::cout &lt;&lt; j &lt;&lt; std::endl;</pre></div>
 
 <p>The output is</p>
 
-<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>: <span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>: <span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>: <span class="pl-c1">2</span>}</pre></div>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>}</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>json j;
 j[<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
@@ -836,7 +836,7 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
     <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>]
 }</pre></div>
 
-<p>By default, within objects, array scalar values are displayed on the same line.</p>
+<p>By default, within objects, arrays of scalar values are displayed on the same line.</p>
 
 <p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/output_format">output_format</a>, that allows custom formatting of output.<br>
 To display the array scalar values on a new line, set the <code>object_array_split_lines</code> property to <code>line_split_kind::new_line</code>. The code</p>

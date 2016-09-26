@@ -250,7 +250,7 @@ std::cout << j << std::endl;
 ```
 The output is
 ```json
-{"one": 1,"three": 3,"two": 2}
+{"one":1,"three":3,"two":2}
 ```
 
 ```c++
