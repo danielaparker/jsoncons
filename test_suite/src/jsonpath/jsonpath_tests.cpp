@@ -6,8 +6,12 @@
 #endif
 
 #include <boost/test/unit_test.hpp>
+#include <iostream>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <utility>
 #include <ctime>
 #include <new>
@@ -54,6 +58,70 @@ struct jsonpath_fixture
 };
 
 BOOST_AUTO_TEST_CASE(test_jsonpath)
+{
+    boost::filesystem::path p("input/JSONPath");
+
+    if (exists(p) && is_directory(p))
+    {
+        ojson document;
+        std::map<boost::filesystem::path,std::string> jsonpath_dictionary;
+        std::map<boost::filesystem::path,ojson> expected_dictionary;
+
+        boost::filesystem::directory_iterator end_iter;
+        for (boost::filesystem::directory_iterator dir_itr(p);
+            dir_itr != end_iter;
+            ++dir_itr)
+        {
+            if (is_regular_file(dir_itr->status()))
+            {
+                if (dir_itr->path().filename() == "json.json")
+                {
+                    boost::filesystem::ifstream is(dir_itr->path());
+                    is >> document;
+                    std::cout << dir_itr->path().filename() << '\n';
+                }
+                else if (dir_itr->path().extension() == ".jsonpath")
+                {
+                    std::string s;
+                    boost::filesystem::ifstream is(dir_itr->path());
+                    is >> s;
+                    jsonpath_dictionary[dir_itr->path().stem()] = s;
+                    std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
+                }
+                else if (dir_itr->path().extension() == ".json")
+                {
+                    ojson j;
+                    boost::filesystem::ifstream is(dir_itr->path());
+                    is >> j;
+                    expected_dictionary[dir_itr->path().stem()] = j;
+                    std::cout << ".json " << dir_itr->path() << '\n';
+                }
+            }
+        }
+        for (auto pair : jsonpath_dictionary)
+        {
+            auto it = expected_dictionary.find(pair.first);
+            if (it != expected_dictionary.end())
+            {
+                std::cout << pair.second << '\n';
+                ojson result = json_query(document,pair.second);
+                BOOST_CHECK_EQUAL(it->second,result);
+            }
+            else
+            {
+                std::cout << pair.second << '\n';
+                ojson result = json_query(document,pair.second);
+                std::cout << pretty_print(result) << std::endl;
+            }
+        }
+    }
+    else
+    {
+        std::cout << p << " directory does not exist\n";
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_path)
 {
     jsonpath_fixture fixture;
 
