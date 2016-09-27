@@ -261,21 +261,20 @@ private:
     {
     private:
         size_t start_;
-        size_t end_;
-        size_t step_;
         bool positive_start_;
+        size_t end_;
         bool positive_end_;
-        bool positive_step_;
         bool undefined_end_;
+        size_t step_;
+        bool positive_step_;
     public:
         array_slice_selector(size_t start, bool positive_start, 
                              size_t end, bool positive_end,
                              size_t step, bool positive_step,
                              bool undefined_end)
             : start_(start), positive_start_(positive_start),
-              end_(end), positive_end_(positive_end),
-              step_(step), positive_step_(positive_step),
-              undefined_end_(undefined_end) 
+              end_(end), positive_end_(positive_end),undefined_end_(undefined_end),
+              step_(step), positive_step_(positive_step) 
         {
         }
 
@@ -351,12 +350,12 @@ private:
     states state_;
     string_type buffer_;
     size_t start_;
-    size_t end_;
-    size_t step_;
     bool positive_start_;
+    size_t end_;
     bool positive_end_;
-    bool positive_step_;
     bool undefined_end_;
+    size_t step_;
+    bool positive_step_;
     std::vector<node_set> stack_;
     bool recursive_descent_;
     std::vector<cjson_ptr> nodes_;
@@ -370,13 +369,15 @@ private:
 
 public:
     jsonpath_evaluator()
-        : state_(states::start), 
-          start_(0), end_(0), step_(0),
-          positive_start_(true),positive_end_(true), positive_step_(true),
-          undefined_end_(false), recursive_descent_(false),
+        : err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance())),
+          state_(states::start),
+          start_(0), positive_start_(true), 
+          end_(0), positive_end_(true), undefined_end_(false),
+          step_(0), positive_step_(true),
+          recursive_descent_(false),
           line_(0), column_(0),
-          begin_input_(nullptr), end_input_(nullptr), p_(nullptr),
-          err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance()))
+          begin_input_(nullptr), end_input_(nullptr),
+          p_(nullptr)
     {
     }
 

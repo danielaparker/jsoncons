@@ -42,9 +42,9 @@ class basic_output_format
     bool escape_all_non_ascii_;
     bool escape_solidus_;
 
-    line_split_kind array_array_split_lines_;
-    line_split_kind object_array_split_lines_;
     line_split_kind object_object_split_lines_;
+    line_split_kind object_array_split_lines_;
+    line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
 public:
     static const size_t default_indent = 4;
@@ -64,9 +64,9 @@ public:
         escape_all_non_ascii_(false),
         escape_solidus_(false),
         object_object_split_lines_(line_split_kind::multi_line),
-        array_object_split_lines_(line_split_kind::multi_line),
         object_array_split_lines_(line_split_kind::same_line),
-        array_array_split_lines_(line_split_kind::new_line)
+        array_array_split_lines_(line_split_kind::new_line),
+        array_object_split_lines_(line_split_kind::multi_line)
     {
     }
 
@@ -84,45 +84,45 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     block_options array_array_block_option()
     {
-        return array_array_split_lines_ ? block_options::next_line : block_options::same_line;
+        return (array_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
     basic_output_format<CharT>& array_array_block_option(block_options value)
     {
-        array_array_split_lines_ = value == block_options::next_line ? true : false;
+        array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
         return *this;
     }
 
     block_options array_object_block_option()
     {
-        return array_object_split_lines_ ? block_options::next_line : block_options::same_line;
+        return (array_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
     basic_output_format<CharT>& array_object_block_option(block_options value)
     {
-        array_object_split_lines_ = value == block_options::next_line ? true : false;
+        array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
         return *this;
     }
 
     block_options object_array_block_option()
     {
-        return object_array_split_lines_ ? block_options::next_line : block_options::same_line;
+        return (object_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
     basic_output_format<CharT>& object_array_block_option(block_options value)
     {
-        object_array_split_lines_ = value == block_options::next_line ? true : false;
+        object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
         return *this;
     }
 
     block_options object_object_block_option()
     {
-        return object_object_split_lines_ ? block_options::next_line : block_options::same_line;
+        return (object_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
     basic_output_format<CharT>& object_object_block_option(block_options value)
     {
-        object_object_split_lines_ = value == block_options::next_line ? true : false;
+        object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
         return *this;
     }
 #endif

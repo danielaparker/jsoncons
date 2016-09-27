@@ -70,8 +70,8 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
         bool is_object_;
         size_t count_;
         line_split_kind split_lines_;
-        bool unindent_at_end_;
         bool indent_once_;
+        bool unindent_at_end_;
     };
     basic_output_format<CharT> format_;
     std::vector<stack_item> stack_;
