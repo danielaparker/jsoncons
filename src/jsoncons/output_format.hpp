@@ -89,7 +89,7 @@ public:
 
     basic_output_format<CharT>& array_array_block_option(block_options value)
     {
-        array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
+        array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
     }
 
@@ -100,7 +100,7 @@ public:
 
     basic_output_format<CharT>& array_object_block_option(block_options value)
     {
-        array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
+        array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
     }
 
@@ -111,7 +111,7 @@ public:
 
     basic_output_format<CharT>& object_array_block_option(block_options value)
     {
-        object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
+        object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
     }
 
@@ -122,7 +122,7 @@ public:
 
     basic_output_format<CharT>& object_object_block_option(block_options value)
     {
-        object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::next_line;
+        object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
     }
 #endif
