@@ -382,6 +382,7 @@ public:
             new(reinterpret_cast<void*>(&data_))empty_object_data();
             break;
         case value_types::double_t:
+            new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
             break;
         case value_types::integer_t:
             break;
@@ -435,9 +436,19 @@ public:
         return reinterpret_cast<null_data*>(&data_);
     }
 
+    const null_data* null_data_cast() const
+    {
+        return reinterpret_cast<const null_data*>(&data_);
+    }
+
     empty_object_data* empty_object_data_cast()
     {
         return reinterpret_cast<empty_object_data*>(&data_);
+    }
+
+    const empty_object_data* empty_object_data_cast() const
+    {
+        return reinterpret_cast<const empty_object_data*>(&data_);
     }
 
     bool_data* bool_data_cast()
@@ -445,9 +456,19 @@ public:
         return reinterpret_cast<bool_data*>(&data_);
     }
 
+    const bool_data* bool_data_cast() const
+    {
+        return reinterpret_cast<const bool_data*>(&data_);
+    }
+
     integer_data* integer_data_cast()
     {
         return reinterpret_cast<integer_data*>(&data_);
+    }
+
+    const integer_data* integer_data_cast() const
+    {
+        return reinterpret_cast<const integer_data*>(&data_);
     }
 
     uinteger_data* uinteger_data_cast()
@@ -455,9 +476,19 @@ public:
         return reinterpret_cast<uinteger_data*>(&data_);
     }
 
+    const uinteger_data* uinteger_data_cast() const
+    {
+        return reinterpret_cast<const uinteger_data*>(&data_);
+    }
+
     double_data* double_data_cast()
     {
         return reinterpret_cast<double_data*>(&data_);
+    }
+
+    const double_data* double_data_cast() const
+    {
+        return reinterpret_cast<const double_data*>(&data_);
     }
 
     small_string_data* small_string_data_cast()
@@ -465,9 +496,19 @@ public:
         return reinterpret_cast<small_string_data*>(&data_);
     }
 
+    const small_string_data* small_string_data_cast() const
+    {
+        return reinterpret_cast<const small_string_data*>(&data_);
+    }
+
     string_data* string_data_cast()
     {
         return reinterpret_cast<string_data*>(&data_);
+    }
+
+    const string_data* string_data_cast() const
+    {
+        return reinterpret_cast<const string_data*>(&data_);
     }
 
     object_data* object_data_cast()
@@ -475,9 +516,19 @@ public:
         return reinterpret_cast<object_data*>(&data_);
     }
 
+    const object_data* object_data_cast() const
+    {
+        return reinterpret_cast<const object_data*>(&data_);
+    }
+
     array_data* array_data_cast()
     {
         return reinterpret_cast<array_data*>(&data_);
+    }
+
+    const array_data* array_data_cast() const
+    {
+        return reinterpret_cast<const array_data*>(&data_);
     }
 
     void swap(variant& rhs)
@@ -533,9 +584,25 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     BOOST_CHECK(value_types::small_string_t == var6.type_id());
     BOOST_CHECK(small == var6.small_string_data_cast()->data_);
     BOOST_CHECK(small.length() == var6.small_string_data_cast()->length_);
+
+    double val7 = 123456789.9;
+    variant var7(val7,0);
+    variant var8(std::move(var7));
+    BOOST_CHECK(value_types::null_t == var7.type_id());
+    BOOST_CHECK(value_types::double_t == var8.type_id());
+    BOOST_CHECK(var8.double_data_cast()->val_ == val7);
 }
 
+BOOST_AUTO_TEST_CASE(test_copy_constructor)
+{
 
+    double val7 = 123456789.9;
+    variant var7(val7,0);
+    variant var8(var7);
+    BOOST_CHECK(value_types::double_t == var7.type_id());
+    BOOST_CHECK(value_types::double_t == var8.type_id());
+    BOOST_CHECK(var8.double_data_cast()->val_ == val7);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
