@@ -365,11 +365,22 @@ public:
 
     void parse(const CharT* const input, size_t start, size_t length)
     {
-        begin_input_ = input + start;
         end_input_ = input + length;
+
+        if (start == 0)
+        {
+            index_ = json_text_traits<CharT>::skip_bom(input,length);
+            column_ = index_+1;
+            begin_input_ = input + index_;
+        }
+        else
+        {
+            index_ = start;
+            begin_input_ = input + start;
+        }
         p_ = begin_input_;
 
-        index_ = start;
+        index_ = (start == 0) ? json_text_traits<CharT>::skip_bom(input,length) : start;
         while ((p_ < end_input_) && (stack_.back() != states::done))
         {
             switch (*p_)

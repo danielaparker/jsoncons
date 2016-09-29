@@ -132,6 +132,20 @@ struct json_text_traits<char>
         return value;
     }
 
+    static size_t skip_bom(const char* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 3)
+        {
+            uint32_t bom = static_cast<uint32_t>(static_cast<unsigned char>(it[0]) |
+                                                (static_cast<unsigned char>(it[1]) << 8) | 
+                                                (static_cast<unsigned char>(it[2]) << 16));
+            if ((bom & 0xFFFFFF) == 0xBFBBEF)  
+                count += 3;
+        }
+        return count;
+    }
+
     static size_t codepoint_count(const char* it, 
                                   const char* end)
     {
@@ -286,6 +300,20 @@ struct json_wchar_traits
 template <>
 struct json_wchar_traits<wchar_t,2> // assume utf16
 {
+    static size_t skip_bom(const wchar_t* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 1)
+        {
+            uint32_t bom = static_cast<uint32_t>(it[0]);
+            if ((bom & 0xFFFF) == 0xFFFE)      
+                ++count;
+            else if ((bom & 0xFFFF) == 0xFEFF)      
+                ++count;
+        }
+        return count;
+    }
+
     static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
     {
         if (cp <= 0xFFFF)
@@ -335,6 +363,20 @@ struct json_wchar_traits<wchar_t,2> // assume utf16
 template <>
 struct json_wchar_traits<wchar_t,4> // assume utf32
 {
+    static size_t skip_bom(const wchar_t* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 1)
+        {
+            uint32_t bom = static_cast<uint32_t>(it[0]);
+            if (bom == 0xFFFE0000)                  
+                ++count;
+            else if (bom == 0x0000FEFF)             
+                ++count;
+        }
+        return count;
+    }
+
     static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
     {
         if (cp <= 0xFFFF)
@@ -379,6 +421,11 @@ struct json_text_traits<wchar_t>
     {
         static const std::pair<const wchar_t*,size_t> value = {L"false",5};
         return value;
+    }
+
+    static size_t skip_bom(const wchar_t* it, size_t length)
+    {
+        return json_wchar_traits<wchar_t,sizeof(wchar_t)>::skip_bom(it, length);
     }
 
     static size_t codepoint_count(const wchar_t* it, 
