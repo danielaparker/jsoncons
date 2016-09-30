@@ -1,5 +1,5 @@
-0.99.3
-------
+0.99.3a
+-------
 
 Changes
 
@@ -34,6 +34,8 @@ Enhancements
 - Added static method `null()` to `json` class to return null value
 
 - A new extension jsonx that supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
+
+- json parser will skip `bom` in input if present
 
 Fixes:
 
