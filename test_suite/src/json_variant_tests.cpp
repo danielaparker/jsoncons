@@ -63,310 +63,330 @@ enum class value_types : uint8_t
 #endif
 };
 
-struct base_data
-{
-    value_types type_id_;
-
-    base_data(value_types id)
-        : type_id_(id)
-    {}
-};
-
-struct null_data : public base_data
-{
-    null_data()
-        : base_data(value_types::null_t)
-    {
-    }
-};
-
-struct empty_object_data : public base_data
-{
-    empty_object_data()
-        : base_data(value_types::empty_object_t)
-    {
-    }
-};
-
-struct bool_data : public base_data
-{
-    bool val_;
-
-    bool_data(bool val)
-        : base_data(value_types::bool_t),val_(val)
-    {
-    }
-
-    bool_data(const bool_data& val)
-        : base_data(value_types::bool_t),val_(val.val_)
-    {
-    }
-};
-
-struct integer_data : public base_data
-{
-    int64_t val_;
-
-    integer_data(int64_t val)
-        : base_data(value_types::integer_t),val_(val)
-    {
-    }
-
-    integer_data(const integer_data& val)
-        : base_data(value_types::integer_t),val_(val.val_)
-    {
-    }
-};
-
-struct uinteger_data : public base_data
-{
-    uint64_t val_;
-
-    uinteger_data(uint64_t val)
-        : base_data(value_types::uinteger_t),val_(val)
-    {
-    }
-
-    uinteger_data(const uinteger_data& val)
-        : base_data(value_types::uinteger_t),val_(val.val_)
-    {
-    }
-};
-
-struct double_data : public base_data
-{
-    uint8_t precision_;
-    double val_;
-
-    double_data(double val, uint8_t precision)
-        : base_data(value_types::double_t), 
-          precision_(precision), 
-          val_(val)
-    {
-    }
-
-    double_data(const double_data& val)
-        : base_data(value_types::double_t),
-          precision_(val.precision_), 
-          val_(val.val_)
-    {
-    }
-};
-
-struct small_string_data : public base_data
-{
-    static const size_t capacity = 14/sizeof(char_type);
-    static const size_t max_length = (14 / sizeof(char_type)) - 1;
-
-    uint8_t length_;
-    char_type data_[capacity];
-
-    small_string_data(const char_type* p, uint8_t length)
-        : base_data(value_types::small_string_t), length_(length)
-    {
-        JSONCONS_ASSERT(length <= max_length);
-        std::memcpy(data_,p,length*sizeof(char_type));
-        data_[length] = 0;
-    }
-
-    small_string_data(const small_string_data& val)
-        : base_data(value_types::small_string_t), length_(val.length_)
-    {
-        std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
-        data_[length_] = 0;
-    }
-
-    uint8_t length() const
-    {
-        return length_;
-    }
-
-    const char_type* data() const
-    {
-        return data_;
-    }
-};
-
-struct string_data : public base_data
-{
-    struct string_holder : public string_allocator
-    {
-        const char_type* c_str() const { return p_; }
-        const char_type* data() const { return p_; }
-        size_t length() const { return length_; }
-        string_allocator get_allocator() const
-        {
-            return *this;
-        }
-
-        bool operator==(const string_holder& rhs) const
-        {
-            return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
-        }
-
-        string_holder(const string_allocator& allocator)
-            : string_allocator(allocator), length_(0), p_(nullptr)
-        {
-        }
-
-        size_t length_;
-        char_type* p_;
-    private:
-        string_holder(const string_holder&);
-        string_holder& operator=(const string_holder&);
-    };
-
-    struct string_holderA
-    {
-        string_holder data;
-        char_type c[1];
-    };
-
-    typedef typename std::aligned_storage<sizeof(string_holderA), JSONCONS_ALIGNOF(string_holderA)>::type storage_type;
-
-    static size_t aligned_size(size_t n)
-    {
-        return sizeof(storage_type) + n;
-    }
-
-    string_holder* create_string_holder(const char_type* s, size_t length, const string_allocator& allocator)
-    {
-        size_t mem_size = aligned_size(length*sizeof(char_type));
-
-        typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
-
-        char* storage = alloc.allocate(mem_size);
-        string_holder* ps = new(storage)string_holder(allocator);
-        auto psa = reinterpret_cast<string_holderA*>(storage); 
-
-        ps->p_ = new(&psa->c)char_type[length + 1];
-        memcpy(ps->p_, s, length*sizeof(char_type));
-        ps->p_[length] = 0;
-        ps->length_ = length;
-        return ps;
-    }
-
-    void destroy_string_holder(const string_allocator& allocator, string_holder* p)
-    {
-        size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-        typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
-        alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
-    }
-    string_holder* holder_;
-
-    string_data(const char_type* s, size_t length, const string_allocator& alloc)
-        : base_data(value_types::string_t)
-    {
-        holder_ = create_string_holder(s, length, alloc);
-    }
-
-    string_data(const string_data& val)
-        : base_data(value_types::string_t)
-    {
-        holder_ = create_string_holder(val.holder_->p_, 
-                                     val.holder_->length_, 
-                                     val.holder_->get_allocator());
-    }
-
-    string_data(const string_data& val, string_allocator allocator)
-        : base_data(value_types::string_t)
-    {
-        holder_ = create_string_holder(val.holder_->p_, 
-                                       val.holder_->length_, 
-                                       allocator);
-    }
-    ~string_data()
-    {
-        destroy_string_holder(holder_->get_allocator(), holder_);
-    }
-
-    size_t length() const
-    {
-        return holder_->length_;
-    }
-
-    const char_type* data() const
-    {
-        return holder_->p_;
-    }
-};
-
-
-struct object_data : public base_data
-{
-    object* data_;
-
-    explicit object_data(const Allocator& a)
-        : base_data(value_types::object_t)
-    {
-        data_ = create_impl<object>(a, object_allocator(a));
-    }
-
-    explicit object_data(const object & val)
-        : base_data(value_types::object_t)
-    {
-        data_ = create_impl<object>(val.get_allocator(), val);
-    }
-
-    explicit object_data(const object & val, const Allocator& a)
-        : base_data(value_types::object_t)
-    {
-        data_ = create_impl<object>(a, val, object_allocator(a));
-    }
-
-    explicit object_data(const object_data & val)
-        : base_data(value_types::object_t)
-    {
-        data_ = create_impl<object>(val.data_->get_allocator(), *(val.data_));
-    }
-
-    explicit object_data(const object_data & val, const Allocator& a)
-        : base_data(value_types::object_t)
-    {
-        data_ = create_impl<object>(a, *(val.data_), object_allocator(a));
-    }
-
-    ~object_data()
-    {
-        destroy_impl(data_->get_allocator(), data_);
-    }
-};
-
-struct array_data : public base_data
-{
-    array* data_;
-
-    array_data(const array & val)
-        : base_data(value_types::array_t)
-    {
-        data_ = create_impl<array>(val.get_allocator(), val);
-    }
-
-    array_data(const array & val, const Allocator& a)
-        : base_data(value_types::array_t)
-    {
-        data_ = create_impl<array>(a, val, array_allocator(a));
-    }
-
-    array_data(const array_data & val)
-        : base_data(value_types::array_t)
-    {
-        data_ = create_impl<array>(val.data_->get_allocator(), *(val.data_));
-    }
-
-    array_data(const array_data & val, const Allocator& a)
-        : base_data(value_types::array_t)
-    {
-        data_ = create_impl<array>(a, *(val.data_), array_allocator(a));
-    }
-    ~array_data()
-    {
-        destroy_impl(data_->get_allocator(), data_);
-    }
-};
-
 struct variant
 {
+    struct base_data
+    {
+        value_types type_id_;
+
+        base_data(value_types id)
+            : type_id_(id)
+        {}
+    };
+
+    struct null_data : public base_data
+    {
+        null_data()
+            : base_data(value_types::null_t)
+        {
+        }
+    };
+
+    struct empty_object_data : public base_data
+    {
+        empty_object_data()
+            : base_data(value_types::empty_object_t)
+        {
+        }
+    };
+
+    struct bool_data : public base_data
+    {
+        bool val_;
+
+        bool_data(bool val)
+            : base_data(value_types::bool_t),val_(val)
+        {
+        }
+
+        bool_data(const bool_data& val)
+            : base_data(value_types::bool_t),val_(val.val_)
+        {
+        }
+    };
+
+    struct integer_data : public base_data
+    {
+        int64_t val_;
+
+        integer_data(int64_t val)
+            : base_data(value_types::integer_t),val_(val)
+        {
+        }
+
+        integer_data(const integer_data& val)
+            : base_data(value_types::integer_t),val_(val.val_)
+        {
+        }
+    };
+
+    struct uinteger_data : public base_data
+    {
+        uint64_t val_;
+
+        uinteger_data(uint64_t val)
+            : base_data(value_types::uinteger_t),val_(val)
+        {
+        }
+
+        uinteger_data(const uinteger_data& val)
+            : base_data(value_types::uinteger_t),val_(val.val_)
+        {
+        }
+    };
+
+    struct double_data : public base_data
+    {
+        uint8_t precision_;
+        double val_;
+
+        double_data(double val, uint8_t precision)
+            : base_data(value_types::double_t), 
+              precision_(precision), 
+              val_(val)
+        {
+        }
+
+        double_data(const double_data& val)
+            : base_data(value_types::double_t),
+              precision_(val.precision_), 
+              val_(val.val_)
+        {
+        }
+    };
+
+    struct small_string_data : public base_data
+    {
+        static const size_t capacity = 14/sizeof(char_type);
+        static const size_t max_length = (14 / sizeof(char_type)) - 1;
+
+        uint8_t length_;
+        char_type data_[capacity];
+
+        small_string_data(const char_type* p, uint8_t length)
+            : base_data(value_types::small_string_t), length_(length)
+        {
+            JSONCONS_ASSERT(length <= max_length);
+            std::memcpy(data_,p,length*sizeof(char_type));
+            data_[length] = 0;
+        }
+
+        small_string_data(const small_string_data& val)
+            : base_data(value_types::small_string_t), length_(val.length_)
+        {
+            std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
+            data_[length_] = 0;
+        }
+
+        uint8_t length() const
+        {
+            return length_;
+        }
+
+        const char_type* data() const
+        {
+            return data_;
+        }
+    };
+
+    struct string_data : public base_data
+    {
+        struct string_holder : public string_allocator
+        {
+            const char_type* c_str() const { return p_; }
+            const char_type* data() const { return p_; }
+            size_t length() const { return length_; }
+            string_allocator get_allocator() const
+            {
+                return *this;
+            }
+
+            bool operator==(const string_holder& rhs) const
+            {
+                return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
+            }
+
+            string_holder(const string_allocator& allocator)
+                : string_allocator(allocator), length_(0), p_(nullptr)
+            {
+            }
+
+            size_t length_;
+            char_type* p_;
+        private:
+            string_holder(const string_holder&);
+            string_holder& operator=(const string_holder&);
+        };
+
+        struct string_holderA
+        {
+            string_holder data;
+            char_type c[1];
+        };
+
+        typedef typename std::aligned_storage<sizeof(string_holderA), JSONCONS_ALIGNOF(string_holderA)>::type storage_type;
+
+        static size_t aligned_size(size_t n)
+        {
+            return sizeof(storage_type) + n;
+        }
+
+        string_holder* create_string_holder(const char_type* s, size_t length, const string_allocator& allocator)
+        {
+            size_t mem_size = aligned_size(length*sizeof(char_type));
+
+            typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
+
+            char* storage = alloc.allocate(mem_size);
+            string_holder* ps = new(storage)string_holder(allocator);
+            auto psa = reinterpret_cast<string_holderA*>(storage); 
+
+            ps->p_ = new(&psa->c)char_type[length + 1];
+            memcpy(ps->p_, s, length*sizeof(char_type));
+            ps->p_[length] = 0;
+            ps->length_ = length;
+            return ps;
+        }
+
+        void destroy_string_holder(const string_allocator& allocator, string_holder* p)
+        {
+            size_t mem_size = aligned_size(p->length_*sizeof(char_type));
+            typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
+            alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
+        }
+        string_holder* holder_;
+
+        string_data(const char_type* s, size_t length, const string_allocator& alloc)
+            : base_data(value_types::string_t)
+        {
+            holder_ = create_string_holder(s, length, alloc);
+        }
+
+        string_data(const string_data& val)
+            : base_data(value_types::string_t)
+        {
+            holder_ = create_string_holder(val.holder_->p_, 
+                                         val.holder_->length_, 
+                                         val.holder_->get_allocator());
+        }
+
+        string_data(const string_data& val, string_allocator allocator)
+            : base_data(value_types::string_t)
+        {
+            holder_ = create_string_holder(val.holder_->p_, 
+                                           val.holder_->length_, 
+                                           allocator);
+        }
+        ~string_data()
+        {
+            destroy_string_holder(holder_->get_allocator(), holder_);
+        }
+
+        size_t length() const
+        {
+            return holder_->length_;
+        }
+
+        const char_type* data() const
+        {
+            return holder_->p_;
+        }
+    };
+
+
+    struct object_data : public base_data
+    {
+        object* data_;
+
+        explicit object_data(const Allocator& a)
+            : base_data(value_types::object_t)
+        {
+            data_ = create_impl<object>(a, object_allocator(a));
+        }
+
+        explicit object_data(const object & val)
+            : base_data(value_types::object_t)
+        {
+            data_ = create_impl<object>(val.get_allocator(), val);
+        }
+
+        explicit object_data(const object & val, const Allocator& a)
+            : base_data(value_types::object_t)
+        {
+            data_ = create_impl<object>(a, val, object_allocator(a));
+        }
+
+        explicit object_data(const object_data & val)
+            : base_data(value_types::object_t)
+        {
+            data_ = create_impl<object>(val.data_->get_allocator(), *(val.data_));
+        }
+
+        explicit object_data(const object_data & val, const Allocator& a)
+            : base_data(value_types::object_t)
+        {
+            data_ = create_impl<object>(a, *(val.data_), object_allocator(a));
+        }
+
+        ~object_data()
+        {
+            destroy_impl(data_->get_allocator(), data_);
+        }
+
+        object& value()
+        {
+            return *data_;
+        }
+
+        const object& value() const
+        {
+            return *data_;
+        }
+    };
+
+    struct array_data : public base_data
+    {
+        array* data_;
+
+        array_data(const array & val)
+            : base_data(value_types::array_t)
+        {
+            data_ = create_impl<array>(val.get_allocator(), val);
+        }
+
+        array_data(const array & val, const Allocator& a)
+            : base_data(value_types::array_t)
+        {
+            data_ = create_impl<array>(a, val, array_allocator(a));
+        }
+
+        array_data(const array_data & val)
+            : base_data(value_types::array_t)
+        {
+            data_ = create_impl<array>(val.data_->get_allocator(), *(val.data_));
+        }
+
+        array_data(const array_data & val, const Allocator& a)
+            : base_data(value_types::array_t)
+        {
+            data_ = create_impl<array>(a, *(val.data_), array_allocator(a));
+        }
+        ~array_data()
+        {
+            destroy_impl(data_->get_allocator(), data_);
+        }
+
+        array& value()
+        {
+            return *data_;
+        }
+
+        const array& value() const
+        {
+            return *data_;
+        }
+    };
+
 //private:
     static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(small_string_data), sizeof(string_data)>::value;
     static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(small_string_data),JSONCONS_ALIGNOF(string_data)>::value;
@@ -697,9 +717,9 @@ public:
                 return string_data_cast()->length() == rhs.string_data_cast()->length() &&
                        std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.string_data_cast()->data(),string_data_cast()->length()) == 0;
             case value_types::object_t:
-                return *(object_data_cast()->data_) == *(rhs.object_data_cast()->data_);
+                return object_data_cast()->value() == rhs.object_data_cast()->value();
             case value_types::array_t:
-                return *(array_data_cast()->data_) == *(rhs.array_data_cast()->data_);
+                return array_data_cast()->value() == rhs.array_data_cast()->value();
             default:
                 return false;
             }
