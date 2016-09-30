@@ -749,6 +749,22 @@ public:
                 return true;
             }
             break;
+        case value_types::small_string_t:
+            if ((rhs_id == value_types::string_t) && 
+                (small_string_data_cast()->length() == rhs.string_data_cast()->length()) &&
+                 std::char_traits<char_type>::compare(small_string_data_cast()->data(),rhs.string_data_cast()->data(),small_string_data_cast()->length()) == 0)
+            {
+                return true;
+            }
+            break;
+        case value_types::string_t:
+            if ((rhs_id == value_types::small_string_t) && 
+                (string_data_cast()->length() == rhs.small_string_data_cast()->length()) &&
+                 std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.small_string_data_cast()->data(),string_data_cast()->length()) == 0)
+            {
+                return true;
+            }
+            break;
         default:
             break;
         }
@@ -959,6 +975,8 @@ BOOST_AUTO_TEST_CASE(test_equals)
     BOOST_CHECK(var12 == var13 && var13 == var12);
     BOOST_CHECK(var12 != var14 && var14 != var12);
 
+    variant var15(val9.data(),val9.length(),std::allocator<char>());
+    BOOST_CHECK(var9 == var15 && var15 == var9);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
