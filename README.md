@@ -33,6 +33,11 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 
+## What's new
+
+- New release 0.99.3a
+- The deprecated class `json::any` has been removed from master
+
 ## Using the jsoncons library
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
