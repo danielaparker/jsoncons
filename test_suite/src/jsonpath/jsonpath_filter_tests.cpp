@@ -155,6 +155,12 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     std::string expr1 = "(0)";
     auto res = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res.eval(parent);
+
+    std::cout << (int)result1.type() << std::endl;
+    std::cout << result1 << std::endl;
+    BOOST_CHECK(json(0) == 0);
+    BOOST_CHECK(result1 == 0);
+
     BOOST_CHECK_EQUAL(json(0),result1);
 }
 

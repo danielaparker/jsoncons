@@ -208,6 +208,11 @@ BOOST_AUTO_TEST_CASE(test_equals)
 
     json::variant var15(val9.data(),val9.length(),std::allocator<char>());
     BOOST_CHECK(var9 == var15 && var15 == var9);
+
+    json::variant var16(static_cast<int64_t>(0));
+    json::variant var17(static_cast<uint64_t>(0));
+    BOOST_CHECK(var16 == var17);
+    BOOST_CHECK(var17 == var16);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

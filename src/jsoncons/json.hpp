@@ -72,10 +72,6 @@ enum class value_types : uint8_t
     string_t,
     object_t,
     array_t
-#if !defined(JSONCONS_NO_DEPRECATED)
-    ,
-    any_t
-#endif
 };
 
 inline
@@ -896,7 +892,7 @@ public:
                 {
                     return static_cast<double>(integer_data_cast()->val_) == rhs.double_data_cast()->val_;
                 }
-                else if (rhs_id == value_types::uinteger_t && integer_data_cast()->val_ > 0)
+                else if (rhs_id == value_types::uinteger_t && integer_data_cast()->val_ >= 0)
                 {
                     return static_cast<uint64_t>(integer_data_cast()->val_) == rhs.uinteger_data_cast()->val_;
                 }
@@ -906,7 +902,7 @@ public:
                 {
                     return static_cast<double>(uinteger_data_cast()->val_) == rhs.double_data_cast()->val_;
                 }
-                else if (rhs_id == value_types::integer_t && rhs.integer_data_cast()->val_ > 0)
+                else if (rhs_id == value_types::integer_t && rhs.integer_data_cast()->val_ >= 0)
                 {
                     return uinteger_data_cast()->val_ == static_cast<uint64_t>(rhs.integer_data_cast()->val_);
                 }
