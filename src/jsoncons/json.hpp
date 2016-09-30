@@ -701,8 +701,7 @@ public:
 
         ~variant()
         {
-            value_types id = type_id();
-            switch (id)
+            switch (type_id())
             {
             case value_types::string_t:
                 reinterpret_cast<string_data*>(&data_)->~string_data();
@@ -712,6 +711,8 @@ public:
                 break;
             case value_types::array_t:
                 reinterpret_cast<array_data*>(&data_)->~array_data();
+                break;
+            default:
                 break;
             }
         }

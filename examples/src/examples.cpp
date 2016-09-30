@@ -16,7 +16,6 @@ using std::string;
 
 void run_readme_examples();
 void array_examples();
-void json_any_examples();
 void wjson_examples();
 void serialization_examples();
 
@@ -282,7 +281,6 @@ int main()
         second_example_a();
 
         array_examples();
-        json_any_examples();
 
         read_csv_file();
         write_csv_file();
