@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_erase_member)
     BOOST_CHECK_EQUAL(true,a["b"].is_object());
     BOOST_CHECK_EQUAL(a["b"],b_copy);
 }
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_empty_object)
 {
     json a;
@@ -121,7 +121,6 @@ BOOST_AUTO_TEST_CASE(test_empty_object_assignment)
     BOOST_CHECK(c.size() == 1);
     BOOST_CHECK(c.is_object());
     BOOST_CHECK(c.is<json::object>());
-
     c = a;
     BOOST_CHECK(c.size() == 0);
     BOOST_CHECK(c.is_object());
@@ -313,7 +312,6 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
 
     //*it = member; // Don't want this to compile
 }
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -207,25 +207,6 @@ private:
 };
 
 template<class Json>
-struct json_type_traits<Json, typename Json::any>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& lhs) JSONCONS_NOEXCEPT
-    {
-        return lhs.is_any();
-    }
-    static typename Json::any as(const Json& rhs)
-    {
-        return rhs.any_value();
-    }
-    static void assign(Json& lhs, typename Json::any rhs)
-    {
-        lhs.assign_any(rhs);
-    }
-};
-
-template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
 {
     static const bool is_assignable = true;
