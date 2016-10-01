@@ -50,10 +50,6 @@ namespace jsoncons
 #if defined(_MSC_VER)
 #define JSONCONS_HAS_FOPEN_S
 #define JSONCONS_HAS_WCSTOMBS_S
-#if _MSC_VER < 1800 // VS2013
-#define JSONCONS_NO_RAW_STRING_LITERALS
-#define JSONCONS_NO_FOR_RANGE
-#endif
 #if _MSC_VER >= 1900
 #define JSONCONS_ALIGNOF alignof
 #else

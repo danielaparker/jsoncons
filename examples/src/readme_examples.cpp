@@ -49,7 +49,6 @@ void example1()
     hint = book3.set(hint, "title", "Kafka on the Shore");
 
     // Construct a fourth from a string
-#if !defined(JSONCONS_NO_RAW_STRING_LITERALS)
     json book4 = json::parse(R"(
     {
         "category" : "Fiction",
@@ -60,15 +59,6 @@ void example1()
         "isbn" : "1852272007"  
     }
     )");
-#else
-    json book4;
-    book4["category"] = "Fiction";
-    book4["title"] = "Pulp";
-    book4["author"] = "Charles Bukowski";
-    book4["date"] = "2004-07-08";
-    book4["price"] = 22.48;
-    book4["isbn"] = "1852272007";
-#endif
 
     // Construct a booklist array
     json booklist = json::array();
@@ -91,27 +81,23 @@ void example1()
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
-#if !defined(JSONCONS_NO_FOR_RANGE)
     for(auto book : booklist.elements())
     {
         std::cout << book["title"].as<std::string>()
                   << ","
                   << book["price"].as<double>() << std::endl;
     }
-#endif
 
     // The second book
     json& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-#if !defined(JSONCONS_NO_FOR_RANGE)
     for(auto member : book.members())
     {
         std::cout << member.name()
                   << ","
                   << member.value() << std::endl;
     }
-#endif
 
     auto it = book.find("author");
     if (it != book.members().end())
@@ -217,7 +203,6 @@ void example3()
 
     // Construct a fourth from a string
 
-#if !defined(JSONCONS_NO_RAW_STRING_LITERALS)
     wjson book4 = wjson::parse(LR"(
     {
         "category" : "Fiction",
@@ -228,15 +213,6 @@ void example3()
         "isbn" : "1852272007"  
     }
     )");
-#else
-    wjson book4;
-    book4[L"category"] = L"Fiction";
-    book4[L"title"] = L"Pulp";
-    book4[L"author"] = L"Charles Bukowski";
-    book4[L"date"] = L"2004-07-08";
-    book4[L"price"] = 22.48;
-    book4[L"isbn"] = L"1852272007";
-#endif
     // Construct a booklist array
     wjson booklist = wjson::array();
 
@@ -258,27 +234,23 @@ void example3()
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
-#if !defined(JSONCONS_NO_FOR_RANGE)
     for (const auto& book : booklist.elements())
     {
         std::wcout << book[L"title"].as<std::wstring>()
                    << L","
                    << book[L"price"].as<double>() << std::endl;
     }
-#endif
 
     // The second book
     wjson& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-#if !defined(JSONCONS_NO_FOR_RANGE)
     for(const auto& member : book.members())
     {
         std::wcout << member.name()
                    << L","
                    << member.value() << std::endl;
     }
-#endif
 
     auto it = book.find(L"author");
     if (it != book.members().end())

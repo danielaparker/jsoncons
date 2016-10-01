@@ -60,7 +60,6 @@ void destroy_impl(const Allocator& allocator, T* p)
 
 enum class value_types : uint8_t 
 {
-    // Simple types
     empty_object_t,
     small_string_t,
     double_t,
@@ -68,17 +67,10 @@ enum class value_types : uint8_t
     uinteger_t,
     bool_t,
     null_t,
-    // Non simple types
     string_t,
     object_t,
     array_t
 };
-
-inline
-bool is_simple(value_types type)
-{
-    return type < value_types::string_t;
-}
 
 template <class CharT, 
           class JsonTraits = json_traits<CharT>, 
