@@ -50,6 +50,11 @@ namespace jsoncons
         {
             lhs.assign_string(to_iso_extended_string(val));
         }
+
+        static Json to_json(boost::gregorian::date val)
+        {
+            return Json::make_string(to_iso_extended_string(val));
+        }
     };
 }
 

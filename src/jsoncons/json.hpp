@@ -1670,17 +1670,22 @@ public:
 
     static basic_json make_array()
     {
-        return basic_json::array();
+        return json_type(variant(array()));
+    }
+
+    static basic_json make_array(const array& a)
+    {
+        return json_type(variant(a));
     }
 
     static basic_json make_array(std::initializer_list<json_type> init, const Allocator& allocator = Allocator())
     {
-        return basic_json::array(std::move(init),allocator);
+        return array(std::move(init),allocator);
     }
 
     static basic_json make_array(size_t n, const array_allocator& allocator = array_allocator())
     {
-        return basic_json::array(n,allocator);
+        return array(n,allocator);
     }
 
     template <class T>
@@ -1717,7 +1722,7 @@ public:
 
     static const json_type& null()
     {
-        static json_type a_null = json_type(null_type());
+        static json_type a_null = json_type(variant(null_type()));
         return a_null;
     }
 
@@ -1758,6 +1763,16 @@ public:
     {
     }
 
+    basic_json(variant&& other)
+        : var_(std::forward<variant>(other))
+    {
+    }
+
+    basic_json(const variant& val)
+        : var_(val)
+    {
+    }
+
     basic_json(array&& other)
         : var_(std::move(other))
     {
@@ -1781,9 +1796,8 @@ public:
 
     template <class T>
     basic_json(const T& val)
-        : var_(null_type())
+        : var_(json_type_traits<json_type,T>::to_json(val).var_)
     {
-        json_type_traits<json_type,T>::assign(*this,val);
     }
 
     basic_json(const char_type* s)
@@ -2966,6 +2980,42 @@ public:
     {
         a.swap(b);
     }
+
+    static json_type make_string(const string_type& s)
+    {
+        return json_type(variant(s.data(),s.length()));
+    }
+
+    static json_type make_string(const char_type* rhs, size_t length)
+    {
+        return json_type(variant(rhs,length));
+    }
+
+    static json_type make_integer(int64_t val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type make_uinteger(uint64_t val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type make_double(double val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type make_bool(bool val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type make_object(const object& o)
+    {
+        return json_type(variant(o));
+    }
+
     void assign_string(const string_type& rhs)
     {
         var_ = variant(rhs.data(),rhs.length());

@@ -51,6 +51,8 @@ struct json_type_traits
     static T as(const Json& rhs);
 
     static void assign(Json& lhs, T rhs);
+
+    static Json to_json(T rhs);
 };
 
 template <class Json, class T>
@@ -226,6 +228,11 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
         size_t length = std::char_traits<char_type>::length(rhs);
         lhs.assign_string(rhs,length);
     }
+    static Json to_json(const char_type* rhs)
+    {
+        size_t length = std::char_traits<char_type>::length(rhs);
+        return Json::make_string(rhs,length);
+    }
 };
 
 template<class Json>
@@ -243,6 +250,11 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     {
         size_t length = std::char_traits<char_type>::length(rhs);
         lhs.assign_string(rhs,length);
+    }
+    static Json to_json(const char_type *rhs)
+    {
+        size_t length = std::char_traits<char_type>::length(rhs);
+        return Json::make_string(rhs,length);
     }
 };
 
@@ -269,6 +281,10 @@ struct json_type_traits<Json, char>
     static void assign(Json& lhs, char ch)
     {
         lhs.assign_integer(ch);
+    }
+    static Json to_json(char ch)
+    {
+        return Json::make_integer(ch);
     }
 };
 
@@ -300,6 +316,10 @@ struct json_type_traits<Json, unsigned char>
     {
         lhs.assign_uinteger(ch);
     }
+    static Json to_json(unsigned char ch)
+    {
+        return Json::make_uinteger(ch);
+    }
 };
 
 template<class Json>
@@ -329,6 +349,10 @@ struct json_type_traits<Json, signed char>
     static void assign(Json& lhs, signed char ch)
     {
         lhs.assign_integer(ch);
+    }
+    static Json to_json(signed char ch)
+    {
+        return Json::make_integer(ch);
     }
 };
 
@@ -360,6 +384,10 @@ struct json_type_traits<Json, wchar_t>
     {
         lhs.assign_integer(ch);
     }
+    static Json to_json(wchar_t ch)
+    {
+        return Json::make_integer(ch);
+    }
 };
 
 template<class Json>
@@ -374,6 +402,10 @@ struct json_type_traits<Json, typename Json::object>
     static void assign(Json& lhs, typename Json::object rhs)
     {
         lhs.assign_object(rhs);
+    }
+    static Json to_json(const typename Json::object& rhs)
+    {
+        return Json::make_object(rhs);
     }
 };
 
@@ -394,6 +426,10 @@ struct json_type_traits<Json, Json>
     {
         lhs.swap(rhs);
     }
+    static Json to_json(const Json& rhs)
+    {
+        return rhs;
+    }
 };
 
 template<class Json>
@@ -408,6 +444,10 @@ struct json_type_traits<Json, typename Json::array>
     static void assign(Json& lhs, typename Json::array rhs)
     {
         lhs.assign_array(rhs);
+    }
+    static Json to_json(const typename Json::array& rhs)
+    {
+        return Json::make_array(rhs);
     }
 };
 
@@ -429,6 +469,10 @@ struct json_type_traits<Json, jsoncons::null_type>
     {
         lhs.assign_null();
     }
+    static Json to_json(jsoncons::null_type)
+    {
+        return Json::null();
+    }
 };
 
 template<class Json>
@@ -447,6 +491,10 @@ struct json_type_traits<Json, bool>
     static void assign(Json& lhs, bool rhs)
     {
         lhs.assign_bool(rhs);
+    }
+    static Json to_json(bool rhs)
+    {
+        return Json::make_bool(rhs);
     }
 };
 
@@ -470,6 +518,10 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         lhs.assign_bool(rhs);
     }
+    static Json to_json(bool rhs)
+    {
+        return Json::make_bool(rhs);
+    }
 };
 
 template<class Json>
@@ -488,6 +540,10 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     static void assign(Json& lhs, std::vector<bool>::reference rhs)
     {
         lhs.assign_bool(rhs);
+    }
+    static Json to_json(std::vector<bool>::reference rhs)
+    {
+        return Json::make_bool(rhs);
     }
 };
 
@@ -519,6 +575,10 @@ struct json_type_traits<Json, short>
     {
         lhs.assign_integer(rhs);
     }
+    static Json to_json(short rhs)
+    {
+        return Json::make_integer(rhs);
+    }
 };
 
 template<class Json>
@@ -548,6 +608,10 @@ struct json_type_traits<Json, unsigned short>
     static void assign(Json& lhs, unsigned short rhs)
     {
         lhs.assign_uinteger(rhs);
+    }
+    static Json to_json(unsigned short rhs)
+    {
+        return Json::make_uinteger(rhs);
     }
 };
 
@@ -579,6 +643,10 @@ struct json_type_traits<Json, int>
     {
         lhs.assign_integer(rhs);
     }
+    static Json to_json(int rhs)
+    {
+        return Json::make_integer(rhs);
+    }
 };
 
 template<class Json>
@@ -608,6 +676,10 @@ struct json_type_traits<Json, unsigned int>
     static void assign(Json& lhs, unsigned int rhs)
     {
         lhs.assign_uinteger(rhs);
+    }
+    static Json to_json(unsigned int rhs)
+    {
+        return Json::make_uinteger(rhs);
     }
 };
 
@@ -639,6 +711,10 @@ struct json_type_traits<Json, long>
     {
         lhs.assign_integer(rhs);
     }
+    static Json to_json(long rhs)
+    {
+        return Json::make_integer(rhs);
+    }
 };
 
 template<class Json>
@@ -669,6 +745,10 @@ struct json_type_traits<Json, unsigned long>
     {
         lhs.assign_uinteger(rhs);
     }
+    static Json to_json(unsigned long rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
 };
 
 template<class Json>
@@ -687,6 +767,10 @@ struct json_type_traits<Json, long long>
     static void assign(Json& lhs, long long rhs)
     {
         lhs.assign_integer(rhs);
+    }
+    static Json to_json(long long rhs)
+    {
+        return Json::make_integer(rhs);
     }
 };
 
@@ -707,6 +791,10 @@ struct json_type_traits<Json, unsigned long long>
     {
         lhs.assign_uinteger(rhs);
     }
+    static Json to_json(unsigned long long rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
 };
 
 template<class Json>
@@ -725,6 +813,10 @@ struct json_type_traits<Json, float>
     static void assign(Json& lhs, float rhs)
     {
         lhs.assign_double(static_cast<double>(rhs));
+    }
+    static Json to_json(float rhs)
+    {
+        return Json::make_double(rhs);
     }
 };
 
@@ -745,6 +837,10 @@ struct json_type_traits<Json, double>
     static void assign(Json& lhs, double rhs)
     {
         lhs.assign_double(rhs);
+    }
+    static Json to_json(double rhs)
+    {
+        return Json::make_double(rhs);
     }
 };
 
@@ -795,6 +891,10 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
     {
         lhs = Json(std::begin(rhs), std::end(rhs));
     }
+    static Json to_json(const T& rhs)
+    {
+        return Json(std::begin(rhs), std::end(rhs));
+    }
 };
 
 template<class Json, typename T>
@@ -821,6 +921,10 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
     static void assign(Json& lhs, const T& rhs)
     {
         lhs.assign_string(rhs);
+    }
+    static Json to_json(const T& rhs)
+    {
+        return Json::make_string(rhs);
     }
 };
 
@@ -863,6 +967,16 @@ struct json_type_traits<Json, T,
             val.set(p.first,p.second);
         }
         lhs.swap(val);
+    }
+    static Json to_json(const T& rhs)
+    {
+        Json val;
+        val.reserve(rhs.size());
+        for (auto p: rhs)
+        {
+            val.set(p.first,p.second);
+        }
+        return val;
     }
 };
 
