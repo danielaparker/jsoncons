@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
         json_reader reader(is,handler);
         reader.read_next();
     }
-    catch (const json_exception&)
+    catch (const std::exception&)
     {
     }
     //BOOST_CHECK_EQUAL(false,handler.is_valid());

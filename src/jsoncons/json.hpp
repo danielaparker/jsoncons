@@ -659,7 +659,14 @@ public:
         }
         variant(const char_type* s, size_t length, const Allocator& alloc)
         {
-            new(reinterpret_cast<void*>(&data_))string_data(s, length, string_allocator(alloc));
+            if (length <= small_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, string_allocator(alloc));
+            }
         }
         variant(const object& val)
         {
