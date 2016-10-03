@@ -17,7 +17,9 @@ struct json_type_traits
 
     static T as(const Json& rhs);
 
-    static void assign(Json& lhs, T rhs);
+    static Json to_json(T rhs);
+
+    static Json to_json(T rhs, typename Json::allocator_type allocator);
 };
 ```
 
@@ -90,9 +92,15 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static void assign(Json& lhs, boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val)
         {
-            lhs.assign_string(to_iso_extended_string(val));
+            return Json::make_string(to_iso_extended_string(val));
+        }
+
+        static Json to_json(boost::gregorian::date val, 
+                            typename Json::allocator_type allocator)
+        {
+            return Json::make_string(to_iso_extended_string(val),allocator);
         }
     };
 }

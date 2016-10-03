@@ -486,7 +486,9 @@ vertical-align:1px;
 
     <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
 
-    <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
+    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs);
+
+    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs, <span class="pl-k">typename</span> Json::allocator_type allocator);
 };</pre></div>
 
 <h2>Specializations</h2>
@@ -751,9 +753,15 @@ vertical-align:1px;
             <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
         }
 
-        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val)
         {
-            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+        }
+
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val, 
+                            <span class="pl-k">typename</span> Json::allocator_type allocator)
+        {
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val),allocator);
         }
     };
 }</pre></div>
@@ -763,12 +771,12 @@ vertical-align:1px;
     <span class="pl-k">using</span> jsoncons::json;
     <span class="pl-k">using</span> boost::gregorian::date;
 
-    json deal = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+    json deal = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">    {</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>Maturity<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">10</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">        <span class="pl-pds">"</span></span>ObservationDates<span class="pl-s"><span class="pl-pds">"</span>: [<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">14</span><span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span><span class="pl-c1">2014</span>-<span class="pl-c1">02</span>-<span class="pl-c1">21</span><span class="pl-s"><span class="pl-pds">"</span>]</span>
+<span class="pl-s">        "Maturity":"2014-10-14",</span>
+<span class="pl-s">        "ObservationDates": ["2014-02-14","2014-02-21"]</span>
 <span class="pl-s">    }</span>
-<span class="pl-s">    )<span class="pl-pds">"</span></span>);
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
 
     deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">28</span>));    
 

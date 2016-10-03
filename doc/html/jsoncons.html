@@ -1130,7 +1130,9 @@ void add(T val)</pre></div>
 
     <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
 
-    <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
+    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs);
+
+    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs, <span class="pl-k">typename</span> Json::allocator_type allocator);
 };</pre></div>
 
 <p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. </p>
@@ -1171,9 +1173,15 @@ void add(T val)</pre></div>
             <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
         }
 
-        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val)
         {
-            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+        }
+
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val, 
+                            <span class="pl-k">typename</span> Json::allocator_type allocator)
+        {
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val),allocator);
         }
     };
 }</pre></div>
