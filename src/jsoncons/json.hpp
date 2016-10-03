@@ -106,8 +106,6 @@ public:
     typedef typename object::const_iterator const_object_iterator;
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
-    typedef typename string_type::pointer string_iterator;
-    typedef typename string_type::const_pointer const_string_iterator;
 
     template <typename IteratorT>
     class range 
@@ -137,8 +135,6 @@ public:
     typedef range<const_object_iterator> const_object_range;
     typedef range<array_iterator> array_range;
     typedef range<const_array_iterator> const_array_range;
-    typedef range<string_iterator> string_range;
-    typedef range<const_string_iterator> const_string_range;
 
     struct variant
     {
@@ -1042,9 +1038,9 @@ public:
             return evaluate().size();
         }
 
-        value_types type() const
+        value_types type_id() const
         {
-            return evaluate().type();
+            return evaluate().type_id();
         }
 
         size_t count(const string_type& name) const
@@ -1678,6 +1674,11 @@ public:
         return json_type(variant(a));
     }
 
+    static basic_json make_array(const array& a, allocator_type allocator)
+    {
+        return json_type(variant(a,allocator));
+    }
+
     static basic_json make_array(std::initializer_list<json_type> init, const Allocator& allocator = Allocator())
     {
         return array(std::move(init),allocator);
@@ -1816,10 +1817,9 @@ public:
     }
 
     template <class T>
-    basic_json(T val, const Allocator& allocator)
-        : var_(allocator)
+    basic_json(const T& val, const Allocator& allocator)
+        : var_(json_type_traits<json_type,T>::to_json(val,allocator)::var_)
     {
-        json_type_traits<json_type,T>::assign(*this,val);
     }
 
     basic_json(const char_type *s, size_t length, const Allocator& allocator = Allocator())
@@ -1854,14 +1854,14 @@ public:
     template <class T>
     json_type& operator=(const T& val)
     {
-        json_type_traits<json_type,T>::assign(*this,val);
+        var_ = json_type_traits<json_type,T>::to_json(val).var_;
         return *this;
     }
 
     json_type& operator=(const char_type* s)
     {
         size_t length = std::char_traits<char_type>::length(s);
-        assign_string(s,length);
+        var_ = make_string(s,length).var_;
         return *this;
     }
 
@@ -2955,7 +2955,7 @@ public:
         }
     }
 
-    value_types type() const
+    value_types type_id() const
     {
         return var_.type_id();
     }
@@ -2984,6 +2984,11 @@ public:
     static json_type make_string(const string_type& s)
     {
         return json_type(variant(s.data(),s.length()));
+    }
+
+    static json_type make_string(const string_type& s, allocator_type allocator)
+    {
+        return json_type(variant(s.data(),s.length(),allocator));
     }
 
     static json_type make_string(const char_type* rhs, size_t length)
@@ -3016,49 +3021,9 @@ public:
         return json_type(variant(o));
     }
 
-    void assign_string(const string_type& rhs)
+    static json_type make_object(const object& o, allocator_type)
     {
-        var_ = variant(rhs.data(),rhs.length());
-    }
-
-    void assign_string(const char_type* rhs, size_t length)
-    {
-        var_ = variant(rhs,length);
-    }
-
-    void assign_bool(bool rhs)
-    {
-        var_ = variant(rhs);
-    }
-
-    void assign_object(const object & rhs)
-    {
-        var_ = variant(rhs);
-    }
-
-    void assign_array(const array& rhs)
-    {
-        var_ = variant(rhs);
-    }
-
-    void assign_null()
-    {
-        var_ = variant(null_type());
-    }
-
-    void assign_integer(int64_t rhs)
-    {
-        var_ = variant(rhs);
-    }
-
-    void assign_uinteger(uint64_t rhs)
-    {
-        var_ = variant(rhs);
-    }
-
-    void assign_double(double rhs, uint8_t precision = 0)
-    {
-        var_ = variant(rhs,precision);
+        return json_type(variant(o,allocator));
     }
 
     static basic_json make_2d_array(size_t m, size_t n);
@@ -3322,15 +3287,6 @@ public:
     bool is_numeric() const JSONCONS_NOEXCEPT
     {
         return is_number();
-    }
-
-    void assign_longlong(long long rhs)
-    {
-        var_ = variant(rhs);
-    }
-    void assign_ulonglong(unsigned long long rhs)
-    {
-        var_ = variant(rhs); 
     }
 
     template<int size>

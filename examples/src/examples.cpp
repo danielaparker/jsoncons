@@ -7,7 +7,6 @@
 #include "csv_examples.h"
 
 using jsoncons::json;
-using jsoncons::json_exception;
 using jsoncons::json_deserializer;
 using jsoncons::json_reader;
 using jsoncons::pretty_print;
@@ -54,7 +53,7 @@ void first_example_b()
             string price = book.get("price", "N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-        catch (const json_exception& e)
+        catch (const std::exception& e)
         {
             std::cerr << e.what() << std::endl;
         }

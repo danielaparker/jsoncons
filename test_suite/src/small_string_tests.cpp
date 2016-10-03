@@ -22,18 +22,18 @@ BOOST_AUTO_TEST_SUITE(small_string_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_small_string)
 {
-	json s("ABCD");
-	BOOST_CHECK(s.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(s.as<std::string>() == std::string("ABCD"));
+    json s("ABCD");
+    BOOST_CHECK(s.type_id() == jsoncons::value_types::small_string_t);
+    BOOST_CHECK(s.as<std::string>() == std::string("ABCD"));
 
-	json t(s);
-	BOOST_CHECK(t.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(t.as<std::string>() == std::string("ABCD"));
+    json t(s);
+    BOOST_CHECK(t.type_id() == jsoncons::value_types::small_string_t);
+    BOOST_CHECK(t.as<std::string>() == std::string("ABCD"));
 
-	json q;
-	q = s;
-	BOOST_CHECK(q.type() == jsoncons::value_types::small_string_t);
-	BOOST_CHECK(q.as<std::string>() == std::string("ABCD"));
+    json q;
+    q = s;
+    BOOST_CHECK(q.type_id() == jsoncons::value_types::small_string_t);
+    BOOST_CHECK(q.as<std::string>() == std::string("ABCD"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

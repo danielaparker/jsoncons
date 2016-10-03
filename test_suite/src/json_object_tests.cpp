@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_get)
     std::string s1 = a.at("field1").as<std::string>();
     std::string s1a = a.at("field1").as<std::string>();
     std::string s2 = a.get_with_default("field2","null");
-    BOOST_REQUIRE_THROW(a.at("field2"), json_exception);
+    BOOST_REQUIRE_THROW(a.at("field2"), std::out_of_range);
 
     BOOST_CHECK(s1 == std::string("value1"));
     BOOST_CHECK(s1a == std::string("value1"));
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(test_const_member_read)
 
     int val1 = b["field1"].as<int>();
     BOOST_CHECK(val1 == 10);
-    BOOST_REQUIRE_THROW(b["field2"], json_exception);
+    BOOST_REQUIRE_THROW(b["field2"], std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(test_proxy_const_member_read)
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(test_proxy_const_member_read)
     const json b(a);
 
     std::string s1 = b["object1"]["field1"].as<std::string>();
-    BOOST_REQUIRE_THROW(b["object1"]["field2"], json_exception);
+    BOOST_REQUIRE_THROW(b["object1"]["field2"], std::out_of_range);
 
     BOOST_CHECK(s1 == std::string("value1"));
 }

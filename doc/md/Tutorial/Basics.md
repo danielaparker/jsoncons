@@ -166,7 +166,7 @@ The output is
     {
         std::string experience = obj["outdoor_experience"].as<std::string>();
     }
-    catch (const json_exception& e)
+    catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }

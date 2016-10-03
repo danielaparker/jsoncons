@@ -19,7 +19,7 @@
 using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(allocator_test_suite)
-/*
+
 class pool 
 { 
 private: 
@@ -160,10 +160,10 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
 {
     return s0.pool_ptr_ != s1.pool_ptr_;
 }
-*/
+
 BOOST_AUTO_TEST_CASE(test_allocator)
 {
-/*    pool a_pool(1024);
+    pool a_pool(1024);
     pool_allocator<json> a_pool_allocator(&a_pool); 
 
     typedef basic_json<char,json_traits<char>,pool_allocator<json>> myjson;
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     myjson root = an_object;
     root.reserve(1);
 
-    root.set("field1", 10.0);
+    /*root.set("field1", 10.0);
     root.set("field2", 20.0);
 
     auto it = root.find("field1");
@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     if (it != root.members().end())
     {
         myjson& val = it->value();
-    }
-*/    
+    }*/
+   
     //BOOST_CHECK_EQUAL(10.0,root["field1"]);
     //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
     //std::cout << root << std::endl; 

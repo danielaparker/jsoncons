@@ -507,7 +507,11 @@ public:
 private:
     std::vector<value_type,allocator_type> members_;
 public:
-    json_object(const allocator_type& allocator = allocator_type())
+    json_object()
+        : members_()
+    {
+    }
+    json_object(const allocator_type& allocator)
         : members_(allocator)
     {
     }

@@ -188,7 +188,7 @@ public:
         return *this;
     }
 
-    token_types type() const
+    token_types type_id() const
     {
         return type_;
     }
@@ -751,7 +751,7 @@ public:
         auto t = ts.get();
         while (true)
         {
-            switch (t.type())
+            switch (t.type_id())
             {
             case token_types::plus:
             {
@@ -779,13 +779,13 @@ public:
     {
         auto t = ts.get();
 
-        switch (t.type())
+        switch (t.type_id())
         {
         case token_types::left_paren:
         {
             auto expr = expression(ts);
             t = ts.get();
-            if (t.type() != token_types::right_paren)
+            if (t.type_id() != token_types::right_paren)
             {
                 throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_right_brace,line_,column_);
             }
@@ -816,7 +816,7 @@ public:
         auto t = ts.get();
         while (true)
         {
-            switch (t.type())
+            switch (t.type_id())
             {
             case token_types::eq:
             {

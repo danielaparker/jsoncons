@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string1)
         json_reader reader(is,handler);
         reader.read_next();
     }
-    catch (const json_exception&)
+    catch (const std::exception&)
     {
     }
     BOOST_CHECK(handler.is_valid());
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string2)
         json_reader reader(is, handler);
         reader.read_next();
     }
-    catch (const json_exception&)
+    catch (const std::exception&)
     {
     }
     BOOST_CHECK(handler.is_valid());
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
             reader.buffer_capacity(i);
             reader.read_next();
         }
-        catch (const json_exception&)
+        catch (const std::exception&)
         {
         }
         BOOST_CHECK(handler.is_valid());
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
             reader.buffer_capacity(i);
             reader.read_next();
         }
-        catch (const json_exception&)
+        catch (const std::exception&)
         {
         }
         BOOST_CHECK(handler.is_valid());
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
             //reader.buffer_capacity(i);
             reader.read_next();
         }
-        catch (const json_exception&)
+        catch (const std::exception&)
         {
         }
         BOOST_CHECK(handler.is_valid());

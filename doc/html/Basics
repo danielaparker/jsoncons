@@ -636,7 +636,7 @@ vertical-align:1px;
     {
         std::string experience = obj[<span class="pl-s"><span class="pl-pds">"</span>outdoor_experience<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
     }
-    <span class="pl-k">catch</span> (<span class="pl-k">const</span> json_exception&amp; e)
+    <span class="pl-k">catch</span> (<span class="pl-k">const</span> std::exception&amp; e)
     {
         std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
     }
