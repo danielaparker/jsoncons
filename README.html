@@ -512,6 +512,7 @@ vertical-align:1px;
 <ul>
 <li>New release 0.99.3a</li>
 <li>The deprecated class <code>json::any</code> has been removed from master</li>
+<li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
 </ul>
 
 <h2>Using the jsoncons library</h2>

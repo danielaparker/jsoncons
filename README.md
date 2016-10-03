@@ -37,6 +37,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - New release 0.99.3a
 - The deprecated class `json::any` has been removed from master
+- The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
 
 ## Using the jsoncons library
 
