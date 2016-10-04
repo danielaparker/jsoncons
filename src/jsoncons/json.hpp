@@ -1825,7 +1825,7 @@ public:
 
     template <class T>
     basic_json(const T& val, const Allocator& allocator)
-        : var_(json_type_traits<json_type,T>::to_json(val,allocator)::var_)
+        : var_(json_type_traits<json_type,T>::to_json(val,allocator).var_)
     {
     }
 
@@ -3028,7 +3028,7 @@ public:
         return json_type(variant(o));
     }
 
-    static json_type make_object(const object& o, allocator_type)
+    static json_type make_object(const object& o, allocator_type allocator)
     {
         return json_type(variant(o,allocator));
     }
