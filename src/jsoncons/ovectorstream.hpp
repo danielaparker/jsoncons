@@ -72,7 +72,7 @@ protected:
                     return c;
                 }
                 this->gbump(-1);
-                *this->gptr() = c;
+                *this->gptr() = static_cast<CharT>(c);
                 return c;
             } 
             else
@@ -193,7 +193,7 @@ public:
     {}
     basic_ovectorstream(std::size_t length) JSONCONS_NOEXCEPT
         : basic_ovectorbuf<CharT, CharTraits>(length),
-          std::basic_ostream<CharT, CharTraits>()
+          std::basic_ostream<CharT, CharTraits>(this)
     {}
 
     ~basic_ovectorstream() {}

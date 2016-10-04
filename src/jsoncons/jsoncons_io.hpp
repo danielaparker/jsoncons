@@ -90,7 +90,7 @@ public:
 
 };
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER99
 
 template <class CharT>
 class float_printer
