@@ -211,14 +211,14 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     BOOST_CHECK_EQUAL(static_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
     BOOST_CHECK_EQUAL(static_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
     BOOST_CHECK_EQUAL(static_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
-
+/*
     std::array<unsigned long, 4> c_array {{1, 2, 3, 4}};
     json j_array(c_array);
     BOOST_CHECK_EQUAL(1, j_array[0].as<int>());
     BOOST_CHECK_EQUAL(2, j_array[1].as<int>());
     BOOST_CHECK_EQUAL(3, j_array[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_array[3].as<int>());
-
+*/
     std::set<std::string> c_set {"one", "two", "three", "four", "one"};
     json j_set(c_set); // only one entry for "one" is used
     // ["four", "one", "three", "two"]
