@@ -287,7 +287,7 @@ struct json_type_traits<Json, unsigned char>
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (rhs.is_uinteger())
         {
@@ -317,11 +317,11 @@ struct json_type_traits<Json, signed char>
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<signed char>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<signed char>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -351,7 +351,7 @@ struct json_type_traits<Json, wchar_t>
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
@@ -365,6 +365,263 @@ struct json_type_traits<Json, wchar_t>
     static Json to_json(wchar_t ch)
     {
         return Json::make_integer(ch);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, short>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static short as(const Json& rhs)
+    {
+        return static_cast<short>(rhs.as_integer());
+    }
+    static Json to_json(short rhs)
+    {
+        return Json::make_integer(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, unsigned short>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static unsigned short as(const Json& rhs)
+    {
+        return (unsigned short)rhs.as_uinteger();
+    }
+    static Json to_json(unsigned short rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, int>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static int as(const Json& rhs)
+    {
+        return static_cast<int>(rhs.as_integer());
+    }
+    static Json to_json(int rhs)
+    {
+        return Json::make_integer(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, unsigned int>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static unsigned int as(const Json& rhs)
+    {
+        return static_cast<unsigned int>(rhs.as_uinteger());
+    }
+    static Json to_json(unsigned int rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, long>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static long as(const Json& rhs)
+    {
+        return static_cast<long>(rhs.as_integer());
+    }
+    static Json to_json(long rhs)
+    {
+        return Json::make_integer(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, unsigned long>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        if (rhs.is_integer())
+        {
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else if (rhs.is_uinteger())
+        {
+            return rhs.as_uinteger() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    static unsigned long as(const Json& rhs)
+    {
+        return static_cast<unsigned long>(rhs.as_uinteger());
+    }
+    static Json to_json(unsigned long rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, long long>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_integer();
+    }
+    static long long as(const Json& rhs)
+    {
+        return rhs.as_integer();
+    }
+    static Json to_json(long long rhs)
+    {
+        return Json::make_integer(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, unsigned long long>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_uinteger();
+    }
+    static unsigned long long as(const Json& rhs)
+    {
+        return rhs.as_uinteger();
+    }
+    static Json to_json(unsigned long long rhs)
+    {
+        return Json::make_uinteger(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, float>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_double();
+    }
+    static double as(const Json& rhs)
+    {
+        return static_cast<float>(rhs.as_double());
+    }
+    static Json to_json(float rhs)
+    {
+        return Json::make_double(rhs);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, double>
+{
+    static const bool is_assignable = true;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_double();
+    }
+
+    static double as(const Json& rhs)
+    {
+        return rhs.as_double();
+    }
+    static Json to_json(double rhs)
+    {
+        return Json::make_double(rhs);
     }
 };
 
@@ -494,263 +751,6 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     static Json to_json(std::vector<bool>::reference rhs)
     {
         return Json::make_bool(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, short>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static short as(const Json& rhs)
-    {
-        return static_cast<short>(rhs.as_integer());
-    }
-    static Json to_json(short rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned short>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static unsigned short as(const Json& rhs)
-    {
-        return (unsigned short)rhs.as_uinteger();
-    }
-    static Json to_json(unsigned short rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, int>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static int as(const Json& rhs)
-    {
-        return static_cast<int>(rhs.as_integer());
-    }
-    static Json to_json(int rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned int>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static unsigned int as(const Json& rhs)
-    {
-        return static_cast<unsigned int>(rhs.as_uinteger());
-    }
-    static Json to_json(unsigned int rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, long>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static long as(const Json& rhs)
-    {
-        return static_cast<long>(rhs.as_integer());
-    }
-    static Json to_json(long rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned long>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<unsigned long long>(rhs.as_integer()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static unsigned long as(const Json& rhs)
-    {
-        return static_cast<unsigned long>(rhs.as_uinteger());
-    }
-    static Json to_json(unsigned long rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, long long>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_integer();
-    }
-    static long long as(const Json& rhs)
-    {
-        return rhs.as_integer();
-    }
-    static Json to_json(long long rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned long long>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_uinteger();
-    }
-    static unsigned long long as(const Json& rhs)
-    {
-        return rhs.as_uinteger();
-    }
-    static Json to_json(unsigned long long rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, float>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_double();
-    }
-    static double as(const Json& rhs)
-    {
-        return static_cast<float>(rhs.as_double());
-    }
-    static Json to_json(float rhs)
-    {
-        return Json::make_double(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, double>
-{
-    static const bool is_assignable = true;
-
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_double();
-    }
-
-    static double as(const Json& rhs)
-    {
-        return rhs.as_double();
-    }
-    static Json to_json(double rhs)
-    {
-        return Json::make_double(rhs);
     }
 };
 

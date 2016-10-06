@@ -191,6 +191,13 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     BOOST_CHECK_EQUAL(3, j_vec[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_vec[3].as<int>());
 
+    std::vector<unsigned long> c_vector2 {1ul, 2ul, 3ul, 4ul};
+    json j_vec2(c_vector2);
+    BOOST_CHECK_EQUAL(1, j_vec2[0].as<int>());
+    BOOST_CHECK_EQUAL(2, j_vec2[1].as<int>());
+    BOOST_CHECK_EQUAL(3, j_vec2[2].as<int>());
+    BOOST_CHECK_EQUAL(4, j_vec2[3].as<int>());
+
     std::deque<double> c_deque {1.2, 2.3, 3.4, 5.6};
     json j_deque(c_deque);
     BOOST_CHECK_EQUAL(1.2, j_deque[0].as<double>());
@@ -261,7 +268,7 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     //    std::cout << m.name() << ", " << m.value() << std::endl;
     //}
 
-    std::unordered_multimap<std::string, bool> c_ummap { {"one", true}, {"two", true}, {"three", false}, {"three", true} };
+    std::unordered_multimap<std::string, bool> c_ummap { {"one", true}, {"two", true}, /*{"three", false},*/ {"three", true} };
     json j_ummap(c_ummap); // two entries for key "three"
     BOOST_CHECK_EQUAL(true, j_ummap.find("one")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_ummap.find("two")->value().as<bool>());
