@@ -221,7 +221,7 @@ public:
         typename std::basic_string<CharT>::size_type exp_pos= str.find('e');
         if (exp_pos != std::basic_string<CharT>::npos)
         {
-            int len = (int)exp_pos;
+            size_t len = exp_pos;
             while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
             {
                 --len;
@@ -247,7 +247,7 @@ public:
         }
         else
         {
-            int len = (int)str.length();
+            size_t len = str.length();
             while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
             {
                 --len;
