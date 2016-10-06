@@ -20,7 +20,6 @@
 #include <locale.h>
 #include <limits> // std::numeric_limits
 #include "jsoncons_config.hpp"
-#include "ovectorstream.hpp"
 
 namespace jsoncons
 {
