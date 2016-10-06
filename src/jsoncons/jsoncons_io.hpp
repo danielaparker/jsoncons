@@ -90,7 +90,7 @@ public:
 
 };
 
-#ifdef _MSC_VER
+#ifdef JSONCONS_HAS__ECVT_S
 
 template <class CharT>
 class float_printer
@@ -203,44 +203,69 @@ public:
 template <class CharT>
 class float_printer
 {
-    jsoncons::basic_ovectorstream<CharT> vs_;
     uint8_t precision_;
 public:
     float_printer(uint8_t precision)
-        : vs_(255), precision_(precision)
+        : precision_(precision)
     {
-        vs_.set_locale(std::locale::classic());
-        vs_.precision(precision);
     }
-
     void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
     {
-        vs_.reset();
-        vs_.precision(precision == 0 ? precision_ : precision);
-        vs_ << val;
+        uint8_t prec = (precision == 0) ? precision_ : precision;
 
-        const CharT* s = vs_.data();
-        const CharT* se = s + vs_.length();
+        std::basic_ostringstream<CharT> ss;
+        ss.imbue(std::locale::classic());
+        ss << std::showpoint << std::setprecision(prec) << val;
+        std::basic_string<CharT> str(ss.str());
 
         bool dot = false;
-        while (s < se)
+        typename std::basic_string<CharT>::size_type exp_pos= str.find('e');
+        if (exp_pos != std::basic_string<CharT>::npos)
         {
-            if (*s == '.')
+            int len = (int)exp_pos;
+            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
             {
-                dot = true;
+                --len;
             }
-            else if (*s == 'e')
+            for (size_t i = 0; i < len;++i)
             {
-                if (!dot)
+                if (str[i] == '.')
                 {
-                    os.put('.');
-                    os.put('0');
                     dot = true;
                 }
+                os.put(str[i]);
             }
-            os.put(*s);
-            ++s;
+            if (!dot)
+            {
+                os.put('.');
+                os.put('0');
+                dot = true;
+            }
+            for (size_t i = exp_pos; i < str.size();++i)
+            {
+                os.put(str[i]);
+            }
         }
+        else
+        {
+            int len = (int)str.length();
+            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
+            {
+                --len;
+            }
+            const CharT* s = str.data();
+            const CharT* se = s + len;
+            while (s < se)
+            {
+                if (*s == '.')
+                {
+                    dot = true;
+                }
+                os.put(*s);
+                ++s;
+            }
+        }
+
         if (!dot)
         {
             os.put('.');
@@ -248,7 +273,6 @@ public:
         }
     }
 };
-
 #endif
 
 // string_to_float only requires narrow char

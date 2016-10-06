@@ -43,10 +43,16 @@ public:
           buf_(length)
     {  
         // Set write position to beginning of buffer.
-        this->setp(buf_.data(), buf_.data() + buf_.size());
+        //this->setp(buf_.data(), buf_.data() + buf_.size());
     }
 
     virtual ~basic_ovectorbuf() {}
+
+    void init_ovectorbuf()
+    {
+        // Set write position to beginning of buffer.
+        this->setp(buf_.data(), buf_.data() + buf_.size());
+    }
 
     const CharT* data() const
     {
@@ -72,7 +78,7 @@ protected:
                     return c;
                 }
                 this->gbump(-1);
-                *this->gptr() = static_cast<CharT>(c);
+                *this->gptr() = c;
                 return c;
             } 
             else
@@ -187,14 +193,10 @@ private:
     const base_ouputbuf& get_buf() const {return *this;}
 
 public:
-    basic_ovectorstream() JSONCONS_NOEXCEPT
-        : basic_ovectorbuf<CharT, CharTraits>(),
-          std::basic_ostream<CharT, CharTraits>()
-    {}
     basic_ovectorstream(std::size_t length) JSONCONS_NOEXCEPT
         : basic_ovectorbuf<CharT, CharTraits>(length),
-          std::basic_ostream<CharT, CharTraits>(this)
-    {}
+          std::basic_ostream<CharT, CharTraits>(&get_buf())
+    {init_ovectorbuf();}
 
     ~basic_ovectorstream() {}
 

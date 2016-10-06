@@ -8,7 +8,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/jsoncons_config.hpp"
-#undef JSONCONS_HAS__ECVT_S
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
 #include <sstream>
@@ -18,7 +17,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(double_to_string_test_suite)
+BOOST_AUTO_TEST_SUITE(double_to_string2_test_suite)
 
 template<class CharT>
 std::basic_string<CharT> float_to_string(double val, uint8_t precision)
