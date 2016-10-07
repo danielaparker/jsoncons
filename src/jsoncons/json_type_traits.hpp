@@ -49,6 +49,38 @@ struct json_type_traits
     }
 };
 
+// is_compatible_string_type
+template<class Json, class T, class Enable=void>
+struct is_compatible_string_type : std::false_type {};
+
+template<class Json, class T>
+struct is_compatible_string_type<Json,T, 
+    typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
+    !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+    std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
+    json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value
+>::type> : std::true_type {};
+
+// is_compatible_array_type
+template<class Json, class T, class Enable=void>
+struct is_compatible_array_type : std::false_type {};
+
+template<class Json, class T>
+struct is_compatible_array_type<Json,T, 
+    typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
+    std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+    std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
+    json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value
+>::type> : std::true_type {};
+
+// is_compatible_object_type
+template<class Json, class T, class Enable=void>
+struct is_compatible_object_type : std::false_type {};
+
+template<class Json, class T>
+struct is_compatible_object_type<Json,T, 
+                       typename std::enable_if<std::integral_constant<bool, json_type_traits<Json, typename T::mapped_type>::is_assignable>::value>::type> : std::true_type {};
+
 template <class Json, class T>
 class json_array_input_iterator
 {
@@ -756,11 +788,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
-                             json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value
->::type>
+                        typename std::enable_if<is_compatible_array_type<Json,T>::value>::type>
 {
     typedef typename T::iterator::value_type element_type;
 
@@ -805,10 +833,7 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_type>::is_assignable &&
-                             json_type_traits<Json, typename T::const_iterator::value_type>::is_assignable>::value>::type>
+                        typename std::enable_if<is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename T::iterator::value_type element_type;
 
@@ -832,7 +857,8 @@ std::integral_constant<bool, json_type_traits<Json, typename T::iterator::value_
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                       typename std::enable_if<std::integral_constant<bool, json_type_traits<Json, typename T::mapped_type>::is_assignable>::value>::type>
+                        typename std::enable_if<is_compatible_object_type<Json,T>::value>::type
+>
 {
     typedef typename T::key_type key_type;
     typedef typename T::mapped_type mapped_type;
