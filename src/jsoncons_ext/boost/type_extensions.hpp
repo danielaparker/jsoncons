@@ -20,8 +20,6 @@ namespace jsoncons
     template <class Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
-        static const bool is_assignable = true;
-
         static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_string())

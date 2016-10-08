@@ -62,8 +62,6 @@ the conversions works. In this implementation the `boost` date values are stored
         template <class Json>
         struct json_type_traits<Json,boost::gregorian::date>
         {
-            static const bool is_assignable = true;
-
             static bool is(const Json& val) noexcept
             {
                 if (!val.is_string())

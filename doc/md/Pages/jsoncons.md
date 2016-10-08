@@ -636,7 +636,7 @@ The output is
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
 template <class T>
-json(T val)
+json(const T& val)
 
 template<class T>
 bool is() const
@@ -645,117 +645,105 @@ template<class T>
 T as() const
 
 template <class T>
-basic_json& operator=(T val)
+basic_json& operator=(const T& val)
 
 template <class T>
-void add(T val)
+void add(const T& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 ```c++
 
-template <class Json, class T, class Enable=void>
-struct json_type_traits
-{
-    static const bool is_assignable = false;
+This `json_type_traits` template is extensible, you, the user, can extend `json_type_traits` in the `jsoncons` namespace with your own types. 
+For example, you can provide a specialization of `json_type_traits` for a `book` class, and then transfer book objects or
+standard library collections of book objects to and from `json` values.
 
-    static bool is(const Json&)
-    {
-        return false;
-    }
-
-    static T as(const Json& rhs);
-
-    static Json to_json(T rhs);
-
-    static Json to_json(T rhs, typename Json::allocator_type allocator);
-};
 ```
-This class template is extensible, you as a user can extend `json_type_traits` in the `jsoncons` namespace with your own types. 
-
-You can, for example, extend `json_type_traits` to access and modify `json` structures with `boost::gregorian::date values`.
-
-```c++
-#include "jsoncons/json.hpp"
-#include "boost/date_time/gregorian/gregorian.hpp"
-
-namespace jsoncons 
+struct book
 {
-    template <class Json>
-    struct json_type_traits<Json,boost::gregorian::date>
+    std::string author;
+    std::string title;
+    double price;
+};
+
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, book>
     {
-        static const bool is_assignable = true;
-
-        static bool is(const Json& val) noexcept
+        static bool is(const Json& rhs) noexcept
         {
-            if (!val.is_string())
-            {
-                return false;
-            }
-            std::string s = val.template as<std::string>();
-            try
-            {
-                boost::gregorian::from_simple_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
+            return rhs.is_object() &&
+                   rhs.count("author") == 1 && 
+                   rhs.count("title") == 1 && 
+                   rhs.count("price") == 1;
         }
-
-        static boost::gregorian::date as(const Json& val)
+        static book as(const Json& rhs)
         {
-            std::string s = val.template as<std::string>();
-            return boost::gregorian::from_simple_string(s);
+            book val;
+            val.author = rhs["author"].as<std::string>();
+            val.title = rhs["title"].as<std::string>();
+            val.price = rhs["price"].as<double>();
+            return val;
         }
-
-        static Json to_json(boost::gregorian::date val)
+        static Json to_json(book val)
         {
-            return Json::make_string(to_iso_extended_string(val));
-        }
-
-        static Json to_json(boost::gregorian::date val, 
-                            typename Json::allocator_type allocator)
-        {
-            return Json::make_string(to_iso_extended_string(val),allocator);
+            Json j;
+            j["author"] = val.author;
+            j["title"] = val.title;
+            j["price"] = val.price;
+            return j;
         }
     };
-}
-```
-```c++
-namespace my_ns
+
+};
+
+int main()
 {
-    using jsoncons::json;
-    using boost::gregorian::date;
+    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
-    json deal = json::parse(R"(
+    json j = book1;
+
+    std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
+
+    std::cout << "(2) " << j << "\n\n";
+
+    book temp = j.as<book>();
+    std::cout << "(3) " << temp.author << "," << temp.title << "," << temp.price << "\n\n";
+
+    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
+
+    std::vector<book> book_array{book1, book2};
+
+    json ja = book_array;
+
+    std::cout << "(4) " << std::boolalpha << ja.is<std::vector<book>>() << "\n\n";
+
+    std::cout << "(5)" << "\n";
+    std::cout << ja << "\n\n";
+
+    auto book_list = ja.as<std::list<book>>();
+
+    std::cout << "(6)" << std::endl;
+    for (auto b : book_list)
     {
-        "Maturity":"2014-10-14",
-        "ObservationDates": ["2014-02-14","2014-02-21"]
+        std::cout << b.author << ", " << b.title << ", " << b.price << std::endl;
     }
-    )");
-
-    deal["ObservationDates"].add(date(2014,2,28));    
-
-    date maturity = deal["Maturity"].as<date>();
-    std::cout << "Maturity: " << maturity << std::endl << std::endl;
-
-    std::cout << "Observation dates: " << std::endl << std::endl;
-
-    for (auto observation_date: deal["ObservationDates"].elements())
-    {
-        std::cout << observation_date << std::endl;
-    }
-    std::cout << std::endl;
 }
-```
+``` 
 The output is
 ```
-Maturity: 2014-Oct-14
+(1) true
 
-Observation dates:
+(2) {"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"}
 
-2014-Feb-14
-2014-Feb-21
-2014-Feb-28
-``` 
+(3) Haruki Murakami,Kafka on the Shore,25.17
+
+(4) true
+
+(5)
+[{"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"},{"author":"Charles Bukowski","price":12.0,"title":"Women: A Novel"}]
+
+(6)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12
+```

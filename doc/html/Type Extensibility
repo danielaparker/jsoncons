@@ -532,8 +532,6 @@ the conversions works. In this implementation the <code>boost</code> date values
         <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
         <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
         {
-            <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">true</span>;
-
             <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
             {
                 <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
