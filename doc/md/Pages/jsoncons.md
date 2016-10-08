@@ -651,13 +651,12 @@ template <class T>
 void add(const T& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
-```c++
 
 This `json_type_traits` template is extensible, you, the user, can extend `json_type_traits` in the `jsoncons` namespace with your own types. 
 For example, you can provide a specialization of `json_type_traits` for a `book` class, and then transfer book objects or
 standard library collections of book objects to and from `json` values.
 
-```
+```c++
 struct book
 {
     std::string author;
