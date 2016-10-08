@@ -684,7 +684,7 @@ namespace jsoncons
             val.price = rhs["price"].as<double>();
             return val;
         }
-        static Json to_json(book val)
+        static Json to_json(const book& val)
         {
             Json j;
             j["author"] = val.author;
