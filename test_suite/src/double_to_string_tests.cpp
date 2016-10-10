@@ -7,8 +7,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include "jsoncons/jsoncons_config.hpp"
-#undef JSONCONS_HAS__ECVT_S
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_serializer.hpp"
 #include <sstream>
@@ -111,11 +109,25 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     BOOST_CHECK(s == std::string("-11.0"));
 }
 
+#if defined(_MSC_VER)
+BOOST_AUTO_TEST_CASE(test_locale)
+{
+    wchar_t * loc = _wsetlocale(LC_ALL, L"de-DE");
+    BOOST_CHECK(loc != nullptr);
+
+    double x = 123456789.0123;
+    std::wstring s = float_to_string<wchar_t>(x, 13);
+    std::wcout << std::setprecision(13) << x << L": " << s << std::endl;
+    BOOST_CHECK(std::wstring(L"123456789.0123") == s);
+    _wsetlocale(LC_ALL, L"C");
+}
+#endif
+
 BOOST_AUTO_TEST_CASE(test_double_to_wstring)
 {
     double x = 1.0e100;
     std::wstring s = float_to_string<wchar_t>(x, format.precision());
-    std::wcout << x << ":" << s << std::endl;
+    std::wcout << x << L":" << s << std::endl;
     BOOST_CHECK(s == std::wstring(L"1.0e+100") || s == std::wstring(L"1.0e100"));
 
     x = 1.0e-100;

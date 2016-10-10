@@ -17,9 +17,10 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
-#include <locale.h>
+#include <locale>
 #include <limits> // std::numeric_limits
-#include "jsoncons_config.hpp"
+#include "jsoncons/jsoncons_config.hpp"
+#include "jsoncons/osequencestream.hpp"
 
 namespace jsoncons
 {
@@ -87,6 +88,161 @@ public:
         }
     }
 
+};
+
+template <class CharT>
+class ostringstream_float_printer
+{
+    uint8_t precision_;
+public:
+    ostringstream_float_printer(uint8_t precision)
+        : precision_(precision)
+    {
+    }
+    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
+    {
+        uint8_t prec = (precision == 0) ? precision_ : precision;
+
+        std::basic_ostringstream<CharT> ss;
+        ss.imbue(std::locale::classic());
+        ss << std::showpoint << std::setprecision(prec) << val;
+        std::basic_string<CharT> str(ss.str());
+
+        bool dot = false;
+        typename std::basic_string<CharT>::size_type exp_pos= str.find('e');
+        if (exp_pos != std::basic_string<CharT>::npos)
+        {
+            size_t len = exp_pos;
+            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
+            {
+                --len;
+            }
+            for (size_t i = 0; i < len;++i)
+            {
+                if (str[i] == '.')
+                {
+                    dot = true;
+                }
+                os.put(str[i]);
+            }
+            if (!dot)
+            {
+                os.put('.');
+                os.put('0');
+                dot = true;
+            }
+            for (size_t i = exp_pos; i < str.size();++i)
+            {
+                os.put(str[i]);
+            }
+        }
+        else
+        {
+            size_t len = str.length();
+            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
+            {
+                --len;
+            }
+            const CharT* s = str.data();
+            const CharT* se = s + len;
+            while (s < se)
+            {
+                if (*s == '.')
+                {
+                    dot = true;
+                }
+                os.put(*s);
+                ++s;
+            }
+        }
+
+        if (!dot)
+        {
+            os.put('.');
+            os.put('0');
+        }
+    }
+};
+
+template <class CharT>
+class osequencestream_float_printer
+{
+    uint8_t precision_;
+    basic_osequencestream<CharT> oss_;
+public:
+    osequencestream_float_printer(uint8_t precision)
+        : precision_(precision)
+    {
+        oss_.imbue(std::locale::classic());
+        oss_.precision(precision);
+    }
+    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
+    {
+        oss_.clear_sequence();
+        oss_.precision((precision == 0) ? precision_ : precision);
+        oss_ << val;
+
+        const CharT* sb = oss_.data();
+        const CharT* se = sb + oss_.length();
+        const CharT* p = sb;
+
+        bool dot = false;
+        size_t exp_pos = 0;
+        for (p = sb; *p != 'e' && p < se; ++p)
+        {
+        }
+
+        if (p != se)
+        {
+            size_t len = p - sb;
+            while (len >= 2 && sb[len - 1] == '0' && sb[len - 2] != '.')
+            {
+                --len;
+            }
+            for (size_t i = 0; i < len;++i)
+            {
+                if (sb[i] == '.')
+                {
+                    dot = true;
+                }
+                os.put(sb[i]);
+            }
+            if (!dot)
+            {
+                os.put('.');
+                os.put('0');
+                dot = true;
+            }
+            for (size_t i = exp_pos; i < (se-sb);++i)
+            {
+                os.put(sb[i]);
+            }
+        }
+        else
+        {
+            size_t len = (se-sb);
+            while (len >= 2 && sb[len - 1] == '0' && sb[len - 2] != '.')
+            {
+                --len;
+            }
+            const CharT* s = sb;
+            while (s < se)
+            {
+                if (*s == '.')
+                {
+                    dot = true;
+                }
+                os.put(*s);
+                ++s;
+            }
+        }
+
+        if (!dot)
+        {
+            os.put('.');
+            os.put('0');
+        }
+    }
 };
 
 #ifdef JSONCONS_HAS__ECVT_S
@@ -198,77 +354,84 @@ public:
 };
 
 #else
-
 template <class CharT>
 class float_printer
 {
     uint8_t precision_;
+    basic_osequencestream<CharT> oss_;
 public:
     float_printer(uint8_t precision)
         : precision_(precision)
     {
+        oss_.imbue(std::locale::classic());
+        oss_.precision(precision);
     }
     void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
     {
-        uint8_t prec = (precision == 0) ? precision_ : precision;
+        oss_.clear_sequence();
+        oss_.precision((precision == 0) ? precision_ : precision);
+        oss_ << val;
 
-        std::basic_ostringstream<CharT> ss;
-        ss.imbue(std::locale::classic());
-        ss << std::showpoint << std::setprecision(prec) << val;
-        std::basic_string<CharT> str(ss.str());
+        const CharT* sbeg = oss_.data();
+        const CharT* send = sbeg + oss_.length();
+        const CharT* pexp = send;
 
-        bool dot = false;
-        typename std::basic_string<CharT>::size_type exp_pos= str.find('e');
-        if (exp_pos != std::basic_string<CharT>::npos)
+        if (sbeg != send)
         {
-            size_t len = exp_pos;
-            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
+            bool dot = false;
+            for (pexp = sbeg; *pexp != 'e' && pexp < send; ++pexp)
             {
-                --len;
             }
-            for (size_t i = 0; i < len;++i)
+
+            if (pexp != send)
             {
-                if (str[i] == '.')
+                const CharT* p = pexp;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
                 {
+                    --p;
+                }
+                for (const CharT* q = sbeg; q < p; ++q)
+                {
+                    if (*q == '.')
+                    {
+                        dot = true;
+                    }
+                    os.put(*q);
+                }
+                if (!dot)
+                {
+                    os.put('.');
+                    os.put('0');
                     dot = true;
                 }
-                os.put(str[i]);
+                for (const CharT* q = pexp; q < send; ++q)
+                {
+                    os.put(*q);
+                }
             }
+            else
+            {
+                const CharT* p = send;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
+                {
+                    --p;
+                }
+                const CharT* qend = *(p-2) == '.' ? p : send;
+                for (const CharT* q = sbeg; q < qend; ++q)
+                {
+                    if (*q == '.')
+                    {
+                        dot = true;
+                    }
+                    os.put(*q);
+                }
+            }
+
             if (!dot)
             {
                 os.put('.');
                 os.put('0');
-                dot = true;
             }
-            for (size_t i = exp_pos; i < str.size();++i)
-            {
-                os.put(str[i]);
-            }
-        }
-        else
-        {
-            size_t len = str.length();
-            while (len >= 2 && str[len - 1] == '0' && str[len - 2] != '.')
-            {
-                --len;
-            }
-            const CharT* s = str.data();
-            const CharT* se = s + len;
-            while (s < se)
-            {
-                if (*s == '.')
-                {
-                    dot = true;
-                }
-                os.put(*s);
-                ++s;
-            }
-        }
-
-        if (!dot)
-        {
-            os.put('.');
-            os.put('0');
         }
     }
 };

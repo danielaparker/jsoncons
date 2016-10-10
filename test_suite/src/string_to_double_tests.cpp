@@ -23,8 +23,8 @@ BOOST_AUTO_TEST_CASE(test_string_to_double)
     const double value2 = strtod((char*) begin, (char**)&endptr );
     const double value3 = reader.read(begin,endptr-begin);
 
-    BOOST_CHECK(value1 == value2);
-    BOOST_CHECK(value2 == value3);
+    BOOST_CHECK_EQUAL(value1,value2);
+    BOOST_CHECK_EQUAL(value2,value3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
