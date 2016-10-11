@@ -13,7 +13,7 @@
 #include <ostream>
 #include <cstdlib>
 #include <map>
-#include "jsoncons/jsoncons.hpp"
+#include "jsoncons/json_text_traits.hpp"
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include <limits> // std::numeric_limits
@@ -54,7 +54,7 @@ void escape_attribute(const CharT* s,
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
             }
             it = stop - 1;
-            if (is_non_ascii_character(cp) || is_control_character(u))
+            if (json_text_traits<CharT>::is_non_ascii_character(cp) || json_text_traits<CharT>::is_control_character(u))
             {
                 if (cp > 0xFFFF)
                 {
@@ -65,18 +65,18 @@ void escape_attribute(const CharT* s,
                     bos.put('&');
                     bos.put('#');
                     bos.put('x');
-                    bos.put(to_hex_character(first >> 12 & 0x000F));
-                    bos.put(to_hex_character(first >> 8  & 0x000F));
-                    bos.put(to_hex_character(first >> 4  & 0x000F));
-                    bos.put(to_hex_character(first     & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(first >> 12 & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(first >> 8  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(first >> 4  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(first     & 0x000F));
                     bos.put(';');
                     bos.put('&');
                     bos.put('#');
                     bos.put('x');
-                    bos.put(to_hex_character(second >> 12 & 0x000F));
-                    bos.put(to_hex_character(second >> 8  & 0x000F));
-                    bos.put(to_hex_character(second >> 4  & 0x000F));
-                    bos.put(to_hex_character(second     & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(second >> 12 & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(second >> 8  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(second >> 4  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(second     & 0x000F));
                     bos.put(';');
                 }
                 else
@@ -84,10 +84,10 @@ void escape_attribute(const CharT* s,
                     bos.put('&');
                     bos.put('#');
                     bos.put('x');
-                    bos.put(to_hex_character(cp >> 12 & 0x000F));
-                    bos.put(to_hex_character(cp >> 8  & 0x000F));
-                    bos.put(to_hex_character(cp >> 4  & 0x000F));
-                    bos.put(to_hex_character(cp     & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(cp >> 12 & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(cp >> 8  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(cp >> 4  & 0x000F));
+                    bos.put(json_text_traits<CharT>::to_hex_character(cp     & 0x000F));
                     bos.put(';');
                 }
             }

@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
-#include "jsoncons/jsoncons.hpp"
+#include "jsoncons/json_text_traits.hpp"
 #include "jsoncons/json_input_handler.hpp"
 #include "jsoncons/parse_error_handler.hpp"
 #include "jsoncons/json_parser.hpp"

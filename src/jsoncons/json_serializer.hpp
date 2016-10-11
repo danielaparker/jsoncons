@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <fstream>
-#include "jsoncons/jsoncons.hpp"
+#include "jsoncons/json_text_traits.hpp"
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json_output_handler.hpp"
 

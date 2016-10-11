@@ -18,7 +18,7 @@
 #include <typeinfo>
 #include "jsoncons/json_traits.hpp"
 #include "jsoncons/json_structures.hpp"
-#include "jsoncons/jsoncons.hpp"
+#include "jsoncons/json_text_traits.hpp"
 #include "jsoncons/json_output_handler.hpp"
 #include "jsoncons/output_format.hpp"
 #include "jsoncons/json_serializer.hpp"

@@ -182,65 +182,66 @@ public:
         oss_.precision((precision == 0) ? precision_ : precision);
         oss_ << val;
 
-        const CharT* sb = oss_.data();
-        const CharT* se = sb + oss_.length();
-        const CharT* p = sb;
+        const CharT* sbeg = oss_.data();
+        const CharT* send = sbeg + oss_.length();
+        const CharT* pexp = send;
 
-        bool dot = false;
-        size_t exp_pos = 0;
-        for (p = sb; *p != 'e' && p < se; ++p)
+        if (sbeg != send)
         {
-        }
-
-        if (p != se)
-        {
-            size_t len = p - sb;
-            while (len >= 2 && sb[len - 1] == '0' && sb[len - 2] != '.')
+            bool dot = false;
+            for (pexp = sbeg; *pexp != 'e' && *pexp != 'E' && pexp < send; ++pexp)
             {
-                --len;
             }
-            for (size_t i = 0; i < len;++i)
+
+            if (pexp != send)
             {
-                if (sb[i] == '.')
+                const CharT* p = pexp;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
                 {
+                    --p;
+                }
+                for (const CharT* q = sbeg; q < p; ++q)
+                {
+                    if (*q == '.')
+                    {
+                        dot = true;
+                    }
+                    os.put(*q);
+                }
+                if (!dot)
+                {
+                    os.put('.');
+                    os.put('0');
                     dot = true;
                 }
-                os.put(sb[i]);
+                for (const CharT* q = pexp; q < send; ++q)
+                {
+                    os.put(*q);
+                }
             }
+            else
+            {
+                const CharT* p = send;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
+                {
+                    --p;
+                }
+                const CharT* qend = *(p-2) == '.' ? p : send;
+                for (const CharT* q = sbeg; q < qend; ++q)
+                {
+                    if (*q == '.')
+                    {
+                        dot = true;
+                    }
+                    os.put(*q);
+                }
+            }
+
             if (!dot)
             {
                 os.put('.');
                 os.put('0');
-                dot = true;
             }
-            for (size_t i = exp_pos; i < (se-sb);++i)
-            {
-                os.put(sb[i]);
-            }
-        }
-        else
-        {
-            size_t len = (se-sb);
-            while (len >= 2 && sb[len - 1] == '0' && sb[len - 2] != '.')
-            {
-                --len;
-            }
-            const CharT* s = sb;
-            while (s < se)
-            {
-                if (*s == '.')
-                {
-                    dot = true;
-                }
-                os.put(*s);
-                ++s;
-            }
-        }
-
-        if (!dot)
-        {
-            os.put('.');
-            os.put('0');
         }
     }
 };
@@ -379,7 +380,7 @@ public:
         if (sbeg != send)
         {
             bool dot = false;
-            for (pexp = sbeg; *pexp != 'e' && pexp < send; ++pexp)
+            for (pexp = sbeg; *pexp != 'e' && *pexp != 'E' && pexp < send; ++pexp)
             {
             }
 

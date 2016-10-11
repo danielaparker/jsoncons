@@ -7,7 +7,7 @@
 #ifndef JSONCONS_PARSE_ERROR_HANDLER_HPP
 #define JSONCONS_PARSE_ERROR_HANDLER_HPP
 
-#include "jsoncons/jsoncons.hpp"
+#include "jsoncons/json_text_traits.hpp"
 #include <system_error>
 
 namespace jsoncons {
