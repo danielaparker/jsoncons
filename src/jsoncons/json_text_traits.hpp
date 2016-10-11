@@ -35,9 +35,10 @@ template <class CharT>
 struct Json_text_traits_
 {
 
-    static bool is_control_character(uint32_t c)
+    static bool is_control_character(CharT c)
     {
-        return c <= 0x1F || c == 0x7f;
+        uint32_t u(c >= 0 ? c : 256 + c);
+        return u <= 0x1F || u == 0x7f;
     }
 
     static char to_hex_character(unsigned char c)

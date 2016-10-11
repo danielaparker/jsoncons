@@ -280,13 +280,12 @@ void escape_string(const CharT* s,
             os.put('t');
             break;
         default:
-            uint32_t u(c >= 0 ? c : 256 + c);
             if (format.escape_solidus() && c == '/')
             {
                 os.put('\\');
                 os.put('/');
             }
-            else if (json_text_traits<CharT>::is_control_character(u) || format.escape_all_non_ascii())
+            else if (json_text_traits<CharT>::is_control_character(c) || format.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
                 const CharT* stop = nullptr;
@@ -296,7 +295,7 @@ void escape_string(const CharT* s,
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
                 it = stop - 1;
-                if (json_text_traits<CharT>::is_non_ascii_character(cp) || json_text_traits<CharT>::is_control_character(u))
+                if (json_text_traits<CharT>::is_non_ascii_character(cp) || json_text_traits<CharT>::is_control_character(c))
                 {
                     if (cp > 0xFFFF)
                     {
