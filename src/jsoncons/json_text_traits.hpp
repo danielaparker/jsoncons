@@ -41,16 +41,16 @@ struct Json_text_traits_
         return u <= 0x1F || u == 0x7f;
     }
 
-    static char to_hex_character(unsigned char c)
+    static CharT to_hex_character(unsigned char c)
     {
         JSONCONS_ASSERT(c <= 0xF);
 
         return (c < 10) ? ('0' + c) : ('A' - 10 + c);
     }
 
-    static bool is_non_ascii_character(uint32_t c)
+    static bool is_non_ascii_codepoint(uint32_t cp)
     {
-        return c >= 0x80;
+        return cp >= 0x80;
     }
 
     static std::pair<const CharT*,size_t> char_sequence_at(const CharT* it, 

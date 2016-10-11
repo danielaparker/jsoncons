@@ -295,7 +295,7 @@ void escape_string(const CharT* s,
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
                 it = stop - 1;
-                if (json_text_traits<CharT>::is_non_ascii_character(cp) || json_text_traits<CharT>::is_control_character(c))
+                if (json_text_traits<CharT>::is_non_ascii_codepoint(cp) || json_text_traits<CharT>::is_control_character(c))
                 {
                     if (cp > 0xFFFF)
                     {
