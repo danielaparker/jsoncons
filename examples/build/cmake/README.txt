@@ -14,11 +14,11 @@ UNIX
 
 From the examples directory
 
-mkdir -p build/debug
-cd build/debug
-cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" ../..
+mkdir -p build/cmake/debug
+cd build/cmake/debug
+cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" ..
 make
 
 From the examples directory
 
-./jsoncons_examples
+./build/cmake/debug/jsoncons_examples
