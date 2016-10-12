@@ -49,7 +49,10 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 
 ## Building the test suite and examples with CMake
 
-[CMake](https://cmake.org/) is a C++ Makefiles/Solution generator for cross-platform software development. 
+[CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
+```
+    sudo apt-get install cmake
+```
 
 Instructions for building the test suite with CMake may be found in
 

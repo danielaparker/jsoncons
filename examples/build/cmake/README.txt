@@ -1,10 +1,6 @@
 To build the jsoncons examples with cmake:
 
-Set the environmental variables:
-
-BOOST_ROOT
-BOOST_INCLUDEDIR       - Preferred include directory 
-BOOST_LIBRARYDIR       - Preferred library directory e.g. <prefix>/lib/vc140x64
+Windows
 
 To build the tests with vc140,
 
@@ -14,3 +10,15 @@ and to run them
 
 run_examples_vc140x64.cmd
 
+UNIX
+
+From the examples directory
+
+mkdir -p build/debug
+cd build/debug
+cmake -DCMAKE_BUILD_TYPE=debug -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DARCHIVE_INSTALL_DIR=. -G "Unix Makefiles" ../..
+make
+
+From the examples directory
+
+./jsoncons_examples
