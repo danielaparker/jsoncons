@@ -291,348 +291,89 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     }
 };
 
-template<class Json>
-struct json_type_traits<Json, char>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<char>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static char as(const Json& rhs)
-    {
-        return static_cast<char>(rhs.as_integer());
-    }
-    static Json to_json(char ch)
-    {
-        return Json::make_integer(ch);
-    }
-};
+// integral
 
-template<class Json>
-struct json_type_traits<Json, unsigned char>
+template<class Json, class T>
+struct json_type_traits<Json, T,
+                        typename std::enable_if<std::is_integral<T>::value &&
+                        std::is_signed<T>::value &&
+                        !std::is_same<T,bool>::value
+>::type>
 {
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= std::numeric_limits<T>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned char>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP());
         }
         else
         {
             return false;
         }
     }
-    static unsigned char as(const Json& rhs)
+    static T as(const Json& rhs)
     {
-        return static_cast<unsigned char>(rhs.as_uinteger());
+        return static_cast<T>(rhs.as_integer());
     }
-    static Json to_json(unsigned char ch)
-    {
-        return Json::make_uinteger(ch);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, signed char>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<char>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<signed char>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<signed char>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static signed char as(const Json& rhs)
-    {
-        return static_cast<signed char>(rhs.as_integer());
-    }
-    static Json to_json(signed char ch)
-    {
-        return Json::make_integer(ch);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, wchar_t>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<wchar_t>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<wchar_t>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static wchar_t as(const Json& rhs)
-    {
-        return static_cast<wchar_t>(rhs.as_integer());
-    }
-    static Json to_json(wchar_t ch)
-    {
-        return Json::make_integer(ch);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, short>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<short>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<short>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static short as(const Json& rhs)
-    {
-        return static_cast<short>(rhs.as_integer());
-    }
-    static Json to_json(short rhs)
+    static Json to_json(T rhs)
     {
         return Json::make_integer(rhs);
     }
 };
 
-template<class Json>
-struct json_type_traits<Json, unsigned short>
+template<class Json, class T>
+struct json_type_traits<Json, T,
+                        typename std::enable_if<std::is_integral<T>::value &&
+                        std::is_unsigned<T>::value &&
+                        !std::is_same<T,bool>::value
+>::type >
 {
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned short>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
         }
         else
         {
             return false;
         }
     }
-    static unsigned short as(const Json& rhs)
+    static T as(const Json& rhs)
     {
-        return (unsigned short)rhs.as_uinteger();
+        return static_cast<T>(rhs.as_uinteger());
     }
-    static Json to_json(unsigned short rhs)
+
+    static Json to_json(T val)
     {
-        return Json::make_uinteger(rhs);
+        return Json::make_uinteger(val);
     }
 };
 
-template<class Json>
-struct json_type_traits<Json, int>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<int>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static int as(const Json& rhs)
-    {
-        return static_cast<int>(rhs.as_integer());
-    }
-    static Json to_json(int rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned int>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned int>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static unsigned int as(const Json& rhs)
-    {
-        return static_cast<unsigned int>(rhs.as_uinteger());
-    }
-    static Json to_json(unsigned int rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, long>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= std::numeric_limits<long>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<long>::max JSONCONS_NO_MACRO_EXP());
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static long as(const Json& rhs)
-    {
-        return static_cast<long>(rhs.as_integer());
-    }
-    static Json to_json(long rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned long>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        if (rhs.is_integer())
-        {
-            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else if (rhs.is_uinteger())
-        {
-            return rhs.as_uinteger() <= std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP();
-        }
-        else
-        {
-            return false;
-        }
-    }
-    static unsigned long as(const Json& rhs)
-    {
-        return static_cast<unsigned long>(rhs.as_uinteger());
-    }
-    static Json to_json(unsigned long rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, long long>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_integer();
-    }
-    static long long as(const Json& rhs)
-    {
-        return rhs.as_integer();
-    }
-    static Json to_json(long long rhs)
-    {
-        return Json::make_integer(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, unsigned long long>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_uinteger();
-    }
-    static unsigned long long as(const Json& rhs)
-    {
-        return rhs.as_uinteger();
-    }
-    static Json to_json(unsigned long long rhs)
-    {
-        return Json::make_uinteger(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, float>
+template<class Json,class T>
+struct json_type_traits<Json, T,
+                        typename std::enable_if<std::is_floating_point<T>::value
+>::type>
 {
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
     }
-    static double as(const Json& rhs)
+    static T as(const Json& rhs)
     {
-        return static_cast<float>(rhs.as_double());
+        return static_cast<T>(rhs.as_double());
     }
-    static Json to_json(float rhs)
+    static Json to_json(T val)
     {
-        return Json::make_double(rhs);
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, double>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_double();
-    }
-
-    static double as(const Json& rhs)
-    {
-        return rhs.as_double();
-    }
-    static Json to_json(double rhs)
-    {
-        return Json::make_double(rhs);
+        return Json::make_double(val);
     }
 };
 
