@@ -2268,6 +2268,16 @@ public:
     {
         switch (var_.type_id())
         {
+        case value_types::small_string_t:
+            {
+                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
+                return j.as<int64_t>();
+            }
+        case value_types::string_t:
+            {
+                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                return j.as<int64_t>();
+            }
         case value_types::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2285,6 +2295,16 @@ public:
     {
         switch (var_.type_id())
         {
+        case value_types::small_string_t:
+            {
+                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
+                return j.as<uint64_t>();
+            }
+        case value_types::string_t:
+            {
+                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                return j.as<uint64_t>();
+            }
         case value_types::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2313,6 +2333,16 @@ public:
     {
         switch (var_.type_id())
         {
+        case value_types::small_string_t:
+            {
+                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
+                return j.as<double>();
+            }
+        case value_types::string_t:
+            {
+                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                return j.as<double>();
+            }
         case value_types::double_t:
             return var_.double_data_cast()->value();
         case value_types::integer_t:

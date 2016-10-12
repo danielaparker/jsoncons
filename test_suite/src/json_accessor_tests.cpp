@@ -131,6 +131,18 @@ BOOST_AUTO_TEST_CASE(test_as)
     // Compile time error, "as<Json::object> not supported"
 }
 
+BOOST_AUTO_TEST_CASE(test_as2)
+{
+    json obj;
+    obj["field1"] = "10";
+    obj["field2"] = "-10";
+    obj["field3"] = "10.1";
+
+    BOOST_CHECK_EQUAL(10,obj["field1"].as<int>());
+    BOOST_CHECK_EQUAL(-10,obj["field2"].as<int>());
+    BOOST_CHECK_EQUAL(10.1,obj["field3"].as<double>());
+}
+
 BOOST_AUTO_TEST_CASE(test_is)
 {
     json obj;
