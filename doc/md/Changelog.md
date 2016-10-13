@@ -3,9 +3,10 @@ master
 
 Changes
 
-- The deprecated class `json::any` has been removed
+- The deprecated class `json::any` has been removed. 
+- The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the "Type Extensibility" tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
-- - Removed `is_assignable` data member from `json_type_traits` specializations
+- Removed `is_assignable` data member from `json_type_traits` specializations
 
 0.99.3a
 -------

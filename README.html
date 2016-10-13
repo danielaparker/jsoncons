@@ -512,6 +512,8 @@ vertical-align:1px;
 <ul>
 <li>New release 0.99.3a</li>
 <li>The deprecated class <code>json::any</code> has been removed from master</li>
+<li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the <a href="https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility">Type Extensibility</a> tutorial.<br>
+</li>
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
 </ul>
 

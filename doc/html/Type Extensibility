@@ -468,44 +468,213 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>If you want to use the json methods <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, <code>add</code>, <code>set</code> and <code>operator=</code> to access or modify with a new type, you need to show json how to interact with that type, by extending <code>json_type_traits</code> in the <code>jsoncons</code> namespace.</p>
+<p>In the <code>json</code> class, constructors, accessors and modifiers are templated, for example,</p>
 
-<p>For example, by including the header file <code>jsoncons_ext/boost/type_extensions.hpp</code>, you can access and modify <code>json</code> values with <code>boost::gregorian</code> dates.</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-en">json</span>(<span class="pl-k">const</span> T&amp; val)
 
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
-    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/boost/type_extensions.hpp<span class="pl-pds">"</span></span>
+template&lt;class T&gt;
+bool is() <span class="pl-k">const</span>
 
-    <span class="pl-k">namespace</span> <span class="pl-en">my</span>
+template&lt;class T&gt;
+T as() <span class="pl-k">const</span>
+
+template &lt;class T&gt;
+basic_json&amp; operator=(<span class="pl-k">const</span> T&amp; val)
+
+template &lt;class T&gt;
+void add(<span class="pl-k">const</span> T&amp; val)</pre></div>
+
+<p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Enable</span>=<span class="pl-k">void</span>&gt;
+<span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>;</pre></div>
+
+<p>If you want to use the json constructor, <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, <code>operator=</code>, <code>add</code>, and <code>set</code> to access or modify with a new type, you need to show <code>json</code> how to interact with that type, by extending <code>json_type_traits</code> in the <code>jsoncons</code> namespace.</p>
+
+<h3>Example 1. Convert to/from user defined type</h3>
+
+<p>You can provide a specialization of <code>json_type_traits</code> for a <code>book</code> class, and then transfer book objects or<br>
+standard library collections of book objects to and from <code>json</code> values.</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
+{
+    std::string author;
+    std::string title;
+    <span class="pl-k">double</span> price;
+};
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
+{
+    <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, book&gt;
     {
-        <span class="pl-k">using</span> jsoncons::json;
-        <span class="pl-k">using</span> boost::gregorian::date;
-
-        json deal;
-        deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>] = date(<span class="pl-c1">2014</span>,<span class="pl-c1">10</span>,<span class="pl-c1">14</span>);
-
-        json observation_dates = json::array();
-        observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">14</span>));
-        observation_dates.add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">21</span>));
-
-        deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>] = std::move(observation_dates);
-
-        date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>].as&lt;date&gt;();
-        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Maturity: <span class="pl-pds">"</span></span> &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
-
-        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
-        json::array_iterator it = deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].elements().begin();
-        json::array_iterator end = deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].end_elements();
-
-        <span class="pl-k">while</span> (it != end)
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
         {
-            date d = it-&gt;as&lt;date&gt;();
-            std::cout &lt;&lt; d &lt;&lt; std::endl;
-            ++it;
+            <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
+                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
+                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
+                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span>;
         }
-        std::cout &lt;&lt; std::endl;
+        <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
+        {
+            book val;
+            val.<span class="pl-smi">author</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+            val.<span class="pl-smi">title</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+            val.<span class="pl-smi">price</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;();
+            <span class="pl-k">return</span> val;
+        }
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> book&amp; val)
+        {
+            Json j;
+            j[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">author</span>;
+            j[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">title</span>;
+            j[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">price</span>;
+            <span class="pl-k">return</span> j;
+        }
+    };
+};
 
-        std::cout &lt;&lt; pretty_print(deal) &lt;&lt; std::endl;
-    }</pre></div>
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    book book1{<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>, <span class="pl-c1">25.17</span>};
+
+    json j = book1;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; j.<span class="pl-smi">is</span>&lt;book&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(j) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    book temp = j.<span class="pl-smi">as</span>&lt;book&gt;();
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; temp.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> 
+                        &lt;&lt; temp.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> 
+                        &lt;&lt; temp.<span class="pl-smi">price</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    book book2{<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Women: A Novel<span class="pl-pds">"</span></span>, <span class="pl-c1">12.0</span>};
+
+    std::vector&lt;book&gt; book_array{book1, book2};
+
+    json ja = book_array;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha 
+                        &lt;&lt; ja.<span class="pl-smi">is</span>&lt;std::vector&lt;book&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5)<span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(ja) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">auto</span> book_list = ja.<span class="pl-smi">as</span>&lt;std::list&lt;book&gt;&gt;();
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> b : book_list)
+    {
+        std::cout &lt;&lt; b.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> 
+                  &lt;&lt; b.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> 
+                  &lt;&lt; b.<span class="pl-smi">price</span> &lt;&lt; std::endl;
+    }
+}</pre></div>
+
+<p>The output is</p>
+
+<pre><code>(1) true
+
+(2) {
+    "author": "Haruki Murakami",
+    "price": 25.17,
+    "title": "Kafka on the Shore"
+}
+
+(3) Haruki Murakami,Kafka on the Shore,25.17
+
+(4) true
+
+(5)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    }
+]
+
+(6)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12
+</code></pre>
+
+<h3>Example 2. Convert to/from <code>boost::gregorian::date</code>
+</h3>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
+{
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">true</span>;
+
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
+        {
+            <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">try</span>
+            {
+                <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+                <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+            }
+            <span class="pl-k">catch</span> (...)
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+        }
+
+        <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
+        {
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+        }
+
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
+        {
+            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+        }
+    };
+}</pre></div>
+
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> jsoncons::json;
+    <span class="pl-k">using</span> boost::gregorian::date;
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    json deal = <span class="pl-c1">json::parse</span>(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        "Maturity":"2014-10-14",</span>
+<span class="pl-s">        "ObservationDates": ["2014-02-14","2014-02-21"]</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
+
+    deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].<span class="pl-c1">add</span>(<span class="pl-c1">date</span>(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">28</span>));    
+
+    date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;date&gt;();
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Maturity: <span class="pl-pds">"</span></span> &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
+
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].<span class="pl-c1">elements</span>())
+    {
+        std::cout &lt;&lt; observation_date &lt;&lt; std::endl;
+    }
+    std::cout &lt;&lt; std::endl;
+}</pre></div>
 
 <p>The output is</p>
 
@@ -515,59 +684,148 @@ Observation dates:
 
 2014-Feb-14
 2014-Feb-21
+2014-Feb-28
 </code></pre>
 
-<div class="highlight highlight-source-json"><pre>    {
-        <span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2014-10-14<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>:
-        [<span class="pl-s"><span class="pl-pds">"</span>2014-02-14<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2014-02-21<span class="pl-pds">"</span></span>]
-    }</pre></div>
+<h3>Example 3. Convert to/from <code>boost::numeric::ublas::matrix&lt;T&gt;</code>
+</h3>
 
-<p>You can look in the header file <code>jsoncons_ext/boost/type_extensions.hpp</code><br>
-to see how the specialization of <code>json_type_traits</code> that supports<br>
-the conversions works. In this implementation the <code>boost</code> date values are stored in the <code>json</code> values as strings.</p>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
 
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
-    {
-        <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-        <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
+{
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) JSONCONS_NOEXCEPT
         {
-            <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
+            <span class="pl-k">if</span> (!val.<span class="pl-c1">is_array</span>())
             {
-                <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+            <span class="pl-k">if</span> (val.<span class="pl-c1">size</span>() &gt; <span class="pl-c1">0</span>)
+            {
+                <span class="pl-c1">size_t</span> n = val[<span class="pl-c1">0</span>].<span class="pl-c1">size</span>();
+                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a: val.<span class="pl-c1">elements</span>())
                 {
-                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                    <span class="pl-k">if</span> (!(a.<span class="pl-c1">is_array</span>() &amp;&amp; a.<span class="pl-c1">size</span>() == n))
+                    {
+                        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                    }
+                    <span class="pl-k">for</span> (<span class="pl-k">auto</span> x: a.<span class="pl-c1">elements</span>())
+                    {
+                        <span class="pl-k">if</span> (!x.<span class="pl-smi">is</span>&lt;T&gt;())
+                        {
+                            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                        }
+                    }
                 }
-                std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
-                <span class="pl-k">try</span>
+            }
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+
+        <span class="pl-k">static</span> boost::numeric::ublas::matrix&lt;T&gt; <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
+        {
+            <span class="pl-k">if</span> (val.<span class="pl-c1">is_array</span>() &amp;&amp; val.<span class="pl-c1">size</span>() &gt; <span class="pl-c1">0</span>)
+            {
+                <span class="pl-c1">size_t</span> m = val.<span class="pl-c1">size</span>();
+                <span class="pl-c1">size_t</span> n = <span class="pl-c1">0</span>;
+                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a : val.<span class="pl-c1">elements</span>())
                 {
-                    <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
-                    <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                    <span class="pl-k">if</span> (a.<span class="pl-c1">size</span>() &gt; n)
+                    {
+                        n = a.<span class="pl-c1">size</span>();
+                    }
                 }
-                <span class="pl-k">catch</span> (...)
+
+                boost::numeric::ublas::matrix&lt;T&gt; <span class="pl-c1">A</span>(m,n,<span class="pl-c1">T</span>());
+                <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; m; ++i)
                 {
-                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                    <span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a = val[i];
+                    <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; a.<span class="pl-c1">size</span>(); ++j)
+                    {
+                        <span class="pl-c1">A</span>(i,j) = a[j].<span class="pl-smi">as</span>&lt;T&gt;();
+                    }
+                }
+                <span class="pl-k">return</span> A;
+            }
+            <span class="pl-k">else</span>
+            {
+                boost::numeric::ublas::matrix&lt;T&gt; A;
+                <span class="pl-k">return</span> A;
+            }
+        }
+
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> boost::numeric::ublas::matrix&lt;T&gt;&amp; val)
+        {
+            Json a = Json::make_array&lt;<span class="pl-c1">2</span>&gt;(val.<span class="pl-c1">size1</span>(), val.<span class="pl-c1">size2</span>(),<span class="pl-c1">T</span>());
+            <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; val.<span class="pl-c1">size1</span>(); ++i)
+            {
+                <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; val.<span class="pl-c1">size1</span>(); ++j)
+                {
+                    a[i][j] = <span class="pl-c1">val</span>(i,j);
                 }
             }
+            <span class="pl-k">return</span> a;
+        }
+    };
+}</pre></div>
 
-            <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
-            {
-                std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
-                <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
-            }
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> jsoncons::json;
+    <span class="pl-k">using</span> boost::gregorian::date;
 
-            <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val)
-            {
-                <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
-            }
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    matrix&lt;<span class="pl-k">double</span>&gt; <span class="pl-c1">A</span>(<span class="pl-c1">2</span>, <span class="pl-c1">2</span>);
+    <span class="pl-c1">A</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>) = <span class="pl-c1">1.1</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>) = <span class="pl-c1">2.1</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">0</span>) = <span class="pl-c1">3.1</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>) = <span class="pl-c1">4.1</span>;
 
-            <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val, 
-                                <span class="pl-k">typename</span> Json::allocator_type allocator)
+    json a = A;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; a.<span class="pl-smi">is</span>&lt;matrix&lt;<span class="pl-k">double</span>&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; a.<span class="pl-smi">is</span>&lt;matrix&lt;<span class="pl-k">int</span>&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(a) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    matrix&lt;<span class="pl-k">double</span>&gt; B = a.<span class="pl-smi">as</span>&lt;matrix&lt;<span class="pl-k">double</span>&gt;&gt;();
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; B.<span class="pl-c1">size1</span>(); ++i)
+    {
+        <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; B.<span class="pl-c1">size2</span>(); ++j)
+        {
+            <span class="pl-k">if</span> (j &gt; <span class="pl-c1">0</span>)
             {
-                <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val),allocator);
+                std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>;
             }
-        };
-    }</pre></div>
+            std::cout &lt;&lt; <span class="pl-c1">B</span>(i, j);
+        }
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+    }
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+}</pre></div>
+
+<p>The output is</p>
+
+<pre><code>(1) true
+
+(2) false
+
+(3)
+
+[
+    [1.1,2.1],
+    [3.1,4.1]
+]
+
+(4)
+
+1.1,2.1
+3.1,4.1
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -17,6 +17,7 @@ void run_readme_examples();
 void array_examples();
 void wjson_examples();
 void serialization_examples();
+void type_extensibility_examples();
 
 void first_example_a()
 {
@@ -296,6 +297,9 @@ int main()
         serialization_examples();
 
         parse_exception_example();
+
+        type_extensibility_examples();
+
     }
     catch (const std::exception& e)
     {

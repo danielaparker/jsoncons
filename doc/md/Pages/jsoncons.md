@@ -631,7 +631,7 @@ The output is
 }
 ```
 
-### Type extensibility
+### Convert `json` to/from user defined type
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
@@ -693,7 +693,6 @@ namespace jsoncons
             return j;
         }
     };
-
 };
 
 int main()
@@ -704,10 +703,12 @@ int main()
 
     std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
 
-    std::cout << "(2) " << j << "\n\n";
+    std::cout << "(2) " << pretty_print(j) << "\n\n";
 
     book temp = j.as<book>();
-    std::cout << "(3) " << temp.author << "," << temp.title << "," << temp.price << "\n\n";
+    std::cout << "(3) " << temp.author << "," 
+                        << temp.title << "," 
+                        << temp.price << "\n\n";
 
     book book2{"Charles Bukowski", "Women: A Novel", 12.0};
 
@@ -715,17 +716,20 @@ int main()
 
     json ja = book_array;
 
-    std::cout << "(4) " << std::boolalpha << ja.is<std::vector<book>>() << "\n\n";
+    std::cout << "(4) " << std::boolalpha 
+                        << ja.is<std::vector<book>>() << "\n\n";
 
     std::cout << "(5)" << "\n";
-    std::cout << ja << "\n\n";
+    std::cout << pretty_print(ja) << "\n\n";
 
     auto book_list = ja.as<std::list<book>>();
 
     std::cout << "(6)" << std::endl;
     for (auto b : book_list)
     {
-        std::cout << b.author << ", " << b.title << ", " << b.price << std::endl;
+        std::cout << b.author << ", " 
+                  << b.title << ", " 
+                  << b.price << std::endl;
     }
 }
 ``` 
@@ -733,14 +737,29 @@ The output is
 ```
 (1) true
 
-(2) {"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"}
+(2) {
+    "author": "Haruki Murakami",
+    "price": 25.17,
+    "title": "Kafka on the Shore"
+}
 
 (3) Haruki Murakami,Kafka on the Shore,25.17
 
 (4) true
 
 (5)
-[{"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"},{"author":"Charles Bukowski","price":12.0,"title":"Women: A Novel"}]
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    }
+]
 
 (6)
 Haruki Murakami, Kafka on the Shore, 25.17

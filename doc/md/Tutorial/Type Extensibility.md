@@ -1,101 +1,367 @@
-If you want to use the json methods `is<T>`, `as<T>`, `add`, `set` and `operator=` to access or modify with a new type, you need to show json how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+In the `json` class, constructors, accessors and modifiers are templated, for example,
 
-For example, by including the header file `jsoncons_ext/boost/type_extensions.hpp`, you can access and modify `json` values with `boost::gregorian` dates.
 ```c++
-    #include "jsoncons/json.hpp"
-    #include "jsoncons_ext/boost/type_extensions.hpp"
+template <class T>
+json(const T& val)
 
-    namespace my
-    {
-        using jsoncons::json;
-        using boost::gregorian::date;
+template<class T>
+bool is() const
 
-        json deal;
-        deal["Maturity"] = date(2014,10,14);
+template<class T>
+T as() const
 
-        json observation_dates = json::array();
-        observation_dates.add(date(2014,2,14));
-        observation_dates.add(date(2014,2,21));
+template <class T>
+basic_json& operator=(const T& val)
 
-        deal["ObservationDates"] = std::move(observation_dates);
-
-        date maturity = deal["Maturity"].as<date>();
-        std::cout << "Maturity: " << maturity << std::endl << std::endl;
-
-        std::cout << "Observation dates: " << std::endl << std::endl;
-        json::array_iterator it = deal["ObservationDates"].elements().begin();
-        json::array_iterator end = deal["ObservationDates"].end_elements();
-
-        while (it != end)
-        {
-            date d = it->as<date>();
-            std::cout << d << std::endl;
-            ++it;
-        }
-        std::cout << std::endl;
-
-        std::cout << pretty_print(deal) << std::endl;
-    }
+template <class T>
+void add(const T& val)
 ```
+The implementations of these functions and operators make use of the class template `json_type_traits`
+
+```c++
+template <class Json, class T, class Enable=void>
+struct json_type_traits;
+```
+
+If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `add`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+
+### Example 1. Convert to/from user defined type
+
+You can provide a specialization of `json_type_traits` for a `book` class, and then transfer book objects or
+standard library collections of book objects to and from `json` values.
+
+```c++
+struct book
+{
+    std::string author;
+    std::string title;
+    double price;
+};
+
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, book>
+    {
+        static bool is(const Json& rhs) noexcept
+        {
+            return rhs.is_object() &&
+                   rhs.count("author") == 1 && 
+                   rhs.count("title") == 1 && 
+                   rhs.count("price") == 1;
+        }
+        static book as(const Json& rhs)
+        {
+            book val;
+            val.author = rhs["author"].as<std::string>();
+            val.title = rhs["title"].as<std::string>();
+            val.price = rhs["price"].as<double>();
+            return val;
+        }
+        static Json to_json(const book& val)
+        {
+            Json j;
+            j["author"] = val.author;
+            j["title"] = val.title;
+            j["price"] = val.price;
+            return j;
+        }
+    };
+};
+
+int main()
+{
+    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
+
+    json j = book1;
+
+    std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
+
+    std::cout << "(2) " << pretty_print(j) << "\n\n";
+
+    book temp = j.as<book>();
+    std::cout << "(3) " << temp.author << "," 
+                        << temp.title << "," 
+                        << temp.price << "\n\n";
+
+    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
+
+    std::vector<book> book_array{book1, book2};
+
+    json ja = book_array;
+
+    std::cout << "(4) " << std::boolalpha 
+                        << ja.is<std::vector<book>>() << "\n\n";
+
+    std::cout << "(5)" << "\n";
+    std::cout << pretty_print(ja) << "\n\n";
+
+    auto book_list = ja.as<std::list<book>>();
+
+    std::cout << "(6)" << std::endl;
+    for (auto b : book_list)
+    {
+        std::cout << b.author << ", " 
+                  << b.title << ", " 
+                  << b.price << std::endl;
+    }
+}
+``` 
 The output is
+```
+(1) true
 
-    Maturity: 2014-Oct-14
+(2) {
+    "author": "Haruki Murakami",
+    "price": 25.17,
+    "title": "Kafka on the Shore"
+}
 
-    Observation dates:
+(3) Haruki Murakami,Kafka on the Shore,25.17
 
-    2014-Feb-14
-    2014-Feb-21
-```json
+(4) true
+
+(5)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    }
+]
+
+(6)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12
+```
+
+### Example 2. Convert to/from `boost::gregorian::date`
+
+```c++
+#include "jsoncons/json.hpp"
+#include "boost/date_time/gregorian/gregorian.hpp"
+
+namespace jsoncons 
+{
+    template <class Json>
+    struct json_type_traits<Json,boost::gregorian::date>
+    {
+        static const bool is_assignable = true;
+
+        static bool is(const Json& val) noexcept
+        {
+            if (!val.is_string())
+            {
+                return false;
+            }
+            std::string s = val.template as<std::string>();
+            try
+            {
+                boost::gregorian::from_simple_string(s);
+                return true;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        }
+
+        static boost::gregorian::date as(const Json& val)
+        {
+            std::string s = val.template as<std::string>();
+            return boost::gregorian::from_simple_string(s);
+        }
+
+        static void assign(Json& lhs, boost::gregorian::date val)
+        {
+            lhs.assign_string(to_iso_extended_string(val));
+        }
+    };
+}
+```
+
+```c++
+    using jsoncons::json;
+    using boost::gregorian::date;
+
+int main()
+{
+    json deal = json::parse(R"(
     {
         "Maturity":"2014-10-14",
-        "ObservationDates":
-        ["2014-02-14","2014-02-21"]
+        "ObservationDates": ["2014-02-14","2014-02-21"]
     }
+    )");
+
+    deal["ObservationDates"].add(date(2014,2,28));    
+
+    date maturity = deal["Maturity"].as<date>();
+    std::cout << "Maturity: " << maturity << std::endl << std::endl;
+
+    std::cout << "Observation dates: " << std::endl << std::endl;
+
+    for (auto observation_date: deal["ObservationDates"].elements())
+    {
+        std::cout << observation_date << std::endl;
+    }
+    std::cout << std::endl;
+}
 ```
-You can look in the header file `jsoncons_ext/boost/type_extensions.hpp`
-to see how the specialization of `json_type_traits` that supports
-the conversions works. In this implementation the `boost` date values are stored in the `json` values as strings.
+The output is
+```
+Maturity: 2014-Oct-14
+
+Observation dates:
+
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
+``` 
+
+### Example 3. Convert to/from `boost::numeric::ublas::matrix<T>`
 
 ```c++
-    namespace jsoncons 
-    {
-        template <class Json>
-        struct json_type_traits<Json,boost::gregorian::date>
+#include "jsoncons/json.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
+
+namespace jsoncons 
+{
+        static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
-            static bool is(const Json& val) noexcept
+            if (!val.is_array())
             {
-                if (!val.is_string())
+                return false;
+            }
+            if (val.size() > 0)
+            {
+                size_t n = val[0].size();
+                for (const auto& a: val.elements())
                 {
-                    return false;
+                    if (!(a.is_array() && a.size() == n))
+                    {
+                        return false;
+                    }
+                    for (auto x: a.elements())
+                    {
+                        if (!x.is<T>())
+                        {
+                            return false;
+                        }
+                    }
                 }
-                std::string s = val.template as<std::string>();
-                try
+            }
+            return true;
+        }
+
+        static boost::numeric::ublas::matrix<T> as(const Json& val)
+        {
+            if (val.is_array() && val.size() > 0)
+            {
+                size_t m = val.size();
+                size_t n = 0;
+                for (const auto& a : val.elements())
                 {
-                    boost::gregorian::from_simple_string(s);
-                    return true;
+                    if (a.size() > n)
+                    {
+                        n = a.size();
+                    }
                 }
-                catch (...)
+
+                boost::numeric::ublas::matrix<T> A(m,n,T());
+                for (size_t i = 0; i < m; ++i)
                 {
-                    return false;
+                    const auto& a = val[i];
+                    for (size_t j = 0; j < a.size(); ++j)
+                    {
+                        A(i,j) = a[j].as<T>();
+                    }
+                }
+                return A;
+            }
+            else
+            {
+                boost::numeric::ublas::matrix<T> A;
+                return A;
+            }
+        }
+
+        static Json to_json(const boost::numeric::ublas::matrix<T>& val)
+        {
+            Json a = Json::make_array<2>(val.size1(), val.size2(),T());
+            for (size_t i = 0; i < val.size1(); ++i)
+            {
+                for (size_t j = 0; j < val.size1(); ++j)
+                {
+                    a[i][j] = val(i,j);
                 }
             }
-
-            static boost::gregorian::date as(const Json& val)
-            {
-                std::string s = val.template as<std::string>();
-                return boost::gregorian::from_simple_string(s);
-            }
-
-            static Json to_json(boost::gregorian::date val)
-            {
-                return Json::make_string(to_iso_extended_string(val));
-            }
-
-            static Json to_json(boost::gregorian::date val, 
-                                typename Json::allocator_type allocator)
-            {
-                return Json::make_string(to_iso_extended_string(val),allocator);
-            }
-        };
-    }
+            return a;
+        }
+    };
+}
 ```
+
+```c++
+    using jsoncons::json;
+    using boost::gregorian::date;
+
+int main()
+{
+    matrix<double> A(2, 2);
+    A(0, 0) = 1.1;
+    A(0, 1) = 2.1;
+    A(1, 0) = 3.1;
+    A(1, 1) = 4.1;
+
+    json a = A;
+
+    std::cout << "(1) " << std::boolalpha << a.is<matrix<double>>() << "\n\n";
+
+    std::cout << "(2) " << std::boolalpha << a.is<matrix<int>>() << "\n\n";
+
+    std::cout << "(3) \n\n";
+
+    std::cout << pretty_print(a) << "\n\n";
+
+    matrix<double> B = a.as<matrix<double>>();
+
+    std::cout << "(4) \n\n";
+    for (size_t i = 0; i < B.size1(); ++i)
+    {
+        for (size_t j = 0; j < B.size2(); ++j)
+        {
+            if (j > 0)
+            {
+                std::cout << ",";
+            }
+            std::cout << B(i, j);
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n\n";
+}
+```
+The output is
+```
+(1) true
+
+(2) false
+
+(3)
+
+[
+    [1.1,2.1],
+    [3.1,4.1]
+]
+
+(4)
+
+1.1,2.1
+3.1,4.1
+``` 
+

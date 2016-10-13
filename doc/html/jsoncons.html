@@ -1101,7 +1101,7 @@ std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 <p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-<span class="pl-en">json</span>(<span class="pl-k">const</span> T&amp; val)
+<span class="pl-en">json</span>(T val)
 
 template&lt;class T&gt;
 bool is() <span class="pl-k">const</span>
@@ -1110,105 +1110,109 @@ template&lt;class T&gt;
 T as() <span class="pl-k">const</span>
 
 template &lt;class T&gt;
-basic_json&amp; operator=(<span class="pl-k">const</span> T&amp; val)
+basic_json&amp; operator=(T val)
 
 template &lt;class T&gt;
-void add(<span class="pl-k">const</span> T&amp; val)</pre></div>
+void add(T val)</pre></div>
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 
-<p>This <code>json_type_traits</code> template is extensible, you, the user, can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. <br>
-For example, you can provide a specialization of <code>json_type_traits</code> for a <code>book</code> class, and then transfer book objects or<br>
-standard library collections of book objects to and from <code>json</code> values.</p>
-
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
+<div class="highlight highlight-source-c++"><pre>
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Enable</span>=<span class="pl-k">void</span>&gt;
+<span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>
 {
-    std::string author;
-    std::string title;
-    <span class="pl-k">double</span> price;
-};
+    <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">false</span>;
 
-<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
-{
-    <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, book&gt;
+    <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp;)
     {
-        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+    <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
+
+    <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, T rhs);
+};</pre></div>
+
+<p>This class template is extensible, you as a user can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. </p>
+
+<p>You can, for example, extend <code>json_type_traits</code> to access and modify <code>json</code> structures with <code>boost::gregorian::date values</code>.</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
+{
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::gregorian::date&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-k">bool</span> is_assignable = <span class="pl-c1">true</span>;
+
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
         {
-            <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span>;
+            <span class="pl-k">if</span> (!val.<span class="pl-c1">is_string</span>())
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">try</span>
+            {
+                <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
+                <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+            }
+            <span class="pl-k">catch</span> (...)
+            {
+                <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+            }
         }
-        <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
+
+        <span class="pl-k">static</span> boost::gregorian::date <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; val)
         {
-            book val;
-            val.<span class="pl-smi">author</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
-            val.<span class="pl-smi">title</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
-            val.<span class="pl-smi">price</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;();
-            <span class="pl-k">return</span> val;
+            std::string s = val.<span class="pl-smi">template</span> as&lt;std::string&gt;();
+            <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
         }
-        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> book&amp; val)
+
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
         {
-            Json j;
-            j[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">author</span>;
-            j[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">title</span>;
-            j[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">price</span>;
-            <span class="pl-k">return</span> j;
+            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
         }
     };
+}</pre></div>
 
-};
-
-<span class="pl-k">int</span> <span class="pl-en">main</span>()
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">namespace</span> <span class="pl-en">my_ns</span>
 {
-    book book1{<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>, <span class="pl-c1">25.17</span>};
+    <span class="pl-k">using</span> jsoncons::json;
+    <span class="pl-k">using</span> boost::gregorian::date;
 
-    json j = book1;
+    json deal = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        "Maturity":"2014-10-14",</span>
+<span class="pl-s">        "ObservationDates": ["2014-02-14","2014-02-21"]</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; j.<span class="pl-smi">is</span>&lt;book&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].add(date(<span class="pl-c1">2014</span>,<span class="pl-c1">2</span>,<span class="pl-c1">28</span>));    
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    date maturity = deal[<span class="pl-s"><span class="pl-pds">"</span>Maturity<span class="pl-pds">"</span></span>].as&lt;date&gt;();
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Maturity: <span class="pl-pds">"</span></span> &lt;&lt; maturity &lt;&lt; std::endl &lt;&lt; std::endl;
 
-    book temp = j.<span class="pl-smi">as</span>&lt;book&gt;();
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; temp.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; temp.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> &lt;&lt; temp.<span class="pl-smi">price</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
 
-    book book2{<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Women: A Novel<span class="pl-pds">"</span></span>, <span class="pl-c1">12.0</span>};
-
-    std::vector&lt;book&gt; book_array{book1, book2};
-
-    json ja = book_array;
-
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; ja.<span class="pl-smi">is</span>&lt;std::vector&lt;book&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
-
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5)<span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
-    std::cout &lt;&lt; ja &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
-
-    <span class="pl-k">auto</span> book_list = ja.<span class="pl-smi">as</span>&lt;std::list&lt;book&gt;&gt;();
-
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
-    <span class="pl-k">for</span> (<span class="pl-k">auto</span> b : book_list)
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].elements())
     {
-        std::cout &lt;&lt; b.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> &lt;&lt; b.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> &lt;&lt; b.<span class="pl-smi">price</span> &lt;&lt; std::endl;
+        std::cout &lt;&lt; observation_date &lt;&lt; std::endl;
     }
+    std::cout &lt;&lt; std::endl;
 }</pre></div>
 
 <p>The output is</p>
 
-<pre><code>(1) true
+<pre><code>Maturity: 2014-Oct-14
 
-(2) {"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"}
+Observation dates:
 
-(3) Haruki Murakami,Kafka on the Shore,25.17
-
-(4) true
-
-(5)
-[{"author":"Haruki Murakami","price":25.17,"title":"Kafka on the Shore"},{"author":"Charles Bukowski","price":12.0,"title":"Women: A Novel"}]
-
-(6)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Women: A Novel, 12
+2014-Feb-14
+2014-Feb-21
+2014-Feb-28
 </code></pre>
 </body>
 </html>
