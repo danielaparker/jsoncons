@@ -275,7 +275,9 @@ Make `get_with_default` do the right thing for string literals.
 Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
 
     as<bool>
-Returns `false` if value is `false` or `null`, if value is a zero length string, or if value is a zero length array or object. Everything else returns `true`.
+Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
+Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
+Otherwise throws `std::runtime_exception`
 
     as<double>
 If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
@@ -304,7 +306,7 @@ Returns `json` value as an `std::vector<T>`.
     as<json::std::map<std::string,T>>()
 Returns `json` object value as an `std::map`.
 
-    bool as_bool() const noexcept
+    bool as_bool() const
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
