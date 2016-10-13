@@ -1169,7 +1169,7 @@ public:
         {
             return evaluate().template as<T>(allocator);
         }
-        bool as_bool() const JSONCONS_NOEXCEPT
+        bool as_bool() const
         {
             return evaluate().as_bool();
         }
@@ -2236,13 +2236,10 @@ public:
         return json_type_traits<json_type,T>::as(*this,allocator);
     }
 
-    bool as_bool() const JSONCONS_NOEXCEPT
+    bool as_bool() const 
     {
         switch (var_.type_id())
         {
-        case value_types::null_t:
-        case value_types::empty_object_t:
-            return false;
         case value_types::bool_t:
             return var_.bool_data_cast()->value();
         case value_types::double_t:
@@ -2251,16 +2248,8 @@ public:
             return var_.integer_data_cast()->value() != 0;
         case value_types::uinteger_t:
             return var_.uinteger_data_cast()->value() != 0;
-        case value_types::small_string_t:
-            return var_.small_string_data_cast()->length() != 0;
-        case value_types::string_t:
-            return var_.string_data_cast()->length() != 0;
-        case value_types::array_t:
-            return var_.array_data_cast()->value().size() != 0;
-        case value_types::object_t:
-            return var_.object_data_cast()->value().size() != 0;
         default:
-            return false;
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
         }
     }
 
