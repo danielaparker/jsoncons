@@ -2240,6 +2240,26 @@ public:
     {
         switch (var_.type_id())
         {
+        case value_types::small_string_t:
+            try
+            {
+                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
+                return j.as_bool();
+            }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
+            }
+        case value_types::string_t:
+            try
+            {
+                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                return j.as_bool();
+            }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
+            }
         case value_types::bool_t:
             return var_.bool_data_cast()->value();
         case value_types::double_t:
@@ -2258,14 +2278,24 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
+            try
             {
                 json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
                 return j.as<int64_t>();
             }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
+            }
         case value_types::string_t:
+            try
             {
                 json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
                 return j.as<int64_t>();
+            }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
             }
         case value_types::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
@@ -2285,14 +2315,24 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
+            try
             {
                 json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
                 return j.as<uint64_t>();
             }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
+            }
         case value_types::string_t:
+            try
             {
                 json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
                 return j.as<uint64_t>();
+            }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
             }
         case value_types::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
@@ -2323,14 +2363,24 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
+            try
             {
                 json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
                 return j.as<double>();
             }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
+            }
         case value_types::string_t:
+            try
             {
                 json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
                 return j.as<double>();
+            }
+            catch (...)
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
             }
         case value_types::double_t:
             return var_.double_data_cast()->value();

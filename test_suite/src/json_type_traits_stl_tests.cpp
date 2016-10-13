@@ -214,10 +214,10 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
 
     std::forward_list<int64_t>a_flist {12345678909876, 23456789098765, 34567890987654, 45678909876543};
     json j_flist(a_flist);
-    BOOST_CHECK_EQUAL(statia_cast<int64_t>(12345678909876), j_flist[0].as<int64_t>());
-    BOOST_CHECK_EQUAL(statia_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
-    BOOST_CHECK_EQUAL(statia_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
-    BOOST_CHECK_EQUAL(statia_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
+    BOOST_CHECK_EQUAL(static_cast<int64_t>(12345678909876), j_flist[0].as<int64_t>());
+    BOOST_CHECK_EQUAL(static_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
+    BOOST_CHECK_EQUAL(static_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
+    BOOST_CHECK_EQUAL(static_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
 /*
     std::array<unsigned long, 4> a_array {{1, 2, 3, 4}};
     json j_array(a_array);
