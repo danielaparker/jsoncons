@@ -8,13 +8,11 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [Basics](Basics)
 
-[Unicode support](Unicode%20support)
-
 [Arrays](Arrays)
 
-[Introspection](Introspection)
-
 [Type Extensibility](Type%20Extensibility)
+
+[Unicode support](Unicode%20support)
 
 [Transforming JSON with filters](Transforming%20JSON%20with%20filters)
 
