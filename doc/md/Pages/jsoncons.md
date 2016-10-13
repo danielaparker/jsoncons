@@ -180,14 +180,27 @@ Or, use an array initializer-list:
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
 
-The `operator[]` provides another way for setting name-value pairs:
+The `operator[]` provides another way for setting name-value pairs.
 ```c++
 json file_export;
-file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces);
-file_export["File Format Options"]["Image Formats"] = std::move(image_formats);
+file_export["File Format Options"]["Color Spaces"] = 
+    std::move(color_spaces);
+file_export["File Format Options"]["Image Formats"] = 
+    std::move(image_formats);
 file_export["File Settings"] = std::move(file_settings);
 file_export["Image Sizing"] = std::move(image_sizing);
 ```
+Note that if 
+```c++
+file_export["File Format Options"]
+```
+doesn't exist, 
+```c++
+file_export["File Format Options"]["Color Spaces"] = 
+    std::move(color_spaces)
+```
+creates `"File Format Options"` as an object and puts `"Color Spaces"` in it.
+
 Serializing
 ```c++
 std::cout << pretty_print(file_export) << std::endl;
