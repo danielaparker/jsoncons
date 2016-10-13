@@ -184,78 +184,78 @@ BOOST_AUTO_TEST_CASE(test_as_map2)
 
 BOOST_AUTO_TEST_CASE(test_from_stl_container)
 {
-    std::vector<int> c_vector {1, 2, 3, 4};
-    json j_vec(c_vector);
+    std::vector<int> cpp_vector{1, 2, 3, 4};
+    json j_vec(cpp_vector);
     BOOST_CHECK_EQUAL(1, j_vec[0].as<int>());
     BOOST_CHECK_EQUAL(2, j_vec[1].as<int>());
     BOOST_CHECK_EQUAL(3, j_vec[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_vec[3].as<int>());
 
-    std::vector<unsigned long> c_vector2 {1ul, 2ul, 3ul, 4ul};
-    json j_vec2(c_vector2);
+    std::vector<unsigned long> cpp_vector2{1ul, 2ul, 3ul, 4ul};
+    json j_vec2(cpp_vector2);
     BOOST_CHECK_EQUAL(1, j_vec2[0].as<int>());
     BOOST_CHECK_EQUAL(2, j_vec2[1].as<int>());
     BOOST_CHECK_EQUAL(3, j_vec2[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_vec2[3].as<int>());
 
-    std::deque<double> c_deque {1.2, 2.3, 3.4, 5.6};
-    json j_deque(c_deque);
-    BOOST_CHECK_EQUAL(1.2, j_deque[0].as<double>());
-    BOOST_CHECK_EQUAL(2.3, j_deque[1].as<double>());
-    BOOST_CHECK_EQUAL(3.4, j_deque[2].as<double>());
-    BOOST_CHECK_EQUAL(5.6, j_deque[3].as<double>());
+    std::deque<double> cpp_deque{1.123, 2.234, 3.456, 4.567};
+    json j_deque(cpp_deque);
+    BOOST_CHECK_EQUAL(1.123, j_deque[0].as<double>());
+    BOOST_CHECK_EQUAL(2.234, j_deque[1].as<double>());
+    BOOST_CHECK_EQUAL(3.456, j_deque[2].as<double>());
+    BOOST_CHECK_EQUAL(4.567, j_deque[3].as<double>());
 
-    std::list<bool> c_list {true, true, false, true};
-    json j_list(c_list);
+    std::list<bool> cpp_list{true, true, false, true};
+    json j_list(cpp_list);
     BOOST_CHECK_EQUAL(true, j_list[0].as<bool>());
     BOOST_CHECK_EQUAL(true, j_list[1].as<bool>());
     BOOST_CHECK_EQUAL(false, j_list[2].as<bool>());
     BOOST_CHECK_EQUAL(true, j_list[3].as<bool>());
 
-    std::forward_list<int64_t> c_flist {12345678909876, 23456789098765, 34567890987654, 45678909876543};
-    json j_flist(c_flist);
-    BOOST_CHECK_EQUAL(static_cast<int64_t>(12345678909876), j_flist[0].as<int64_t>());
-    BOOST_CHECK_EQUAL(static_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
-    BOOST_CHECK_EQUAL(static_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
-    BOOST_CHECK_EQUAL(static_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
+    std::forward_list<int64_t>cpp_flist {12345678909876, 23456789098765, 34567890987654, 45678909876543};
+    json j_flist(cpp_flist);
+    BOOST_CHECK_EQUAL(staticpp_cast<int64_t>(12345678909876), j_flist[0].as<int64_t>());
+    BOOST_CHECK_EQUAL(staticpp_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
+    BOOST_CHECK_EQUAL(staticpp_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
+    BOOST_CHECK_EQUAL(staticpp_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
 /*
-    std::array<unsigned long, 4> c_array {{1, 2, 3, 4}};
-    json j_array(c_array);
+    std::array<unsigned long, 4> cpp_array {{1, 2, 3, 4}};
+    json j_array(cpp_array);
     BOOST_CHECK_EQUAL(1, j_array[0].as<int>());
     BOOST_CHECK_EQUAL(2, j_array[1].as<int>());
     BOOST_CHECK_EQUAL(3, j_array[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_array[3].as<int>());
 */
-    std::set<std::string> c_set {"one", "two", "three", "four", "one"};
-    json j_set(c_set); // only one entry for "one" is used
+    std::set<std::string> cpp_set{"one", "two", "three", "four", "one"};
+    json j_set(cpp_set); // only one entry for "one" is used
     // ["four", "one", "three", "two"]
 
-    std::unordered_set<std::string> c_uset {"one", "two", "three", "four", "one"};
-    json j_uset(c_uset); // only one entry for "one" is used
+    std::unordered_set<std::string> cpp_uset{"one", "two", "three", "four", "one"};
+    json j_uset(cpp_uset); // only one entry for "one" is used
     // maybe ["two", "three", "four", "one"]
 
-    std::multiset<std::string> c_mset {"one", "two", "one", "four"};
-    json j_mset(c_mset); // only one entry for "one" is used
+    std::multiset<std::string> cpp_mset{"one", "two", "one", "four"};
+    json j_mset(cpp_mset); // only one entry for "one" is used
     // maybe ["one", "two", "four"]
 
-    std::unordered_multiset<std::string> c_umset {"one", "two", "one", "four"};
-    json j_umset(c_umset); // both entries for "one" are used
+    std::unordered_multiset<std::string> cpp_umset {"one", "two", "one", "four"};
+    json j_umset(cpp_umset); // both entries for "one" are used
     // maybe ["one", "two", "one", "four"]
 
-    std::map<std::string, int> c_map { {"one", 1}, {"two", 2}, {"three", 3} };
-    json j_map(c_map);
+    std::map<std::string, int> cpp_map{ {"one", 1}, {"two", 2}, {"three", 3} };
+    json j_map(cpp_map);
     BOOST_CHECK_EQUAL(1, j_map["one"].as<int>());
     BOOST_CHECK_EQUAL(2, j_map["two"].as<int>());
     BOOST_CHECK_EQUAL(3, j_map["three"].as<int>());
 
-    std::unordered_map<const char*, double> c_umap { {"one", 1.2}, {"two", 2.3}, {"three", 3.4} };
-    json j_umap(c_umap);
+    std::unordered_map<const char*, double> cpp_umap{ {"one", 1.2}, {"two", 2.3}, {"three", 3.4} };
+    json j_umap(cpp_umap);
     BOOST_CHECK_EQUAL(1.2, j_umap["one"].as<double>());
     BOOST_CHECK_EQUAL(2.3, j_umap["two"].as<double>());
     BOOST_CHECK_EQUAL(3.4, j_umap["three"].as<double>());
 
-    std::multimap<std::string, bool> c_mmap { {"one", true}, {"two", true}, {"three", false}, {"three", true} };
-    json j_mmap(c_mmap); // one entry for key "three"
+    std::multimap<std::string, bool> cpp_mmap{ {"one", true}, {"two", true}, {"three", false}, {"three", true} };
+    json j_mmap(cpp_mmap); // one entry for key "three"
     BOOST_CHECK_EQUAL(true, j_mmap.find("one")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_mmap.find("two")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_mmap.find("three")->value().as<bool>());
@@ -268,8 +268,8 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     //    std::cout << m.name() << ", " << m.value() << std::endl;
     //}
 
-    std::unordered_multimap<std::string, bool> c_ummap { {"one", true}, {"two", true}, /*{"three", false},*/ {"three", true} };
-    json j_ummap(c_ummap); // two entries for key "three"
+    std::unordered_multimap<std::string, bool> cpp_ummap { {"one", true}, {"two", true}, /*{"three", false},*/ {"three", true} };
+    json j_ummap(cpp_ummap); // two entries for key "three"
     BOOST_CHECK_EQUAL(true, j_ummap.find("one")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_ummap.find("two")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_ummap.find("three")->value().as<bool>());

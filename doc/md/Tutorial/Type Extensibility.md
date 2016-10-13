@@ -231,7 +231,7 @@ Observation dates:
 
 namespace jsoncons 
 {
-        static bool is(const Json& val) JSONCONS_NOEXCEPT
+        static bool is(const Json& val) noexcept
         {
             if (!val.is_array())
             {

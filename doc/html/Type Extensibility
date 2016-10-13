@@ -695,7 +695,7 @@ Observation dates:
 
 <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
 {
-        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) JSONCONS_NOEXCEPT
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
         {
             <span class="pl-k">if</span> (!val.<span class="pl-c1">is_array</span>())
             {
