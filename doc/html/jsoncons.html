@@ -658,11 +658,7 @@ file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<
 file_export[<span class="pl-s"><span class="pl-pds">"</span>File Settings<span class="pl-pds">"</span></span>] = std::move(file_settings);
 file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);</pre></div>
 
-<p>Note that if </p>
-
-<div class="highlight highlight-source-c++"><pre>file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>]</pre></div>
-
-<p>doesn't exist, </p>
+<p>Note that if <code>file_export["File Format Options"]</code> doesn't exist, </p>
 
 <div class="highlight highlight-source-c++"><pre>file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = 
     <span class="pl-en">std::move</span>(color_spaces)</pre></div>
