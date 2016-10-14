@@ -83,7 +83,7 @@ The library includes four instantiations of `basic_json`:
 
 ## Features
 
-# Convert from and to standard library containers
+### Convert from and to standard library containers
 
 ```c++
 std::vector<int> v = {1,2,3,4};
@@ -91,7 +91,7 @@ json j(v);
 std::deque<int> d = j.as<std::deque<int>();
 ```
 
-# Convert from and to user defined types (and standard library containers of user defined types)
+### Convert from and to user defined types (and standard library containers of user defined types)
 
 ```c++
 struct book
@@ -121,9 +121,6 @@ std::list<book> l = j.as<std::list<book>>();
 ```
 
 See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
-
-# Convert from and to standard library containers
-
 
 ## Acknowledgements
 
