@@ -165,7 +165,7 @@ namespace jsoncons
     template<class Json>
     struct json_type_traits<Json, book>
     {
-        // Implement static functions `is`, `as` and `to_json` 
+        // Implement static functions is, as and to_json 
     };
 }        
 
