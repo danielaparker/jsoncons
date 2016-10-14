@@ -1,224 +1,448 @@
-```c++
-    #include "jsoncons/json.hpp"
+## Examples
 
-    using jsoncons::json;
-    using jsoncons::pretty_print;
+The examples below illustrate the use of the [json](https://github.com/danielaparker/jsoncons/wiki/json) class and [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) function.
+
+### json construction
+
+```c++
+#include "jsoncons/json.hpp"
+
+// For convenience
+using jsoncons::json;
+
+// Construct a book object
+json book1;
+
+book1["category"] = "Fiction";
+book1["title"] = "A Wild Sheep Chase: A Novel";
+book1["author"] = "Haruki Murakami";
+book1["date"] = "2002-04-09";
+book1["price"] = 9.01;
+book1["isbn"] = "037571894X";  
+
+// Construct another using the set function
+json book2;
+
+book2.set("category", "History");
+book2.set("title", "Charlie Wilson's War");
+book2.set("author", "George Crile");
+book2.set("date", "2007-11-06");
+book2.set("price", 10.50);
+book2.set("isbn", "0802143415");  
+
+// Use set again, but more efficiently
+json book3;
+
+// Reserve memory, to avoid reallocations
+book3.reserve(6);
+
+// Insert in name alphabetical order
+// Give set a hint where to insert the next member
+auto hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+hint = book3.set(hint, "category", "Fiction");
+hint = book3.set(hint, "date", "2006-01-03");
+hint = book3.set(hint, "isbn", "1400079276");  
+hint = book3.set(hint, "price", 13.45);
+hint = book3.set(hint, "title", "Kafka on the Shore");
+
+// Construct a fourth from a string
+json book4 = json::parse(R"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
+
+// Construct a booklist array
+
+json booklist = json::array();
+
+// For efficiency, reserve memory, to avoid reallocations
+booklist.reserve(4);
+
+// For efficency, tell jsoncons to move the contents 
+// of the four book objects into the array
+booklist.add(std::move(book1));    
+booklist.add(std::move(book2));    
+
+// Add the third book to the front
+auto pos = booklist.add(booklist.elements().begin(),std::move(book3));
+
+// and the last one immediately after
+booklist.add(pos+1,std::move(book4));    
+
+// See what's left of book1, 2, 3 and 4 (expect nulls)
+std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
+
+
+++
+//Loop through the booklist elements using a range-based for loop    
+for (const auto& book : booklist.elements())
+{
+    std::cout << book["title"].as<std::string>()
+              << ","
+              << book["price"].as<double>() << std::endl;
+}
+
+// The second book
+json& book = booklist[1];
+
+//Loop through the book's name-value pairs using a range-based for loop    
+for (const auto& member : book.members())
+{
+    std::cout << member.name()
+              << ","
+              << member.value() << std::endl;
+}
+
+auto it = book.find("author");
+if (it != book.members().end())
+{
+    // member "author" found
+}
+
+if (book.count("author") > 0)
+{
+    // book has a member "author"
+}
+
+book.get("author", "author unknown").as<std::string>();
+// Returns author if found, otherwise "author unknown"
+
+try
+{
+    book["ratings"].as<std::string>();
+}
+catch (const std::out_of_range& e)
+{
+    // member "ratings" not found
+}
+
+// Add ratings
+book["ratings"]["*****"] = 4;
+book["ratings"]["*"] = 2;
+
+// Delete one-star ratings
+book["ratings"].erase("*");
+
 ```
-## Constructing a json value
+```c++  
+    // Serialize the booklist to a file
+    std::ofstream os("booklist.json");
+    os << pretty_print(booklist);
+```
 
-### From a string
-```c++
-    std::string input = R"(
+The JSON output `booklist.json`
+```json
+[
     {
-        "first_name":"Jane",
-        "last_name":"Roe",
-        "events_attended":10
-    }
-    )";
-
-    json val = json::parse(input);
-
-    std::cout << val << std::endl;
-```
-The output is
-```json
-    {"events_attended":10,"first_name":"Jane","last_name":"Roe"}
-```
-Note that on output, object members are sorted alphabetically by name.
-
-### From a file
-
-The input file is
-```json
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2006-01-03",
+        "isbn":"1400079276",
+        "price":13.45,
+        "title":"Kafka on the Shore"
+    },
     {
-        // Members
-        "members" : [
-            {
-                "first_name":"Jane",
-                "last_name":"Roe",
-                "events_attended":10,
-                "accept_waiver_of_liability" : true
-            },
-            {
-                 "first_name":"John",
-                 "last_name":"Doe",
-                 "events_attended":2,
-                 "accept_waiver_of_liability" : true
-             }
-        ]
-    }
-```
-`members.json`
-```c++
-    json val = json::parse_file("members.json");
-
-    std::cout << pretty_print(val) << std::endl;
-```
-The output is
-```json
-    {
-        "members":
-        [
-            {
-                "accept_waiver_of_liability":true,
-                "events_attended":10,
-                "first_name":"Jane",
-                "last_name":"Roe"
-            },
-            {
-                "accept_waiver_of_liability":true,
-                "events_attended":2,
-                "first_name":"John",
-                "last_name":"Doe"
-            }
-        ]
-    }
-```
-Note that the parser accepts and ignores the single line comment that starts with the marker `//`.
-
-### With code
-```c++
-    // A boolean value
-    json flag(true);
-
-    // A numeric value
-    json number(10.5);
-
-    // An object value with four members
-    json obj;
-    obj["first_name"] = "Jane";
-    obj["last_name"] = "Roe";
-    obj["events_attended"] = 10;
-    obj["accept_waiver_of_liability"] = true;
-
-    // An array value with four elements
-    json arr = json::array();
-    arr.add(json::null());
-    arr.add(flag);
-    arr.add(number);
-    arr.add(obj);
-
-    std::cout << pretty_print(arr) << std::endl;
-```
-The output is
-```json
-    [null,true,10.5,
+        "author":"Charles Bukowski",
+        "category":"Fiction",
+        "date":"2004-07-08",
+        "isbn":"1852272007",
+        "price":22.48,
+        "ratings":
         {
-            "accept_waiver_of_liability":true,
-            "events_attended":10,
-            "first_name":"Jane",
-            "last_name":"Roe"
-        }
-    ]
+            "*****":4
+        },
+        "title":"Pulp"
+    },
+    {
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2002-04-09",
+        "isbn":"037571894X",
+        "price":9.01,
+        "title":"A Wild Sheep Chase: A Novel"
+    },
+    {
+        "author":"George Crile",
+        "category":"History",
+        "date":"2007-11-06",
+        "isbn":"0802143415",
+        "price":10.5,
+        "title":"Charlie Wilson's War"
+    }
+]
 ```
-### From containers such as std::vector or std::list
+### json query
+
 ```c++
-    std::vector<int> vec;
-    vec.push_back(10);
-    vec.push_back(20);
-    vec.push_back(30);
+#include <fstream>
+#include "jsoncons/json.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
 
-    json val1(vec.begin(), vec.end());
-    std::cout << val1 << std::endl;
+// For convenience
+using jsoncons::json;
+using jsoncons::jsonpath::json_query;
 
-    std::list<double> list;
-    list.push_back(10.5);
-    list.push_back(20.5);
-    list.push_back(30.5);
+// Deserialize the booklist
+std::ifstream is("booklist.json");
+json booklist;
+is >> booklist;
 
-    json val2(list.begin(), list.end());
-    std::cout << val2 << std::endl;
+// Use a JsonPath expression to find 
+//  
+// (1) The authors of books that cost less than $12
+json result = json_query(booklist, "$[*][?(@.price < 12)].author");
+std::cout << result << std::endl;
+
+// (2) The number of books
+result = json_query(booklist, "$.length");
+std::cout << result << std::endl;
+
+// (3) The third book
+result = json_query(booklist, "$[2]");
+std::cout << std::endl << pretty_print(result) << std::endl;
+
+// (4) The authors of books that were published in 2004
+result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
+std::cout << result << std::endl;
+
+// (5) The titles of all books that have ratings
+result = json_query(booklist, "$[*][?(@.ratings)].title");
+std::cout << result << std::endl;
+
+// (6) All authors and titles of books
+result = json_query(booklist, "$..['author','title']");
+std::cout << pretty_print(result) << std::endl;
 ```
-The output is 
+Result:
 ```json
-    [10,20,30]
-    [10.5,20.5,30.5]
-```
-## Accessing object members and array elements
-
-### Accessing object members
-```c++
-    json obj;
-    obj["first_name"] = "Jane";
-    obj["last_name"] = "Roe";
-    obj["events_attended"] = 10;
-    obj["accept_waiver_of_liability"] = true;
-
-    std::string first_name = obj["first_name"].as<std::string>();
-    std::string last_name = obj.at("last_name").as<std::string>();
-    int events_attended = obj["events_attended"].as<int>();
-    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
-
-    std::cout << first_name << " " << last_name << ", " << events_attended 
-              << ", " << accept_waiver_of_liability << std::endl;
-```
-The output is
-```
-    Jane Roe, 10, 1
-```
-### Missing values and defaults
-```c++
-    json obj;
-    obj["first_name"] = "Jane";
-    obj["last_name"] = "Roe";
-
-    try
+(1) ["Haruki Murakami","George Crile"]
+(2) [4]
+(3)
+[
     {
-        std::string experience = obj["outdoor_experience"].as<std::string>();
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2002-04-09",
+        "isbn":"037571894X",
+        "price":9.01,
+        "title":"A Wild Sheep Chase: A Novel"
     }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
-
-    bool first_aid_certification = obj.get_with_default("first_aid_certification",false);
-
-    std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
+]
+(4) ["Charles Bukowski"]
+(5) ["Pulp"]
+(6) 
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
 ```
-The output is
-```
-    Member outdoor_experience not found.
-    experience=, first_aid_certification=0
-```
-### Iterating over the members of an object
+## Once again, this time with wide characters
+
+### wjson construction
+
 ```c++
-    json obj;
-    obj["first_name"] = "Jane";
-    obj["last_name"] = "Roe";
-    obj["events_attended"] = 10;
-    obj["accept_waiver_of_liability"] = true;
+#include "jsoncons/json.hpp"
 
-    for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
-    {
-        std::cout << "name=" << it->name() << ", value=" << it->value().as<std::string>() << std::endl;
-    }
+// For convenience
+using jsoncons::wjson;
+
+// Construct a book object
+wjson book1;
+
+book1[L"category"] = L"Fiction";
+book1[L"title"] = L"A Wild Sheep Chase: A Novel";
+book1[L"author"] = L"Haruki Murakami";
+book1[L"date"] = L"2002-04-09";
+book1[L"price"] = 9.01;
+book1[L"isbn"] = L"037571894X";
+
+// Construct another using the set function
+wjson book2;
+
+book2.set(L"category", L"History");
+book2.set(L"title", L"Charlie Wilson's War");
+book2.set(L"author", L"George Crile");
+book2.set(L"date", L"2007-11-06");
+book2.set(L"price", 10.50);
+book2.set(L"isbn", L"0802143415");
+
+// Use set again, but more efficiently
+wjson book3;
+
+// Reserve memory, to avoid reallocations
+book3.reserve(6);
+
+// Insert in name alphabetical order
+// Give set a hint where to insert the next member
+auto hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+hint = book3.set(hint, L"category", L"Fiction");
+hint = book3.set(hint, L"date", L"2006-01-03");
+hint = book3.set(hint, L"isbn", L"1400079276");
+hint = book3.set(hint, L"price", 13.45);
+hint = book3.set(hint, L"title", L"Kafka on the Shore");
+
+// Construct a fourth from a string
+wjson book4 = wjson::parse(LR"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
+
+// Construct a booklist array
+
+wjson booklist = wjson::array();
+
+// For efficiency, reserve memory, to avoid reallocations
+booklist.reserve(4);
+
+// For efficency, tell jsoncons to move the contents 
+// of the four book objects into the array
+booklist.add(std::move(book1));
+booklist.add(std::move(book2));
+
+// Add the third book to the front
+auto pos = booklist.add(booklist.elements().begin(),std::move(book3));
+
+// and the last one immediately after
+booklist.add(pos+1,std::move(book4));    
+
+// See what's left of book1, 2, 3 and 4 (expect nulls)
+std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
+
+++
+//Loop through the booklist elements using a range-based for loop    
+for (const auto& book : booklist.elements())
+{
+    std::wcout << book[L"title"].as<std::wstring>()
+               << L","
+               << book[L"price"].as<double>() << std::endl;
+}
+
+// The second book
+wjson& book = booklist[1];
+
+//Loop through the book's name-value pairs using a range-based for loop    
+for (const auto& member : book.members())
+{
+    std::wcout << member.name()
+               << L","
+               << member.value() << std::endl;
+}
+
+auto it = book.find(L"author");
+if (it != book.members().end())
+{
+    // member "author" found
+}
+
+if (book.count(L"author") > 0)
+{
+    // book has a member "author"
+}
+
+book.get(L"author", L"author unknown").as<std::wstring>();
+// Returns author if found, otherwise "author unknown"
+
+try
+{
+    book[L"ratings"].as<std::wstring>();
+}
+catch (const std::out_of_range& e)
+{
+    // member "ratings" not found
+}
+
+// Add ratings
+book[L"ratings"][L"*****"] = 4;
+book[L"ratings"][L"*"] = 2;
+
+// Delete one-star ratings
+book[L"ratings"].erase(L"*");
+
 ```
-The output is
-```
-    name=accept_waiver_of_liability, value=true
-    name=events_attended, value=10
-    name=first_name, value=Jane
-    name=last_name, value=Roe
-```
-### Iterating over the elements of an array
 ```c++
-    json arr = json::array();
-    arr.add("Montreal");
-    arr.add("Toronto");
-    arr.add("Ottawa");
-    arr.add("Vancouver");
+// Serialize the booklist to a file
+std::wofstream os("booklist2.json");
+os << pretty_print(booklist);
+```
+### wjson query
 
-    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
+```c++
+// Deserialize the booklist
+std::wifstream is("booklist2.json");
+wjson booklist;
+is >> booklist;
+
+// Use a JsonPath expression to find 
+//  
+// (1) The authors of books that cost less than $12
+wjson result = json_query(booklist, L"$[*][?(@.price < 12)].author");
+std::wcout << result << std::endl;
+
+// (2) The number of books
+result = json_query(booklist, L"$.length");
+std::wcout << result << std::endl;
+
+// (3) The third book
+result = json_query(booklist, L"$[2]");
+std::wcout << pretty_print(result) << std::endl;
+
+// (4) The authors of books that were published in 2004
+result = json_query(booklist, L"$[*][?(@.date =~ /2004.*?/)].author");
+std::wcout << result << std::endl;
+
+// (5) The titles of all books that have ratings
+result = json_query(booklist, L"$[*][?(@.ratings)].title");
+std::wcout << result << std::endl;
+
+// (6) All authors and titles of books
+result = json_query(booklist, L"$..['author','title']");
+std::wcout << pretty_print(result) << std::endl;
+```
+Result:
+```json
+(1) ["Haruki Murakami","George Crile"]
+(2) [4]
+(3)
+[
     {
-        std::cout << it->as<std::string>() << std::endl;
+        "author":"Haruki Murakami",
+        "category":"Fiction",
+        "date":"2002-04-09",
+        "isbn":"037571894X",
+        "price":9.01,
+        "title":"A Wild Sheep Chase: A Novel"
     }
+]
+(4) ["Charles Bukowski"]
+(5) ["Pulp"]
+(6) 
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
 ```
-The output is
-```
-    Montreal
-    Toronto
-    Ottawa
-    Vancouver
-```
+
