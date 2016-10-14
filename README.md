@@ -83,6 +83,32 @@ The library includes four instantiations of `basic_json`:
 
 ## Features
 
+### Construct a json value
+
+```c++
+json image_sizing; // empty object
+
+image_sizing["Resize To Fit"] = true; // a boolean 
+image_sizing["Resize Unit"] = "pixels"; // a string
+image_sizing["Resize What"] = "long_edge"; // a string
+image_sizing["Dimension 1"] = 9.84; // a double
+image_sizing["Dimension 2"] = json::null(); // a null value
+
+json color_spaces = json::array();
+
+color_spaces.add("sRGB");
+color_spaces.add("AdobeRGB");
+color_spaces.add("ProPhoto RGB");
+
+json file_export;
+file_export["File Format Options"]["Color Spaces"] = 
+    std::move(color_spaces);
+file_export["File Format Options"]["Image Formats"] = 
+    std::move(image_formats);
+```
+
+See [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
+
 ### Use range-based for loops for arrays
 
 ```c++
