@@ -60,8 +60,8 @@ The output is
 ### Making an array of size 10 initialized with zeros
 
     json a = json::make_array<1>(10,0);
-	a[1] = 1;
-	a[2] = 2;
+        a[1] = 1;
+        a[2] = 2;
     std::cout << pretty_print(a) << std::endl;
 
 The output is
@@ -73,7 +73,7 @@ The output is
     json a = json::make_array<2>(3,4,0);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
-	a[0][2] = "25-d-MS";
+        a[0][2] = "25-d-MS";
     a[0][3] = "25-d-RR";
     a[1][0] = "1Y";
     a[1][1] = 0.20;
@@ -98,7 +98,7 @@ The output is
 
     json a = json::make_array<3>(4,3,2,0);
     a[0][2][0] = 2;
-	a[0][2][1] = 3;
+    a[0][2][1] = 3;
     std::cout << pretty_print(a) << std::endl;
 
 The output is

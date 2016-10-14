@@ -2,7 +2,7 @@
 
 jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. 
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
 
 The [code repository](https://github.com/danielaparker/jsoncons) and [releases](https://github.com/danielaparker/jsoncons/releases) are on github. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
 
@@ -46,7 +46,7 @@ The jsoncons library is header-only: it consists solely of header files containi
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
+For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). Consult the [wiki](https://github.com/danielaparker/jsoncons/wiki) for the latest documentation, tutorials and roadmap. 
 
 ## Building the test suite and examples with CMake
 
@@ -107,7 +107,7 @@ file_export["File Format Options"]["Image Formats"] =
     std::move(image_formats);
 ```
 
-See [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
+See [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
 ### Use range-based for loops for arrays
 
@@ -135,6 +135,14 @@ for (const auto& member : book.members())
               << member.value() << std::endl;
 }
 ```
+
+### Construct multi-dimensional json arrays
+```c++
+    json j = json::make_array<3>(4,3,2,0.0);
+    j[0][2][0] = 2.1;
+    j[0][2][1] = 3.1;
+```
+See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
 
 ### Convert from and to standard library containers
 
