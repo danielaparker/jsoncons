@@ -83,6 +83,33 @@ The library includes four instantiations of `basic_json`:
 
 ## Features
 
+### Use range-based for loops for arrays
+
+```c++
+json j = json::array{1,2,3,4};
+
+for (auto element : book.elements())
+{
+    std::cout << element << std::endl;
+}
+```
+
+### Use range-based for loops for objects
+
+```c++
+json book = json::object{
+    {"author", "Haruki Murakami"},
+    {"title", "Kafka on the Shore"},
+    {"price", 25.17}
+};
+
+for (const auto& member : book.members())
+{
+    std::cout << member.name() << "=" 
+              << member.value() << std::endl;
+}
+```
+
 ### Convert from and to standard library containers
 
 ```c++
