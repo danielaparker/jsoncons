@@ -563,25 +563,23 @@ vertical-align:1px;
 
 <h3>Construct a json value</h3>
 
-<div class="highlight highlight-source-c++"><pre>json image_sizing; <span class="pl-c">// empty object</span>
+<div class="highlight highlight-source-c++"><pre>
+json color_spaces = json::array();
+color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
+color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
+color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
 
+json image_sizing; <span class="pl-c">// empty object</span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>; <span class="pl-c">// a boolean </span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>; <span class="pl-c">// a double</span>
 image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>] = json::null(); <span class="pl-c">// a null value</span>
 
-json color_spaces = json::array();
-
-color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
-color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
-color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
-
 json file_export;
 file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = 
     <span class="pl-en">std::move</span>(color_spaces);
-file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Image Formats<span class="pl-pds">"</span></span>] = 
-    <span class="pl-en">std::move</span>(image_formats);</pre></div>
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);</pre></div>
 
 <p>See <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 
