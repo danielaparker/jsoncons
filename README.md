@@ -183,6 +183,25 @@ std::cout << pretty_print(result) << std::endl;
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
+### Read a csv file as a json value
+
+```c++
+std::fstream is("tasks.csv");
+
+json_deserializer handler;
+
+csv_parameters params;
+params.assume_header(true)
+      .trim(true)
+      .ignore_empty_values(true)
+      .column_types({"integer","string","string","string"});
+
+csv_reader reader(is,handler,params);
+reader.read();
+json val = handler.get_result();
+```
+See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) for details
+
 ## Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
