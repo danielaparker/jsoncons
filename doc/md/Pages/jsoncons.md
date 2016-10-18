@@ -688,9 +688,9 @@ namespace jsoncons
         static book as(const Json& rhs)
         {
             book val;
-            val.author = rhs["author"].as<std::string>();
-            val.title = rhs["title"].as<std::string>();
-            val.price = rhs["price"].as<double>();
+            val.author = rhs["author"]. template as<std::string>();
+            val.title = rhs["title"]. template as<std::string>();
+            val.price = rhs["price"]. template as<double>();
             return val;
         }
         static Json to_json(const book& val)
