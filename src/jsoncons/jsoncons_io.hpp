@@ -359,7 +359,7 @@ public:
 #endif
 
 // string_to_float only requires narrow char
-#if defined(_MSC_VER2)
+#if defined(_MSC_VER)
 class float_reader
 {
 private:
