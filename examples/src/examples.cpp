@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 #include "jsoncons/json.hpp"
-#include "csv_examples.h"
 
 using jsoncons::json;
 using jsoncons::json_deserializer;
@@ -13,12 +12,13 @@ using jsoncons::pretty_print;
 using jsoncons::output_format;
 using std::string;
 
-void run_readme_examples();
+void basics_examples();
 void array_examples();
 void container_examples();
 void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
+void csv_examples();
 
 void first_example_a()
 {
@@ -273,7 +273,7 @@ int main()
 {
     try
     {
-        run_readme_examples();
+        basics_examples();
         first_example_a();
         first_example_b();
         first_example_c();
@@ -284,8 +284,7 @@ int main()
         array_examples();
         container_examples();
 
-        read_csv_file();
-        write_csv_file();
+        csv_examples();
 
         more_examples();
         mulitple_json_objects();

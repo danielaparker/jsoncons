@@ -57,13 +57,9 @@ void read_csv_file2()
     std::cout << pretty_print(val) << std::endl;
 }
 
-void read_csv_file()
+void csv_examples()
 {
     read_csv_file1();
     read_csv_file2();
-}
-
-void write_csv_file()
-{
 }
 

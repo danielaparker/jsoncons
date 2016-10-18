@@ -9,9 +9,7 @@ using jsoncons::json;
 using jsoncons::wjson;
 using jsoncons::jsonpath::json_query;
 
-namespace readme_examples {
-
-void example1()
+void basics_json_example1()
 {
     // Construct a book object
     json book1;
@@ -134,7 +132,7 @@ void example1()
     os << pretty_print(booklist);
 }
 
-void example2()
+void basics_json_example2()
 {
     // Deserialize the booklist
     std::ifstream is("booklist.json");
@@ -164,7 +162,7 @@ void example2()
     std::cout << "(5) " << result << std::endl;
 }
 
-void example3()
+void basics_wjson_example1()
 {
     // Construct a book object
     wjson book1;
@@ -287,7 +285,7 @@ void example3()
     os << pretty_print(booklist);
 }
 
-void example4()
+void basics_wjson_example2()
 {
     // Deserialize the booklist
     std::wifstream is("booklist2.json");
@@ -317,13 +315,11 @@ void example4()
     std::wcout << L"(5) " << result << std::endl;
 }
 
-}
-
-void run_readme_examples()
+void basics_examples()
 {
-    readme_examples::example1();
-    readme_examples::example2();
-    readme_examples::example3();
-    readme_examples::example4();
+    basics_json_example1();
+    basics_json_example2();
+    basics_wjson_example1();
+    basics_wjson_example2();
 }
 
