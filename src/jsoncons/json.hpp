@@ -1782,7 +1782,7 @@ public:
     }
 
     basic_json(array&& other)
-        : var_(std::move(other))
+        : var_(std::forward<array&&>(other))
     {
     }
 
@@ -1792,7 +1792,7 @@ public:
     }
 
     basic_json(object&& other)
-        : var_(std::move(other))
+        : var_(std::forward<object&&>(other))
     {
     }
 
@@ -2672,7 +2672,7 @@ public:
         {
         case value_types::empty_object_t:
             {
-                return json_type(std::forward<T>(default_val));
+                return json_type(std::forward<T&&>(default_val));
             }
         case value_types::object_t:
             {
@@ -2683,7 +2683,7 @@ public:
                 }
                 else
                 {
-                    return json_type(std::forward<T>(default_val));
+                    return json_type(std::forward<T&&>(default_val));
                 }
             }
         default:
