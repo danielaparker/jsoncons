@@ -496,7 +496,7 @@ template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<is_compatible_array_type<Json,T>::value>::type>
 {
-    typedef typename T::iterator::value_type element_type;
+    typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -539,7 +539,7 @@ template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<is_compatible_string_type<Json,T>::value>::type>
 {
-    typedef typename T::iterator::value_type element_type;
+    typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
