@@ -68,7 +68,7 @@ template<class Json, class T>
 struct is_compatible_string_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
     !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-    !is_incompatible<Json,typename T::iterator::value_type>::value
+    !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
 // is_compatible_array_type
@@ -79,7 +79,7 @@ template<class Json, class T>
 struct is_compatible_array_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
     std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
-    !is_incompatible<Json,typename T::iterator::value_type>::value
+    !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
 // is_compatible_object_type
@@ -592,7 +592,7 @@ struct json_type_traits<Json, T,
         val.reserve(rhs.size());
         for (auto p: rhs)
         {
-            val.set(p.first,p.second);
+            val.set(p.first, p.second);
         }
         return val;
     }

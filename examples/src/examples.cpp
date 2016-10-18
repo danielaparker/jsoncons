@@ -15,6 +15,7 @@ using std::string;
 
 void run_readme_examples();
 void array_examples();
+void container_examples();
 void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
@@ -281,6 +282,7 @@ int main()
         second_example_a();
 
         array_examples();
+        container_examples();
 
         read_csv_file();
         write_csv_file();

@@ -1219,9 +1219,9 @@ public:
             return *this;
         }
 
-        json_proxy& operator=(basic_json&& val)
+        json_proxy& operator=(basic_json&& value)
         {
-            parent_.evaluate_with_default().set(name_, std::move(val));
+            parent_.evaluate_with_default().set(name_, std::forward<basic_json&&>(value));
             return *this;
         }
 
@@ -1359,19 +1359,19 @@ public:
         void set(string_type&& name, const json_type& value)
 
         {
-            evaluate().set(std::move(name),value);
+            evaluate().set(std::forward<string_type&&>(name),value);
         }
 
         void set(const string_type& name, json_type&& value)
 
         {
-            evaluate().set(name,std::move(value));
+            evaluate().set(name,std::forward<json_type&&>(value));
         }
 
         void set(string_type&& name, json_type&& value)
 
         {
-            evaluate().set(std::move(name),std::move(value));
+            evaluate().set(std::forward<string_type&&>(name),std::forward<json_type&&>(value));
         }
 
         object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
@@ -1382,19 +1382,19 @@ public:
         object_iterator set(object_iterator hint, string_type&& name, const json_type& value)
 
         {
-            return evaluate().set(hint, std::move(name),value);
+            return evaluate().set(hint, std::forward<string_type&&>(name),value);
         }
 
         object_iterator set(object_iterator hint, const string_type& name, json_type&& value)
 
         {
-            return evaluate().set(hint, name,std::move(value));
+            return evaluate().set(hint, name,std::forward<json_type&&>(value));
         }
 
         object_iterator set(object_iterator hint, string_type&& name, json_type&& value)
 
         {
-            return evaluate().set(hint, std::move(name),std::move(value));
+            return evaluate().set(hint, std::forward<string_type&&>(name),std::forward<json_type&&>(value));
         }
 
         template <class T>
@@ -1405,7 +1405,7 @@ public:
 
         void add(json_type&& value)
         {
-            evaluate_with_default().add(std::move(value));
+            evaluate_with_default().add(std::forward<json_type&&>(value));
         }
 
         void add(const json_type& value)
@@ -1426,7 +1426,7 @@ public:
 
         array_iterator add(const_array_iterator pos, json_type&& value)
         {
-            return evaluate_with_default().add(pos, std::move(value));
+            return evaluate_with_default().add(pos, std::forward<json_type&&>(value));
         }
 
         string_type to_string(const string_allocator& allocator = string_allocator()) const JSONCONS_NOEXCEPT
@@ -1589,7 +1589,7 @@ public:
 
         void add(size_t index, json_type&& value)
         {
-            evaluate_with_default().add(index, std::move(value));
+            evaluate_with_default().add(index, std::forward<json_type&&>(value));
         }
 
         bool has_member(const string_type& name) const
@@ -2858,7 +2858,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(std::move(name),value);
+            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),value);
             break;
         default:
             {
@@ -2872,7 +2872,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(name,std::move(value));
+            var_.object_data_cast()->value().set(name,std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -2888,7 +2888,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(std::move(name),std::move(value));
+            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -2930,7 +2930,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::move(name),value);
+            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),value);
             break;
         default:
             {
@@ -2944,7 +2944,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, name,std::move(value));
+            return var_.object_data_cast()->value().set(hint, name,std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -2958,7 +2958,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::move(name),std::move(value));
+            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -2990,7 +2990,7 @@ public:
     void add(json_type&& value){
         switch (var_.type_id()){
         case value_types::array_t:
-            var_.array_data_cast()->value().push_back(std::move(value));
+            var_.array_data_cast()->value().push_back(std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -3022,7 +3022,7 @@ public:
     array_iterator add(const_array_iterator pos, json_type&& value){
         switch (var_.type_id()){
         case value_types::array_t:
-            return var_.array_data_cast()->value().add(pos, std::move(value));
+            return var_.array_data_cast()->value().add(pos, std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -3309,7 +3309,7 @@ public:
     void add(size_t index, json_type&& value){
         switch (var_.type_id()){
         case value_types::array_t:
-            var_.array_data_cast()->value().add(index, std::move(value));
+            var_.array_data_cast()->value().add(index, std::forward<json_type&&>(value));
             break;
         default:
             {

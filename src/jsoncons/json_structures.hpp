@@ -138,7 +138,7 @@ public:
 
     void push_back(Json&& value)
     {
-        elements_.push_back(std::move(value));
+        elements_.push_back(std::forward<Json&&>(value));
     }
 
     void add(size_t index, const Json& value)
@@ -150,7 +150,7 @@ public:
     void add(size_t index, Json&& value)
     {
         auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(it, std::move(value));
+        elements_.insert(it, std::forward<Json&&>(value));
     }
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
@@ -164,7 +164,7 @@ public:
     iterator add(const_iterator pos, Json&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.insert(it, std::move(value));
+        return elements_.insert(it, std::forward<Json&&>(value));
     }
 #else
     iterator add(const_iterator pos, const Json& value)
@@ -174,7 +174,7 @@ public:
 
     iterator add(const_iterator pos, Json&& value)
     {
-        return elements_.insert(pos, std::move(value));
+        return elements_.insert(pos, std::forward<Json&&>(value));
     }
 #endif
 
@@ -306,7 +306,7 @@ public:
     {
     }
     name_value_pair(string_type&& name)
-        : name_(std::move(name))
+        : name_(std::forward<string_type&&>(name))
     {
     }
 
@@ -315,15 +315,15 @@ public:
     {
     }
     name_value_pair(string_type&& name, const ValueT& val)
-        : name_(std::move(name)), value_(val)
+        : name_(std::forward<string_type&&>(name)), value_(val)
     {
     }
     name_value_pair(const string_type& name, ValueT&& val)
-        : name_(name), value_(std::move(val))
+        : name_(name), value_(std::forward<ValueT&&>(val))
     {
     }
     name_value_pair(string_type&& name, ValueT&& val)
-        : name_(std::move(name)), value_(std::move(val))
+        : name_(std::forward<string_type&&>(name)), value_(std::forward<ValueT&&>(val))
     {
     }
     name_value_pair(const name_value_pair& member)
@@ -357,7 +357,7 @@ public:
 
     void value(ValueT&& value)
     {
-        value_ = std::move(value);
+        value_ = std::forward<ValueT&&>(value);
     }
 
     void swap(name_value_pair& member)
@@ -681,15 +681,15 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s,length),std::move(value)));
+            members_.push_back(value_type(string_type(s,length),std::forward<Json&&>(value)));
         }
         else if (name_eq_string(it->name(),s,length))
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-            members_.insert(it,value_type(string_type(s,length),std::move(value)));
+            members_.insert(it,value_type(string_type(s,length),std::forward<Json&&>(value)));
         }
     }
 
@@ -698,7 +698,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), value));
+            members_.push_back(value_type(std::forward<string_type&&>(name), value));
         }
         else if (it->name() == name)
         {
@@ -706,7 +706,7 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(std::move(name),value));
+            members_.insert(it,value_type(std::forward<string_type&&>(name),value));
         }
     }
 
@@ -717,7 +717,7 @@ public:
 
     void set(const string_type& name, Json&& value)
     {
-        set(name.data(),name.length(),std::move(value));
+        set(name.data(),name.length(),std::forward<Json&&>(value));
     }
 
     void set(string_type&& name, Json&& value)
@@ -725,15 +725,15 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
         }
         else if (it->name() == name)
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-            members_.insert(it,value_type(std::move(name),std::move(value)));
+            members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
         }
     }
 
@@ -744,7 +744,7 @@ public:
 
     iterator set(iterator hint, const char_type* name, Json&& value)
     {
-        return set(hint, name, std::char_traits<char_type>::length(name), std::move(value));
+        return set(hint, name, std::char_traits<char_type>::length(name), std::forward<Json&&>(value));
     }
 
     iterator set(iterator hint, const char_type* s, size_t length, const Json& value)
@@ -789,16 +789,16 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(s, length), std::move(value)));
+            members_.push_back(value_type(string_type(s, length), std::forward<Json&&>(value)));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (name_eq_string(it->name(),s,length))
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-           it = members_.insert(it,value_type(string_type(s,length),std::move(value)));
+           it = members_.insert(it,value_type(string_type(s,length),std::forward<Json&&>(value)));
         }
         return iterator(it);
     }
@@ -822,7 +822,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), value));
+            members_.push_back(value_type(std::forward<string_type&&>(name), value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
@@ -831,14 +831,14 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),value));
+            it = members_.insert(it,value_type(std::forward<string_type&&>(name),value));
         }
         return iterator(it);
     }
 
     iterator set(iterator hint, const string_type& name, Json&& value)
     {
-        return set(hint,name.data(),name.length(),std::move(value));
+        return set(hint,name.data(),name.length(),std::forward<Json&&>(value));
     }
 
     iterator set(iterator hint, string_type&& name, Json&& value)
@@ -855,16 +855,16 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),std::move(value)));
+            it = members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
         }
         return iterator(it);
     }
@@ -1061,11 +1061,11 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(name,length),std::move(value)));
+            members_.push_back(value_type(string_type(name,length),std::forward<Json&&>(value)));
         }
         else 
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
     }
 
@@ -1076,7 +1076,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), value));
+            members_.push_back(value_type(std::forward<string_type&&>(name), value));
         }
         else
         {
@@ -1091,7 +1091,7 @@ public:
 
     void set(const string_type& name, Json&& value)
     {
-        set(name.data(),name.length(),std::move(value));
+        set(name.data(),name.length(),std::forward<Json&&>(value));
     }
 
     void set(string_type&& name, Json&& value)
@@ -1101,11 +1101,11 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
         }
         else
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
     }
 
@@ -1116,7 +1116,7 @@ public:
 
     iterator set(iterator hint, const char_type* name, Json&& value)
     {
-        return set(hint, name, std::char_traits<char_type>::length(name), std::move(value));
+        return set(hint, name, std::char_traits<char_type>::length(name), std::forward<Json&&>(value));
     }
 
     iterator set(iterator hint, const char_type* name, size_t length, const Json& value)
@@ -1145,16 +1145,16 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(string_type(name, length), std::move(value)));
+            members_.push_back(value_type(string_type(name, length), std::forward<Json&&>(value)));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (name_eq_string(it->name(),name,length))
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-           it = members_.insert(it,value_type(string_type(name,length),std::move(value)));
+           it = members_.insert(it,value_type(string_type(name,length),std::forward<Json&&>(value)));
         }
         return it;
     }
@@ -1170,7 +1170,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), value));
+            members_.push_back(value_type(std::forward<string_type&&>(name), value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
@@ -1179,14 +1179,14 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),value));
+            it = members_.insert(it,value_type(std::forward<string_type&&>(name),value));
         }
         return it;
     }
 
     iterator set(iterator hint, const string_type& name, Json&& value)
     {
-        return set(hint,name.data(),name.length(),std::move(value));
+        return set(hint,name.data(),name.length(),std::forward<Json&&>(value));
     }
 
     iterator set(iterator hint, string_type&& name, Json&& value)
@@ -1195,16 +1195,16 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::move(name), std::move(value)));
+            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {
-            it->value(std::move(value));
+            it->value(std::forward<Json&&>(value));
         }
         else
         {
-            it = members_.insert(it,value_type(std::move(name),std::move(value)));
+            it = members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
         }
         return it;
     }
