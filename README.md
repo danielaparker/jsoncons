@@ -240,27 +240,21 @@ is >> booklist;
 
 // The authors of books that cost less than $12
 json result = json_query(booklist, "$[*][?(@.price < 12)].author");
-std::cout << result << std::endl;
 
 // The number of books
 result = json_query(booklist, "$.length");
-std::cout << result << std::endl;
 
 // The third book
 result = json_query(booklist, "$[2]");
-std::cout << std::endl << pretty_print(result) << std::endl;
 
 // The authors of books that were published in 2004
 result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
-std::cout << result << std::endl;
 
 // The titles of all books that have ratings
 result = json_query(booklist, "$[*][?(@.ratings)].title");
-std::cout << result << std::endl;
 
 // All authors and titles of books
 result = json_query(booklist, "$..['author','title']");
-std::cout << pretty_print(result) << std::endl;
 ```
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
