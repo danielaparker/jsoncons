@@ -103,8 +103,24 @@ json file_export;
 file_export["File Format Options"]["Color Spaces"] = 
     std::move(color_spaces);
 file_export["Image Sizing"] = std::move(image_sizing);
-```
 
+std::cout << pretty_print(file_export) << std::endl;
+```
+Output:
+```json
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
+    },
+    "Image Sizing": {
+        "Dimension 1": 9.84,
+        "Dimension 2": null,
+        "Resize To Fit": true,
+        "Resize Unit": "pixels",
+        "Resize What": "long_edge"
+    }
+}
+```
 See [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
 ### Meaningful error messages

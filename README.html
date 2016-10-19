@@ -579,7 +579,24 @@ image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span cl
 json file_export;
 file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = 
     <span class="pl-en">std::move</span>(color_spaces);
-file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);</pre></div>
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);
+
+std::cout &lt;&lt; pretty_print(file_export) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>]
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>: <span class="pl-c1">9.84</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>
+    }
+}</pre></div>
 
 <p>See <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 
