@@ -157,7 +157,7 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-### Use range-based for loops for arrays
+### Use range-based for loops with arrays
 
 ```c++
 json j = json::array{1,2,3,4};
@@ -168,7 +168,7 @@ for (auto element : book.elements())
 }
 ```
 
-### Use range-based for loops for objects
+### Use range-based for loops with objects
 
 ```c++
 json book = json::object{
