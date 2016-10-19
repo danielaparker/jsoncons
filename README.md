@@ -130,7 +130,7 @@ try
 {
     jsoncons::json val = jsoncons::json::parse("[1,2,3,4,]");
 } 
-catch(const jsoncons::parse_exception& e) 
+catch(const std::exception& e) 
 {
     std::cout << e.what() << std::endl;
 }

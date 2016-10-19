@@ -606,7 +606,7 @@ std::cout &lt;&lt; pretty_print(file_export) &lt;&lt; std::endl;</pre></div>
 {
     jsoncons::json val = <span class="pl-c1">jsoncons::json::parse</span>(<span class="pl-s"><span class="pl-pds">"</span>[1,2,3,4,]<span class="pl-pds">"</span></span>);
 } 
-<span class="pl-k">catch</span>(<span class="pl-k">const</span> jsoncons::parse_exception&amp; e) 
+<span class="pl-k">catch</span>(<span class="pl-k">const</span> std::exception&amp; e) 
 {
     std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
 }</pre></div>
