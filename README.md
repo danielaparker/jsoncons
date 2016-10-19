@@ -40,11 +40,68 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility) tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
 
-## Using the jsoncons library
+## Get jsoncons
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
 
 To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
+
+## A simple program using jsoncons
+
+```c++
+#include <iostream>
+#include "jsoncons/json.hpp"
+
+// For convenience
+using jsoncons::json;
+```c++
+int main()
+{
+    json color_spaces = json::array();
+    color_spaces.add("sRGB");
+    color_spaces.add("AdobeRGB");
+    color_spaces.add("ProPhoto RGB");
+
+    json image_sizing; // empty object
+    image_sizing["Resize To Fit"] = true; // a boolean 
+    image_sizing["Resize Unit"] = "pixels"; // a string
+    image_sizing["Resize What"] = "long_edge"; // a string
+    image_sizing["Dimension 1"] = 9.84; // a double
+    
+    json file_export;
+    file_export["File Format Options"]["Color Spaces"] =
+        std::move(color_spaces);
+    file_export["Image Sizing"] = std::move(image_sizing);
+
+    std::cout << "(1)" << "\n";
+    std::cout << pretty_print(file_export) << "\n\n";
+
+    const json& val = file_export["Image Sizing"];
+
+    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
+
+    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2","null") << "\n";
+}
+```
+Output:
+```json
+(1)
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
+    },
+    "Image Sizing": {
+        "Dimension 1": 9.84,
+        "Resize To Fit": true,
+        "Resize Unit": "pixels",
+        "Resize What": "long_edge"
+    }
+}
+
+(2) Dimension 1 = 9.84
+
+(3) Dimension 2 = null
+```
 
 For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). Consult the [wiki](https://github.com/danielaparker/jsoncons/wiki) for the latest documentation, tutorials and roadmap. 
 
@@ -82,46 +139,6 @@ The library includes four instantiations of `basic_json`:
 - [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) constructs a wide character json value that retains the original name-value insertion order
 
 ## Features
-
-### Construct a json value
-
-```c++
-
-json color_spaces = json::array();
-color_spaces.add("sRGB");
-color_spaces.add("AdobeRGB");
-color_spaces.add("ProPhoto RGB");
-
-json image_sizing; // empty object
-image_sizing["Resize To Fit"] = true; // a boolean 
-image_sizing["Resize Unit"] = "pixels"; // a string
-image_sizing["Resize What"] = "long_edge"; // a string
-image_sizing["Dimension 1"] = 9.84; // a double
-image_sizing["Dimension 2"] = json::null(); // a null value
-
-json file_export;
-file_export["File Format Options"]["Color Spaces"] = 
-    std::move(color_spaces);
-file_export["Image Sizing"] = std::move(image_sizing);
-
-std::cout << pretty_print(file_export) << std::endl;
-```
-Output:
-```json
-{
-    "File Format Options": {
-        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
-    },
-    "Image Sizing": {
-        "Dimension 1": 9.84,
-        "Dimension 2": null,
-        "Resize To Fit": true,
-        "Resize Unit": "pixels",
-        "Resize What": "long_edge"
-    }
-}
-```
-See [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
 ### Meaningful error messages
 
