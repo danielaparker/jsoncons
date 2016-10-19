@@ -54,7 +54,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 // For convenience
 using jsoncons::json;
-```c++
+
 int main()
 {
     json color_spaces = json::array();
