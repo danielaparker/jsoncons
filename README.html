@@ -583,6 +583,22 @@ file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span cl
 
 <p>See <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 
+<h3>Meaningful error messages</h3>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">try</span> 
+{
+    jsoncons::json val = <span class="pl-c1">jsoncons::json::parse</span>(<span class="pl-s"><span class="pl-pds">"</span>[1,2,3,4,]<span class="pl-pds">"</span></span>);
+} 
+<span class="pl-k">catch</span>(<span class="pl-k">const</span> jsoncons::parse_exception&amp; e) 
+{
+    std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<pre><code>Extra comma at line 1 and column 10
+</code></pre>
+
 <h3>Use range-based for loops for arrays</h3>
 
 <div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};

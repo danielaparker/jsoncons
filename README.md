@@ -107,6 +107,23 @@ file_export["Image Sizing"] = std::move(image_sizing);
 
 See [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
+### Meaningful error messages
+
+```c++
+try 
+{
+    jsoncons::json val = jsoncons::json::parse("[1,2,3,4,]");
+} 
+catch(const jsoncons::parse_exception& e) 
+{
+    std::cout << e.what() << std::endl;
+}
+```
+Output:
+```
+Extra comma at line 1 and column 10
+```
+
 ### Use range-based for loops for arrays
 
 ```c++
