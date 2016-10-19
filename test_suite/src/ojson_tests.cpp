@@ -52,10 +52,7 @@ BOOST_AUTO_TEST_CASE(test_object)
     }
     )");
 
-    std::cout << pretty_print(o) << std::endl;
-
     o.set("postal_code", "M5H 2N2");
-    std::cout << pretty_print(o) << std::endl;
 
     ojson o2 = o;
     BOOST_CHECK(o == o2);
@@ -74,11 +71,7 @@ BOOST_AUTO_TEST_CASE(test_object)
 
     o.set("unit_type","O");
 
-    std::cout << pretty_print(o) << std::endl;
-
     o.erase("unit_type");
-
-    std::cout << pretty_print(o) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

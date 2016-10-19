@@ -174,7 +174,7 @@ void make_3_dimensional_array()
 
 void array_examples()
 {
-    std::cout << "Array examples\n" << std::endl;
+    std::cout << "\nArray examples\n\n";
     array_example1();
 
     construct_json_from_vector();

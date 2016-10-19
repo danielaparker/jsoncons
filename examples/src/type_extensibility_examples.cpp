@@ -48,6 +48,8 @@ namespace jsoncons
 
 void type_extensibility_examples()
 {
+    std::cout << "\nType extensibility examples\n\n";
+
     book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
 
     json j = book1;
@@ -82,5 +84,7 @@ void type_extensibility_examples()
                   << b.title << ", " 
                   << b.price << std::endl;
     }
+
+    std::cout << std::endl;
 }
 

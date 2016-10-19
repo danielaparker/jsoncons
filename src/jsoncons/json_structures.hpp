@@ -22,6 +22,30 @@
 
 namespace jsoncons {
 
+template <typename IteratorT>
+class range 
+{
+    IteratorT first_;
+    IteratorT last_;
+public:
+    range(const IteratorT& first, const IteratorT& last)
+        : first_(first), last_(last)
+    {
+    }
+
+public:
+    //friend class basic_json<CharT,JsonTraits,Allocator>;
+
+    IteratorT begin()
+    {
+        return first_;
+    }
+    IteratorT end()
+    {
+        return last_;
+    }
+};
+
 template <class Json, class Allocator>
 class json_array
 {
@@ -229,6 +253,29 @@ public:
     }
 };
 
+template <class CharT,class ValueT>
+class member_lt_string2
+{
+    size_t length_;
+public:
+    member_lt_string2(size_t length)
+        : length_(length)
+    {
+    }
+
+    bool operator()(const CharT* a, const ValueT& b) const
+    {
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(b.name().length(),length_);
+        int result = std::char_traits<CharT>::compare(a, b.name().data(),len);
+        if (result != 0)
+        {
+            return result < 0;
+        }
+
+        return length_ < b.name().length();
+    }
+};
+
 template <class StringT,class CharT>
 bool name_le_string(const StringT& a, const CharT* b, size_t length)
 {
@@ -315,7 +362,7 @@ public:
     {
     }
     name_value_pair(string_type&& name, const ValueT& val)
-        : name_(std::forward<string_type&&>(name)), value_(val)
+        : name_(std::forward<string_type>(name)), value_(val)
     {
     }
     name_value_pair(const string_type& name, ValueT&& val)
@@ -323,7 +370,8 @@ public:
     {
     }
     name_value_pair(string_type&& name, ValueT&& val)
-        : name_(std::forward<string_type&&>(name)), value_(std::forward<ValueT&&>(val))
+        : name_(std::forward<string_type&&>(name)), 
+          value_(std::forward<ValueT&&>(val))
     {
     }
     name_value_pair(const name_value_pair& member)
@@ -567,13 +615,11 @@ public:
 
     iterator end()
     {
-        //return members_.end();
         return iterator(members_.end());
     }
 
     const_iterator begin() const
     {
-        //return iterator(members.data());
         return const_iterator(members_.begin());
     }
 
@@ -612,6 +658,24 @@ public:
     const Json& at(size_t) const 
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
+    }
+
+    range<iterator> members(const char_type* name, size_t length)
+    {
+        member_lt_string<value_type,char_type> comp(length);
+        member_lt_string2<char_type, value_type> comp2(length);
+        auto lb = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        auto ub = std::upper_bound(lb,members_.end(), name, comp2);
+        return range<iterator>{iterator(lb),iterator(ub)};
+    }
+
+    range<const_iterator> members(const char_type* name, size_t length) const
+    {
+        member_lt_string<value_type,char_type> comp(length);
+        member_lt_string2<char_type, value_type> comp2(length);
+        auto lb = std::lower_bound(members_.begin(),members_.end(), name, comp);
+        auto ub = std::upper_bound(lb,members_.end(), name, comp2);
+        return range<const_iterator>{const_iterator(lb),const_iterator(ub)};
     }
 
     iterator find(const char_type* name, size_t length)
@@ -659,9 +723,44 @@ public:
         std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
+    void insert(const value_type& value)
+    {
+        auto it = std::upper_bound(members_.begin(),
+                                   members_.end(),
+                                   value.name().c_str(),
+                                   member_lt_string2<char_type,value_type>(value.name().length()));
+        if (it == members_.end())
+        {
+            members_.push_back(value);
+        }
+        else
+        {
+            members_.insert(it,value);
+        }
+    }
+
+    void insert(value_type&& value)
+    {
+        auto it = std::upper_bound(members_.begin(),
+                                   members_.end(),
+                                   value.name().c_str(),
+                                   member_lt_string2<char_type,value_type>(value.name().length()));
+        if (it == members_.end())
+        {
+            members_.push_back(std::forward<value_type&&>(value));
+        }
+        else
+        {
+            members_.insert(it,std::forward<value_type&&>(value));
+        }
+    }
+
     void set(const char_type* s, size_t length, const Json& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
+        auto it = std::lower_bound(members_.begin(),
+                                   members_.end(),
+                                   s,
+                                   member_lt_string<value_type,char_type>(length));
         if (it == members_.end())
         {
             members_.push_back(value_type(string_type(s,length),value));
@@ -733,7 +832,8 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
+            members_.insert(it,value_type(std::forward<string_type&&>(name),
+                                          std::forward<Json&&>(value)));
         }
     }
 
@@ -855,7 +955,8 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
+            members_.push_back(value_type(std::forward<string_type&&>(name), 
+                                          std::forward<Json&&>(value)));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
@@ -995,6 +1096,24 @@ public:
             JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
         }
         return members_[i].value();
+    }
+
+    range<iterator> members(const char_type* name, size_t length)
+    {
+        equals_pred<value_type,char_type> comp(name, length);
+        auto lb = std::find_if(members_.begin(),members_.end(), comp);
+        auto ub = std::find_if_not(lb,members_.end(), comp);
+
+        return range<iterator>{lb,ub};
+    }
+
+    range<const_iterator> members(const char_type* name, size_t length) const
+    {
+        equals_pred<value_type,char_type> comp(name, length);
+        auto lb = std::find_if(members_.begin(),members_.end(), comp);
+        auto ub = std::find_if_not(lb,members_.end(), comp);
+
+        return range<const_iterator>{lb,ub};
     }
 
     iterator find(const char_type* name, size_t length)

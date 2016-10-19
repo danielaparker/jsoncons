@@ -5,12 +5,7 @@
 #include <string>
 #include "jsoncons/json.hpp"
 
-using jsoncons::json;
-using jsoncons::json_deserializer;
-using jsoncons::json_reader;
-using jsoncons::pretty_print;
-using jsoncons::output_format;
-using std::string;
+using namespace jsoncons;
 
 void basics_examples();
 void array_examples();
@@ -19,6 +14,8 @@ void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
 void csv_examples();
+void ojson_examples();
+void unicode_examples();
 
 void first_example_a()
 {
@@ -29,8 +26,8 @@ void first_example_a()
         try
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
             double price = book["price"].as<double>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
@@ -50,9 +47,9 @@ void first_example_b()
         try
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
-            string price = book.get("price", "N/A").as<std::string>();
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
+            std::string price = book.get("price", "N/A").as<std::string>();
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const std::exception& e)
@@ -75,9 +72,9 @@ void first_example_c()
         try
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
-            string price = book.get("price", "N/A").to_string(format);
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
+            std::string price = book.get("price", "N/A").to_string(format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const std::exception& e)
@@ -101,8 +98,8 @@ void first_example_d()
         try
         {
             json& book = books[i];
-            string author = book["author"].as<std::string>();
-            string title = book["title"].as<std::string>();
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
             if (book.count("price") > 0 && book["price"].is_number())
             {
                 double price = book["price"].as<double>();
@@ -239,24 +236,9 @@ void introspection_example()
     }
 }
 
-void read_and_write_escaped_unicode()
-{
-    string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
-    json value = json::parse(input);
-    output_format format;
-    format.escape_all_non_ascii(true);
-    string output = value.to_string(format);
-
-    std::cout << "Input:" << std::endl;
-    std::cout << input << std::endl;
-    std::cout << std::endl;
-    std::cout << "Output:" << std::endl;
-    std::cout << output << std::endl;
-}
-
 void parse_exception_example()
 {
-    string s = "[1,2,3,4,]";
+    std::string s = "[1,2,3,4,]";
     try 
     {
         jsoncons::json val = jsoncons::json::parse(s);
@@ -274,6 +256,8 @@ int main()
     try
     {
         basics_examples();
+        ojson_examples();
+
         first_example_a();
         first_example_b();
         first_example_c();
@@ -293,7 +277,7 @@ int main()
 
         wjson_examples();
 
-        read_and_write_escaped_unicode();
+        unicode_examples();
 
         serialization_examples();
 

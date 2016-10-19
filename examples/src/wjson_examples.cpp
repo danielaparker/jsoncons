@@ -77,9 +77,11 @@ void wjson_surrogate_pair()
 
 void wjson_examples()
 {
+    std::cout << "\nwjson examples\n\n";
     wjson_object();
     wjson_escape_u2();
     wjson_surrogate_pair();
+    std::cout << std::endl;
 }
 
 

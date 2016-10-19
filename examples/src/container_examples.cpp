@@ -83,6 +83,8 @@ void container_example1()
 
 void container_examples()
 {
+    std::cout << "\nContainer examples\n\n";
     container_example1();
+    std::cout << std::endl;
 }
 

@@ -35,8 +35,6 @@ BOOST_AUTO_TEST_CASE(test_variant)
     BOOST_CHECK(value_types::object_t == var8.type_id());
     json::variant var9(123456789.9,0);
     BOOST_CHECK(value_types::double_t == var9.type_id());
-
-    std::cout << sizeof(json::variant) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_move_constructor)

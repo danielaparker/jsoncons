@@ -59,7 +59,9 @@ void read_csv_file2()
 
 void csv_examples()
 {
+    std::cout << "\nCSV examples\n\n";
     read_csv_file1();
     read_csv_file2();
+    std::cout << std::endl;
 }
 

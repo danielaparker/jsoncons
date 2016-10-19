@@ -125,10 +125,6 @@ BOOST_AUTO_TEST_CASE(test_is_json_map)
     a["c"] = 2; 
 
     BOOST_CHECK_EQUAL(true,(a.is<std::map<std::string,int> >()));
-
-    std::cout << std::is_same<std::string::value_type,json::char_type>::value << std::endl;
-    std::cout << std::is_same<std::string,json::string_type>::value << std::endl;
-    std::cout << std::is_constructible<json::string_type,std::string>::value << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_is_json_map2)
@@ -218,14 +214,14 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     BOOST_CHECK_EQUAL(static_cast<int64_t>(23456789098765), j_flist[1].as<int64_t>());
     BOOST_CHECK_EQUAL(static_cast<int64_t>(34567890987654), j_flist[2].as<int64_t>());
     BOOST_CHECK_EQUAL(static_cast<int64_t>(45678909876543), j_flist[3].as<int64_t>());
-/*
+
     std::array<unsigned long, 4> a_array {{1, 2, 3, 4}};
     json j_array(a_array);
     BOOST_CHECK_EQUAL(1, j_array[0].as<int>());
     BOOST_CHECK_EQUAL(2, j_array[1].as<int>());
     BOOST_CHECK_EQUAL(3, j_array[2].as<int>());
     BOOST_CHECK_EQUAL(4, j_array[3].as<int>());
-*/
+
     std::set<std::string> a_set{"one", "two", "three", "four", "one"};
     json j_set(a_set); // only one entry for "one" is used
     // ["four", "one", "three", "two"]
@@ -260,21 +256,11 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     BOOST_CHECK_EQUAL(true, j_mmap.find("two")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_mmap.find("three")->value().as<bool>());
 
-    //std::cout << "------------------" << std::endl;
-    //std::cout << j_mmap << std::endl;
-
-    //for (auto m : j_mmap.members())
-    //{
-    //    std::cout << m.name() << ", " << m.value() << std::endl;
-    //}
-
     std::unordered_multimap<std::string, bool> a_ummap { {"one", true}, {"two", true}, /*{"three", false},*/ {"three", true} };
     json j_ummap(a_ummap); // two entries for key "three"
     BOOST_CHECK_EQUAL(true, j_ummap.find("one")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_ummap.find("two")->value().as<bool>());
     BOOST_CHECK_EQUAL(true, j_ummap.find("three")->value().as<bool>());
-
-    std::cout << j_ummap << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

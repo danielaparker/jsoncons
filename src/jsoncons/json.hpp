@@ -107,30 +107,6 @@ public:
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
 
-    template <typename IteratorT>
-    class range 
-    {
-        IteratorT first_;
-        IteratorT last_;
-    public:
-        range(const IteratorT& first, const IteratorT& last)
-            : first_(first), last_(last)
-        {
-        }
-
-    public:
-        friend class basic_json<CharT,JsonTraits,Allocator>;
-
-        IteratorT begin()
-        {
-            return first_;
-        }
-        IteratorT end()
-        {
-            return last_;
-        }
-    };
-
     typedef range<object_iterator> object_range;
     typedef range<const_object_iterator> const_object_range;
     typedef range<array_iterator> array_range;

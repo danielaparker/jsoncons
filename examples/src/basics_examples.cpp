@@ -317,9 +317,11 @@ void basics_wjson_example2()
 
 void basics_examples()
 {
+    std::cout << "\nBasics\n\n";
     basics_json_example1();
     basics_json_example2();
     basics_wjson_example1();
     basics_wjson_example2();
+    std::cout << std::endl;
 }
 

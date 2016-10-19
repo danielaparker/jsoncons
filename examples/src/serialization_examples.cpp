@@ -266,9 +266,11 @@ void serialization_example4()
 
 void serialization_examples()
 {
+    std::cout << "\nSerialization examples\n\n";
     serialization_example1();
     serialization_example2();
     serialization_example3();
     serialization_example4();
+    std::cout << std::endl;
 }
 
