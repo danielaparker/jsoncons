@@ -1327,27 +1327,17 @@ public:
 
        // Remove a member from an object 
 
-        void set(const string_type& name, const json_type& value)
+        template <class T>
+        void set(const string_type& name, T&& value)
         {
-            evaluate().set(name,value);
+            evaluate().set(name,std::forward<T&&>(value));
         }
 
-        void set(string_type&& name, const json_type& value)
+        template <class T>
+        void set(string_type&& name, T&& value)
 
         {
-            evaluate().set(std::forward<string_type&&>(name),value);
-        }
-
-        void set(const string_type& name, json_type&& value)
-
-        {
-            evaluate().set(name,std::forward<json_type&&>(value));
-        }
-
-        void set(string_type&& name, json_type&& value)
-
-        {
-            evaluate().set(std::forward<string_type&&>(name),std::forward<json_type&&>(value));
+            evaluate().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
 
         object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
@@ -2776,31 +2766,20 @@ public:
             var_.object_data_cast()->value().erase(name.data(),name.length());
             break;
         default:
-            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", name);
             break;
         }
     }
 
     template <class T>
-    void set(const string_type& name, const T& value)
-    {
-        set(name,json_type(value));
-    }
-
-    template <class T>
-    void set(string_type&& name, const T& value)
-    {
-        set(name,json_type(value));
-    }
-
-    void set(const string_type& name, const json_type& value)
+    void set(const string_type& name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(name, value);
+            var_.object_data_cast()->value().set(name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -2809,42 +2788,13 @@ public:
         }
     }
 
-    void set(string_type&& name, const json_type& value){
+    template <class T>
+    void set(string_type&& name, T&& value){
         switch (var_.type_id()){
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
-            }
-        }
-    }
-
-    void set(const string_type& name, json_type&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            var_.object_data_cast()->value().set(name,std::forward<json_type&&>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
-            }
-        }
-    }
-
-    void set(string_type&& name, json_type&& value)
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),std::forward<json_type&&>(value));
+            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
             break;
         default:
             {

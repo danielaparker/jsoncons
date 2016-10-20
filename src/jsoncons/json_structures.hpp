@@ -690,49 +690,13 @@ public:
         std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
     }
 
-    void set(const char_type* s, size_t length, const Json& value)
-    {
-        auto it = std::lower_bound(members_.begin(),
-                                   members_.end(),
-                                   s,
-                                   member_lt_string<value_type,char_type>(length));
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(s,length),value));
-        }
-        else if (name_eq_string(it->name(),s,length))
-        {
-            it->value(value);
-        }
-        else
-        {
-            members_.insert(it,value_type(string_type(s,length),value));
-        }
-    }
-
-    void set(const char_type* s, size_t length, Json&& value)
-    {
-        auto it = std::lower_bound(members_.begin(),members_.end(),s,member_lt_string<value_type,char_type>(length));
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(s,length),std::forward<Json&&>(value)));
-        }
-        else if (name_eq_string(it->name(),s,length))
-        {
-            it->value(std::forward<Json&&>(value));
-        }
-        else
-        {
-            members_.insert(it,value_type(string_type(s,length),std::forward<Json&&>(value)));
-        }
-    }
-
-    void set(string_type&& name, const Json& value)
+    template <class T>
+    void set(const string_type& name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), value));
+            members_.emplace_back(name, std::forward<T&&>(value));
         }
         else if (it->name() == name)
         {
@@ -740,35 +704,25 @@ public:
         }
         else
         {
-            members_.insert(it,value_type(std::forward<string_type&&>(name),value));
+            members_.emplace(it,name,std::forward<T&&>(value));
         }
     }
 
-    void set(const string_type& name, const Json& value)
-    {
-        set(name.data(),name.length(),value);
-    }
-
-    void set(const string_type& name, Json&& value)
-    {
-        set(name.data(),name.length(),std::forward<Json&&>(value));
-    }
-
-    void set(string_type&& name, Json&& value)
+    template <class T>
+    void set(string_type&& name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
+            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
         }
         else if (it->name() == name)
         {
-            it->value(std::forward<Json&&>(value));
+            it->value(value);
         }
         else
         {
-            members_.insert(it,value_type(std::forward<string_type&&>(name),
-                                          std::forward<Json&&>(value)));
+            members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
     }
 
