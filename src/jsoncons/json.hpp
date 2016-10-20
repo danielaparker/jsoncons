@@ -1374,35 +1374,15 @@ public:
         }
 
         template <class T>
-        void add(const T& value)
+        void add(T&& value)
         {
-            evaluate_with_default().add(json_type(value));
-        }
-
-        void add(json_type&& value)
-        {
-            evaluate_with_default().add(std::forward<json_type&&>(value));
-        }
-
-        void add(const json_type& value)
-        {
-            evaluate_with_default().add(value);
+            evaluate_with_default().add(std::forward<T&&>(value));
         }
 
         template <class T>
-        array_iterator add(const_array_iterator pos, const T& value)
+        array_iterator add(const_array_iterator pos, T&& value)
         {
-            return evaluate_with_default().add(pos, json_type(value));
-        }
-
-        array_iterator add(const_array_iterator pos, const json_type& value)
-        {
-            return evaluate_with_default().add(pos, value);
-        }
-
-        array_iterator add(const_array_iterator pos, json_type&& value)
-        {
-            return evaluate_with_default().add(pos, std::forward<json_type&&>(value));
+            return evaluate_with_default().add(pos, std::forward<T&&>(value));
         }
 
         string_type to_string(const string_allocator& allocator = string_allocator()) const JSONCONS_NOEXCEPT
@@ -2944,29 +2924,12 @@ public:
     }
 
     template <class T>
-    void add(const T& value)
-    {
-        add(json_type(value));
-    }
-
-    void add(const json_type& value)
+    void add(T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().push_back(value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
-    }
-
-    void add(json_type&& value){
-        switch (var_.type_id()){
-        case value_types::array_t:
-            var_.array_data_cast()->value().push_back(std::forward<json_type&&>(value));
+            var_.array_data_cast()->value().push_back(std::forward<T&&>(value));
             break;
         default:
             {
@@ -2976,29 +2939,12 @@ public:
     }
 
     template <class T>
-    array_iterator add(const_array_iterator pos, const T& value)
-    {
-        return add(pos,json_type(value));
-    }
-
-    array_iterator add(const_array_iterator pos, const json_type& value)
+    array_iterator add(const_array_iterator pos, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return var_.array_data_cast()->value().add(pos, value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
-    }
-
-    array_iterator add(const_array_iterator pos, json_type&& value){
-        switch (var_.type_id()){
-        case value_types::array_t:
-            return var_.array_data_cast()->value().add(pos, std::forward<json_type&&>(value));
+            return var_.array_data_cast()->value().add(pos, std::forward<T&&>(value));
             break;
         default:
             {

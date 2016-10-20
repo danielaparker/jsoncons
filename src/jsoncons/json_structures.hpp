@@ -153,14 +153,10 @@ public:
 
     const Json& operator[](size_t i) const {return elements_[i];}
 
-    void push_back(const Json& value)
+    template <class T>
+    void push_back(T&& value)
     {
-        elements_.push_back(value);
-    }
-
-    void push_back(Json&& value)
-    {
-        elements_.push_back(std::forward<Json&&>(value));
+        elements_.emplace_back(std::forward<T&&>(value));
     }
 
     void add(size_t index, const Json& value)
@@ -177,26 +173,17 @@ public:
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
-    iterator add(const_iterator pos, const Json& value)
+    template <class T>
+    iterator add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.insert(it, value);
-    }
-
-    iterator add(const_iterator pos, Json&& value)
-    {
-        iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.insert(it, std::forward<Json&&>(value));
+        return elements_.emplace(it, std::forward<T&&>(value));
     }
 #else
-    iterator add(const_iterator pos, const Json& value)
+    template <class T>
+    iterator add(const_iterator pos, T&& value)
     {
-        return elements_.insert(pos, value);
-    }
-
-    iterator add(const_iterator pos, Json&& value)
-    {
-        return elements_.insert(pos, std::forward<Json&&>(value));
+        return elements_.insert(pos, std::forward<T&&>(value));
     }
 #endif
 
