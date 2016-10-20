@@ -145,7 +145,7 @@ The library includes four instantiations of `basic_json`:
 ```c++
 try 
 {
-    jsoncons::json val = jsoncons::json::parse("[1,2,3,4,]");
+    json val = json::parse("[1,2,3,4,]");
 } 
 catch(const std::exception& e) 
 {
