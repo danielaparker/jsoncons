@@ -474,39 +474,36 @@ vertical-align:1px;
 
 <p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
 
-<pre><code>std::fstream fs(const char* filename)
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>std::fstream <span class="pl-en">fs</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* filename)</pre></div>
 
 <p>Instead you need to use the non standard Microsoft extension</p>
 
-<pre><code>std::fstream fs(const wchar_t* filename)
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>std::fstream <span class="pl-en">fs</span>(<span class="pl-k">const</span> <span class="pl-c1">wchar_t</span>* filename)</pre></div>
 
 <h4>Unicode escaping</h4>
 
-<pre><code>string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");
-std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
+<div class="highlight highlight-source-c++"><pre>string <span class="pl-en">inputStr</span>(<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u0040<span class="pl-cce">\\</span>u0040<span class="pl-cce">\\</span>u0000<span class="pl-cce">\\</span>u0011<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:    <span class="pl-pds">"</span></span> &lt;&lt; inputStr &lt;&lt; std::endl;
 
 json arr = json::parse(inputStr);
-std::string str = arr[0].as&lt;std::string&gt;();
-std::cout &lt;&lt; "Hex dump: [";
-for (size_t i = 0; i &lt; str.size(); ++i)
+std::string str = arr[<span class="pl-c1">0</span>].as&lt;std::string&gt;();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<span class="pl-pds">"</span></span>;
+<span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; str.size(); ++i)
 {
-    unsigned int val = static_cast&lt;unsigned int&gt;(str[i]);
-    if (i != 0)
+    <span class="pl-k">unsigned</span> <span class="pl-k">int</span> val = <span class="pl-k">static_cast</span>&lt;<span class="pl-k">unsigned</span> <span class="pl-k">int</span>&gt;(str[i]);
+    <span class="pl-k">if</span> (i != <span class="pl-c1">0</span>)
     {
-        std::cout &lt;&lt; " ";
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>;
     }
-    std::cout &lt;&lt; "0x" &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; std::hex &lt;&lt; val;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>0x<span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">std::setfill</span>(<span class="pl-s"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>) &lt;&lt; <span class="pl-c1">std::setw</span>(<span class="pl-c1">2</span>) &lt;&lt; std::hex &lt;&lt; val;
 }
-std::cout &lt;&lt; "]" &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 
 std::ostringstream os;
 os &lt;&lt; arr;
-std::cout &lt;&lt; "Output:   " &lt;&lt; os.str() &lt;&lt; std::endl;
-</code></pre>
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:   <span class="pl-pds">"</span></span> &lt;&lt; os.str() &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>Input:    ["\u0040\u0040\u0000\u0011"]
 Hex dump: [0x40 0x40 0x00 0x11]
@@ -517,42 +514,41 @@ Output:   ["@@\u0000\u0011"]
 
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode</h4>
 
-<pre><code>string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
-std::cout &lt;&lt; "Input:    " &lt;&lt; inputStr &lt;&lt; std::endl;
+<div class="highlight highlight-source-c++"><pre>string <span class="pl-en">inputStr</span>(<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u007F<span class="pl-cce">\\</span>u07FF<span class="pl-cce">\\</span>u0800<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:    <span class="pl-pds">"</span></span> &lt;&lt; inputStr &lt;&lt; std::endl;
 
 json arr = json::parse(inputStr);
-std::string s = arr[0].as&lt;string&gt;();
-std::cout &lt;&lt; "Hex dump: [";
-for (size_t i = 0; i &lt; s.size(); ++i)
+std::string s = arr[<span class="pl-c1">0</span>].as&lt;string&gt;();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<span class="pl-pds">"</span></span>;
+<span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; s.size(); ++i)
 {
-    if (i != 0)
-        std::cout &lt;&lt; " ";
-    unsigned int u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
-    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    <span class="pl-k">if</span> (i != <span class="pl-c1">0</span>)
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>;
+    <span class="pl-k">unsigned</span> <span class="pl-k">int</span> <span class="pl-smi">u</span>(s[i] &gt;= <span class="pl-c1">0</span> ? s[i] : <span class="pl-c1">256</span> + s[i] );
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>0x<span class="pl-pds">"</span></span>  &lt;&lt; std::hex&lt;&lt; <span class="pl-c1">std::setfill</span>(<span class="pl-s"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>) &lt;&lt; <span class="pl-c1">std::setw</span>(<span class="pl-c1">2</span>) &lt;&lt; u;
 }
-std::cout &lt;&lt; "]" &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 
 std::ostringstream os;
 output_format format;
-format.escape_all_non_ascii(true);
+format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 os &lt;&lt; print(arr,format);
 std::string outputStr = os.str();
-std::cout &lt;&lt; "Output:   " &lt;&lt; os.str() &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:   <span class="pl-pds">"</span></span> &lt;&lt; os.str() &lt;&lt; std::endl;
 
 json arr2 = json::parse(outputStr);
-std::string s2 = arr2[0].as&lt;string&gt;();
-std::cout &lt;&lt; "Hex dump: [";
-for (size_t i = 0; i &lt; s2.size(); ++i)
+std::string s2 = arr2[<span class="pl-c1">0</span>].as&lt;string&gt;();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<span class="pl-pds">"</span></span>;
+<span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; s2.size(); ++i)
 {
-    if (i != 0)
-        std::cout &lt;&lt; " ";
-    unsigned int u(s2[i] &gt;= 0 ? s2[i] : 256 + s2[i] );
-    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    <span class="pl-k">if</span> (i != <span class="pl-c1">0</span>)
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>;
+    <span class="pl-k">unsigned</span> <span class="pl-k">int</span> <span class="pl-smi">u</span>(s2[i] &gt;= <span class="pl-c1">0</span> ? s2[i] : <span class="pl-c1">256</span> + s2[i] );
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>0x<span class="pl-pds">"</span></span>  &lt;&lt; std::hex&lt;&lt; <span class="pl-c1">std::setfill</span>(<span class="pl-s"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>) &lt;&lt; <span class="pl-c1">std::setw</span>(<span class="pl-c1">2</span>) &lt;&lt; u;
 }
-std::cout &lt;&lt; "]" &lt;&lt; std::endl;
-</code></pre>
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>Input:    ["\u007F\u07FF\u0800"]
 Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
@@ -564,18 +560,17 @@ Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)</h4>
 
-<pre><code>string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
+<div class="highlight highlight-source-c++"><pre>string input = <span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u8A73<span class="pl-cce">\\</span>u7D30<span class="pl-cce">\\</span>u95B2<span class="pl-cce">\\</span>u89A7<span class="pl-cce">\\</span>uD800<span class="pl-cce">\\</span>uDC01<span class="pl-cce">\\</span>u4E00<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>;
 json value = json::parse(input);
 output_format format;
-format.escape_all_non_ascii(true);
+format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 string output = value.to_string(format);
 
-std::cout &lt;&lt; "Input:" &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 std::cout &lt;&lt; input &lt;&lt; std::endl;
 std::cout &lt;&lt; std::endl;
-std::cout &lt;&lt; "Output:" &lt;&lt; std::endl;
-std::cout &lt;&lt; output &lt;&lt; std::endl;
-</code></pre>
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
+std::cout &lt;&lt; output &lt;&lt; std::endl;</pre></div>
 
 <p>Since all of the escaped unicode is non-ascii, we get back the same text as what we started with.</p>
 
@@ -606,49 +601,47 @@ Output:
 
 <h4>Constructing a wjson value</h4>
 
-<pre><code>using jsoncons::wjson;
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::wjson;
 
 wjson root;
-root[L"field1"] = L"test";
-root[L"field2"] = 3.9;
-root[L"field3"] = true;
-std::wcout &lt;&lt; root &lt;&lt; L"\n";
-</code></pre>
+root[<span class="pl-s"><span class="pl-pds">L"</span>field1<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>test<span class="pl-pds">"</span></span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">3.9</span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
+std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>{"field1":"test","field2":3.9,"field3":true}
 </code></pre>
 
 <h4>Escaped unicode</h4>
 
-<pre><code>wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
-std::wistringstream is(input);
+<div class="highlight highlight-source-c++"><pre>wstring input = <span class="pl-s"><span class="pl-pds">L"</span>[<span class="pl-cce">\"\\</span>u007F<span class="pl-cce">\\</span>u07FF<span class="pl-cce">\\</span>u0800<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>;
+std::wistringstream <span class="pl-en">is</span>(input);
 
 wjson val = wjson::parse_stream(is);
 
-wstring s = val[0].as&lt;wstring&gt;();
-std::cout &lt;&lt; "length=" &lt;&lt; s.length() &lt;&lt; std::endl;
-std::cout &lt;&lt; "Hex dump: [";
-for (size_t i = 0; i &lt; s.size(); ++i)
+wstring s = val[<span class="pl-c1">0</span>].as&lt;wstring&gt;();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>length=<span class="pl-pds">"</span></span> &lt;&lt; s.length() &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<span class="pl-pds">"</span></span>;
+<span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; s.size(); ++i)
 {
-    if (i != 0)
-        std::cout &lt;&lt; " ";
-    uint32_t u(s[i] &gt;= 0 ? s[i] : 256 + s[i] );
-    std::cout &lt;&lt; "0x"  &lt;&lt; std::hex&lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; u;
+    <span class="pl-k">if</span> (i != <span class="pl-c1">0</span>)
+        std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>;
+    <span class="pl-c1">uint32_t</span> <span class="pl-smi">u</span>(s[i] &gt;= <span class="pl-c1">0</span> ? s[i] : <span class="pl-c1">256</span> + s[i] );
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>0x<span class="pl-pds">"</span></span>  &lt;&lt; std::hex&lt;&lt; <span class="pl-c1">std::setfill</span>(<span class="pl-s"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>) &lt;&lt; <span class="pl-c1">std::setw</span>(<span class="pl-c1">2</span>) &lt;&lt; u;
 }
-std::cout &lt;&lt; "]" &lt;&lt; std::endl;
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 
-std::wofstream os("output/xxx.txt");
-os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16&lt;wchar_t&gt;));
+std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/xxx.txt<span class="pl-pds">"</span></span>);
+os.imbue(std::locale(os.getloc(), <span class="pl-k">new</span> std::codecvt_utf8_utf16&lt;<span class="pl-c1">wchar_t</span>&gt;));
 
 woutput_format format;
-format.escape_all_non_ascii(true);
+format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 
-os &lt;&lt; pretty_print(val,format) &lt;&lt; L"\n";
-</code></pre>
+os &lt;&lt; pretty_print(val,format) &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>length=3
 Hex dump: [0x7f 0x7ff 0x800]

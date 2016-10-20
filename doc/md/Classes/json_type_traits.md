@@ -132,7 +132,7 @@ namespace my_ns
     std::cout << std::endl;
 }
 ```
-The output is
+Output:
 ```
 Maturity: 2014-Oct-14
 

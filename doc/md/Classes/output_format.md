@@ -104,7 +104,7 @@ For an array whose parent is an array, set whether that array is split on a new 
     obj["field3"] = -1.79e308*1000;
     std::cout << obj << std::endl;
 ```
-The output is
+Output:
 ```json
     {"field1":null,"field2":null,"field3":null}
 ```
@@ -124,7 +124,7 @@ The output is
     std::cout << pretty_print(obj,format) << std::endl;
 ```
 
-The output is
+Output:
 ```json
     {
         "field1":null,
@@ -156,7 +156,7 @@ The output is
     std::cout << pretty_print(val,format2) << std::endl;
 ```
 
-The output is
+Output:
 
 Default (same line)
 
@@ -233,7 +233,7 @@ Multi line
     std::cout << pretty_print(val, format2) << std::endl;
 ```
 
-The output is
+Output:
 
 Default (new line)
 

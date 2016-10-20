@@ -517,18 +517,18 @@ std::cout &lt;&lt; member.name() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; s
 
 <h2>Examples</h2>
 
-<div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>street_number<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span><span class="pl-c1">100</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>street_name<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Queen St W<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>city<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Toronto<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>country<span class="pl-s"><span class="pl-pds">"</span> : <span class="pl-pds">"</span></span>Canada<span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">    "street_number" : "100",</span>
+<span class="pl-s">    "street_name" : "Queen St W",</span>
+<span class="pl-s">    "city" : "Toronto",</span>
+<span class="pl-s">    "country" : "Canada"</span>
 <span class="pl-s">}</span>
-<span class="pl-s">)<span class="pl-pds">"</span></span>);
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
@@ -543,7 +543,7 @@ std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
@@ -560,7 +560,7 @@ o.set(it,<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,

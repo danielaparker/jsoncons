@@ -107,7 +107,7 @@ int main()
     }
 }
 ``` 
-The output is
+Output:
 ```
 (1) true
 
@@ -212,7 +212,7 @@ int main()
     std::cout << std::endl;
 }
 ```
-The output is
+Output:
 ```
 Maturity: 2014-Oct-14
 
@@ -346,7 +346,7 @@ int main()
     std::cout << "\n\n";
 }
 ```
-The output is
+Output:
 ```
 (1) true
 

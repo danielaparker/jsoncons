@@ -792,7 +792,7 @@ vertical-align:1px;
     std::cout &lt;&lt; std::endl;
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>Maturity: 2014-Oct-14
 

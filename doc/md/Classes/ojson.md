@@ -55,7 +55,7 @@ ojson o = ojson::parse(R"(
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",
@@ -70,7 +70,7 @@ o.set("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",
@@ -87,7 +87,7 @@ o.set(it,"province","Ontario");
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",

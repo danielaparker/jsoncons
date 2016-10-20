@@ -73,7 +73,7 @@ int main()
 }
 ```
 
-The output is
+Output:
 
 ```json
 [

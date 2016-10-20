@@ -77,7 +77,7 @@ for (size_t i = 0; i < books.size(); ++i)
     std::cout << author << ", " << title << std::endl;
 }
 ```
-The output is
+Output:
 ```
 Haruki Murakami, Kafka on the Shore
 Charles Bukowski, Women: A Novel
@@ -105,7 +105,7 @@ for (auto it = books[2].members().begin();
               << (*it).value() << std::endl;
 } 
 ```
-The output is
+Output:
 ```
 author=Ivan Passer
 title=Cutter's Way
@@ -232,7 +232,7 @@ std::vector<int> v = {1,2,3,4};
 json j(v);
 std::cout << j << std::endl;
 ```
-The output is
+Output:
 ```json
 [1,2,3,4]
 ```
@@ -245,7 +245,7 @@ for (auto x : d)
     std::cout << x << std::endl;
 }
 ```
-The output is
+Output:
 ```
 1
 true
@@ -257,7 +257,7 @@ std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
 json j(m);
 std::cout << j << std::endl;
 ```
-The output is
+Output:
 ```json
 {"one":1,"three":3,"two":2}
 ```
@@ -274,7 +274,7 @@ for (const auto& x : um)
     std::cout << x.first << "=" << x.second << std::endl;
 }
 ```
-The output is
+Output:
 ```
 one=1
 three=3
@@ -316,7 +316,7 @@ json val = handler.get_result();
 
 std::cout << pretty_print(val) << std::endl;
 ```
-The output is:
+Output:
 ```json
 [
     {
@@ -596,7 +596,7 @@ ojson o = ojson::parse(R"(
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",
@@ -611,7 +611,7 @@ o.set("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",
@@ -628,7 +628,7 @@ o.set(it,"province","Ontario");
 
 std::cout << pretty_print(o) << std::endl;
 ```
-The output is
+Output:
 ```json
 {
     "street_number": "100",
@@ -742,7 +742,7 @@ int main()
     }
 }
 ``` 
-The output is
+Output:
 ```
 (1) true
 

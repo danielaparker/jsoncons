@@ -71,7 +71,7 @@ jsonx_serializer serializer(std::cout,true);
 person.write(serializer);
 ```
 
-The output is
+Output:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -113,7 +113,7 @@ jsonx_serializer serializer(std::cout,true);
 special_chars.write(serializer);
 ```
 
-The output is
+Output:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

@@ -526,31 +526,31 @@ using namespace jsoncons::jsonx;
 
 <h3>JSONx conversion example</h3>
 
-<div class="highlight highlight-source-c++"><pre>json person = json::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>json person = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>name<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>John Smith<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>address<span class="pl-s"><span class="pl-pds">"</span>: {</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>streetAddress<span class="pl-s"><span class="pl-pds">"</span>: <span class="pl-pds">"</span></span><span class="pl-c1">21</span> 2nd Street<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>city<span class="pl-s"><span class="pl-pds">"</span>: <span class="pl-pds">"</span></span>New York<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>state<span class="pl-s"><span class="pl-pds">"</span>: <span class="pl-pds">"</span></span>NY<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span>postalCode<span class="pl-s"><span class="pl-pds">"</span>: 10021</span>
+<span class="pl-s">  "name":"John Smith",</span>
+<span class="pl-s">  "address": {</span>
+<span class="pl-s">    "streetAddress": "21 2nd Street",</span>
+<span class="pl-s">    "city": "New York",</span>
+<span class="pl-s">    "state": "NY",</span>
+<span class="pl-s">    "postalCode": 10021</span>
 <span class="pl-s">  },</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>phoneNumbers<span class="pl-s"><span class="pl-pds">"</span>: [</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span><span class="pl-c1">212</span> <span class="pl-c1">555</span>-<span class="pl-c1">1111</span><span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">    <span class="pl-pds">"</span></span><span class="pl-c1">212</span> <span class="pl-c1">555</span>-<span class="pl-c1">2222</span><span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">  "phoneNumbers": [</span>
+<span class="pl-s">    "212 555-1111",</span>
+<span class="pl-s">    "212 555-2222"</span>
 <span class="pl-s">  ],</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>additionalInfo<span class="pl-s"><span class="pl-pds">"</span>: null,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>remote<span class="pl-s"><span class="pl-pds">"</span>: false,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>height<span class="pl-s"><span class="pl-pds">"</span>: 62.4,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>ficoScore<span class="pl-s"><span class="pl-pds">"</span>: <span class="pl-pds">"</span></span> &gt; <span class="pl-c1">640</span><span class="pl-s"><span class="pl-pds">"</span></span>
+<span class="pl-s">  "additionalInfo": null,</span>
+<span class="pl-s">  "remote": false,</span>
+<span class="pl-s">  "height": 62.4,</span>
+<span class="pl-s">  "ficoScore": " &gt; 640"</span>
 <span class="pl-s">}</span>
-<span class="pl-s">)<span class="pl-pds">"</span></span>);
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
 jsonx_serializer <span class="pl-en">serializer</span>(std::cout,<span class="pl-c1">true</span>);
 
 person.write(serializer);</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-text-xml"><pre>&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> encoding</span>=<span class="pl-s"><span class="pl-pds">"</span>UTF-8<span class="pl-pds">"</span></span>?&gt;
 &lt;<span class="pl-ent">json</span><span class="pl-ent">:</span><span class="pl-ent">object</span> <span class="pl-e">xsi</span><span class="pl-e">:</span><span class="pl-e">schemaLocation</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.datapower.com/schemas/json jsonx.xsd<span class="pl-pds">"</span></span>
@@ -575,22 +575,22 @@ person.write(serializer);</pre></div>
 
 <h3>Special characters and escaped characters</h3>
 
-<div class="highlight highlight-source-c++"><pre>ojson special_chars = ojson::parse(R<span class="pl-s"><span class="pl-pds">"</span>(</span>
+<div class="highlight highlight-source-c++"><pre>ojson special_chars = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>&amp;<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>&amp;<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>&lt;<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>&lt;<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>&gt;<span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span>&gt;<span class="pl-s"><span class="pl-pds">"</span>,</span>
-<span class="pl-s">  <span class="pl-pds">"</span></span>\<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span><span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span>'<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>'<span class="pl-pds">"</span></span>,
-  <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\u00A9</span><span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
-}
-)<span class="pl-s"><span class="pl-pds">"</span>);</span>
-<span class="pl-s"></span>
-<span class="pl-s">jsonx_serializer serializer(std::cout,true);</span>
-<span class="pl-s"></span>
-<span class="pl-s">special_chars.write(serializer);</span></pre></div>
+<span class="pl-s">  "&amp;":"&amp;",</span>
+<span class="pl-s">  "&lt;":"&lt;",</span>
+<span class="pl-s">  "&gt;":"&gt;",</span>
+<span class="pl-s">  "\"":"\"",</span>
+<span class="pl-s">  "'":"'",</span>
+<span class="pl-s">  "\u00A9":""</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-<p>The output is</p>
+jsonx_serializer <span class="pl-en">serializer</span>(std::cout,<span class="pl-c1">true</span>);
+
+special_chars.write(serializer);</pre></div>
+
+<p>Output:</p>
 
 <div class="highlight highlight-text-xml"><pre>&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> encoding</span>=<span class="pl-s"><span class="pl-pds">"</span>UTF-8<span class="pl-pds">"</span></span>?&gt;
 &lt;<span class="pl-ent">json</span><span class="pl-ent">:</span><span class="pl-ent">object</span> <span class="pl-e">xsi</span><span class="pl-e">:</span><span class="pl-e">schemaLocation</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.datapower.com/schemas/json jsonx.xsd<span class="pl-pds">"</span></span>

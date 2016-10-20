@@ -488,7 +488,7 @@ std::cout << "x2=" << x2 << std::endl;
 std::cout << "x3=" << x3 << std::endl;
 std::cout << "x4=" << x4 << std::endl;
 ```
-The output is
+Output:
 ```c++
 x1=1
 x2=20
@@ -501,7 +501,7 @@ json obj;
 obj["field1"] = json::null();
 std::cout << obj << std::endl;
 ```
-The output is 
+Output: 
 ```json
 {"field1":null}
 ```
@@ -514,7 +514,7 @@ arr.add(30);
 
 std::cout << arr << std::endl;
 ```
-The output is 
+Output: 
 ```json
 [10,20,30]
 ```
@@ -529,7 +529,7 @@ json arr(v.begin(),v.end());
 
 std::cout << arr << std::endl;
 ```
-The output is 
+Output: 
 ```c++
 [10,20,30]
 ```
@@ -545,7 +545,7 @@ for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
     std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
 }
 ```
-The output is
+Output:
 ```c++
 city=Toronto
 country=Canada
@@ -560,7 +560,7 @@ for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
     std::cout << it->as<string_type>() << std::endl;
 }
 ```
-The output is
+Output:
 ```json
 Toronto
 Vancouver 
@@ -587,7 +587,7 @@ root["persons"].add(std::move(person));
 
 std::cout << pretty_print(root) << std::endl;
 ```
-The output is
+Output:
 ```c++
 {
     "persons":

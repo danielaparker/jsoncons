@@ -561,7 +561,7 @@ size_t max_nesting_depth() const
 <pre><code>std::ifstream is("json-texts.json");
 if (!is.is_open())
 {
-    throw std::exception("Cannot open file");
+    throw std::runtime_error("Cannot open file");
 }
 
 json_deserializer handler;
@@ -578,7 +578,7 @@ while (!reader.eof())
 }
 </code></pre>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>{"a":1,"b":2,"c":3}
 {"a":4,"b":5,"c":6}

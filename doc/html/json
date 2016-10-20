@@ -1183,7 +1183,7 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x2=<span clas
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x3=<span class="pl-pds">"</span></span> &lt;&lt; x3 &lt;&lt; std::endl;
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>x4=<span class="pl-pds">"</span></span> &lt;&lt; x4 &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-c++"><pre>x1=<span class="pl-c1">1</span>
 x2=<span class="pl-c1">20</span>
@@ -1196,7 +1196,7 @@ x4=San Francisco</pre></div>
 obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = json::null();
 std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 
-<p>The output is </p>
+<p>Output: </p>
 
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
 
@@ -1209,7 +1209,7 @@ arr.add(<span class="pl-c1">30</span>);
 
 std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 
-<p>The output is </p>
+<p>Output: </p>
 
 <div class="highlight highlight-source-json"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 
@@ -1224,7 +1224,7 @@ json <span class="pl-en">arr</span>(v.begin(),v.end());
 
 std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 
-<p>The output is </p>
+<p>Output: </p>
 
 <div class="highlight highlight-source-c++"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 
@@ -1240,7 +1240,7 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">
     std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-c++"><pre>city=Toronto
 country=Canada
@@ -1255,7 +1255,7 @@ province=Ontario</pre></div>
     std::cout &lt;&lt; it-&gt;as&lt;string_type&gt;() &lt;&lt; std::endl;
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-json"><pre>Toronto
 Vancouver 
@@ -1282,7 +1282,7 @@ root[<span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds"
 
 std::cout &lt;&lt; pretty_print(root) &lt;&lt; std::endl;</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <div class="highlight highlight-source-c++"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>:

@@ -186,18 +186,61 @@ for (const auto& member : book.members())
 
 ### Construct multi-dimensional json arrays
 ```c++
-    json j = json::make_array<3>(4,3,2,0.0);
-    j[0][2][0] = 2.1;
-    j[0][2][1] = 3.1;
+json a = json::make_array<3>(4, 3, 2, 0.0);
+a[0][2][0] = 2.1;
+a[0][2][1] = 3.1;
+std::cout << pretty_print(a) << std::endl;
 ```
-See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
+Output:
+```json
+[
+    [
+        [0.0,0.0],
+        [0.0,0.0],
+        [2.1,3.1]
+    ],
+    [
+        [0.0,0.0],
+        [0.0,0.0],
+        [0.0,0.0]
+    ],
+    [
+        [0.0,0.0],
+        [0.0,0.0],
+        [0.0,0.0]
+    ],
+    [
+        [0.0,0.0],
+        [0.0,0.0],
+        [0.0,0.0]
+    ]
+]
+```See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
 
-### Convert from and to standard library containers
+### Convert from and to standard library sequence containers
 
 ```c++
-std::vector<int> v = {1,2,3,4};
+std::vector<int> v{1, 2, 3, 4};
 json j(v);
-std::deque<int> d = j.as<std::deque<int>();
+std::cout << "(1) "<< j << std::endl;
+std::deque<int> d = j.as<std::deque<int>>();
+```
+Output:
+```
+(1) [1,2,3,4]
+```
+
+### Convert from and to standard library associative containers
+
+```c++
+std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+json j(m);
+std::cout << "(1) " << j << std::endl;
+std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
+```
+Output:
+```
+(1) {"one":1,"three":3,"two":2}
 ```
 
 ### Convert from and to user defined types (and standard library containers of user defined types)

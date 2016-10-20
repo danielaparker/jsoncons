@@ -573,7 +573,7 @@ standard library collections of book objects to and from <code>json</code> value
     }
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>(1) true
 
@@ -676,7 +676,7 @@ Charles Bukowski, Women: A Novel, 12
     std::cout &lt;&lt; std::endl;
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>Maturity: 2014-Oct-14
 
@@ -808,7 +808,7 @@ Observation dates:
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 }</pre></div>
 
-<p>The output is</p>
+<p>Output:</p>
 
 <pre><code>(1) true
 
