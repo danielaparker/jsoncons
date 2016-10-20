@@ -657,9 +657,35 @@ vertical-align:1px;
 
 <h3>Construct multi-dimensional json arrays</h3>
 
-<div class="highlight highlight-source-c++"><pre>    json j = json::make_array&lt;<span class="pl-c1">3</span>&gt;(<span class="pl-c1">4</span>,<span class="pl-c1">3</span>,<span class="pl-c1">2</span>,<span class="pl-c1">0.0</span>);
-    j[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">0</span>] = <span class="pl-c1">2.1</span>;
-    j[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">3.1</span>;</pre></div>
+<div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">3</span>&gt;(<span class="pl-c1">4</span>, <span class="pl-c1">3</span>, <span class="pl-c1">2</span>, <span class="pl-c1">0.0</span>);
+a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">0</span>] = <span class="pl-c1">2.1</span>;
+a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">3.1</span>;
+std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>[
+    [
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">2.1</span>,<span class="pl-c1">3.1</span>]
+    ],
+    [
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+    ],
+    [
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+    ],
+    [
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
+        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+    ]
+]</pre></div>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Arrays">Arrays</a> for details</p>
 

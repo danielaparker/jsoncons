@@ -215,7 +215,8 @@ Output:
         [0.0,0.0]
     ]
 ]
-```See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
+```
+See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
 
 ### Convert from and to standard library sequence containers
 
