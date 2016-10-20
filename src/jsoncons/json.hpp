@@ -1177,27 +1177,9 @@ public:
         }
 
         template <class T>
-        json_proxy& operator=(const T& val)
+        json_proxy& operator=(T&& val)
         {
-            parent_.evaluate_with_default().set(name_, json_type(val));
-            return *this;
-        }
-
-        json_proxy& operator=(const char_type* s)
-        {
-            parent_.evaluate_with_default().set(name_, json_type(s));
-            return *this;
-        }
-
-        json_proxy& operator=(const basic_json& val)
-        {
-            parent_.evaluate_with_default().set(name_, val);
-            return *this;
-        }
-
-        json_proxy& operator=(basic_json&& value)
-        {
-            parent_.evaluate_with_default().set(name_, std::forward<basic_json&&>(value));
+            parent_.evaluate_with_default().set(name_, std::forward<T&&>(val));
             return *this;
         }
 
