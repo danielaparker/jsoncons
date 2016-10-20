@@ -1340,27 +1340,17 @@ public:
             evaluate().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
 
-        object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
+        template <class T>
+        object_iterator set(object_iterator hint, const string_type& name, T&& value)
         {
-            return evaluate().set(hint, name,value);
+            return evaluate().set(hint, name, std::forward<T&&>(value));
         }
 
-        object_iterator set(object_iterator hint, string_type&& name, const json_type& value)
+        template <class T>
+        object_iterator set(object_iterator hint, string_type&& name, T&& value)
 
         {
-            return evaluate().set(hint, std::forward<string_type&&>(name),value);
-        }
-
-        object_iterator set(object_iterator hint, const string_type& name, json_type&& value)
-
-        {
-            return evaluate().set(hint, name,std::forward<json_type&&>(value));
-        }
-
-        object_iterator set(object_iterator hint, string_type&& name, json_type&& value)
-
-        {
-            return evaluate().set(hint, std::forward<string_type&&>(name),std::forward<json_type&&>(value));
+            return evaluate().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
@@ -2804,25 +2794,14 @@ public:
     }
 
     template <class T>
-    object_iterator set(object_iterator hint, const string_type& name, const T& value)
-    {
-        return set(hint,name,json_type(value));
-    }
-
-    template <class T>
-    object_iterator set(object_iterator hint, string_type&& name, const T& value)
-    {
-        return set(hint,name,json_type(value));
-    }
-
-    object_iterator set(object_iterator hint, const string_type& name, const json_type& value)
+    object_iterator set(object_iterator hint, const string_type& name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, name, value);
+            return var_.object_data_cast()->value().set(hint, name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -2831,40 +2810,13 @@ public:
         }
     }
 
-    object_iterator set(object_iterator hint, string_type&& name, const json_type& value){
+    template <class T>
+    object_iterator set(object_iterator hint, string_type&& name, T&& value){
         switch (var_.type_id()){
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
-            }
-        }
-    }
-
-    object_iterator set(object_iterator hint, const string_type& name, json_type&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, name,std::forward<json_type&&>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
-            }
-        }
-    } 
-
-    object_iterator set(object_iterator hint, string_type&& name, json_type&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),std::forward<json_type&&>(value));
+            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
             break;
         default:
             {

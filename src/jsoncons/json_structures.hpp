@@ -693,7 +693,7 @@ public:
     template <class T>
     void set(const string_type& name, T&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
             members_.emplace_back(name, std::forward<T&&>(value));
@@ -711,7 +711,7 @@ public:
     template <class T>
     void set(string_type&& name, T&& value)
     {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
             members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
@@ -726,78 +726,8 @@ public:
         }
     }
 
-    iterator set(iterator hint, const char_type* name, const Json& value)
-    {
-        return set(hint, name, std::char_traits<char_type>::length(name), value);
-    }
-
-    iterator set(iterator hint, const char_type* name, Json&& value)
-    {
-        return set(hint, name, std::char_traits<char_type>::length(name), std::forward<Json&&>(value));
-    }
-
-    iterator set(iterator hint, const char_type* s, size_t length, const Json& value)
-    {
-        base_iterator it;
-        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
-        {
-            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),s, member_lt_string<value_type,char_type>(length));
-        }
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(s, length), value));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (name_eq_string(it->name(),s,length))
-        {
-            it->value(value);
-        }
-        else
-        {
-           it = members_.insert(it,value_type(string_type(s,length),value));
-        }
-        return iterator(it);
-    }
-
-    iterator set(iterator hint, const char_type* s, size_t length, Json&& value)
-    {
-        base_iterator it;
-        if (hint.get() != members_.end() && name_le_string(hint.get()->name(), s, length))
-        {
-            it = std::lower_bound(hint.get(),members_.end(),s,member_lt_string<value_type,char_type>(length));
-        }
-        else
-        {
-            it = std::lower_bound(members_.begin(),members_.end(),s, member_lt_string<value_type,char_type>(length));
-        }
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(s, length), std::forward<Json&&>(value)));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (name_eq_string(it->name(),s,length))
-        {
-            it->value(std::forward<Json&&>(value));
-        }
-        else
-        {
-           it = members_.insert(it,value_type(string_type(s,length),std::forward<Json&&>(value)));
-        }
-        return iterator(it);
-    }
-
-    iterator set(iterator hint, const string_type& name, const Json& value)
-    {
-        return set(hint,name.data(),name.length(),value);
-    }
-
-    iterator set(iterator hint, string_type&& name, const Json& value)
+    template <class T>
+    iterator set(iterator hint, const string_type& name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->name() <= name)
@@ -811,7 +741,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), value));
+            members_.emplace_back(name, std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
@@ -820,19 +750,15 @@ public:
         }
         else
         {
-            it = members_.insert(it,value_type(std::forward<string_type&&>(name),value));
+            it = members_.emplace(it,name,std::forward<T&&>(value));
         }
         return iterator(it);
     }
 
-    iterator set(iterator hint, const string_type& name, Json&& value)
+    template <class T>
+    iterator set(iterator hint, string_type&& name, T&& value)
     {
-        return set(hint,name.data(),name.length(),std::forward<Json&&>(value));
-    }
-
-    iterator set(iterator hint, string_type&& name, Json&& value)
-    {
-        typename std::vector<value_type,allocator_type>::iterator it;
+        base_iterator it;
         if (hint.get() != members_.end() && hint.get()->name() <= name)
         {
             it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
@@ -844,17 +770,16 @@ public:
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), 
-                                          std::forward<Json&&>(value)));
+            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {
-            it->value(std::forward<Json&&>(value));
+            it->value(value);
         }
         else
         {
-            it = members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
+            it = members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
         return iterator(it);
     }
