@@ -183,7 +183,7 @@ public:
     template <class T>
     iterator add(const_iterator pos, T&& value)
     {
-        return elements_.insert(pos, std::forward<T&&>(value));
+        return elements_.emplace(pos, std::forward<T&&>(value));
     }
 #endif
 
