@@ -34,8 +34,6 @@ public:
     }
 
 public:
-    //friend class basic_json<CharT,JsonTraits,Allocator>;
-
     IteratorT begin()
     {
         return first_;
@@ -254,11 +252,11 @@ public:
 };
 
 template <class CharT,class ValueT>
-class member_lt_string2
+class string_lt_member
 {
     size_t length_;
 public:
-    member_lt_string2(size_t length)
+    string_lt_member(size_t length)
         : length_(length)
     {
     }
@@ -660,24 +658,6 @@ public:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
     }
 
-    range<iterator> members(const char_type* name, size_t length)
-    {
-        member_lt_string<value_type,char_type> comp(length);
-        member_lt_string2<char_type, value_type> comp2(length);
-        auto lb = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto ub = std::upper_bound(lb,members_.end(), name, comp2);
-        return range<iterator>{iterator(lb),iterator(ub)};
-    }
-
-    range<const_iterator> members(const char_type* name, size_t length) const
-    {
-        member_lt_string<value_type,char_type> comp(length);
-        member_lt_string2<char_type, value_type> comp2(length);
-        auto lb = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto ub = std::upper_bound(lb,members_.end(), name, comp2);
-        return range<const_iterator>{const_iterator(lb),const_iterator(ub)};
-    }
-
     iterator find(const char_type* name, size_t length)
     {
         member_lt_string<value_type,char_type> comp(length);
@@ -721,38 +701,6 @@ public:
             *d = pred(*s);
         }
         std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
-    }
-
-    void insert(const value_type& value)
-    {
-        auto it = std::upper_bound(members_.begin(),
-                                   members_.end(),
-                                   value.name().c_str(),
-                                   member_lt_string2<char_type,value_type>(value.name().length()));
-        if (it == members_.end())
-        {
-            members_.push_back(value);
-        }
-        else
-        {
-            members_.insert(it,value);
-        }
-    }
-
-    void insert(value_type&& value)
-    {
-        auto it = std::upper_bound(members_.begin(),
-                                   members_.end(),
-                                   value.name().c_str(),
-                                   member_lt_string2<char_type,value_type>(value.name().length()));
-        if (it == members_.end())
-        {
-            members_.push_back(std::forward<value_type&&>(value));
-        }
-        else
-        {
-            members_.insert(it,std::forward<value_type&&>(value));
-        }
     }
 
     void set(const char_type* s, size_t length, const Json& value)
