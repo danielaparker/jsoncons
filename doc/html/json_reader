@@ -468,17 +468,15 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_reader
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_reader
 
-typedef basic_json_reader&lt;char&gt; json_reader
-</code></pre>
+<span class="pl-k">typedef</span> basic_json_reader&lt;<span class="pl-k">char</span>&gt; json_reader</pre></div>
 
 <p>A <code>json_reader</code> can read a sequence of JSON texts from a stream.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/json_reader.hpp"
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json_reader.hpp<span class="pl-pds">"</span></span></pre></div>
 
 <h3>Constructors</h3>
 
@@ -551,39 +549,36 @@ size_t max_nesting_depth() const
 
 <p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
 
-<pre><code>{"a":1,"b":2,"c":3}
-{"a":4,"b":5,"c":6}
-{"a":7,"b":8,"c":9}
-</code></pre>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}
+{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">5</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">6</span>}
+{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">7</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">8</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">9</span>}</pre></div>
 
 <p>This is the code that reads them: </p>
 
-<pre><code>std::ifstream is("json-texts.json");
-if (!is.is_open())
+<div class="highlight highlight-source-c++"><pre>std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>json-texts.json<span class="pl-pds">"</span></span>);
+<span class="pl-k">if</span> (!is.is_open())
 {
-    throw std::runtime_error("Cannot open file");
+    <span class="pl-k">throw</span> <span class="pl-smi">std::runtime_error</span>(<span class="pl-s"><span class="pl-pds">"</span>Cannot open file<span class="pl-pds">"</span></span>);
 }
 
 json_deserializer handler;
-json_reader reader(is,handler);
+json_reader <span class="pl-en">reader</span>(is,handler);
 
-while (!reader.eof())
+<span class="pl-k">while</span> (!reader.eof())
 {
-    reader.read_next();
-    if (!reader.eof())
+    reader.<span class="pl-c1">read_next</span>();
+    <span class="pl-k">if</span> (!reader.<span class="pl-c1">eof</span>())
     {
-        json val = handler.get_result();
+        json val = handler.<span class="pl-c1">get_result</span>();
         std::cout &lt;&lt; val &lt;&lt; std::endl;
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>Output:</p>
 
-<pre><code>{"a":1,"b":2,"c":3}
-{"a":4,"b":5,"c":6}
-{"a":7,"b":8,"c":9}
-</code></pre>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}
+{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">5</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">6</span>}
+{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">7</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">8</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">9</span>}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

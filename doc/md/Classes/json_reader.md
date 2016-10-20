@@ -1,13 +1,14 @@
-    jsoncons::json_reader
+```c++
+jsoncons::json_reader
 
-    typedef basic_json_reader<char> json_reader
-
+typedef basic_json_reader<char> json_reader
+```
 A `json_reader` can read a sequence of JSON texts from a stream.
 
 ### Header
-
-    #include "jsoncons/json_reader.hpp"
-
+```c++
+#include "jsoncons/json_reader.hpp"
+```
 ### Constructors
 
     json_reader(std::istream& is,
@@ -60,35 +61,35 @@ Use `max_nesting_depth(size_t depth)` instead
 ### Reading a sequence of JSON texts from a stream
 
 `jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
-
-    {"a":1,"b":2,"c":3}
-    {"a":4,"b":5,"c":6}
-    {"a":7,"b":8,"c":9}
-
+```json
+{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+```
 This is the code that reads them: 
+```c++
+std::ifstream is("json-texts.json");
+if (!is.is_open())
+{
+    throw std::runtime_error("Cannot open file");
+}
 
-    std::ifstream is("json-texts.json");
-    if (!is.is_open())
+json_deserializer handler;
+json_reader reader(is,handler);
+
+while (!reader.eof())
+{
+    reader.read_next();
+    if (!reader.eof())
     {
-        throw std::runtime_error("Cannot open file");
+        json val = handler.get_result();
+        std::cout << val << std::endl;
     }
-
-    json_deserializer handler;
-    json_reader reader(is,handler);
-
-    while (!reader.eof())
-    {
-        reader.read_next();
-        if (!reader.eof())
-        {
-            json val = handler.get_result();
-            std::cout << val << std::endl;
-        }
-    }
-
+}
+```
 Output:
-
-    {"a":1,"b":2,"c":3}
-    {"a":4,"b":5,"c":6}
-    {"a":7,"b":8,"c":9}
-
+```json
+{"a":1,"b":2,"c":3}
+{"a":4,"b":5,"c":6}
+{"a":7,"b":8,"c":9}
+```

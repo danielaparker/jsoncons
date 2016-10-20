@@ -468,10 +468,9 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::output_format
+<div class="highlight highlight-source-c++"><pre>jsoncons::output_format
 
-typedef basic_output_format&lt;char&gt; output_format
-</code></pre>
+<span class="pl-k">typedef</span> basic_output_format&lt;<span class="pl-k">char</span>&gt; output_format</pre></div>
 
 <p>The output_format class is an instantiation of the basic_output_format class template that uses <code>char</code> as the character type.</p>
 
@@ -481,8 +480,7 @@ typedef basic_output_format&lt;char&gt; output_format
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/output_format.hpp"
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/output_format.hpp<span class="pl-pds">"</span></span></pre></div>
 
 <h3>Member constants</h3>
 
