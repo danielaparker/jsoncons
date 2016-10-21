@@ -763,7 +763,7 @@ public:
             return *this;
         }
 
-        variant& operator=(variant&& val)
+        variant& operator=(variant&& val) JSONCONS_NOEXCEPT
         {
             if (this != &val)
             {
@@ -1199,7 +1199,7 @@ public:
         }
 
         template <class T>
-        json_proxy& operator=(T&& val)
+        json_proxy& operator=(T&& val) 
         {
             parent_.evaluate_with_default().set(name_, std::forward<T&&>(val));
             return *this;
@@ -1696,7 +1696,7 @@ public:
     {
     }
 
-    basic_json(json_type&& other)
+    basic_json(json_type&& other) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_))
     {
     }
@@ -1789,7 +1789,7 @@ public:
         return *this;
     }
 
-    basic_json& operator=(json_type&& rhs)
+    basic_json& operator=(json_type&& rhs) JSONCONS_NOEXCEPT
     {
         if (this != &rhs)
         {

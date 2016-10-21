@@ -69,7 +69,7 @@ public:
         : elements_(val.elements_,allocator)
     {
     }
-    json_array(json_array&& val)
+    json_array(json_array&& val) JSONCONS_NOEXCEPT
         : elements_(std::move(val.elements_))
     {
     }
@@ -810,7 +810,7 @@ public:
     {
     }
 
-    json_object(json_object&& val)
+    json_object(json_object&& val) JSONCONS_NOEXCEPT
         : members_(std::move(val.members_))
     {
     }

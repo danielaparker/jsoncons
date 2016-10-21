@@ -768,23 +768,113 @@ result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 
-<h3>Read a csv file as a json value</h3>
+<h3>Read from a csv file</h3>
 
-<div class="highlight highlight-source-c++"><pre>std::fstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>tasks.csv<span class="pl-pds">"</span></span>);
+<pre lang="csv"><code>project_id, task_name, task_start, task_finish
+4001,task1,01/01/2003,01/31/2003
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+</code></pre>
 
-json_deserializer handler;
+<p><code>tasks.csv</code></p>
 
-csv_parameters params;
-params.assume_header(<span class="pl-c1">true</span>)
-      .trim(<span class="pl-c1">true</span>)
-      .ignore_empty_values(<span class="pl-c1">true</span>)
-      .column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">"</span></span>
 
-csv_reader <span class="pl-en">reader</span>(is,handler,params);
-reader.read();
-json val = handler.get_result();</pre></div>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::csv<span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/tasks.csv<span class="pl-pds">"</span></span>);
+
+    ojson_deserializer handler;
+
+    csv_parameters params;
+    params.<span class="pl-c1">assume_header</span>(<span class="pl-c1">true</span>)
+          .<span class="pl-c1">trim</span>(<span class="pl-c1">true</span>)
+          .<span class="pl-c1">ignore_empty_values</span>(<span class="pl-c1">true</span>) 
+          .<span class="pl-c1">column_types</span>({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
+    csv_reader <span class="pl-smi">reader</span>(is,handler,params);
+    reader.<span class="pl-c1">read</span>();
+    ojson val = handler.<span class="pl-c1">get_result</span>();
+
+    std::ofstream <span class="pl-smi">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/tasks.json<span class="pl-pds">"</span></span>);
+    os &lt;&lt; <span class="pl-c1">pretty_print</span>(val);
+}</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>: <span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>01/31/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>task1<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>01/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>: <span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>02/28/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>task2<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>02/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>: <span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>03/31/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>task3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>03/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>: <span class="pl-c1">4002</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>04/30/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>task1<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>04/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>: <span class="pl-c1">4002</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>task2<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>05/01/2003<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
+
+<p><code>tasks.json</code></p>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/csv_reader">csv_reader</a> for details</p>
+
+<h3>Write to a csv file</h3>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">"</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::csv<span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>output/tasks.json<span class="pl-pds">"</span></span>);
+
+    ojson tasks;
+    is &gt;&gt; tasks;
+
+    std::ofstream <span class="pl-smi">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/tasks.csv<span class="pl-pds">"</span></span>);
+    csv_serializer <span class="pl-smi">serializer</span>(os);
+    tasks.<span class="pl-c1">write</span>(serializer);
+}</pre></div>
+
+<p>Output:</p>
+
+<pre lang="csv"><code>project_id,task_name,task_start,task_finish
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+</code></pre>
+
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/csv_serializer">csv_serializer</a> for details</p>
 
 <h2>Acknowledgements</h2>
 

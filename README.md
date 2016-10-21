@@ -303,24 +303,113 @@ result = json_query(booklist, "$..['author','title']");
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
-### Read a csv file as a json value
-
-```c++
-std::fstream is("tasks.csv");
-
-json_deserializer handler;
-
-csv_parameters params;
-params.assume_header(true)
-      .trim(true)
-      .ignore_empty_values(true)
-      .column_types({"integer","string","string","string"});
-
-csv_reader reader(is,handler,params);
-reader.read();
-json val = handler.get_result();
+### Read from a csv file 
+```csv
+project_id, task_name, task_start, task_finish
+4001,task1,01/01/2003,01/31/2003
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
 ```
+`tasks.csv`
+```c++
+#include <fstream>
+#include "jsoncons/json.hpp"
+#include "jsoncons_ext/csv/csv_reader.hpp"
+
+using namespace jsoncons;
+using namespace jsoncons::csv;
+
+int main()
+{
+    std::ifstream is("input/tasks.csv");
+
+    ojson_deserializer handler;
+
+    csv_parameters params;
+    params.assume_header(true)
+          .trim(true)
+          .ignore_empty_values(true) 
+          .column_types({"integer","string","string","string"});
+    csv_reader reader(is,handler,params);
+    reader.read();
+    ojson val = handler.get_result();
+
+    std::ofstream os("output/tasks.json");
+    os << pretty_print(val);
+}
+```
+Output:
+```json
+[
+    {
+        "project_id": 4001,
+        "task_finish": "01/31/2003",
+        "task_name": "task1",
+        "task_start": "01/01/2003"
+    },
+    {
+        "project_id": 4001,
+        "task_finish": "02/28/2003",
+        "task_name": "task2",
+        "task_start": "02/01/2003"
+    },
+    {
+        "project_id": 4001,
+        "task_finish": "03/31/2003",
+        "task_name": "task3",
+        "task_start": "03/01/2003"
+    },
+    {
+        "project_id": 4002,
+        "task_finish": "04/30/2003",
+        "task_name": "task1",
+        "task_start": "04/01/2003"
+    },
+    {
+        "project_id": 4002,
+        "task_name": "task2",
+        "task_start": "05/01/2003"
+    }
+]
+```
+`tasks.json`
+
 See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) for details
+
+### Write to a csv file 
+```c++
+#include <fstream>
+#include "jsoncons/json.hpp"
+#include "jsoncons_ext/csv/csv_serializer.hpp"
+
+using namespace jsoncons;
+using namespace jsoncons::csv;
+
+int main()
+{
+    std::ifstream is("output/tasks.json");
+
+    ojson tasks;
+    is >> tasks;
+
+    std::ofstream os("output/tasks.csv");
+    csv_serializer serializer(os);
+    tasks.write(serializer);
+}
+```
+Output:
+```csv
+project_id,task_name,task_start,task_finish
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+```
+`tasks.csv`
+
+See [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details
 
 ## Acknowledgements
 

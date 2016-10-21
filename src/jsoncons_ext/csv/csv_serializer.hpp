@@ -147,11 +147,15 @@ private:
     {
         if (stack_.size() == 2)
         {
+            while (stack_.back().count_ < header_.size())
+            {
+                os_.put(parameters_.field_delimiter());
+                ++stack_.back().count_;
+            }
             os_.write(parameters_.line_delimiter());
             if (stack_[0].count_ == 0)
             {
                 os_.write(header_oss_.str());
-                os_.write(parameters_.line_delimiter());
             }
         }
         stack_.pop_back();
