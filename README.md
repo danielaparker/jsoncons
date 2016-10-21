@@ -303,7 +303,7 @@ result = json_query(booklist, "$..['author','title']");
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
-### Read from a csv file 
+### Read csv file tasks.csv 
 ```csv
 project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -312,7 +312,6 @@ project_id, task_name, task_start, task_finish
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 ```
-`tasks.csv`
 ```c++
 #include <fstream>
 #include "jsoncons/json.hpp"
@@ -374,11 +373,10 @@ Output:
     }
 ]
 ```
-`tasks.json`
 
 See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) for details
 
-### Write to a csv file 
+### Write csv file tasks.csv
 ```c++
 #include <fstream>
 #include "jsoncons/json.hpp"
@@ -407,7 +405,6 @@ project_id,task_name,task_start,task_finish
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 ```
-`tasks.csv`
 
 See [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details
 
