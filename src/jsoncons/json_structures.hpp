@@ -22,28 +22,6 @@
 
 namespace jsoncons {
 
-template <typename IteratorT>
-class range 
-{
-    IteratorT first_;
-    IteratorT last_;
-public:
-    range(const IteratorT& first, const IteratorT& last)
-        : first_(first), last_(last)
-    {
-    }
-
-public:
-    IteratorT begin()
-    {
-        return first_;
-    }
-    IteratorT end()
-    {
-        return last_;
-    }
-};
-
 template <class Json, class Allocator>
 class json_array
 {
@@ -154,7 +132,7 @@ public:
     const Json& operator[](size_t i) const {return elements_[i];}
 
     template <class T>
-    void push_back(T&& value)
+    void add(T&& value)
     {
         elements_.emplace_back(std::forward<T&&>(value));
     }
@@ -700,7 +678,7 @@ public:
         }
         else if (it->name() == name)
         {
-            it->value(value);
+            it->value(std::forward<T&&>(value));
         }
         else
         {
@@ -718,7 +696,7 @@ public:
         }
         else if (it->name() == name)
         {
-            it->value(value);
+            it->value(std::forward<T&&>(value));
         }
         else
         {
@@ -912,24 +890,6 @@ public:
         return members_[i].value();
     }
 
-    range<iterator> members(const char_type* name, size_t length)
-    {
-        equals_pred<value_type,char_type> comp(name, length);
-        auto lb = std::find_if(members_.begin(),members_.end(), comp);
-        auto ub = std::find_if_not(lb,members_.end(), comp);
-
-        return range<iterator>{lb,ub};
-    }
-
-    range<const_iterator> members(const char_type* name, size_t length) const
-    {
-        equals_pred<value_type,char_type> comp(name, length);
-        auto lb = std::find_if(members_.begin(),members_.end(), comp);
-        auto ub = std::find_if_not(lb,members_.end(), comp);
-
-        return range<const_iterator>{lb,ub};
-    }
-
     iterator find(const char_type* name, size_t length)
     {
         equals_pred<value_type,char_type> comp(name, length);
@@ -972,172 +932,76 @@ public:
         }
     }
 
-    void set(const char_type* name, size_t length, const Json& value)
-    {
-        equals_pred<value_type,char_type> comp(name, length);
-        auto it = std::find_if(members_.begin(),members_.end(), comp);
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(name,length),value));
-        }
-        else
-        {
-            it->value(value);
-        }
-    }
-
-    void set(const char_type* name, size_t length, Json&& value)
-    {
-        equals_pred<value_type,char_type> comp(name, length);
-        auto it = std::find_if(members_.begin(),members_.end(), comp);
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(name,length),std::forward<Json&&>(value)));
-        }
-        else 
-        {
-            it->value(std::forward<Json&&>(value));
-        }
-    }
-
-    void set(string_type&& name, const Json& value)
+    template <class T>
+    void set(const string_type& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), value));
+            members_.emplace_back(name, std::forward<T&&>(value));
         }
         else
         {
-            it->value(value);
+            it->value(std::forward<T&&>(value));
         }
     }
 
-    void set(const string_type& name, const Json& value)
-    {
-        set(name.data(),name.length(),value);
-    }
-
-    void set(const string_type& name, Json&& value)
-    {
-        set(name.data(),name.length(),std::forward<Json&&>(value));
-    }
-
-    void set(string_type&& name, Json&& value)
+    template <class T>
+    void set(string_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
+            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
         }
         else
         {
-            it->value(std::forward<Json&&>(value));
+            it->value(std::forward<T&&>(value));
         }
     }
 
-    iterator set(iterator hint, const char_type* name, const Json& value)
-    {
-        return set(hint, name, std::char_traits<char_type>::length(name), value);
-    }
-
-    iterator set(iterator hint, const char_type* name, Json&& value)
-    {
-        return set(hint, name, std::char_traits<char_type>::length(name), std::forward<Json&&>(value));
-    }
-
-    iterator set(iterator hint, const char_type* name, size_t length, const Json& value)
-    {
-        iterator it = hint;
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(name, length), value));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (name_eq_string(it->name(),name,length))
-        {
-            it->value(value);
-        }
-        else
-        {
-           it = members_.insert(it,value_type(string_type(name,length),value));
-        }
-        return it;
-    }
-
-    iterator set(iterator hint, const char_type* name, size_t length, Json&& value)
-    {
-        iterator it = hint;
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(string_type(name, length), std::forward<Json&&>(value)));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (name_eq_string(it->name(),name,length))
-        {
-            it->value(std::forward<Json&&>(value));
-        }
-        else
-        {
-           it = members_.insert(it,value_type(string_type(name,length),std::forward<Json&&>(value)));
-        }
-        return it;
-    }
-
-    iterator set(iterator hint, const string_type& name, const Json& value)
-    {
-        return set(hint,name.data(),name.length(),value);
-    }
-
-    iterator set(iterator hint, string_type&& name, const Json& value)
-    {
-        iterator it = hint;
-
-        if (it == members_.end())
-        {
-            members_.push_back(value_type(std::forward<string_type&&>(name), value));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (it->name() == name)
-        {
-            it->value(value);
-        }
-        else
-        {
-            it = members_.insert(it,value_type(std::forward<string_type&&>(name),value));
-        }
-        return it;
-    }
-
-    iterator set(iterator hint, const string_type& name, Json&& value)
-    {
-        return set(hint,name.data(),name.length(),std::forward<Json&&>(value));
-    }
-
-    iterator set(iterator hint, string_type&& name, Json&& value)
+    template <class T>
+    iterator set(iterator hint, const string_type& name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
 
         if (it == members_.end())
         {
-            members_.push_back(value_type(std::forward<string_type&&>(name), std::forward<Json&&>(value)));
+            members_.emplace_back(name, std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->name() == name)
         {
-            it->value(std::forward<Json&&>(value));
+            it->value(std::forward<T&&>(value));
         }
         else
         {
-            it = members_.insert(it,value_type(std::forward<string_type&&>(name),std::forward<Json&&>(value)));
+            it = members_.emplace(it,name,std::forward<T&&>(value));
+        }
+        return it;
+    }
+
+    template <class T>
+    iterator set(iterator hint, string_type&& name, T&& value)
+    {
+        typename std::vector<value_type,allocator_type>::iterator it = hint;
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
+            it = members_.begin() + (members_.size() - 1);
+        }
+        else if (it->name() == name)
+        {
+            it->value(std::forward<T&&>(value));
+        }
+        else
+        {
+            it = members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
         return it;
     }

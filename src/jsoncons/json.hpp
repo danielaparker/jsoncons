@@ -33,6 +33,28 @@
 
 namespace jsoncons {
 
+template <typename IteratorT>
+class range 
+{
+    IteratorT first_;
+    IteratorT last_;
+public:
+    range(const IteratorT& first, const IteratorT& last)
+        : first_(first), last_(last)
+    {
+    }
+
+public:
+    IteratorT begin()
+    {
+        return first_;
+    }
+    IteratorT end()
+    {
+        return last_;
+    }
+};
+
 template <class T, class Allocator, typename... Args>
 T* create_impl(const Allocator& allocator, Args&& ... args)
 {
@@ -2813,7 +2835,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().push_back(std::forward<T&&>(value));
+            var_.array_data_cast()->value().add(std::forward<T&&>(value));
             break;
         default:
             {
