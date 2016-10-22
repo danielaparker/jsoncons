@@ -248,7 +248,7 @@ namespace jsoncons
                     }
                     for (auto x: a.elements())
                     {
-                        if (!x.is<T>())
+                        if (!x.template is<T>())
                         {
                             return false;
                         }
@@ -278,7 +278,7 @@ namespace jsoncons
                     const auto& a = val[i];
                     for (size_t j = 0; j < a.size(); ++j)
                     {
-                        A(i,j) = a[j].as<T>();
+                        A(i,j) = a[j].template as<T>();
                     }
                 }
                 return A;

@@ -712,7 +712,7 @@ Observation dates:
                     }
                     <span class="pl-k">for</span> (<span class="pl-k">auto</span> x: a.<span class="pl-c1">elements</span>())
                     {
-                        <span class="pl-k">if</span> (!x.<span class="pl-smi">is</span>&lt;T&gt;())
+                        <span class="pl-k">if</span> (!x.<span class="pl-smi">template</span> is&lt;T&gt;())
                         {
                             <span class="pl-k">return</span> <span class="pl-c1">false</span>;
                         }
@@ -742,7 +742,7 @@ Observation dates:
                     <span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a = val[i];
                     <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; a.<span class="pl-c1">size</span>(); ++j)
                     {
-                        <span class="pl-c1">A</span>(i,j) = a[j].<span class="pl-smi">as</span>&lt;T&gt;();
+                        <span class="pl-c1">A</span>(i,j) = a[j].<span class="pl-smi">template</span> as&lt;T&gt;();
                     }
                 }
                 <span class="pl-k">return</span> A;

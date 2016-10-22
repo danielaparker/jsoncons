@@ -71,7 +71,7 @@ namespace jsoncons
                     }
                     for (auto x: a.elements())
                     {
-                        if (!x.is<T>())
+                        if (!x.template is<T>())
                         {
                             return false;
                         }
@@ -101,7 +101,7 @@ namespace jsoncons
                     const auto& a = val[i];
                     for (size_t j = 0; j < a.size(); ++j)
                     {
-                        A(i,j) = a[j].as<T>();
+                        A(i,j) = a[j].template as<T>();
                     }
                 }
                 return A;
@@ -115,7 +115,7 @@ namespace jsoncons
 
         static Json to_json(const boost::numeric::ublas::matrix<T>& val)
         {
-            Json a = Json::make_array<2>(val.size1(), val.size2(),T());
+            Json a = Json::make_array<2>(val.size1(), val.size2(), T());
             for (size_t i = 0; i < val.size1(); ++i)
             {
                 for (size_t j = 0; j < val.size1(); ++j)
