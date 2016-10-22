@@ -7,10 +7,7 @@
 #include <map>
 #include <unordered_map>
 
-using jsoncons::json;
-using jsoncons::pretty_print;
-using jsoncons::output_format;
-using std::string;
+using namespace jsoncons;
 
 void array_example1()
 {

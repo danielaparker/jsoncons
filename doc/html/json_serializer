@@ -523,9 +523,8 @@ You must ensure that the output stream exists as long as does <code>json_seriali
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json_serializer.hpp<span class="pl-pds">"</span></span>
 
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> boost::numeric::ublas::matrix;
-<span class="pl-k">using</span> jsoncons::json_serializer;
-<span class="pl-k">using</span> jsoncons::output_format;
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {

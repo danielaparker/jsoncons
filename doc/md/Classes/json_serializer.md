@@ -43,9 +43,8 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 #include <boost/numeric/ublas/matrix.hpp>
 #include "jsoncons/json_serializer.hpp"
 
+using namespace jsoncons;
 using boost::numeric::ublas::matrix;
-using jsoncons::json_serializer;
-using jsoncons::output_format;
 
 int main()
 {

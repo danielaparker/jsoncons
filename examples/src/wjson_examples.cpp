@@ -9,10 +9,6 @@
 #include "jsoncons/json.hpp"
 
 using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::pretty_print;
-using jsoncons::woutput_format;
-using std::wstring;
 
 void wjson_object()
 {
@@ -26,12 +22,12 @@ void wjson_object()
 void wjson_escape_u2()
 {
 #ifdef _MSC_VER
-    wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
+    std::wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
     std::wistringstream is(input);
 
     wjson val = wjson::parse_stream(is);
 
-    wstring s = val[0].as<wstring>();
+    std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)
@@ -56,12 +52,12 @@ void wjson_escape_u2()
 void wjson_surrogate_pair()
 {
 #ifdef _MSC_VER
-    wstring input = L"[\"\\uD950\\uDF21\"]";
+    std::wstring input = L"[\"\\uD950\\uDF21\"]";
     std::wistringstream is(input);
 
     wjson val = wjson::parse_stream(is);
 
-    wstring s = val[0].as<wstring>();
+    std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
     std::cout << "Hex dump: [";
     for (size_t i = 0; i < s.size(); ++i)

@@ -5,9 +5,8 @@
 #include "jsoncons/json.hpp"
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
-using jsoncons::json;
-using jsoncons::wjson;
-using jsoncons::jsonpath::json_query;
+using namespace jsoncons;
+using namespace jsoncons::jsonpath;
 
 void basics_json_example1()
 {
