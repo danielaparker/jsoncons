@@ -483,7 +483,10 @@ template &lt;class T&gt;
 basic_json&amp; operator=(<span class="pl-k">const</span> T&amp; val)
 
 template &lt;class T&gt;
-void add(<span class="pl-k">const</span> T&amp; val)</pre></div>
+void add(T&amp;&amp; val)
+
+template &lt;class T&gt;
+void set(<span class="pl-k">const</span> string_type&amp; name, T&amp;&amp; val)</pre></div>
 
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 

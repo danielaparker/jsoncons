@@ -994,19 +994,19 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 
 <p>Requests the removal of unused capacity.</p>
 
-<pre><code>void set(const string_type&amp; name, const json&amp; val)
-void set(string_type&amp;&amp; name, const json&amp; val)
-void set(const string_type&amp; name, json&amp;&amp; val)
-void set(string_type&amp;&amp; name, json&amp;&amp; val)
+<pre><code>template &lt;class T&gt;
+void set(const string_type&amp; name, T&amp;&amp; val)
+template &lt;class T&gt;
+void set(string_type&amp;&amp; name, T&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>object_iterator set(object_iterator hint, const string_type&amp; name, const json&amp; val)
-object_iterator set(object_iterator hint, string_type&amp;&amp; name, const json&amp; val)
-object_iterator set(object_iterator hint, const string_type&amp; name, json&amp;&amp; val)
-object_iterator set(object_iterator hint, string_type&amp;&amp; name, json&amp;&amp; val)
+<pre><code>template &lt;class T&gt;
+object_iterator set(object_iterator hint, const string_type&amp; name, T&amp;&amp; val)
+template &lt;class T&gt;
+object_iterator set(object_iterator hint, string_type&amp;&amp; name, T&amp;&amp; val)
 </code></pre>
 
 <p>Inserts a new member or replaces an existing member in a json object.<br>
@@ -1014,19 +1014,19 @@ Insertion time is optimized if <code>hint</code> points to the member that will 
 Returns a <code>member_iterator</code> pointing at the member that was inserted or updated<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>void add(const json&amp; val)
-void add(json&amp;&amp; val)
+<pre><code>template &lt;class T&gt;
+void add(T&amp;&amp; val)
 </code></pre>
 
-<p>Adds a new element at the end of a json array. The content of <code>val</code> is copied (or moved) to the new element.<br>
+<p>Adds a new json element at the end of a json array. The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
 
-<pre><code>array_iterator add(const_array_iterator pos, const json&amp; val)
-array_iterator add(const_array_iterator pos, json&amp;&amp; val)
+<pre><code>template &lt;class T&gt;
+array_iterator add(const_array_iterator pos, T&amp;&amp; val)
 </code></pre>
 
-<p>Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
-The content of <code>val</code> is copied (or moved) to the new element.<br>
+<p>Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
+The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
 Returns an <code>array_iterator</code> that points to the new value<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
 

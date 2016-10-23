@@ -335,31 +335,31 @@ Throws `std::runtime_error` if not an object.
     void shrink_to_fit()
 Requests the removal of unused capacity.
 
-    void set(const string_type& name, const json& val)
-    void set(string_type&& name, const json& val)
-    void set(const string_type& name, json&& val)
-    void set(string_type&& name, json&& val)
+    template <class T>
+    void set(const string_type& name, T&& val)
+    template <class T>
+    void set(string_type&& name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
 
-    object_iterator set(object_iterator hint, const string_type& name, const json& val)
-    object_iterator set(object_iterator hint, string_type&& name, const json& val)
-    object_iterator set(object_iterator hint, const string_type& name, json&& val)
-    object_iterator set(object_iterator hint, string_type&& name, json&& val)
+    template <class T>
+    object_iterator set(object_iterator hint, const string_type& name, T&& val)
+    template <class T>
+    object_iterator set(object_iterator hint, string_type&& name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_iterator` pointing at the member that was inserted or updated
 Throws `std::runtime_error` if not an object.
 
-    void add(const json& val)
-    void add(json&& val)
-Adds a new element at the end of a json array. The content of `val` is copied (or moved) to the new element.
+    template <class T>
+    void add(T&& val)
+Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Throws `std::runtime_error` if not an array.
 
-    array_iterator add(const_array_iterator pos, const json& val)
-    array_iterator add(const_array_iterator pos, json&& val)
-Adds a new element at the specified position of a json array, shifting all elements currently at or above that position to the right.
-The content of `val` is copied (or moved) to the new element.
+    template <class T>
+    array_iterator add(const_array_iterator pos, T&& val)
+Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
+The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Returns an `array_iterator` that points to the new value
 Throws `std::runtime_error` if not an array.
 

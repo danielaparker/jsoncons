@@ -14,7 +14,10 @@ template <class T>
 basic_json& operator=(const T& val)
 
 template <class T>
-void add(const T& val)
+void add(T&& val)
+
+template <class T>
+void set(const string_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
