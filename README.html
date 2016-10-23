@@ -742,29 +742,40 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a> for details.</p>
 
+<h2>Extensions</h2>
+
 <h3>Query json values with JsonPath</h3>
 
-<div class="highlight highlight-source-c++"><pre>std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
-json booklist;
-is &gt;&gt; booklist;
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
-<span class="pl-c">// The authors of books that cost less than $12</span>
-json result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
 
-<span class="pl-c">// The number of books</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
+    json booklist;
+    is &gt;&gt; booklist;
 
-<span class="pl-c">// The third book</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// The authors of books that cost less than $12</span>
+    json result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
 
-<span class="pl-c">// The authors of books that were published in 2004</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// The number of books</span>
+    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
 
-<span class="pl-c">// The titles of all books that have ratings</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// The third book</span>
+    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
 
-<span class="pl-c">// All authors and titles of books</span>
-result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);</pre></div>
+    <span class="pl-c">// The authors of books that were published in 2004</span>
+    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c">// The titles of all books that have ratings</span>
+    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c">// All authors and titles of books</span>
+    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
+}</pre></div>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 

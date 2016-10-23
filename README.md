@@ -275,30 +275,41 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
 
+## Extensions
+
 ### Query json values with JsonPath
 
 ```c++
-std::ifstream is("booklist.json");
-json booklist;
-is >> booklist;
+#include "jsoncons/json.hpp"
+#include "jsoncons_ext/jsonpath/json_query.hpp"
 
-// The authors of books that cost less than $12
-json result = json_query(booklist, "$[*][?(@.price < 12)].author");
+using namespace jsoncons;
+using namespace jsoncons::jsonpath;
 
-// The number of books
-result = json_query(booklist, "$.length");
+int main()
+{
+    std::ifstream is("booklist.json");
+    json booklist;
+    is >> booklist;
 
-// The third book
-result = json_query(booklist, "$[2]");
+    // The authors of books that cost less than $12
+    json result = json_query(booklist, "$[*][?(@.price < 12)].author");
 
-// The authors of books that were published in 2004
-result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
+    // The number of books
+    result = json_query(booklist, "$.length");
 
-// The titles of all books that have ratings
-result = json_query(booklist, "$[*][?(@.ratings)].title");
+    // The third book
+    result = json_query(booklist, "$[2]");
 
-// All authors and titles of books
-result = json_query(booklist, "$..['author','title']");
+    // The authors of books that were published in 2004
+    result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
+
+    // The titles of all books that have ratings
+    result = json_query(booklist, "$[*][?(@.ratings)].title");
+
+    // All authors and titles of books
+    result = json_query(booklist, "$..['author','title']");
+}
 ```
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
