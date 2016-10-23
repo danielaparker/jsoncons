@@ -658,32 +658,41 @@ vertical-align:1px;
 <h3>Construct multi-dimensional json arrays</h3>
 
 <div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">3</span>&gt;(<span class="pl-c1">4</span>, <span class="pl-c1">3</span>, <span class="pl-c1">2</span>, <span class="pl-c1">0.0</span>);
-a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">0</span>] = <span class="pl-c1">2.1</span>;
-a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">3.1</span>;
+<span class="pl-k">double</span> val = <span class="pl-c1">1</span>;
+<span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; a.size(); ++i)
+{
+    <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; a[i].<span class="pl-c1">size</span>(); ++j)
+    {
+        <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> k = <span class="pl-c1">0</span>; k &lt; a[i][j].<span class="pl-c1">size</span>(); ++k)
+        {
+            a[i][j][k] = val++;
+        }
+    }
+}
 std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
 
 <p>Output:</p>
 
 <div class="highlight highlight-source-json"><pre>[
     [
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">2.1</span>,<span class="pl-c1">3.1</span>]
+        [<span class="pl-c1">1.0</span>,<span class="pl-c1">2.0</span>],
+        [<span class="pl-c1">3.0</span>,<span class="pl-c1">4.0</span>],
+        [<span class="pl-c1">5.0</span>,<span class="pl-c1">6.0</span>]
     ],
     [
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+        [<span class="pl-c1">7.0</span>,<span class="pl-c1">8.0</span>],
+        [<span class="pl-c1">9.0</span>,<span class="pl-c1">10.0</span>],
+        [<span class="pl-c1">11.0</span>,<span class="pl-c1">12.0</span>]
     ],
     [
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+        [<span class="pl-c1">13.0</span>,<span class="pl-c1">14.0</span>],
+        [<span class="pl-c1">15.0</span>,<span class="pl-c1">16.0</span>],
+        [<span class="pl-c1">17.0</span>,<span class="pl-c1">18.0</span>]
     ],
     [
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>],
-        [<span class="pl-c1">0.0</span>,<span class="pl-c1">0.0</span>]
+        [<span class="pl-c1">19.0</span>,<span class="pl-c1">20.0</span>],
+        [<span class="pl-c1">21.0</span>,<span class="pl-c1">22.0</span>],
+        [<span class="pl-c1">23.0</span>,<span class="pl-c1">24.0</span>]
     ]
 ]</pre></div>
 
