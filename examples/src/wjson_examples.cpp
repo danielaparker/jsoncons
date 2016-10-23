@@ -8,7 +8,7 @@
 #endif
 #include "jsoncons/json.hpp"
 
-using jsoncons::json;
+using namespace jsoncons;
 
 void wjson_object()
 {

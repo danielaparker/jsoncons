@@ -12,8 +12,8 @@ using namespace jsoncons::csv;
 void read_csv_file1()
 {
     std::string text = R"(employee-no,employee-name,dept,salary
-00000001,Smith,Matthew,sales,150000.00
-00000002,Brown,Sarah,sales,89000.00
+00000001,\"Smith,Matthew\",sales,150000.00
+00000002,\"Brown,Sarah\",sales,89000.00
 )";
 
     std::istringstream is(text);
@@ -30,12 +30,11 @@ void read_csv_file1()
     std::cout << pretty_print(val) << std::endl;
 }
 
-void read_csv_tasks_file()
+void read_write_csv_tasks()
 {
     std::ifstream is("input/tasks.csv");
 
     ojson_deserializer handler;
-
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
@@ -43,21 +42,13 @@ void read_csv_tasks_file()
           .column_types({"integer","string","string","string"});
     csv_reader reader(is,handler,params);
     reader.read();
-    ojson val = handler.get_result();
+    ojson tasks = handler.get_result();
 
-    std::ofstream os("output/tasks.json");
-    os << pretty_print(val);
-}
+    std::cout << "(1)\n";
+    std::cout << pretty_print(tasks) << "\n\n";
 
-void write_csv_tasks_file()
-{
-    std::ifstream is("output/tasks.json");
-
-    ojson tasks;
-    is >> tasks;
-
-    std::ofstream os("output/tasks.csv");
-    csv_serializer serializer(os);
+    std::cout << "(2)\n";
+    csv_serializer serializer(std::cout);
     tasks.write(serializer);
 }
 
@@ -92,8 +83,7 @@ void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
     read_csv_file1();
-    read_csv_tasks_file();
-    write_csv_tasks_file();
+    read_write_csv_tasks();
     serialize_array_of_arrays_to_comma_delimited();
     serialize_to_tab_delimited_file();
     std::cout << std::endl;
