@@ -187,14 +187,15 @@ for (const auto& member : book.members())
 ### Construct multi-dimensional json arrays
 ```c++
 json a = json::make_array<3>(4, 3, 2, 0.0);
-double val = 1;
+double val = 1.0;
 for (size_t i = 0; i < a.size(); ++i)
 {
     for (size_t j = 0; j < a[i].size(); ++j)
     {
         for (size_t k = 0; k < a[i][j].size(); ++k)
         {
-            a[i][j][k] = val++;
+            a[i][j][k] = val;
+            val += 1.0;
         }
     }
 }
