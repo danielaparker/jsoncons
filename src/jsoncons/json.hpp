@@ -1053,6 +1053,11 @@ public:
             return evaluate().count(name);
         }
 
+        bool contains_name(const string_type& name) const
+        {
+            return evaluate().contains_name(name);
+        }
+
         bool is_null() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_null();
@@ -1994,6 +1999,21 @@ public:
     bool is_null() const JSONCONS_NOEXCEPT
     {
         return var_.type_id() == value_types::null_t;
+    }
+
+    bool contains_name(const string_type& name) const
+    {
+        switch (var_.type_id())
+        {
+        case value_types::object_t:
+            {
+                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                return it != members().end();
+            }
+            break;
+        default:
+            return false;
+        }
     }
 
     size_t count(const string_type& name) const
