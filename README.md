@@ -289,6 +289,36 @@ See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20E
 
 ### jsonpath
 
+Example file (store.json):
+```json
+{ "store": {
+    "book": [ 
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      },
+      { "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
+      }
+    ]
+  }
+}
+```
 ```c++
 #include "jsoncons/json.hpp"
 #include "jsoncons_ext/jsonpath/json_query.hpp"
@@ -298,33 +328,76 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("booklist.json");
+    std::ifstream is("input/booklist.json");
     json booklist;
     is >> booklist;
 
-    // The authors of books that cost less than $12
-    json result = json_query(booklist, "$[*][?(@.price < 12)].author");
+    // The authors of books that are cheaper than $10
+    json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");
+    std::cout << "(1) " << result1 << std::endl;
 
     // The number of books
-    result = json_query(booklist, "$.length");
+    json result2 = json_query(booklist, "$..book.length");
+    std::cout << "(2) " << result2 << std::endl;
 
     // The third book
-    result = json_query(booklist, "$[2]");
+    json result3 = json_query(booklist, "$..book[2]");
+    std::cout << "(3)\n" << pretty_print(result3) << std::endl;
 
-    // The authors of books that were published in 2004
-    result = json_query(booklist, "$[*][?(@.date =~ /2004.*?/)].author");
+    // All books whose author's name starts with Evelyn
+    json result4 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    std::cout << "(4)\n" << pretty_print(result4) << std::endl;
 
-    // The titles of all books that have ratings
-    result = json_query(booklist, "$[*][?(@.ratings)].title");
+    // The titles of all books that have isbn number
+    json result5 = json_query(booklist, "$..book[?(@.isbn)].title");
+    std::cout << "(5) " << result5 << std::endl;
 
     // All authors and titles of books
-    result = json_query(booklist, "$..['author','title']");
+    json result6 = json_query(booklist, "$['store']['book']..['author','title']");
+    std::cout << "(6)\n" << pretty_print(result6) << std::endl;
 }
+```
+Output:
+```json
+(1) ["Nigel Rees","Herman Melville"]
+(2) [4]
+(3)
+[
+    {
+        "author": "Herman Melville",
+        "category": "fiction",
+        "isbn": "0-553-21311-3",
+        "price": 8.99,
+        "title": "Moby Dick"
+    }
+]
+(4)
+[
+    {
+        "author": "Evelyn Waugh",
+        "category": "fiction",
+        "price": 12.99,
+        "title": "Sword of Honour"
+    }
+]
+(5) ["Moby Dick","The Lord of the Rings"]
+(6)
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
 ```
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
 ### csv
+Example file (tasks.csv)
 ```csv
 project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -333,7 +406,7 @@ project_id, task_name, task_start, task_finish
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 ```
-_tasks.csv_
+
 ```c++
 #include <fstream>
 #include "jsoncons/json.hpp"

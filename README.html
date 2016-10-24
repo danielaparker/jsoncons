@@ -756,6 +756,36 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
 <h3>jsonpath</h3>
 
+<p>Example file (store.json):</p>
+
+<div class="highlight highlight-source-json"><pre>{ <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [ 
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.99</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-395-19395-8<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">22.99</span>
+      }
+    ]
+  }
+}</pre></div>
+
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
@@ -764,32 +794,76 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
-    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/booklist.json<span class="pl-pds">"</span></span>);
     json booklist;
     is &gt;&gt; booklist;
 
-    <span class="pl-c">// The authors of books that cost less than $12</span>
-    json result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.price &lt; 12)].author<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// The authors of books that are cheaper than $10</span>
+    json result1 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.price &lt; 10)].author<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; result1 &lt;&lt; std::endl;
 
     <span class="pl-c">// The number of books</span>
-    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.length<span class="pl-pds">"</span></span>);
+    json result2 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book.length<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; result2 &lt;&lt; std::endl;
 
     <span class="pl-c">// The third book</span>
-    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[2]<span class="pl-pds">"</span></span>);
+    json result3 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book[2]<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(result3) &lt;&lt; std::endl;
 
-    <span class="pl-c">// The authors of books that were published in 2004</span>
-    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.date =~ /2004.*?/)].author<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// All books whose author's name starts with Evelyn</span>
+    json result4 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.author =~ /Evelyn.*?/)]<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(result4) &lt;&lt; std::endl;
 
-    <span class="pl-c">// The titles of all books that have ratings</span>
-    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$[*][?(@.ratings)].title<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// The titles of all books that have isbn number</span>
+    json result5 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book[?(@.isbn)].title<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result5 &lt;&lt; std::endl;
 
     <span class="pl-c">// All authors and titles of books</span>
-    result = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
+    json result6 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$['store']['book']..['author','title']<span class="pl-pds">"</span></span>);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(result6) &lt;&lt; std::endl;
 }</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
+(<span class="pl-c1">3</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.99</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">4</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">5</span>) [<span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">6</span>)
+[
+    <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
+]</pre></div>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
 
 <h3>csv</h3>
+
+<p>Example file (tasks.csv)</p>
 
 <pre lang="csv"><code>project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -798,8 +872,6 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 </code></pre>
-
-<p><em>tasks.csv</em></p>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>

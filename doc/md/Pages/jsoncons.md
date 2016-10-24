@@ -471,53 +471,55 @@ using jsoncons::jsonpath::json_query;
 
 json root = json::parse_file("store.json");
 
-// (1) The authors of books that are cheaper than $10
-json result = json_query(root,"$.store.book[?(@.price < 10)].author");
-std::cout << result << std::endl;
+// The authors of books that are cheaper than $10
+json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");
+std::cout << "(1) " << result1 << std::endl;
 
-// (2) The number of books
-json result = json_query(root,"$..book.length");
-std::cout << result << std::endl;
+// The number of books
+json result2 = json_query(booklist, "$..book.length");
+std::cout << "(2) " << result2 << std::endl;
 
-// (3) The third book
-json result = json_query(root,"$..book[2]");
-std::cout << pretty_print(result) << std::endl;
+// The third book
+json result3 = json_query(booklist, "$..book[2]");
+std::cout << "(3)\n" << pretty_print(result3) << std::endl;
 
-// (4) All books whose author's name starts with Evelyn
-json result = json_query(root,"$.store.book[?(@.author =~ /Evelyn.*?/)]");
-std::cout << pretty_print(result) << std::endl;
+// All books whose author's name starts with Evelyn
+json result4 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+std::cout << "(4)\n" << pretty_print(result4) << std::endl;
 
-// (5) The titles of all books that have isbn number
-json result = json_query(root,"$..book[?(@.isbn)]/title");
-std::cout << result << std::endl;
+// The titles of all books that have isbn number
+json result5 = json_query(booklist, "$..book[?(@.isbn)].title");
+std::cout << "(5) " << result5 << std::endl;
 
-// (6) All authors and titles of books
-result = json_query(booklist, "$['store']['book']..['author','title']");
-std::cout << pretty_print(result) << std::endl;
+// All authors and titles of books
+json result6 = json_query(booklist, "$['store']['book']..['author','title']");
+std::cout << "(6)\n" << pretty_print(result6) << std::endl;
 ```
-Result:
+Output:
 ```json
 (1) ["Nigel Rees","Herman Melville"]
 (2) [4]
-(3) [
-        {
-            "category": "fiction",
-            "author": "Herman Melville",
-            "title": "Moby Dick",
-            "isbn": "0-553-21311-3",
-            "price": 8.99
-        }
-    ]
-(4) [
-        {
-            "category": "fiction",
-            "author": "Evelyn Waugh",
-            "title": "Sword of Honour",
-            "price": 12.99
-        }
-    ]
-(5) ["Moby Dick","The Lord of the Rings"] 
-(6) 
+(3)
+[
+    {
+        "author": "Herman Melville",
+        "category": "fiction",
+        "isbn": "0-553-21311-3",
+        "price": 8.99,
+        "title": "Moby Dick"
+    }
+]
+(4)
+[
+    {
+        "author": "Evelyn Waugh",
+        "category": "fiction",
+        "price": 12.99,
+        "title": "Sword of Honour"
+    }
+]
+(5) ["Moby Dick","The Lord of the Rings"]
+(6)
 [
     "Nigel Rees",
     "Sayings of the Century",

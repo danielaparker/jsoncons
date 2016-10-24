@@ -16,6 +16,7 @@ void type_extensibility_examples();
 void csv_examples();
 void ojson_examples();
 void unicode_examples();
+void jsonpath_examples();
 
 void first_example_a()
 {
@@ -285,6 +286,7 @@ int main()
 
         type_extensibility_examples();
 
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {
