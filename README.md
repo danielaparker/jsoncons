@@ -73,8 +73,7 @@ int main()
         std::move(color_spaces);
     file_export["Image Sizing"] = std::move(image_sizing);
 
-    std::cout << "(1)" << "\n";
-    std::cout << pretty_print(file_export) << "\n\n";
+    std::cout << "(1)\n" << pretty_print(file_export) << "\n\n";
 
     const json& val = file_export["Image Sizing"];
 
@@ -430,8 +429,7 @@ int main()
     reader.read();
     ojson tasks = handler.get_result();
 
-    std::cout << "(1)\n";
-    std::cout << pretty_print(tasks) << "\n\n";
+    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
     csv_serializer serializer(std::cout);

@@ -549,8 +549,7 @@ vertical-align:1px;
         <span class="pl-c1">std::move</span>(color_spaces);
     file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = <span class="pl-c1">std::move</span>(image_sizing);
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(file_export) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(file_export) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
     <span class="pl-k">const</span> json&amp; val = file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>];
 
@@ -895,8 +894,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     reader.<span class="pl-c1">read</span>();
     ojson tasks = handler.<span class="pl-c1">get_result</span>();
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(tasks) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(tasks) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
     csv_serializer <span class="pl-smi">serializer</span>(std::cout);

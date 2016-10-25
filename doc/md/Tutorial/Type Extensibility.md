@@ -96,8 +96,7 @@ int main()
     std::cout << "(4) " << std::boolalpha 
                         << ja.is<std::vector<book>>() << "\n\n";
 
-    std::cout << "(5)" << "\n";
-    std::cout << pretty_print(ja) << "\n\n";
+    std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
 
     auto book_list = ja.as<std::list<book>>();
 
@@ -327,9 +326,7 @@ int main()
 
     std::cout << "(2) " << std::boolalpha << a.is<matrix<int>>() << "\n\n";
 
-    std::cout << "(3) \n\n";
-
-    std::cout << pretty_print(a) << "\n\n";
+    std::cout << "(3) \n\n" << pretty_print(a) << "\n\n";
 
     matrix<double> B = a.as<matrix<double>>();
 

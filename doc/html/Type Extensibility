@@ -562,8 +562,7 @@ standard library collections of book objects to and from <code>json</code> value
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha 
                         &lt;&lt; ja.<span class="pl-smi">is</span>&lt;std::vector&lt;book&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5)<span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(ja) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(ja) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
     <span class="pl-k">auto</span> book_list = ja.<span class="pl-smi">as</span>&lt;std::list&lt;book&gt;&gt;();
 
@@ -789,9 +788,7 @@ Observation dates:
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; a.<span class="pl-smi">is</span>&lt;matrix&lt;<span class="pl-k">int</span>&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
-
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(a) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(a) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 
     matrix&lt;<span class="pl-k">double</span>&gt; B = a.<span class="pl-smi">as</span>&lt;matrix&lt;<span class="pl-k">double</span>&gt;&gt;();
 
