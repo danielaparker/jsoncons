@@ -19,6 +19,57 @@
 #include <limits> // std::numeric_limits
 
 namespace jsoncons { namespace jsonx {
+
+template <class CharT>
+struct jsonx_char_traits
+{
+};
+
+template <>
+struct jsonx_char_traits<char>
+{
+    static const std::string top_array_element_literal() {return R"(<json:array xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
+
+    static const std::string top_object_element_literal() {return R"(<json:object xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
+
+    static const std::string array_element_literal() {return R"(<json:array>)";};
+    static const std::string object_element_literal() {return R"(<json:object>)";};
+
+    static const std::string object_name_element_literal() {return R"(<json:object name=")";};
+    static const std::string array_name_element_literal() {return R"(<json:array name=")";};
+
+    static const std::string close_object_element_literal() {return "</json:object>";};
+    static const std::string close_array_element_literal() {return "</json:array>";};
+
+    static const std::string close_tag_literal() {return R"(">)";};
+};
+
+template <>
+struct jsonx_char_traits<wchar_t>
+{
+    static const std::wstring top_array_element_literal() {return LR"(<json:array xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
+
+    static const std::wstring top_object_element_literal() {return LR"(<json:object xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
+
+    static const std::wstring array_element_literal() {return LR"(<json:array>)";};
+    static const std::wstring object_element_literal() {return LR"(<json:object>)";};
+
+    static const std::wstring object_name_element_literal() {return LR"(<json:object name=")";};
+    static const std::wstring array_name_element_literal() {return LR"(<json:array name=")";};
+
+    static const std::wstring close_object_element_literal() {return L"</json:object>";};
+    static const std::wstring close_array_element_literal() {return L"</json:array>";};
+
+    static const std::wstring close_tag_literal() {return LR"(">)";};
+};
  
 template <class CharT>
 void escape_attribute(const CharT* s,
@@ -129,35 +180,6 @@ void escape_value(const CharT* s,
         }
     }
 }
-
-template <class CharT>
-struct jsonx_char_traits
-{
-};
-
-template <>
-struct jsonx_char_traits<char>
-{
-    static const std::string all_literal() {return "all";};
-
-    static const std::string minimal_literal() {return "minimal";};
-
-    static const std::string none_literal() {return "none";};
-
-    static const std::string nonnumeric_literal() {return "nonumeric";};
-};
-
-template <>
-struct jsonx_char_traits<wchar_t>
-{
-    static const std::wstring all_literal() {return L"all";};
-
-    static const std::wstring minimal_literal() {return L"minimal";};
-
-    static const std::wstring none_literal() {return L"none";};
-
-    static const std::wstring nonnumeric_literal() {return L"nonumeric";};
-};
  
 template<class CharT>
 class basic_jsonx_serializer : public basic_json_output_handler<CharT>
@@ -260,9 +282,8 @@ private:
     {
         if (stack_.size() == 0)
         {
-            bos_.write(R"(<json:object xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)");
+            bos_.write(jsonx_char_traits<CharT>::top_object_element_literal().data(),
+                       jsonx_char_traits<CharT>::top_object_element_literal().length());
         }
         else 
         {
@@ -272,12 +293,14 @@ private:
             }
             if (stack_.back().is_object())
             {
-                bos_.write("<json:object name=\"");
+                bos_.write(jsonx_char_traits<CharT>::object_name_element_literal().data(),
+                           jsonx_char_traits<CharT>::object_name_element_literal().length());
                 escape_attribute(stack_.back().name_.data(),
                                  stack_.back().name_.length(),
                                  format_,
                                  bos_);
-                bos_.write("\">");
+                bos_.write(jsonx_char_traits<CharT>::close_tag_literal().data(),
+                           jsonx_char_traits<CharT>::close_tag_literal().length());
             }
             else
             {
@@ -299,7 +322,8 @@ private:
             unindent();
             write_indent();
         }
-        bos_.write("</json:object>");
+        bos_.write(jsonx_char_traits<CharT>::close_object_element_literal().data(),
+                   jsonx_char_traits<CharT>::close_object_element_literal().length());
         stack_.pop_back();
     }
 
@@ -307,9 +331,8 @@ private:
     {
         if (stack_.size() == 0)
         {
-            bos_.write(R"(<json:array xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)");
+            bos_.write(jsonx_char_traits<CharT>::top_array_element_literal().data(),
+                       jsonx_char_traits<CharT>::top_array_element_literal().length());
             stack_.push_back(stack_item(false));
         }
         else 
@@ -320,12 +343,14 @@ private:
             }
             if (stack_.back().is_object())
             {
-                bos_.write("<json:array name=\"");
+                bos_.write(jsonx_char_traits<CharT>::array_name_element_literal().data(),
+                           jsonx_char_traits<CharT>::array_name_element_literal().length());
                 escape_attribute(stack_.back().name_.data(),
                                  stack_.back().name_.length(),
                                  format_,
                                  bos_);
-                bos_.write("\">");
+                bos_.write(jsonx_char_traits<CharT>::close_tag_literal().data(),
+                           jsonx_char_traits<CharT>::close_tag_literal().length());
             }
             else
             {
@@ -347,7 +372,8 @@ private:
             unindent();
             write_indent();
         }
-        bos_.write("</json:array>");
+        bos_.write(jsonx_char_traits<CharT>::close_array_element_literal().data(),
+                   jsonx_char_traits<CharT>::close_array_element_literal().length());
         stack_.pop_back();
     }
 

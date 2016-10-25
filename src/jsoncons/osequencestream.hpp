@@ -198,12 +198,11 @@ class basic_osequencestream :
     public std::basic_ostream<CharT, Traits>
 {
 public:
-    typedef typename std::basic_ios
-        <CharT, Traits>::char_type          char_type;
-    typedef typename std::basic_ios<char_type, Traits>::int_type     int_type;
-    typedef typename std::basic_ios<char_type, Traits>::pos_type     pos_type;
-    typedef typename std::basic_ios<char_type, Traits>::off_type     off_type;
-    typedef typename std::basic_ios<char_type, Traits>::traits_type  traits_type;
+    typedef typename std::basic_ios<CharT, Traits>::char_type       char_type;
+    typedef typename std::basic_ios<char_type, Traits>::int_type    int_type;
+    typedef typename std::basic_ios<char_type, Traits>::pos_type    pos_type;
+    typedef typename std::basic_ios<char_type, Traits>::off_type    off_type;
+    typedef typename std::basic_ios<char_type, Traits>::traits_type traits_type;
 
 private:
     typedef basic_osequencebuf<CharT, Traits>      base_ouputbuf;

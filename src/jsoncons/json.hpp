@@ -16,15 +16,16 @@
 #include <ostream>
 #include <memory>
 #include <typeinfo>
-#include "jsoncons/json_traits.hpp"
-#include "jsoncons/json_structures.hpp"
-#include "jsoncons/json_text_traits.hpp"
-#include "jsoncons/json_output_handler.hpp"
-#include "jsoncons/output_format.hpp"
-#include "jsoncons/json_serializer.hpp"
-#include "jsoncons/json_deserializer.hpp"
-#include "jsoncons/json_reader.hpp"
-#include "jsoncons/json_type_traits.hpp"
+#include <jsoncons/json_traits.hpp>
+#include <jsoncons/json_array.hpp>
+#include <jsoncons/json_object.hpp>
+#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/output_format.hpp>
+#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_deserializer.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_type_traits.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -108,15 +109,14 @@ public:
     typedef typename JsonTraits::parse_error_handler_type parse_error_handler_type;
 
     typedef CharT char_type;
-    typedef typename std::char_traits<CharT> char_traits_type;
+    typedef typename json_traits_type::char_traits_type char_traits_type;
+    typedef typename json_traits_type::char_allocator char_allocator;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> string_allocator;
-    typedef std::basic_string<CharT,char_traits_type,string_allocator> string_type;
+    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef name_value_pair<string_type,json_type> member_type;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_type> array_allocator;
-
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
 
     typedef json_array<json_type,array_allocator> array;
@@ -293,12 +293,12 @@ public:
 
         struct string_data : public base_data
         {
-            struct string_holder : public string_allocator
+            struct string_holder : public char_allocator
             {
                 const char_type* c_str() const { return p_; }
                 const char_type* data() const { return p_; }
                 size_t length() const { return length_; }
-                string_allocator get_allocator() const
+                char_allocator get_allocator() const
                 {
                     return *this;
                 }
@@ -308,8 +308,8 @@ public:
                     return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
                 }
 
-                string_holder(const string_allocator& allocator)
-                    : string_allocator(allocator), length_(0), p_(nullptr)
+                string_holder(const char_allocator& allocator)
+                    : char_allocator(allocator), length_(0), p_(nullptr)
                 {
                 }
 
@@ -333,11 +333,11 @@ public:
                 return sizeof(storage_type) + n;
             }
 
-            string_holder* create_string_holder(const char_type* s, size_t length, const string_allocator& allocator)
+            string_holder* create_string_holder(const char_type* s, size_t length, const char_allocator& allocator)
             {
                 size_t mem_size = aligned_size(length*sizeof(char_type));
 
-                typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
+                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
 
                 char* storage = alloc.allocate(mem_size);
                 string_holder* ps = new(storage)string_holder(allocator);
@@ -350,15 +350,15 @@ public:
                 return ps;
             }
 
-            void destroy_string_holder(const string_allocator& allocator, string_holder* p)
+            void destroy_string_holder(const char_allocator& allocator, string_holder* p)
             {
                 size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-                typename std::allocator_traits<string_allocator>:: template rebind_alloc<char> alloc(allocator);
+                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
                 alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
             }
             string_holder* holder_;
 
-            string_data(const char_type* s, size_t length, const string_allocator& alloc)
+            string_data(const char_type* s, size_t length, const char_allocator& alloc)
                 : base_data(value_types::string_t)
             {
                 holder_ = create_string_holder(s, length, alloc);
@@ -372,7 +372,7 @@ public:
                                              val.holder_->get_allocator());
             }
 
-            string_data(const string_data& val, string_allocator allocator)
+            string_data(const string_data& val, char_allocator allocator)
                 : base_data(value_types::string_t)
             {
                 holder_ = create_string_holder(val.holder_->p_, 
@@ -399,7 +399,7 @@ public:
                 return holder_->p_;
             }
 
-            string_allocator get_allocator() const
+            char_allocator get_allocator() const
             {
                 return holder_->get_allocator();
             }
@@ -640,7 +640,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, string_allocator());
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
             }
         }
         variant(const char_type* s)
@@ -652,7 +652,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, string_allocator());
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
             }
         }
         variant(const char_type* s, size_t length, const Allocator& alloc)
@@ -663,7 +663,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, string_allocator(alloc));
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator(alloc));
             }
         }
         variant(const object& val)
@@ -1145,7 +1145,7 @@ public:
             return evaluate().as_string();
         }
 
-        string_type as_string(const string_allocator& allocator) const JSONCONS_NOEXCEPT
+        string_type as_string(const char_allocator& allocator) const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string(allocator);
         }
@@ -1156,7 +1156,7 @@ public:
         }
 
         string_type as_string(const basic_output_format<char_type>& format,
-                              const string_allocator& allocator) const
+                              const char_allocator& allocator) const
         {
             return evaluate().as_string(format,allocator);
         }
@@ -1168,7 +1168,7 @@ public:
         }
 
         template<class T>
-        typename std::enable_if<std::is_same<string_type,T>::value>::type as(const string_allocator& allocator) const
+        typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }
@@ -1374,12 +1374,12 @@ public:
             return evaluate_with_default().add(pos, std::forward<T&&>(value));
         }
 
-        string_type to_string(const string_allocator& allocator = string_allocator()) const JSONCONS_NOEXCEPT
+        string_type to_string(const char_allocator& allocator = char_allocator()) const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string(allocator);
         }
 
-        string_type to_string(const basic_output_format<char_type>& format, string_allocator& allocator = string_allocator()) const
+        string_type to_string(const basic_output_format<char_type>& format, char_allocator& allocator = char_allocator()) const
         {
             return evaluate().to_string(format,allocator);
         }
@@ -1866,10 +1866,10 @@ public:
         return at(name);
     }
 
-    string_type to_string(const string_allocator& allocator=string_allocator()) const JSONCONS_NOEXCEPT
+    string_type to_string(const char_allocator& allocator=char_allocator()) const JSONCONS_NOEXCEPT
     {
         string_type s(allocator);
-        std::basic_ostringstream<char_type,char_traits_type,string_allocator> os(s);
+        std::basic_ostringstream<char_type,char_traits_type,char_allocator> os(s);
         {
             basic_json_serializer<char_type> serializer(os);
             write_body(serializer);
@@ -1878,7 +1878,7 @@ public:
     }
 
     string_type to_string(const basic_output_format<char_type>& format,
-                          const string_allocator& allocator=string_allocator()) const
+                          const char_allocator& allocator=char_allocator()) const
     {
         string_type s(allocator);
         std::basic_ostringstream<char_type> os(s);
@@ -2191,7 +2191,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<std::is_same<string_type,T>::value>::type as(const string_allocator& allocator) const
+    typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator& allocator) const
     {
         return json_type_traits<json_type,T>::as(*this,allocator);
     }
@@ -2368,7 +2368,7 @@ public:
         }
     }
 
-    string_type as_string(const string_allocator& allocator) const JSONCONS_NOEXCEPT
+    string_type as_string(const char_allocator& allocator) const JSONCONS_NOEXCEPT
     {
         switch (var_.type_id())
         {
@@ -2395,7 +2395,7 @@ public:
     }
 
     string_type as_string(const basic_output_format<char_type>& format,
-                          const string_allocator& allocator) const 
+                          const char_allocator& allocator) const 
     {
         switch (var_.type_id())
         {

@@ -14,12 +14,17 @@
 
 #include <jsoncons/output_format.hpp>
 #include <jsoncons/parse_error_handler.hpp>
+#include <string>
 
 namespace jsoncons {
 
 template <class CharT>
 struct json_traits
 {
+    typedef typename std::char_traits<CharT> char_traits_type;
+    typedef std::allocator<CharT> char_allocator;
+    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
+
     static const bool is_object_sorted = true;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
@@ -28,6 +33,10 @@ struct json_traits
 template <class CharT>
 struct ojson_traits 
 {
+    typedef typename std::char_traits<CharT> char_traits_type;
+    typedef std::allocator<CharT> char_allocator;
+    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
+
     static const bool is_object_sorted = false;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;

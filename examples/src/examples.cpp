@@ -13,10 +13,11 @@ void container_examples();
 void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
-void csv_examples();
 void ojson_examples();
 void unicode_examples();
+void csv_examples();
 void jsonpath_examples();
+void jsonx_examples();
 
 void first_example_a()
 {
@@ -287,6 +288,8 @@ int main()
         type_extensibility_examples();
 
         jsonpath_examples();
+
+        jsonx_examples();
     }
     catch (const std::exception& e)
     {

@@ -19,7 +19,7 @@ Member type                         |Definition
 ------------------------------------|------------------------------
 `json_type`|json type
 `allocator_type`|Allocator type
-`string_allocator`|String allocator type
+`char_allocator`|String allocator type
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
@@ -297,7 +297,7 @@ If value is double, returns value, if value is signed or unsigned integer, casts
 Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
     string_type as<string_type>() const noexcept
-    string_type as<string_type>(const string_allocator& allocator) const noexcept
+    string_type as<string_type>(const char_allocator& allocator) const noexcept
 If value is string, returns value, otherwise returns result of `to_string`.
 
     as<std::vector<T>>()
@@ -311,7 +311,7 @@ Returns `json` object value as an `std::map`.
     uint64_t as_uinteger() const
     double as_double() const
     string_type as_string() const noexcept
-    string_type as_string(const string_allocator& allocator) const noexcept
+    string_type as_string(const char_allocator& allocator) const noexcept
     unsigned int as<unsigned int> const 
 Non-generic versions of `as` methods
 
@@ -376,10 +376,10 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
-    string_type to_string(const string_allocator& allocator = string_allocator()) const noexcept
+    string_type to_string(const char_allocator& allocator = char_allocator()) const noexcept
 Inserts json value into string.
 
-    string_type to_string(const output_format& format, const string_allocator& allocator = string_allocator()) const
+    string_type to_string(const output_format& format, const char_allocator& allocator = char_allocator()) const
 Inserts json value into string using specified [output_format](output_format).
 
     void write(basic_json_output_handler<char_type>& output_handler) const

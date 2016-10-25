@@ -22,12 +22,12 @@
 namespace jsoncons { namespace csv {
 
 template <class CharT>
-struct csv_char_traits
+struct csv_string_traits
 {
 };
 
 template <>
-struct csv_char_traits<char>
+struct csv_string_traits<char>
 {
     static const std::string all_literal() {return "all";};
 
@@ -39,7 +39,7 @@ struct csv_char_traits<char>
 };
 
 template <>
-struct csv_char_traits<wchar_t>
+struct csv_string_traits<wchar_t>
 {
     static const std::wstring all_literal() {return L"all";};
 

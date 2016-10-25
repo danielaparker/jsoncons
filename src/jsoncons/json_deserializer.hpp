@@ -26,14 +26,14 @@ class basic_json_deserializer : public basic_json_input_handler<typename Json::c
     typedef typename Json::char_type char_type;
     typedef typename Json::member_type member_type;
     typedef typename Json::string_type string_type;
-    typedef typename string_type::allocator_type string_allocator;
+    typedef typename string_type::allocator_type char_allocator;
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::array array;
     typedef typename array::allocator_type array_allocator;
     typedef typename Json::object object;
     typedef typename object::allocator_type object_allocator;
 
-    string_allocator sa_;
+    char_allocator sa_;
     object_allocator oa_;
     array_allocator aa_;
 
@@ -50,7 +50,7 @@ class basic_json_deserializer : public basic_json_input_handler<typename Json::c
     bool is_valid_;
 
 public:
-    basic_json_deserializer(const string_allocator& sa = string_allocator(),
+    basic_json_deserializer(const char_allocator& sa = char_allocator(),
                             const allocator_type& allocator = allocator_type())
         : sa_(sa),
           oa_(allocator),
