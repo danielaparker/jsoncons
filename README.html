@@ -545,8 +545,10 @@ vertical-align:1px;
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>; <span class="pl-c">// a double</span>
 
     json file_export;
-    file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] =
-        <span class="pl-c1">std::move</span>(color_spaces); <span class="pl-c">// creates "File Format Options" object and puts "Color Spaces" in it</span>
+
+    <span class="pl-c">// create "File Format Options" as an object and put "Color Spaces" in it</span>
+    file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = <span class="pl-c1">std::move</span>(color_spaces); 
+
     file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = <span class="pl-c1">std::move</span>(image_sizing);
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(file_export) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;

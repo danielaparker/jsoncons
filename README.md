@@ -69,8 +69,10 @@ int main()
     image_sizing["Dimension 1"] = 9.84; // a double
     
     json file_export;
-    file_export["File Format Options"]["Color Spaces"] =
-        std::move(color_spaces); // creates "File Format Options" object and puts "Color Spaces" in it
+
+    // create "File Format Options" as an object and put "Color Spaces" in it
+    file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
+
     file_export["Image Sizing"] = std::move(image_sizing);
 
     std::cout << "(1)\n" << pretty_print(file_export) << "\n\n";
