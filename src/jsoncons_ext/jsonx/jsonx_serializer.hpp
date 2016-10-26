@@ -28,6 +28,8 @@ struct jsonx_char_traits
 template <>
 struct jsonx_char_traits<char>
 {
+    static const std::string xml_prolog_literal() {return R"(<?xml version="1.0" encoding="UTF-8"?>)";};
+
     static const std::string top_array_element_literal() {return R"(<json:array xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
@@ -46,11 +48,17 @@ struct jsonx_char_traits<char>
     static const std::string close_array_element_literal() {return "</json:array>";};
 
     static const std::string close_tag_literal() {return R"(">)";};
+
+    static const std::string amp_literal() {return "&amp;";}
+    static const std::string lt_literal() {return "&lt;";}
+    static const std::string quote_literal() {return "&#34;";}
 };
 
 template <>
 struct jsonx_char_traits<wchar_t>
 {
+    static const std::wstring xml_prolog_literal() {return LR"(<?xml version="1.0" encoding="UTF-8"?>)";};
+
     static const std::wstring top_array_element_literal() {return LR"(<json:array xsi:schemaLocation="http://www.datapower.com/schemas/json jsonx.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
@@ -69,6 +77,10 @@ struct jsonx_char_traits<wchar_t>
     static const std::wstring close_array_element_literal() {return L"</json:array>";};
 
     static const std::wstring close_tag_literal() {return LR"(">)";};
+
+    static const std::wstring amp_literal() {return L"&amp;";};
+    static const std::wstring lt_literal() {return L"&lt;";};
+    static const std::wstring quote_literal() {return L"&#34;";};
 };
  
 template <class CharT>
@@ -87,13 +99,16 @@ void escape_attribute(const CharT* s,
         switch (c)
         {
         case '&':
-            bos.write("&amp;");
+            bos.write(jsonx_char_traits<CharT>::amp_literal().data(),
+                      jsonx_char_traits<CharT>::amp_literal().length());
             break;
         case '<':
-            bos.write("&lt;");
+            bos.write(jsonx_char_traits<CharT>::lt_literal().data(),
+                      jsonx_char_traits<CharT>::lt_literal().length());
             break;
         case '\"':
-            bos.write("&#34;");
+            bos.write(jsonx_char_traits<CharT>::quote_literal().data(),
+                      jsonx_char_traits<CharT>::quote_literal().length());
             break;
         default:
             // convert utf8 to codepoint
@@ -166,13 +181,16 @@ void escape_value(const CharT* s,
         switch (c)
         {
         case '&':
-            bos.write("&amp;");
+            bos.write(jsonx_char_traits<CharT>::amp_literal().data(),
+                      jsonx_char_traits<CharT>::amp_literal().length());
             break;
         case '<':
-            bos.write("&lt;");
+            bos.write(jsonx_char_traits<CharT>::lt_literal().data(),
+                      jsonx_char_traits<CharT>::lt_literal().length());
             break;
         case '\"':
-            bos.write("\"");
+            bos.write(jsonx_char_traits<CharT>::quote_literal().data(),
+                      jsonx_char_traits<CharT>::quote_literal().length());
             break;
         default:
             bos.put(c);
@@ -263,7 +281,8 @@ private:
 
     void do_begin_json() override
     {
-        bos_.write(R"(<?xml version="1.0" encoding="UTF-8"?>)");
+        bos_.write(jsonx_char_traits<CharT>::xml_prolog_literal().data(),
+                   jsonx_char_traits<CharT>::xml_prolog_literal().length());
         if (indenting_)
         {
             write_indent();
@@ -304,7 +323,8 @@ private:
             }
             else
             {
-                bos_.write("<json:object>");
+                bos_.write(jsonx_char_traits<CharT>::object_element_literal().data(),
+                           jsonx_char_traits<CharT>::object_element_literal().length());
             }
         }
         if (indenting_)
@@ -354,7 +374,8 @@ private:
             }
             else
             {
-                bos_.write("<json:array>");
+                bos_.write(jsonx_char_traits<CharT>::array_element_literal().data(),
+                           jsonx_char_traits<CharT>::array_element_literal().length());
             }
             stack_.push_back(stack_item(false));
         }
