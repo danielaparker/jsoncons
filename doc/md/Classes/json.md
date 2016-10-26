@@ -96,10 +96,10 @@ Constructs a copy of val
     json(const json& val, const allocator_type& allocator)
 Copy with allocator
 
-    json(json&& val)
+    json(json&& val) noexcept
 Acquires the contents of val, leaving val a `null` value
 
-    json(json&& val, const allocator_type& allocator)
+    json(json&& val, const allocator_type& allocator) 
 Move with allocator
 
     template <class T>
@@ -124,7 +124,7 @@ Destroys all values and deletes all memory allocated for strings, arrays, and ob
 ### Assignment operator
 
     json& operator=(const json& rhs)
-    json& operator=(json&& rhs)
+    json& operator=(json&& rhs) noexcept
 Assigns a new `json` value to a `json` variable, replacing it's current contents.
 
     template <class T>

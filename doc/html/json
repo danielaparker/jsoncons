@@ -502,7 +502,7 @@ vertical-align:1px;
 <td>Allocator type</td>
 </tr>
 <tr>
-<td><code>string_allocator</code></td>
+<td><code>char_allocator</code></td>
 <td>String allocator type</td>
 </tr>
 <tr>
@@ -655,12 +655,12 @@ static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const ar
 
 <p>Copy with allocator</p>
 
-<pre><code>json(json&amp;&amp; val)
+<pre><code>json(json&amp;&amp; val) noexcept
 </code></pre>
 
 <p>Acquires the contents of val, leaving val a <code>null</code> value</p>
 
-<pre><code>json(json&amp;&amp; val, const allocator_type&amp; allocator)
+<pre><code>json(json&amp;&amp; val, const allocator_type&amp; allocator) 
 </code></pre>
 
 <p>Move with allocator</p>
@@ -694,7 +694,7 @@ json(InputIterator first, InputIterator last,
 <h3>Assignment operator</h3>
 
 <pre><code>json&amp; operator=(const json&amp; rhs)
-json&amp; operator=(json&amp;&amp; rhs)
+json&amp; operator=(json&amp;&amp; rhs) noexcept
 </code></pre>
 
 <p>Assigns a new <code>json</code> value to a <code>json</code> variable, replacing it's current contents.</p>
@@ -938,7 +938,7 @@ unsigned long long as&lt;unsigned long long&gt; const
 <p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
 <pre><code>string_type as&lt;string_type&gt;() const noexcept
-string_type as&lt;string_type&gt;(const string_allocator&amp; allocator) const noexcept
+string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noexcept
 </code></pre>
 
 <p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
@@ -958,7 +958,7 @@ int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
 string_type as_string() const noexcept
-string_type as_string(const string_allocator&amp; allocator) const noexcept
+string_type as_string(const char_allocator&amp; allocator) const noexcept
 unsigned int as&lt;unsigned int&gt; const 
 </code></pre>
 
@@ -1049,12 +1049,12 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Serialization</h3>
 
-<pre><code>string_type to_string(const string_allocator&amp; allocator = string_allocator()) const noexcept
+<pre><code>string_type to_string(const char_allocator&amp; allocator = char_allocator()) const noexcept
 </code></pre>
 
 <p>Inserts json value into string.</p>
 
-<pre><code>string_type to_string(const output_format&amp; format, const string_allocator&amp; allocator = string_allocator()) const
+<pre><code>string_type to_string(const output_format&amp; format, const char_allocator&amp; allocator = char_allocator()) const
 </code></pre>
 
 <p>Inserts json value into string using specified <a href="output_format">output_format</a>.</p>
