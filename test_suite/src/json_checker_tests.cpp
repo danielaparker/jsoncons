@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE(test_fail29)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_number);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail30)
@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_CASE(test_fail30)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_number);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail31)
@@ -567,7 +567,7 @@ BOOST_AUTO_TEST_CASE(test_fail31)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_number);
+    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail32)
