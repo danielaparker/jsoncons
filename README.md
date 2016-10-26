@@ -70,7 +70,7 @@ int main()
     
     json file_export;
     file_export["File Format Options"]["Color Spaces"] =
-        std::move(color_spaces);
+        std::move(color_spaces); // creates "File Format Options" object and puts "Color Spaces" in it
     file_export["Image Sizing"] = std::move(image_sizing);
 
     std::cout << "(1)\n" << pretty_print(file_export) << "\n\n";
