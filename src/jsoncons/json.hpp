@@ -1118,13 +1118,6 @@ public:
         {
             return evaluate().is_array();
         }
-#if !defined(JSONCONS_NO_DEPRECATED)
- 
-        bool is_any() const JSONCONS_NOEXCEPT
-        {
-            return evaluate().is_any();
-        }
-#endif
         bool is_integer() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_integer();
@@ -1175,12 +1168,6 @@ public:
         bool as_bool() const
         {
             return evaluate().as_bool();
-        }
-
-        template <class T>
-        std::vector<T> as_vector() const
-        {
-            return evaluate().template as_vector<T>();
         }
 
         double as_double() const
@@ -2887,17 +2874,6 @@ public:
     void swap(json_type& b)
     {
         var_.swap(b.var_);
-    }
-
-    template <class T>
-    std::vector<T> as_vector() const
-    {
-        std::vector<T> v(size());
-        for (size_t i = 0; i < v.size(); ++i)
-        {
-            v[i] = json_type_traits<json_type,T>::as(at(i));
-        }
-        return v;
     }
 
     friend void swap(json_type& a, json_type& b)

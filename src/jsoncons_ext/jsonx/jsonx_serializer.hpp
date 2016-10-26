@@ -36,8 +36,8 @@ struct jsonx_char_traits<char>
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
 
-    static const std::string array_element_literal() {return R"(<json:array>)";};
-    static const std::string object_element_literal() {return R"(<json:object>)";};
+    static const std::string array_element_literal() {return "<json:array>";};
+    static const std::string object_element_literal() {return "<json:object>";};
 
     static const std::string object_name_element_literal() {return R"(<json:object name=")";};
     static const std::string array_name_element_literal() {return R"(<json:array name=")";};
@@ -59,8 +59,8 @@ struct jsonx_char_traits<wchar_t>
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:json="http://www.ibm.com/xmlns/prod/2009/jsonx">)";};
 
-    static const std::wstring array_element_literal() {return LR"(<json:array>)";};
-    static const std::wstring object_element_literal() {return LR"(<json:object>)";};
+    static const std::wstring array_element_literal() {return L"<json:array>";};
+    static const std::wstring object_element_literal() {return L"<json:object>";};
 
     static const std::wstring object_name_element_literal() {return LR"(<json:object name=")";};
     static const std::wstring array_name_element_literal() {return LR"(<json:array name=")";};
