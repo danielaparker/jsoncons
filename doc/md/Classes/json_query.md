@@ -117,9 +117,8 @@ Our first example returns all authors whose books are cheaper than $10.
     #include "jsoncons/json.hpp"
     #include "jsoncons_ext/jsonpath/json_query.hpp"
 
-    using jsoncons::json;
-    using jsoncons::pretty_print;
-    using jsoncons::jsonpath::json_query;
+    using namespace jsoncons;
+    using namespace jsoncons::jsonpath;
 
     json root = json::parse_file("store.json");
 

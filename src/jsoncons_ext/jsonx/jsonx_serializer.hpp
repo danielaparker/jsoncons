@@ -40,14 +40,26 @@ struct jsonx_char_traits<char>
 
     static const std::string array_element_literal() {return "<json:array>";};
     static const std::string object_element_literal() {return "<json:object>";};
+    static const std::string null_element_literal() {return "<json:null>";};
+    static const std::string string_element_literal() {return "<json:string>";};
+    static const std::string number_element_literal() {return "<json:number>";};
+    static const std::string boolean_element_literal() {return "<json:boolean>";};
 
     static const std::string object_name_element_literal() {return R"(<json:object name=")";};
     static const std::string array_name_element_literal() {return R"(<json:array name=")";};
+    static const std::string null_name_element_literal() {return R"(<json:null name=")";};
+    static const std::string string_name_element_literal() {return R"(<json:string name=")";};
+    static const std::string number_name_element_literal() {return R"(<json:number name=")";};
+    static const std::string boolean_name_element_literal() {return R"(<json:boolean name=")";};
 
-    static const std::string close_object_element_literal() {return "</json:object>";};
-    static const std::string close_array_element_literal() {return "</json:array>";};
+    static const std::string end_object_element_literal() {return "</json:object>";};
+    static const std::string end_array_element_literal() {return "</json:array>";};
+    static const std::string end_null_element_literal() {return "</json:null>";};
+    static const std::string end_string_element_literal() {return "</json:string>";};
+    static const std::string end_number_element_literal() {return "</json:number>";};
+    static const std::string end_boolean_element_literal() {return "</json:boolean>";};
 
-    static const std::string close_tag_literal() {return R"(">)";};
+    static const std::string end_tag_literal() {return R"(">)";};
 
     static const std::string amp_literal() {return "&amp;";}
     static const std::string lt_literal() {return "&lt;";}
@@ -69,14 +81,26 @@ struct jsonx_char_traits<wchar_t>
 
     static const std::wstring array_element_literal() {return L"<json:array>";};
     static const std::wstring object_element_literal() {return L"<json:object>";};
+    static const std::wstring null_element_literal() {return L"<json:null>";};
+    static const std::wstring string_element_literal() {return L"<json:string>";};
+    static const std::wstring number_element_literal() {return L"<json:number>";};
+    static const std::wstring boolean_element_literal() {return L"<json:boolean>";};
 
     static const std::wstring object_name_element_literal() {return LR"(<json:object name=")";};
     static const std::wstring array_name_element_literal() {return LR"(<json:array name=")";};
+    static const std::wstring null_name_element_literal() {return LR"(<json:null name=")";};
+    static const std::wstring string_name_element_literal() {return LR"(<json:string name=")";};
+    static const std::wstring number_name_element_literal() {return LR"(<json:number name=")";};
+    static const std::wstring boolean_name_element_literal() {return LR"(<json:boolean name=")";};
 
-    static const std::wstring close_object_element_literal() {return L"</json:object>";};
-    static const std::wstring close_array_element_literal() {return L"</json:array>";};
+    static const std::wstring end_object_element_literal() {return L"</json:object>";};
+    static const std::wstring end_array_element_literal() {return L"</json:array>";};
+    static const std::wstring end_null_element_literal() {return L"</json:null>";};
+    static const std::wstring end_string_element_literal() {return L"</json:string>";};
+    static const std::wstring end_number_element_literal() {return L"</json:number>";};
+    static const std::wstring end_boolean_element_literal() {return L"</json:boolean>";};
 
-    static const std::wstring close_tag_literal() {return LR"(">)";};
+    static const std::wstring end_tag_literal() {return LR"(">)";};
 
     static const std::wstring amp_literal() {return L"&amp;";};
     static const std::wstring lt_literal() {return L"&lt;";};
@@ -318,8 +342,8 @@ private:
                                  stack_.back().name_.length(),
                                  format_,
                                  bos_);
-                bos_.write(jsonx_char_traits<CharT>::close_tag_literal().data(),
-                           jsonx_char_traits<CharT>::close_tag_literal().length());
+                bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                           jsonx_char_traits<CharT>::end_tag_literal().length());
             }
             else
             {
@@ -342,8 +366,8 @@ private:
             unindent();
             write_indent();
         }
-        bos_.write(jsonx_char_traits<CharT>::close_object_element_literal().data(),
-                   jsonx_char_traits<CharT>::close_object_element_literal().length());
+        bos_.write(jsonx_char_traits<CharT>::end_object_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_object_element_literal().length());
         stack_.pop_back();
     }
 
@@ -369,8 +393,8 @@ private:
                                  stack_.back().name_.length(),
                                  format_,
                                  bos_);
-                bos_.write(jsonx_char_traits<CharT>::close_tag_literal().data(),
-                           jsonx_char_traits<CharT>::close_tag_literal().length());
+                bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                           jsonx_char_traits<CharT>::end_tag_literal().length());
             }
             else
             {
@@ -393,8 +417,8 @@ private:
             unindent();
             write_indent();
         }
-        bos_.write(jsonx_char_traits<CharT>::close_array_element_literal().data(),
-                   jsonx_char_traits<CharT>::close_array_element_literal().length());
+        bos_.write(jsonx_char_traits<CharT>::end_array_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_array_element_literal().length());
         stack_.pop_back();
     }
 
@@ -413,20 +437,24 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:null name=\"");
+            bos_.write(jsonx_char_traits<CharT>::null_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::null_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:number>");
+            bos_.write(jsonx_char_traits<CharT>::null_element_literal().data(),
+                       jsonx_char_traits<CharT>::null_element_literal().length());
         }
         auto buf = json_text_traits<CharT>::null_literal();
         bos_.write(buf.first,buf.second);
-        bos_.write("</json:null>");
+        bos_.write(jsonx_char_traits<CharT>::end_null_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_null_element_literal().length());
     }
 
     void do_string_value(const CharT* val, size_t length) override
@@ -438,19 +466,23 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:string name=\"");
+            bos_.write(jsonx_char_traits<CharT>::string_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::string_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:string>");
+            bos_.write(jsonx_char_traits<CharT>::string_element_literal().data(),
+                       jsonx_char_traits<CharT>::string_element_literal().length());
         }
         escape_value(val,length,format_,bos_);
-        bos_.write("</json:string>");     
+        bos_.write(jsonx_char_traits<CharT>::end_string_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_string_element_literal().length());
     }
 
     void do_double_value(double value, uint8_t precision) override
@@ -462,16 +494,19 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:number name=\"");
+            bos_.write(jsonx_char_traits<CharT>::number_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:number>");
+            bos_.write(jsonx_char_traits<CharT>::number_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_element_literal().length());
         }
         if (is_nan(value) && format_.replace_nan())
         {
@@ -489,7 +524,8 @@ private:
         {
             fp_.print(value,precision,bos_);
         }
-        bos_.write("</json:number>");
+        bos_.write(jsonx_char_traits<CharT>::end_number_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_number_element_literal().length());
     }
 
     void do_integer_value(int64_t value) override
@@ -501,19 +537,23 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:number name=\"");
+            bos_.write(jsonx_char_traits<CharT>::number_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:number>");
+            bos_.write(jsonx_char_traits<CharT>::number_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_element_literal().length());
         }
         print_integer(value,bos_);
-        bos_.write("</json:number>");
+        bos_.write(jsonx_char_traits<CharT>::end_number_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_number_element_literal().length());
     }
 
     void do_uinteger_value(uint64_t value) override
@@ -525,19 +565,23 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:number name=\"");
+            bos_.write(jsonx_char_traits<CharT>::number_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:number>");
+            bos_.write(jsonx_char_traits<CharT>::number_element_literal().data(),
+                       jsonx_char_traits<CharT>::number_element_literal().length());
         }
         print_integer(value,bos_);
-        bos_.write("</json:number>");
+        bos_.write(jsonx_char_traits<CharT>::end_number_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_number_element_literal().length());
     }
 
     void do_bool_value(bool value) override
@@ -549,16 +593,19 @@ private:
         }
         if (stack_.back().is_object())
         {
-            bos_.write("<json:boolean name=\"");
+            bos_.write(jsonx_char_traits<CharT>::boolean_name_element_literal().data(),
+                       jsonx_char_traits<CharT>::boolean_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
                              format_,
                              bos_);
-            bos_.write("\">");
+            bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
+                       jsonx_char_traits<CharT>::end_tag_literal().length());
         }
         else
         {
-            bos_.write("<json:boolean>");
+            bos_.write(jsonx_char_traits<CharT>::boolean_element_literal().data(),
+                       jsonx_char_traits<CharT>::boolean_element_literal().length());
         }
         if (value)
         {
@@ -570,7 +617,8 @@ private:
             auto buf = json_text_traits<CharT>::false_literal();
             bos_.write(buf.first,buf.second);
         }
-        bos_.write("</json:boolean>");
+        bos_.write(jsonx_char_traits<CharT>::end_boolean_element_literal().data(),
+                   jsonx_char_traits<CharT>::end_boolean_element_literal().length());
     }
 
     void indent()

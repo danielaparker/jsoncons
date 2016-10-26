@@ -23,11 +23,7 @@ You can achieve the desired result by subclassing the [json_filter](json_filter)
     #include "jsoncons/json_filter.hpp"
     #include "jsoncons/json_reader.hpp"
 
-    using jsoncons::parsing_context;
-    using jsoncons::json_serializer;
-    using jsoncons::json_reader;
-    using jsoncons::json_input_handler;
-    using jsoncons::json_output_handler;
+    using namespace jsoncons;
 
     class my_json_filter : public json_filter
     {
@@ -91,7 +87,7 @@ In your code you will pass `my_json_filter` to the constructor of [json_reader](
     json_serializer serializer(os, true);
     my_json_filter filter(serializer);
     json_reader reader(is,filter);
-	reader.read();
+        reader.read();
 
 The output is a warning message written to the console
 
