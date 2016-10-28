@@ -472,7 +472,7 @@ public:
 
     void initialize(const Json& context_node) override
     {
-        jsonpath_evaluator<Json> evaluator;
+        jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
         evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_values();
     }
