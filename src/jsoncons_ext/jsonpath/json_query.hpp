@@ -98,7 +98,7 @@ namespace jsoncons { namespace jsonpath {
 template<class Json>
 Json json_query(const Json& root, const typename Json::char_type* path, size_t length)
 {
-    jsonpath_evaluator<Json> evaluator;
+    jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
     evaluator.evaluate(root,path,length);
     return evaluator.get_values();
 }
