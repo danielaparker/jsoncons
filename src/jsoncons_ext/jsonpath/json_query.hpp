@@ -115,6 +115,26 @@ Json json_query(const Json& root, const typename Json::char_type* path)
     return json_query(root,path,std::char_traits<typename Json::char_type>::length(path));
 }
 
+template<class Json, class T>
+void json_replace(Json& root, const typename Json::char_type* path, size_t length, T&& new_value)
+{
+    jsonpath_evaluator<Json,Json&,Json*> evaluator;
+    evaluator.evaluate(root,path,length);
+    evaluator.replace(std::forward<T&&>(new_value));
+}
+
+template<class Json, class T>
+void json_replace(Json& root, const typename Json::string_type& path, T&& new_value)
+{
+    json_replace(root, path.data(), path.length(), std::forward<T&&>(new_value));
+}
+
+template<class Json, class T>
+void json_replace(Json& root, const typename Json::char_type* path, T&& new_value)
+{
+    json_replace(root,path,std::char_traits<typename Json::char_type>::length(path),std::forward<T&&>(new_value));
+}
+
 enum class states 
 {
     start,
@@ -135,14 +155,17 @@ enum class states
     dot
 };
 
-template<class Json>
+template<class Json,
+         class JsonReference=const Json&,
+         class JsonPointer=const Json*>
 class jsonpath_evaluator : private basic_parsing_context<typename Json::char_type>
 {
 private:
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
-    typedef const Json* cjson_ptr;
-    typedef std::vector<cjson_ptr> node_set;
+    typedef JsonReference json_reference;
+    typedef JsonPointer json_pointer;
+    typedef std::vector<json_pointer> node_set;
 
     class selector
     {
@@ -150,7 +173,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
+        virtual void select(json_reference context, std::vector<json_pointer>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
     class expr_selector : public selector
@@ -163,7 +186,7 @@ private:
         {
         }
 
-        void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
+        void select(json_reference context, std::vector<json_pointer>& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(context);
             if (index.template is<size_t>())
@@ -192,11 +215,11 @@ private:
         {
         }
 
-        void select(const Json& context, std::vector<cjson_ptr>& nodes, std::vector<std::shared_ptr<Json>>&) override
+        void select(json_reference context, std::vector<json_pointer>& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (context.is_array())
             {
-                for (const auto& element : context.elements())
+                for (json_reference element : context.elements())
                 {
                     if (result_.exists(element))
                     {
@@ -218,8 +241,8 @@ private:
         {
         }
 
-        void select(const Json& context,
-            std::vector<cjson_ptr>& nodes,
+        void select(json_reference context,
+            std::vector<json_pointer>& nodes,
             std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             if (context.is_object() && context.count(name_) > 0)
@@ -278,8 +301,8 @@ private:
         {
         }
 
-        void select(const Json& context,
-            std::vector<cjson_ptr>& nodes,
+        void select(json_reference context,
+            std::vector<json_pointer>& nodes,
             std::vector<std::shared_ptr<Json>>&) override
         {
             if (positive_step_)
@@ -292,8 +315,8 @@ private:
             }
         }
 
-        void end_array_slice1(const Json& context,
-                              std::vector<cjson_ptr>& nodes)
+        void end_array_slice1(json_reference context,
+                              std::vector<json_pointer>& nodes)
         {
             if (context.is_array())
             {
@@ -317,8 +340,8 @@ private:
             }
         }
 
-        void end_array_slice2(const Json& context,
-                              std::vector<cjson_ptr>& nodes)
+        void end_array_slice2(json_reference context,
+                              std::vector<json_pointer>& nodes)
         {
             if (context.is_array())
             {
@@ -358,7 +381,7 @@ private:
     bool positive_step_;
     std::vector<node_set> stack_;
     bool recursive_descent_;
-    std::vector<cjson_ptr> nodes_;
+    std::vector<json_pointer> nodes_;
     std::vector<std::shared_ptr<Json>> temp_json_values_;
     size_t line_;
     size_t column_;
@@ -389,23 +412,35 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                cjson_ptr p = stack_.back()[i];
+                json_pointer p = stack_.back()[i];
                 result.add(*p);
             }
         }
         return result;
     }
 
-    void evaluate(const Json& root, const string_type& path)
+    template <class T>
+    void replace(T&& new_value)
+    {
+        if (stack_.size() > 0)
+        {
+            for (size_t i = 0; i < stack_.back().size(); ++i)
+            {
+                *(stack_.back()[i]) = new_value;
+            }
+        }
+    }
+
+    void evaluate(json_reference root, const string_type& path)
     {
         evaluate(root,path.data(),path.length());
     }
-    void evaluate(const Json& root, const char_type* path)
+    void evaluate(json_reference root, const char_type* path)
     {
         evaluate(root,path,std::char_traits<char_type>::length(path));
     }
 
-    void evaluate(const Json& root, const char_type* path, size_t length)
+    void evaluate(json_reference root, const char_type* path, size_t length)
     {
         states pre_line_break_state = states::start;
 
@@ -852,7 +887,7 @@ public:
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
-            cjson_ptr p = stack_.back()[i];
+            json_pointer p = stack_.back()[i];
             if (p->is_array())
             {
                 for (auto it = p->elements().begin(); it != p->elements().end(); ++it)
@@ -884,7 +919,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(const Json& context, const string_type& name)
+    void apply_unquoted_string(json_reference context, const string_type& name)
     {
         if (context.is_object())
         {
@@ -967,7 +1002,7 @@ public:
         }
     }
 
-    void apply_selectors(const Json& context)
+    void apply_selectors(json_reference context)
     {
         for (const auto& selector : selectors_)
         {

@@ -1053,9 +1053,9 @@ public:
             return evaluate().count(name);
         }
 
-        bool contains_name(const string_type& name) const
+        bool has_name(const string_type& name) const
         {
-            return evaluate().contains_name(name);
+            return evaluate().has_name(name);
         }
 
         bool is_null() const JSONCONS_NOEXCEPT
@@ -1988,7 +1988,7 @@ public:
         return var_.type_id() == value_types::null_t;
     }
 
-    bool contains_name(const string_type& name) const
+    bool has_name(const string_type& name) const
     {
         switch (var_.type_id())
         {

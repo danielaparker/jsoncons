@@ -1035,6 +1035,36 @@ BOOST_AUTO_TEST_CASE(test_array_slice_operator)
 
 }
 
+BOOST_AUTO_TEST_CASE(test_replace)
+{
+    json j;
+    try
+    {
+        j = json::parse(R"(
+{"store":
+{"book": [
+{"category": "reference",
+"author": "Margaret Weis",
+"title": "Dragonlance Series",
+"price": 31.96}, {"category": "reference",
+"author": "Brent Weeks",
+"title": "Night Angel Trilogy",
+"price": 14.70
+}]}}
+)");
+    }
+    catch (const parse_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << ("1\n") << pretty_print(j) << std::endl;
+
+    json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
+
+    std::cout << ("2\n") << pretty_print(j) << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

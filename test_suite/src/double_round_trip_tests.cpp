@@ -61,6 +61,15 @@ BOOST_AUTO_TEST_CASE(test_precision)
 
     val = json::parse("0.12345E30");
     BOOST_CHECK_EQUAL(6,val.double_precision());
+
+    val = json::parse("0E30");
+    BOOST_CHECK_EQUAL(1,val.double_precision());
+
+    val = json::parse("1E30");
+    BOOST_CHECK_EQUAL(1,val.double_precision());
+
+    val = json::parse("12E30");
+    BOOST_CHECK_EQUAL(2,val.double_precision());
 }
 
 BOOST_AUTO_TEST_CASE(test_round_trip)

@@ -314,6 +314,11 @@ public:
 
     void check_done(const CharT* input, size_t start, size_t length)
     {
+        JSONCONS_ASSERT(stack_.size() >= 1);
+        if (stack_.back() != states::done)
+        {
+            err_handler_->error(json_parser_errc::unexpected_eof, *this);
+        }
         index_ = start;
         for (; index_ < length; ++index_)
         {
@@ -1379,6 +1384,7 @@ public:
     void end_parse()
     {
         JSONCONS_ASSERT(stack_.size() >= 2);
+        
         if (parent() == states::root)
         {
             switch (stack_.back())
@@ -1399,7 +1405,7 @@ public:
         { 
             stack_.pop_back();
         }
-        if (!(stack_.back() == states::done))
+        if (!(stack_.back() == states::done || stack_.back() == states::start))
         {
             err_handler_->error(json_parser_errc::unexpected_eof, *this);
         }

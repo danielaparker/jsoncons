@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace jsonpath {
 
-template <class Json>
+template <class Json,class JsonReference,class JsonPointer>
 class jsonpath_evaluator;
 
 enum class filter_states

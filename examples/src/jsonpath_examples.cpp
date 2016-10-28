@@ -40,10 +40,41 @@ void json_query_examples()
     std::cout << "(6)\n" << pretty_print(result6) << std::endl;
 }
 
+void json_replace_examples()
+{
+    json j;
+    try
+    {
+        j = json::parse(R"(
+{"store":
+{"book": [
+{"category": "reference",
+"author": "Margaret Weis",
+"title": "Dragonlance Series",
+"price": 31.96}, {"category": "reference",
+"author": "Brent Weeks",
+"title": "Night Angel Trilogy",
+"price": 14.70
+}]}}
+)");
+    }
+    catch (const parse_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << ("1\n") << pretty_print(j) << std::endl;
+
+    json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
+
+    std::cout << ("2\n") << pretty_print(j) << std::endl;
+}
+
 void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
     json_query_examples();
+    json_replace_examples();
     std::cout << std::endl;
 }
 
