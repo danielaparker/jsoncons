@@ -378,7 +378,7 @@ Output:
 }
 ```
 
-See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query), See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_replace), and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
+See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query), See [json_replace](https://github.com/danielaparker/jsoncons/wiki/json_replace), and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
 
 ### csv
 Example file (tasks.csv)
