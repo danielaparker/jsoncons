@@ -516,6 +516,7 @@ vertical-align:1px;
 <li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the <a href="https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility">Type Extensibility</a> tutorial.<br>
 </li>
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
+<li>New <code>jsonpath</code> function <code>json_replace</code> that searches for all values that match a JsonPath expression and replaces them with a specified value.</li>
 </ul>
 
 <h2>Get jsoncons</h2>

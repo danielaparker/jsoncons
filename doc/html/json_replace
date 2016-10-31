@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+<title>json_replace</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,59 +468,103 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>.  </p>
+<pre><code>jsoncons::jsonpath::json_replace
+</code></pre>
 
-<h3>Roadmap</h3>
+<p>Searches for all values that match a JsonPath expression and replaces them with the specified value</p>
 
-<p><a href="Roadmap">Roadmap</a></p>
+<h3>Header</h3>
 
-<h3>Tutorials</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">"</span></span></pre></div>
 
-<p><a href="Basics">Basics</a></p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-k">void</span> <span class="pl-en">json_replace</span>(Json&amp; root, 
+                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, <span class="pl-c1">size_t</span> length, 
+                  T&amp;&amp; new_value)
 
-<p><a href="Arrays">Arrays</a></p>
+template&lt;class Json, class T&gt;
+void json_replace(Json&amp; root, 
+                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::string_type&amp; path, 
+                  T&amp;&amp; new_value)
 
-<p><a href="Type%20Extensibility">Type Extensibility</a></p>
+template&lt;class Json, class T&gt;
+void json_replace(Json&amp; root, 
+                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, 
+                  T&amp;&amp; new_value)</pre></div>
 
-<p><a href="Unicode%20support">Unicode support</a></p>
+<h2>Examples</h2>
 
-<p><a href="Transforming%20JSON%20with%20filters">Transforming JSON with filters</a></p>
+<h3>Change the price of a book</h3>
 
-<h3>Classes</h3>
+<p>Example file (store.json):</p>
 
-<p><a href="json">json</a><br><br>
-<a href="json_serializer">json_serializer</a><br><br>
-<a href="output_format">output_format</a><br><br>
-<a href="json_reader">json_reader</a><br><br>
-<a href="json_deserializer">json_deserializer</a>  </p>
+<div class="highlight highlight-source-json"><pre>{ <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [ 
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.99</span>
+      }
+    ]
+  }
+}</pre></div>
 
-<p><a href="wjson">wjson</a><br><br>
-<a href="wjson_serializer">wjson_serializer</a><br><br>
-<a href="woutput_format">woutput_format</a><br><br>
-<a href="wjson_reader">wjson_reader</a><br><br>
-<a href="wjson_deserializer">wjson_deserializer</a>  </p>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
-<p><a href="ojson">ojson</a>  </p>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
 
-<p><a href="wojson">wojson</a>  </p>
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/booklist.json<span class="pl-pds">"</span></span>);
+    json booklist;
+    is &gt;&gt; booklist;
 
-<h3>Extensions</h3>
+    <span class="pl-c">// Change the price of "Moby Dick"</span>
+    <span class="pl-c1">json_replace</span>(booklist,<span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.isbn == '0-553-21311-3')].price<span class="pl-pds">"</span></span>,<span class="pl-c1">10.0</span>);
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(booklist) &lt;&lt; std::endl;
 
-<h4>csv</h4>
+}</pre></div>
 
-<p><a href="csv_reader">csv_reader</a></p>
+<p>Output:</p>
 
-<p><a href="csv_serializer">csv_serializer</a></p>
-
-<h4>jsonpath</h4>
-
-<p><a href="json_query">json_query</a></p>
-
-<p><a href="json_replace">json_replace</a></p>
-
-<h4>jsonx</h4>
-
-<p><a href="jsonx_serializer">jsonx_serializer</a></p>
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [
+            {
+                <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
+                <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
+            },
+            {
+                <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>,
+                <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>
+            },
+            {
+                <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+                <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">10.0</span>,
+                <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>
+            }
+        ]
+    }
+}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -46,6 +46,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json_query](json_query)
 
+[json_replace](json_replace)
+
 #### jsonx
 
 [jsonx_serializer](jsonx_serializer)
