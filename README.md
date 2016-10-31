@@ -26,6 +26,7 @@ The library has a number of features, which are listed below:
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 - Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
+- Supports search (by JsonPath) and replace
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
@@ -309,12 +310,6 @@ Example file (store.json):
         "title": "Moby Dick",
         "isbn": "0-553-21311-3",
         "price": 8.99
-      },
-      { "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
       }
     ]
   }
@@ -333,46 +328,19 @@ int main()
     json booklist;
     is >> booklist;
 
-    // The authors of books that are cheaper than $10
-    json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");
-    std::cout << "(1) " << result1 << std::endl;
-
-    // The number of books
-    json result2 = json_query(booklist, "$..book.length");
-    std::cout << "(2) " << result2 << std::endl;
-
-    // The third book
-    json result3 = json_query(booklist, "$..book[2]");
-    std::cout << "(3)\n" << pretty_print(result3) << std::endl;
-
     // All books whose author's name starts with Evelyn
-    json result4 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
-    std::cout << "(4)\n" << pretty_print(result4) << std::endl;
+    json result1 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    std::cout << "(1)\n" << pretty_print(result1) << std::endl;
 
-    // The titles of all books that have isbn number
-    json result5 = json_query(booklist, "$..book[?(@.isbn)].title");
-    std::cout << "(5) " << result5 << std::endl;
+    // Change the price of "Moby Dick"
+    json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
+    std::cout << "(2)\n" << pretty_print(booklist) << std::endl;
 
-    // All authors and titles of books
-    json result6 = json_query(booklist, "$['store']['book']..['author','title']");
-    std::cout << "(6)\n" << pretty_print(result6) << std::endl;
 }
 ```
 Output:
 ```json
-(1) ["Nigel Rees","Herman Melville"]
-(2) [4]
-(3)
-[
-    {
-        "author": "Herman Melville",
-        "category": "fiction",
-        "isbn": "0-553-21311-3",
-        "price": 8.99,
-        "title": "Moby Dick"
-    }
-]
-(4)
+(1)
 [
     {
         "author": "Evelyn Waugh",
@@ -381,18 +349,32 @@ Output:
         "title": "Sword of Honour"
     }
 ]
-(5) ["Moby Dick","The Lord of the Rings"]
-(6)
-[
-    "Nigel Rees",
-    "Sayings of the Century",
-    "Evelyn Waugh",
-    "Sword of Honour",
-    "Herman Melville",
-    "Moby Dick",
-    "J. R. R. Tolkien",
-    "The Lord of the Rings"
-]
+(2)
+{
+    "store": {
+        "book": [
+            {
+                "author": "Nigel Rees",
+                "category": "reference",
+                "price": 8.95,
+                "title": "Sayings of the Century"
+            },
+            {
+                "author": "Evelyn Waugh",
+                "category": "fiction",
+                "price": 12.99,
+                "title": "Sword of Honour"
+            },
+            {
+                "author": "Herman Melville",
+                "category": "fiction",
+                "isbn": "0-553-21311-3",
+                "price": 10.0,
+                "title": "Moby Dick"
+            }
+        ]
+    }
+}
 ```
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.

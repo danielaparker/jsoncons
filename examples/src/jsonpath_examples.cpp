@@ -40,7 +40,17 @@ void json_query_examples()
     std::cout << "(6)\n" << pretty_print(result6) << std::endl;
 }
 
-void json_replace_examples()
+void json_replace_example1()
+{
+    std::ifstream is("input/booklist.json");
+    json booklist;
+    is >> booklist;
+
+    json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
+    std::cout << pretty_print(booklist) << std::endl;
+}
+
+void json_replace_example2()
 {
     json j;
     try
@@ -74,7 +84,8 @@ void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
     json_query_examples();
-    json_replace_examples();
+    json_replace_example1();
+    json_replace_example2();
     std::cout << std::endl;
 }
 
