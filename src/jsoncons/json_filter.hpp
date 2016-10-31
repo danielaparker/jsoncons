@@ -82,7 +82,7 @@ private:
     }
 
     void do_uinteger_value(uint64_t value, 
-                                 const basic_parsing_context<CharT>&) override
+                           const basic_parsing_context<CharT>&) override
     {
         writer_->value(value);
     }
@@ -108,7 +108,7 @@ class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
 {
 private:
 
-    class empty_parsing_context : public parsing_context
+    class null_parsing_context : public parsing_context
     {
         size_t do_line_number() const override {return 1;}
 
@@ -118,7 +118,7 @@ private:
     };
     basic_null_json_input_handler<CharT> null_input_handler_;
 
-    const empty_parsing_context context_;
+    const null_parsing_context context_;
     basic_json_input_handler<CharT>* input_handler_;
 
 public:
@@ -228,7 +228,7 @@ public:
         return *input_handler_; 
     }
 
-    basic_json_output_handler<CharT>& output_handler()
+    basic_json_output_handler<CharT>& parent_handler()
     {
         return *output_handler_;
     }
@@ -349,11 +349,11 @@ private:
         size_t len = std::min JSONCONS_NO_MACRO_EXP(name_.length(),length);
         if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
         {
-            output_handler().name(new_name_.data(),new_name_.length());
+            parent_handler().name(new_name_.data(),new_name_.length());
         }
         else
         {
-            output_handler().name(p,length);
+            parent_handler().name(p,length);
         }
     }
 };

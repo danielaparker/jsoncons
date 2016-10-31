@@ -47,7 +47,7 @@ private:
         property_name_ = std::string(p, length);
         if (property_name_ != "name")
         {
-            output_handler().name(p, length);
+            parent_handler().name(p, length);
         }
     }
 
@@ -58,14 +58,14 @@ private:
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            output_handler().name("first-name");
+            parent_handler().name("first-name");
             std::string first = value.substr(0, end_first);
-            output_handler().value(first);
+            parent_handler().value(first);
             if (start_last != std::string::npos)
             {
-                output_handler().name("last-name");
+                parent_handler().name("last-name");
                 std::string last = value.substr(start_last);
-                output_handler().value(last);
+                parent_handler().value(last);
             }
             else
             {
@@ -74,7 +74,7 @@ private:
         }
         else
         {
-            output_handler().value(p, length);
+            parent_handler().value(p, length);
         }
     }
 
