@@ -186,7 +186,7 @@ private:
 };
 
 template <class CharT>
-class null_json_output_handler_impl : public basic_json_output_handler<CharT>
+class basic_null_json_output_handler : public basic_json_output_handler<CharT>
 {
 private:
 
@@ -247,13 +247,6 @@ private:
     }
 
 };
-
-template<class CharT>
-basic_json_output_handler<CharT>& null_json_output_handler()
-{
-    static null_json_output_handler_impl<CharT> instance;
-    return instance;
-}
 
 typedef basic_json_output_handler<char> json_output_handler;
 typedef basic_json_output_handler<wchar_t> wjson_output_handler;

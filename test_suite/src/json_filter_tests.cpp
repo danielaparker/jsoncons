@@ -34,7 +34,7 @@ struct item
 class my_json_filter : public json_filter
 {
 public:
-    std::vector<item> items;
+    std::vector<std::string> items;
 
     my_json_filter(json_output_handler& handler)
         : json_filter(handler)
@@ -42,39 +42,39 @@ public:
     }
 
 private:
-    void do_name(const char* p, size_t length, const parsing_context& context) override
+    void do_name(const char* p, size_t length) override
     {
         property_name_ = std::string(p, length);
         if (property_name_ != "name")
         {
-            input_handler().name(p, length, context);
+            output_handler().name(p, length);
         }
     }
 
-    void do_string_value(const char* p, size_t length, const parsing_context& context) override
+    void do_string_value(const char* p, size_t length) override
     {
         if (property_name_ == "name")
         {
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            input_handler().name("first-name", context);
+            output_handler().name("first-name");
             std::string first = value.substr(0, end_first);
-            input_handler().value(first, context);
+            output_handler().value(first);
             if (start_last != std::string::npos)
             {
-                input_handler().name("last-name", context);
+                output_handler().name("last-name");
                 std::string last = value.substr(start_last);
-                input_handler().value(last, context);
+                output_handler().value(last);
             }
             else
             {
-                items.push_back(item(value, context.line_number(), context.column_number()));
+                items.push_back(value);
             }
         }
         else
         {
-            input_handler().value(p, length, context);
+            output_handler().value(p, length);
         }
     }
 
@@ -94,9 +94,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
     reader.read_next();
 
     BOOST_CHECK_EQUAL(1,filter.items.size());
-    BOOST_CHECK_EQUAL("John", filter.items[0].name);
-    BOOST_CHECK_EQUAL(9, filter.items[0].line);
-    BOOST_CHECK_EQUAL(26, filter.items[0].column);
+    BOOST_CHECK_EQUAL("John", filter.items[0]);
 }
 
 class my_parsing_context : public parsing_context
@@ -123,8 +121,7 @@ BOOST_AUTO_TEST_CASE(test_output_input_adapter)
     std::istringstream is(input);
 
     json_deserializer handler;
-    my_parsing_context context;
-    basic_json_output_input_adapter<char> adapter(handler,context);
+    basic_json_output_input_adapter<char> adapter(handler);
     try
     {
         json_reader reader(is,handler);
@@ -133,6 +130,38 @@ BOOST_AUTO_TEST_CASE(test_output_input_adapter)
     catch (const std::exception&)
     {
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_rename_name)
+{
+    json j;
+    try
+    {
+        j = json::parse(R"(
+{"store":
+{"book": [
+{"category": "reference",
+"author": "Margaret Weis",
+"title": "Dragonlance Series",
+"price": 31.96}, {"category": "reference",
+"author": "Brent Weeks",
+"title": "Night Angel Trilogy",
+"price": 14.70
+}]}}
+)");
+    }
+    catch (const parse_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << ("1\n") << pretty_print(j) << std::endl;
+
+    json_serializer serializer(std::cout, true);
+
+    rename_name_filter filter("price","price2",serializer);
+    j.write(filter);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

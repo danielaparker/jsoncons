@@ -280,7 +280,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
         else if (parameters_.header().length() > 0)
         {
-            basic_empty_json_input_handler<CharT> ih;
+            basic_null_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.quote_char(parameters_.quote_char());
@@ -319,7 +319,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
         else if (parameters_.data_types().length() > 0)
         {
-            basic_empty_json_input_handler<CharT> ih;
+            basic_null_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.assume_header(true);
@@ -356,7 +356,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
         else if (parameters_.default_values().length() > 0)
         {
-            basic_empty_json_input_handler<CharT> ih;
+            basic_null_json_input_handler<CharT> ih;
             basic_csv_parameters<CharT> params;
             params.field_delimiter(parameters_.field_delimiter());
             params.assume_header(true);

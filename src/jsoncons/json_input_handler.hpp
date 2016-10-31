@@ -154,14 +154,13 @@ private:
     virtual void do_bool_value(bool value, const basic_parsing_context<CharT>& context) = 0;
 };
 
-
 template <class CharT>
-class basic_empty_json_input_handler : public basic_json_input_handler<CharT>
+class basic_null_json_input_handler : public basic_json_input_handler<CharT>
 {
 public:
     static basic_json_input_handler<CharT>& instance()
     {
-        static basic_empty_json_input_handler<CharT> instance;
+        static basic_null_json_input_handler<CharT> instance;
         return instance;
     }
 private:
@@ -225,8 +224,8 @@ private:
 typedef basic_json_input_handler<char> json_input_handler;
 typedef basic_json_input_handler<wchar_t> wjson_input_handler;
 
-typedef basic_empty_json_input_handler<char> empty_json_input_handler;
-typedef basic_empty_json_input_handler<wchar_t> wempty_json_input_handler;
+typedef basic_null_json_input_handler<char> empty_json_input_handler;
+typedef basic_null_json_input_handler<wchar_t> wempty_json_input_handler;
 
 }
 
