@@ -91,10 +91,7 @@ BOOST_AUTO_TEST_CASE(test_json)
                                 dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes.json") == std::string::npos &&
                                 dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes_null.json") == std::string::npos &&
                                 dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_structure_object_with_comment.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_single_space.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_structure_no_data.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_structure_UTF8_BOM_no_data.json") == std::string::npos) 
+                                dir_itr->path().filename().string().find("n_structure_object_with_comment.json") == std::string::npos) 
                             {
                                 boost::filesystem::ifstream is(dir_itr->path());
                                 ojson document;

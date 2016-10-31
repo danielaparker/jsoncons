@@ -117,29 +117,36 @@ public:
 
     void check_done()
     {
-        while (!eof_)
+        if (eof_)
         {
-            if (!(index_ < buffer_length_))
+            parser_.check_done(buffer_.data(),0,0);
+        }
+        else
+        {
+            while (!eof_)
             {
-                if (!is_->eof())
+                if (!(index_ < buffer_length_))
                 {
-                    is_->read(buffer_.data(), buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_->gcount());
-                    if (buffer_length_ == 0)
+                    if (!is_->eof())
+                    {
+                        is_->read(buffer_.data(), buffer_capacity_);
+                        buffer_length_ = static_cast<size_t>(is_->gcount());
+                        if (buffer_length_ == 0)
+                        {
+                            eof_ = true;
+                        }
+                        index_ = 0;
+                    }
+                    else
                     {
                         eof_ = true;
                     }
-                    index_ = 0;
                 }
-                else
+                if (!eof_)
                 {
-                    eof_ = true;
+                    parser_.check_done(buffer_.data(),index_,buffer_length_);
+                    index_ = parser_.index();
                 }
-            }
-            if (!eof_)
-            {
-                parser_.check_done(buffer_.data(),index_,buffer_length_);
-                index_ = parser_.index();
             }
         }
     }
