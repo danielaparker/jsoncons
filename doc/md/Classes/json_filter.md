@@ -10,29 +10,23 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 ### Base classes
 
-[json_input_handler](json_input_handler)
+[json_output_handler](json_output_handler)
 
 ### Constructors
 
     json_filter(json_input_handler& handler)
-    json_filter(json_input_handler& handler,
-                 parse_error_handler& err_handler)
 All JSON events that pass through the `json_filter` go to the specified `json_input_handler` (i.e. another filter.)
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
     json_filter(json_output_handler& handler)
-    json_filter(json_output_handler& handler,
-                 parse_error_handler& err_handler)
 All JSON events that pass through the `json_filter` go to the specified `json_output_handler`.
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
 ### Accessors
 
-    json_input_handler& input_handler()
-Returns a reference to the JSON event handler. 
+    operator json_input_handler&() 
+Adapts a `json_filter` to a `json_input_handler`
 
-### Deprecated methods
-
-    json_input_handler& parent()
-Replaced by `input_handler`. 
+    json_output_handler& output_handler()
+Returns a reference to the JSON result output handler. 
 

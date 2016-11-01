@@ -717,7 +717,14 @@ vertical-align:1px;
 <td></td>
 <td>wojson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>wojson_encoder</code>json member types</td>
+<td>Use <code>wojson_encoder</code>
+</td>
+</tr>
+<tr>
+<td>json member types</td>
+<td>any</td>
+<td><em>✓</em></td>
+<td></td>
 </tr>
 <tr>
 <td>json member constants</td>

@@ -482,21 +482,17 @@ typedef basic_json_filter&lt;char&gt; json_filter
 
 <h3>Base classes</h3>
 
-<p><a href="json_input_handler">json_input_handler</a></p>
+<p><a href="json_output_handler">json_output_handler</a></p>
 
 <h3>Constructors</h3>
 
 <pre><code>json_filter(json_input_handler&amp; handler)
-json_filter(json_input_handler&amp; handler,
-             parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_input_handler</code> (i.e. another filter.)<br>
 You must ensure that the <code>handler</code> exists as long as does <code>json_filter</code>, as <code>json_filter</code> holds a pointer to but does not own this object.</p>
 
 <pre><code>json_filter(json_output_handler&amp; handler)
-json_filter(json_output_handler&amp; handler,
-             parse_error_handler&amp; err_handler)
 </code></pre>
 
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_output_handler</code>.<br>
@@ -504,17 +500,15 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
 
 <h3>Accessors</h3>
 
-<pre><code>json_input_handler&amp; input_handler()
+<pre><code>operator json_input_handler&amp;() 
 </code></pre>
 
-<p>Returns a reference to the JSON event handler. </p>
+<p>Adapts a <code>json_filter</code> to a <code>json_input_handler</code></p>
 
-<h3>Deprecated methods</h3>
-
-<pre><code>json_input_handler&amp; parent()
+<pre><code>json_output_handler&amp; output_handler()
 </code></pre>
 
-<p>Replaced by <code>input_handler</code>. </p>
+<p>Returns a reference to the JSON result output handler. </p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
