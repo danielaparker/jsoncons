@@ -476,7 +476,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json_reader.hpp<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Constructors</h3>
 
@@ -505,7 +505,7 @@ You must ensure that the input stream and input handler exist as long as does <c
 <pre><code>void read_next()
 </code></pre>
 
-<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.<br>
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_encoder">json_encoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>void check_done()
@@ -561,7 +561,7 @@ size_t max_nesting_depth() const
     <span class="pl-k">throw</span> <span class="pl-smi">std::runtime_error</span>(<span class="pl-s"><span class="pl-pds">"</span>Cannot open file<span class="pl-pds">"</span></span>);
 }
 
-json_deserializer handler;
+json_encoder handler;
 json_reader <span class="pl-en">reader</span>(is,handler);
 
 <span class="pl-k">while</span> (!reader.eof())

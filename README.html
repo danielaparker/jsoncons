@@ -508,15 +508,19 @@ vertical-align:1px;
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
 
-<h2>What's new</h2>
+<h2>What's new on master</h2>
 
 <ul>
-<li>New release 0.99.3a</li>
-<li>The deprecated class <code>json::any</code> has been removed from master</li>
+<li>The deprecated class <code>json::any</code> has been removed </li>
 <li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the <a href="https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility">Type Extensibility</a> tutorial.<br>
 </li>
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
+<li>
+<code>json_type_traits</code> specializations no longer require the <code>is_assignable</code> data member</li>
+<li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>wojson_deserializer</code> have been deprecated (they still work) and replaced by <code>json_encoder</code>,<code>ojson_encoder</code>,<code>wjson_encoder</code>,<code>wojson_encoder</code>.<br>
+</li>
 <li>New <code>jsonpath</code> function <code>json_replace</code> that searches for all values that match a JsonPath expression and replaces them with a specified value.</li>
+<li>If you have implemented your own custom filters that extend <code>json_filter</code>, you will have to make a change to your class. See the Changelog for details.</li>
 </ul>
 
 <h2>Get jsoncons</h2>
@@ -528,7 +532,7 @@ vertical-align:1px;
 <h2>A simple program using jsoncons</h2>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c">// For convenience</span>
 <span class="pl-k">using</span> jsoncons::json;
@@ -755,6 +759,24 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a> for details.</p>
 
+<h3>Filter json names and values</h3>
+
+<p>You can rename object member names with the built in filter <code>rename_name_filter</code></p>
+
+<div class="highlight highlight-source-c++"><pre>
+std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/booklist.json<span class="pl-pds">"</span></span>);
+std::ifstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>input/new_booklist.json<span class="pl-pds">"</span></span>);
+
+json booklist;
+is &gt;&gt; booklist;
+
+json_serializer <span class="pl-en">serializer</span>(os, <span class="pl-c1">true</span>);
+
+rename_name_filter <span class="pl-en">filter</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>new_price<span class="pl-pds">"</span></span>,serializer);
+j.write(filter);</pre></div>
+
+<p>Or define and use your oun filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters">Transforming JSON with filters</a> for details.</p>
+
 <h2>Extensions</h2>
 
 <h3>jsonpath</h3>
@@ -783,7 +805,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
   }
 }</pre></div>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
@@ -858,8 +880,8 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 </code></pre>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">"</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
@@ -869,7 +891,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 {
     std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/tasks.csv<span class="pl-pds">"</span></span>);
 
-    ojson_deserializer handler;
+    ojson_encoder handler;
     csv_parameters params;
     params.<span class="pl-c1">assume_header</span>(<span class="pl-c1">true</span>)
           .<span class="pl-c1">trim</span>(<span class="pl-c1">true</span>)

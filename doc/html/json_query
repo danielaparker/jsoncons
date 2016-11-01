@@ -475,7 +475,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/jsonpath/json_query.hpp"
+<pre><code>#include &lt;jsoncons/jsonpath/json_query.hpp&gt;
 
 template&lt;Json&gt;
 Json json_query(const Json&amp; root, 
@@ -684,7 +684,7 @@ Json json_query(const Json&amp; root,
 
 <p>Our first example returns all authors whose books are cheaper than $10. </p>
 
-<pre><code>#include "jsoncons/json.hpp"
+<pre><code>#include &lt;jsoncons/json.hpp&gt;
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using namespace jsoncons;

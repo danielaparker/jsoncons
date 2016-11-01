@@ -475,7 +475,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons_ext/csv/csv_reader.hpp"
+<pre><code>#include &lt;jsoncons_ext/csv/csv_reader.hpp&gt;
 </code></pre>
 
 <h3>Constructors</h3>
@@ -532,7 +532,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 <pre><code>void read()
 </code></pre>
 
-<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_deserializer">json_deserializer</a>.<br>
+<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_encoder">json_encoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>size_t buffer_capacity() const
@@ -565,7 +565,7 @@ void buffer_capacity(size_t buffer_capacity)
 <div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
     std::ifstream <span class="pl-en">is</span>(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
 
     csv_reader <span class="pl-en">reader</span>(is,handler);
     reader.read();
@@ -608,7 +608,7 @@ void buffer_capacity(size_t buffer_capacity)
 <div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>employees.txt<span class="pl-pds">"</span></span>;
     std::ifstream <span class="pl-en">is</span>(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
     csv_parameters params;
     params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>
           .assume_header = <span class="pl-c1">true</span>;
@@ -665,7 +665,7 @@ void buffer_capacity(size_t buffer_capacity)
 <div class="highlight highlight-source-c++"><pre>    std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
     std::ifstream <span class="pl-en">is</span>(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
 
     csv_parameters params;
     params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>})

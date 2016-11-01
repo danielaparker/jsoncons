@@ -528,14 +528,14 @@ You must ensure that the output stream exists as long as does <code>csv_serializ
 <pre><code>std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
 
-json_deserializer handler;
+json_encoder handler;
 json_reader reader(is,handler);
 reader.read_next();
 json countries = handler.get_result();
 
 csv_serializer serializer(std::cout);
 
-countries.to_stream(serializer);
+countries.write(serializer);
 </code></pre>
 
 <h4>Output</h4>
@@ -595,7 +595,7 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <pre><code>std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
 
-json_deserializer handler;
+json_encoder handler;
 csv_parameters params;
 params.field_delimiter = '\t';
 
@@ -605,7 +605,7 @@ json employees = handler.get_result();
 
 csv_serializer serializer(std::cout,params);
 
-employees.to_stream(serializer);
+employees.write(serializer);
 </code></pre>
 
 <h4>Tab delimited output file</h4>

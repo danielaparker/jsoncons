@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>wjson_deserializer</title>
+<title>json_encoder</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,21 +468,67 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::wjson_deserializer
+<pre><code>jsoncons::json_encoder
 
-typedef basic_json_deserializer&lt;wjson&gt; wjson_deserializer
+typedef basic_json_encoder&lt;json&gt; json_encoder
 </code></pre>
 
-<p>The <code>wjson_deserializer</code> class is an instantiation of the <code>basic_json_deserializer</code> class template that uses <code>wjson</code> as the json type.</p>
+<p>The <code>json_encoder</code> class is an instantiation of the <code>basic_json_encoder</code> class template that uses <code>json</code> as the json type.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/json_deserializer.hpp"
+<pre><code>#include &lt;jsoncons/json.hpp&gt;
 </code></pre>
 
-<h3>Interface</h3>
+<h3>Base classes</h3>
 
-<p>The interface is the same as <a href="json_deserializer">json_deserializer</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, etc. - for narrow character ones.</p>
+<p><a href="json_input_handler">json_input_handler</a></p>
+
+<h3>Member types</h3>
+
+<table>
+<thead>
+<tr>
+<th>Member type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>allocator_type</code></td>
+<td>Allocator</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Constructors</h3>
+
+<pre><code>json_encoder(const allocator_type allocator = allocator_type())
+</code></pre>
+
+<h3>Member functions</h3>
+
+<pre><code>allocator_type get_allocator() const
+</code></pre>
+
+<p>Returns the allocator associated with the json value.</p>
+
+<pre><code>bool is_valid() const
+</code></pre>
+
+<p>Checks if the <code>deserializer</code> contains a valid json value. The initial <code>is_valid()</code> is true (the value is an empty object), becomes false when a <code>do_begin_json</code> event is received, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
+
+<pre><code>json get_result()
+</code></pre>
+
+<p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>. If before calling this function <code>is_valid()</code> is false, the behavior is undefined. After <code>get_result()</code> is called, 'is_valid()' becomes false.</p>
+
+<h3>Deprecated methods</h3>
+
+<pre><code>json&amp; root()
+</code></pre>
+
+<p>Use the public member function <code>get_result()</code> instead</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

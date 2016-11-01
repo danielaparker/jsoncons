@@ -468,10 +468,9 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::line_split_kind
+<div class="highlight highlight-source-c++"><pre>jsoncons::line_split_kind
 
-enum class line_split_kind{same_line,new_line,multi_line};
-</code></pre>
+<span class="pl-k">enum</span> <span class="pl-k">class</span> <span class="pl-en">line_split_kind</span>{same_line,new_line,multi_line};</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -719,7 +719,7 @@ vertical-align:1px;
 
 <p>For example, you can access and modify <code>json</code> values with <code>boost::gregorian</code> dates.</p>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
 
 <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 

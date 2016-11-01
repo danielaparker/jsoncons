@@ -500,7 +500,7 @@ vertical-align:1px;
 <tr>
 <td>column_defaults</td>
 <td>A list of strings containing default json values corresponding to the columns in the file.</td>
-<td>{"false","0.0",""}</td>
+<td>{"false","0.0","\"\""}</td>
 </tr>
 <tr>
 <td>max_lines</td>

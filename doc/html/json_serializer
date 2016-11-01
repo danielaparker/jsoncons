@@ -476,7 +476,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons/json_serializer.hpp"
+<pre><code>#include &lt;jsoncons/json_serializer.hpp&gt;
 </code></pre>
 
 <h3>Implemented interfaces</h3>
@@ -521,7 +521,7 @@ You must ensure that the output stream exists as long as does <code>json_seriali
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json_serializer.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_serializer.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> boost::numeric::ublas::matrix;

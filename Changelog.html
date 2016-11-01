@@ -477,7 +477,45 @@ vertical-align:1px;
 <li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the "Type Extensibility" tutorial.<br>
 </li>
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
-<li>Removed <code>is_assignable</code> data member from <code>json_type_traits</code> specializations</li>
+<li>
+<code>json_type_traits</code> specializations no longer require the <code>is_assignable</code> data member</li>
+<li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>wojson_deserializer</code> have been deprecated (they still work) and replaced by <code>json_encoder</code>,<code>ojson_encoder</code>,<code>wjson_encoder</code>,<code>wojson_encoder</code>.<br>
+</li>
+</ul>
+
+<p>New features</p>
+
+<ul>
+<li>New <code>jsonpath</code> function <code>json_replace</code> that searches for all values that match a JsonPath expression and replaces them with a specified value.</li>
+<li>
+<code>json</code> class has new method <code>has_name</code>
+</li>
+<li>New filter class <code>rename_name</code> allows search and replace of <code>json</code> object member names</li>
+</ul>
+
+<p>Changes to <code>json_filter</code></p>
+
+<p>If you have implemented your own custom filters that extend <code>json_filter</code>, you will have to make a change to your class. </p>
+
+<ul>
+<li>The virtual methods <code>do_begin_object</code>, <code>do_end_object</code>, <code>do_name</code>, etc. now implement a <code>json_output_handler</code> (instead of a <code>json_input_handler</code>), so if you have a custom filter that implements e.g. <code>do_name</code>, you need to change</li>
+</ul>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
+             <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
+{
+    <span class="pl-c">// Do something</span>
+}</pre></div>
+
+<p>to</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length) <span class="pl-k">override</span>
+{
+    <span class="pl-c">// Do something</span>
+}</pre></div>
+
+<ul>
+<li>Method <code>input_handler</code> has been changed to <code>output_handler</code> (which now returns an output_handler)</li>
 </ul>
 
 <h2>0.99.3a</h2>
