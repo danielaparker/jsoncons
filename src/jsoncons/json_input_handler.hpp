@@ -8,7 +8,7 @@
 #define JSONCONS_JSON_INPUT_HANDLER_HPP
 
 #include <string>
-#include "jsoncons/json_text_traits.hpp"
+#include <jsoncons/json_text_traits.hpp>
 
 namespace jsoncons {
 

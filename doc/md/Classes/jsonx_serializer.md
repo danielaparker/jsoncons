@@ -7,7 +7,7 @@ The `jsonx_serializer` class is an instantiation of the `basic_jsonx_serializer`
 
 ### Header
 
-    #include "jsoncons/jsonx/jsonx_serializer.hpp"
+    #include <jsoncons/jsonx/jsonx_serializer.hpp>
 
 ### Implemented interfaces
 
@@ -37,7 +37,7 @@ You must ensure that the output stream exists as long as does `jsonx_serializer`
 
 ### Examples
 ```
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
 #include <fstream>
 

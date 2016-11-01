@@ -7,9 +7,9 @@
 
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer.hpp"
-#include "jsoncons/json_filter.hpp"
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_object_key_proxy)
     b["key2"] = json();
     b["key2"]["key3"] = std::move(a);
 
-	BOOST_CHECK(a.is_null());
+    BOOST_CHECK(a.is_null());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

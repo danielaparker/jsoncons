@@ -12,7 +12,7 @@ To install the jsoncons library, download the zip file, extract the zipped files
 
 The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
 ```c++ 
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 ```
 and, for convenience,
 
@@ -294,15 +294,15 @@ project_id, task_name, task_start, task_finish
 ```
 You can read the `CSV` file into a `json` value with the `csv_reader`.
 ```c++
-#include "jsoncons_ext/csv/csv_reader.hpp"
+#include <jsoncons_ext/csv/csv_reader.hpp>
 
 using jsoncons::csv::csv_parameters;
 using jsoncons::csv::csv_reader;
-using jsoncons::json_deserializer;
+using jsoncons::json_encoder;
 
 std::fstream is("tasks.csv");
 
-json_deserializer handler;
+json_encoder handler;
 
 csv_parameters params;
 params.assume_header(true)
@@ -553,7 +553,7 @@ If you prefer to retain the original insertion order, use [wojson](https://githu
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++
 #include <boost/pool/pool_alloc.hpp>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 
 typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
 

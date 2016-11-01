@@ -8,9 +8,9 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
-#include "jsoncons/json_reader.hpp"
-#include "jsoncons/json.hpp"
-#include "jsoncons/json_deserializer.hpp"
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
 
     try
     {
-        json_deserializer handler;
+        json_encoder handler;
         json_reader reader(is,handler);
         reader.max_nesting_depth(20);
         reader.read_next();

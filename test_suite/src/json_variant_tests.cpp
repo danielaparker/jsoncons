@@ -8,8 +8,8 @@
 #include <boost/test/unit_test.hpp>
 #include <new>
 #include <string>
-#include "jsoncons/jsoncons.hpp"
-#include "jsoncons/json.hpp"
+#include <jsoncons/jsoncons.hpp>
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 

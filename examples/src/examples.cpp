@@ -3,11 +3,12 @@
 
 #include <stdexcept>
 #include <string>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 
 void basics_examples();
+void json_filter_examples();
 void array_examples();
 void container_examples();
 void wjson_examples();
@@ -165,7 +166,7 @@ void mulitple_json_objects()
         throw std::runtime_error("Cannot open file");
     }
 
-    json_deserializer handler;
+    json_encoder handler;
     json_reader reader(is, handler);
 
     while (!reader.eof())
@@ -286,6 +287,8 @@ int main()
         parse_exception_example();
 
         type_extensibility_examples();
+
+        json_filter_examples();
 
         jsonpath_examples();
 

@@ -16,7 +16,7 @@
 #include <ctime>
 #include <new>
 #include <codecvt>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using namespace jsoncons;

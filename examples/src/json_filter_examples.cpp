@@ -1,31 +1,18 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <new>
-#include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_filter.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <jsoncons/json.hpp>
+#include <string>
+#include "jsoncons/json.hpp"
+#include "jsoncons/json_filter.hpp"
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_filter_test_suite)
-
-class my_json_filter : public json_filter
+class name_fix_up_filter : public json_filter
 {
 public:
     std::vector<std::string> items;
 
-    my_json_filter(json_output_handler& handler)
+    name_fix_up_filter(json_output_handler& handler)
         : json_filter(handler)
     {
     }
@@ -70,40 +57,35 @@ private:
     std::string member_name_;
 };
 
-BOOST_AUTO_TEST_CASE(test_filter)
+void name_fix_up_example1()
 {
     std::string in_file = "input/address-book.json";
-    std::string out_file = "output/address-book-new.json";
-    std::ifstream is(in_file, std::ofstream::binary);
+    std::string out_file = "output/new-address-book1.json";
+    std::ifstream is(in_file);
+    std::ofstream os(out_file);
+
+    json j;
+    is >> j;
+
+    json_serializer serializer(os, true);
+    name_fix_up_filter filter(serializer);
+    j.write(filter);
+}
+
+void name_fix_up_example2()
+{
+    std::string in_file = "input/address-book.json";
+    std::string out_file = "output/new-address-book2.json";
+    std::ifstream is(in_file);
     std::ofstream os(out_file);
 
     json_serializer serializer(os, true);
-    my_json_filter filter(serializer);
+    name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
-
-    BOOST_CHECK_EQUAL(1,filter.items.size());
-    BOOST_CHECK_EQUAL("John", filter.items[0]);
 }
 
-BOOST_AUTO_TEST_CASE(test_output_input_adapter)
-{
-    std::string input = "\"String\"";
-    std::istringstream is(input);
-
-    json_encoder handler;
-    basic_json_output_input_adapter<char> adapter(handler);
-    try
-    {
-        json_reader reader(is,handler);
-        reader.read_next();
-    }
-    catch (const std::exception&)
-    {
-    }
-}
-
-BOOST_AUTO_TEST_CASE(test_rename_name)
+void change_member_name_example()
 {
     json j;
     try
@@ -135,4 +117,13 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
 
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+void json_filter_examples()
+{
+    std::cout << "\njson_filter examples\n\n";
+    name_fix_up_example1();
+    name_fix_up_example2();
+    change_member_name_example();
+
+    std::cout << std::endl;
+}
+

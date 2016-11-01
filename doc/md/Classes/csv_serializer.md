@@ -49,7 +49,7 @@ Note
     std::string in_file = "input/countries.json";
     std::ifstream is(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
     json_reader reader(is,handler);
     reader.read_next();
     json countries = handler.get_result();
@@ -111,7 +111,7 @@ Note
     std::string in_file = "input/employees.json";
     std::ifstream is(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
     csv_parameters params;
     params.field_delimiter = '\t';
 

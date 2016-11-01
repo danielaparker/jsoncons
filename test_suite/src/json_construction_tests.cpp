@@ -7,8 +7,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include "jsoncons/json.hpp"
-#include "jsoncons/json_serializer.hpp"
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_serializer.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(test_multiple)
 
     std::istringstream is(in);
 
-    jsoncons::json_deserializer handler;
+    jsoncons::json_encoder handler;
     json_reader reader(is,handler);
 
     if (!reader.eof())

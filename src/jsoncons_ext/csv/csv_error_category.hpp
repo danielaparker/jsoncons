@@ -7,7 +7,7 @@
 #ifndef JSONCONS_CSV_CSV_ERROR_CATEGORY_HPP
 #define JSONCONS_CSV_CSV_ERROR_CATEGORY_HPP
 
-#include "jsoncons/json_text_traits.hpp"
+#include <jsoncons/json_text_traits.hpp>
 #include <system_error>
 
 namespace jsoncons { namespace csv {

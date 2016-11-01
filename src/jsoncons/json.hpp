@@ -23,7 +23,7 @@
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/output_format.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_deserializer.hpp>
+#include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
 
@@ -1571,7 +1571,7 @@ public:
 
     static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
     {
-        basic_json_deserializer<json_type> handler;
+        basic_json_encoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s.data(),0,s.length());
@@ -1586,7 +1586,7 @@ public:
 
     static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
     {
-        basic_json_deserializer<json_type> handler;
+        basic_json_encoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s,0,length);
@@ -3338,7 +3338,7 @@ private:
 
     friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
     {
-        basic_json_deserializer<json_type> handler;
+        basic_json_encoder<json_type> handler;
         basic_json_reader<typename string_type::value_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
@@ -3432,7 +3432,7 @@ template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is, 
                                                                                             basic_parse_error_handler<char_type>& err_handler)
 {
-    basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
+    basic_json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
@@ -3470,7 +3470,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
     }
 #endif
 
-    basic_json_deserializer<basic_json<CharT,JsonTraits,Allocator>> handler;
+    basic_json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     try
     {
         // obtain file size:
@@ -3513,7 +3513,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
 template <class Json>
 std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
 {
-    basic_json_deserializer<Json> handler;
+    basic_json_encoder<Json> handler;
     basic_json_reader<typename Json::char_type> reader(is, handler);
     reader.read_next();
     reader.check_done();
@@ -3591,15 +3591,20 @@ json_printable<Json> pretty_print(const Json& val,
 
 typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
 typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
+typedef basic_json<char, ojson_traits<char>, std::allocator<char>> ojson;
+typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
 
-typedef basic_json_deserializer<json> json_deserializer;
-typedef basic_json_deserializer<wjson> wjson_deserializer;
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_json_encoder<json> json_deserializer;
+typedef basic_json_encoder<wjson> wjson_deserializer;
+typedef basic_json_encoder<ojson> ojson_deserializer;
+typedef basic_json_encoder<wojson> wojson_deserializer;
+#endif
 
-typedef basic_json<char,ojson_traits<char>,std::allocator<char>> ojson;
-typedef basic_json<wchar_t,ojson_traits<wchar_t>,std::allocator<wchar_t>> wojson;
-
-typedef basic_json_deserializer<ojson> ojson_deserializer;
-typedef basic_json_deserializer<wojson> wojson_deserializer;
+typedef basic_json_encoder<json> json_encoder;
+typedef basic_json_encoder<wjson> wjson_encoder;
+typedef basic_json_encoder<ojson> ojson_encoder;
+typedef basic_json_encoder<wojson> wojson_encoder;
 }
 
 #if defined(__GNUC__)

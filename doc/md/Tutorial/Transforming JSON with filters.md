@@ -15,20 +15,20 @@ Suppose you have a JSON address book file (`address-book.json`) that looks like 
 }
 ```
 
-Now suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separator. Pretend that the file `address-book.json` is too large to hold in memory.
+Now suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separator. 
 
 You can achieve the desired result by subclassing the [json_filter](json_filter) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_input_handler](json_input_handler) (which in this example will forward them to a [json_serializer](json_serializer).) 
 ```c++
-#include "jsoncons/json_serializer.hpp"
-#include "jsoncons/json_filter.hpp"
-#include "jsoncons/json_reader.hpp"
+#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_reader.hpp>
 
 using namespace jsoncons;
 
-class my_json_filter : public json_filter
+class name_fix_up_filter : public json_filter
 {
 public:
-    my_json_filter(json_output_handler& handler)
+    name_fix_up_filter(json_output_handler& handler)
         : json_filter(handler)
     {
     }
@@ -39,7 +39,7 @@ private:
         member_name_ = std::string(p, length);
         if (member_name_ != "name")
         {
-            parent_handler().name(p, length);
+            output_handler().name(p, length);
         }
     }
 
@@ -50,26 +50,26 @@ private:
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            parent_handler().name("first-name");
+            output_handler().name("first-name");
             std::string first = value.substr(0, end_first);
-            parent_handler().value(first);
+            output_handler().value(first);
             if (start_last != std::string::npos)
             {
-                parent_handler().name("last-name");
+                output_handler().name("last-name");
                 std::string last = value.substr(start_last);
-                parent_handler().value(last);
+                output_handler().value(last);
             }
         }
         else
         {
-            parent_handler().value(p, length);
+            output_handler().value(p, length);
         }
     }
 
     std::string member_name_;
 };
 ```
-In your code you will pass `my_json_filter` to the constructor of [json_reader](json_reader), and call read
+In your code you will pass `name_fix_up_filter` to the constructor of [json_reader](json_reader), and call `read_next`
 ```c++
     std::string in_file = "input/address-book.json";
     std::string out_file = "output/address-book-new.json";
@@ -77,7 +77,7 @@ In your code you will pass `my_json_filter` to the constructor of [json_reader](
     std::ofstream os(out_file);
 
     json_serializer serializer(os, true);
-    my_json_filter filter(serializer);
+    name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
 ```

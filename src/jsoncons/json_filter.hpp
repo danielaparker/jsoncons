@@ -9,9 +9,9 @@
 
 #include <string>
 
-#include "jsoncons/json_input_handler.hpp"
-#include "jsoncons/json_output_handler.hpp"
-#include "jsoncons/parse_error_handler.hpp"
+#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/parse_error_handler.hpp>
 
 namespace jsoncons {
 
@@ -28,11 +28,11 @@ private:
 
         char do_current_char() const override { return '\0'; }
     };
-    basic_null_json_output_handler<CharT> null_output_handler_;
-    basic_json_output_handler<CharT>* writer_;
-
     const null_parsing_context default_context_;
     const basic_parsing_context<CharT>* context_ptr_;
+
+    basic_null_json_output_handler<CharT> null_output_handler_;
+    basic_json_output_handler<CharT>* output_handler_;
     basic_json_input_handler<CharT>* input_handler_;
 
     basic_json_input_output_adapter<CharT>(const basic_json_input_output_adapter<CharT>&) = delete;
@@ -41,13 +41,13 @@ private:
 public:
     basic_json_input_output_adapter()
         : context_ptr_(&default_context_),
-          writer_(&null_output_handler_)
+          output_handler_(&null_output_handler_)
     {
     }
 
     basic_json_input_output_adapter(basic_json_output_handler<CharT>& handler)
         : context_ptr_(&default_context_),
-          writer_(std::addressof(handler))
+          output_handler_(std::addressof(handler))
     {
     }
 
@@ -60,81 +60,81 @@ private:
 
     void do_begin_json() override
     {
-        writer_->begin_json();
+        output_handler_->begin_json();
     }
 
     void do_end_json() override
     {
-        writer_->end_json();
+        output_handler_->end_json();
     }
 
     void do_begin_object(const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context); 
-        writer_->begin_object();
+        output_handler_->begin_object();
     }
 
     void do_end_object(const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->end_object();
+        output_handler_->end_object();
     }
 
     void do_begin_array(const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->begin_array();
+        output_handler_->begin_array();
     }
 
     void do_end_array(const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->end_array();
+        output_handler_->end_array();
     }
 
     void do_name(const CharT* name, size_t length, 
                  const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->name(name, length);
+        output_handler_->name(name, length);
     }
 
     void do_string_value(const CharT* value, size_t length, 
                          const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(value, length);
+        output_handler_->value(value, length);
     }
 
     void do_integer_value(int64_t value, const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(value);
+        output_handler_->value(value);
     }
 
     void do_uinteger_value(uint64_t value, 
                            const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(value);
+        output_handler_->value(value);
     }
 
     void do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(value, precision);
+        output_handler_->value(value, precision);
     }
 
     void do_bool_value(bool value, const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(value);
+        output_handler_->value(value);
     }
 
     void do_null_value(const basic_parsing_context<CharT>& context) override
     {
         context_ptr_ = std::addressof(context);
-        writer_->value(null_type());
+        output_handler_->value(null_type());
     }
 };
 
@@ -268,9 +268,14 @@ public:
         return *input_handler_; 
     }
 
-    basic_json_output_handler<CharT>& parent_handler()
+    basic_json_output_handler<CharT>& output_handler()
     {
         return *output_handler_;
+    }
+
+    const basic_parsing_context<CharT>& context() const
+    {
+        return input_output_adapter_.context();
     }
 
 private:
@@ -389,11 +394,11 @@ private:
         size_t len = std::min JSONCONS_NO_MACRO_EXP(name_.length(),length);
         if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
         {
-            parent_handler().name(new_name_.data(),new_name_.length());
+            this->output_handler().name(new_name_.data(),new_name_.length());
         }
         else
         {
-            parent_handler().name(p,length);
+            this->output_handler().name(p,length);
         }
     }
 };

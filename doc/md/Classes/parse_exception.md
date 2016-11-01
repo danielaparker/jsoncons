@@ -2,7 +2,7 @@
 
 ### Header
 
-    #include "jsoncons/parse_error_handler.hpp"
+    #include <jsoncons/parse_error_handler.hpp>
 
 ### Base class
 
@@ -34,22 +34,22 @@ Constructs an error message, including line and column position
 
 ### Example
 
-    #include "jsoncons/json.hpp"
+    #include <jsoncons/json.hpp>
 
     using jsoncons::json;
 
     int main()
     {
-    	string s = "[1,2,3,4,]";
+        string s = "[1,2,3,4,]";
         try 
-    	{
+        {
             jsoncons::json val = jsoncons::json::parse(s);
         } 
-    	catch(const jsoncons::parse_exception& e) 
-    	{
+        catch(const jsoncons::parse_exception& e) 
+        {
             std::cout << "Caught parse_exception with category " 
                       << e.code().category().name() 
-    			      << ", code " << e.code().value() 
+                              << ", code " << e.code().value() 
                       << " and message " << e.what() << std::endl;
         }
     }

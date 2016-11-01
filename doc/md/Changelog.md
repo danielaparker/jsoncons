@@ -6,7 +6,8 @@ Changes
 - The deprecated class `json::any` has been removed. 
 - The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the "Type Extensibility" tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
-- Removed `is_assignable` data member from `json_type_traits` specializations
+- `json_type_traits` specializations no longer require the `is_assignable` data member
+- The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`wojson_deserializer` have been deprecated (they still work) and replaced by `json_encoder`,`ojson_encoder`,`wjson_encoder`,`wojson_encoder`.  
 
 New features
 
@@ -33,7 +34,7 @@ void do_name(const char* p, size_t length) override
     // Do something
 }
 ```   
-- Method `input_handler` has been changed to `parent_handler` (which now returns an output_handler)
+- Method `input_handler` has been changed to `output_handler` (which now returns an output_handler)
 
 0.99.3a
 -------

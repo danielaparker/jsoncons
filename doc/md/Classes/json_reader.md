@@ -7,7 +7,7 @@ A `json_reader` can read a sequence of JSON texts from a stream.
 
 ### Header
 ```c++
-#include "jsoncons/json_reader.hpp"
+#include <jsoncons/json_reader.hpp>
 ```
 ### Constructors
 
@@ -28,7 +28,7 @@ You must ensure that the input stream and input handler exist as long as does `j
 Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
 
     void read_next()
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_deserializer](json_deserializer).
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
 Throws [parse_exception](parse_exception) if parsing fails.
 
     void check_done()
@@ -74,7 +74,7 @@ if (!is.is_open())
     throw std::runtime_error("Cannot open file");
 }
 
-json_deserializer handler;
+json_encoder handler;
 json_reader reader(is,handler);
 
 while (!reader.eof())

@@ -5,7 +5,7 @@
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include <boost/test/unit_test.hpp>
 #include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
 #include <sstream>

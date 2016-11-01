@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
-#include "jsoncons/json_text_traits.hpp"
+#include <jsoncons/json_text_traits.hpp>
 
 namespace jsoncons {
 

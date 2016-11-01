@@ -4,7 +4,7 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
 
 ### Header
 
-    #include "jsoncons_ext/csv/csv_reader.hpp"
+    #include <jsoncons_ext/csv/csv_reader.hpp>
 
 ### Constructors
 
@@ -48,7 +48,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler), such as a [json_deserializer](json_deserializer).
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
 Throws [parse_exception](parse_exception) if parsing fails.
 
     size_t buffer_capacity() const
@@ -77,7 +77,7 @@ Note
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
 
     csv_reader reader(is,handler);
     reader.read();
@@ -116,7 +116,7 @@ Note
     std::string in_file = "employees.txt";
     std::ifstream is(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
     csv_parameters params;
     params.field_delimiter = '\t'
           .assume_header = true;
@@ -174,7 +174,7 @@ Note
     std::string in_file = "countries.csv";
     std::ifstream is(in_file);
 
-    json_deserializer handler;
+    json_encoder handler;
 
     csv_parameters params;
     params.column_names({"Country Code","Name"})

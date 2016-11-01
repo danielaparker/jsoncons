@@ -2,8 +2,8 @@
 // Distributed under Boost license
 
 #include <string>
-#include "jsoncons/json.hpp"
-#include "jsoncons_ext/csv/csv_reader.hpp"
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_reader.hpp>
 #include "jsoncons_ext/csv/csv_serializer.hpp"
 
 using namespace jsoncons;
@@ -18,7 +18,7 @@ void read_csv_file1()
 
     std::istringstream is(text);
 
-    json_deserializer handler;
+    json_encoder handler;
 
     csv_parameters params;
     params.assume_header(true)
@@ -34,7 +34,7 @@ void read_write_csv_tasks()
 {
     std::ifstream is("input/tasks.csv");
 
-    ojson_deserializer handler;
+    ojson_encoder handler;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)

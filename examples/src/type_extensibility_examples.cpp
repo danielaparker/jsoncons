@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 

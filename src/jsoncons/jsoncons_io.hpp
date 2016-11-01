@@ -19,8 +19,8 @@
 #include <cstdarg>
 #include <locale>
 #include <limits> // std::numeric_limits
-#include "jsoncons/jsoncons_config.hpp"
-#include "jsoncons/osequencestream.hpp"
+#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/osequencestream.hpp>
 
 namespace jsoncons
 {

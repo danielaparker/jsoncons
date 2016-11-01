@@ -6,7 +6,7 @@
 #ifdef _MSC_VER
 #include <codecvt>
 #endif
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 

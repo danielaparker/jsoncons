@@ -6,7 +6,7 @@ The woutput_format class is an instantiation of the basic_output_format class te
 
 ### Header
 
-    #include "jsoncons/output_format.hpp"
+    #include <jsoncons/output_format.hpp>
 
 ### Interface
 

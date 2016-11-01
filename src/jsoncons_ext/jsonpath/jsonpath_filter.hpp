@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <memory>
 #include <regex>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
 namespace jsoncons { namespace jsonpath {

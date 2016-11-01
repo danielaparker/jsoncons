@@ -13,7 +13,7 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsonpath_filter.hpp"
 #include "jsonpath_error_category.hpp"
 

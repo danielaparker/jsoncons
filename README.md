@@ -34,13 +34,15 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 
-## What's new
+## What's new on master
 
-- New release 0.99.3a
-- The deprecated class `json::any` has been removed from master
+- The deprecated class `json::any` has been removed 
 - The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility) tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
+- `json_type_traits` specializations no longer require the `is_assignable` data member
+- The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`wojson_deserializer` have been deprecated (they still work) and replaced by `json_encoder`,`ojson_encoder`,`wjson_encoder`,`wojson_encoder`.  
 - New `jsonpath` function `json_replace` that searches for all values that match a JsonPath expression and replaces them with a specified value.
+- If you have implemented your own custom filters that extend `json_filter`, you will have to make a change to your class. See the Changelog for details.
 
 ## Get jsoncons
 
@@ -52,7 +54,7 @@ To install the jsoncons library, download the zip file, unpack the release, unde
 
 ```c++
 #include <iostream>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 
 // For convenience
 using jsoncons::json;
@@ -288,6 +290,25 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
 
+### Filter json names and values
+
+You can rename object member names with the built in filter `rename_name_filter`
+
+```c++
+
+std::ifstream is("input/booklist.json");
+std::ifstream os("input/new_booklist.json");
+
+json booklist;
+is >> booklist;
+
+json_serializer serializer(os, true);
+
+rename_name_filter filter("price","new_price",serializer);
+j.write(filter);
+```
+Or define and use your oun filters. See [Transforming JSON with filters](https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters) for details.
+
 ## Extensions
 
 ### jsonpath
@@ -317,7 +338,7 @@ Example file (store.json):
 }
 ```
 ```c++
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsoncons_ext/jsonpath/json_query.hpp"
 
 using namespace jsoncons;
@@ -393,8 +414,8 @@ project_id, task_name, task_start, task_finish
 
 ```c++
 #include <fstream>
-#include "jsoncons/json.hpp"
-#include "jsoncons_ext/csv/csv_reader.hpp"
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_reader.hpp>
 #include "jsoncons_ext/csv/csv_serializer.hpp"
 
 using namespace jsoncons;
@@ -404,7 +425,7 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    ojson_deserializer handler;
+    ojson_encoder handler;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)

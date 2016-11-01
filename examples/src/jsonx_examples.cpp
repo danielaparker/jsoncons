@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <string>
-#include "jsoncons/json.hpp"
+#include <jsoncons/json.hpp>
 #include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
 
 using namespace jsoncons;

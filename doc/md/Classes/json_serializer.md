@@ -7,7 +7,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Header
 
-    #include "jsoncons/json_serializer.hpp"
+    #include <jsoncons/json_serializer.hpp>
 
 ### Implemented interfaces
 
@@ -41,7 +41,7 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 ```c++
 #include <iostream>
 #include <boost/numeric/ublas/matrix.hpp>
-#include "jsoncons/json_serializer.hpp"
+#include <jsoncons/json_serializer.hpp>
 
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;

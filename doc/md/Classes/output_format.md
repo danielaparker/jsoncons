@@ -11,7 +11,7 @@ When parsing text, the precision of the fractional number is retained, and used 
 
 ### Header
 ```c++
-#include "jsoncons/output_format.hpp"
+#include <jsoncons/output_format.hpp>
 ```
 ### Member constants
 
