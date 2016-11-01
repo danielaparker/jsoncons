@@ -122,9 +122,9 @@ So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++
 std::string price = book.get_with_default("price","n/a");
 ```
-Or you can check if book has a member "price" with the method `count`, and output accordingly,
+Or you can check if book has a member "price" with the method `has_name`, and output accordingly,
 ```c++
-if (book.count("price") > 0)
+if (book.has_name("price"))
 {
     double price = book["price"].as<double>();
     std::cout << price;
@@ -683,9 +683,9 @@ namespace jsoncons
         static bool is(const Json& rhs) noexcept
         {
             return rhs.is_object() &&
-                   rhs.count("author") == 1 && 
-                   rhs.count("title") == 1 && 
-                   rhs.count("price") == 1;
+                   rhs.has_name("author") && 
+                   rhs.has_name("title") && 
+                   rhs.has_name("price");
         }
         static book as(const Json& rhs)
         {

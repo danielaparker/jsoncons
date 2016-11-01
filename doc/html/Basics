@@ -474,7 +474,7 @@ vertical-align:1px;
 
 <h3>json construction</h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c">// For convenience</span>
 <span class="pl-k">using</span> jsoncons::json;
@@ -574,7 +574,7 @@ json&amp; book = booklist[<span class="pl-c1">1</span>];
     <span class="pl-c">// member "author" found</span>
 }
 
-<span class="pl-k">if</span> (book.count(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
+<span class="pl-k">if</span> (book.has_name(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>))
 {
     <span class="pl-c">// book has a member "author"</span>
 }
@@ -647,7 +647,7 @@ book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds"
 <h3>json query</h3>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
 
 <span class="pl-c">// For convenience</span>
@@ -718,7 +718,7 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
 
 <h3>wjson construction</h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c">// For convenience</span>
 <span class="pl-k">using</span> jsoncons::wjson;
@@ -817,7 +817,7 @@ wjson&amp; book = booklist[<span class="pl-c1">1</span>];
     <span class="pl-c">// member "author" found</span>
 }
 
-<span class="pl-k">if</span> (book.count(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>) &gt; <span class="pl-c1">0</span>)
+<span class="pl-k">if</span> (book.has_name(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>))
 {
     <span class="pl-c">// book has a member "author"</span>
 }

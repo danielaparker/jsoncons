@@ -85,7 +85,7 @@ int main()
 
     std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
-    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2","null") << "\n";
+    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2","n/a") << "\n";
 }
 ```
 Output:
@@ -105,7 +105,7 @@ Output:
 
 (2) Dimension 1 = 9.84
 
-(3) Dimension 2 = null
+(3) Dimension 2 = n/a
 ```
 
 For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). Consult the [wiki](https://github.com/danielaparker/jsoncons/wiki) for the latest documentation, tutorials and roadmap. 

@@ -167,6 +167,9 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
+    bool has_name(const string_type& name) const
+Returns `true` if an object has a member with the given `name`, otherwise `false`.    
+
     size_t count(const string_type& name) const
 Returns the number of object members that match `name`.    
 

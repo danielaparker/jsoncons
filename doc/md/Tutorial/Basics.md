@@ -105,7 +105,7 @@ if (it != book.members().end())
     // member "author" found
 }
 
-if (book.count("author") > 0)
+if (book.has_name("author"))
 {
     // book has a member "author"
 }
@@ -352,7 +352,7 @@ if (it != book.members().end())
     // member "author" found
 }
 
-if (book.count(L"author") > 0)
+if (book.has_name(L"author"))
 {
     // book has a member "author"
 }
