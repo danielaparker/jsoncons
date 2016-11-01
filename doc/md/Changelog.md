@@ -8,6 +8,33 @@ Changes
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
 - Removed `is_assignable` data member from `json_type_traits` specializations
 
+New features
+
+- New `jsonpath` function `json_replace` that searches for all values that match a JsonPath expression and replaces them with a specified value.
+- `json` class has new method `has_name`
+- New filter class `rename_name` allows search and replace of `json` object member names
+
+Changes to `json_filter`
+
+If you have implemented your own custom filters that extend `json_filter`, you will have to make a change to your class. 
+
+- The virtual methods `do_begin_object`, `do_end_object`, `do_name`, etc. now implement a `json_output_handler` (instead of a `json_input_handler`), so if you have a custom filter that implements e.g. `do_name`, you need to change
+```c++
+void do_name(const char* p, size_t length, 
+             const parsing_context& context) override
+{
+    // Do something
+}
+```
+to
+```c++
+void do_name(const char* p, size_t length) override
+{
+    // Do something
+}
+```   
+- Method `input_handler` has been changed to `parent_handler` (which now returns an output_handler)
+
 0.99.3a
 -------
 

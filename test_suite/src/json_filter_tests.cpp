@@ -44,8 +44,8 @@ public:
 private:
     void do_name(const char* p, size_t length) override
     {
-        property_name_ = std::string(p, length);
-        if (property_name_ != "name")
+        member_name_ = std::string(p, length);
+        if (member_name_ != "name")
         {
             parent_handler().name(p, length);
         }
@@ -53,7 +53,7 @@ private:
 
     void do_string_value(const char* p, size_t length) override
     {
-        if (property_name_ == "name")
+        if (member_name_ == "name")
         {
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
@@ -78,7 +78,7 @@ private:
         }
     }
 
-    std::string property_name_;
+    std::string member_name_;
 };
 
 BOOST_AUTO_TEST_CASE(test_filter)

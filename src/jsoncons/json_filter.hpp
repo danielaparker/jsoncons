@@ -16,6 +16,110 @@
 namespace jsoncons {
 
 template <class CharT>
+class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
+{
+private:
+
+    class null_parsing_context : public parsing_context
+    {
+        size_t do_line_number() const override {return 1;}
+
+        size_t do_column_number() const override {return 1;}
+
+        char do_current_char() const override {return '0';}
+    };
+    basic_null_json_input_handler<CharT> null_input_handler_;
+
+    const null_parsing_context default_context_;
+    const basic_parsing_context<CharT>* context_ptr_;
+    basic_json_input_handler<CharT>* input_handler_;
+
+public:
+    basic_json_output_input_adapter()
+        : context_ptr_(&default_context_),
+          input_handler_(&null_input_handler_)
+    {
+    }
+    basic_json_output_input_adapter(basic_json_input_handler<CharT>& input_handler)
+        : context_ptr_(&default_context_),
+          input_handler_(std::addressof(input_handler))
+    {
+    }
+
+    void context(const basic_parsing_context<CharT>& c)
+    {
+        context_ptr_ = std::addressof(c);
+    }
+
+private:
+
+    void do_begin_json() override
+    {
+        input_handler_->begin_json();
+    }
+
+    void do_end_json() override
+    {
+        input_handler_->end_json();
+    }
+
+    void do_begin_object() override
+    {
+        input_handler_->begin_object(*context_ptr_);
+    }
+
+    void do_end_object() override
+    {
+        input_handler_->end_object(*context_ptr_);
+    }
+
+    void do_begin_array() override
+    {
+        input_handler_->begin_array(*context_ptr_);
+    }
+
+    void do_end_array() override
+    {
+        input_handler_->end_array(*context_ptr_);
+    }
+
+    void do_name(const CharT* name, size_t length) override
+    {
+        input_handler_->name(name, length, *context_ptr_);
+    }
+
+    void do_string_value(const CharT* value, size_t length) override
+    {
+        input_handler_->value(value, length, *context_ptr_);
+    }
+
+    void do_integer_value(int64_t value) override
+    {
+        input_handler_->value(value, *context_ptr_);
+    }
+
+    void do_uinteger_value(uint64_t value) override
+    {
+        input_handler_->value(value, *context_ptr_);
+    }
+
+    void do_double_value(double value, uint8_t precision) override
+    {
+        input_handler_->value(value, precision, *context_ptr_);
+    }
+
+    void do_bool_value(bool value) override
+    {
+        input_handler_->value(value, *context_ptr_);
+    }
+
+    void do_null_value() override
+    {
+        input_handler_->value(null_type(), *context_ptr_);
+    }
+};
+
+template <class CharT>
 class basic_json_input_output_adapter : public basic_json_input_handler<CharT>
 {
 private:
@@ -100,102 +204,6 @@ private:
     void do_null_value(const basic_parsing_context<CharT>&) override
     {
         writer_->value(null_type());
-    }
-};
-
-template <class CharT>
-class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
-{
-private:
-
-    class null_parsing_context : public parsing_context
-    {
-        size_t do_line_number() const override {return 1;}
-
-        size_t do_column_number() const override {return 1;}
-
-        char do_current_char() const override {return '0';}
-    };
-    basic_null_json_input_handler<CharT> null_input_handler_;
-
-    const null_parsing_context context_;
-    basic_json_input_handler<CharT>* input_handler_;
-
-public:
-    basic_json_output_input_adapter()
-        : input_handler_(&null_input_handler_)
-    {
-    }
-    basic_json_output_input_adapter(basic_json_input_handler<CharT>& input_handler)
-        : input_handler_(std::addressof(input_handler))
-    {
-    }
-
-private:
-
-    void do_begin_json() override
-    {
-        input_handler_->begin_json();
-    }
-
-    void do_end_json() override
-    {
-        input_handler_->end_json();
-    }
-
-    void do_begin_object() override
-    {
-        input_handler_->begin_object(context_);
-    }
-
-    void do_end_object() override
-    {
-        input_handler_->end_object(context_);
-    }
-
-    void do_begin_array() override
-    {
-        input_handler_->begin_array(context_);
-    }
-
-    void do_end_array() override
-    {
-        input_handler_->end_array(context_);
-    }
-
-    void do_name(const CharT* name, size_t length) override
-    {
-        input_handler_->name(name, length, context_);
-    }
-
-    void do_string_value(const CharT* value, size_t length) override
-    {
-        input_handler_->value(value, length, context_);
-    }
-
-    void do_integer_value(int64_t value) override
-    {
-        input_handler_->value(value, context_);
-    }
-
-    void do_uinteger_value(uint64_t value) override
-    {
-        input_handler_->value(value, context_);
-    }
-
-    void do_double_value(double value, uint8_t precision) override
-    {
-        input_handler_->value(value, precision, context_);
-    }
-
-    void do_bool_value(bool value) override
-    {
-        input_handler_->value(value, context_);
-    }
-
-    void do_null_value() override
-    {
-        input_handler_->value(null_type(), context_);
     }
 };
 
