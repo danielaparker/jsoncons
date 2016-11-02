@@ -583,7 +583,7 @@ and sorts object members in alphabetically order.</p>
                    JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson;</pre></div>
 
-<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/wojson">wojson</a> instead.</p>
+<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> instead.</p>
 
 <p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
 
@@ -620,9 +620,9 @@ std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</sp
 <div class="highlight highlight-source-c++"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">3.9</span>,<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>}</pre></div>
 
 <h3>
-<a id="ojson-and-wojson" class="anchor" href="#ojson-and-wojson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ojson and wojson</h3>
+<a id="ojson-and-owjson" class="anchor" href="#ojson-and-owjson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ojson and owjson</h3>
 
-<p>The <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> (<a href="https://github.com/danielaparker/jsoncons/wiki/wojson">wojson</a>) class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> (<code>wchar_t</code>) as the character type and keeps object members in their original order. </p>
+<p>The <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> (<a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a>) class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> (<code>wchar_t</code>) as the character type and keeps object members in their original order. </p>
 
 <div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
