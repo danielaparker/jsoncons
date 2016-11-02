@@ -314,7 +314,7 @@ Output:
 ```json
 {"first":1,"second":2,"third":3}
 ```
-Or define and use your oun filters. See [Transforming JSON with filters](https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters) for details.
+Or define and use your own filters. See [Transforming JSON with filters](https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters) for details.
 
 ## Extensions
 
