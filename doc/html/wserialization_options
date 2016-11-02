@@ -468,17 +468,15 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::wserialization_options
+<div class="highlight highlight-source-c++"><pre>jsoncons::wserialization_options
 
-typedef basic_serialization_options&lt;wchar_t&gt; wserialization_options
-</code></pre>
+<span class="pl-k">typedef</span> basic_serialization_options&lt;<span class="pl-c1">wchar_t</span>&gt; wserialization_options</pre></div>
 
 <p>The wserialization_options class is an instantiation of the basic_serialization_options class template that uses <code>wchar_t</code> as the character type.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include &lt;jsoncons/output_format.hpp&gt;
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/serialization_options.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Interface</h3>
 

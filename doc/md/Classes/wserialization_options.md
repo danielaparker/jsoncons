@@ -8,7 +8,7 @@ The wserialization_options class is an instantiation of the basic_serialization_
 ### Header
 
 ```c++
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 ```
 
 ### Interface
