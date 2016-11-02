@@ -292,7 +292,7 @@ See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20E
 
 ### Filter json names and values
 
-You can rename object member names with the built in filter `rename_name_filter`
+You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
 
 ```c++
 #include "jsoncons/json.hpp"

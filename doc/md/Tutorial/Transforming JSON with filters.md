@@ -1,6 +1,6 @@
 ### Rename object member names
 
-You can rename object member names with the built in filter `rename_name_filter`
+You can rename object member names with the built in filter [rename_name_filter](rename_name_filter)
 
 ```c++
 #include "jsoncons/json.hpp"
@@ -115,7 +115,8 @@ json_reader reader(is, filter);
 reader.read_next();
 ```
 Output:
-(1) An address book file (`address-book-new.json`) with name fixes
+
+(1) An address book file (`address-book-new1.json`) with name fixes
 ```json
 {
     "address-book":
@@ -152,7 +153,8 @@ Incomplete name "John" at line 9 and column 26
     j.write(filter);
 ```
 Output:
-(1) An address book file (`address-book-new.json`) with name fixes
+
+(1) An address book file (`address-book-new2.json`) with name fixes
 ```json
 {
     "address-book":

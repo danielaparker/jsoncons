@@ -10,8 +10,9 @@ The `json` class is an instantiation of the `basic_json` class template that use
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
 ### Header
-
-    #include <jsoncons/json.hpp>
+```c++
+#include <jsoncons/json.hpp>
+```
 
 ### Member types
 

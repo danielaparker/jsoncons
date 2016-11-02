@@ -470,7 +470,7 @@ vertical-align:1px;
 <body>
 <h3>Rename object member names</h3>
 
-<p>You can rename object member names with the built in filter <code>rename_name_filter</code></p>
+<p>You can rename object member names with the built in filter <a href="rename_name_filter">rename_name_filter</a></p>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json_filter.hpp<span class="pl-pds">"</span></span>
@@ -581,8 +581,9 @@ name_fix_up_filter <span class="pl-en">filter</span>(serializer);
 json_reader <span class="pl-en">reader</span>(is, filter);
 reader.read_next();</pre></div>
 
-<p>Output:<br>
-(1) An address book file (<code>address-book-new.json</code>) with name fixes</p>
+<p>Output:</p>
+
+<p>(1) An address book file (<code>address-book-new1.json</code>) with name fixes</p>
 
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>address-book<span class="pl-pds">"</span></span>:
@@ -618,8 +619,9 @@ reader.read_next();</pre></div>
     name_fix_up_filter <span class="pl-en">filter</span>(serializer);
     j.write(filter);</pre></div>
 
-<p>Output:<br>
-(1) An address book file (<code>address-book-new.json</code>) with name fixes</p>
+<p>Output:</p>
+
+<p>(1) An address book file (<code>address-book-new2.json</code>) with name fixes</p>
 
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>address-book<span class="pl-pds">"</span></span>:

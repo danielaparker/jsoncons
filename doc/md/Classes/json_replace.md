@@ -4,7 +4,7 @@
 
 ### Header
 ```c++
-#include "jsoncons/jsonpath/json_query.hpp"
+#include <jsoncons/jsonpath/json_query.hpp>
 ```
 
 ```c++

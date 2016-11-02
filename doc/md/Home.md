@@ -23,7 +23,9 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [output_format](output_format)  
 [json_reader](json_reader)  
 [json_encoder](json_encoder)  
+
 [json_filter](json_filter)  
+[rename_name_filter](rename_name_filter)  
 
 [wjson](wjson)  
 [wjson_serializer](wjson_serializer)  
