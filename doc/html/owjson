@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>wojson</title>
+<title>owjson</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,13 +468,13 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::wojson
+<div class="highlight highlight-source-c++"><pre>jsoncons::owjson
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
                    JsonTraits = ojson_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
-                   Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wojson</pre></div>
+                   Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; owjson</pre></div>
 
-<p>The <code>wojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
+<p>The <code>owjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
 
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
@@ -487,23 +487,23 @@ vertical-align:1px;
 <p>The interface is the same as <a href="wjson">wjson</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
 
 <ul>
-<li>In <code>wojson</code>, <code>object_allocator</code> is a random access iterator, so object members can be accessed by position, e.g.</li>
+<li>In <code>owjson</code>, <code>object_allocator</code> is a random access iterator, so object members can be accessed by position, e.g.</li>
 </ul>
 
-<pre><code>wojson o = wojson::parse(R"(
+<pre><code>owjson o = owjson::parse(R"(
 {
     "street_number" : "100",
     "street_name" : "Queen St W"
 }
 )");
 
-wojson::member_type member = o.members().begin()[1];
+owjson::member_type member = o.members().begin()[1];
 std::cout &lt;&lt; member.name() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
 </code></pre>
 
 <ul>
-<li><p><code>wojson</code>, like <code>wjson</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>wjson</code> that parameter is just a hint that allows optimization, with <code>wojson</code> it is the actual location where to insert the member.</p></li>
-<li><p>In <code>wojson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p></li>
+<li><p><code>owjson</code>, like <code>wjson</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>wjson</code> that parameter is just a hint that allows optimization, with <code>owjson</code> it is the actual location where to insert the member.</p></li>
+<li><p>In <code>owjson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p></li>
 </ul>
 
 <h3>See also</h3>

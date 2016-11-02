@@ -43,6 +43,7 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |wjson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wjson>`
     |ojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<ojson>`
     |wojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wojson>`
+    |wojson|<em>&#x2713;</em>|Use owjson`
 json member types|any|<em>&#x2713;</em>|
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.

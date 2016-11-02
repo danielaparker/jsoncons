@@ -3592,13 +3592,14 @@ json_printable<Json> pretty_print(const Json& val,
 typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
 typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
 typedef basic_json<char, ojson_traits<char>, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
+typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> owjson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
 typedef json_encoder<json> json_deserializer;
 typedef json_encoder<wjson> wjson_deserializer;
 typedef json_encoder<ojson> ojson_deserializer;
-typedef json_encoder<wojson> wojson_deserializer;
+typedef json_encoder<owjson> wojson_deserializer;
 #endif
 
 }

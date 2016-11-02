@@ -1121,7 +1121,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 <ul>
 <li><p><a href="ojson">ojson</a> constructs a json value that retains the original name-value insertion order</p></li>
 <li><p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="wojson">wojson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="owjson">owjson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
 </ul>
 
 <h2>Examples</h2>

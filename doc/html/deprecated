@@ -720,6 +720,12 @@ vertical-align:1px;
 </td>
 </tr>
 <tr>
+<td></td>
+<td>wojson</td>
+<td><em>✓</em></td>
+<td>Use owjson`</td>
+</tr>
+<tr>
 <td>json member types</td>
 <td>any</td>
 <td><em>✓</em></td>

@@ -548,7 +548,7 @@ typedef basic_json<wchar_t,
                    JsonTraits = json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) instead.
+If you prefer to retain the original insertion order, use [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++
@@ -583,9 +583,9 @@ which prints
 ```c++
 {"field1":"test","field2":3.9,"field3":true}
 ```
-### ojson and wojson
+### ojson and owjson
 
-The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([wojson](https://github.com/danielaparker/jsoncons/wiki/wojson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([owjson](https://github.com/danielaparker/jsoncons/wiki/owjson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```c++
 ojson o = ojson::parse(R"(
 {
