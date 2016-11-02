@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>Deprecated Features</h1>
+<h2>Deprecated Features</h2>
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
 
