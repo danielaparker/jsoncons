@@ -10,8 +10,6 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    std::vector<std::string> items;
-
     name_fix_up_filter(json_output_handler& handler)
         : json_filter(handler)
     {
@@ -45,7 +43,9 @@ private:
             }
             else
             {
-                items.push_back(value);
+                std::cerr << "Incomplete name \"" << value
+                   << "\" at line " << this->context().line_number()
+                   << " and column " << this->context().column_number() << std::endl;
             }
         }
         else
@@ -64,12 +64,10 @@ void name_fix_up_example1()
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 
-    json j;
-    is >> j;
-
     json_serializer serializer(os, true);
     name_fix_up_filter filter(serializer);
-    j.write(filter);
+    json_reader reader(is, filter);
+    reader.read_next();
 }
 
 void name_fix_up_example2()
@@ -79,10 +77,12 @@ void name_fix_up_example2()
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 
+    json j;
+    is >> j;
+
     json_serializer serializer(os, true);
     name_fix_up_filter filter(serializer);
-    json_reader reader(is, filter);
-    reader.read_next();
+    j.write(filter);
 }
 
 void change_member_name_example()
