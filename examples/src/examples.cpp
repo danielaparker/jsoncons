@@ -66,7 +66,7 @@ void first_example_c()
 {
     json books = json::parse_file("input/books.json");
 
-    output_format format;
+    serialization_options format;
     //format.floatfield(std::ios::fixed);
     format.precision(2);
 
@@ -92,7 +92,7 @@ void first_example_d()
 {
     json books = json::parse_file("input/books.json");
 
-    output_format format;
+    serialization_options format;
     //format.floatfield(std::ios::fixed);
     format.precision(2);
 

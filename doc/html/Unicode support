@@ -530,7 +530,7 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<s
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 
 std::ostringstream os;
-output_format format;
+serialization_options format;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 os &lt;&lt; print(arr,format);
 std::string outputStr = os.str();
@@ -562,7 +562,7 @@ Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 
 <div class="highlight highlight-source-c++"><pre>string input = <span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u8A73<span class="pl-cce">\\</span>u7D30<span class="pl-cce">\\</span>u95B2<span class="pl-cce">\\</span>u89A7<span class="pl-cce">\\</span>uD800<span class="pl-cce">\\</span>uDC01<span class="pl-cce">\\</span>u4E00<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>;
 json value = json::parse(input);
-output_format format;
+serialization_options format;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 string output = value.to_string(format);
 
@@ -636,7 +636,7 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class=
 std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/xxx.txt<span class="pl-pds">"</span></span>);
 os.imbue(std::locale(os.getloc(), <span class="pl-k">new</span> std::codecvt_utf8_utf16&lt;<span class="pl-c1">wchar_t</span>&gt;));
 
-woutput_format format;
+wserialization_options format;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 
 os &lt;&lt; pretty_print(val,format) &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>

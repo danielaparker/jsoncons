@@ -746,10 +746,17 @@ vertical-align:1px;
 <td>Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</td>
 </tr>
 <tr>
-<td>json_deserializer</td>
+<td>json_encoder</td>
 <td>json&amp; root()</td>
 <td><em>✓</em></td>
 <td>json get_result()</td>
+</tr>
+<tr>
+<td>serialization</td>
+<td><code>output_format</code></td>
+<td><em>✓</em></td>
+<td>Use <code>serialization_options</code>
+</td>
 </tr>
 <tr>
 <td>json_reader</td>

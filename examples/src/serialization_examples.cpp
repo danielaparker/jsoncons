@@ -54,7 +54,7 @@ void serialization_example1()
     std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
     std::cout << "array_object_split_lines(line_split_kind::new_line)" << std::endl;
 
-    output_format format;
+    serialization_options format;
 
     format.array_array_split_lines(line_split_kind::new_line)
           .array_object_split_lines(line_split_kind::new_line);
@@ -74,17 +74,17 @@ void serialization_example2()
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "object_array_split_lines(line_split_kind::same_line)" << std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.object_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val,format1) << std::endl;
 
     std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.object_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val,format2) << std::endl;
 
     std::cout << "object_array_split_lines(line_split_kind::multi_line)" << std::endl;
-    output_format format3;
+    serialization_options format3;
     format3.object_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val,format3) << std::endl;
 }
@@ -101,7 +101,7 @@ void serialization_example3()
         ]
         )");
 
-        output_format format;
+        serialization_options format;
         format.array_object_split_lines(line_split_kind::same_line);
         std::cout << "array_object_split_lines(line_split_kind::same_line)" << std::endl;
         std::cout << pretty_print(val,format) << std::endl;
@@ -122,11 +122,11 @@ void serialization_example3()
         std::cout << "Default pretty print" << std::endl;
         std::cout << pretty_print(val) << std::endl;
 
-        output_format format1;
+        serialization_options format1;
         format1.array_array_split_lines(line_split_kind::same_line);
         std::cout << pretty_print(val,format1) << std::endl;
 
-        output_format format;
+        serialization_options format;
         format.object_object_split_lines(line_split_kind::new_line);
         std::cout << pretty_print(val,format) << std::endl;
     }
@@ -147,17 +147,17 @@ void serialization_example3()
         std::cout << pretty_print(val2) << std::endl;
      
         std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
-        output_format format2;
+        serialization_options format2;
         format2.array_array_split_lines(line_split_kind::new_line);
         std::cout << pretty_print(val2,format2) << std::endl;
 
         std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
-        output_format format4;
+        serialization_options format4;
         format4.array_array_split_lines(line_split_kind::same_line);
         std::cout << pretty_print(val2, format4) << std::endl;
 
         std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
-        output_format format5;
+        serialization_options format5;
         format5.array_array_split_lines(line_split_kind::same_line);
         std::cout << pretty_print(val2, format5) << std::endl;
     }
@@ -171,7 +171,7 @@ void serialization_example3()
     }
 )");
     std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
-    output_format format6;
+    serialization_options format6;
     format6.array_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val3,format6) << std::endl;
 }
@@ -193,20 +193,20 @@ void serialization_example4()
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "Array-array same line format" << std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format1) << std::endl;
 
     std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
     std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.object_array_split_lines(line_split_kind::new_line)
            .array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format2) << std::endl;
 
     std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
     std::cout << "array_array_split_lines(line_split_kind::multi_line)" << std::endl;
-    output_format format3;
+    serialization_options format3;
     format3.object_array_split_lines(line_split_kind::new_line)
            .array_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val, format3) << std::endl;
@@ -228,37 +228,37 @@ void serialization_example4()
 
         std::string style1 = "array_array_split_lines(line_split_kind:same_line)";
         std::cout << style1 << std::endl;
-        output_format format1;
+        serialization_options format1;
         format1.array_array_split_lines(line_split_kind::same_line);
         std::cout << pretty_print(val,format1) << std::endl;
 
         std::string style2 = "array_array_split_lines(line_split_kind::new_line)";
         std::cout << style2 << std::endl;
-        output_format format2;
+        serialization_options format2;
         format2.array_array_split_lines(line_split_kind::new_line);
         std::cout << pretty_print(val,format2) << std::endl;
 
         std::string style3 = "array_array_split_lines(line_split_kind::multi_line)";
         std::cout << style3 << std::endl;
-        output_format format3;
+        serialization_options format3;
         format3.array_array_split_lines(line_split_kind::multi_line);
         std::cout << pretty_print(val,format3) << std::endl;
 
         std::string style4 = "object_array_split_lines(line_split_kind:same_line)";
         std::cout << style4 << std::endl;
-        output_format format4;
+        serialization_options format4;
         format4.object_array_split_lines(line_split_kind::same_line);
         std::cout << pretty_print(val,format4) << std::endl;
 
         std::string style5 = "object_array_split_lines(line_split_kind::new_line)";
         std::cout << style5 << std::endl;
-        output_format format5;
+        serialization_options format5;
         format5.object_array_split_lines(line_split_kind::new_line);
         std::cout << pretty_print(val,format5) << std::endl;
 
         std::string style6 = "object_array_split_lines(line_split_kind::multi_line)";
         std::cout << style6 << std::endl;
-        output_format format6;
+        serialization_options format6;
         format6.object_array_split_lines(line_split_kind::multi_line);
         std::cout << pretty_print(val,format6) << std::endl;
     }

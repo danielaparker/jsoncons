@@ -31,7 +31,7 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     return ss.str();
 }
 
-const output_format format;
+const serialization_options format;
 
 BOOST_AUTO_TEST_CASE(test_double_to_string)
 {

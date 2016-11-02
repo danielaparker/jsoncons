@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
     obj["field2"] = 1.79e308 * 1000;
     obj["field3"] = -1.79e308 * 1000;
 
-    output_format format;
+    serialization_options format;
     format.nan_replacement("null");
     format.pos_inf_replacement("1e9999");
     format.neg_inf_replacement("-1e9999");
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE(test_no_nan_replacement)
     obj["field2"] = 1.79e308 * 1000;
     obj["field3"] = -1.79e308 * 1000;
 
-    output_format format;
+    serialization_options format;
     format.replace_nan(false);
     format.replace_inf(false);
 
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::cout << "]" << std::endl;
 
     std::ostringstream os;
-    output_format format;
+    serialization_options format;
     format.escape_all_non_ascii(true);
     arr.write(os, format);
     std::string outputStr = os.str();
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE(test_big_file)
     std::string john_sport("soccer");
     std::string john_food("spaghetti");
 
-    output_format format;
+    serialization_options format;
     json_serializer handler(os, format, true);
 
     std::clock_t t = std::clock();

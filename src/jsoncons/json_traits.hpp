@@ -12,7 +12,7 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <string>
 

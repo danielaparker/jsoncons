@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>output_format</title>
+<title>serialization_options</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,11 +468,11 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::output_format
+<div class="highlight highlight-source-c++"><pre>jsoncons::serialization_options
 
-<span class="pl-k">typedef</span> basic_output_format&lt;<span class="pl-k">char</span>&gt; output_format</pre></div>
+<span class="pl-k">typedef</span> basic_output_format&lt;<span class="pl-k">char</span>&gt; serialization_options</pre></div>
 
-<p>The output_format class is an instantiation of the basic_output_format class template that uses <code>char</code> as the character type.</p>
+<p>The serialization_options class is an instantiation of the basic_output_format class template that uses <code>char</code> as the character type.</p>
 
 <p>The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A <code>precision</code> gives the maximum number of significant digits, the default precision is <code>16</code>. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written. </p>
 
@@ -480,7 +480,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/output_format.hpp<span class="pl-pds">&gt;</span></span></pre></div>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/serialization_options.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Member constants</h3>
 
@@ -496,10 +496,10 @@ vertical-align:1px;
 
 <h3>Constructors</h3>
 
-<pre><code>output_format()
+<pre><code>serialization_options()
 </code></pre>
 
-<p>Constructs an <code>output_format</code> with default values. </p>
+<p>Constructs an <code>serialization_options</code> with default values. </p>
 
 <h3>Accessors</h3>
 
@@ -555,47 +555,47 @@ vertical-align:1px;
 
 <h3>Modifiers</h3>
 
-<pre><code>output_format&amp; indent(int value)
+<pre><code>serialization_options&amp; indent(int value)
 
-output_format&amp; escape_all_non_ascii(bool value)
+serialization_options&amp; escape_all_non_ascii(bool value)
 
-output_format&amp; escape_solidus(bool value)
+serialization_options&amp; escape_solidus(bool value)
 
-output_format&amp; replace_nan(bool replace)
+serialization_options&amp; replace_nan(bool replace)
 
-output_format&amp; replace_inf(bool replace)
+serialization_options&amp; replace_inf(bool replace)
 
-output_format&amp; replace_pos_inf(bool replace)
+serialization_options&amp; replace_pos_inf(bool replace)
 
-output_format&amp; replace_neg_inf(bool replace)
+serialization_options&amp; replace_neg_inf(bool replace)
 
-output_format&amp; nan_replacement(const std::string&amp; replacement)
+serialization_options&amp; nan_replacement(const std::string&amp; replacement)
 
-output_format&amp; pos_inf_replacement(const std::string&amp; replacement)
+serialization_options&amp; pos_inf_replacement(const std::string&amp; replacement)
 
-output_format&amp; neg_inf_replacement(const std::string&amp; replacement)
+serialization_options&amp; neg_inf_replacement(const std::string&amp; replacement)
 </code></pre>
 
 <p>Sets replacement text for negative infinity.</p>
 
-<pre><code>output_format&amp; precision(uint8_t prec)
+<pre><code>serialization_options&amp; precision(uint8_t prec)
 
-output_format&amp; object_object_split_lines(line_split_kind value)
+serialization_options&amp; object_object_split_lines(line_split_kind value)
 </code></pre>
 
 <p>For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::multi_line</a>.</p>
 
-<pre><code>output_format&amp; array_object_split_lines(line_split_kind value)
+<pre><code>serialization_options&amp; array_object_split_lines(line_split_kind value)
 </code></pre>
 
 <p>For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::multi_line</a>.</p>
 
-<pre><code>output_format&amp; object_array_split_lines(line_split_kind value)
+<pre><code>serialization_options&amp; object_array_split_lines(line_split_kind value)
 </code></pre>
 
 <p>For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::same_line</a>.</p>
 
-<pre><code>output_format&amp; array_array_split_lines(line_split_kind value)
+<pre><code>serialization_options&amp; array_array_split_lines(line_split_kind value)
 </code></pre>
 
 <p>For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::new_line</a>.</p>
@@ -621,7 +621,7 @@ output_format&amp; object_object_split_lines(line_split_kind value)
     obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
     obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = -<span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
 
-    output_format format;
+    serialization_options format;
     format.nan_replacement(<span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>);        <span class="pl-c">// default is "null"</span>
     format.pos_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>1e9999<span class="pl-pds">"</span></span>);  <span class="pl-c">// default is "null"</span>
     format.neg_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>-1e9999<span class="pl-pds">"</span></span>); <span class="pl-c">// default is "null"</span>
@@ -648,12 +648,12 @@ output_format&amp; object_object_split_lines(line_split_kind value)
     std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>New line<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.object_array_split_lines(line_split_kind::new_line);
     std::cout &lt;&lt; pretty_print(val,format1) &lt;&lt; std::endl;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Multi line<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.object_array_split_lines(line_split_kind::multi_line);
     std::cout &lt;&lt; pretty_print(val,format2) &lt;&lt; std::endl;</pre></div>
 
@@ -719,12 +719,12 @@ output_format&amp; object_object_split_lines(line_split_kind value)
     std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Same line<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.array_array_split_lines(line_split_kind::same_line);
     std::cout &lt;&lt; pretty_print(val, format1) &lt;&lt; std::endl;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Multi line<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.array_array_split_lines(line_split_kind::multi_line);
     std::cout &lt;&lt; pretty_print(val, format2) &lt;&lt; std::endl;</pre></div>
 

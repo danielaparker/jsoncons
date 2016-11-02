@@ -23,12 +23,12 @@ You must ensure that the output stream exists as long as does `jsonx_serializer`
 Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `jsonx_serializer`, as `jsonx_serializer` holds a pointer to but does not own this object.
 
-    jsonx_serializer(std::ostream& os, const output_format& format)
-Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
+    jsonx_serializer(std::ostream& os, const serialization_options& format)
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `jsonx_serializer`, as `jsonx_serializer` holds a pointer to but does not own this object.
 
-    jsonx_serializer(std::ostream& os, const output_format& format, bool indenting)
-Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
+    jsonx_serializer(std::ostream& os, const serialization_options& format, bool indenting)
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `jsonx_serializer`, as `jsonx_serializer` holds a pointer to but does not own this object.
 
 ### Destructor

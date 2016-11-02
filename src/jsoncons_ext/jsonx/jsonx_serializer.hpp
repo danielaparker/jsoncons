@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <map>
 #include <jsoncons/json_text_traits.hpp>
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <limits> // std::numeric_limits
 
@@ -110,7 +110,7 @@ struct jsonx_char_traits<wchar_t>
 template <class CharT>
 void escape_attribute(const CharT* s,
                       size_t length,
-                      const basic_output_format<CharT>& format,
+                      const basic_serialization_options<CharT>& format,
                       buffered_ostream<CharT>& bos)
 {
     (void)format;
@@ -192,7 +192,7 @@ void escape_attribute(const CharT* s,
 template <class CharT>
 void escape_value(const CharT* s,
                   size_t length,
-                  const basic_output_format<CharT>& format,
+                  const basic_serialization_options<CharT>& format,
                   buffered_ostream<CharT>& bos)
 {
     (void)format;
@@ -241,7 +241,7 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
         std::basic_string<CharT> name_;
     };
     buffered_ostream<CharT> bos_;
-    basic_output_format<CharT> format_;
+    basic_serialization_options<CharT> format_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
@@ -273,7 +273,7 @@ public:
        indent_(0)
     {
     }
-    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format)
+    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format)
        :
        bos_(os),
        format_(format),
@@ -285,7 +285,7 @@ public:
        indent_(0)
     {
     }
-    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_output_format<CharT>& format, bool indenting)
+    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format, bool indenting)
        :
        bos_(os),
        format_(format),

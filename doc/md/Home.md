@@ -20,7 +20,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json](json)  
 [json_serializer](json_serializer)  
-[output_format](output_format)  
+[serialization_options](serialization_options)  
 [json_reader](json_reader)  
 [json_encoder](json_encoder)  
 
@@ -29,7 +29,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [wjson](wjson)  
 [wjson_serializer](wjson_serializer)  
-[woutput_format](woutput_format)  
+[wserialization_options](wserialization_options)  
 [wjson_reader](wjson_reader)  
 [wjson_encoder](wjson_encoder)  
 

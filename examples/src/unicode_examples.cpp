@@ -11,7 +11,7 @@ void read_and_write_escaped_unicode()
 {
     std::string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     json value = json::parse(input);
-    output_format format;
+    serialization_options format;
     format.escape_all_non_ascii(true);
     std::string output = value.to_string(format);
 

@@ -21,7 +21,7 @@
 #include <jsoncons/json_object.hpp>
 #include <jsoncons/json_text_traits.hpp>
 #include <jsoncons/json_output_handler.hpp>
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -1143,12 +1143,12 @@ public:
             return evaluate().as_string(allocator);
         }
 
-        string_type as_string(const basic_output_format<char_type>& format) const
+        string_type as_string(const basic_serialization_options<char_type>& format) const
         {
             return evaluate().as_string(format);
         }
 
-        string_type as_string(const basic_output_format<char_type>& format,
+        string_type as_string(const basic_serialization_options<char_type>& format,
                               const char_allocator& allocator) const
         {
             return evaluate().as_string(format,allocator);
@@ -1366,7 +1366,7 @@ public:
             return evaluate().to_string(allocator);
         }
 
-        string_type to_string(const basic_output_format<char_type>& format, char_allocator& allocator = char_allocator()) const
+        string_type to_string(const basic_serialization_options<char_type>& format, char_allocator& allocator = char_allocator()) const
         {
             return evaluate().to_string(format,allocator);
         }
@@ -1380,12 +1380,12 @@ public:
             evaluate().write(os);
         }
 
-        void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+        void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
         {
             evaluate().write(os,format);
         }
 
-        void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+        void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
         {
             evaluate().write(os,format,indenting);
         }
@@ -1400,12 +1400,12 @@ public:
             evaluate().to_stream(os);
         }
 
-        void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+        void to_stream(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
         {
             evaluate().to_stream(os,format);
         }
 
-        void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+        void to_stream(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
         {
             evaluate().to_stream(os,format,indenting);
         }
@@ -1864,7 +1864,7 @@ public:
         return os.str();
     }
 
-    string_type to_string(const basic_output_format<char_type>& format,
+    string_type to_string(const basic_serialization_options<char_type>& format,
                           const char_allocator& allocator=char_allocator()) const
     {
         string_type s(allocator);
@@ -1945,13 +1945,13 @@ public:
         write(serializer);
     }
 
-    void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+    void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
     {
         basic_json_serializer<char_type> serializer(os, format);
         write(serializer);
     }
 
-    void write(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+    void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
     {
         basic_json_serializer<char_type> serializer(os, format, indenting);
         write(serializer);
@@ -1971,13 +1971,13 @@ public:
         to_stream(serializer);
     }
 
-    void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format) const
+    void to_stream(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
     {
         basic_json_serializer<char_type> serializer(os, format);
         to_stream(serializer);
     }
 
-    void to_stream(std::basic_ostream<char_type>& os, const basic_output_format<char_type>& format, bool indenting) const
+    void to_stream(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
     {
         basic_json_serializer<char_type> serializer(os, format, indenting);
         to_stream(serializer);
@@ -2368,7 +2368,7 @@ public:
         }
     }
 
-    string_type as_string(const basic_output_format<char_type>& format) const 
+    string_type as_string(const basic_serialization_options<char_type>& format) const 
     {
         switch (var_.type_id())
         {
@@ -2381,7 +2381,7 @@ public:
         }
     }
 
-    string_type as_string(const basic_output_format<char_type>& format,
+    string_type as_string(const basic_serialization_options<char_type>& format,
                           const char_allocator& allocator) const 
     {
         switch (var_.type_id())
@@ -3539,7 +3539,7 @@ public:
 
     json_printable(const Json& o,
                    bool is_pretty_print,
-                   const basic_output_format<char_type>& format)
+                   const basic_serialization_options<char_type>& format)
        : o_(&o), is_pretty_print_(is_pretty_print), format_(format)
     {
         ;
@@ -3558,7 +3558,7 @@ public:
 
     const Json *o_;
     bool is_pretty_print_;
-    basic_output_format<char_type> format_;
+    basic_serialization_options<char_type> format_;
 private:
     json_printable();
 };
@@ -3571,7 +3571,7 @@ json_printable<Json> print(const Json& val)
 
 template<class Json>
 json_printable<Json> print(const Json& val,
-                            const basic_output_format<typename Json::char_type>& format)
+                            const basic_serialization_options<typename Json::char_type>& format)
 {
     return json_printable<Json>(val, false, format);
 }
@@ -3584,7 +3584,7 @@ json_printable<Json> pretty_print(const Json& val)
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& val,
-                                   const basic_output_format<typename Json::char_type>& format)
+                                   const basic_serialization_options<typename Json::char_type>& format)
 {
     return json_printable<Json>(val, true, format);
 }

@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    output_format format;
+    serialization_options format;
     json_serializer os(std::cout, format, true); // pretty printing
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os1 << pretty_print(val);
     BOOST_CHECK_EQUAL(expected1,os1.str());
 
-    output_format format2;
+    serialization_options format2;
     format2.array_array_split_lines(line_split_kind::same_line);
     std::string expected2 = R"({
     "data": {
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os2 << pretty_print(val,format2);
     BOOST_CHECK_EQUAL(expected2,os2.str());
 
-    output_format format3;
+    serialization_options format3;
     format3.array_array_split_lines(line_split_kind::new_line);
     std::string expected3 = R"({
     "data": {
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os3 << pretty_print(val,format3);
     BOOST_CHECK_EQUAL(expected3,os3.str());
 
-    output_format format4;
+    serialization_options format4;
     format4.array_array_split_lines(line_split_kind::multi_line);
     std::string expected4 = R"({
     "data": {
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os4 << pretty_print(val,format4);
     BOOST_CHECK_EQUAL(expected4,os4.str());
 
-    output_format format5;
+    serialization_options format5;
     format5.object_array_split_lines(line_split_kind::same_line);
     std::string expected5 = R"({
     "data": {
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os5 << pretty_print(val,format5);
     BOOST_CHECK_EQUAL(expected5,os5.str());
 
-    output_format format6;
+    serialization_options format6;
     format6.object_array_split_lines(line_split_kind::new_line);
     std::string expected6 = R"({
     "data": {
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os6 << pretty_print(val,format6);
     BOOST_CHECK_EQUAL(expected6,os6.str());
 
-    output_format format7;
+    serialization_options format7;
     format7.object_array_split_lines(line_split_kind::multi_line);
     std::string expected7 = R"({
     "data": {

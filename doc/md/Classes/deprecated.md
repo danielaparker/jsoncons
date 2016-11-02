@@ -47,7 +47,8 @@ json member types|any|<em>&#x2713;</em>|
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.
     |an_array||Use assignment to `json::array()` or `json::make_array()` instead.
-json_deserializer|json& root()|<em>&#x2713;</em>|json get_result()
+json_encoder|json& root()|<em>&#x2713;</em>|json get_result()
+serialization|`output_format`|<em>&#x2713;</em>|Use `serialization_options`
 json_reader|read()|<em>&#x2713;</em>|Use read_next()
     |max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
     |max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const

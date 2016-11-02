@@ -480,8 +480,7 @@ vertical-align:1px;
 
 <h3>Header</h3>
 
-<pre><code>#include &lt;jsoncons/json.hpp&gt;
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Member types</h3>
 
@@ -757,6 +756,11 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 <p>Resizes a json array so that it contains <code>n</code> elements that are initialized to <code>val</code>. </p>
 
 <h3>Accessors</h3>
+
+<pre><code>bool has_name(const string_type&amp; name) const
+</code></pre>
+
+<p>Returns <code>true</code> if an object has a member with the given <code>name</code>, otherwise <code>false</code>.    </p>
 
 <pre><code>size_t count(const string_type&amp; name) const
 </code></pre>
@@ -1054,10 +1058,10 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <p>Inserts json value into string.</p>
 
-<pre><code>string_type to_string(const output_format&amp; format, const char_allocator&amp; allocator = char_allocator()) const
+<pre><code>string_type to_string(const serialization_options&amp; format, const char_allocator&amp; allocator = char_allocator()) const
 </code></pre>
 
-<p>Inserts json value into string using specified <a href="output_format">output_format</a>.</p>
+<p>Inserts json value into string using specified <a href="serialization_options">serialization_options</a>.</p>
 
 <pre><code>void write(basic_json_output_handler&lt;char_type&gt;&amp; output_handler) const
 </code></pre>
@@ -1067,12 +1071,12 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 <pre><code>write write(std::ostream&amp; os) const
 </code></pre>
 
-<p>Inserts json value into stream with default output format.</p>
+<p>Inserts json value into stream with default serialization options.</p>
 
-<pre><code>write write(std::ostream&lt;CharT&gt; os, const output_format&amp; format) const
+<pre><code>write write(std::ostream&lt;CharT&gt; os, const serialization_options&amp; format) const
 </code></pre>
 
-<p>Inserts json value into stream using specified <a href="output_format">output_format</a>.</p>
+<p>Inserts json value into stream using specified <a href="serialization_options">serialization_options</a>.</p>
 
 <pre><code>void write_body(json_output_handler&amp; handler) const
 </code></pre>
@@ -1092,16 +1096,16 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 <p>Inserts json value into stream.</p>
 
 <pre><code>std::ostream&amp; print(const json&amp; val)  
-std::ostream&amp; print(const json&amp; val, const output_format&lt;CharT&gt;&amp; format)  
+std::ostream&amp; print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; format)  
 </code></pre>
 
-<p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
+<p>Inserts json value into stream using the specified <a href="serialization_options">serialization_options</a> if supplied.</p>
 
 <pre><code>std::ostream&amp; pretty_print(const json&amp; val)  
-std::ostream&amp; pretty_print(const json&amp; val, const output_format&lt;CharT&gt;&amp; format)  
+std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; format)  
 </code></pre>
 
-<p>Inserts json value into stream using the specified <a href="output_format">output_format</a> if supplied.</p>
+<p>Inserts json value into stream using the specified <a href="serialization_options">serialization_options</a> if supplied.</p>
 
 <pre><code>void swap(json&amp; a, json&amp; b)
 </code></pre>

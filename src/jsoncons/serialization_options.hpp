@@ -29,7 +29,7 @@ class buffered_ostream;
 enum class line_split_kind{same_line,new_line,multi_line};
 
 template <class CharT>
-class basic_output_format
+class basic_serialization_options
 {
     int indent_;
     uint8_t precision_;
@@ -51,7 +51,7 @@ public:
 
 //  Constructors
 
-    basic_output_format()
+    basic_serialization_options()
         :
         indent_(default_indent),
         precision_(16),
@@ -76,10 +76,10 @@ public:
     line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
     line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
 
-    basic_output_format<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
-    basic_output_format<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
-    basic_output_format<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
-    basic_output_format<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
+    basic_serialization_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
+    basic_serialization_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
+    basic_serialization_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
+    basic_serialization_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     block_options array_array_block_option()
@@ -87,7 +87,7 @@ public:
         return (array_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_output_format<CharT>& array_array_block_option(block_options value)
+    basic_serialization_options<CharT>& array_array_block_option(block_options value)
     {
         array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -98,7 +98,7 @@ public:
         return (array_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_output_format<CharT>& array_object_block_option(block_options value)
+    basic_serialization_options<CharT>& array_object_block_option(block_options value)
     {
         array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -109,7 +109,7 @@ public:
         return (object_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_output_format<CharT>& object_array_block_option(block_options value)
+    basic_serialization_options<CharT>& object_array_block_option(block_options value)
     {
         object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -120,7 +120,7 @@ public:
         return (object_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_output_format<CharT>& object_object_block_option(block_options value)
+    basic_serialization_options<CharT>& object_object_block_option(block_options value)
     {
         object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -170,68 +170,68 @@ public:
 
 //  Modifiers
 
-    basic_output_format<CharT>& precision(uint8_t prec)
+    basic_serialization_options<CharT>& precision(uint8_t prec)
     {
         precision_ = prec;
         return *this;
     }
 
-    basic_output_format<CharT>& escape_all_non_ascii(bool value)
+    basic_serialization_options<CharT>& escape_all_non_ascii(bool value)
     {
         escape_all_non_ascii_ = value;
         return *this;
     }
 
-    basic_output_format<CharT>& escape_solidus(bool value)
+    basic_serialization_options<CharT>& escape_solidus(bool value)
     {
         escape_solidus_ = value;
         return *this;
     }
 
-    basic_output_format<CharT>& replace_nan(bool replace)
+    basic_serialization_options<CharT>& replace_nan(bool replace)
     {
         replace_nan_ = replace;
         return *this;
     }
 
-    basic_output_format<CharT>& replace_inf(bool replace)
+    basic_serialization_options<CharT>& replace_inf(bool replace)
     {
         replace_pos_inf_ = replace;
         replace_neg_inf_ = replace;
         return *this;
     }
 
-    basic_output_format<CharT>& replace_pos_inf(bool replace)
+    basic_serialization_options<CharT>& replace_pos_inf(bool replace)
     {
         replace_pos_inf_ = replace;
         return *this;
     }
 
-    basic_output_format<CharT>& replace_neg_inf(bool replace)
+    basic_serialization_options<CharT>& replace_neg_inf(bool replace)
     {
         replace_neg_inf_ = replace;
         return *this;
     }
 
-    basic_output_format<CharT>& nan_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& nan_replacement(const std::basic_string<CharT>& replacement)
     {
         nan_replacement_ = replacement;
         return *this;
     }
 
-    basic_output_format<CharT>& pos_inf_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& pos_inf_replacement(const std::basic_string<CharT>& replacement)
     {
         pos_inf_replacement_ = replacement;
         return *this;
     }
 
-    basic_output_format<CharT>& neg_inf_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& neg_inf_replacement(const std::basic_string<CharT>& replacement)
     {
         neg_inf_replacement_ = replacement;
         return *this;
     }
 
-    basic_output_format<CharT>& indent(int value)
+    basic_serialization_options<CharT>& indent(int value)
     {
         indent_ = value;
         return *this;
@@ -241,7 +241,7 @@ public:
 template<class CharT>
 void escape_string(const CharT* s,
                    size_t length,
-                   const basic_output_format<CharT>& format,
+                   const basic_serialization_options<CharT>& format,
                    buffered_ostream<CharT>& os)
 {
     const CharT* begin = s;
@@ -340,8 +340,13 @@ void escape_string(const CharT* s,
     }
 }
 
-typedef basic_output_format<char> output_format;
-typedef basic_output_format<wchar_t> woutput_format;
+typedef basic_serialization_options<char> serialization_options;
+typedef basic_serialization_options<wchar_t> wserialization_options;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef basic_serialization_options<char> output_format;
+typedef basic_serialization_options<wchar_t> woutput_format;
+#endif
 
 }
 #endif

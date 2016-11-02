@@ -1,9 +1,9 @@
 ```c++
-jsoncons::output_format
+jsoncons::serialization_options
 
-typedef basic_output_format<char> output_format
+typedef basic_output_format<char> serialization_options
 ```
-The output_format class is an instantiation of the basic_output_format class template that uses `char` as the character type.
+The serialization_options class is an instantiation of the basic_output_format class template that uses `char` as the character type.
 
 The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `16`. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written. 
 
@@ -11,7 +11,7 @@ When parsing text, the precision of the fractional number is retained, and used 
 
 ### Header
 ```c++
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 ```
 ### Member constants
 
@@ -23,8 +23,8 @@ The default indent is 4
 
 ### Constructors
 
-    output_format()
-Constructs an `output_format` with default values. 
+    serialization_options()
+Constructs an `serialization_options` with default values. 
 
 ### Accessors
 
@@ -60,39 +60,39 @@ The default is "null"
 
 ### Modifiers
 
-    output_format& indent(int value)
+    serialization_options& indent(int value)
 
-    output_format& escape_all_non_ascii(bool value)
+    serialization_options& escape_all_non_ascii(bool value)
 
-    output_format& escape_solidus(bool value)
+    serialization_options& escape_solidus(bool value)
 
-    output_format& replace_nan(bool replace)
+    serialization_options& replace_nan(bool replace)
 
-    output_format& replace_inf(bool replace)
+    serialization_options& replace_inf(bool replace)
 
-    output_format& replace_pos_inf(bool replace)
+    serialization_options& replace_pos_inf(bool replace)
 
-    output_format& replace_neg_inf(bool replace)
+    serialization_options& replace_neg_inf(bool replace)
 
-    output_format& nan_replacement(const std::string& replacement)
+    serialization_options& nan_replacement(const std::string& replacement)
 
-    output_format& pos_inf_replacement(const std::string& replacement)
+    serialization_options& pos_inf_replacement(const std::string& replacement)
 
-    output_format& neg_inf_replacement(const std::string& replacement)
+    serialization_options& neg_inf_replacement(const std::string& replacement)
 Sets replacement text for negative infinity.
 
-    output_format& precision(uint8_t prec)
+    serialization_options& precision(uint8_t prec)
 
-    output_format& object_object_split_lines(line_split_kind value)
+    serialization_options& object_object_split_lines(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
 
-    output_format& array_object_split_lines(line_split_kind value)
+    serialization_options& array_object_split_lines(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
 
-    output_format& object_array_split_lines(line_split_kind value)
+    serialization_options& object_array_split_lines(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind).
 
-    output_format& array_array_split_lines(line_split_kind value)
+    serialization_options& array_array_split_lines(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
 
 ## Examples
@@ -117,7 +117,7 @@ Output:
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
 
-    output_format format;
+    serialization_options format;
     format.nan_replacement("null");        // default is "null"
     format.pos_inf_replacement("1e9999");  // default is "null"
     format.neg_inf_replacement("-1e9999"); // default is "null"
@@ -147,12 +147,12 @@ Output:
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "New line" << std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.object_array_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val,format1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.object_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val,format2) << std::endl;
 ```
@@ -224,12 +224,12 @@ Multi line
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "Same line" << std::endl;
-    output_format format1;
+    serialization_options format1;
     format1.array_array_split_lines(line_split_kind::same_line);
     std::cout << pretty_print(val, format1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    output_format format2;
+    serialization_options format2;
     format2.array_array_split_lines(line_split_kind::multi_line);
     std::cout << pretty_print(val, format2) << std::endl;
 ```

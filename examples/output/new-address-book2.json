@@ -1,13 +1,13 @@
 {
     "address-book": [
         {
+            "email": "jane.roe@example.com",
             "first-name": "Jane",
-            "last-name": "Roe",
-            "email": "jane.roe@example.com"
+            "last-name": "Roe"
         },
         {
-            "first-name": "John",
-            "email": "john.doe@example.com"
+            "email": "john.doe@example.com",
+            "first-name": "John"
         }
     ]
 }

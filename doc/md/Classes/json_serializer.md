@@ -23,12 +23,12 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const output_format& format)
-Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
+    json_serializer(std::ostream& os, const serialization_options& format)
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const output_format& format, bool indenting)
-Constructs a new serializer that writes to the specified output stream using the specified [output_format](output_format).
+    json_serializer(std::ostream& os, const serialization_options& format, bool indenting)
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 ### Destructor
@@ -54,7 +54,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    output_format format;
+    serialization_options format;
     json_serializer os(std::cout, format, true); // pretty printing
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

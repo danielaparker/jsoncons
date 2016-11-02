@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>woutput_format</title>
+<title>wserialization_options</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,12 +468,12 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::woutput_format
+<pre><code>jsoncons::wserialization_options
 
-typedef basic_output_format&lt;wchar_t&gt; woutput_format
+typedef basic_serialization_options&lt;wchar_t&gt; wserialization_options
 </code></pre>
 
-<p>The woutput_format class is an instantiation of the basic_output_format class template that uses <code>wchar_t</code> as the character type.</p>
+<p>The wserialization_options class is an instantiation of the basic_serialization_options class template that uses <code>wchar_t</code> as the character type.</p>
 
 <h3>Header</h3>
 
@@ -482,7 +482,7 @@ typedef basic_output_format&lt;wchar_t&gt; woutput_format
 
 <h3>Interface</h3>
 
-<p>The interface is the same as <a href="output_format">output_format</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, etc. - for narrow character ones.</p>
+<p>The interface is the same as <a href="serialization_options">serialization_options</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, etc. - for narrow character ones.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

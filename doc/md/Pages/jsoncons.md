@@ -380,10 +380,10 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [output_format](https://github.com/danielaparker/jsoncons/wiki/output_format), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/wiki/serialization_options), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
-output_format format;
+serialization_options format;
 format.object_array_split_lines(line_split_kind::new_line);
 std::cout << pretty_print(val,format) << std::endl;
 ```
@@ -403,7 +403,7 @@ produces
 ```
 To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
 ```c++
-output_format format;
+serialization_options format;
 format.object_array_split_lines(line_split_kind::multi_line);
 std::cout << pretty_print(val,format) << std::endl;
 ```

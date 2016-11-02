@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     arr.add(number);
     arr.add(obj);
 
-    output_format format;
+    serialization_options format;
     std::cout << pretty_print(arr) << std::endl;
 }
 

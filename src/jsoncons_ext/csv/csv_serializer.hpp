@@ -15,7 +15,7 @@
 #include <map>
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_text_traits.hpp>
-#include <jsoncons/output_format.hpp>
+#include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include "jsoncons_ext/csv/csv_parameters.hpp"
 
@@ -93,7 +93,7 @@ class basic_csv_serializer : public basic_json_output_handler<CharT>
     };
     buffered_ostream<CharT> os_;
     basic_csv_parameters<CharT> parameters_;
-    basic_output_format<CharT> format_;
+    basic_serialization_options<CharT> format_;
     std::vector<stack_item> stack_;
     std::basic_ostringstream<CharT> header_oss_;
     buffered_ostream<CharT> header_os_;
