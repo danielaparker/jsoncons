@@ -524,13 +524,6 @@ json_encoder</pre></div>
 </code></pre>
 
 <p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>. If before calling this function <code>is_valid()</code> is false, the behavior is undefined. After <code>get_result()</code> is called, 'is_valid()' becomes false.</p>
-
-<h3>Deprecated methods</h3>
-
-<pre><code>json_type&amp; root()
-</code></pre>
-
-<p>Use the public member function <code>get_result()</code> instead</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

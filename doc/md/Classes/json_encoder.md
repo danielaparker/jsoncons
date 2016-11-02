@@ -34,8 +34,3 @@ Checks if the `deserializer` contains a valid json_type value. The initial `is_v
 
     json_type get_result()
 Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
-
-### Deprecated methods
-
-    json_type& root()
-Use the public member function `get_result()` instead
