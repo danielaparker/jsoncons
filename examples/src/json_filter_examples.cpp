@@ -117,12 +117,26 @@ void change_member_name_example()
 
 }
 
+void change_member_name_example2()
+{
+    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
+
+    std::cout << ("1\n") << j << std::endl;
+
+    ojson_serializer serializer(std::cout);
+
+    rename_name_filter filter("fourth","third",serializer);
+    j.write(filter);
+
+}
+
 void json_filter_examples()
 {
     std::cout << "\njson_filter examples\n\n";
     name_fix_up_example1();
     name_fix_up_example2();
     change_member_name_example();
+    change_member_name_example2();
 
     std::cout << std::endl;
 }

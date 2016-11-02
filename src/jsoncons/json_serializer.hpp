@@ -458,7 +458,9 @@ private:
 };
 
 typedef basic_json_serializer<char> json_serializer;
+typedef basic_json_serializer<char> ojson_serializer;
 typedef basic_json_serializer<wchar_t> wjson_serializer;
+typedef basic_json_serializer<wchar_t> wojson_serializer;
 
 }
 #endif

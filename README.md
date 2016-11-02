@@ -295,17 +295,24 @@ See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20E
 You can rename object member names with the built in filter `rename_name_filter`
 
 ```c++
+#include "jsoncons/json.hpp"
+#include "jsoncons/json_filter.hpp"
 
-std::ifstream is("input/booklist.json");
-std::ifstream os("input/new_booklist.json");
+using namespace jsoncons;
 
-json booklist;
-is >> booklist;
+int main()
+{
+    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
 
-json_serializer serializer(os, true);
+    ojson_serializer serializer(std::cout);
 
-rename_name_filter filter("price","new_price",serializer);
-j.write(filter);
+    rename_name_filter filter("fourth","third",serializer);
+    j.write(filter);
+}
+```
+Output:
+```json
+{"first":1,"second":2,"third":3}
 ```
 Or define and use your oun filters. See [Transforming JSON with filters](https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters) for details.
 
