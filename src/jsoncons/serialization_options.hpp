@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_OUTPUT_FORMAT_HPP
-#define JSONCONS_OUTPUT_FORMAT_HPP
+#ifndef JSONCONS_SERIALIZATION_OPTIONS_HPP
+#define JSONCONS_SERIALIZATION_OPTIONS_HPP
 
 #include <string>
 #include <sstream>
