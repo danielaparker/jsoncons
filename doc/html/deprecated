@@ -696,28 +696,27 @@ vertical-align:1px;
 <td></td>
 <td>json_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>json_encoder</code>
-</td>
+<td>Use json_encoder`</td>
 </tr>
 <tr>
 <td></td>
 <td>wjson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>wjson_encoder</code>
+<td>Use <code>json_encoder&lt;wjson&gt;</code>
 </td>
 </tr>
 <tr>
 <td></td>
 <td>ojson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>ojson_encoder</code>
+<td>Use <code>json_encoder&lt;ojson&gt;</code>
 </td>
 </tr>
 <tr>
 <td></td>
 <td>wojson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>wojson_encoder</code>
+<td>Use <code>json_encoder&lt;wojson&gt;</code>
 </td>
 </tr>
 <tr>

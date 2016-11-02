@@ -1,12 +1,13 @@
-    jsoncons::json_encoder
+```c++
+jsoncons::json_encoder
 
-    typedef basic_json_encoder<json> json_encoder
-
-The `json_encoder` class is an instantiation of the `basic_json_encoder` class template that uses `json` as the json type.
+template <class Json>
+json_encoder
+```
 
 ### Header
 
-    #include <jsoncons/json.hpp>
+    #include <jsoncons/json_encoder.hpp>
 
 ### Base classes
 
@@ -16,7 +17,8 @@ The `json_encoder` class is an instantiation of the `basic_json_encoder` class t
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`allocator_type`|Allocator
+`json_type`|Json
+`allocator_type`|Json::allocator_type
 
 ### Constructors
 
@@ -28,12 +30,12 @@ Member type                         |Definition
 Returns the allocator associated with the json value.
 
     bool is_valid() const
-Checks if the `deserializer` contains a valid json value. The initial `is_valid()` is true (the value is an empty object), becomes false when a `do_begin_json` event is received, becomes `true` when a `do_end_json` event is received, and becomes false when `get_result()` is called.
+Checks if the `deserializer` contains a valid json_type value. The initial `is_valid()` is true (the value is an empty object), becomes false when a `do_begin_json` event is received, becomes `true` when a `do_end_json` event is received, and becomes false when `get_result()` is called.
 
-    json get_result()
+    json_type get_result()
 Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
 
 ### Deprecated methods
 
-    json& root()
+    json_type& root()
 Use the public member function `get_result()` instead

@@ -765,7 +765,7 @@ two=2
 
 std::fstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>tasks.csv<span class="pl-pds">"</span></span>);
 
-json_encoder handler;
+json_encoder&lt;json&gt; encoder;
 
 csv_parameters params;
 params.assume_header(<span class="pl-c1">true</span>)
@@ -773,9 +773,9 @@ params.assume_header(<span class="pl-c1">true</span>)
       .ignore_empty_values(<span class="pl-c1">true</span>)
       .column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
 
-csv_reader <span class="pl-en">reader</span>(is,handler,params);
+csv_reader <span class="pl-en">reader</span>(is,encoder,params);
 reader.read();
-json val = handler.get_result();
+json val = encoder.get_result();
 
 std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 

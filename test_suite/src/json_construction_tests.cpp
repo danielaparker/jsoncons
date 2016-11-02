@@ -223,21 +223,21 @@ BOOST_AUTO_TEST_CASE(test_multiple)
 
     std::istringstream is(in);
 
-    jsoncons::json_encoder handler;
-    json_reader reader(is,handler);
+    jsoncons::json_encoder<json> encoder;
+    json_reader reader(is,encoder);
 
     if (!reader.eof())
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = handler.get_result();
+        json val = encoder.get_result();
         BOOST_CHECK_EQUAL(1,val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = handler.get_result();
+        json val = encoder.get_result();
         BOOST_CHECK_EQUAL(4,val["a"].as<int>());
     }
 

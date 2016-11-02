@@ -479,7 +479,7 @@ vertical-align:1px;
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
 <li>
 <code>json_type_traits</code> specializations no longer require the <code>is_assignable</code> data member</li>
-<li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>wojson_deserializer</code> have been deprecated (they still work) and renamed to <code>json_encoder</code>,<code>ojson_encoder</code>,<code>wjson_encoder</code>,<code>wojson_encoder</code>.<br>
+<li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>wojson_deserializer</code> have been deprecated (they still work) and replaced by <code>template &lt;class Json&gt; json_encoder</code>.<br>
 </li>
 <li>The name <code>output_format</code> has been deprecated (it still works) and renamed to <code>serialization_options</code>.<br>
 </li>

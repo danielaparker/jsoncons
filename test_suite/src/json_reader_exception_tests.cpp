@@ -23,17 +23,17 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
     std::string in_file = "input/json-exception--1.json";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();
     }
     catch (const std::exception&)
     {
     }
-    //BOOST_CHECK_EQUAL(false,handler.is_valid());
+    //BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_left_brace)
@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     std::string in_file = "input/json-exception-1.json";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();
     }
     catch (const parse_exception& e)
@@ -53,17 +53,17 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
         BOOST_CHECK_EQUAL(14,e.line_number());
         BOOST_CHECK_EQUAL(30,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 BOOST_AUTO_TEST_CASE(test_exception_right_brace)
 {
     std::string in_file = "input/json-exception-2.json";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -74,17 +74,17 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
         BOOST_CHECK_EQUAL(17,e.line_number());
         BOOST_CHECK_EQUAL(9, e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_array_eof)
 {
     std::istringstream is("[100");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -94,17 +94,17 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
 {
     std::istringstream is("[\"\\u");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -115,17 +115,17 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
 {
     std::istringstream is("[tru");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -136,17 +136,17 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
 {
     std::istringstream is("[fals");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -157,17 +157,17 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
 {
     std::istringstream is("[nul");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -178,17 +178,17 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(5,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_true_eof)
 {
     std::istringstream is("[true");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -198,17 +198,17 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_false_eof)
 {
     std::istringstream is("[false");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -218,17 +218,17 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(7,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 {
     std::istringstream is("[null");
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
         BOOST_CHECK_EQUAL(1,e.line_number());
         BOOST_CHECK_EQUAL(6,e.column_number());
     }
-    BOOST_CHECK_EQUAL(false,handler.is_valid());
+    BOOST_CHECK_EQUAL(false,encoder.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE(test_exception)

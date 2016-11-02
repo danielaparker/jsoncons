@@ -19,10 +19,11 @@
 namespace jsoncons {
 
 template <class Json>
-class basic_json_encoder : public basic_json_input_handler<typename Json::char_type>
+class json_encoder : public basic_json_input_handler<typename Json::char_type>
 {
     static const int default_stack_size = 1000;
 
+    typedef Json json_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::member_type member_type;
     typedef typename Json::string_type string_type;
@@ -50,7 +51,7 @@ class basic_json_encoder : public basic_json_input_handler<typename Json::char_t
     bool is_valid_;
 
 public:
-    basic_json_encoder(const char_allocator& sa = char_allocator(),
+    json_encoder(const char_allocator& sa = char_allocator(),
                             const allocator_type& allocator = allocator_type())
         : sa_(sa),
           oa_(allocator),

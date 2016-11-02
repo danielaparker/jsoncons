@@ -302,7 +302,7 @@ using jsoncons::json_encoder;
 
 std::fstream is("tasks.csv");
 
-json_encoder handler;
+json_encoder<json> encoder;
 
 csv_parameters params;
 params.assume_header(true)
@@ -310,9 +310,9 @@ params.assume_header(true)
       .ignore_empty_values(true)
       .column_types({"integer","string","string","string"});
 
-csv_reader reader(is,handler,params);
+csv_reader reader(is,encoder,params);
 reader.read();
-json val = handler.get_result();
+json val = encoder.get_result();
 
 std::cout << pretty_print(val) << std::endl;
 ```

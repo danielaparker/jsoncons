@@ -468,16 +468,14 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_encoder
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_encoder
 
-typedef basic_json_encoder&lt;json&gt; json_encoder
-</code></pre>
-
-<p>The <code>json_encoder</code> class is an instantiation of the <code>basic_json_encoder</code> class template that uses <code>json</code> as the json type.</p>
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+json_encoder</pre></div>
 
 <h3>Header</h3>
 
-<pre><code>#include &lt;jsoncons/json.hpp&gt;
+<pre><code>#include &lt;jsoncons/json_encoder.hpp&gt;
 </code></pre>
 
 <h3>Base classes</h3>
@@ -495,8 +493,12 @@ typedef basic_json_encoder&lt;json&gt; json_encoder
 </thead>
 <tbody>
 <tr>
+<td><code>json_type</code></td>
+<td>Json</td>
+</tr>
+<tr>
 <td><code>allocator_type</code></td>
-<td>Allocator</td>
+<td>Json::allocator_type</td>
 </tr>
 </tbody>
 </table>
@@ -516,16 +518,16 @@ typedef basic_json_encoder&lt;json&gt; json_encoder
 <pre><code>bool is_valid() const
 </code></pre>
 
-<p>Checks if the <code>deserializer</code> contains a valid json value. The initial <code>is_valid()</code> is true (the value is an empty object), becomes false when a <code>do_begin_json</code> event is received, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
+<p>Checks if the <code>deserializer</code> contains a valid json_type value. The initial <code>is_valid()</code> is true (the value is an empty object), becomes false when a <code>do_begin_json</code> event is received, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
 
-<pre><code>json get_result()
+<pre><code>json_type get_result()
 </code></pre>
 
 <p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>. If before calling this function <code>is_valid()</code> is false, the behavior is undefined. After <code>get_result()</code> is called, 'is_valid()' becomes false.</p>
 
 <h3>Deprecated methods</h3>
 
-<pre><code>json&amp; root()
+<pre><code>json_type&amp; root()
 </code></pre>
 
 <p>Use the public member function <code>get_result()</code> instead</p>

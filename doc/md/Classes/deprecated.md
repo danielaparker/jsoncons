@@ -39,10 +39,10 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
     |to_stream|<em>&#x2713;</em>|Use write
     |`json` initializer-list constructor||Construct from `json::array` with initializer-list
-    |json_deserializer|<em>&#x2713;</em>|Use `json_encoder`
-    |wjson_deserializer|<em>&#x2713;</em>|Use `wjson_encoder`
-    |ojson_deserializer|<em>&#x2713;</em>|Use `ojson_encoder`
-    |wojson_deserializer|<em>&#x2713;</em>|Use `wojson_encoder`
+    |json_deserializer|<em>&#x2713;</em>|Use json_encoder<json>`
+    |wjson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wjson>`
+    |ojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<ojson>`
+    |wojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wojson>`
 json member types|any|<em>&#x2713;</em>|
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.

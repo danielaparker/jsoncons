@@ -29,15 +29,15 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values)
 
     std::istringstream is(input);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true)
           .column_types({"boolean","integer","float","string"});
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
     BOOST_CHECK(val[0]["bool-f"].is_null());
@@ -77,16 +77,16 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
 
     std::istringstream is(input);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true) 
           .column_types({"boolean","integer","float","string"})
           .column_defaults({"false","0","0.0","\"\""});
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
     BOOST_CHECK(val[0]["bool-f"].as<bool>() == false);
@@ -126,16 +126,16 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
 
     std::istringstream is(input);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true)
           .column_types({"boolean","integer","float","string"})
           .column_defaults({"","","",""});
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
     std::cout << pretty_print(val) << std::endl; 
 
     BOOST_CHECK(val[0]["bool-f"].is_null());
@@ -171,14 +171,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1)
     std::string text = "a\n1\n4";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.header_lines(1);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
     //std::cout << pretty_print(val) << std::endl; 
 
     BOOST_CHECK(val.size()==2);
@@ -193,13 +193,13 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col)
     std::string text = "1\n4";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -213,13 +213,13 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols)
     std::string text = "a,b,c\n1,2,3\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -241,14 +241,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
     std::string text = "a ,b ,c \n 1, 2, 3\n 4 , 5 , 6 ";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.trim_leading(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -270,14 +270,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_trailing)
     std::string text = "a ,b ,c \n 1, 2, 3\n 4 , 5 , 6 ";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.trim_trailing(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -299,15 +299,15 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
     std::string text = "a ,, \n 1, 2, 3\n 4 , 5 , 6 ";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.trim(true)
           .unquoted_empty_value_is_null(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -329,14 +329,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_comment)
     std::string text = "a,b,c\n#1,2,3\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.comment_starter('#');
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -354,14 +354,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col)
     std::string text = "a\n1\n4";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -375,14 +375,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols)
     std::string text = "a,b,c\n1,2,3\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -400,15 +400,15 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
     std::string text = "a,b,c\n1,2,3\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.column_names({"x","y","z"})
           .header_lines(1);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -426,16 +426,16 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
     std::string text = "a,b,c\n1,0,1\ntrue,FalSe,TrUe";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.column_names({"x","y","z"})
           .column_types({"boolean","boolean","boolean"})
           .header_lines(1);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -453,14 +453,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col_quoted)
     std::string text = "a\n\"1\"\n\"4\"";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     std::cout << pretty_print(val) << std::endl;
 
@@ -476,14 +476,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_quoted)
     std::string text = "a,b,c\n\"1\",\"2\",\"3\"\n4,5,\"6\"";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     std::cout << pretty_print(val) << std::endl;
 
@@ -503,13 +503,13 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_crlf)
     std::string text = "1\r\n4";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -523,13 +523,13 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_crlf)
     std::string text = "a,b,c\r\n1,2,3\r\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -551,14 +551,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col_crlf)
     std::string text = "a\r\n1\r\n4";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
@@ -572,14 +572,14 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
     std::string text = "a,b,c\r\n1,2,3\r\n4,5,6";
     std::istringstream is(text);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json val = handler.get_result();
+    json val = encoder.get_result();
 
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
@@ -597,14 +597,14 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
     std::string in_file = "input/countries.csv";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json countries = handler.get_result();
+    json countries = encoder.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
 }
@@ -614,15 +614,15 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
     std::string in_file = "input/countries.csv";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
 
     csv_parameters params;
     params.column_names({"Country Code","Name"})
           .header_lines(1);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json countries = handler.get_result();
+    json countries = encoder.get_result();
 
     std::cout << pretty_print(countries) << std::endl;
 }
@@ -632,10 +632,10 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
     std::string in_file = "input/countries.json";
     std::ifstream is(in_file);
 
-    json_encoder handler;
-    json_reader reader(is,handler);
+    json_encoder<json> encoder;
+    json_reader reader(is,encoder);
     reader.read_next();
-    json countries = handler.get_result();
+    json countries = encoder.get_result();
 
     csv_serializer serializer(std::cout);
 
@@ -647,14 +647,14 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     std::string in_file = "input/employees.txt";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     csv_parameters params;
     params.field_delimiter('\t')
           .assume_header(true);
 
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    json employees = handler.get_result();
+    json employees = encoder.get_result();
 
     std::cout << pretty_print(employees) << std::endl;
 }
@@ -664,13 +664,13 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     std::string in_file = "input/employees.json";
     std::ifstream is(in_file);
 
-    json_encoder handler;
+    json_encoder<json> encoder;
     csv_parameters params;
     params.field_delimiter('\t');
 
-    json_reader reader(is,handler);
+    json_reader reader(is,encoder);
     reader.read_next();
-    json employees = handler.get_result();
+    json employees = encoder.get_result();
 
     csv_serializer serializer(std::cout,params);
 

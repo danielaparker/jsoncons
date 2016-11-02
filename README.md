@@ -40,7 +40,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility) tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
 - `json_type_traits` specializations no longer require the `is_assignable` data member
-- The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`wojson_deserializer` have been deprecated (they still work) and renamed to `json_encoder`,`ojson_encoder`,`wjson_encoder`,`wojson_encoder`.  
+- The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`wojson_deserializer` have been deprecated (they still work) and replaced by `template <class Json> json_encoder`.  
 - The name `output_format` has been deprecated (it still works) and renamed to `serialization_options`.  
 - New `jsonpath` function `json_replace` that searches for all values that match a JsonPath expression and replaces them with a specified value.
 - If you have implemented your own custom filters that extend `json_filter`, you will have to make a change to your class. See the Changelog for details.
@@ -433,15 +433,15 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    ojson_encoder handler;
+    json_encoder<json> encoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types({"integer","string","string","string"});
-    csv_reader reader(is,handler,params);
+    csv_reader reader(is,encoder,params);
     reader.read();
-    ojson tasks = handler.get_result();
+    ojson tasks = encoder.get_result();
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 

@@ -468,15 +468,13 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::csv::csv_serializer
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>jsoncons::csv::csv_serializer</pre></div>
 
 <p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
 
 <h3>Header</h3>
 
-<pre><code>#include "jsoncons_ext/csv/csv_serializer.hpp"
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">"</span></span></pre></div>
 
 <h3>Constructors</h3>
 
@@ -508,14 +506,13 @@ You must ensure that the output stream exists as long as does <code>csv_serializ
 
 <h4>JSON input file</h4>
 
-<pre><code>[
-    ["country_code","name"],
-    ["ABW","ARUBA"],
-    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-    ["VUT","VANUATU"],
-    ["WLF","WALLIS &amp; FUTUNA ISLANDS"]
-]
-</code></pre>
+<div class="highlight highlight-source-json"><pre>[
+    [<span class="pl-s"><span class="pl-pds">"</span>country_code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>ABW<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ARUBA<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>ATF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>FRENCH SOUTHERN TERRITORIES, D.R. OF<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>VUT<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>VANUATU<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>WLF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>WALLIS &amp; FUTUNA ISLANDS<span class="pl-pds">"</span></span>]
+]</pre></div>
 
 <p>Note </p>
 
@@ -525,18 +522,17 @@ You must ensure that the output stream exists as long as does <code>csv_serializ
 
 <h4>Serializing the comma delimited file with csv_serializer</h4>
 
-<pre><code>std::string in_file = "input/countries.json";
-std::ifstream is(in_file);
+<div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/countries.json<span class="pl-pds">"</span></span>;
+std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder handler;
-json_reader reader(is,handler);
+json_encoder&lt;json&gt; encoder;
+json_reader <span class="pl-en">reader</span>(is,encoder);
 reader.read_next();
-json countries = handler.get_result();
+json countries = encoder.get_result();
 
-csv_serializer serializer(std::cout);
+csv_serializer <span class="pl-en">serializer</span>(std::cout);
 
-countries.write(serializer);
-</code></pre>
+countries.write(serializer);</pre></div>
 
 <h4>Output</h4>
 
@@ -551,37 +547,36 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 
 <h4>JSON input file</h4>
 
-<pre><code>[
+<div class="highlight highlight-source-json"><pre>[
     {
-        "dept":"sales",
-        "employee-name":"Smith, Matthew",
-        "employee-no":"00000001",
-        "note":"",
-        "salary":"150,000.00"
+        <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Smith, Matthew<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000001<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>150,000.00<span class="pl-pds">"</span></span>
     },
     {
-        "dept":"sales",
-        "employee-name":"Brown, Sarah",
-        "employee-no":"00000002",
-        "note":"",
-        "salary":"89,000.00"
+        <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Brown, Sarah<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000002<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>89,000.00<span class="pl-pds">"</span></span>
     },
     {
-        "dept":"finance",
-        "employee-name":"Oberc, Scott",
-        "employee-no":"00000003",
-        "salary":"110,000.00"
+        <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>finance<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Oberc, Scott<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>110,000.00<span class="pl-pds">"</span></span>
     },
     {
-        "dept":"sales",
-        "employee-name":"Scott, Colette",
-        "employee-no":"00000004",
-        "note":"\"Exemplary\" employee\nDependable, trustworthy",
-        "comment":"Team player",
-        "salary":"75,000.00"
+        <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Scott, Colette<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>employee-no<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>00000004<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span>Exemplary<span class="pl-cce">\"</span> employee<span class="pl-cce">\n</span>Dependable, trustworthy<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>comment<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Team player<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>75,000.00<span class="pl-pds">"</span></span>
     }
-]
-</code></pre>
+]</pre></div>
 
 <p>Note </p>
 
@@ -592,21 +587,20 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 
 <h4>Reading the tab delimited file with csv_serializer</h4>
 
-<pre><code>std::string in_file = "input/employees.json";
-std::ifstream is(in_file);
+<div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/employees.json<span class="pl-pds">"</span></span>;
+std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder handler;
+json_encoder&lt;json&gt; encoder;
 csv_parameters params;
-params.field_delimiter = '\t';
+params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>;
 
-json_reader reader(is,handler);
+json_reader <span class="pl-en">reader</span>(is,encoder);
 reader.read_next();
-json employees = handler.get_result();
+json employees = encoder.get_result();
 
-csv_serializer serializer(std::cout,params);
+csv_serializer <span class="pl-en">serializer</span>(std::cout,params);
 
-employees.write(serializer);
-</code></pre>
+employees.write(serializer);</pre></div>
 
 <h4>Tab delimited output file</h4>
 

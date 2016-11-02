@@ -91,11 +91,11 @@ BOOST_AUTO_TEST_CASE(test_output_input_adapter)
     std::string input = "\"String\"";
     std::istringstream is(input);
 
-    json_encoder handler;
-    basic_json_output_input_adapter<char> adapter(handler);
+    json_encoder<json> encoder;
+    basic_json_output_input_adapter<char> adapter(encoder);
     try
     {
-        json_reader reader(is,handler);
+        json_reader reader(is,encoder);
         reader.read_next();
     }
     catch (const std::exception&)
@@ -132,6 +132,23 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
 
     rename_name_filter filter("price","price2",serializer);
     j.write(filter);
+
+}
+
+BOOST_AUTO_TEST_CASE(test_chained_filters)
+{
+    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
+
+    std::cout << ("1\n") << j << std::endl;
+
+    json_encoder<ojson> encoder;
+
+    rename_name_filter filter("fourth", "third", encoder);
+
+    j.write(filter);
+    ojson j2 = encoder.get_result();
+
+    std::cout << ("2\n") << j2 << std::endl;
 
 }
 

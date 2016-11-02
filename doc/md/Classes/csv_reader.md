@@ -1,11 +1,13 @@
-    jsoncons::csv::csv_reader
+```c++
+jsoncons::csv::csv_reader
+```
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 
 ### Header
-
-    #include <jsoncons_ext/csv/csv_reader.hpp>
-
+```c++
+#include <jsoncons_ext/csv/csv_reader.hpp>
+```
 ### Constructors
 
     csv_reader(std::istream& is,
@@ -61,11 +63,11 @@ Throws [parse_exception](parse_exception) if parsing fails.
 
 #### Comma delimited input file 
 ```
-    country_code,name
-    ABW,ARUBA
-    ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-    VUT,VANUATU
-    WLF,WALLIS & FUTUNA ISLANDS
+country_code,name
+ABW,ARUBA
+ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+VUT,VANUATU
+WLF,WALLIS & FUTUNA ISLANDS
 ```
 Note 
 
@@ -74,37 +76,37 @@ Note
 
 #### Code
 ```c++
-    std::string in_file = "countries.csv";
-    std::ifstream is(in_file);
+std::string in_file = "countries.csv";
+std::ifstream is(in_file);
 
-    json_encoder handler;
+json_encoder<json> encoder;
 
-    csv_reader reader(is,handler);
-    reader.read();
-    json countries = handler.get_result();
+csv_reader reader(is,encoder);
+reader.read();
+json countries = encoder.get_result();
 
-    std::cout << pretty_print(countries) << std::endl;
+std::cout << pretty_print(countries) << std::endl;
 ```
 #### Output 
-```
-    [
-        ["country_code","name"],
-        ["ABW","ARUBA"],
-        ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
-        ["VUT","VANUATU"],
-        ["WLF","WALLIS & FUTUNA ISLANDS"]
-    ]
+```json
+[
+    ["country_code","name"],
+    ["ABW","ARUBA"],
+    ["ATF","FRENCH SOUTHERN TERRITORIES, D.R. OF"],
+    ["VUT","VANUATU"],
+    ["WLF","WALLIS & FUTUNA ISLANDS"]
+]
 ```
 ### Reading a tab delimted file into an array of json objects
 
 #### Tab delimited input file
 ```
-    employee-no employee-name   dept    salary  note
-    00000001    Smith, Matthew  sales   150,000.00      
-    00000002    Brown, Sarah    sales   89,000.00       
-    00000003    Oberc, Scott    finance 110,000.00      
-    00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
-    Dependable, trustworthy"
+employee-no employee-name   dept    salary  note
+00000001    Smith, Matthew  sales   150,000.00      
+00000002    Brown, Sarah    sales   89,000.00       
+00000003    Oberc, Scott    finance 110,000.00      
+00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
+Dependable, trustworthy"
 ```
 Note 
 
@@ -113,54 +115,54 @@ Note
 
 #### Code
 ```c++
-    std::string in_file = "employees.txt";
-    std::ifstream is(in_file);
+std::string in_file = "employees.txt";
+std::ifstream is(in_file);
 
-    json_encoder handler;
-    csv_parameters params;
-    params.field_delimiter = '\t'
-          .assume_header = true;
+json_encoder<json> encoder;
+csv_parameters params;
+params.field_delimiter = '\t'
+      .assume_header = true;
 
-    csv_reader reader(is,handler,params);
-    reader.read();
-    json employees = handler.get_result();
+csv_reader reader(is,encoder,params);
+reader.read();
+json employees = encoder.get_result();
 
-    std::cout << pretty_print(employees) << std::endl;
+std::cout << pretty_print(employees) << std::endl;
 ```
 
 #### Output
 
 ```json
-    [
-        {
-            "dept":"sales",
-            "employee-name":"Smith, Matthew",
-            "employee-no":"00000001",
-            "note":"",
-            "salary":"150,000.00"
-        },
-        {
-            "dept":"sales",
-            "employee-name":"Brown, Sarah",
-            "employee-no":"00000002",
-            "note":"",
-            "salary":"89,000.00"
-        },
-        {
-            "dept":"finance",
-            "employee-name":"Oberc, Scott",
-            "employee-no":"00000003",
-            "note":"",
-            "salary":"110,000.00"
-        },
-        {
-            "dept":"sales",
-            "employee-name":"Scott, Colette",
-            "employee-no":"00000004",
-            "note":"\"Exemplary\" employee\nDependable, trustworthy",
-            "salary":"75,000.00"
-        }
-    ]
+[
+    {
+        "dept":"sales",
+        "employee-name":"Smith, Matthew",
+        "employee-no":"00000001",
+        "note":"",
+        "salary":"150,000.00"
+    },
+    {
+        "dept":"sales",
+        "employee-name":"Brown, Sarah",
+        "employee-no":"00000002",
+        "note":"",
+        "salary":"89,000.00"
+    },
+    {
+        "dept":"finance",
+        "employee-name":"Oberc, Scott",
+        "employee-no":"00000003",
+        "note":"",
+        "salary":"110,000.00"
+    },
+    {
+        "dept":"sales",
+        "employee-name":"Scott, Colette",
+        "employee-no":"00000004",
+        "note":"\"Exemplary\" employee\nDependable, trustworthy",
+        "salary":"75,000.00"
+    }
+]
 ```
 
 #### Reading the comma delimited file as an array of objects with user supplied columns names
@@ -171,40 +173,40 @@ Note
 
 #### Code
 ```c++
-    std::string in_file = "countries.csv";
-    std::ifstream is(in_file);
+std::string in_file = "countries.csv";
+std::ifstream is(in_file);
 
-    json_encoder handler;
+json_encoder<json> encoder;
 
-    csv_parameters params;
-    params.column_names({"Country Code","Name"})
-          .header_lines(1);
+csv_parameters params;
+params.column_names({"Country Code","Name"})
+      .header_lines(1);
 
-    csv_reader reader(is,handler,params);
-    reader.read();
-    json countries = handler.get_result();
+csv_reader reader(is,encoder,params);
+reader.read();
+json countries = encoder.get_result();
 
-    std::cout << pretty_print(countries) << std::endl;
+std::cout << pretty_print(countries) << std::endl;
 ```
 
 #### Output 
 ```json
-    [
-        {
-            "Country Code":"ABW",
-            "Name":"ARUBA"
-        },
-        {
-            "Country Code":"ATF",
-            "Name":"FRENCH SOUTHERN TERRITORIES, D.R. OF"
-        },
-        {
-            "Country Code":"VUT",
-            "Name":"VANUATU"
-        },
-        {
-            "Country Code":"WLF",
-            "Name":"WALLIS & FUTUNA ISLANDS"
-        }
-    ]
+[
+    {
+        "Country Code":"ABW",
+        "Name":"ARUBA"
+    },
+    {
+        "Country Code":"ATF",
+        "Name":"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+    },
+    {
+        "Country Code":"VUT",
+        "Name":"VANUATU"
+    },
+    {
+        "Country Code":"WLF",
+        "Name":"WALLIS & FUTUNA ISLANDS"
+    }
+]
 ```
