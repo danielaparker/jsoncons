@@ -414,10 +414,10 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 
 <p>By default, within objects, arrays of scalar values are displayed on the same line.</p>
 
-<p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/output_format">output_format</a>, that allows custom formatting of output.
+<p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/serialization_options">serialization_options</a>, that allows custom formatting of output.
 To display the array scalar values on a new line, set the <code>object_array_split_lines</code> property to <code>line_split_kind::new_line</code>. The code</p>
 
-<div class="highlight highlight-source-c++"><pre>output_format format;
+<div class="highlight highlight-source-c++"><pre>serialization_options format;
 format.object_array_split_lines(line_split_kind::new_line);
 std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
@@ -437,7 +437,7 @@ std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
 <p>To display the elements of array values on multiple lines, set the <code>object_array_split_lines</code> property to <code>line_split_kind::multi_line</code>. The code</p>
 
-<div class="highlight highlight-source-c++"><pre>output_format format;
+<div class="highlight highlight-source-c++"><pre>serialization_options format;
 format.object_array_split_lines(line_split_kind::multi_line);
 std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
