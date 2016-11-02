@@ -305,7 +305,7 @@ int main()
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
 
-    ojson_serializer serializer(std::cout);
+    json_serializer serializer(std::cout);
 
     rename_name_filter filter("fourth","third",serializer);
     j.write(filter);

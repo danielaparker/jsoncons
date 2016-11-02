@@ -481,7 +481,7 @@ vertical-align:1px;
 {
     ojson j = <span class="pl-c1">ojson::parse</span>(<span class="pl-s"><span class="pl-pds">R"(</span>{"first":1,"second":2,"fourth":3}<span class="pl-pds">)"</span></span>);
 
-    ojson_serializer <span class="pl-smi">serializer</span>(std::cout);
+    json_serializer <span class="pl-smi">serializer</span>(std::cout);
 
     rename_name_filter <span class="pl-smi">filter</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>,serializer);
     j.<span class="pl-c1">write</span>(filter);

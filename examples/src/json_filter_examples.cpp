@@ -123,7 +123,7 @@ void change_member_name_example2()
 
     std::cout << ("1\n") << j << std::endl;
 
-    ojson_serializer serializer(std::cout);
+    json_serializer serializer(std::cout);
 
     rename_name_filter filter("fourth","third",serializer);
     j.write(filter);
