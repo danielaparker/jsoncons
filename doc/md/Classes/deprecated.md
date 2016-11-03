@@ -61,7 +61,8 @@ json_output_handler class|do_longlong_value(long long value)||Removed, override 
     |do_ulonglong_value(unsigned long long value)||Removed, override do_uinteger_value(uint64_t value)
     |do_double_value(double value)||Removed, override do_double_value(double value, uint8_t precision)
 basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
-json_filter|parent()|<em>&#x2713;</em>|Use input_handler()
+json_filter|parent()|<em>&#x2713;</em>|Use downstream_handler()
+           |input_handler()|<em>&#x2713;</em>|Use downstream_handler()
 csv_parameters|`header(std::string value)`|<em>&#x2713;</em>|Use `column_names(std::vector<std::string>> value)`
     |`data_types()`|<em>&#x2713;</em>|Use `column_types()`
     |`data_types(std::string value)`|<em>&#x2713;</em>|Use `column_types(std::vector<std::string>> value)`

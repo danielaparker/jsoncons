@@ -22,7 +22,7 @@ private:
         member_name_ = std::string(p, length);
         if (member_name_ != "name")
         {
-            this->input_handler().name(p, length, context);
+            this->downstream_handler().name(p, length, context);
         }
     }
 
@@ -34,14 +34,14 @@ private:
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            this->input_handler().name("first-name", context);
+            this->downstream_handler().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            this->input_handler().value(first, context);
+            this->downstream_handler().value(first, context);
             if (start_last != std::string::npos)
             {
-                this->input_handler().name("last-name", context);
+                this->downstream_handler().name("last-name", context);
                 std::string last = value.substr(start_last);
-                this->input_handler().value(last, context);
+                this->downstream_handler().value(last, context);
             }
             else
             {
@@ -52,7 +52,7 @@ private:
         }
         else
         {
-            this->input_handler().value(p, length, context);
+            this->downstream_handler().value(p, length, context);
         }
     }
 

@@ -10,6 +10,7 @@ Changes
 - The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`owjson_deserializer` have been deprecated (they still work) and replaced by `json_encoder<json>`, `json_encoder<ojson>`, `json_encoder<wjson>` and `json_encoder<owjson>`.  
 - The name `output_format` has been deprecated (it still works) and renamed to `serialization_options`.  
 - The name `wojson` has been deprecated (it still works) and renamed to `owjson`.  
+- The `json_filter` accessor `input_handler` has been deprecated (it still works) and renamed to `downstream_handler`.  
 
 New features
 

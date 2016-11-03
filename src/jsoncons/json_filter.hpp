@@ -268,7 +268,14 @@ public:
         return *output_handler_; 
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_input_handler<CharT>& input_handler()
+    {
+        return *input_handler_;
+    }
+#endif
+
+    basic_json_input_handler<CharT>& downstream_handler()
     {
         return *input_handler_;
     }
@@ -396,11 +403,11 @@ private:
         size_t len = std::min JSONCONS_NO_MACRO_EXP(name_.length(),length);
         if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
         {
-            this->input_handler().name(new_name_.data(),new_name_.length(),context);
+            this->downstream_handler().name(new_name_.data(),new_name_.length(),context);
         }
         else
         {
-            this->input_handler().name(p,length,context);
+            this->downstream_handler().name(p,length,context);
         }
     }
 };

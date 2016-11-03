@@ -29,6 +29,6 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
     operator json_output_handler&() 
 Adapts a `json_filter` to a `json_output_handler`
 
-    json_input_handler& input_handler()
-Returns a reference to the JSON input handler that will receive output json events. 
+    json_input_handler& downstream_handler()
+Returns a reference to the JSON handler that sends json events to downstream handlers. 
 

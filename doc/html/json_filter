@@ -504,10 +504,10 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
 
 <p>Adapts a <code>json_filter</code> to a <code>json_output_handler</code></p>
 
-<pre><code>json_input_handler&amp; input_handler()
+<pre><code>json_input_handler&amp; downstream_handler()
 </code></pre>
 
-<p>Returns a reference to the JSON input handler that will receive output json events. </p>
+<p>Returns a reference to the JSON handler that sends json events to downstream handlers. </p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

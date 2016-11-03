@@ -46,6 +46,7 @@ Note that changes introduced to the `json_filter` class have been reversed, if y
 - The name `output_format` has been deprecated (it still works) and renamed to `serialization_options`.  
 - The name `wojson` has been deprecated (it still works) and renamed to `owjson`.  
 - New `jsonpath` function `json_replace` that searches for all values that match a JsonPath expression and replaces them with a specified value.
+- The `json_filter` accessor `input_handler` has been deprecated (it still works) and renamed to `downstream_handler`.  
 
 ## Get jsoncons
 

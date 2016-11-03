@@ -833,7 +833,13 @@ vertical-align:1px;
 <td>json_filter</td>
 <td>parent()</td>
 <td><em>✓</em></td>
-<td>Use input_handler()</td>
+<td>Use downstream_handler()</td>
+</tr>
+<tr>
+<td></td>
+<td>input_handler()</td>
+<td><em>✓</em></td>
+<td>Use downstream_handler()</td>
 </tr>
 <tr>
 <td>csv_parameters</td>
