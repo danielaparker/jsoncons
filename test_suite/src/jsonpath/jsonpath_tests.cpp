@@ -17,7 +17,7 @@
 #include <new>
 #include <codecvt>
 #include <jsoncons/json.hpp>
-#include "jsoncons_ext/jsonpath/json_query.hpp"
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;

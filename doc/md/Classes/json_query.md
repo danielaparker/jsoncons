@@ -115,7 +115,7 @@ The examples below use the JSON text from [Stefan Goessner's JsonPath](http://go
 Our first example returns all authors whose books are cheaper than $10. 
     
     #include <jsoncons/json.hpp>
-    #include "jsoncons_ext/jsonpath/json_query.hpp"
+    #include <jsoncons_ext/jsonpath/json_query.hpp>
 
     using namespace jsoncons;
     using namespace jsoncons::jsonpath;

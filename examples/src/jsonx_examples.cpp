@@ -3,7 +3,7 @@
 
 #include <string>
 #include <jsoncons/json.hpp>
-#include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
+#include <jsoncons_ext/jsonx/jsonx_serializer.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonx;

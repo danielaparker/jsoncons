@@ -38,7 +38,7 @@ You must ensure that the output stream exists as long as does `jsonx_serializer`
 ### Examples
 ```
 #include <jsoncons/json.hpp>
-#include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
+#include <jsoncons_ext/jsonx/jsonx_serializer.hpp>
 #include <fstream>
 
 using namespace jsoncons;

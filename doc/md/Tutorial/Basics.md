@@ -182,7 +182,7 @@ The JSON output `booklist.json`
 ```c++
 #include <fstream>
 #include <jsoncons/json.hpp>
-#include "jsoncons_ext/jsonpath/json_query.hpp"
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 // For convenience
 using jsoncons::json;
