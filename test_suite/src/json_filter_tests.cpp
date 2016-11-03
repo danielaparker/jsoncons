@@ -20,12 +20,19 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_filter_test_suite)
 
-class my_json_filter : public json_filter
+struct warning
+{
+    std::string name;
+    size_t line_number;
+    size_t column_number;
+};
+
+class name_fix_up_filter : public json_filter
 {
 public:
-    std::vector<std::string> items;
+    std::vector<warning> warnings;
 
-    my_json_filter(json_output_handler& handler)
+    name_fix_up_filter(json_output_handler& handler)
         : json_filter(handler)
     {
     }
@@ -58,7 +65,9 @@ private:
             }
             else
             {
-                items.push_back(value);
+                warnings.push_back(warning{value,
+                                           this->context().line_number(),
+                                           this->context().column_number()});
             }
         }
         else
@@ -78,29 +87,36 @@ BOOST_AUTO_TEST_CASE(test_filter)
     std::ofstream os(out_file);
 
     json_serializer serializer(os, true);
-    my_json_filter filter(serializer);
+    name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
 
-    BOOST_CHECK_EQUAL(1,filter.items.size());
-    BOOST_CHECK_EQUAL("John", filter.items[0]);
+    BOOST_CHECK_EQUAL(1,filter.warnings.size());
+    BOOST_CHECK_EQUAL("John", filter.warnings[0].name);
+    BOOST_CHECK_EQUAL(9, filter.warnings[0].line_number);
+    BOOST_CHECK_EQUAL(26, filter.warnings[0].column_number);
 }
 
-BOOST_AUTO_TEST_CASE(test_output_input_adapter)
+BOOST_AUTO_TEST_CASE(test_filter2)
 {
-    std::string input = "\"String\"";
-    std::istringstream is(input);
+    std::string in_file = "input/address-book.json";
+    std::string out_file = "output/address-book-new.json";
+    std::ifstream is(in_file, std::ofstream::binary);
+    std::ofstream os(out_file);
 
-    json_encoder<json> encoder;
-    basic_json_output_input_adapter<char> adapter(encoder);
-    try
-    {
-        json_reader reader(is,encoder);
-        reader.read_next();
-    }
-    catch (const std::exception&)
-    {
-    }
+    json_serializer serializer(os, true);
+
+    name_fix_up_filter filter2(serializer);
+
+    rename_name_filter filter1("email","email2",filter2);
+
+    json_reader reader(is, filter1);
+    reader.read_next();
+
+    BOOST_CHECK_EQUAL(1,filter2.warnings.size());
+    BOOST_CHECK_EQUAL("John", filter2.warnings[0].name);
+    BOOST_CHECK_EQUAL(9, filter2.warnings[0].line_number);
+    BOOST_CHECK_EQUAL(26, filter2.warnings[0].column_number);
 }
 
 BOOST_AUTO_TEST_CASE(test_rename_name)
@@ -139,17 +155,18 @@ BOOST_AUTO_TEST_CASE(test_chained_filters)
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
 
-    std::cout << ("1\n") << j << std::endl;
-
     json_encoder<ojson> encoder;
 
-    rename_name_filter filter("fourth", "third", encoder);
+    rename_name_filter filter2("fifth", "fourth", encoder);
+    rename_name_filter filter1("fourth", "third", filter2);
 
-    j.write(filter);
+    j.write(filter1);
     ojson j2 = encoder.get_result();
-
-    std::cout << ("2\n") << j2 << std::endl;
-
+    BOOST_CHECK(j2.size() == 4);
+    BOOST_CHECK(j2["first"] == 1);
+    BOOST_CHECK(j2["second"] == 2);
+    BOOST_CHECK(j2["third"] == 3);
+    BOOST_CHECK(j2["fourth"] == 4);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
