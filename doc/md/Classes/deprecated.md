@@ -50,8 +50,7 @@ json member constants|null||Use static member function `json::null()`
     |an_array||Use assignment to `json::array()` or `json::make_array()` instead.
 json_encoder|json& root()|<em>&#x2713;</em>|json get_result()
 serialization|`output_format`|<em>&#x2713;</em>|Use `serialization_options`
-json_reader|read()|<em>&#x2713;</em>|Use read_next()
-    |max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
+json_reader|max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
     |max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const
     |json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
 json_input_handler class|do_longlong_value(long long value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)

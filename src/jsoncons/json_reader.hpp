@@ -156,12 +156,13 @@ public:
         return eof_;
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
     void read()
     {
         read_next();
+        check_done();
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     size_t max_depth() const
     {
         return parser_.max_nesting_depth();

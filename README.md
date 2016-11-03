@@ -299,26 +299,43 @@ See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20E
 You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
 
 ```c++
-#include "jsoncons/json.hpp"
-#include "jsoncons/json_filter.hpp"
+#include <sstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_filter.hpp>
 
 using namespace jsoncons;
 
 int main()
 {
-    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
+    std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
     json_serializer serializer(std::cout);
 
-    rename_name_filter filter("fourth","third",serializer);
-    j.write(filter);
+    // Filters can be chained
+    rename_name_filter filter2("fifth", "fourth", serializer);
+    rename_name_filter filter1("fourth", "third", filter2);
+
+    // A filter can be passed to any function that takes
+    // a json_input_handler ...
+    std::cout << "(1) ";
+    std::istringstream is(s);
+    json_reader reader(is, filter1);
+    reader.read();
+    std::cout << std::endl;
+
+    // or a json_output_handler    
+    std::cout << "(2) ";
+    ojson j = ojson::parse(s);
+    j.write(filter1);
+    std::cout << std::endl;
 }
 ```
 Output:
 ```json
-{"first":1,"second":2,"third":3}
+(1) {"first":1,"second":2,"third":3,"fourth":4}
+(2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [Transforming JSON with filters](https://github.com/danielaparker/jsoncons/wiki/Transforming%20JSON%20with%20filters) for details.
+Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
 
 ## Extensions
 

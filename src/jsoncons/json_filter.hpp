@@ -243,7 +243,7 @@ private:
     basic_json_input_output_adapter<CharT> input_output_adapter_;
     basic_json_output_input_adapter<CharT> output_input_adapter_;
     basic_json_output_handler<CharT>* output_handler_;
-    basic_json_input_handler<CharT>* input_handler_;
+    basic_json_input_handler<CharT>* downstream_handler_;
 
     basic_json_filter<CharT>(const basic_json_filter<CharT>&) = delete;
     basic_json_filter<CharT>& operator=(const basic_json_filter<CharT>&) = delete;
@@ -252,14 +252,14 @@ public:
         : input_output_adapter_(handler),
           output_input_adapter_(*this),
           output_handler_(std::addressof(output_input_adapter_)),
-          input_handler_(std::addressof(input_output_adapter_))
+          downstream_handler_(std::addressof(input_output_adapter_))
     {
     }
 
     basic_json_filter(basic_json_input_handler<CharT>& handler)
         : output_input_adapter_(*this),
           output_handler_(std::addressof(output_input_adapter_)),
-          input_handler_(std::addressof(handler))
+          downstream_handler_(std::addressof(handler))
     {
     }
 
@@ -271,85 +271,85 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_input_handler<CharT>& input_handler()
     {
-        return *input_handler_;
+        return *downstream_handler_;
     }
 #endif
 
     basic_json_input_handler<CharT>& downstream_handler()
     {
-        return *input_handler_;
+        return *downstream_handler_;
     }
 
 private:
     void do_begin_json() override
     {
-        input_handler_->begin_json();
+        downstream_handler_->begin_json();
     }
 
     void do_end_json() override
     {
-        input_handler_->end_json();
+        downstream_handler_->end_json();
     }
 
     void do_begin_object(const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->begin_object(context);
+        downstream_handler_->begin_object(context);
     }
 
     void do_end_object(const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->end_object(context);
+        downstream_handler_->end_object(context);
     }
 
     void do_begin_array(const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->begin_array(context);
+        downstream_handler_->begin_array(context);
     }
 
     void do_end_array(const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->end_array(context);
+        downstream_handler_->end_array(context);
     }
 
     void do_name(const CharT* name, size_t length,
                  const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->name(name, length,context);
+        downstream_handler_->name(name, length,context);
     }
 
     void do_string_value(const CharT* value, size_t length,
                          const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(value,length,context);
+        downstream_handler_->value(value,length,context);
     }
 
     void do_double_value(double value, uint8_t precision,
                  const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(value,precision,context);
+        downstream_handler_->value(value,precision,context);
     }
 
     void do_integer_value(int64_t value,
                  const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(value,context);
+        downstream_handler_->value(value,context);
     }
 
     void do_uinteger_value(uint64_t value,
                  const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(value,context);
+        downstream_handler_->value(value,context);
     }
 
     void do_bool_value(bool value,
                  const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(value,context);
+        downstream_handler_->value(value,context);
     }
 
     void do_null_value(const basic_parsing_context<CharT>& context) override
     {
-        input_handler_->value(null_type(),context);
+        downstream_handler_->value(null_type(),context);
     }
 
 };

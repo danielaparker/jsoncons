@@ -765,12 +765,6 @@ vertical-align:1px;
 </tr>
 <tr>
 <td>json_reader</td>
-<td>read()</td>
-<td><em>✓</em></td>
-<td>Use read_next()</td>
-</tr>
-<tr>
-<td></td>
 <td>max_depth() const</td>
 <td><em>✓</em></td>
 <td>Use max_nesting_depth() const</td>

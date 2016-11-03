@@ -27,6 +27,11 @@ You must ensure that the input stream and input handler exist as long as does `j
     bool eof() const
 Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
 
+    void read()
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
+Throws if there are any unconsumed non-whitespace characters left in the input.
+Throws [parse_exception](parse_exception) if parsing fails.
+
     void read_next()
 Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
 Throws [parse_exception](parse_exception) if parsing fails.

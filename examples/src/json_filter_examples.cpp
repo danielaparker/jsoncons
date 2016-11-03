@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <string>
+#include <sstream>
 #include "jsoncons/json.hpp"
 #include "jsoncons/json_filter.hpp"
 
@@ -89,47 +90,27 @@ void name_fix_up_example2()
 
 void change_member_name_example()
 {
-    json j;
-    try
-    {
-        j = json::parse(R"(
-{"store":
-{"book": [
-{"category": "reference",
-"author": "Margaret Weis",
-"title": "Dragonlance Series",
-"price": 31.96}, {"category": "reference",
-"author": "Brent Weeks",
-"title": "Night Angel Trilogy",
-"price": 14.70
-}]}}
-)");
-    }
-    catch (const parse_exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    std::cout << ("1\n") << pretty_print(j) << std::endl;
-
-    json_serializer serializer(std::cout, true);
-
-    rename_name_filter filter("price","price2",serializer);
-    j.write(filter);
-
-}
-
-void change_member_name_example2()
-{
-    ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3})");
-
-    std::cout << ("1\n") << j << std::endl;
+    std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
 
     json_serializer serializer(std::cout);
 
-    rename_name_filter filter("fourth","third",serializer);
-    j.write(filter);
+    // Filters can be chained
+    rename_name_filter filter2("fifth", "fourth", serializer);
+    rename_name_filter filter1("fourth", "third", filter2);
 
+    // A filter can be passed to any function that takes
+    // a json_input_handler ...
+    std::cout << "(1) ";
+    std::istringstream is(s);
+    json_reader reader(is, filter1);
+    reader.read();
+    std::cout << std::endl;
+
+    // or a json_output_handler    
+    std::cout << "(2) ";
+    ojson j = ojson::parse(s);
+    j.write(filter1);
+    std::cout << std::endl;
 }
 
 void json_filter_examples()
@@ -138,7 +119,6 @@ void json_filter_examples()
     name_fix_up_example1();
     name_fix_up_example2();
     change_member_name_example();
-    change_member_name_example2();
 
     std::cout << std::endl;
 }
