@@ -494,7 +494,10 @@ public:
         {
             *d = pred(*s);
         }
-        std::sort(members_.begin(),members_.end(),member_lt_member<value_type>());
+        std::stable_sort(members_.begin(),members_.end(),member_lt_member<value_type>());
+        auto it = std::unique(members_.rbegin(), members_.rend(),
+                              [](const value_type& a, const value_type& b){ return !(a.name().compare(b.name()));});
+        members_.erase(members_.begin(),it.base());
     }
 
     template <class T>

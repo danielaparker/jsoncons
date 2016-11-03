@@ -14,6 +14,17 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_test_suite)
 
+BOOST_AUTO_TEST_CASE(test_multiple_values)
+{
+    json j1 = json::parse(R"({"first":1,"second":2,"third":3})");
+    BOOST_CHECK_EQUAL(3,j1.size());
+    BOOST_CHECK_EQUAL(1,j1["first"].as<int>());
+
+    json j2 = json::parse(R"({"first":1,"second":2,"first":3})");
+    BOOST_CHECK_EQUAL(2,j2.size());
+    BOOST_CHECK_EQUAL(3,j2["first"].as<int>());
+}
+
 BOOST_AUTO_TEST_CASE(test_erase_member)
 {
     json o;
