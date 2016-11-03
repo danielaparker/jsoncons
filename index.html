@@ -463,6 +463,49 @@ std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 }</pre></div>
 
 <h3>
+<a id="filters" class="anchor" href="#filters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Filters</h3>
+
+<p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::string s = <span class="pl-s"><span class="pl-pds">R"(</span>{"first":1,"second":2,"fourth":3,"fifth":4}<span class="pl-pds">)"</span></span>;    
+
+    json_serializer <span class="pl-smi">serializer</span>(std::cout);
+
+    <span class="pl-c">// Filters can be chained</span>
+    rename_name_filter <span class="pl-smi">filter2</span>(<span class="pl-s"><span class="pl-pds">"</span>fifth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, serializer);
+    rename_name_filter <span class="pl-smi">filter1</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>, filter2);
+
+    <span class="pl-c">// A filter can be passed to any function that takes</span>
+    <span class="pl-c">// a json_input_handler ...</span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
+    std::istringstream <span class="pl-smi">is</span>(s);
+    json_reader <span class="pl-smi">reader</span>(is, filter1);
+    reader.<span class="pl-c1">read</span>();
+    std::cout &lt;&lt; std::endl;
+
+    <span class="pl-c">// or a json_output_handler    </span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
+    ojson j = <span class="pl-c1">ojson::parse</span>(s);
+    j.<span class="pl-c1">write</span>(filter1);
+    std::cout &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
+(<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
+
+<p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
+
+<h3>
 <a id="jsonpath" class="anchor" href="#jsonpath" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JsonPath</h3>
 
 <p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
@@ -499,7 +542,7 @@ std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 
 <p>JsonPath examples:</p>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> jsoncons::jsonpath::json_query;
 
