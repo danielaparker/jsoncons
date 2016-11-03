@@ -468,10 +468,9 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_filter
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_filter
 
-typedef basic_json_filter&lt;char&gt; json_filter
-</code></pre>
+<span class="pl-k">typedef</span> basic_json_filter&lt;<span class="pl-k">char</span>&gt; json_filter</pre></div>
 
 <p>The <code>json_filter</code> class is an instantiation of the <code>basic_json_filter</code> class template that uses <code>char</code> as the character type.</p>
 
@@ -482,7 +481,7 @@ typedef basic_json_filter&lt;char&gt; json_filter
 
 <h3>Base classes</h3>
 
-<p><a href="json_output_handler">json_output_handler</a></p>
+<p><a href="json_input_handler">json_input_handler</a></p>
 
 <h3>Constructors</h3>
 
@@ -500,15 +499,15 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
 
 <h3>Accessors</h3>
 
-<pre><code>operator json_input_handler&amp;() 
+<pre><code>operator json_output_handler&amp;() 
 </code></pre>
 
-<p>Adapts a <code>json_filter</code> to a <code>json_input_handler</code></p>
+<p>Adapts a <code>json_filter</code> to a <code>json_output_handler</code></p>
 
-<pre><code>json_output_handler&amp; output_handler()
+<pre><code>json_input_handler&amp; input_handler()
 </code></pre>
 
-<p>Returns a reference to the JSON result output handler. </p>
+<p>Returns a reference to the JSON input handler that will receive output json events. </p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

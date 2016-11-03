@@ -16,41 +16,43 @@ public:
     }
 
 private:
-    void do_name(const char* p, size_t length) override
+    void do_name(const char* p, size_t length, 
+                 const parsing_context& context) override
     {
         member_name_ = std::string(p, length);
         if (member_name_ != "name")
         {
-            this->output_handler().name(p, length);
+            this->input_handler().name(p, length, context);
         }
     }
 
-    void do_string_value(const char* p, size_t length) override
+    void do_string_value(const char* p, size_t length, 
+                         const parsing_context& context) override
     {
         if (member_name_ == "name")
         {
             std::string value(p, length);
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
-            this->output_handler().name("first-name");
+            this->input_handler().name("first-name", context);
             std::string first = value.substr(0, end_first);
-            this->output_handler().value(first);
+            this->input_handler().value(first, context);
             if (start_last != std::string::npos)
             {
-                this->output_handler().name("last-name");
+                this->input_handler().name("last-name", context);
                 std::string last = value.substr(start_last);
-                this->output_handler().value(last);
+                this->input_handler().value(last, context);
             }
             else
             {
                 std::cerr << "Incomplete name \"" << value
-                   << "\" at line " << this->context().line_number()
-                   << " and column " << this->context().column_number() << std::endl;
+                   << "\" at line " << context.line_number()
+                   << " and column " << context.column_number() << std::endl;
             }
         }
         else
         {
-            this->output_handler().value(p, length);
+            this->input_handler().value(p, length, context);
         }
     }
 

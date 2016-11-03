@@ -497,31 +497,6 @@ vertical-align:1px;
 <li>New filter class <code>rename_name</code> allows search and replace of <code>json</code> object member names</li>
 </ul>
 
-<p>Changes to <code>json_filter</code></p>
-
-<p>If you have implemented your own custom filters that extend <code>json_filter</code>, you will have to make a change to your class. </p>
-
-<ul>
-<li>The virtual methods <code>do_begin_object</code>, <code>do_end_object</code>, <code>do_name</code>, etc. now implement a <code>json_output_handler</code> (instead of a <code>json_input_handler</code>), so if you have a custom filter that implements e.g. <code>do_name</code>, you need to change</li>
-</ul>
-
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
-             <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
-{
-    <span class="pl-c">// Do something</span>
-}</pre></div>
-
-<p>to</p>
-
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length) <span class="pl-k">override</span>
-{
-    <span class="pl-c">// Do something</span>
-}</pre></div>
-
-<ul>
-<li>Method <code>input_handler</code> has been changed to <code>output_handler</code> (which now returns an output_handler)</li>
-</ul>
-
 <h2>0.99.3a</h2>
 
 <p>Changes</p>

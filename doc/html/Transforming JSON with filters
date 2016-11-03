@@ -519,6 +519,7 @@ vertical-align:1px;
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 
+
 <span class="pl-k">class</span> <span class="pl-en">name_fix_up_filter</span> : <span class="pl-k">public</span> <span class="pl-en">json_filter</span>
 {
 <span class="pl-k">public:</span>
@@ -528,41 +529,43 @@ vertical-align:1px;
     }
 
 <span class="pl-k">private:</span>
-    <span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length) <span class="pl-k">override</span>
+    <span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
+                 <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
     {
         member_name_ = <span class="pl-c1">std::string</span>(p, length);
         <span class="pl-k">if</span> (member_name_ != <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>)
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">name</span>(p, length);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">name</span>(p, length, context);
         }
     }
 
-    <span class="pl-k">void</span> <span class="pl-en">do_string_value</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length) <span class="pl-k">override</span>
+    <span class="pl-k">void</span> <span class="pl-en">do_string_value</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
+                         <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
     {
         <span class="pl-k">if</span> (member_name_ == <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>)
         {
             std::string <span class="pl-smi">value</span>(p, length);
             <span class="pl-c1">size_t</span> end_first = value.<span class="pl-c1">find_first_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>);
             <span class="pl-c1">size_t</span> start_last = value.<span class="pl-c1">find_first_not_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>, end_first);
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>first-name<span class="pl-pds">"</span></span>);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>first-name<span class="pl-pds">"</span></span>, context);
             std::string first = value.<span class="pl-c1">substr</span>(<span class="pl-c1">0</span>, end_first);
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">value</span>(first);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">value</span>(first, context);
             <span class="pl-k">if</span> (start_last != std::string::npos)
             {
-                <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>last-name<span class="pl-pds">"</span></span>);
+                <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>last-name<span class="pl-pds">"</span></span>, context);
                 std::string last = value.<span class="pl-c1">substr</span>(start_last);
-                <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">value</span>(last);
+                <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">value</span>(last, context);
             }
             <span class="pl-k">else</span>
             {
                 std::cerr &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Incomplete name <span class="pl-cce">\"</span><span class="pl-pds">"</span></span> &lt;&lt; value
-                   &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span> at line <span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-v">this</span>-&gt;<span class="pl-c1">context</span>().<span class="pl-c1">line_number</span>()
-                   &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> and column <span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-v">this</span>-&gt;<span class="pl-c1">context</span>().<span class="pl-c1">column_number</span>() &lt;&lt; std::endl;
+                   &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span> at line <span class="pl-pds">"</span></span> &lt;&lt; context.<span class="pl-c1">line_number</span>()
+                   &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> and column <span class="pl-pds">"</span></span> &lt;&lt; context.<span class="pl-c1">column_number</span>() &lt;&lt; std::endl;
             }
         }
         <span class="pl-k">else</span>
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">output_handler</span>().<span class="pl-c1">value</span>(p, length);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">input_handler</span>().<span class="pl-c1">value</span>(p, length, context);
         }
     }
 

@@ -237,7 +237,7 @@ private:
 };
 
 template <class CharT>
-class basic_json_filter : public basic_json_output_handler<CharT>
+class basic_json_filter : public basic_json_input_handler<CharT>
 {
 private:
     basic_json_input_output_adapter<CharT> input_output_adapter_;
@@ -249,99 +249,100 @@ private:
     basic_json_filter<CharT>& operator=(const basic_json_filter<CharT>&) = delete;
 public:
     basic_json_filter(basic_json_output_handler<CharT>& handler)
-        : input_output_adapter_(*this),
-          output_handler_(std::addressof(handler)),
-          input_handler_(std::addressof(input_output_adapter_))
-    {
-    }
-
-    basic_json_filter(basic_json_input_handler<CharT>& handler)
-        : input_output_adapter_(*this),
-          output_input_adapter_(handler),
+        : input_output_adapter_(handler),
+          output_input_adapter_(*this),
           output_handler_(std::addressof(output_input_adapter_)),
           input_handler_(std::addressof(input_output_adapter_))
     {
     }
 
-    operator basic_json_input_handler<CharT>&() 
+    basic_json_filter(basic_json_input_handler<CharT>& handler)
+        : output_input_adapter_(*this),
+          output_handler_(std::addressof(output_input_adapter_)),
+          input_handler_(std::addressof(handler))
+    {
+    }
+
+    operator basic_json_output_handler<CharT>&() 
     { 
-        return *input_handler_; 
+        return *output_handler_; 
     }
 
-    basic_json_output_handler<CharT>& output_handler()
+    basic_json_input_handler<CharT>& input_handler()
     {
-        return *output_handler_;
-    }
-
-    const basic_parsing_context<CharT>& context() const
-    {
-        return input_output_adapter_.context();
+        return *input_handler_;
     }
 
 private:
     void do_begin_json() override
     {
-        output_handler_->begin_json();
+        input_handler_->begin_json();
     }
 
     void do_end_json() override
     {
-        output_handler_->end_json();
+        input_handler_->end_json();
     }
 
-    void do_begin_object() override
+    void do_begin_object(const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->begin_object();
+        input_handler_->begin_object(context);
     }
 
-    void do_end_object() override
+    void do_end_object(const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->end_object();
+        input_handler_->end_object(context);
     }
 
-    void do_begin_array() override
+    void do_begin_array(const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->begin_array();
+        input_handler_->begin_array(context);
     }
 
-    void do_end_array() override
+    void do_end_array(const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->end_array();
+        input_handler_->end_array(context);
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(const CharT* name, size_t length,
+                 const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->name(name, length);
+        input_handler_->name(name, length,context);
     }
 
-    void do_string_value(const CharT* value, size_t length) override
+    void do_string_value(const CharT* value, size_t length,
+                         const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(value,length);
+        input_handler_->value(value,length,context);
     }
 
-    void do_double_value(double value, uint8_t precision) override
+    void do_double_value(double value, uint8_t precision,
+                 const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(value,precision);
+        input_handler_->value(value,precision,context);
     }
 
-    void do_integer_value(int64_t value) override
+    void do_integer_value(int64_t value,
+                 const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(value);
+        input_handler_->value(value,context);
     }
 
-    void do_uinteger_value(uint64_t value) override
+    void do_uinteger_value(uint64_t value,
+                 const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(value);
+        input_handler_->value(value,context);
     }
 
-    void do_bool_value(bool value) override
+    void do_bool_value(bool value,
+                 const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(value);
+        input_handler_->value(value,context);
     }
 
-    void do_null_value() override
+    void do_null_value(const basic_parsing_context<CharT>& context) override
     {
-        output_handler_->value(null_type());
+        input_handler_->value(null_type(),context);
     }
 
 };
@@ -389,16 +390,17 @@ public:
     }
 
 private:
-    void do_name(const CharT* p, size_t length) override
+    void do_name(const CharT* p, size_t length,
+                 const basic_parsing_context<CharT>& context) override
     {
         size_t len = std::min JSONCONS_NO_MACRO_EXP(name_.length(),length);
         if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
         {
-            this->output_handler().name(new_name_.data(),new_name_.length());
+            this->input_handler().name(new_name_.data(),new_name_.length(),context);
         }
         else
         {
-            this->output_handler().name(p,length);
+            this->input_handler().name(p,length,context);
         }
     }
 };

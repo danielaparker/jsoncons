@@ -1,6 +1,8 @@
-    jsoncons::json_filter
+```c++
+jsoncons::json_filter
 
-    typedef basic_json_filter<char> json_filter
+typedef basic_json_filter<char> json_filter
+```
 
 The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses `char` as the character type.
 
@@ -10,7 +12,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 ### Base classes
 
-[json_output_handler](json_output_handler)
+[json_input_handler](json_input_handler)
 
 ### Constructors
 
@@ -24,9 +26,9 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
 
 ### Accessors
 
-    operator json_input_handler&() 
-Adapts a `json_filter` to a `json_input_handler`
+    operator json_output_handler&() 
+Adapts a `json_filter` to a `json_output_handler`
 
-    json_output_handler& output_handler()
-Returns a reference to the JSON result output handler. 
+    json_input_handler& input_handler()
+Returns a reference to the JSON input handler that will receive output json events. 
 

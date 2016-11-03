@@ -17,27 +17,6 @@ New features
 - `json` class has new method `has_name`
 - New filter class `rename_name` allows search and replace of `json` object member names
 
-Changes to `json_filter`
-
-If you have implemented your own custom filters that extend `json_filter`, you will have to make a change to your class. 
-
-- The virtual methods `do_begin_object`, `do_end_object`, `do_name`, etc. now implement a `json_output_handler` (instead of a `json_input_handler`), so if you have a custom filter that implements e.g. `do_name`, you need to change
-```c++
-void do_name(const char* p, size_t length, 
-             const parsing_context& context) override
-{
-    // Do something
-}
-```
-to
-```c++
-void do_name(const char* p, size_t length) override
-{
-    // Do something
-}
-```   
-- Method `input_handler` has been changed to `output_handler` (which now returns an output_handler)
-
 0.99.3a
 -------
 
