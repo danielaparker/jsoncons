@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_count)
     json b = json::parse(
         "{\"key1\":\"a value\",\"key1\":\"another value\"}"
         );
-    BOOST_CHECK_EQUAL(2, b.count("key1"));
+    BOOST_CHECK_EQUAL(1, b.count("key1"));
 }
 
 BOOST_AUTO_TEST_CASE(test_find)

@@ -22,6 +22,84 @@
 
 namespace jsoncons {
 
+template <class Pointer,class Compare>
+struct compare_pointer
+{
+    Compare c_;
+
+    compare_pointer(Compare c)
+        : c_(c)
+    {
+    }
+    bool operator()(Pointer a, Pointer b)
+    {
+        return c_(*a,*b);
+    }
+};
+
+template <class ForwardIt,class Compare,class BinaryPredicate>
+ForwardIt unique_unsorted(ForwardIt first, ForwardIt last, Compare comp, BinaryPredicate predicate)
+{
+    if (first == last)
+    {
+        return last;
+    }
+    std::vector<typename ForwardIt::pointer> dups;
+    {
+        typedef typename ForwardIt::pointer pointer;
+
+        std::vector<pointer> v(std::distance(first,last));
+        auto p = v.begin();
+        for (auto it = first; it != last; ++it)
+        {
+            *p++ = &(*it);
+        }
+        compare_pointer<pointer,Compare> c(comp);
+        std::sort(v.begin(), v.end(), c);
+        auto it = v.begin();
+        auto end = v.end();
+        for (auto begin = it+1; begin != end; ++it, ++begin)
+        {
+            if (predicate(*(*it),*(*begin)))
+            {
+                dups.push_back(*it);
+            }
+        }
+    }
+    if (dups.size() == 0)
+    {
+        return last;
+    }
+
+    auto it = first;
+    for (auto p = first; p != last; ++p)
+    {
+        bool no_dup = true;
+        if (dups.size() > 0)
+        {
+            for (auto q = dups.begin(); no_dup && q != dups.end();)
+            {
+                if (predicate(*p,*(*q)))
+                {
+                    dups.erase(q);
+                    no_dup = false;
+                }
+                else
+                {
+                    ++q;
+                }
+            }
+        }
+        if (no_dup && it != p)
+        {
+            *it = std::move(*p);
+            ++it;
+        }
+    }
+    
+    return it;
+}
+
 template <class ValueT,class CharT>
 class member_lt_string
 {
@@ -762,6 +840,10 @@ public:
         {
             *d = pred(*s);
         }
+        auto it = unique_unsorted(members_.begin(), members_.end(),
+                                  member_lt_member<value_type>(),
+                              [](const value_type& a, const value_type& b){ return !(a.name().compare(b.name()));});
+        members_.erase(it,members_.end());
     }
 
     template <class T>

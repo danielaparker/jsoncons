@@ -14,61 +14,6 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_test_suite)
 
-template <class Iterator,class BinaryPredicate>
-Iterator unique_unsorted(Iterator first, Iterator last, BinaryPredicate predicate)
-{
-    if (first == last)
-    {
-        return last;
-    }
-    std::vector<typename Iterator::value_type> dups;
-    {
-        std::vector<typename Iterator::value_type> v(first,last);
-        std::sort(v.begin(), v.end());
-        auto begin = v.begin();
-        auto end = v.end();
-        for (auto it = begin; ++begin != end; ++it)
-        {
-            if (predicate(*it,*begin))
-            {
-                dups.push_back(*it);
-            }
-        }
-    }
-    if (dups.size() == 0)
-    {
-        return last;
-    }
-
-    auto it = first;
-    for (auto p = first; p != last; ++p)
-    {
-        bool no_dup = true;
-        if (dups.size() > 0)
-        {
-            for (auto q = dups.begin(); no_dup && q != dups.end();)
-            {
-                if (predicate(*p,*q))
-                {
-                    dups.erase(q);
-                    no_dup = false;
-                }
-                else
-                {
-                    ++q;
-                }
-            }
-        }
-        if (no_dup && it != p)
-        {
-            *it = std::move(*p);
-            ++it;
-        }
-    }
-    
-    return it;
-}
-
 BOOST_AUTO_TEST_CASE(test1)
 {
     std::vector<std::string> u = { "a","c","a","d","e","e","f","a" };
@@ -81,7 +26,36 @@ BOOST_AUTO_TEST_CASE(test1)
         std::cout << *p;
     }
     std::cout << std::endl;
-    auto it = unique_unsorted(u.begin(),u.end(),[](const std::string& a, const std::string& b){return a.compare(b) == 0;});
+    auto it = unique_unsorted(u.begin(),u.end(),
+                              std::greater<std::string>(),
+                              [](const std::string& a, const std::string& b){return a.compare(b) == 0;});
+    for (auto p = u.begin(); p != it; ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+
+}
+
+BOOST_AUTO_TEST_CASE(test2)
+{
+    std::vector<std::string> u = {"a","b","a"};
+    for (auto p = u.begin(); p != u.end(); ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+    auto it = unique_unsorted(u.begin(),u.end(),
+                               std::greater<std::string>(),
+                              [](const std::string& a, const std::string& b){return a.compare(b) == 0;});
     for (auto p = u.begin(); p != it; ++p)
     {
         if (p != u.begin())
@@ -106,7 +80,9 @@ BOOST_AUTO_TEST_CASE(test_no_dups)
         std::cout << *p;
     }
     std::cout << std::endl;
-    auto it = unique_unsorted(u.begin(),u.end(),[](const std::string& a, const std::string& b){return a.compare(b) == 0;});
+    auto it = unique_unsorted(u.begin(),u.end(),
+                              std::greater<std::string>(),
+                              [](const std::string& a, const std::string& b){return a.compare(b) == 0;});
     for (auto p = u.begin(); p != it; ++p)
     {
         if (p != u.begin())
@@ -118,16 +94,30 @@ BOOST_AUTO_TEST_CASE(test_no_dups)
     std::cout << std::endl;
 
 }
-/*
+
 BOOST_AUTO_TEST_CASE(test_multiple_values)
 {
     json j1 = json::parse(R"({"first":1,"second":2,"third":3})");
     BOOST_CHECK_EQUAL(3,j1.size());
     BOOST_CHECK_EQUAL(1,j1["first"].as<int>());
+    BOOST_CHECK_EQUAL(2,j1["second"].as<int>());
+    BOOST_CHECK_EQUAL(3,j1["third"].as<int>());
 
     json j2 = json::parse(R"({"first":1,"second":2,"first":3})");
     BOOST_CHECK_EQUAL(2,j2.size());
     BOOST_CHECK_EQUAL(3,j2["first"].as<int>());
+    BOOST_CHECK_EQUAL(2,j2["second"].as<int>());
+
+    ojson oj1 = ojson::parse(R"({"first":1,"second":2,"third":3})");
+    BOOST_CHECK_EQUAL(3,oj1.size());
+    BOOST_CHECK_EQUAL(1,oj1["first"].as<int>());
+    BOOST_CHECK_EQUAL(2,oj1["second"].as<int>());
+    BOOST_CHECK_EQUAL(3,oj1["third"].as<int>());
+
+    ojson oj2 = ojson::parse(R"({"first":1,"second":2,"first":3})");
+    BOOST_CHECK_EQUAL(2,oj2.size());
+    BOOST_CHECK_EQUAL(3,oj2["first"].as<int>());
+    BOOST_CHECK_EQUAL(2,oj2["second"].as<int>());
 }
 
 BOOST_AUTO_TEST_CASE(test_erase_member)
@@ -428,6 +418,6 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
 
     //*it = member; // Don't want this to compile
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()
 
