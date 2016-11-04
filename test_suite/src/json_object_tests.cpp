@@ -14,6 +14,111 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_test_suite)
 
+template <class Iterator,class BinaryPredicate>
+Iterator unique_unsorted(Iterator first, Iterator last, BinaryPredicate predicate)
+{
+    if (first == last)
+    {
+        return last;
+    }
+    std::vector<typename Iterator::value_type> dups;
+    {
+        std::vector<typename Iterator::value_type> v(first,last);
+        std::sort(v.begin(), v.end());
+        auto begin = v.begin();
+        auto end = v.end();
+        for (auto it = begin; ++begin != end; ++it)
+        {
+            if (predicate(*it,*begin))
+            {
+                dups.push_back(*it);
+            }
+        }
+    }
+    if (dups.size() == 0)
+    {
+        return last;
+    }
+
+    auto it = first;
+    for (auto p = first; p != last; ++p)
+    {
+        bool no_dup = true;
+        if (dups.size() > 0)
+        {
+            for (auto q = dups.begin(); no_dup && q != dups.end();)
+            {
+                if (predicate(*p,*q))
+                {
+                    dups.erase(q);
+                    no_dup = false;
+                }
+                else
+                {
+                    ++q;
+                }
+            }
+        }
+        if (no_dup && it != p)
+        {
+            *it = std::move(*p);
+            ++it;
+        }
+    }
+    
+    return it;
+}
+
+BOOST_AUTO_TEST_CASE(test1)
+{
+    std::vector<std::string> u = { "a","c","a","d","e","e","f","a" };
+    for (auto p = u.begin(); p != u.end(); ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+    auto it = unique_unsorted(u.begin(),u.end(),[](const std::string& a, const std::string& b){return a.compare(b) == 0;});
+    for (auto p = u.begin(); p != it; ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+
+}
+
+BOOST_AUTO_TEST_CASE(test_no_dups)
+{
+    std::vector<std::string> u = { "a","b","f","e","c","d"};
+    for (auto p = u.begin(); p != u.end(); ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+    auto it = unique_unsorted(u.begin(),u.end(),[](const std::string& a, const std::string& b){return a.compare(b) == 0;});
+    for (auto p = u.begin(); p != it; ++p)
+    {
+        if (p != u.begin())
+        {
+            std::cout << ",";
+        }
+        std::cout << *p;
+    }
+    std::cout << std::endl;
+
+}
+/*
 BOOST_AUTO_TEST_CASE(test_multiple_values)
 {
     json j1 = json::parse(R"({"first":1,"second":2,"third":3})");
@@ -323,6 +428,6 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
 
     //*it = member; // Don't want this to compile
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
 
