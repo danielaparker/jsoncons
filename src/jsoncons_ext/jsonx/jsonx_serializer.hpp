@@ -110,13 +110,17 @@ struct jsonx_char_traits<wchar_t>
 template <class CharT>
 void escape_attribute(const CharT* s,
                       size_t length,
-                      const basic_serialization_options<CharT>& format,
-                      buffered_ostream<CharT>& bos)
+                      const basic_serialization_options<CharT>& options,
+                      buffered_output<CharT>& bos)
 {
-    (void)format;
+    std::basic_ostringstream<CharT> oss;
+    buffered_output<CharT> boos(oss);
+    jsoncons::escape_string(s,length,options,boos);
+    boos.flush();
+    std::basic_string<CharT> str = oss.str();
 
-    const CharT* begin = s;
-    const CharT* end = s + length;
+    const CharT* begin = str.data();
+    const CharT* end = str.data() + str.length();
     for (const CharT* it = begin; it != end; ++it)
     {
         CharT c = *it;
@@ -192,13 +196,18 @@ void escape_attribute(const CharT* s,
 template <class CharT>
 void escape_value(const CharT* s,
                   size_t length,
-                  const basic_serialization_options<CharT>& format,
-                  buffered_ostream<CharT>& bos)
+                  const basic_serialization_options<CharT>& options,
+                  buffered_output<CharT>& bos)
 {
-    (void)format;
+    std::basic_ostringstream<CharT> oss;
+    buffered_output<CharT> boos(oss);
+    jsoncons::escape_string(s,length,options,boos);
+    boos.flush();
+    std::basic_string<CharT> str = oss.str();
 
-    const CharT* begin = s;
-    const CharT* end = s + length;
+    const CharT* begin = str.data();
+    const CharT* end = str.data() + str.length();
+
     for (const CharT* it = begin; it != end; ++it)
     {
         CharT c = *it;
@@ -240,8 +249,8 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
         bool is_object_;
         std::basic_string<CharT> name_;
     };
-    buffered_ostream<CharT> bos_;
-    basic_serialization_options<CharT> format_;
+    buffered_output<CharT> bos_;
+    basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
@@ -252,11 +261,11 @@ public:
     basic_jsonx_serializer(std::basic_ostream<CharT>& os)
        :
        bos_(os),
-       format_(),
+       options_(),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       fp_(format_.precision()),
+       fp_(options_.precision()),
        indenting_(false),
        indent_(0)
     {
@@ -264,35 +273,35 @@ public:
     basic_jsonx_serializer(std::basic_ostream<CharT>& os, bool indenting)
        :
        bos_(os),
-       format_(),
+       options_(),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       fp_(format_.precision()),
+       fp_(options_.precision()),
        indenting_(indenting),
        indent_(0)
     {
     }
-    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format)
+    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options)
        :
        bos_(os),
-       format_(format),
+       options_(options),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       fp_(format.precision()),
+       fp_(options.precision()),
        indenting_(false),
        indent_(0)
     {
     }
-    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format, bool indenting)
+    basic_jsonx_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options, bool indenting)
        :
        bos_(os),
-       format_(format),
+       options_(options),
        stack_(),
        original_precision_(),
        original_format_flags_(),
-       fp_(format.precision()),
+       fp_(options.precision()),
        indenting_(indenting),
        indent_(0)
     {
@@ -340,7 +349,7 @@ private:
                            jsonx_char_traits<CharT>::object_name_element_literal().length());
                 escape_attribute(stack_.back().name_.data(),
                                  stack_.back().name_.length(),
-                                 format_,
+                                 options_,
                                  bos_);
                 bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                            jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -391,7 +400,7 @@ private:
                            jsonx_char_traits<CharT>::array_name_element_literal().length());
                 escape_attribute(stack_.back().name_.data(),
                                  stack_.back().name_.length(),
-                                 format_,
+                                 options_,
                                  bos_);
                 bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                            jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -441,7 +450,7 @@ private:
                        jsonx_char_traits<CharT>::null_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -470,7 +479,7 @@ private:
                        jsonx_char_traits<CharT>::string_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -480,7 +489,7 @@ private:
             bos_.write(jsonx_char_traits<CharT>::string_element_literal().data(),
                        jsonx_char_traits<CharT>::string_element_literal().length());
         }
-        escape_value(val,length,format_,bos_);
+        escape_value(val,length,options_,bos_);
         bos_.write(jsonx_char_traits<CharT>::end_string_element_literal().data(),
                    jsonx_char_traits<CharT>::end_string_element_literal().length());
     }
@@ -498,7 +507,7 @@ private:
                        jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -508,17 +517,17 @@ private:
             bos_.write(jsonx_char_traits<CharT>::number_element_literal().data(),
                        jsonx_char_traits<CharT>::number_element_literal().length());
         }
-        if (is_nan(value) && format_.replace_nan())
+        if (is_nan(value) && options_.replace_nan())
         {
-            bos_.write(format_.nan_replacement());
+            bos_.write(options_.nan_replacement());
         }
-        else if (is_pos_inf(value) && format_.replace_pos_inf())
+        else if (is_pos_inf(value) && options_.replace_pos_inf())
         {
-            bos_.write(format_.pos_inf_replacement());
+            bos_.write(options_.pos_inf_replacement());
         }
-        else if (is_neg_inf(value) && format_.replace_neg_inf())
+        else if (is_neg_inf(value) && options_.replace_neg_inf())
         {
-            bos_.write(format_.neg_inf_replacement());
+            bos_.write(options_.neg_inf_replacement());
         }
         else
         {
@@ -541,7 +550,7 @@ private:
                        jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -569,7 +578,7 @@ private:
                        jsonx_char_traits<CharT>::number_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -597,7 +606,7 @@ private:
                        jsonx_char_traits<CharT>::boolean_name_element_literal().length());
             escape_attribute(stack_.back().name_.data(),
                              stack_.back().name_.length(),
-                             format_,
+                             options_,
                              bos_);
             bos_.write(jsonx_char_traits<CharT>::end_tag_literal().data(),
                        jsonx_char_traits<CharT>::end_tag_literal().length());
@@ -623,12 +632,12 @@ private:
 
     void indent()
     {
-        indent_ += static_cast<int>(format_.indent());
+        indent_ += static_cast<int>(options_.indent());
     }
 
     void unindent()
     {
-        indent_ -= static_cast<int>(format_.indent());
+        indent_ -= static_cast<int>(options_.indent());
     }
 
     void write_indent()

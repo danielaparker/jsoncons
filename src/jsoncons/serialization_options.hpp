@@ -24,7 +24,7 @@ enum class block_options {next_line,same_line};
 #endif
 
 template <class CharT>
-class buffered_ostream;
+class buffered_output;
 
 enum class line_split_kind{same_line,new_line,multi_line};
 
@@ -242,7 +242,7 @@ template<class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    const basic_serialization_options<CharT>& format,
-                   buffered_ostream<CharT>& os)
+                   buffered_output<CharT>& os)
 {
     const CharT* begin = s;
     const CharT* end = s + length;

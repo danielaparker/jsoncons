@@ -54,7 +54,7 @@ template <class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    CharT quote_char, CharT quote_escape_char,
-                   buffered_ostream<CharT>& os)
+                   buffered_output<CharT>& os)
 {
     const CharT* begin = s;
     const CharT* end = s + length;
@@ -91,12 +91,12 @@ class basic_csv_serializer : public basic_json_output_handler<CharT>
         size_t count_;
         bool skip_;
     };
-    buffered_ostream<CharT> os_;
+    buffered_output<CharT> os_;
     basic_csv_parameters<CharT> parameters_;
     basic_serialization_options<CharT> format_;
     std::vector<stack_item> stack_;
     std::basic_ostringstream<CharT> header_oss_;
-    buffered_ostream<CharT> header_os_;
+    buffered_output<CharT> header_os_;
     std::map<std::basic_string<CharT>,size_t> header_;
     float_printer<CharT> fp_;
 public:
@@ -317,7 +317,7 @@ private:
         }
     }
 
-    void value(const CharT* val, size_t length, buffered_ostream<CharT>& os)
+    void value(const CharT* val, size_t length, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -337,7 +337,7 @@ private:
         end_value();
     }
 
-    void value(double val, buffered_ostream<CharT>& os)
+    void value(double val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -362,7 +362,7 @@ private:
 
     }
 
-    void value(int64_t val, buffered_ostream<CharT>& os)
+    void value(int64_t val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -373,7 +373,7 @@ private:
         end_value();
     }
 
-    void value(uint64_t val, buffered_ostream<CharT>& os)
+    void value(uint64_t val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -384,7 +384,7 @@ private:
         end_value();
     }
 
-    void value(bool val, buffered_ostream<CharT>& os) 
+    void value(bool val, buffered_output<CharT>& os) 
     {
         begin_value(os);
 
@@ -402,7 +402,7 @@ private:
         end_value();
     }
 
-    void do_null_value(buffered_ostream<CharT>& os) 
+    void do_null_value(buffered_output<CharT>& os) 
     {
         begin_value(os);
         auto buf = json_text_traits<CharT>::null_literal();
@@ -411,7 +411,7 @@ private:
 
     }
 
-    void begin_value(buffered_ostream<CharT>& os)
+    void begin_value(buffered_output<CharT>& os)
     {
         if (!stack_.empty())
         {

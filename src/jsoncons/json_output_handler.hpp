@@ -13,7 +13,7 @@
 namespace jsoncons {
 
 template<class CharT> 
-void print_integer(int64_t value, buffered_ostream<CharT>& os)
+void print_integer(int64_t value, buffered_output<CharT>& os)
 {
     CharT buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
@@ -34,7 +34,7 @@ void print_integer(int64_t value, buffered_ostream<CharT>& os)
 }
 
 template<class CharT>
-void print_uinteger(uint64_t value, buffered_ostream<CharT>& os)
+void print_uinteger(uint64_t value, buffered_output<CharT>& os)
 {
     CharT buf[255];
     CharT* p = buf;

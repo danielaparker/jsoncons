@@ -26,7 +26,7 @@ namespace jsoncons
 {
 
 template <class CharT>
-class buffered_ostream
+class buffered_output
 {
     static const size_t default_buffer_length = 16384;
 
@@ -36,11 +36,11 @@ class buffered_ostream
     const CharT* const end_buffer_;
     CharT* p_;
 public:
-    buffered_ostream(std::basic_ostream<CharT>& os)
+    buffered_output(std::basic_ostream<CharT>& os)
         : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
     {
     }
-    ~buffered_ostream()
+    ~buffered_output()
     {
         os_->write(begin_buffer_, (p_ - begin_buffer_));
         os_->flush();
@@ -99,7 +99,7 @@ public:
         : precision_(precision)
     {
     }
-    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
+    void print(double val, uint8_t precision, buffered_output<CharT>& os)
     {
         uint8_t prec = (precision == 0) ? precision_ : precision;
 
@@ -176,7 +176,7 @@ public:
         oss_.imbue(std::locale::classic());
         oss_.precision(precision);
     }
-    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
+    void print(double val, uint8_t precision, buffered_output<CharT>& os)
     {
         oss_.clear_sequence();
         oss_.precision((precision == 0) ? precision_ : precision);
@@ -258,7 +258,7 @@ public:
     {
     }
 
-    void print(double val, uint8_t precision, buffered_ostream<CharT>& os)
+    void print(double val, uint8_t precision, buffered_output<CharT>& os)
     {
         char buf[_CVTBUFSIZE];
         int decimal_point = 0;
