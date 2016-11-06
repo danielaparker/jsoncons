@@ -499,7 +499,7 @@ vertical-align:1px;
 )");
 
 ojson::member_type member = o.object_range().begin()[1];
-std::cout &lt;&lt; member.name() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
+std::cout &lt;&lt; member.key() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
 </code></pre>
 
 <ul>

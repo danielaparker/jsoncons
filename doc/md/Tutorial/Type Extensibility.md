@@ -49,9 +49,9 @@ namespace jsoncons
         static bool is(const Json& rhs) noexcept
         {
             return rhs.is_object() &&
-                   rhs.has_name("author") && 
-                   rhs.has_name("title") && 
-                   rhs.has_name("price");
+                   rhs.has_key("author") && 
+                   rhs.has_key("title") && 
+                   rhs.has_key("price");
         }
         static book as(const Json& rhs)
         {

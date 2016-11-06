@@ -714,6 +714,12 @@ vertical-align:1px;
 <td>Use owjson`</td>
 </tr>
 <tr>
+<td></td>
+<td>member_type name()</td>
+<td><em>✓</em></td>
+<td>Use key()</td>
+</tr>
+<tr>
 <td>json member types</td>
 <td>any</td>
 <td><em>✓</em></td>

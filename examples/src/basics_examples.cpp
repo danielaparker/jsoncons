@@ -91,7 +91,7 @@ void basics_json_example1()
     //Loop through the book members using a range-based for loop    
     for(auto member : book.object_range())
     {
-        std::cout << member.name()
+        std::cout << member.key()
                   << ","
                   << member.value() << std::endl;
     }
@@ -102,7 +102,7 @@ void basics_json_example1()
         // member "author" found
     }
 
-    if (book.has_name("author"))
+    if (book.has_key("author"))
     {
         // book has member "author"
     }
@@ -244,7 +244,7 @@ void basics_wjson_example1()
     //Loop through the book members using a range-based for loop    
     for(const auto& member : book.object_range())
     {
-        std::wcout << member.name()
+        std::wcout << member.key()
                    << L","
                    << member.value() << std::endl;
     }
@@ -255,7 +255,7 @@ void basics_wjson_example1()
         // book has member "author"
     }
 
-    if (book.has_name(L"author"))
+    if (book.has_key(L"author"))
     {
         // book has member "author"
     }

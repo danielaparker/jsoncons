@@ -563,7 +563,7 @@ json&amp; book = booklist[<span class="pl-c1">1</span>];
 <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.object_range())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">name</span>()
+    std::cout &lt;&lt; member.<span class="pl-c1">key</span>()
               &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }
@@ -574,7 +574,7 @@ json&amp; book = booklist[<span class="pl-c1">1</span>];
     <span class="pl-c">// member "author" found</span>
 }
 
-<span class="pl-k">if</span> (book.has_name(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>))
+<span class="pl-k">if</span> (book.has_key(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>))
 {
     <span class="pl-c">// book has a member "author"</span>
 }
@@ -806,7 +806,7 @@ wjson&amp; book = booklist[<span class="pl-c1">1</span>];
 <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.object_range())
 {
-    std::wcout &lt;&lt; member.<span class="pl-c1">name</span>()
+    std::wcout &lt;&lt; member.<span class="pl-c1">key</span>()
                &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span>
                &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }
@@ -817,7 +817,7 @@ wjson&amp; book = booklist[<span class="pl-c1">1</span>];
     <span class="pl-c">// member "author" found</span>
 }
 
-<span class="pl-k">if</span> (book.has_name(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>))
+<span class="pl-k">if</span> (book.has_key(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>))
 {
     <span class="pl-c">// book has a member "author"</span>
 }

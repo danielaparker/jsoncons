@@ -515,9 +515,9 @@ standard library collections of book objects to and from <code>json</code> value
         <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
         {
             <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
         }
         <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
         {

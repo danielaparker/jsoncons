@@ -175,7 +175,7 @@ json book = json::object{
 
 for (const auto& member : book.object_range())
 {
-    std::cout << member.name() << "=" 
+    std::cout << member.key() << "=" 
               << member.value() << std::endl;
 }
 ```

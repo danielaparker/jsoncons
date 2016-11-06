@@ -89,7 +89,7 @@ Loop through the members of the third book element, using a range-based for loop
 ```c++
 for (const auto& member : books[2].object_range())
 {
-    std::cout << member.name() << "=" 
+    std::cout << member.key() << "=" 
               << member.value() << std::endl;
 }
 ```
@@ -101,7 +101,7 @@ for (auto it = books[2].object_range().begin();
      it != books[2].object_range().end();
      ++it)
 {
-    std::cout << (*it).name() << "=" 
+    std::cout << (*it).key() << "=" 
               << (*it).value() << std::endl;
 } 
 ```
@@ -122,9 +122,9 @@ So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++
 std::string price = book.get_with_default("price","n/a");
 ```
-Or you can check if book has a member "price" with the method `has_name`, and output accordingly,
+Or you can check if book has a member "price" with the method `has_key`, and output accordingly,
 ```c++
-if (book.has_name("price"))
+if (book.has_key("price"))
 {
     double price = book["price"].as<double>();
     std::cout << price;
@@ -726,9 +726,9 @@ namespace jsoncons
         static bool is(const Json& rhs) noexcept
         {
             return rhs.is_object() &&
-                   rhs.has_name("author") && 
-                   rhs.has_name("title") && 
-                   rhs.has_name("price");
+                   rhs.has_key("author") && 
+                   rhs.has_key("title") && 
+                   rhs.has_key("price");
         }
         static book as(const Json& rhs)
         {

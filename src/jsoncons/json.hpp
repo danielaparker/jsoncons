@@ -1048,9 +1048,9 @@ public:
             return evaluate().count(name);
         }
 
-        bool has_name(const string_type& name) const
+        bool has_key(const string_type& name) const
         {
-            return evaluate().has_name(name);
+            return evaluate().has_key(name);
         }
 
         bool is_null() const JSONCONS_NOEXCEPT
@@ -2003,7 +2003,7 @@ public:
         return var_.type_id() == value_types::null_t;
     }
 
-    bool has_name(const string_type& name) const
+    bool has_key(const string_type& name) const
     {
         switch (var_.type_id())
         {

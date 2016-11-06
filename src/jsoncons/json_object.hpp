@@ -112,14 +112,14 @@ public:
 
     bool operator()(const ValueT& a, const CharT* b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.name().data(),b,len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),length_);
+        int result = std::char_traits<CharT>::compare(a.key().data(),b,len);
         if (result != 0)
         {
             return result < 0;
         }
 
-        return a.name().length() < length_;
+        return a.key().length() < length_;
     }
 };
 
@@ -135,14 +135,14 @@ public:
 
     bool operator()(const CharT* a, const ValueT& b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(b.name().length(),length_);
-        int result = std::char_traits<CharT>::compare(a, b.name().data(),len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(b.key().length(),length_);
+        int result = std::char_traits<CharT>::compare(a, b.key().data(),len);
         if (result != 0)
         {
             return result < 0;
         }
 
-        return length_ < b.name().length();
+        return length_ < b.key().length();
     }
 };
 
@@ -172,19 +172,19 @@ class member_lt_member
 public:
     bool operator()(const ValueT& a, const ValueT& b) const
     {
-        if (a.name().length() == b.name().length())
+        if (a.key().length() == b.key().length())
         {
-            return std::char_traits<char_type>::compare(a.name().data(),b.name().data(),a.name().length()) < 0;
+            return std::char_traits<char_type>::compare(a.key().data(),b.key().data(),a.key().length()) < 0;
         }
 
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),b.name().length());
-        int result = std::char_traits<char_type>::compare(a.name().data(),b.name().data(),len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),b.key().length());
+        int result = std::char_traits<char_type>::compare(a.key().data(),b.key().data(),len);
         if (result != 0)
         {
             return result < 0;
         }
 
-        return a.name().length() < b.name().length();
+        return a.key().length() < b.key().length();
     }
 };
 
@@ -201,10 +201,10 @@ public:
 
     bool operator()(const ValueT& a) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.name().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.name().data(),b_,len);
+        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),length_);
+        int result = std::char_traits<CharT>::compare(a.key().data(),b_,len);
 
-        return result == 0 && a.name().length() == length_;
+        return result == 0 && a.key().length() == length_;
     }
 };
 
@@ -219,43 +219,43 @@ public:
     {
     }
     name_value_pair(const string_type& name)
-        : name_(name)
+        : key_(name)
     {
     }
     name_value_pair(string_type&& name)
-        : name_(std::forward<string_type&&>(name))
+        : key_(std::forward<string_type&&>(name))
     {
     }
 
     name_value_pair(const string_type& name, const ValueT& val)
-        : name_(name), value_(val)
+        : key_(name), value_(val)
     {
     }
     name_value_pair(string_type&& name, const ValueT& val)
-        : name_(std::forward<string_type>(name)), value_(val)
+        : key_(std::forward<string_type>(name)), value_(val)
     {
     }
     name_value_pair(const string_type& name, ValueT&& val)
-        : name_(name), value_(std::forward<ValueT&&>(val))
+        : key_(name), value_(std::forward<ValueT&&>(val))
     {
     }
     name_value_pair(string_type&& name, ValueT&& val)
-        : name_(std::forward<string_type&&>(name)), 
+        : key_(std::forward<string_type&&>(name)), 
           value_(std::forward<ValueT&&>(val))
     {
     }
     name_value_pair(const name_value_pair& member)
-        : name_(member.name_), value_(member.value_)
+        : key_(member.key_), value_(member.value_)
     {
     }
     name_value_pair(name_value_pair&& member)
-        : name_(std::move(member.name_)), value_(std::move(member.value_))
+        : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
 
-    const string_type& name() const
+    const string_type& key() const
     {
-        return name_;
+        return key_;
     }
 
     ValueT& value()
@@ -280,7 +280,7 @@ public:
 
     void swap(name_value_pair& member)
     {
-        name_.swap(member.name_);
+        key_.swap(member.key_);
         value_.swap(member.value_);
     }
 
@@ -288,7 +288,7 @@ public:
     {
         if (this != & member)
         {
-            name_ = member.name_;
+            key_ = member.key_;
             value_ = member.value_;
         }
         return *this;
@@ -298,7 +298,7 @@ public:
     {
         if (this != &member)
         {
-            name_.swap(member.name_);
+            key_.swap(member.key_);
             value_.swap(member.value_);
         }
         return *this;
@@ -306,11 +306,17 @@ public:
 
     void shrink_to_fit() 
     {
-        name_.shrink_to_fit();
+        key_.shrink_to_fit();
         value_.shrink_to_fit();
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
+    const string_type& name() const
+    {
+        return key_;
+    }
+#endif
 private:
-    string_type name_;
+    string_type key_;
     ValueT value_;
 };
 
@@ -534,7 +540,7 @@ public:
     {
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
+        auto result = (it != members_.end() && name_eq_string(it->key(),name,length)) ? it : members_.end();
         return iterator(result);
     }
 
@@ -542,7 +548,7 @@ public:
     {
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        auto result = (it != members_.end() && name_eq_string(it->name(),name,length)) ? it : members_.end();
+        auto result = (it != members_.end() && name_eq_string(it->key(),name,length)) ? it : members_.end();
         return const_iterator(result);
     }
 
@@ -555,7 +561,7 @@ public:
     {
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
-        if (it != members_.end() && name_eq_string(it->name(),name,length))
+        if (it != members_.end() && name_eq_string(it->key(),name,length))
         {
             members_.erase(it);
         }
@@ -574,7 +580,7 @@ public:
         }
         std::stable_sort(members_.begin(),members_.end(),member_lt_member<value_type>());
         auto it = std::unique(members_.rbegin(), members_.rend(),
-                              [](const value_type& a, const value_type& b){ return !(a.name().compare(b.name()));});
+                              [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
         members_.erase(members_.begin(),it.base());
     }
 
@@ -586,7 +592,7 @@ public:
         {
             members_.emplace_back(name, std::forward<T&&>(value));
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(std::forward<T&&>(value));
         }
@@ -604,7 +610,7 @@ public:
         {
             members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(std::forward<T&&>(value));
         }
@@ -618,7 +624,7 @@ public:
     iterator set(iterator hint, const string_type& name, T&& value)
     {
         base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->name() <= name)
+        if (hint.get() != members_.end() && hint.get()->key() <= name)
         {
             it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
@@ -632,7 +638,7 @@ public:
             members_.emplace_back(name, std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(value);
         }
@@ -647,7 +653,7 @@ public:
     iterator set(iterator hint, string_type&& name, T&& value)
     {
         base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->name() <= name)
+        if (hint.get() != members_.end() && hint.get()->key() <= name)
         {
             it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
@@ -661,7 +667,7 @@ public:
             members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(value);
         }
@@ -683,7 +689,7 @@ public:
 
             auto rhs_it = std::lower_bound(rhs.members_.begin(), rhs.members_.end(), *it, member_lt_member<value_type>());
             // member_lt_member only compares keys, so we need to check the value separately
-            if (rhs_it == rhs.members_.end() || rhs_it->name() != it->name() || rhs_it->value() != it->value())
+            if (rhs_it == rhs.members_.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
             }
@@ -842,7 +848,7 @@ public:
         }
         auto it = unique_unsorted(members_.begin(), members_.end(),
                                   member_lt_member<value_type>(),
-                              [](const value_type& a, const value_type& b){ return !(a.name().compare(b.name()));});
+                              [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
         members_.erase(it,members_.end());
     }
 
@@ -888,7 +894,7 @@ public:
             members_.emplace_back(name, std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(std::forward<T&&>(value));
         }
@@ -909,7 +915,7 @@ public:
             members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
-        else if (it->name() == name)
+        else if (it->key() == name)
         {
             it->value(std::forward<T&&>(value));
         }
@@ -928,9 +934,9 @@ public:
         }
         for (auto it = members_.begin(); it != members_.end(); ++it)
         {
-            equals_pred<value_type,char_type> comp(it->name().data(), it->name().length());
+            equals_pred<value_type,char_type> comp(it->key().data(), it->key().length());
             auto rhs_it = std::find_if(rhs.members_.begin(),rhs.members_.end(), comp);
-            if (rhs_it == rhs.members_.end() || rhs_it->name() != it->name() || rhs_it->value() != it->value())
+            if (rhs_it == rhs.members_.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
             }

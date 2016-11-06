@@ -337,22 +337,22 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_1)
     a["name3"] = "value3";
 
     json::object_iterator it = a.object_range().begin();
-    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).key() == "name1");
     BOOST_CHECK((*it).value() == json("value1"));
     ++it;
-    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).key() == "name2");
     BOOST_CHECK((*it).value() == json("value2"));
 
-    BOOST_CHECK((*(it++)).name() == "name2");
-    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*(it++)).key() == "name2");
+    BOOST_CHECK((*it).key() == "name3");
     BOOST_CHECK((*it).value() == json("value3"));
 
-    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*(it--)).key() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
     json::member_type member = *it;
-    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
 
@@ -364,23 +364,23 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
     a["name3"] = "value3";
 
     json::const_object_iterator it = a.object_range().begin();
-    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).key() == "name1");
     BOOST_CHECK((*it).value() == json("value1"));
     ++it;
-    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).key() == "name2");
     BOOST_CHECK((*it).value() == json("value2"));
 
-    BOOST_CHECK((*(it++)).name() == "name2");
-    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*(it++)).key() == "name2");
+    BOOST_CHECK((*it).key() == "name3");
     BOOST_CHECK((*it).value() == json("value3"));
 
-    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*(it--)).key() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
 
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
     json::member_type member = *it;
-    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
 
@@ -394,26 +394,26 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
     json::const_object_iterator it = static_cast<const json&>(a).object_range().begin();
     BOOST_CHECK(it == a.object_range().begin());
     BOOST_CHECK(it != a.object_range().end());
-    BOOST_CHECK((*it).name() == "name1");
+    BOOST_CHECK((*it).key() == "name1");
     BOOST_CHECK((*it).value() == json("value1"));
     ++it;
     BOOST_CHECK(it != a.object_range().end());
-    BOOST_CHECK((*it).name() == "name2");
+    BOOST_CHECK((*it).key() == "name2");
     BOOST_CHECK((*it).value() == json("value2"));
 
-    BOOST_CHECK((*(it++)).name() == "name2");
+    BOOST_CHECK((*(it++)).key() == "name2");
     BOOST_CHECK(it != a.object_range().end());
-    BOOST_CHECK((*it).name() == "name3");
+    BOOST_CHECK((*it).key() == "name3");
     BOOST_CHECK((*it).value() == json("value3"));
 
-    BOOST_CHECK((*(it--)).name() == "name3");
+    BOOST_CHECK((*(it--)).key() == "name3");
     BOOST_CHECK((*it).value() == json("value2"));
 
     BOOST_CHECK((*(--it)).value() == json("value1"));
     BOOST_CHECK(it == a.object_range().begin());
 
     json::member_type member = *it;
-    BOOST_CHECK(member.name() == "name1");
+    BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 
     //*it = member; // Don't want this to compile

@@ -741,7 +741,7 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 
 <h3>Accessors</h3>
 
-<pre><code>bool has_name(const string_type&amp; name) const
+<pre><code>bool has_key(const string_type&amp; name) const
 </code></pre>
 
 <p>Returns <code>true</code> if an object has a member with the given <code>name</code>, otherwise <code>false</code>.    </p>
@@ -1118,7 +1118,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.object_range())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; member.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
 } </pre></div>
 
 <h3>Range-based for loop over elements of an array</h3>
@@ -1218,7 +1218,7 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">
 
 <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
-    std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; it-&gt;<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
 }</pre></div>
 
 <p>Output:</p>

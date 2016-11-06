@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["country"] = "Canada";
 
     for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it){
-        std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
+        std::cout << it->key() << "=" << it->value().as<std::string>() << std::endl;
     }
 }
 

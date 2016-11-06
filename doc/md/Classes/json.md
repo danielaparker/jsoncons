@@ -164,7 +164,7 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    bool has_name(const string_type& name) const
+    bool has_key(const string_type& name) const
 Returns `true` if an object has a member with the given `name`, otherwise `false`.    
 
     size_t count(const string_type& name) const
@@ -437,7 +437,7 @@ json book = json::parse(R"(
 
 for (const auto& member: book.object_range())
 {
-    std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
+    std::cout << member.key() << ":" << member.value().as<string>() << std::endl;
 } 
 ```
 ### Range-based for loop over elements of an array
@@ -537,7 +537,7 @@ obj["country"] = "Canada";
 
 for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
-    std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
+    std::cout << it->key() << "=" << it->value().as<string_type>() << std::endl;
 }
 ```
 Output:

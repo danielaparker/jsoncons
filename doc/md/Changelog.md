@@ -6,24 +6,25 @@ Changes
 - The deprecated class `json::any` has been removed. 
 - The jsoncons `boost` extension has been removed. That extension contained a sample `json_type_traits` specialization for `boost::gregorian::date`, which may still be found in the "Type Extensibility" tutorial.  
 - The member `json_type_traits` member function `assign` has been removed and replaced by `to_json`. if you have implemented your own type specializations, you will also have to change your `assign` function to `to_json`.
-
-Non-breaking changes
-
 - `json_type_traits` specializations no longer require the `is_assignable` data member
+
+Non-breaking name changes
+
 - The names `json_deserializer`,`ojson_deserializer`,`wjson_deserializer`,`owjson_deserializer` have been deprecated (they still work) and replaced by `json_encoder<json>`, `json_encoder<ojson>`, `json_encoder<wjson>` and `json_encoder<owjson>`.  
 - The name `output_format` has been deprecated (still works) and renamed to `serialization_options`.  
 - The name `wojson` has been deprecated (still works) and renamed to `owjson`.  
-- The `json_filter` accessor `input_handler` has been deprecated (still works) and renamed to `downstream_handler`.  
+- The `json_filter` member function `input_handler` has been deprecated (still works) and renamed to `downstream_handler`.  
 - The name `elements` has been deprecated (still works) and renamed to `owjson`.  
-- The `json` member function `members` has been deprecated (still works) and renamed to `object_range`.  
-- The `json` member function `elements` has been deprecated (still works) and renamed to `array_range`.  
+- The `json` member function `members()` has been deprecated (still works) and renamed to `object_range()`.  
+- The `json` member function `elements()` has been deprecated (still works) and renamed to `array_range()`.  
+- The `json` member_type function `name()` has been  deprecated (still works) and renamed to `key()`. Rationale: consistency with more general underlying storage classes.
 
 New features
 
 - `json_filter` instances can be passed to functions that take a `json_output_handler` argument (previously only a `json_input_handler` argument)
 - New `jsonpath` function `json_replace` that searches for all values that match a JsonPath expression and replaces them with a specified value.
-- `json` class has new method `has_name`
-- New filter class `rename_name` allows search and replace of `json` object member names
+- `json` class has new method `has_key()`, which returns `true` if a `json` value is an object and has a member with that key
+- New filter class `rename_name` allows search and replace of JSON object names
 
 0.99.3a
 -------

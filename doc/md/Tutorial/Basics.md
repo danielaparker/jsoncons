@@ -94,7 +94,7 @@ json& book = booklist[1];
 //Loop through the book's name-value pairs using a range-based for loop    
 for (const auto& member : book.object_range())
 {
-    std::cout << member.name()
+    std::cout << member.key()
               << ","
               << member.value() << std::endl;
 }
@@ -105,7 +105,7 @@ if (it != book.object_range().end())
     // member "author" found
 }
 
-if (book.has_name("author"))
+if (book.has_key("author"))
 {
     // book has a member "author"
 }
@@ -341,7 +341,7 @@ wjson& book = booklist[1];
 //Loop through the book's name-value pairs using a range-based for loop    
 for (const auto& member : book.object_range())
 {
-    std::wcout << member.name()
+    std::wcout << member.key()
                << L","
                << member.value() << std::endl;
 }
@@ -352,7 +352,7 @@ if (it != book.object_range().end())
     // member "author" found
 }
 
-if (book.has_name(L"author"))
+if (book.has_key(L"author"))
 {
     // book has a member "author"
 }

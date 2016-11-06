@@ -1,6 +1,5 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
-#define JSONCONS_NO_DEPRECATED
 #ifdef __linux__
 #define BOOST_TEST_DYN_LINK
 #endif
