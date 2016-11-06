@@ -3373,7 +3373,7 @@ private:
     friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
     {
         json_encoder<json_type> handler;
-        basic_json_reader<typename string_type::value_type> reader(is, handler);
+        basic_json_reader<char__type> reader(is, handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
