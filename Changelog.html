@@ -477,21 +477,34 @@ vertical-align:1px;
 <li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the "Type Extensibility" tutorial.<br>
 </li>
 <li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
+</ul>
+
+<p>Non-breaking changes</p>
+
+<ul>
 <li>
 <code>json_type_traits</code> specializations no longer require the <code>is_assignable</code> data member</li>
 <li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>owjson_deserializer</code> have been deprecated (they still work) and replaced by <code>json_encoder&lt;json&gt;</code>, <code>json_encoder&lt;ojson&gt;</code>, <code>json_encoder&lt;wjson&gt;</code> and <code>json_encoder&lt;owjson&gt;</code>.<br>
 </li>
-<li>The name <code>output_format</code> has been deprecated (it still works) and renamed to <code>serialization_options</code>.<br>
+<li>The name <code>output_format</code> has been deprecated (still works) and renamed to <code>serialization_options</code>.<br>
 </li>
-<li>The name <code>wojson</code> has been deprecated (it still works) and renamed to <code>owjson</code>.<br>
+<li>The name <code>wojson</code> has been deprecated (still works) and renamed to <code>owjson</code>.<br>
 </li>
-<li>The <code>json_filter</code> accessor <code>input_handler</code> has been deprecated (it still works) and renamed to <code>downstream_handler</code>.<br>
+<li>The <code>json_filter</code> accessor <code>input_handler</code> has been deprecated (still works) and renamed to <code>downstream_handler</code>.<br>
+</li>
+<li>The name <code>elements</code> has been deprecated (still works) and renamed to <code>owjson</code>.<br>
+</li>
+<li>The <code>json</code> member function <code>members</code> has been deprecated (still works) and renamed to <code>object_range</code>.<br>
+</li>
+<li>The <code>json</code> member function <code>elements</code> has been deprecated (still works) and renamed to <code>array_range</code>.<br>
 </li>
 </ul>
 
 <p>New features</p>
 
 <ul>
+<li>
+<code>json_filter</code> instances can be passed to functions that take a <code>json_output_handler</code> argument (previously only a <code>json_input_handler</code> argument)</li>
 <li>New <code>jsonpath</code> function <code>json_replace</code> that searches for all values that match a JsonPath expression and replaces them with a specified value.</li>
 <li>
 <code>json</code> class has new method <code>has_name</code>
