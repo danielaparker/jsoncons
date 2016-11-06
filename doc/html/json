@@ -555,22 +555,6 @@ vertical-align:1px;
 <td>A random access iterator to <code>const json</code>
 </td>
 </tr>
-<tr>
-<td><code>object_range</code></td>
-<td>An <code>object_range</code> provides a pair of bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object. An <code>object_range</code> supports range-based for loops over the members.</td>
-</tr>
-<tr>
-<td><code>const_object_range</code></td>
-<td>A <code>const_object_range</code> provides a pair of const bidirectional iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the members of a json object.</td>
-</tr>
-<tr>
-<td><code>array_range</code></td>
-<td>An <code>array_range</code> provides a pair of random access iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the elements of a json array. An <code>array_range</code> supports range-based for loops over the elements.</td>
-</tr>
-<tr>
-<td><code>const_array_range</code></td>
-<td>A <code>const_array_range</code> provides a pair of const random access iterators, defined by <code>begin()</code> and <code>end()</code>, for accessing the elements of a json array.</td>
-</tr>
 </tbody>
 </table>
 
@@ -709,15 +693,15 @@ json&amp; operator=(const T&amp; rhs)
 
 <h3>Ranges and Iterators</h3>
 
-<pre><code>object_range members();  
-const_object_range members() const;  
+<pre><code>range&lt;object_iterator&gt; object_range();  
+range&lt;const_object_iterator&gt; object_range() const;  
 </code></pre>
 
 <p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the members of a <code>json</code> object<br><br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>array_range elements();
-const_array_range elements() const;
+<pre><code>range&lt;array_iterator&gt; array_range();
+range&lt;const_array_iterator&gt; array_range() const;
 </code></pre>
 
 <p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the elements of a <code>json</code> array<br><br>
@@ -887,13 +871,6 @@ const json&amp; at(size_t i) const
 <p>Returns a reference to the element at index <code>i</code> in a json array.<br><br>
 Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
-
-<pre><code>template &lt;class T&gt;
-const json get(const string_type&amp; name, T&amp;&amp; default_val) const
-</code></pre>
-
-<p>If <code>name</code> matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of <code>default_val</code>.<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
 
 <pre><code>template &lt;class T&gt;
 T get_with_default(const string_type&amp; name, const T&amp; default_val) const
@@ -1139,7 +1116,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 <span class="pl-s">}</span>
 <span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.members())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.object_range())
 {
     std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
 } </pre></div>
@@ -1164,7 +1141,7 @@ book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds"
 <span class="pl-c">// Constructing a json array with an initializer-list </span>
 json booklist = json::array{book1, book2, book3};    
 
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.elements())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.array_range())
 {
     std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::end;
 } 
@@ -1239,7 +1216,7 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</
 obj[<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>;
 obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>;
 
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.members().begin(); it != obj.members().end(); ++it)
+<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
     std::cout &lt;&lt; it-&gt;<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
 }</pre></div>
@@ -1254,7 +1231,7 @@ province=Ontario</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>json arr = json::array{<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>};
 
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.elements().begin(); it != arr.elements().end(); ++it)
+<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
 {
     std::cout &lt;&lt; it-&gt;as&lt;string_type&gt;() &lt;&lt; std::endl;
 }</pre></div>

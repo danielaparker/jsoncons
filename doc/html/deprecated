@@ -598,55 +598,43 @@ vertical-align:1px;
 <td></td>
 <td>has_member(const std::string&amp; name) const</td>
 <td><em>✓</em></td>
-<td>Use count(const std::string&amp; name)</td>
+<td>Use has_name(const std::string&amp; name)</td>
+</tr>
+<tr>
+<td></td>
+<td>members()</td>
+<td><em>✓</em></td>
+<td>Use object_range()</td>
+</tr>
+<tr>
+<td></td>
+<td>elements()</td>
+<td><em>✓</em></td>
+<td>Use array_range()</td>
 </tr>
 <tr>
 <td></td>
 <td>begin_members()</td>
 <td><em>✓</em></td>
-<td>Use members().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_members() const</td>
-<td><em>✓</em></td>
-<td>Use members().begin()</td>
+<td>Use object_range().begin()</td>
 </tr>
 <tr>
 <td></td>
 <td>end_members()</td>
 <td><em>✓</em></td>
-<td>Use members().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_members() const</td>
-<td><em>✓</em></td>
-<td>Use members().end()</td>
+<td>Use object_range().end()</td>
 </tr>
 <tr>
 <td></td>
 <td>begin_elements()</td>
 <td><em>✓</em></td>
-<td>Use elements().begin()</td>
-</tr>
-<tr>
-<td></td>
-<td>begin_elements() const</td>
-<td><em>✓</em></td>
-<td>Use elements().begin()</td>
+<td>Use array_range().begin()</td>
 </tr>
 <tr>
 <td></td>
 <td>end_elements()</td>
 <td><em>✓</em></td>
-<td>Use elements().end()</td>
-</tr>
-<tr>
-<td></td>
-<td>end_elements() const</td>
-<td><em>✓</em></td>
-<td>Use elements().end()</td>
+<td>Use array_range().end()</td>
 </tr>
 <tr>
 <td></td>

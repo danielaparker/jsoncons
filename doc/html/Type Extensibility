@@ -515,9 +515,9 @@ standard library collections of book objects to and from <code>json</code> value
         <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
         {
             <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span> &amp;&amp; 
-                   rhs.<span class="pl-c1">count</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>) == <span class="pl-c1">1</span>;
+                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
         }
         <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
         {
@@ -611,7 +611,7 @@ Charles Bukowski, Women: A Novel, 12
 <h3>Example 2. Convert to/from <code>boost::gregorian::date</code>
 </h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
 
 <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
@@ -671,7 +671,7 @@ Charles Bukowski, Women: A Novel, 12
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
 
-    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].<span class="pl-c1">elements</span>())
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].<span class="pl-c1">array_range</span>())
     {
         std::cout &lt;&lt; observation_date &lt;&lt; std::endl;
     }
@@ -692,7 +692,7 @@ Observation dates:
 <h3>Example 3. Convert to/from <code>boost::numeric::ublas::matrix&lt;T&gt;</code>
 </h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
@@ -706,13 +706,13 @@ Observation dates:
             <span class="pl-k">if</span> (val.<span class="pl-c1">size</span>() &gt; <span class="pl-c1">0</span>)
             {
                 <span class="pl-c1">size_t</span> n = val[<span class="pl-c1">0</span>].<span class="pl-c1">size</span>();
-                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a: val.<span class="pl-c1">elements</span>())
+                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a: val.<span class="pl-c1">array_range</span>())
                 {
                     <span class="pl-k">if</span> (!(a.<span class="pl-c1">is_array</span>() &amp;&amp; a.<span class="pl-c1">size</span>() == n))
                     {
                         <span class="pl-k">return</span> <span class="pl-c1">false</span>;
                     }
-                    <span class="pl-k">for</span> (<span class="pl-k">auto</span> x: a.<span class="pl-c1">elements</span>())
+                    <span class="pl-k">for</span> (<span class="pl-k">auto</span> x: a.<span class="pl-c1">array_range</span>())
                     {
                         <span class="pl-k">if</span> (!x.<span class="pl-smi">template</span> is&lt;T&gt;())
                         {
@@ -730,7 +730,7 @@ Observation dates:
             {
                 <span class="pl-c1">size_t</span> m = val.<span class="pl-c1">size</span>();
                 <span class="pl-c1">size_t</span> n = <span class="pl-c1">0</span>;
-                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a : val.<span class="pl-c1">elements</span>())
+                <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; a : val.<span class="pl-c1">array_range</span>())
                 {
                     <span class="pl-k">if</span> (a.<span class="pl-c1">size</span>() &gt; n)
                     {

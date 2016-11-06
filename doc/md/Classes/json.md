@@ -258,11 +258,6 @@ Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <class T>
-    const json get(const string_type& name, T&& default_val) const
-If `name` matches the name of a member in the json object, returns a copy of the json object, otherwise returns a copy of `default_val`.
-Throws `std::runtime_error` if not an object.
-
-    template <class T>
     T get_with_default(const string_type& name, const T& default_val) const
 If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.

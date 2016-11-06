@@ -468,7 +468,7 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> jsoncons::json;
 <span class="pl-k">using</span> jsoncons::pretty_print;</pre></div>
@@ -480,7 +480,7 @@ std::cout &lt;&lt; cities &lt;&lt; std::endl;  <span class="pl-c">// output is "
 
 cities.add(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);  
 cities.add(<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>);
-cities.add(cities.elements().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);  <span class="pl-c">// inserts "Montreal" at beginning of array</span>
+cities.add(cities.array_range().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);  <span class="pl-c">// inserts "Montreal" at beginning of array</span>
 
 std::cout &lt;&lt; cities &lt;&lt; std::endl;</pre></div>
 
@@ -498,7 +498,7 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>capacity=<spa
 
 cities.add(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);  
 cities.add(<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>);
-cities.add(cities.elements().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
+cities.add(cities.array_range().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>capacity=<span class="pl-pds">"</span></span> &lt;&lt; cities.capacity() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, size=<span class="pl-pds">"</span></span> &lt;&lt; cities.size() &lt;&lt; std::endl;
 
 std::cout &lt;&lt; cities &lt;&lt; std::endl;</pre></div>

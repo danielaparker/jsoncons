@@ -785,7 +785,7 @@ vertical-align:1px;
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Observation dates: <span class="pl-pds">"</span></span> &lt;&lt; std::endl &lt;&lt; std::endl;
 
-    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].elements())
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> observation_date: deal[<span class="pl-s"><span class="pl-pds">"</span>ObservationDates<span class="pl-pds">"</span></span>].array_range())
     {
         std::cout &lt;&lt; observation_date &lt;&lt; std::endl;
     }

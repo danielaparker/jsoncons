@@ -487,6 +487,7 @@ vertical-align:1px;
 <li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
 <li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
 <li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
+<li>Parses files with duplicate names but uses only the last entry</li>
 <li>Supports optional escaping of the solidus (/) character</li>
 <li>Supports Nan, Inf and -Inf replacement</li>
 <li>Supports reading a sequence of JSON texts from a stream</li>
@@ -507,28 +508,6 @@ vertical-align:1px;
 <h2>Benchmarks</h2>
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
-
-<h2>What's new on master</h2>
-
-<p>Note that changes introduced to the <code>json_filter</code> class have been reversed, if you have implemented your own custom filters that extend <code>json_filter</code>, no changes are required.</p>
-
-<ul>
-<li>The deprecated class <code>json::any</code> has been removed </li>
-<li>The jsoncons <code>boost</code> extension has been removed. That extension contained a sample <code>json_type_traits</code> specialization for <code>boost::gregorian::date</code>, which may still be found in the <a href="https://github.com/danielaparker/jsoncons/wiki/Type-Extensibility">Type Extensibility</a> tutorial.<br>
-</li>
-<li>The member <code>json_type_traits</code> member function <code>assign</code> has been removed and replaced by <code>to_json</code>. if you have implemented your own type specializations, you will also have to change your <code>assign</code> function to <code>to_json</code>.</li>
-<li>
-<code>json_type_traits</code> specializations no longer require the <code>is_assignable</code> data member</li>
-<li>The names <code>json_deserializer</code>,<code>ojson_deserializer</code>,<code>wjson_deserializer</code>,<code>wojson_deserializer</code> have been deprecated (they still work) and replaced by <code>json_encoder&lt;json&gt;</code>, <code>json_encoder&lt;ojson&gt;</code>, <code>json_encoder&lt;wjson&gt;</code> and <code>json_encoder&lt;owjson&gt;</code>.<br>
-</li>
-<li>The name <code>output_format</code> has been deprecated (it still works) and renamed to <code>serialization_options</code>.<br>
-</li>
-<li>The name <code>wojson</code> has been deprecated (it still works) and renamed to <code>owjson</code>.<br>
-</li>
-<li>New <code>jsonpath</code> function <code>json_replace</code> that searches for all values that match a JsonPath expression and replaces them with a specified value.</li>
-<li>The <code>json_filter</code> accessor <code>input_handler</code> has been deprecated (it still works) and renamed to <code>downstream_handler</code>.<br>
-</li>
-</ul>
 
 <h2>Get jsoncons</h2>
 
@@ -650,7 +629,7 @@ vertical-align:1px;
 
 <div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
 
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> element : book.elements())
+<span class="pl-k">for</span> (<span class="pl-k">auto</span> element : book.array_range())
 {
     std::cout &lt;&lt; element &lt;&lt; std::endl;
 }</pre></div>
@@ -663,7 +642,7 @@ vertical-align:1px;
     {<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">25.17</span>}
 };
 
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.members())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.object_range())
 {
     std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
@@ -837,7 +816,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 }</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
@@ -913,7 +892,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">"</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::csv<span class="pl-k">;</span>
