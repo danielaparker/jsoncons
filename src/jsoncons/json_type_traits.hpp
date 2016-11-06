@@ -223,7 +223,7 @@ public:
 
     reference operator*() const
     {
-        return T(it_->name(),json_type_traits<Json,mapped_type>::as(it_->value()));
+        return T(it_->key(),json_type_traits<Json,mapped_type>::as(it_->value()));
     }
 
     friend bool operator==(const json_object_input_iterator& it1, const json_object_input_iterator& it2)

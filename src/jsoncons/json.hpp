@@ -1926,7 +1926,7 @@ public:
                 const object& o = var_.object_data_cast()->value();
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    handler.name((it->name()).data(),it->name().length());
+                    handler.name((it->key()).data(),it->key().length());
                     it->value().write_body(handler);
                 }
                 handler.end_object();
@@ -2030,7 +2030,7 @@ public:
                     return 0;
                 }
                 size_t count = 0;
-                while (it != object_range().end() && it->name() == name)
+                while (it != object_range().end() && it->key() == name)
                 {
                     ++count;
                     ++it;
