@@ -29,7 +29,6 @@ class basic_json_reader
 
     basic_json_parser<CharT> parser_;
     std::basic_istream<CharT> *is_;
-    basic_parse_error_handler<CharT> *err_handler_;
     bool eof_;
     std::vector<CharT> buffer_;
     size_t buffer_length_;
@@ -40,7 +39,6 @@ public:
                       basic_json_input_handler<CharT>& handler)
         : parser_(handler),
           is_(std::addressof(is)),
-          err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
           eof_(false),
           buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
@@ -54,7 +52,6 @@ public:
                       basic_parse_error_handler<CharT>& err_handler)
        : parser_(handler,err_handler),
          is_(std::addressof(is)),
-         err_handler_(std::addressof(err_handler)),
          eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
