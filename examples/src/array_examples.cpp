@@ -95,7 +95,7 @@ void add_element_to_array()
     std::cout << cities << std::endl;  // output is "[]"
     cities.add("Toronto");
     cities.add("Vancouver");
-    cities.add(cities.elements().begin(),"Montreal");  // inserts "Montreal" at beginning of array
+    cities.add(cities.array_range().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
     std::cout << cities << std::endl;
 }
@@ -108,7 +108,7 @@ void reserve_array_capacity()
 
     cities.add("Toronto");
     cities.add("Vancouver");
-    cities.add(cities.elements().begin(),"Montreal");
+    cities.add(cities.array_range().begin(),"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
     std::cout << cities << std::endl;

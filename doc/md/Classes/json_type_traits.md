@@ -125,7 +125,7 @@ namespace my_ns
 
     std::cout << "Observation dates: " << std::endl << std::endl;
 
-    for (auto observation_date: deal["ObservationDates"].elements())
+    for (auto observation_date: deal["ObservationDates"].array_range())
     {
         std::cout << observation_date << std::endl;
     }

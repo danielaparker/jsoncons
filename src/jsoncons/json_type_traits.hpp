@@ -503,7 +503,7 @@ struct json_type_traits<Json, T,
         bool result = rhs.is_array();
         if (result)
         {
-            for (auto e : rhs.elements())
+            for (auto e : rhs.array_range())
             {
                 if (!e.template is<element_type>())
                 {
@@ -519,8 +519,8 @@ struct json_type_traits<Json, T,
     {
         if (rhs.is_array())
         {
-            T v(json_array_input_iterator<Json, element_type>(rhs.elements().begin()),
-                json_array_input_iterator<Json, element_type>(rhs.elements().end()));
+            T v(json_array_input_iterator<Json, element_type>(rhs.array_range().begin()),
+                json_array_input_iterator<Json, element_type>(rhs.array_range().end()));
             return v;
         }
         else
@@ -569,7 +569,7 @@ struct json_type_traits<Json, T,
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         bool result = rhs.is_object();
-        for (auto member : rhs.members())
+        for (auto member : rhs.object_range())
         {
             if (!member.value().template is<mapped_type>())
             {
@@ -581,8 +581,8 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& rhs)
     {
-        T v(json_object_input_iterator<Json,value_type>(rhs.members().begin()),
-            json_object_input_iterator<Json,value_type>(rhs.members().end()));
+        T v(json_object_input_iterator<Json,value_type>(rhs.object_range().begin()),
+            json_object_input_iterator<Json,value_type>(rhs.object_range().end()));
         return v;
     }
 

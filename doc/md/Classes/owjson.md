@@ -27,7 +27,7 @@ owjson o = owjson::parse(R"(
 }
 )");
 
-owjson::member_type member = o.members().begin()[1];
+owjson::member_type member = o.object_range().begin()[1];
 std::cout << member.name() << "=" << member.value() << std::endl;
 ```
 - `owjson`, like `wjson`, supports object member `set` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `owjson` it is the actual location where to insert the member.

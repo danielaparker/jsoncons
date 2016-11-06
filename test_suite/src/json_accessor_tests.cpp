@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_find)
     json obj;
 
     json::object_iterator it = obj.find("key");
-    BOOST_CHECK(it == obj.members().end());
+    BOOST_CHECK(it == obj.object_range().end());
 
     obj["key1"] = 10;
     obj["key2"] = true;
@@ -81,10 +81,10 @@ BOOST_AUTO_TEST_CASE(test_find)
     obj["key4"] = "value4";
 
     json::object_iterator it2 =  obj.find("key");
-    BOOST_CHECK(it2 == obj.members().end());
+    BOOST_CHECK(it2 == obj.object_range().end());
 
     json::object_iterator it3 =  obj.find("key4");
-    BOOST_CHECK(it3 != obj.members().end());
+    BOOST_CHECK(it3 != obj.object_range().end());
     BOOST_CHECK_EQUAL("value4",it3->value().as_cstring());
     BOOST_CHECK_EQUAL("value4", it3->value().as<const char*>());
 }

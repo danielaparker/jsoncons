@@ -192,8 +192,8 @@ private:
             stack_[stack2_.back()].value_.resize(count);
 
             auto s = stack_.begin() + (stack2_.back()+1);
-            auto dend = stack_[stack2_.back()].value_.elements().end();
-            for (auto it = stack_[stack2_.back()].value_.elements().begin();
+            auto dend = stack_[stack2_.back()].value_.array_range().end();
+            for (auto it = stack_[stack2_.back()].value_.array_range().begin();
                  it != dend; ++it, ++s)
             {
                 *it = std::move(s->value_);

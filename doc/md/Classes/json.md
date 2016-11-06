@@ -32,10 +32,6 @@ Member type                         |Definition
 `const_object_iterator`|A bidirectional iterator to `const json::member_type`
 `array_iterator`|A random access iterator to `json`
 `const_array_iterator`|A random access iterator to `const json`
-`object_range`|An `object_range` provides a pair of bidirectional iterators, defined by `begin()` and `end()`, for accessing the members of a json object. An `object_range` supports range-based for loops over the members.
-`const_object_range`|A `const_object_range` provides a pair of const bidirectional iterators, defined by `begin()` and `end()`, for accessing the members of a json object.
-`array_range`|An `array_range` provides a pair of random access iterators, defined by `begin()` and `end()`, for accessing the elements of a json array. An `array_range` supports range-based for loops over the elements.
-`const_array_range`|A `const_array_range` provides a pair of const random access iterators, defined by `begin()` and `end()`, for accessing the elements of a json array. 
 
 ### Static member functions
 
@@ -136,13 +132,13 @@ Assigns the templated value to a `json` variable using [json_type_traits](json_t
 
 ### Ranges and Iterators
 
-    object_range members();  
-    const_object_range members() const;  
+    range<object_iterator> object_range();  
+    range<const_object_iterator> object_range() const;  
 Returns a "range" defined by `begin()` and `end()` over the members of a `json` object      
 Throws `std::runtime_error` if not an object.
 
-    array_range elements();
-    const_array_range elements() const;
+    range<array_iterator> array_range();
+    range<const_array_iterator> array_range() const;
 Returns a "range" defined by `begin()` and `end()` over the elements of a `json` array      
 Throws `std::runtime_error` if not an array.
 
@@ -444,7 +440,7 @@ json book = json::parse(R"(
 }
 )");
 
-for (const auto& member: book.members())
+for (const auto& member: book.object_range())
 {
     std::cout << member.name() << ":" << member.value().as<string>() << std::endl;
 } 
@@ -469,7 +465,7 @@ book3["author"] = "Haruki Murakami";
 // Constructing a json array with an initializer-list 
 json booklist = json::array{book1, book2, book3};    
 
-for (const auto& book: booklist.elements())
+for (const auto& book: booklist.array_range())
 {
     std::cout << book["title"].as<string_type>() << std::end;
 } 
@@ -544,7 +540,7 @@ obj["city"] = "Toronto";
 obj["province"] = "Ontario";
 obj["country"] = "Canada";
 
-for (auto it = obj.members().begin(); it != obj.members().end(); ++it)
+for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
     std::cout << it->name() << "=" << it->value().as<string_type>() << std::endl;
 }
@@ -559,7 +555,7 @@ province=Ontario
 ```c++
 json arr = json::array{"Toronto", "Vancouver", "Montreal"};
 
-for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it)
+for (auto it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
 {
     std::cout << it->as<string_type>() << std::endl;
 }

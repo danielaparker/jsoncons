@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
-    arr.add(arr.elements().begin(),"Montreal");
+    arr.add(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(test_array_add_pos)
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
-    arr.add(arr.elements().begin(),"Montreal");
+    arr.add(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -165,11 +165,11 @@ BOOST_AUTO_TEST_CASE(test_array_erase_range)
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
     arr.add("Vancouver");
-    arr.add(arr.elements().begin(),"Montreal");
+    arr.add(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
-    arr.erase(arr.elements().begin()+1,arr.elements().end());
+    arr.erase(arr.array_range().begin()+1,arr.array_range().end());
 
     BOOST_CHECK(arr.size() == 1);
     BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
     cities.add("Vancouver");
-    cities.add(cities.elements().begin(),"Montreal");
+    cities.add(cities.array_range().begin(),"Montreal");
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }

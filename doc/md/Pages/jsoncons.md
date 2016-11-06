@@ -49,7 +49,7 @@ is >> books;
 ```
 Loop through the book array elements, using a range-based for loop
 ```c++
-for (const auto& book : books.elements())
+for (const auto& book : books.array_range())
 {
     std::string author = book["author"].as<std::string>();
     std::string title = book["title"].as<std::string>();
@@ -58,8 +58,8 @@ for (const auto& book : books.elements())
 ```
 or begin-end iterators
 ```c++
-for (auto it = books.elements().begin(); 
-     it != books.elements().end();
+for (auto it = books.array_range().begin(); 
+     it != books.array_range().end();
      ++it)
 {
     std::string author = (*it)["author"].as<std::string>();
@@ -87,7 +87,7 @@ Ivan Passer, Cutter's Way
 Loop through the members of the third book element, using a range-based for loop
 
 ```c++
-for (const auto& member : books[2].members())
+for (const auto& member : books[2].object_range())
 {
     std::cout << member.name() << "=" 
               << member.value() << std::endl;
@@ -97,8 +97,8 @@ for (const auto& member : books[2].members())
 or begin-end iterators:
 
 ```c++
-for (auto it = books[2].members().begin(); 
-     it != books[2].members().end();
+for (auto it = books[2].object_range().begin(); 
+     it != books[2].object_range().end();
      ++it)
 {
     std::cout << (*it).name() << "=" 

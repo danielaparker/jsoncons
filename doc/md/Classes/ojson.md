@@ -27,7 +27,7 @@ ojson o = ojson::parse(R"(
 }
 )");
 
-ojson::member_type member = o.members().begin()[1];
+ojson::member_type member = o.object_range().begin()[1];
 std::cout << member.name() << "=" << member.value() << std::endl;
 ```
 - `ojson`, like `json`, supports object member `set` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.

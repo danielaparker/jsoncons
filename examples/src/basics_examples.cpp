@@ -38,7 +38,7 @@ void basics_json_example1()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    auto hint = book3.set(book3.members().begin(),"author", "Haruki Murakami");
+    auto hint = book3.set(book3.object_range().begin(),"author", "Haruki Murakami");
     hint = book3.set(hint, "category", "Fiction");
     hint = book3.set(hint, "date", "2006-01-03");
     hint = book3.set(hint, "isbn", "1400079276");  
@@ -69,7 +69,7 @@ void basics_json_example1()
     booklist.add(std::move(book2));    
 
     // Add the third one to the front
-    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    auto where = booklist.add(booklist.array_range().begin(),std::move(book3));
     
     // Add the last one immediately after
     booklist.add(where+1,std::move(book4));    
@@ -78,7 +78,7 @@ void basics_json_example1()
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
-    for(auto book : booklist.elements())
+    for(auto book : booklist.array_range())
     {
         std::cout << book["title"].as<std::string>()
                   << ","
@@ -89,7 +89,7 @@ void basics_json_example1()
     json& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(auto member : book.members())
+    for(auto member : book.object_range())
     {
         std::cout << member.name()
                   << ","
@@ -97,7 +97,7 @@ void basics_json_example1()
     }
 
     auto it = book.find("author");
-    if (it != book.members().end())
+    if (it != book.object_range().end())
     {
         // member "author" found
     }
@@ -191,7 +191,7 @@ void basics_wjson_example1()
 
     // Insert in name alphabetical order
     // Give set a hint where to insert the next member
-    auto hint = book3.set(book3.members().begin(), L"author", L"Haruki Murakami");
+    auto hint = book3.set(book3.object_range().begin(), L"author", L"Haruki Murakami");
     hint = book3.set(hint, L"category", L"Fiction");
     hint = book3.set(hint, L"date", L"2006-01-03");
     hint = book3.set(hint, L"isbn", L"1400079276");
@@ -222,7 +222,7 @@ void basics_wjson_example1()
     booklist.add(std::move(book2));
 
     // Add the third one to the front
-    auto where = booklist.add(booklist.elements().begin(),std::move(book3));
+    auto where = booklist.add(booklist.array_range().begin(),std::move(book3));
 
     // Add the last one immediately after
     booklist.add(where+1,std::move(book4));    
@@ -231,7 +231,7 @@ void basics_wjson_example1()
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
-    for (const auto& book : booklist.elements())
+    for (const auto& book : booklist.array_range())
     {
         std::wcout << book[L"title"].as<std::wstring>()
                    << L","
@@ -242,7 +242,7 @@ void basics_wjson_example1()
     wjson& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(const auto& member : book.members())
+    for(const auto& member : book.object_range())
     {
         std::wcout << member.name()
                    << L","
@@ -250,7 +250,7 @@ void basics_wjson_example1()
     }
 
     auto it = book.find(L"author");
-    if (it != book.members().end())
+    if (it != book.object_range().end())
     {
         // book has member "author"
     }

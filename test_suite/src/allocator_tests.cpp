@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_allocator)
     auto it = root.find("field1");
 
     std::cout << it->name() << std::endl;
-    if (it != root.members().end())
+    if (it != root.object_range().end())
     {
         myjson& val = it->value();
     }*/

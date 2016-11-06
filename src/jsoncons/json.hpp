@@ -129,11 +129,6 @@ public:
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
 
-    typedef range<object_iterator> object_range;
-    typedef range<const_object_iterator> const_object_range;
-    typedef range<array_iterator> array_range;
-    typedef range<const_array_iterator> const_array_range;
-
     struct variant
     {
         struct base_data
@@ -988,9 +983,9 @@ public:
         {
             json_type& val = parent_.evaluate_with_default();
             auto it = val.find(name_.data(),name_.length());
-            if (it == val.members().end())
+            if (it == val.object_range().end())
             {
-                it = val.set(val.members().begin(),name_,object(val.object_value().get_allocator()));            
+                it = val.set(val.object_range().begin(),name_,object(val.object_value().get_allocator()));            
             }
             return it->value();
         }
@@ -1018,24 +1013,24 @@ public:
 
         friend class basic_json<CharT,JsonTraits,Allocator>;
 
-        object_range members()
+        range<object_iterator> object_range()
         {
-            return evaluate().members();
+            return evaluate().object_range();
         }
 
-        const_object_range members() const
+        range<const_object_iterator> object_range() const
         {
-            return evaluate().members();
+            return evaluate().object_range();
         }
 
-        array_range elements()
+        range<array_iterator> array_range()
         {
-            return evaluate().elements();
+            return evaluate().array_range();
         }
 
-        const_array_range elements() const
+        range<const_array_iterator> array_range() const
         {
-            return evaluate().elements();
+            return evaluate().array_range();
         }
 
         size_t size() const JSONCONS_NOEXCEPT
@@ -1390,6 +1385,26 @@ public:
             evaluate().write(os,format,indenting);
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+        range<object_iterator> members()
+        {
+            return evaluate().members();
+        }
+
+        range<const_object_iterator> members() const
+        {
+            return evaluate().members();
+        }
+
+        range<array_iterator> elements()
+        {
+            return evaluate().elements();
+        }
+
+        range<const_array_iterator> elements() const
+        {
+            return evaluate().elements();
+        }
         void to_stream(basic_json_output_handler<char_type>& handler) const
         {
             evaluate().to_stream(handler);
@@ -1995,7 +2010,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                return it != members().end();
+                return it != object_range().end();
             }
             break;
         default:
@@ -2010,12 +2025,12 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it == members().end())
+                if (it == object_range().end())
                 {
                     return 0;
                 }
                 size_t count = 0;
-                while (it != members().end() && it->name() == name)
+                while (it != object_range().end() && it->name() == name)
                 {
                     ++count;
                     ++it;
@@ -2416,7 +2431,7 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it == members().end())
+                if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
                 }
@@ -2474,7 +2489,7 @@ public:
         case value_types::object_t:
             {
                 auto it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it == members().end())
+                if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
                 }
@@ -2527,7 +2542,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name.data(),name.length());
         default:
@@ -2542,7 +2557,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name.data(),name.length());
         default:
@@ -2557,7 +2572,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
         default:
@@ -2572,7 +2587,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
         default:
@@ -2587,7 +2602,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name, length);
         default:
@@ -2602,7 +2617,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return members().end();
+            return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name, length);
         default:
@@ -2624,7 +2639,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it != members().end())
+                if (it != object_range().end())
                 {
                     return it->value();
                 }
@@ -2652,7 +2667,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it != members().end())
+                if (it != object_range().end())
                 {
                     return it->value().template as<T>();
                 }
@@ -2679,7 +2694,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                if (it != members().end())
+                if (it != object_range().end())
                 {
                     return it->value().template as<const CharT*>();
                 }
@@ -2970,42 +2985,42 @@ public:
 
     object_iterator begin_members()
     {
-        return members().begin();
+        return object_range().begin();
     }
 
     const_object_iterator begin_members() const
     {
-        return members().begin();
+        return object_range().begin();
     }
 
     object_iterator end_members()
     {
-        return members().end();
+        return object_range().end();
     }
 
     const_object_iterator end_members() const
     {
-        return members().end();
+        return object_range().end();
     }
 
     array_iterator begin_elements()
     {
-        return elements().begin();
+        return array_range().begin();
     }
 
     const_array_iterator begin_elements() const
     {
-        return elements().begin();
+        return array_range().begin();
     }
 
     array_iterator end_elements()
     {
-        return elements().end();
+        return array_range().end();
     }
 
     const_array_iterator end_elements() const
     {
-        return elements().end();
+        return array_range().end();
     }
 
     const json_type& get(const string_type& name) const
@@ -3019,7 +3034,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                return it != members().end() ? it->value() : a_null;
+                return it != object_range().end() ? it->value() : a_null;
             }
         default:
             {
@@ -3149,7 +3164,7 @@ public:
         case value_types::object_t:
             {
                 const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
-                return it != members().end();
+                return it != object_range().end();
             }
             break;
         default:
@@ -3224,53 +3239,72 @@ public:
     {
         return make_array<3>(m, n, k, val);
     }
+    range<object_iterator> members()
+    {
+        return object_range();
+    }
+
+    range<const_object_iterator> members() const
+    {
+        return object_range();
+    }
+
+    range<array_iterator> elements()
+    {
+        return array_range();
+    }
+
+    range<const_array_iterator> elements() const
+    {
+        return array_range();
+    }
 #endif
 
-    object_range members()
+    range<object_iterator> object_range()
     {
         static json_type empty_object = object();
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return object_range(empty_object.members().begin(), empty_object.members().end());
+            return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
         case value_types::object_t:
-            return object_range(object_value().begin(),object_value().end());
+            return range<object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
         }
     }
 
-    const_object_range members() const
+    range<const_object_iterator> object_range() const
     {
         static const json_type empty_object = object();
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
-            return const_object_range(empty_object.members().begin(), empty_object.members().end());
+            return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
         case value_types::object_t:
-            return const_object_range(object_value().begin(),object_value().end());
+            return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
         }
     }
 
-    array_range elements()
+    range<array_iterator> array_range()
     {
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return array_range(array_value().begin(),array_value().end());
+            return range<array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
         }
     }
 
-    const_array_range elements() const
+    range<const_array_iterator> array_range() const
     {
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return const_array_range(array_value().begin(),array_value().end());
+            return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
         }

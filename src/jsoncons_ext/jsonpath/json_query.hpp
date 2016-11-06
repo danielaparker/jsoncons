@@ -219,7 +219,7 @@ private:
         {
             if (context.is_array())
             {
-                for (json_reference element : context.elements())
+                for (json_reference element : context.array_range())
                 {
                     if (result_.exists(element))
                     {
@@ -890,14 +890,14 @@ public:
             json_pointer p = stack_.back()[i];
             if (p->is_array())
             {
-                for (auto it = p->elements().begin(); it != p->elements().end(); ++it)
+                for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
                 {
                     nodes_.push_back(std::addressof(*it));
                 }
             }
             else if (p->is_object())
             {
-                for (auto it = p->members().begin(); it != p->members().end(); ++it)
+                for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
                 {
                     nodes_.push_back(std::addressof(it->value()));
                 }
@@ -929,7 +929,7 @@ public:
             }
             if (recursive_descent_)
             {
-                for (auto it = context.members().begin(); it != context.members().end(); ++it)
+                for (auto it = context.object_range().begin(); it != context.object_range().end(); ++it)
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
@@ -957,7 +957,7 @@ public:
             }
             if (recursive_descent_)
             {
-                for (auto it = context.elements().begin(); it != context.elements().end(); ++it)
+                for (auto it = context.array_range().begin(); it != context.array_range().end(); ++it)
                 {
                     if (it->is_object() || it->is_array())
                     {
@@ -1012,7 +1012,7 @@ public:
         {
             if (context.is_object())
             {
-                for (auto it = context.members().begin(); it != context.members().end(); ++it)
+                for (auto it = context.object_range().begin(); it != context.object_range().end(); ++it)
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
@@ -1022,7 +1022,7 @@ public:
             }
             else if (context.is_array())
             {
-                for (auto it = context.elements().begin(); it != context.elements().end(); ++it)
+                for (auto it = context.array_range().begin(); it != context.array_range().end(); ++it)
                 {
                     if (it->is_object() || it->is_array())
                     {

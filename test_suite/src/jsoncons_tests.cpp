@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse(input);
 
-    json::object_iterator it = val.members().begin();
+    json::object_iterator it = val.object_range().begin();
 
     BOOST_CHECK(it->value().is_string());
     ++it;
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     ++it;
     BOOST_CHECK(it->value().type_id() == jsoncons::value_types::uinteger_t);
     ++it;
-    BOOST_CHECK(it == val.members().end());
+    BOOST_CHECK(it == val.object_range().end());
 }
 
 BOOST_AUTO_TEST_CASE(test_assignment)
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE(test_object_iterator)
     obj["province"] = "Ontario";
     obj["country"] = "Canada";
 
-    for (auto it = obj.members().begin(); it != obj.members().end(); ++it){
+    for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it){
         std::cout << it->name() << "=" << it->value().as<std::string>() << std::endl;
     }
 }
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(test_array_iterator)
     arr.add("Vancouver");
     arr.add("Montreal");
 
-    for (auto it = arr.elements().begin(); it != arr.elements().end(); ++it){
+    for (auto it = arr.array_range().begin(); it != arr.array_range().end(); ++it){
         std::cout << it->as<std::string>() << std::endl;
     }
 }

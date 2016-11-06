@@ -207,7 +207,7 @@ int main()
 
     std::cout << "Observation dates: " << std::endl << std::endl;
 
-    for (auto observation_date: deal["ObservationDates"].elements())
+    for (auto observation_date: deal["ObservationDates"].array_range())
     {
         std::cout << observation_date << std::endl;
     }
@@ -242,13 +242,13 @@ namespace jsoncons
             if (val.size() > 0)
             {
                 size_t n = val[0].size();
-                for (const auto& a: val.elements())
+                for (const auto& a: val.array_range())
                 {
                     if (!(a.is_array() && a.size() == n))
                     {
                         return false;
                     }
-                    for (auto x: a.elements())
+                    for (auto x: a.array_range())
                     {
                         if (!x.template is<T>())
                         {
@@ -266,7 +266,7 @@ namespace jsoncons
             {
                 size_t m = val.size();
                 size_t n = 0;
-                for (const auto& a : val.elements())
+                for (const auto& a : val.array_range())
                 {
                     if (a.size() > n)
                     {

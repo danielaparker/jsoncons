@@ -23,15 +23,13 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |is_numeric() const|<em>&#x2713;</em>|Use `is_number()`
     |remove_member(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
     |const json& get(const std::string& name) const|<em>&#x2713;</em>|Use const json get(const std::string& name, T default_val) const with default `json::null_type()`
-    |has_member(const std::string& name) const|<em>&#x2713;</em>|Use count(const std::string& name)
-    |begin_members()|<em>&#x2713;</em>|Use members().begin()
-    |begin_members() const|<em>&#x2713;</em>|Use members().begin()
-    |end_members()|<em>&#x2713;</em>|Use members().end()
-    |end_members() const|<em>&#x2713;</em>|Use members().end()
-    |begin_elements()|<em>&#x2713;</em>|Use elements().begin()
-    |begin_elements() const|<em>&#x2713;</em>|Use elements().begin()
-    |end_elements()|<em>&#x2713;</em>|Use elements().end()
-    |end_elements() const|<em>&#x2713;</em>|Use elements().end()
+    |has_member(const std::string& name) const|<em>&#x2713;</em>|Use has_name(const std::string& name)
+    |members()|<em>&#x2713;</em>|Use object_range()
+    |elements()|<em>&#x2713;</em>|Use array_range()
+    |begin_members()|<em>&#x2713;</em>|Use object_range().begin()
+    |end_members()|<em>&#x2713;</em>|Use object_range().end()
+    |begin_elements()|<em>&#x2713;</em>|Use array_range().begin()
+    |end_elements()|<em>&#x2713;</em>|Use array_range().end()
     |is_empty() const|<em>&#x2713;</em>|Use `empty()`
     |parse_string(const std::string& s)|<em>&#x2713;</em>|parse(const std::string& s)
     |parse_string(const std::string& s,parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(const std::string& s,parse_error_handler& err_handler)

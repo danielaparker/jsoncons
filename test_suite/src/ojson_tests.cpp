@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_object)
     //BOOST_CHECK_EQUAL(4,o["street_number"].as<int>());
 
     auto it = o.find("country");
-    BOOST_CHECK(it != o.members().end());
+    BOOST_CHECK(it != o.object_range().end());
     o.set(it,"province","Ontario");
 
     o.set("unit_type","O");
