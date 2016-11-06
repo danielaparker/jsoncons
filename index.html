@@ -122,7 +122,7 @@ Ivan Passer, Cutter's Way
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : books[<span class="pl-c1">2</span>].object_range())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+    std::cout &lt;&lt; member.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }</pre></div>
 
@@ -132,7 +132,7 @@ Ivan Passer, Cutter's Way
      it != books[<span class="pl-c1">2</span>].object_range().end();
      ++it)
 {
-    std::cout &lt;&lt; (*it).<span class="pl-c1">name</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+    std::cout &lt;&lt; (*it).<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
               &lt;&lt; (*it).<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 } </pre></div>
 
@@ -157,9 +157,9 @@ title=Cutter's Way
 
 <div class="highlight highlight-source-c++"><pre>std::string price = book.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>);</pre></div>
 
-<p>Or you can check if book has a member "price" with the method <code>has_name</code>, and output accordingly,</p>
+<p>Or you can check if book has a member "price" with the method <code>has_key</code>, and output accordingly,</p>
 
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">if</span> (book.has_name(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>))
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">if</span> (book.has_key(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>))
 {
     <span class="pl-k">double</span> price = book[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;();
     std::cout &lt;&lt; price;
@@ -762,9 +762,9 @@ standard library collections of book objects to and from <code>json</code> value
         <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
         {
             <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
-                   rhs.<span class="pl-c1">has_name</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
         }
         <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
         {
