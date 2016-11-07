@@ -1,10 +1,34 @@
 # jsoncons: a C++ library for json construction
 
+[Preliminaries](#Preliminaries)
+
+[Reading JSON text from a file](#ReadingJSONtextfromafile)
+
+[Constructing json values in C++](#ConstructingjsonvaluesinC++)
+
+[Converting to and from standard library containers](#Convertingtoandfromstandardlibrarycontainers)
+
+[Converting CSV files to json](#ConvertingCSVfilestojson)
+
+[Pretty print](#Prettyprint)
+
+[Filters](#Filters)
+
+[JsonPath](#JsonPath)
+
+[About jsoncons::json](#Aboutjsonconsjson)
+
+[Wide character support](#Widecharactersupport)
+
+[ojson and owjson](#ojsonandowjson)
+
+[Convert json to/from user defined type](#Convertjsontofromuserdefinedtype)
+
+### Preliminaries<a name="Preliminaries"></a>
+
 jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
 
 jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
-
-## Using the jsoncons library
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
 
@@ -15,12 +39,13 @@ The jsoncons classes and functions are in namespace `jsoncons`. You need to incl
 #include <jsoncons/json.hpp>
 ```
 and, for convenience,
+```c++
+using jsoncons::json;
+```
 
-    using jsoncons::json;
+### Reading JSON text from a file<a name="ReadingJSONtextfromafile"></a>
 
-### Reading JSON text from a file
-
-Here is a sample file, `books.json`:
+Example file (`books.json`):
 ```c++
 [
     {
@@ -134,7 +159,7 @@ else
     std::cout << "n/a";
 }
 ```
-### Constructing json values in C++
+### Constructing json values in C++<a name="ConstructingjsonvaluesinC++"></a>
 
 The default `json` constructor produces an empty json object. For example 
 ```c++
@@ -223,7 +248,7 @@ produces
     }
 }
 ```
-### Converting to and from standard library containers
+### Converting to and from standard library containers<a name="Convertingtoandfromstandardlibrarycontainers"></a>
 
 The jsoncons library supports converting to and from the standard library sequence and associative containers.
 
@@ -281,9 +306,9 @@ three=3
 two=2
 ```
 
-### Converting CSV files to json
+### Converting CSV files to json<a name="ConvertingCSVfilestojson"></a>
 
-Here is a sample CSV file (tasks.csv):
+Example CSV file (tasks.csv):
 ```
 project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -356,7 +381,7 @@ There are a few things to note about the effect of the parameter settings.
 - `ignore_empty_values` `true` causes the empty last value in the `task_finish` column to be omitted.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
-### Pretty print
+### Pretty print<a name="Prettyprint"></a>
 
 The `pretty_print` function applies stylistic formatting to JSON text. For example
 
@@ -429,7 +454,7 @@ produces
 }
 ```
 
-### Filters
+### Filters<a name="Filters"></a>
 
 You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
 
@@ -472,11 +497,11 @@ Output:
 ```
 Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
 
-### JsonPath
+### JsonPath<a name="JsonPath"></a>
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
 
-Here is a sample JSON file (store.json):
+Example JSON file (store.json):
 ```json
 { "store": {
     "book": [ 
@@ -574,7 +599,7 @@ Output:
     "The Lord of the Rings"
 ]
 ```
-### About jsoncons::json
+### About jsoncons::json<a name="Aboutjsonconsjson"></a>
 
 The [json](https://github.com/danielaparker/jsoncons/wiki/json) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
@@ -609,7 +634,7 @@ This results in a json value being constucted with all memory being allocated fr
 
 Note that the underlying memory pool used by the `boost::fast_pool_allocator` is never freed. 
 
-### Wide character support
+### Wide character support<a name="Widecharactersupport"></a>
 
 jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
 ```c++
@@ -626,7 +651,7 @@ which prints
 ```c++
 {"field1":"test","field2":3.9,"field3":true}
 ```
-### ojson and owjson
+### ojson and owjson<a name="ojsonandowjson"></a>
 
 The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([owjson](https://github.com/danielaparker/jsoncons/wiki/owjson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```c++
@@ -685,7 +710,7 @@ Output:
 }
 ```
 
-### Convert `json` to/from user defined type
+### Convert `json` to/from user defined type<a name="Convertjsontofromuserdefinedtype"></a>
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
