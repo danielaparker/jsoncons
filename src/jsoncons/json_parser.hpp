@@ -1311,9 +1311,11 @@ public:
                     {
                     case '*':
                         stack_.back() = states::slash_star;
+                        err_handler_->error(json_parser_errc::illegal_comment, *this);
                         break;
                     case '/':
                         stack_.back() = states::slash_slash;
+                        err_handler_->error(json_parser_errc::illegal_comment, *this);
                         break;
                     default:    
                         err_handler_->error(json_parser_errc::invalid_json_text, *this);

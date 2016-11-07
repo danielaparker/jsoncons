@@ -149,6 +149,32 @@ public:
         return instance;
     }
 private:
+    virtual bool do_error(std::error_code code,
+                          const basic_parsing_context<CharT>&) 
+    {
+        static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
+
+        if (code == illegal_comment)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+};
+
+template <class CharT>
+class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
+{
+public:
+    static basic_parse_error_handler<CharT>& instance()
+    {
+        static basic_strict_parse_error_handler<CharT> instance;
+        return instance;
+    }
+private:
     virtual bool do_error(std::error_code,
                           const basic_parsing_context<CharT>&) 
     {
@@ -161,6 +187,8 @@ typedef basic_parse_error_handler<wchar_t> wparse_error_handler;
 
 typedef basic_default_parse_error_handler<char> default_parse_error_handler;
 typedef basic_default_parse_error_handler<wchar_t> wdefault_parse_error_handler;
+typedef basic_strict_parse_error_handler<char> strict_parse_error_handler;
+typedef basic_strict_parse_error_handler<wchar_t> wstrict_parse_error_handler;
 
 typedef basic_parsing_context<char> parsing_context;
 typedef basic_parsing_context<wchar_t> wparsing_context;

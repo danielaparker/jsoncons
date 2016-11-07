@@ -90,12 +90,14 @@ BOOST_AUTO_TEST_CASE(test_json)
                                 dir_itr->path().filename().string().find("n_string_overlong_sequence_2_bytes.json") == std::string::npos &&
                                 dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes.json") == std::string::npos &&
                                 dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes_null.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_structure_object_with_comment.json") == std::string::npos) 
+                                dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") == std::string::npos) 
                             {
-                                boost::filesystem::ifstream is(dir_itr->path());
-                                ojson document;
-                                is >> document;
+                                std::ifstream is(dir_itr->path().c_str());
+
+                                json_encoder<ojson> encoder;
+                                strict_parse_error_handler err_handler;
+                                json_reader reader(is, encoder, err_handler);
+                                reader.read();
                                 std::ostringstream os;
                                 os << dir_itr->path().filename() << " should fail";
                                 BOOST_CHECK_MESSAGE(false, os.str());                        

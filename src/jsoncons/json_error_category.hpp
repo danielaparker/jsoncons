@@ -35,7 +35,8 @@ namespace jsoncons {
         expected_comma_or_right_brace = 19,
         expected_comma_or_right_bracket = 20,
         unexpected_right_bracket = 21,
-        unexpected_right_brace = 22
+        unexpected_right_brace = 22,
+        illegal_comment = 23
     };
 
 class json_error_category_impl
@@ -94,6 +95,8 @@ public:
             return "Unexpected right brace '}'";
         case json_parser_errc::unexpected_right_bracket:
             return "Unexpected right bracket ']'";
+        case json_parser_errc::illegal_comment:
+            return "Illegal comment";
         default:
             return "Unknown JSON parser error";
         }
