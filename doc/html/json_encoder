@@ -518,7 +518,7 @@ json_encoder</pre></div>
 <pre><code>bool is_valid() const
 </code></pre>
 
-<p>Checks if the <code>deserializer</code> contains a valid json_type value. The initial <code>is_valid()</code> is true (the value is an empty object), becomes false when a <code>do_begin_json</code> event is received, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
+<p>Checks if the <code>deserializer</code> contains a valid json_type value. The initial <code>is_valid()</code> is false, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
 
 <pre><code>json_type get_result()
 </code></pre>

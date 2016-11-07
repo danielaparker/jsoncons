@@ -59,7 +59,7 @@ public:
           top_(0),
           stack_(default_stack_size),
           stack2_(),
-          is_valid_(true) // initial json value is an empty object
+          is_valid_(false) 
 
     {
         stack2_.reserve(100);
