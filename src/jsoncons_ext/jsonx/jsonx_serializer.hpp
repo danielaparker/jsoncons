@@ -328,6 +328,7 @@ private:
         {
             write_indent();
         }
+        bos_.flush();
     }
 
     void do_begin_object() override
