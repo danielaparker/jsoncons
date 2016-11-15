@@ -120,7 +120,7 @@ struct json_text_traits<char> : Json_text_traits_<char>
         return value;
     }
 
-    static size_t skip_bom(const char* it, size_t length)
+    static size_t detect_bom(const char* it, size_t length)
     {
         size_t count = 0;
         if (length >= 3)
@@ -243,7 +243,7 @@ struct json_wchar_traits
 template <>
 struct json_wchar_traits<wchar_t,2> // assume utf16
 {
-    static size_t skip_bom(const wchar_t* it, size_t length)
+    static size_t detect_bom(const wchar_t* it, size_t length)
     {
         size_t count = 0;
         if (length >= 1)
@@ -306,7 +306,7 @@ struct json_wchar_traits<wchar_t,2> // assume utf16
 template <>
 struct json_wchar_traits<wchar_t,4> // assume utf32
 {
-    static size_t skip_bom(const wchar_t* it, size_t length)
+    static size_t detect_bom(const wchar_t* it, size_t length)
     {
         size_t count = 0;
         if (length >= 1)
@@ -366,9 +366,9 @@ struct json_text_traits<wchar_t>  : Json_text_traits_<wchar_t>
         return value;
     }
 
-    static size_t skip_bom(const wchar_t* it, size_t length)
+    static size_t detect_bom(const wchar_t* it, size_t length)
     {
-        return json_wchar_traits<wchar_t,sizeof(wchar_t)>::skip_bom(it, length);
+        return json_wchar_traits<wchar_t,sizeof(wchar_t)>::detect_bom(it, length);
     }
 
     static void append_codepoint_to_string(uint32_t cp, std::wstring& s)

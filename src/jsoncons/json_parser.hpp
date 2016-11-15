@@ -427,7 +427,7 @@ public:
 
         if (start == 0)
         {
-            index_ = json_text_traits<CharT>::skip_bom(input,length);
+            index_ = json_text_traits<CharT>::detect_bom(input,length);
             column_ = index_+1;
             begin_input_ = input + index_;
         }
@@ -438,7 +438,7 @@ public:
         }
         p_ = begin_input_;
 
-        index_ = (start == 0) ? json_text_traits<CharT>::skip_bom(input,length) : start;
+        index_ = (start == 0) ? json_text_traits<CharT>::detect_bom(input,length) : start;
         while ((p_ < end_input_) && (stack_.back() != states::done))
         {
             switch (*p_)
