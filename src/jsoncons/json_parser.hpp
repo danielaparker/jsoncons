@@ -498,7 +498,7 @@ public:
                     }
                     if (cp_ >= 0xD800 && cp_ <= 0xDFFF) 
                     {
-                        err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                        err_handler_->error(json_parser_errc::illegal_codepoint, *this);
                     }
                     continuation_count_ = 0;
                     string_state_ = string_states::u1;

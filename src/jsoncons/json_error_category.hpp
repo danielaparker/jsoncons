@@ -38,7 +38,8 @@ namespace jsoncons {
         illegal_comment = 23,
         unexpected_continuation_byte = 24,
         expected_continuation_byte = 25,
-        over_long_utf8_sequence = 26
+        over_long_utf8_sequence = 26,
+        illegal_codepoint = 27
     };
 
 class json_error_category_impl
@@ -105,6 +106,8 @@ public:
             return "Expected continuation byte";
         case json_parser_errc::over_long_utf8_sequence:
             return "Over long UTF-8 sequence";
+        case json_parser_errc::illegal_codepoint:
+            return "Illegal codepoint (>= 0xd800 && <= 0xdfff)";
         default:
             return "Unknown JSON parser error";
         }
