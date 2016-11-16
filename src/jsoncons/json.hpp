@@ -15,6 +15,7 @@
 #include <cstring>
 #include <ostream>
 #include <memory>
+#include <cstring>
 #include <typeinfo>
 #include <jsoncons/json_traits.hpp>
 #include <jsoncons/json_array.hpp>
@@ -26,6 +27,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_error_category.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -3373,7 +3375,7 @@ private:
     friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
     {
         json_encoder<json_type> handler;
-        basic_json_reader<char__type> reader(is, handler);
+        basic_json_reader<char_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
