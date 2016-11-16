@@ -623,7 +623,7 @@ public:
                     default:
                         if (is_trailing_surrogate(*p_))
                         {
-                            err_handler_->error(json_parser_errc::unexpected_continuation_byte, *this);
+                            err_handler_->error(json_parser_errc::unexpected_trailing_surrogate, *this);
                         }
                         if (is_leading_surrogate(*p_))
                         {
@@ -636,7 +636,7 @@ public:
                 case string_states::u2:
                     if (!is_trailing_surrogate(*p_))
                     {
-                        err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                        err_handler_->error(json_parser_errc::expected_trailing_surrogate, *this);
                     }
                     string_state_ = string_states::u1;
                     ++p_;
