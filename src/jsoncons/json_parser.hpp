@@ -432,41 +432,41 @@ public:
                         ++p_;
                         break;
                     default:
-                        if ((unsigned char(*p_) & 0x80) == 0)
+                        if ((static_cast<unsigned char>(*p_) & 0x80) == 0)
                         {
                         }
                         else if (is_continuation_byte(*p_))
                         {
                             err_handler_->error(json_parser_errc::lead_utf8_continuation_byte, *this);
                         }
-                        else if ((unsigned char(*p_) & 0xe0) == 0xc0)
+                        else if ((static_cast<unsigned char>(*p_) & 0xe0) == 0xc0)
                         {
-                            cp_  = (unsigned char(*p_) & 0x1f) << 6;
+                            cp_  = (static_cast<unsigned char>(*p_) & 0x1f) << 6;
                             continuation_count_ = 1;
                             string_state_ = string_states::u2;
                         }
-                        else if ((unsigned char(*p_) & 0xf0) == 0xe0)
+                        else if ((static_cast<unsigned char>(*p_) & 0xf0) == 0xe0)
                         {
                             continuation_count_ = 2;
-                            cp_  = (unsigned char(*p_) & 0x0f) << 12;
+                            cp_  = (static_cast<unsigned char>(*p_) & 0x0f) << 12;
                             string_state_ = string_states::u3;
                         }
-                        else if ((unsigned char(*p_) & 0xf8) == 0xf0)
+                        else if ((static_cast<unsigned char>(*p_) & 0xf8) == 0xf0)
                         {
                             continuation_count_ = 3;
-                            cp_  = (unsigned char(*p_) & 0x07) << 18;
+                            cp_  = (static_cast<unsigned char>(*p_) & 0x07) << 18;
                             string_state_ = string_states::u4;
                         }
-                        else if ((unsigned char(*p_) & 0xfc) == 0xf8)
+                        else if ((static_cast<unsigned char>(*p_) & 0xfc) == 0xf8)
                         {
                             continuation_count_ = 4;
-                            cp_  = (unsigned char(*p_) & 0x03) << 24;
+                            cp_  = (static_cast<unsigned char>(*p_) & 0x03) << 24;
                             string_state_ = string_states::u5;
                         }
-                        else if ((unsigned char(*p_) & 0xfe) == 0xfc)
+                        else if ((static_cast<unsigned char>(*p_) & 0xfe) == 0xfc)
                         {
                             continuation_count_ = 5;
-                            cp_  = (unsigned char(*p_) & 0x01) << 30;
+                            cp_  = (static_cast<unsigned char>(*p_) & 0x01) << 30;
                             string_state_ = string_states::u6;
                         }
                         else
@@ -490,7 +490,7 @@ public:
                 }
                 continuation_count_ = 0;
                 string_state_ = string_states::u1;
-                cp_ |= (unsigned char(*p_) & 0x3f);
+                cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                 if (cp_ <= 0x7F) 
                 {
                     err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
@@ -509,11 +509,11 @@ public:
                 switch (continuation_count_)
                 {
                 case 2:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
                     --continuation_count_;
                     break;
                 default:
-                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                     if (cp_ <= 0x7FF) 
                     {
                         err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
@@ -536,15 +536,15 @@ public:
                 switch (continuation_count_)
                 {
                 case 3:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
                     --continuation_count_;
                     break;
                 case 2:
                     --continuation_count_;
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
                     break;
                 default:
-                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                     if (cp_ <= 0xFFFF) 
                     {
                         err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
@@ -567,19 +567,19 @@ public:
                 switch (continuation_count_)
                 {
                 case 4:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 18;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 18;
                     --continuation_count_;
                     break;
                 case 3:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
                     --continuation_count_;
                     break;
                 case 2:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
                     --continuation_count_;
                     break;
                 default:
-                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                     if (cp_ <= 0x1FFFFF) 
                     {
                         err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
@@ -602,23 +602,23 @@ public:
                 switch (continuation_count_)
                 {
                 case 5:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 24;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 24;
                     --continuation_count_;
                     break;
                 case 4:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 18;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 18;
                     --continuation_count_;
                     break;
                 case 3:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
                     --continuation_count_;
                     break;
                 case 2:
-                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
                     --continuation_count_;
                     break;
                 default:
-                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                     if (cp_ <= 0x3FFFFFF) 
                     {
                         err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
