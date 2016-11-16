@@ -1,4 +1,10 @@
-master
+0.99.4a
+-------
+
+Fixes Issue #101, In json.hpp, line 3376 change "char__type" to "char_type" 
+Fixes Issue #102, include cstring and json_error_category.hpp in json.hpp
+
+0.99.4
 ------
 
 Changes
