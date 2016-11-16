@@ -27,6 +27,7 @@
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_error_category.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push

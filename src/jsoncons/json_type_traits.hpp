@@ -17,7 +17,6 @@
 #include <fstream>
 #include <limits>
 #include <type_traits>
-#include <jsoncons/json_text_traits.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
