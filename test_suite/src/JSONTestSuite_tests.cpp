@@ -77,20 +77,14 @@ BOOST_AUTO_TEST_CASE(test_json)
                         {
                             if (dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") != std::string::npos)
                             {
-                                /*boost::filesystem::ifstream is(dir_itr->path());
-                                ojson document;
-                                is >> document;
-                                std::ostringstream os;
-                                os << dir_itr->path().filename() << " should fail";
-                                BOOST_CHECK_MESSAGE(false, os.str());*/
+                                //boost::filesystem::ifstream is(dir_itr->path());
+                                //ojson document;
+                                //is >> document;
+                                //std::ostringstream os;
+                                //os << dir_itr->path().filename() << " should fail";
+                                //BOOST_CHECK_MESSAGE(false, os.str());
                             }
-                            else if (dir_itr->path().filename().string().find("n_string_invalid_utf-8.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_iso_latin_1.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_lone_utf8_continuation_byte.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_overlong_sequence_2_bytes.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_overlong_sequence_6_bytes_null.json") == std::string::npos &&
-                                dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") == std::string::npos) 
+                            else 
                             {
                                 std::ifstream is(dir_itr->path().c_str());
 

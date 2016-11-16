@@ -74,6 +74,16 @@ bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t&
     return true;
 }
 
+enum class string_states
+{
+    u1,
+    u2,
+    u3,
+    u4,
+    u5,
+    u6
+};
+
 enum class states 
 {
     root,
@@ -93,16 +103,16 @@ enum class states
     string,
     member_name,
     escape, 
-    u1, 
-    u2, 
-    u3, 
-    u4, 
-    expect_surrogate_pair1, 
-    expect_surrogate_pair2, 
-    u6, 
-    u7, 
-    u8, 
-    u9, 
+    escape_u1, 
+    escape_u2, 
+    escape_u3, 
+    escape_u4, 
+    escape_expect_surrogate_pair1, 
+    escape_expect_surrogate_pair2, 
+    escape_u6, 
+    escape_u7, 
+    escape_u8, 
+    escape_u9, 
     minus, 
     zero,  
     integer,
@@ -145,6 +155,8 @@ class basic_json_parser : private basic_parsing_context<CharT>
     int nesting_depth_;
     uint8_t precision_;
     size_t literal_index_;
+    size_t continuation_count_;
+    string_states string_state_;
 
 public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
@@ -159,7 +171,9 @@ public:
          initial_stack_capacity_(default_initial_stack_capacity_),
          nesting_depth_(0), 
          precision_(0), 
-         literal_index_(0)
+         literal_index_(0),
+         continuation_count_(0),
+         string_state_(string_states::u1 )
     {
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
@@ -177,7 +191,9 @@ public:
          initial_stack_capacity_(default_initial_stack_capacity_),
          nesting_depth_(0), 
          precision_(0), 
-         literal_index_(0)
+         literal_index_(0),
+         continuation_count_(0),
+         string_state_(string_states::u1 )
     {
         max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
     }
@@ -337,7 +353,380 @@ public:
         }
     }
 
-    void parse_string()
+    template<class T=CharT>
+    typename std::enable_if<(sizeof(T) == sizeof(uint8_t))>::type 
+    parse_string()
+    {
+        const CharT* sb = p_;
+        bool done = false;
+        while (!done && p_ < end_input_)
+        {
+            switch (string_state_)
+            {
+            case string_states::u1 :
+                {
+                    switch (*p_)
+                    {
+                    case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+                    case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+                    case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                        string_buffer_.append(sb,p_-sb);
+                        column_ += (p_ - sb + 1);
+                        err_handler_->error(json_parser_errc::illegal_control_character, *this);
+                        // recovery - skip
+                        done = true;
+                        ++p_;
+                        break;
+                    case '\r':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            stack_.push_back(states::cr);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\n':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            stack_.push_back(states::lf);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\t':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\\': 
+                        string_buffer_.append(sb,p_-sb);
+                        column_ += (p_ - sb + 1);
+                        stack_.back() = states::escape;
+                        done = true;
+                        ++p_;
+                        break;
+                    case '\"':
+                        if (string_buffer_.length() == 0)
+                        {
+                            end_string_value(sb,p_-sb);
+                        }
+                        else
+                        {
+                            string_buffer_.append(sb,p_-sb);
+                            end_string_value(string_buffer_.data(),string_buffer_.length());
+                            string_buffer_.clear();
+                        }
+                        column_ += (p_ - sb + 1);
+                        done = true;
+                        ++p_;
+                        break;
+                    default:
+                        if ((unsigned char(*p_) & 0x80) == 0)
+                        {
+                        }
+                        else if (is_continuation_byte(*p_))
+                        {
+                            err_handler_->error(json_parser_errc::lead_utf8_continuation_byte, *this);
+                        }
+                        else if ((unsigned char(*p_) & 0xe0) == 0xc0)
+                        {
+                            cp_  = (unsigned char(*p_) & 0x1f) << 6;
+                            continuation_count_ = 1;
+                            string_state_ = string_states::u2;
+                        }
+                        else if ((unsigned char(*p_) & 0xf0) == 0xe0)
+                        {
+                            continuation_count_ = 2;
+                            cp_  = (unsigned char(*p_) & 0x0f) << 12;
+                            string_state_ = string_states::u3;
+                        }
+                        else if ((unsigned char(*p_) & 0xf8) == 0xf0)
+                        {
+                            continuation_count_ = 3;
+                            cp_  = (unsigned char(*p_) & 0x07) << 18;
+                            string_state_ = string_states::u4;
+                        }
+                        else if ((unsigned char(*p_) & 0xfc) == 0xf8)
+                        {
+                            continuation_count_ = 4;
+                            cp_  = (unsigned char(*p_) & 0x03) << 24;
+                            string_state_ = string_states::u5;
+                        }
+                        else if ((unsigned char(*p_) & 0xfe) == 0xfc)
+                        {
+                            continuation_count_ = 5;
+                            cp_  = (unsigned char(*p_) & 0x01) << 30;
+                            string_state_ = string_states::u6;
+                        }
+                        else
+                        {
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                        }
+
+                        ++p_;
+                        break;
+                    }
+                }
+                break;
+            case string_states::u2:
+                if (!is_continuation_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                }
+                if (is_invalid_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::invalid_byte, *this);
+                }
+                continuation_count_ = 0;
+                string_state_ = string_states::u1;
+                cp_ |= (unsigned char(*p_) & 0x3f);
+                if (cp_ <= 0x7F) 
+                {
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                }
+                ++p_;
+                break;
+            case string_states::u3:
+                if (!is_continuation_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                }
+                if (is_invalid_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::invalid_byte, *this);
+                }
+                switch (continuation_count_)
+                {
+                case 2:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    --continuation_count_;
+                    break;
+                default:
+                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    if (cp_ <= 0x7FF) 
+                    {
+                        err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    }
+                    continuation_count_ = 0;
+                    string_state_ = string_states::u1;
+                    break;
+                }
+                ++p_;
+                break;
+            case string_states::u4:
+                if (!is_continuation_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                }
+                if (is_invalid_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::invalid_byte, *this);
+                }
+                switch (continuation_count_)
+                {
+                case 3:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    --continuation_count_;
+                    break;
+                case 2:
+                    --continuation_count_;
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    break;
+                default:
+                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    if (cp_ <= 0xFFFF) 
+                    {
+                        err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    }
+                    continuation_count_ = 0;
+                    string_state_ = string_states::u1;
+                    break;
+                }
+                ++p_;
+                break;
+            case string_states::u5:
+                if (!is_continuation_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                }
+                if (is_invalid_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::invalid_byte, *this);
+                }
+                switch (continuation_count_)
+                {
+                case 4:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 18;
+                    --continuation_count_;
+                    break;
+                case 3:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    --continuation_count_;
+                    break;
+                case 2:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    --continuation_count_;
+                    break;
+                default:
+                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    if (cp_ <= 0x1FFFFF) 
+                    {
+                        err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    }
+                    continuation_count_ = 0;
+                    string_state_ = string_states::u1;
+                    break;
+                }
+                ++p_;
+                break;
+            case string_states::u6:
+                if (!is_continuation_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                }
+                if (is_invalid_byte(*p_))
+                {
+                    err_handler_->error(json_parser_errc::invalid_byte, *this);
+                }
+                switch (continuation_count_)
+                {
+                case 5:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 24;
+                    --continuation_count_;
+                    break;
+                case 4:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 18;
+                    --continuation_count_;
+                    break;
+                case 3:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 12;
+                    --continuation_count_;
+                    break;
+                case 2:
+                    cp_ |= (unsigned char(*p_) & 0x3f) << 6;
+                    --continuation_count_;
+                    break;
+                default:
+                    cp_ |= (unsigned char(*p_) & 0x3f);
+                    if (cp_ <= 0x3FFFFFF) 
+                    {
+                        err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    }
+                    continuation_count_ = 0;
+                    string_state_ = string_states::u1;
+                    break;
+                }
+                ++p_;
+                break;
+            }
+        }
+        if (!done)
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+        }
+    }
+
+    template<class T=CharT>
+    typename std::enable_if<(sizeof(T) == sizeof(uint16_t))>::type 
+    parse_string()
+    {
+        const CharT* sb = p_;
+        bool done = false;
+        while (!done && p_ < end_input_)
+        {
+            switch (*p_)
+            {
+            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                err_handler_->error(json_parser_errc::illegal_control_character, *this);
+                // recovery - skip
+                done = true;
+                ++p_;
+                break;
+            case '\r':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    stack_.push_back(states::cr);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\n':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    stack_.push_back(states::lf);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\t':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\\': 
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                stack_.back() = states::escape;
+                done = true;
+                ++p_;
+                break;
+            case '\"':
+                if (string_buffer_.length() == 0)
+                {
+                    end_string_value(sb,p_-sb);
+                }
+                else
+                {
+                    string_buffer_.append(sb,p_-sb);
+                    end_string_value(string_buffer_.data(),string_buffer_.length());
+                    string_buffer_.clear();
+                }
+                column_ += (p_ - sb + 1);
+                done = true;
+                ++p_;
+                break;
+            default:
+                ++p_;
+                break;
+            }
+        }
+        if (!done)
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+        }
+    }
+
+    template<class T=CharT>
+    typename std::enable_if<(sizeof(T) == sizeof(uint32_t))>::type 
+    parse_string()
     {
         const CharT* sb = p_;
         bool done = false;
@@ -840,36 +1229,36 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::u1: 
+            case states::escape_u1: 
                 {
                     append_codepoint(*p_);
-                    stack_.back() = states::u2;
+                    stack_.back() = states::escape_u2;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u2: 
+            case states::escape_u2: 
                 {
                     append_codepoint(*p_);
-                    stack_.back() = states::u3;
+                    stack_.back() = states::escape_u3;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u3: 
+            case states::escape_u3: 
                 {
                     append_codepoint(*p_);
-                    stack_.back() = states::u4;
+                    stack_.back() = states::escape_u4;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u4: 
+            case states::escape_u4: 
                 {
                     append_codepoint(*p_);
                     if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
                     {
-                        stack_.back() = states::expect_surrogate_pair1;
+                        stack_.back() = states::escape_expect_surrogate_pair1;
                     }
                     else
                     {
@@ -880,13 +1269,13 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::expect_surrogate_pair1: 
+            case states::escape_expect_surrogate_pair1: 
                 {
                     switch (*p_)
                     {
                     case '\\': 
                         cp2_ = 0;
-                        stack_.back() = states::expect_surrogate_pair2;
+                        stack_.back() = states::escape_expect_surrogate_pair2;
                         break;
                     default:
                         err_handler_->error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
@@ -896,12 +1285,12 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::expect_surrogate_pair2: 
+            case states::escape_expect_surrogate_pair2: 
                 {
                     switch (*p_)
                     {
                     case 'u':
-                        stack_.back() = states::u6;
+                        stack_.back() = states::escape_u6;
                         break;
                     default:
                         err_handler_->error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
@@ -911,31 +1300,31 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case states::u6:
+            case states::escape_u6:
                 {
                     append_second_codepoint(*p_);
-                    stack_.back() = states::u7;
+                    stack_.back() = states::escape_u7;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u7: 
+            case states::escape_u7: 
                 {
                     append_second_codepoint(*p_);
-                    stack_.back() = states::u8;
+                    stack_.back() = states::escape_u8;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u8: 
+            case states::escape_u8: 
                 {
                     append_second_codepoint(*p_);
-                    stack_.back() = states::u9;
+                    stack_.back() = states::escape_u9;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case states::u9: 
+            case states::escape_u9: 
                 {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
@@ -1590,7 +1979,7 @@ private:
             break;
         case 'u':
             cp_ = 0;
-            stack_.back() = states::u1;
+            stack_.back() = states::escape_u1;
             break;
         default:    
             err_handler_->error(json_parser_errc::illegal_escaped_character, *this);
