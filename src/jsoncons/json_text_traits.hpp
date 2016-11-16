@@ -31,6 +31,16 @@ const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
 const uint16_t max_trail_surrogate = 0xDFFF;
 
+inline bool is_leading_surrogate(uint16_t c)
+{
+    return c >= min_lead_surrogate && c <= max_lead_surrogate;
+}
+
+inline bool is_trailing_surrogate(uint16_t c)
+{
+    return c >= min_trail_surrogate && c <= max_trail_surrogate;
+}
+
 // json_text_traits
 
 template <class CharT>

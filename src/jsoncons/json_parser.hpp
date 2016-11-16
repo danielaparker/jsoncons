@@ -361,7 +361,7 @@ public:
         {
             switch (string_state_)
             {
-            case string_states::u1 :
+            case string_states::u1:
                 {
                     switch (*p_)
                     {
@@ -550,75 +550,98 @@ public:
         bool done = false;
         while (!done && p_ < end_input_)
         {
-            switch (*p_)
+            switch (string_state_)
             {
-            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                string_buffer_.append(sb,p_-sb);
-                column_ += (p_ - sb + 1);
-                err_handler_->error(json_parser_errc::illegal_control_character, *this);
-                // recovery - skip
-                done = true;
-                ++p_;
-                break;
-            case '\r':
+            case string_states::u1:
                 {
-                    column_ += (p_ - sb + 1);
-                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    stack_.push_back(states::cr);
-                    done = true;
+                    switch (*p_)
+                    {
+                    case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+                    case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+                    case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                        string_buffer_.append(sb,p_-sb);
+                        column_ += (p_ - sb + 1);
+                        err_handler_->error(json_parser_errc::illegal_control_character, *this);
+                        // recovery - skip
+                        done = true;
+                        ++p_;
+                        break;
+                    case '\r':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            stack_.push_back(states::cr);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\n':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            stack_.push_back(states::lf);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\t':
+                        {
+                            column_ += (p_ - sb + 1);
+                            err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
+                            // recovery - keep
+                            string_buffer_.append(sb, p_ - sb + 1);
+                            done = true;
+                            ++p_;
+                        }
+                        break;
+                    case '\\': 
+                        string_buffer_.append(sb,p_-sb);
+                        column_ += (p_ - sb + 1);
+                        stack_.back() = states::escape;
+                        done = true;
+                        ++p_;
+                        break;
+                    case '\"':
+                        if (string_buffer_.length() == 0)
+                        {
+                            end_string_value(sb,p_-sb);
+                        }
+                        else
+                        {
+                            string_buffer_.append(sb,p_-sb);
+                            end_string_value(string_buffer_.data(),string_buffer_.length());
+                            string_buffer_.clear();
+                        }
+                        column_ += (p_ - sb + 1);
+                        done = true;
+                        ++p_;
+                        break;
+                    default:
+                        if (is_trailing_surrogate(*p_))
+                        {
+                            err_handler_->error(json_parser_errc::unexpected_continuation_byte, *this);
+                        }
+                        if (is_leading_surrogate(*p_))
+                        {
+                            string_state_ = string_states::u2;
+                        }
+                        ++p_;
+                        break;
+                    }
+                    break;
+                case string_states::u2:
+                    if (!is_trailing_surrogate(*p_))
+                    {
+                        err_handler_->error(json_parser_errc::expected_continuation_byte, *this);
+                    }
+                    string_state_ = string_states::u1;
                     ++p_;
+                    break;
                 }
-                break;
-            case '\n':
-                {
-                    column_ += (p_ - sb + 1);
-                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    stack_.push_back(states::lf);
-                    done = true;
-                    ++p_;
-                }
-                break;
-            case '\t':
-                {
-                    column_ += (p_ - sb + 1);
-                    err_handler_->error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    done = true;
-                    ++p_;
-                }
-                break;
-            case '\\': 
-                string_buffer_.append(sb,p_-sb);
-                column_ += (p_ - sb + 1);
-                stack_.back() = states::escape;
-                done = true;
-                ++p_;
-                break;
-            case '\"':
-                if (string_buffer_.length() == 0)
-                {
-                    end_string_value(sb,p_-sb);
-                }
-                else
-                {
-                    string_buffer_.append(sb,p_-sb);
-                    end_string_value(string_buffer_.data(),string_buffer_.length());
-                    string_buffer_.clear();
-                }
-                column_ += (p_ - sb + 1);
-                done = true;
-                ++p_;
-                break;
-            default:
-                ++p_;
-                break;
             }
         }
         if (!done)
