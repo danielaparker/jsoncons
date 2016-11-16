@@ -36,9 +36,9 @@ namespace jsoncons {
         unexpected_right_bracket = 21,
         unexpected_right_brace = 22,
         illegal_comment = 23,
-        lead_utf8_continuation_byte = 24,
+        unexpected_continuation_byte = 24,
         expected_continuation_byte = 25,
-        invalid_byte = 26
+        over_long_utf8_sequence = 26
     };
 
 class json_error_category_impl
@@ -99,12 +99,12 @@ public:
             return "Unexpected right bracket ']'";
         case json_parser_errc::illegal_comment:
             return "Illegal comment";
-        case json_parser_errc::lead_utf8_continuation_byte:
+        case json_parser_errc::unexpected_continuation_byte:
             return "Lead utf8 continuation byte";
         case json_parser_errc::expected_continuation_byte:
             return "Expected continuation byte";
-        case json_parser_errc::invalid_byte:
-            return "Invalid byte";
+        case json_parser_errc::over_long_utf8_sequence:
+            return "Over long UTF-8 sequence";
         default:
             return "Unknown JSON parser error";
         }

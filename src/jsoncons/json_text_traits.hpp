@@ -26,12 +26,6 @@ static bool is_continuation_byte(unsigned char ch)
     return (ch & 0xC0) == 0x80;
 }
 
-inline
-static bool is_invalid_byte(unsigned char ch)
-{
-    return ((ch == 192) || (ch == 193) || (ch >= 245));
-}
-
 const uint16_t min_lead_surrogate = 0xD800;
 const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;

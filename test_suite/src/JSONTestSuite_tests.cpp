@@ -75,27 +75,15 @@ BOOST_AUTO_TEST_CASE(test_json)
                     {
                         try
                         {
-                            if (dir_itr->path().filename().string().find("n_string_UTF8_surrogate_U+D800.json") != std::string::npos)
-                            {
-                                //boost::filesystem::ifstream is(dir_itr->path());
-                                //ojson document;
-                                //is >> document;
-                                //std::ostringstream os;
-                                //os << dir_itr->path().filename() << " should fail";
-                                //BOOST_CHECK_MESSAGE(false, os.str());
-                            }
-                            else 
-                            {
-                                std::ifstream is(dir_itr->path().c_str());
+                            std::ifstream is(dir_itr->path().c_str());
 
-                                json_encoder<ojson> encoder;
-                                strict_parse_error_handler err_handler;
-                                json_reader reader(is, encoder, err_handler);
-                                reader.read();
-                                std::ostringstream os;
-                                os << dir_itr->path().filename() << " should fail";
-                                BOOST_CHECK_MESSAGE(false, os.str());                        
-                            }
+                            json_encoder<ojson> encoder;
+                            strict_parse_error_handler err_handler;
+                            json_reader reader(is, encoder, err_handler);
+                            reader.read();
+                            std::ostringstream os;
+                            os << dir_itr->path().filename() << " should fail";
+                            BOOST_CHECK_MESSAGE(false, os.str());  
                         }
                         catch (const parse_exception&)
                         {
