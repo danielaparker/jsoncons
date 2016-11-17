@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(test_multiple)
 
     std::istringstream is(in);
 
-    jsoncons::json_encoder<json> encoder;
+    jsoncons::json_decoder<json> encoder;
     json_reader reader(is,encoder);
 
     if (!reader.eof())

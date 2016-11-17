@@ -166,7 +166,7 @@ void mulitple_json_objects()
         throw std::runtime_error("Cannot open file");
     }
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     json_reader reader(is, encoder);
 
     while (!reader.eof())

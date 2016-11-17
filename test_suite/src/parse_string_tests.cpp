@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string1)
     std::string input = "\"String\"";
     std::istringstream is(input);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string2)
     std::string input = "\"Str\\\"ing\"";
     std::istringstream is(input);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is, encoder);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
     for (size_t i = 2; i < input.length(); ++i)
     {
         std::istringstream is(input);
-        json_encoder<json> encoder;
+        json_decoder<json> encoder;
         try
         {
             json_reader reader(is, encoder);
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
     for (size_t i = 2; i < input.length(); ++i)
     {
         std::istringstream is(input);
-        json_encoder<json> encoder;
+        json_decoder<json> encoder;
         try
         {
             json_reader reader(is, encoder);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
     //for (size_t i = 2; i < input.length(); ++i)
     //{
         std::istringstream is(input);
-        json_encoder<json> encoder;
+        json_decoder<json> encoder;
         lenient_error_handler err_handler(json_parser_errc::illegal_character_in_string);
         try
         {

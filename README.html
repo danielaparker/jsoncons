@@ -505,6 +505,13 @@ vertical-align:1px;
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
 
+<h2>What's new on master</h2>
+
+<ul>
+<li>Validations added to utf8 and utf16 string parsing to pass all <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> tests</li>
+<li>The name <code>json_encoder</code> introduced in 0.99.4 has been changed to <code>json_decoder</code>. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)</li>
+</ul>
+
 <h2>Benchmarks</h2>
 
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
@@ -901,7 +908,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 {
     std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/tasks.csv<span class="pl-pds">"</span></span>);
 
-    json_encoder&lt;json&gt; encoder;
+    json_decoder&lt;json&gt; encoder;
     csv_parameters params;
     params.<span class="pl-c1">assume_header</span>(<span class="pl-c1">true</span>)
           .<span class="pl-c1">trim</span>(<span class="pl-c1">true</span>)

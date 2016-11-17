@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(test_chained_filters)
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
 
-    json_encoder<ojson> encoder;
+    json_decoder<ojson> encoder;
 
     rename_name_filter filter2("fifth", "fourth", encoder);
     rename_name_filter filter1("fourth", "third", filter2);

@@ -28,12 +28,12 @@ You must ensure that the input stream and input handler exist as long as does `j
 Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
 
     void read()
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
 Throws if there are any unconsumed non-whitespace characters left in the input.
 Throws [parse_exception](parse_exception) if parsing fails.
 
     void read_next()
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
 Throws [parse_exception](parse_exception) if parsing fails.
 
     void check_done()
@@ -79,7 +79,7 @@ if (!is.is_open())
     throw std::runtime_error("Cannot open file");
 }
 
-json_encoder<json> encoder;
+json_decoder<json> encoder;
 json_reader reader(is,encoder);
 
 while (!reader.eof())

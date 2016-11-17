@@ -10,7 +10,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
 
     try
     {
-        json_encoder<json> encoder;
+        json_decoder<json> encoder;
         json_reader reader(is,encoder);
         reader.max_nesting_depth(20);
         reader.read_next();

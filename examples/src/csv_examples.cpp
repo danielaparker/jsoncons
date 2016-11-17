@@ -18,7 +18,7 @@ void read_csv_file1()
 
     std::istringstream is(text);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
 
     csv_parameters params;
     params.assume_header(true)
@@ -34,7 +34,7 @@ void read_write_csv_tasks()
 {
     std::ifstream is("input/tasks.csv");
 
-    json_encoder<ojson> encoder;
+    json_decoder<ojson> encoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)

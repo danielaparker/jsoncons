@@ -1,13 +1,13 @@
 ```c++
-jsoncons::json_encoder
+jsoncons::json_decoder
 
 template <class Json>
-json_encoder
+json_decoder
 ```
 
 ### Header
 ```c++
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 ```
 
 ### Base classes
@@ -23,7 +23,7 @@ Member type                         |Definition
 
 ### Constructors
 
-    json_encoder(const allocator_type allocator = allocator_type())
+    json_decoder(const allocator_type allocator = allocator_type())
 
 ### Member functions
 

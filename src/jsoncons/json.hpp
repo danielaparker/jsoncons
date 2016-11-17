@@ -24,7 +24,7 @@
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
@@ -1588,7 +1588,7 @@ public:
 
     static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s.data(),0,s.length());
@@ -1603,7 +1603,7 @@ public:
 
     static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s,0,length);
@@ -3374,7 +3374,7 @@ private:
 
     friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_reader<char_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
@@ -3468,7 +3468,7 @@ template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is, 
                                                                                             basic_parse_error_handler<char_type>& err_handler)
 {
-    json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
+    json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
@@ -3506,7 +3506,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
     }
 #endif
 
-    json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
+    json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     try
     {
         // obtain file size:
@@ -3549,7 +3549,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
 template <class Json>
 std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
 {
-    json_encoder<Json> handler;
+    json_decoder<Json> handler;
     basic_json_reader<typename Json::char_type> reader(is, handler);
     reader.read_next();
     reader.check_done();
@@ -3632,10 +3632,10 @@ typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> owjs
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
-typedef json_encoder<json> json_deserializer;
-typedef json_encoder<wjson> wjson_deserializer;
-typedef json_encoder<ojson> ojson_deserializer;
-typedef json_encoder<owjson> wojson_deserializer;
+typedef json_decoder<json> json_deserializer;
+typedef json_decoder<wjson> wjson_deserializer;
+typedef json_decoder<ojson> ojson_deserializer;
+typedef json_decoder<owjson> wojson_deserializer;
 #endif
 
 }

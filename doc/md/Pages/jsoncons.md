@@ -323,11 +323,11 @@ You can read the `CSV` file into a `json` value with the `csv_reader`.
 
 using jsoncons::csv::csv_parameters;
 using jsoncons::csv::csv_reader;
-using jsoncons::json_encoder;
+using jsoncons::json_decoder;
 
 std::fstream is("tasks.csv");
 
-json_encoder<json> encoder;
+json_decoder<json> encoder;
 
 csv_parameters params;
 params.assume_header(true)

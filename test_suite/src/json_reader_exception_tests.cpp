@@ -8,7 +8,7 @@
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_filename_invalid)
     std::string in_file = "input/json-exception--1.json";
     std::ifstream is(in_file);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
 
     try
     {
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
     std::string in_file = "input/json-exception-1.json";
     std::ifstream is(in_file);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
     std::string in_file = "input/json-exception-2.json";
     std::ifstream is(in_file);
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
 {
     std::istringstream is("[100");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
 {
     std::istringstream is("[\"\\u");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
 {
     std::istringstream is("[tru");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
 {
     std::istringstream is("[fals");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
 {
     std::istringstream is("[nul");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
 {
     std::istringstream is("[true");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
 {
     std::istringstream is("[false");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 {
     std::istringstream is("[null");
 
-    json_encoder<json> encoder;
+    json_decoder<json> encoder;
     try
     {
         json_reader reader(is,encoder);

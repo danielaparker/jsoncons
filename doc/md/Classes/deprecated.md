@@ -37,17 +37,17 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
     |to_stream|<em>&#x2713;</em>|Use write
     |`json` initializer-list constructor||Construct from `json::array` with initializer-list
-    |json_deserializer|<em>&#x2713;</em>|Use json_encoder<json>`
-    |wjson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wjson>`
-    |ojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<ojson>`
-    |wojson_deserializer|<em>&#x2713;</em>|Use `json_encoder<wojson>`
+    |json_deserializer|<em>&#x2713;</em>|Use json_decoder<json>`
+    |wjson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wjson>`
+    |ojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<ojson>`
+    |wojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wojson>`
     |wojson|<em>&#x2713;</em>|Use owjson`
     |member_type name()|<em>&#x2713;</em>|Use key()
 json member types|any|<em>&#x2713;</em>|
 json member constants|null||Use static member function `json::null()`
     |an_object||Use the default constructor `json()` instead.
     |an_array||Use assignment to `json::array()` or `json::make_array()` instead.
-json_encoder|json& root()|<em>&#x2713;</em>|json get_result()
+json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
 serialization|`output_format`|<em>&#x2713;</em>|Use `serialization_options`
 json_reader|max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
     |max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const

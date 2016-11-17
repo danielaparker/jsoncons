@@ -533,6 +533,8 @@ public:
                 }
                 ++p_;
                 break;
+            default:
+                break;
             }
         }
         if (!done)
@@ -640,6 +642,10 @@ public:
                     }
                     string_state_ = string_states::u1;
                     ++p_;
+                    break;
+                case string_states::u3:
+                case string_states::u4:
+                default:
                     break;
                 }
             }

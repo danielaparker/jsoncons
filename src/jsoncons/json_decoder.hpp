@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_ENCODER_HPP
-#define JSONCONS_JSON_ENCODER_HPP
+#ifndef JSONCONS_json_decoder_HPP
+#define JSONCONS_json_decoder_HPP
 
 #include <string>
 #include <sstream>
@@ -19,7 +19,7 @@
 namespace jsoncons {
 
 template <class Json>
-class json_encoder : public basic_json_input_handler<typename Json::char_type>
+class json_decoder : public basic_json_input_handler<typename Json::char_type>
 {
     static const int default_stack_size = 1000;
 
@@ -51,7 +51,7 @@ class json_encoder : public basic_json_input_handler<typename Json::char_type>
     bool is_valid_;
 
 public:
-    json_encoder(const char_allocator& sa = char_allocator(),
+    json_decoder(const char_allocator& sa = char_allocator(),
                             const allocator_type& allocator = allocator_type())
         : sa_(sa),
           oa_(allocator),

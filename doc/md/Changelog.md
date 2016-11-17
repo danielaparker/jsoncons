@@ -1,3 +1,9 @@
+master
+------
+
+- Validations added to utf8 and utf16 string parsing to pass all [JSONTestSuite](https://github.com/nst/JSONTestSuite) tests
+- The name `json_encoder` introduced in 0.99.4 has been changed to `json_decoder`. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)
+
 0.99.4a
 -------
 

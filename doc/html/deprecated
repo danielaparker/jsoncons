@@ -684,27 +684,27 @@ vertical-align:1px;
 <td></td>
 <td>json_deserializer</td>
 <td><em>✓</em></td>
-<td>Use json_encoder`</td>
+<td>Use json_decoder`</td>
 </tr>
 <tr>
 <td></td>
 <td>wjson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>json_encoder&lt;wjson&gt;</code>
+<td>Use <code>json_decoder&lt;wjson&gt;</code>
 </td>
 </tr>
 <tr>
 <td></td>
 <td>ojson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>json_encoder&lt;ojson&gt;</code>
+<td>Use <code>json_decoder&lt;ojson&gt;</code>
 </td>
 </tr>
 <tr>
 <td></td>
 <td>wojson_deserializer</td>
 <td><em>✓</em></td>
-<td>Use <code>json_encoder&lt;wojson&gt;</code>
+<td>Use <code>json_decoder&lt;wojson&gt;</code>
 </td>
 </tr>
 <tr>
@@ -745,7 +745,7 @@ vertical-align:1px;
 <td>Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</td>
 </tr>
 <tr>
-<td>json_encoder</td>
+<td>json_decoder</td>
 <td>json&amp; root()</td>
 <td><em>✓</em></td>
 <td>json get_result()</td>

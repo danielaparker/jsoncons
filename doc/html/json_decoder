@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_encoder</title>
+<title>json_decoder</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,15 +468,14 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json_encoder
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_decoder
 
 <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-json_encoder</pre></div>
+json_decoder</pre></div>
 
 <h3>Header</h3>
 
-<pre><code>#include &lt;jsoncons/json_encoder.hpp&gt;
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_decoder.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Base classes</h3>
 
@@ -505,7 +504,7 @@ json_encoder</pre></div>
 
 <h3>Constructors</h3>
 
-<pre><code>json_encoder(const allocator_type allocator = allocator_type())
+<pre><code>json_decoder(const allocator_type allocator = allocator_type())
 </code></pre>
 
 <h3>Member functions</h3>
