@@ -1,4 +1,4 @@
-master
+0.99.5
 ------
 
 - Validations added to utf8 and utf16 string parsing to pass all [JSONTestSuite](https://github.com/nst/JSONTestSuite) tests
