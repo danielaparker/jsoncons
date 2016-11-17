@@ -11,7 +11,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-  UA-42023908-1</head>
+  </head>
   <body>
     <div class="wrapper">
       <header>
@@ -31,33 +31,34 @@
         <h1>
 <a id="jsoncons-a-c-library-for-json-construction" class="anchor" href="#jsoncons-a-c-library-for-json-construction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>jsoncons: a C++ library for json construction</h1>
 
-<p><a href="#Preliminaries">Preliminaries</a></p>
+<p><a href="#A1">Preliminaries</a></p>
 
-<p><a href="#ReadingJSONtextfromafile">Reading JSON text from a file</a></p>
+<p><a href="#A2">Reading JSON text from a file</a></p>
 
-<p><a href="#ConstructingjsonvaluesinC++">Constructing json values in C++</a></p>
+<p><a href="#A3">Constructing json values in C++</a></p>
 
-<p><a href="#Convertingtoandfromstandardlibrarycontainers">Converting to and from standard library containers</a></p>
+<p><a href="#A4">Converting to and from standard library containers</a></p>
 
-<p><a href="#ConvertingCSVfilestojson">Converting CSV files to json</a></p>
+<p><a href="#A5">Converting CSV files to json</a></p>
 
-<p><a href="#Prettyprint">Pretty print</a></p>
+<p><a href="#A6">Pretty print</a></p>
 
-<p><a href="#Filters">Filters</a></p>
+<p><a href="#A7">Filters</a></p>
 
-<p><a href="#JsonPath">JsonPath</a></p>
+<p><a href="#A8">JsonPath</a></p>
 
-<p><a href="#Aboutjsonconsjson">About jsoncons::json</a></p>
+<p><a href="#A9">About jsoncons::json</a></p>
 
-<p><a href="#Widecharactersupport">Wide character support</a></p>
+<p><a href="#A10">Wide character support</a></p>
 
-<p><a href="#ojsonandowjson">ojson and owjson</a></p>
+<p><a href="#A11">ojson and owjson</a></p>
 
-<p><a href="#Convertjsontofromuserdefinedtype">Convert json to/from user defined type</a></p>
+<p><a href="#A12">Convert json to/from user defined type</a></p>
+
+<p></p><div id="A1"></div>
 
 <h3>
-<a id="preliminaries" class="anchor" href="#preliminaries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preliminaries<a name="Preliminaries"></a>
-</h3>
+<a id="preliminaries" class="anchor" href="#preliminaries" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preliminaries</h3>
 
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
 
@@ -75,9 +76,10 @@
 
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::json;</pre></div>
 
+<p><a name="A2"></a></p>
+
 <h3>
-<a id="reading-json-text-from-a-file" class="anchor" href="#reading-json-text-from-a-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reading JSON text from a file<a name="ReadingJSONtextfromafile"></a>
-</h3>
+<a id="reading-json-text-from-a-file" class="anchor" href="#reading-json-text-from-a-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reading JSON text from a file</h3>
 
 <p>Example file (<code>books.json</code>):</p>
 
@@ -194,9 +196,10 @@ title=Cutter's Way
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>;
 }</pre></div>
 
+<p><a name="A3"></a></p>
+
 <h3>
-<a id="constructing-json-values-in-c" class="anchor" href="#constructing-json-values-in-c" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Constructing json values in C++<a name="ConstructingjsonvaluesinC++"></a>
-</h3>
+<a id="constructing-json-values-in-c" class="anchor" href="#constructing-json-values-in-c" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Constructing json values in C++</h3>
 
 <p>The default <code>json</code> constructor produces an empty json object. For example </p>
 
@@ -281,9 +284,10 @@ file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span cl
     }
 }</pre></div>
 
+<p><a name="A4"></a></p>
+
 <h3>
-<a id="converting-to-and-from-standard-library-containers" class="anchor" href="#converting-to-and-from-standard-library-containers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Converting to and from standard library containers<a name="Convertingtoandfromstandardlibrarycontainers"></a>
-</h3>
+<a id="converting-to-and-from-standard-library-containers" class="anchor" href="#converting-to-and-from-standard-library-containers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Converting to and from standard library containers</h3>
 
 <p>The jsoncons library supports converting to and from the standard library sequence and associative containers.</p>
 
@@ -335,9 +339,10 @@ three=3
 two=2
 </code></pre>
 
+<p><a name="A5"></a></p>
+
 <h3>
-<a id="converting-csv-files-to-json" class="anchor" href="#converting-csv-files-to-json" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Converting CSV files to json<a name="ConvertingCSVfilestojson"></a>
-</h3>
+<a id="converting-csv-files-to-json" class="anchor" href="#converting-csv-files-to-json" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Converting CSV files to json</h3>
 
 <p>Example CSV file (tasks.csv):</p>
 
@@ -419,9 +424,10 @@ std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
 <li>The <code>column_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
 </ul>
 
+<p><a name="A6"></a></p>
+
 <h3>
-<a id="pretty-print" class="anchor" href="#pretty-print" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pretty print<a name="Prettyprint"></a>
-</h3>
+<a id="pretty-print" class="anchor" href="#pretty-print" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pretty print</h3>
 
 <p>The <code>pretty_print</code> function applies stylistic formatting to JSON text. For example</p>
 
@@ -491,9 +497,10 @@ std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
     ]
 }</pre></div>
 
+<p><a name="A7"></a></p>
+
 <h3>
-<a id="filters" class="anchor" href="#filters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Filters<a name="Filters"></a>
-</h3>
+<a id="filters" class="anchor" href="#filters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Filters</h3>
 
 <p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
 
@@ -533,11 +540,11 @@ std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
 
-<p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
+<p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.
+<a name="A8"></a></p>
 
 <h3>
-<a id="jsonpath" class="anchor" href="#jsonpath" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JsonPath<a name="JsonPath"></a>
-</h3>
+<a id="jsonpath" class="anchor" href="#jsonpath" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JsonPath</h3>
 
 <p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
 
@@ -639,9 +646,10 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span clas
     <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
 ]</pre></div>
 
+<p><a name="A9"></a></p>
+
 <h3>
-<a id="about-jsonconsjson" class="anchor" href="#about-jsonconsjson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About jsoncons::json<a name="Aboutjsonconsjson"></a>
-</h3>
+<a id="about-jsonconsjson" class="anchor" href="#about-jsonconsjson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About jsoncons::json</h3>
 
 <p>The <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type
 and sorts object members in alphabetically order.</p>
@@ -676,9 +684,10 @@ o.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
 
 <p>Note that the underlying memory pool used by the <code>boost::fast_pool_allocator</code> is never freed. </p>
 
+<p><a name="A10"></a></p>
+
 <h3>
-<a id="wide-character-support" class="anchor" href="#wide-character-support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Wide character support<a name="Widecharactersupport"></a>
-</h3>
+<a id="wide-character-support" class="anchor" href="#wide-character-support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Wide character support</h3>
 
 <p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It supports <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4. You can construct a <code>wjson</code> value in exactly the same way as a <code>json</code> value, for instance:</p>
 
@@ -695,9 +704,10 @@ std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</sp
 
 <div class="highlight highlight-source-c++"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">3.9</span>,<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>}</pre></div>
 
+<p><a name="A11"></a></p>
+
 <h3>
-<a id="ojson-and-owjson" class="anchor" href="#ojson-and-owjson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ojson and owjson<a name="ojsonandowjson"></a>
-</h3>
+<a id="ojson-and-owjson" class="anchor" href="#ojson-and-owjson" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ojson and owjson</h3>
 
 <p>The <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> (<a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a>) class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> (<code>wchar_t</code>) as the character type and keeps object members in their original order. </p>
 
@@ -755,9 +765,10 @@ std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
     <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
 }</pre></div>
 
+<p><a name="A12"></a></p>
+
 <h3>
-<a id="convert-json-tofrom-user-defined-type" class="anchor" href="#convert-json-tofrom-user-defined-type" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Convert <code>json</code> to/from user defined type<a name="Convertjsontofromuserdefinedtype"></a>
-</h3>
+<a id="convert-json-tofrom-user-defined-type" class="anchor" href="#convert-json-tofrom-user-defined-type" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Convert <code>json</code> to/from user defined type</h3>
 
 <p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
 
