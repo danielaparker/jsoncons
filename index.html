@@ -355,11 +355,11 @@ two=2
 
 <span class="pl-k">using</span> jsoncons::csv::csv_parameters;
 <span class="pl-k">using</span> jsoncons::csv::csv_reader;
-<span class="pl-k">using</span> jsoncons::json_encoder;
+<span class="pl-k">using</span> jsoncons::json_decoder;
 
 std::fstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>tasks.csv<span class="pl-pds">"</span></span>);
 
-json_encoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; encoder;
 
 csv_parameters params;
 params.assume_header(<span class="pl-c1">true</span>)
