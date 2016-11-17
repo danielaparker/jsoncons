@@ -908,13 +908,13 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 {
     std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/tasks.csv<span class="pl-pds">"</span></span>);
 
-    json_decoder&lt;json&gt; encoder;
+    json_decoder&lt;json&gt; decoder;
     csv_parameters params;
     params.<span class="pl-c1">assume_header</span>(<span class="pl-c1">true</span>)
           .<span class="pl-c1">trim</span>(<span class="pl-c1">true</span>)
           .<span class="pl-c1">ignore_empty_values</span>(<span class="pl-c1">true</span>) 
           .<span class="pl-c1">column_types</span>({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
-    csv_reader <span class="pl-smi">reader</span>(is,encoder,params);
+    csv_reader <span class="pl-smi">reader</span>(is,decoder,params);
     reader.<span class="pl-c1">read</span>();
     ojson tasks = encoder.<span class="pl-c1">get_result</span>();
 

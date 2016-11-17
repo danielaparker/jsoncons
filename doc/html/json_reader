@@ -568,8 +568,8 @@ size_t max_nesting_depth() const
     <span class="pl-k">throw</span> <span class="pl-smi">std::runtime_error</span>(<span class="pl-s"><span class="pl-pds">"</span>Cannot open file<span class="pl-pds">"</span></span>);
 }
 
-json_decoder&lt;json&gt; encoder;
-json_reader <span class="pl-en">reader</span>(is,encoder);
+json_decoder&lt;json&gt; decoder;
+json_reader <span class="pl-en">reader</span>(is,decoder);
 
 <span class="pl-k">while</span> (!reader.eof())
 {

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_json_decoder_HPP
-#define JSONCONS_json_decoder_HPP
+#ifndef JSONCONS_JSON_DECODER_HPP
+#define JSONCONS_JSON_DECODER_HPP
 
 #include <string>
 #include <sstream>

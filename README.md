@@ -445,13 +445,13 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    json_decoder<json> encoder;
+    json_decoder<json> decoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types({"integer","string","string","string"});
-    csv_reader reader(is,encoder,params);
+    csv_reader reader(is,decoder,params);
     reader.read();
     ojson tasks = encoder.get_result();
 

@@ -79,8 +79,8 @@ if (!is.is_open())
     throw std::runtime_error("Cannot open file");
 }
 
-json_decoder<json> encoder;
-json_reader reader(is,encoder);
+json_decoder<json> decoder;
+json_reader reader(is,decoder);
 
 while (!reader.eof())
 {

@@ -563,9 +563,9 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_decoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 
-csv_reader <span class="pl-en">reader</span>(is,encoder);
+csv_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -605,12 +605,12 @@ Dependable, trustworthy"
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>employees.txt<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_decoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 csv_parameters params;
 params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>
       .assume_header = <span class="pl-c1">true</span>;
 
-csv_reader <span class="pl-en">reader</span>(is,encoder,params);
+csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
 json employees = encoder.get_result();
 
@@ -662,13 +662,13 @@ std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;</pre></div>
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_decoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 
 csv_parameters params;
 params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>})
       .header_lines(<span class="pl-c1">1</span>);
 
-csv_reader <span class="pl-en">reader</span>(is,encoder,params);
+csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
 json countries = encoder.get_result();
 

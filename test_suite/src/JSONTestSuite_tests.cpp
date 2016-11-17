@@ -77,9 +77,9 @@ BOOST_AUTO_TEST_CASE(test_json)
                         {
                             std::ifstream is(dir_itr->path().c_str());
 
-                            json_decoder<ojson> encoder;
+                            json_decoder<ojson> decoder;
                             strict_parse_error_handler err_handler;
-                            json_reader reader(is, encoder, err_handler);
+                            json_reader reader(is, decoder, err_handler);
                             reader.read();
                             std::ostringstream os;
                             os << dir_itr->path().filename() << " should fail";

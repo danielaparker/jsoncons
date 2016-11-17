@@ -321,8 +321,8 @@ BOOST_AUTO_TEST_CASE(test_fail18)
 
     try
     {
-        json_decoder<json> encoder;
-        json_reader reader(is,encoder);
+        json_decoder<json> decoder;
+        json_reader reader(is,decoder);
         reader.max_nesting_depth(20);
         reader.read_next();
         reader.check_done();

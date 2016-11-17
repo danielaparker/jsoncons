@@ -79,9 +79,9 @@ Note
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
-json_decoder<json> encoder;
+json_decoder<json> decoder;
 
-csv_reader reader(is,encoder);
+csv_reader reader(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -118,12 +118,12 @@ Note
 std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
-json_decoder<json> encoder;
+json_decoder<json> decoder;
 csv_parameters params;
 params.field_delimiter = '\t'
       .assume_header = true;
 
-csv_reader reader(is,encoder,params);
+csv_reader reader(is,decoder,params);
 reader.read();
 json employees = encoder.get_result();
 
@@ -176,13 +176,13 @@ Note
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
-json_decoder<json> encoder;
+json_decoder<json> decoder;
 
 csv_parameters params;
 params.column_names({"Country Code","Name"})
       .header_lines(1);
 
-csv_reader reader(is,encoder,params);
+csv_reader reader(is,decoder,params);
 reader.read();
 json countries = encoder.get_result();
 

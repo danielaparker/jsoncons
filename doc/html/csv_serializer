@@ -525,8 +525,8 @@ You must ensure that the output stream exists as long as does <code>csv_serializ
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/countries.json<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_decoder&lt;json&gt; encoder;
-json_reader <span class="pl-en">reader</span>(is,encoder);
+json_decoder&lt;json&gt; decoder;
+json_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -590,11 +590,11 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/employees.json<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_decoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 csv_parameters params;
 params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>;
 
-json_reader <span class="pl-en">reader</span>(is,encoder);
+json_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
 json employees = encoder.get_result();
 

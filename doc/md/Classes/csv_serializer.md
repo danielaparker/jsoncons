@@ -50,8 +50,8 @@ Note
 std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
 
-json_decoder<json> encoder;
-json_reader reader(is,encoder);
+json_decoder<json> decoder;
+json_reader reader(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -112,11 +112,11 @@ Note
 std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
 
-json_decoder<json> encoder;
+json_decoder<json> decoder;
 csv_parameters params;
 params.field_delimiter = '\t';
 
-json_reader reader(is,encoder);
+json_reader reader(is,decoder);
 reader.read();
 json employees = encoder.get_result();
 
