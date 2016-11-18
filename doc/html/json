@@ -474,7 +474,7 @@ vertical-align:1px;
                    JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json</pre></div>
 
-<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use <a href="ojson">ojson</a> instead.</p>
+<p>The <code>json</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use <a href="ojson">ojson</a> instead.</p>
 
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
@@ -1096,9 +1096,9 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 <h3>See also</h3>
 
 <ul>
-<li><p><a href="ojson">ojson</a> constructs a json value that retains the original name-value insertion order</p></li>
+<li><p><a href="ojson">ojson</a> constructs a json value that preserves the original name-value insertion order</p></li>
 <li><p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="owjson">owjson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="owjson">owjson</a> constructs a wide character json value that preserves the original name-value insertion order</p></li>
 </ul>
 
 <h2>Examples</h2>

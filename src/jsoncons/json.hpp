@@ -122,7 +122,7 @@ public:
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
 
     typedef json_array<json_type,array_allocator> array;
-    typedef json_object<string_type,json_type,json_traits_type::is_object_sorted,object_allocator> object;
+    typedef json_object<string_type,json_type,json_traits_type::preserve_order,object_allocator> object;
 
     typedef jsoncons::null_type null_type;
 
@@ -3627,11 +3627,11 @@ json_printable<Json> pretty_print(const Json& val,
 
 typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
 typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
-typedef basic_json<char, ojson_traits<char>, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> owjson;
+typedef basic_json<char, o_json_traits<char>, std::allocator<char>> ojson;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> owjson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> wojson;
 typedef json_decoder<json> json_deserializer;
 typedef json_decoder<wjson> wjson_deserializer;
 typedef json_decoder<ojson> ojson_deserializer;

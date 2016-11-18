@@ -2,10 +2,10 @@
 jsoncons::owjson
 
 typedef basic_json<wchar_t,
-                   JsonTraits = ojson_traits<wchar_t>,
+                   JsonTraits = o_json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> owjson
 ```
-The `owjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The supplied `JsonTraits` template parameter keeps object members in their original order. 
+The `owjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The original insertion order of an object's name/value pairs is preserved. 
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
@@ -40,5 +40,5 @@ std::cout << member.key() << "=" << member.value() << std::endl;
 
 - [json](json) constructs a narrow character json value that sorts name-value members alphabetically
 
-- [ojson](ojson) constructs a narrow character json value that retains the original name-value insertion order
+- [ojson](ojson) constructs a narrow character json value that preserves the original insertion order of an object's name/value pairs
 

@@ -71,7 +71,16 @@ BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list3)
     val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
     val["data"]["item"] = json::array{json::object{{"first",1},{"second",2}}};
 
-    std::cout << val << std::endl;
+    json expected_id = json::parse(R"(
+[0,1,2,3,4,5,6,7]
+    )");
+
+    json expected_item = json::parse(R"(
+    [{"first":1,"second":2}]
+    )");
+
+    BOOST_CHECK(expected_id == val["data"]["id"]);
+    BOOST_CHECK(expected_item == val["data"]["item"]);
 }
 
 BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)

@@ -505,16 +505,10 @@ vertical-align:1px;
 
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
 
-<h2>What's new on master</h2>
-
-<ul>
-<li>Validations added to utf8 and utf16 string parsing to pass all <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> tests</li>
-<li>The name <code>json_encoder</code> introduced in 0.99.4 has been changed to <code>json_decoder</code>. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)</li>
-</ul>
-
 <h2>Benchmarks</h2>
 
-<p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.</p>
+<p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.<br>
+Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and <a href="http://www.json.org/JSON_checker/">JSON_checker</a> tests may be found <a href="https://danielaparker.github.io/json_benchmarks/">here</a>.</p>
 
 <h2>Get jsoncons</h2>
 
@@ -609,9 +603,9 @@ vertical-align:1px;
 
 <ul>
 <li><p><a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a narrow character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a narrow character json value that preserves the original name-value insertion order</p></li>
 <li><p><a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> constructs a wide character json value that preserves the original name-value insertion order</p></li>
 </ul>
 
 <h2>Features</h2>

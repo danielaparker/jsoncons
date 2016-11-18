@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
 {
     double x = 1.0e100;
     std::string s = float_to_string<char>(x, format.precision());
-    std::cout << x << ": " << s << std::endl;
+    //std::cout << x << ": " << s << std::endl;
     BOOST_CHECK(s == std::string("1.0e+100") || s == std::string("1.0e100"));
 
     x = 1.0e-100;

@@ -129,11 +129,11 @@ The library includes four instantiations of `basic_json`:
 
 - [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a narrow character json value that sorts name-value members alphabetically
 
-- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that retains the original name-value insertion order
+- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that preserves the original name-value insertion order
 
 - [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) constructs a wide character json value that retains the original name-value insertion order
+- [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 

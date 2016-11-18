@@ -471,10 +471,10 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::owjson
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
-                   JsonTraits = ojson_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
+                   JsonTraits = o_json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; owjson</pre></div>
 
-<p>The <code>owjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
+<p>The <code>owjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The original insertion order of an object's name/value pairs is preserved. </p>
 
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
 
@@ -511,7 +511,7 @@ std::cout &lt;&lt; member.key() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; st
 <ul>
 <li><p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
 <li><p><a href="json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="ojson">ojson</a> constructs a narrow character json value that retains the original name-value insertion order</p></li>
+<li><p><a href="ojson">ojson</a> constructs a narrow character json value that preserves the original insertion order of an object's name/value pairs</p></li>
 </ul>
 </body>
 </html>

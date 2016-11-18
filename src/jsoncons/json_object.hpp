@@ -410,13 +410,14 @@ public:
     IteratorT it_;
 };
 
-template <class StringT,class Json,bool IsSorted,class Allocator>
+template <class StringT,class Json,bool PreserveOrder,class Allocator>
 class json_object
 {
 };
 
+// Do not preserve order
 template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,true,Allocator>
+class json_object<StringT,Json,false,Allocator>
 {
 public:
     typedef Allocator allocator_type;
@@ -700,10 +701,10 @@ private:
     json_object& operator=(const json_object&) = delete;
 };
 
-// Original order
+// Preserve order
 
 template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,false,Allocator>
+class json_object<StringT,Json,true,Allocator>
 {
 public:
     typedef Allocator allocator_type;

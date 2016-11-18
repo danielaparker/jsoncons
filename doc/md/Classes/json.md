@@ -5,7 +5,7 @@ typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json
 ```
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The supplied `JsonTraits` template parameter keeps object members in alphabetically sorted order. If you prefer to retain the original insertion order, use [ojson](ojson) instead.
+The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson) instead.
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
@@ -414,11 +414,11 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### See also
 
-- [ojson](ojson) constructs a json value that retains the original name-value insertion order
+- [ojson](ojson) constructs a json value that preserves the original name-value insertion order
 
 - [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](owjson) constructs a wide character json value that retains the original name-value insertion order
+- [owjson](owjson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Examples
 

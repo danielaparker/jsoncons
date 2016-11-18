@@ -25,19 +25,19 @@ struct json_traits
     typedef std::allocator<CharT> char_allocator;
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
 
-    static const bool is_object_sorted = true;
+    static const bool preserve_order = false;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };
 
 template <class CharT>
-struct ojson_traits 
+struct o_json_traits 
 {
     typedef typename std::char_traits<CharT> char_traits_type;
     typedef std::allocator<CharT> char_allocator;
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
 
-    static const bool is_object_sorted = false;
+    static const bool preserve_order = true;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };
