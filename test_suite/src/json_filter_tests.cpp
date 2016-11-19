@@ -143,14 +143,15 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     {
         std::cout << e.what() << std::endl;
     }
+    BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
 
-    std::cout << ("1\n") << pretty_print(j) << std::endl;
-
-    json_serializer serializer(std::cout, true);
-
+    std::stringstream ss;
+    json_serializer serializer(ss, false);
     rename_name_filter filter("price","price2",serializer);
     j.write(filter);
 
+    json j2 = json::parse_stream(ss);
+    BOOST_CHECK_CLOSE(31.96,j2["store"]["book"][0]["price2"].as<double>(),0.001);
 }
 
 BOOST_AUTO_TEST_CASE(test_chained_filters)

@@ -1062,7 +1062,7 @@ BOOST_AUTO_TEST_CASE(test_replace)
     //std::cout << "!!!test_replace" << std::endl;
     //std::cout << ("1\n") << pretty_print(j) << std::endl;
 
-    BOOST_CHECK_EQUAL(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
+    BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
 
     json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
 
