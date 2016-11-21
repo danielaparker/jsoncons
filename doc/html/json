@@ -755,63 +755,48 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 bool is() const noexcept
 </code></pre>
 
-<p>Returns <code>true</code> if the json value is compatible with value type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.  </p>
+<p>Returns <code>true</code> if the json value is the same as type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.  </p>
 
-<pre><code>bool is&lt;char&gt; const noexcept 
-bool is&lt;signed char&gt; const noexcept
-bool is&lt;unsigned char&gt; const noexcept
-bool is&lt;wchar_t&gt; const noexcept
-bool is&lt;short&gt; const noexcept
-bool is&lt;unsigned short&gt; const noexcept 
-bool is&lt;int&gt; const noexcept 
-bool is&lt;unsigned int&gt; const noexcept 
-bool is&lt;long&gt; const noexcept 
-bool is&lt;unsigned long&gt; const noexcept 
-bool is&lt;long long&gt; const noexcept 
-bool is&lt;unsigned long long&gt; const noexcept 
+<pre><code>bool is&lt;X&gt; const noexcept 
 </code></pre>
 
-<p>Return <code>true</code> if json value is of integral type and within the range of the template type, <code>false</code> otherwise.  </p>
+<p>If the type <code>X</code> is integral, returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br><br>
+If the type <code>X</code> is floating point, returns <code>true</code> if the json value is of floating point and within the range of the template type, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;double&gt; 
-</code></pre>
-
-<p>Return true if the json value is of floating point type and within the range of the template type, <code>false</code> otherwise.  </p>
-
-<pre><code>is&lt;string_type&gt; 
+<pre><code>bool is&lt;string_type&gt; const noexcept 
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;bool&gt;
+<pre><code>bool is&lt;bool&gt; const noexcept 
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;json::null_type&gt;
+<pre><code>bool is&lt;json::null_type&gt; const noexcept
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is null, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;json::object&gt; 
+<pre><code>bool is&lt;json::object&gt; const noexcept 
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is an object, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;json::array&gt; 
+<pre><code>bool is&lt;json::array&gt; const noexcept 
 </code></pre>
 
 <p>Returns <code>true</code> if the json value is an array, <code>false</code> otherwise.  </p>
 
-<pre><code>is&lt;std::vector&lt;T&gt;&gt;
+<pre><code>bool is&lt;X&lt;T&gt;&gt; const noexcept
 </code></pre>
 
-<p>Returns <code>true</code> if the json value is an array and each element has type <code>T</code>, <code>false</code> otherwise.</p>
+<p>Returns <code>true</code> if the type <code>X</code> satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, the json value is an array, and each array element is the "same as" type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
 
-<pre><code>is&lt;json::std::map&lt;std::string,T&gt;&gt;
+<pre><code>bool is&lt;X&lt;string_type,T&gt;&gt; const noexcept
 </code></pre>
 
-<p>Returns <code>true</code> if the json value is an object and each mapped value has type <code>T</code>, <code>false</code> otherwise.</p>
+<p>Returns <code>true</code> if the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, the json value is an object, and each mapped value is the "same as" <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
 
 <pre><code>bool is_null() const noexcept
 bool is_string() const noexcept
@@ -1102,6 +1087,66 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 </ul>
 
 <h2>Examples</h2>
+
+<h3>is and as</h3>
+
+<div class="highlight highlight-source-c++"><pre>    json j = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">    {</span>
+<span class="pl-s">        "k1" : 2147483647,</span>
+<span class="pl-s">        "k2" : 2147483648,</span>
+<span class="pl-s">        "k3" : -10,</span>
+<span class="pl-s">        "k4" : 10.5,</span>
+<span class="pl-s">        "k5" : true,</span>
+<span class="pl-s">        "k6" : "10.5"</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
+
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(9) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">bool</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(10) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k6<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(9) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">bool</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(10) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k6<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;</pre></div>
+
+<p>Output:</p>
+
+<pre><code>1) true
+(2) false
+(3) true
+(4) true
+(5) false
+(6) false
+(7) true
+(8) false
+(9) true
+(10) false
+
+(1) 2147483647
+(2) -2147483648
+(3) 2147483648
+(4) -10
+(5) 10
+(6) 10
+(7) 10.5
+(8) 1
+(9) true
+(10) 10.5
+</code></pre>
 
 <h3>Range-based for loop over members of an object</h3>
 

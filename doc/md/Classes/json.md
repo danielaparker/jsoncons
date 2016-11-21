@@ -172,45 +172,32 @@ Returns the number of object members that match `name`.
 
     template <class T>
     bool is() const noexcept
-Returns `true` if the json value is compatible with value type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
+Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
 
-    bool is<char> const noexcept 
-    bool is<signed char> const noexcept
-    bool is<unsigned char> const noexcept
-    bool is<wchar_t> const noexcept
-    bool is<short> const noexcept
-    bool is<unsigned short> const noexcept 
-    bool is<int> const noexcept 
-    bool is<unsigned int> const noexcept 
-    bool is<long> const noexcept 
-    bool is<unsigned long> const noexcept 
-    bool is<long long> const noexcept 
-    bool is<unsigned long long> const noexcept 
-Return `true` if json value is of integral type and within the range of the template type, `false` otherwise.  
+    bool is<X> const noexcept 
+If the type `X` is integral, returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
+If the type `X` is floating point, returns `true` if the json value is of floating point and within the range of the template type, `false` otherwise.  
 
-    is<double> 
-Return true if the json value is of floating point type and within the range of the template type, `false` otherwise.  
-
-    is<string_type> 
+    bool is<string_type> const noexcept 
 Returns `true` if the json value is of string type, `false` otherwise.  
 
-    is<bool>
+    bool is<bool> const noexcept 
 Returns `true` if the json value is of boolean type, `false` otherwise.  
 
-    is<json::null_type>
+    bool is<json::null_type> const noexcept
 Returns `true` if the json value is null, `false` otherwise.  
 
-    is<json::object> 
+    bool is<json::object> const noexcept 
 Returns `true` if the json value is an object, `false` otherwise.  
 
-    is<json::array> 
+    bool is<json::array> const noexcept 
 Returns `true` if the json value is an array, `false` otherwise.  
 
-    is<std::vector<T>>
-Returns `true` if the json value is an array and each element has type `T`, `false` otherwise.
+    bool is<X<T>> const noexcept
+Returns `true` if the type `X` satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), the json value is an array, and each array element is the "same as" type `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
-    is<json::std::map<std::string,T>>
-Returns `true` if the json value is an object and each mapped value has type `T`, `false` otherwise.
+    bool is<X<string_type,T>> const noexcept
+Returns `true` if the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), the json value is an object, and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
     bool is_null() const noexcept
     bool is_string() const noexcept
@@ -421,6 +408,66 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [owjson](owjson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Examples
+
+### is and as
+```c++
+    json j = json::parse(R"(
+    {
+        "k1" : 2147483647,
+        "k2" : 2147483648,
+        "k3" : -10,
+        "k4" : 10.5,
+        "k5" : true,
+        "k6" : "10.5"
+    }
+    )");
+
+    std::cout << std::boolalpha << "(1) " << j["k1"].is<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(2) " << j["k2"].is<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(3) " << j["k2"].is<long long>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].is<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k4"].is<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(6) " << j["k4"].is<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(7) " << j["k4"].is<double>() << '\n';
+    std::cout << std::boolalpha << "(8) " << j["k5"].is<int>() << '\n';
+    std::cout << std::boolalpha << "(9) " << j["k5"].is<bool>() << '\n';
+    std::cout << std::boolalpha << "(10) " << j["k6"].is<double>() << '\n';
+    std::cout << '\n';
+    std::cout << std::boolalpha << "(1) " << j["k1"].as<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(2) " << j["k2"].as<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(3) " << j["k2"].as<long long>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].as<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k4"].as<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(6) " << j["k4"].as<int32_t>() << '\n';
+    std::cout << std::boolalpha << "(7) " << j["k4"].as<double>() << '\n';
+    std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
+    std::cout << std::boolalpha << "(9) " << j["k5"].as<bool>() << '\n';
+    std::cout << std::boolalpha << "(10) " << j["k6"].as<double>() << '\n';
+```
+Output:
+```
+1) true
+(2) false
+(3) true
+(4) true
+(5) false
+(6) false
+(7) true
+(8) false
+(9) true
+(10) false
+
+(1) 2147483647
+(2) -2147483648
+(3) 2147483648
+(4) -10
+(5) 10
+(6) 10
+(7) 10.5
+(8) 1
+(9) true
+(10) 10.5
+```
 
 ### Range-based for loop over members of an object
 ```c++
