@@ -31,16 +31,16 @@ void is_as_examples()
     std::cout << std::boolalpha << "(9) " << j["k5"].is<bool>() << '\n';
     std::cout << std::boolalpha << "(10) " << j["k6"].is<double>() << '\n';
     std::cout << '\n';
-    std::cout << std::boolalpha << "(1) " << j["k1"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(2) " << j["k2"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(3) " << j["k2"].as<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].as<signed char>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k3"].as<uint32_t>() << '\n';
-    std::cout << std::boolalpha << "(6) " << j["k4"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(7) " << j["k4"].as<double>() << '\n';
+    std::cout << "(1) " << j["k1"].as<int32_t>() << '\n';
+    std::cout << "(2) " << j["k2"].as<int32_t>() << '\n';
+    std::cout << "(3) " << j["k2"].as<long long>() << '\n';
+    std::cout << "(4) " << j["k3"].as<signed char>() << '\n';
+    std::cout << "(5) " << j["k3"].as<uint32_t>() << '\n';
+    std::cout << "(6) " << j["k4"].as<int32_t>() << '\n';
+    std::cout << "(7) " << j["k4"].as<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
     std::cout << std::boolalpha << "(9) " << j["k5"].as<bool>() << '\n';
-    std::cout << std::boolalpha << "(10) " << j["k6"].as<double>() << '\n';
+    std::cout << "(10) " << j["k6"].as<double>() << '\n';
 }
 
 void introspection_example()

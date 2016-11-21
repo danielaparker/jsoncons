@@ -433,16 +433,16 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     std::cout << std::boolalpha << "(9) " << j["k5"].is<bool>() << '\n';
     std::cout << std::boolalpha << "(10) " << j["k6"].is<double>() << '\n';
     std::cout << '\n';
-    std::cout << std::boolalpha << "(1) " << j["k1"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(2) " << j["k2"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(3) " << j["k2"].as<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].as<signed char>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k3"].as<uint32_t>() << '\n';
-    std::cout << std::boolalpha << "(6) " << j["k4"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(7) " << j["k4"].as<double>() << '\n';
+    std::cout << "(1) " << j["k1"].as<int32_t>() << '\n';
+    std::cout << "(2) " << j["k2"].as<int32_t>() << '\n';
+    std::cout << "(3) " << j["k2"].as<long long>() << '\n';
+    std::cout << "(4) " << j["k3"].as<signed char>() << '\n';
+    std::cout << "(5) " << j["k3"].as<uint32_t>() << '\n';
+    std::cout << "(6) " << j["k4"].as<int32_t>() << '\n';
+    std::cout << "(7) " << j["k4"].as<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
     std::cout << std::boolalpha << "(9) " << j["k5"].as<bool>() << '\n';
-    std::cout << std::boolalpha << "(10) " << j["k6"].as<double>() << '\n';
+    std::cout << "(10) " << j["k6"].as<double>() << '\n';
 ```
 Output:
 ```
@@ -514,21 +514,21 @@ for (const auto& book: booklist.array_range())
    
 ### Accessors and defaults
 ```c++
-json obj;
+json val;
 
-obj["field1"] = 1;
-obj["field3"] = "Toronto";
+val["field1"] = 1;
+val["field3"] = "Toronto";
 
-double x1 = obj.count("field1") > 0 ? obj["field1"].as<double>() : 10.0;
-double x2 = obj.count("field2") > 0 ? obj["field2"].as<double>() : 20.0;
+double x1 = obj.has_key("field1") ? val["field1"].as<double>() : 10.0;
+double x2 = obj.has_key("field2") ? val["field2"].as<double>() : 20.0;
 
 std::string x3 = obj.get_with_default("field3","Montreal");
 std::string x4 = obj.get_with_default("field4","San Francisco");
 
-std::cout << "x1=" << x1 << std::endl;
-std::cout << "x2=" << x2 << std::endl;
-std::cout << "x3=" << x3 << std::endl;
-std::cout << "x4=" << x4 << std::endl;
+std::cout << "x1=" << x1 << '\n';
+std::cout << "x2=" << x2 << '\n';
+std::cout << "x3=" << x3 << '\n';
+std::cout << "x4=" << x4 << '\n';
 ```
 Output:
 ```c++
