@@ -175,8 +175,8 @@ Returns the number of object members that match `name`.
 Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
 
     bool is<X> const noexcept 
-If the type `X` is integral, returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
-If the type `X` is floating point, returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
+If the type `X` is integral, `is<X>()` returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
+If the type `X` is floating point, `is<X>()` returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
 
     bool is<string_type> const noexcept 
 Returns `true` if the json value is of string type, `false` otherwise.  
@@ -194,10 +194,10 @@ Returns `true` if the json value is an object, `false` otherwise.
 Returns `true` if the json value is an array, `false` otherwise.  
 
     bool is<X<T>> const noexcept
-Returns `true` if the type `X` satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), the json value is an array, and each array element is the "same as" type `T` according to [json_type_traits](json_type_traits), `false` otherwise.
+If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
     bool is<X<string_type,T>> const noexcept
-Returns `true` if the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), the json value is an object, and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits), `false` otherwise.
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
     bool is_null() const noexcept
     bool is_string() const noexcept
@@ -209,6 +209,51 @@ Returns `true` if the type 'X' satisfies [AssociativeContainer](http://en.cppref
     bool is_object() const noexcept
     bool is_array() const noexcept
 Non-generic versions of `is_` methods
+
+    template <class T>
+    T as() const
+Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
+
+    as<bool>
+Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
+Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
+Otherwise throws `std::runtime_exception`
+
+    as<double>
+If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
+
+    char as<char> const
+    signed char as<signed char> const
+    unsigned char as<unsigned char> const
+    wchar_t as<wchar_t> const
+    short as<short> const
+    unsigned short as<unsigned short> const 
+    int as<int> const 
+    unsigned int as<unsigned int> const 
+    long as<long> const 
+    unsigned long as<unsigned long> const 
+    long long as<long long> const 
+    unsigned long long as<unsigned long long> const 
+Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
+
+    string_type as<string_type>() const noexcept
+    string_type as<string_type>(const char_allocator& allocator) const noexcept
+If value is string, returns value, otherwise returns result of `to_string`.
+
+    as<X<T>>()
+If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns a `json` array value as an `X<T>` if possible, otherwise throws.
+
+    as<X<string_type,T>>()
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<string_type,T>>()` returns a `json` object value as an `X<string_type,T>` if possible, otherwise throws.
+
+    bool as_bool() const
+    int64_t as_integer() const
+    uint64_t as_uinteger() const
+    double as_double() const
+    string_type as_string() const noexcept
+    string_type as_string(const char_allocator& allocator) const noexcept
+    unsigned int as<unsigned int> const 
+Non-generic versions of `as` methods
 
     json& operator[](size_t i)
     const json& operator[](size_t i) const
@@ -251,51 +296,6 @@ Throws `std::runtime_error` if not an object.
 
     const char_type* get_with_default(const string_type& name, const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals.
-
-    template <class T>
-    T as() const
-Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
-
-    as<bool>
-Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
-Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
-Otherwise throws `std::runtime_exception`
-
-    as<double>
-If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
-
-    char as<char> const
-    signed char as<signed char> const
-    unsigned char as<unsigned char> const
-    wchar_t as<wchar_t> const
-    short as<short> const
-    unsigned short as<unsigned short> const 
-    int as<int> const 
-    unsigned int as<unsigned int> const 
-    long as<long> const 
-    unsigned long as<unsigned long> const 
-    long long as<long long> const 
-    unsigned long long as<unsigned long long> const 
-Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
-
-    string_type as<string_type>() const noexcept
-    string_type as<string_type>(const char_allocator& allocator) const noexcept
-If value is string, returns value, otherwise returns result of `to_string`.
-
-    as<std::vector<T>>()
-Returns `json` value as an `std::vector<T>`.
-
-    as<json::std::map<std::string,T>>()
-Returns `json` object value as an `std::map`.
-
-    bool as_bool() const
-    int64_t as_integer() const
-    uint64_t as_uinteger() const
-    double as_double() const
-    string_type as_string() const noexcept
-    string_type as_string(const char_allocator& allocator) const noexcept
-    unsigned int as<unsigned int> const 
-Non-generic versions of `as` methods
 
 ### Modifiers
 
