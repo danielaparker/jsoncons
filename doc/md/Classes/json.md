@@ -241,10 +241,10 @@ Return integer value if value has integral type, performs cast if value has doub
 If value is string, returns value, otherwise returns result of `to_string`.
 
     as<X<T>>()
-If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns a `json` array value as an `X<T>` if possible, otherwise throws.
+If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns the `json` value as an `X<T>` if the `json` value is an array and each element is convertible to type `T`, otherwise throws.
 
     as<X<string_type,T>>()
-If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<string_type,T>>()` returns a `json` object value as an `X<string_type,T>` if possible, otherwise throws.
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<string_type,T>>()` returns the `json` value as an `X<string_type,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
     bool as_bool() const
     int64_t as_integer() const

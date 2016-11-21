@@ -854,12 +854,12 @@ string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noe
 <pre><code>as&lt;X&lt;T&gt;&gt;()
 </code></pre>
 
-<p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>as&lt;X&lt;T&gt;&gt;()</code> returns a <code>json</code> array value as an <code>X&lt;T&gt;</code> if possible, otherwise throws.</p>
+<p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>as&lt;X&lt;T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;T&gt;</code> if the <code>json</code> value is an array and each element is convertible to type <code>T</code>, otherwise throws.</p>
 
 <pre><code>as&lt;X&lt;string_type,T&gt;&gt;()
 </code></pre>
 
-<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>as&lt;X&lt;string_type,T&gt;&gt;()</code> returns a <code>json</code> object value as an <code>X&lt;string_type,T&gt;</code> if possible, otherwise throws.</p>
+<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>as&lt;X&lt;string_type,T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;string_type,T&gt;</code> if the <code>json</code> value is an object and if each member value is convertible to type <code>T</code>, otherwise throws.</p>
 
 <pre><code>bool as_bool() const
 int64_t as_integer() const
