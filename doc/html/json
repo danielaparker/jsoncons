@@ -761,7 +761,7 @@ bool is() const noexcept
 </code></pre>
 
 <p>If the type <code>X</code> is integral, returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br><br>
-If the type <code>X</code> is floating point, returns <code>true</code> if the json value is of floating point and within the range of the template type, <code>false</code> otherwise.  </p>
+If the type <code>X</code> is floating point, returns <code>true</code> if the json value is floating point and within the range of the type <code>X</code>, <code>false</code> otherwise.  </p>
 
 <pre><code>bool is&lt;string_type&gt; const noexcept 
 </code></pre>
@@ -1104,8 +1104,8 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">signed</span> <span class="pl-k">char</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
@@ -1115,8 +1115,8 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">signed</span> <span class="pl-k">char</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
+    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
     std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
@@ -1125,7 +1125,7 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 
 <p>Output:</p>
 
-<pre><code>1) true
+<pre><code>(1) true
 (2) false
 (3) true
 (4) true
@@ -1139,8 +1139,8 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 (1) 2147483647
 (2) -2147483648
 (3) 2147483648
-(4) -10
-(5) 10
+(4) ÷
+(5) 4294967286
 (6) 10
 (7) 10.5
 (8) 1

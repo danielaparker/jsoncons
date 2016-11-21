@@ -23,8 +23,8 @@ void is_as_examples()
     std::cout << std::boolalpha << "(1) " << j["k1"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(2) " << j["k2"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(3) " << j["k2"].is<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].is<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k4"].is<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].is<signed char>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k3"].is<uint32_t>() << '\n';
     std::cout << std::boolalpha << "(6) " << j["k4"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(7) " << j["k4"].is<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].is<int>() << '\n';
@@ -34,8 +34,8 @@ void is_as_examples()
     std::cout << std::boolalpha << "(1) " << j["k1"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(2) " << j["k2"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(3) " << j["k2"].as<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k4"].as<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].as<signed char>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k3"].as<uint32_t>() << '\n';
     std::cout << std::boolalpha << "(6) " << j["k4"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(7) " << j["k4"].as<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';

@@ -176,7 +176,7 @@ Returns `true` if the json value is the same as type `T` according to [json_type
 
     bool is<X> const noexcept 
 If the type `X` is integral, returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
-If the type `X` is floating point, returns `true` if the json value is of floating point and within the range of the template type, `false` otherwise.  
+If the type `X` is floating point, returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
 
     bool is<string_type> const noexcept 
 Returns `true` if the json value is of string type, `false` otherwise.  
@@ -425,8 +425,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     std::cout << std::boolalpha << "(1) " << j["k1"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(2) " << j["k2"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(3) " << j["k2"].is<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].is<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k4"].is<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].is<signed char>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k3"].is<uint32_t>() << '\n';
     std::cout << std::boolalpha << "(6) " << j["k4"].is<int32_t>() << '\n';
     std::cout << std::boolalpha << "(7) " << j["k4"].is<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].is<int>() << '\n';
@@ -436,8 +436,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
     std::cout << std::boolalpha << "(1) " << j["k1"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(2) " << j["k2"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(3) " << j["k2"].as<long long>() << '\n';
-    std::cout << std::boolalpha << "(4) " << j["k3"].as<int32_t>() << '\n';
-    std::cout << std::boolalpha << "(5) " << j["k4"].as<uint32_t>() << '\n';
+    std::cout << std::boolalpha << "(4) " << j["k3"].as<signed char>() << '\n';
+    std::cout << std::boolalpha << "(5) " << j["k3"].as<uint32_t>() << '\n';
     std::cout << std::boolalpha << "(6) " << j["k4"].as<int32_t>() << '\n';
     std::cout << std::boolalpha << "(7) " << j["k4"].as<double>() << '\n';
     std::cout << std::boolalpha << "(8) " << j["k5"].as<int>() << '\n';
@@ -446,7 +446,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 ```
 Output:
 ```
-1) true
+(1) true
 (2) false
 (3) true
 (4) true
@@ -460,8 +460,8 @@ Output:
 (1) 2147483647
 (2) -2147483648
 (3) 2147483648
-(4) -10
-(5) 10
+(4) ÷
+(5) 4294967286
 (6) 10
 (7) 10.5
 (8) 1
