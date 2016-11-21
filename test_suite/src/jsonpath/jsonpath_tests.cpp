@@ -140,6 +140,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
             }
             else
             {
+                std::cout << "Expected value for " << pair.first << "not found \n";
                 std::cout << pair.second << '\n';
                 ojson result = json_query(document,pair.second);
                 std::cout << pretty_print(result) << std::endl;
