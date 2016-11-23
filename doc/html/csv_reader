@@ -472,6 +472,8 @@ vertical-align:1px;
 
 <p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
 
+<p><code>csv_reader</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>

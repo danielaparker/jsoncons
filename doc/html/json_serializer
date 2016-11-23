@@ -474,6 +474,8 @@ vertical-align:1px;
 
 <p>The <code>json_serializer</code> class is an instantiation of the <code>basic_json_serializer</code> class template that uses <code>char</code> as the character type. It implements <a href="json_output_handler">json_output_handler</a> and supports pretty print serialization.</p>
 
+<p><code>json_serializer</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <pre><code>#include &lt;jsoncons/json_serializer.hpp&gt;

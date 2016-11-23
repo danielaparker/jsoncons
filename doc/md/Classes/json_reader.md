@@ -5,6 +5,8 @@ typedef basic_json_reader<char> json_reader
 ```
 A `json_reader` can read a sequence of JSON texts from a stream.
 
+`json_reader` is noncopyable and nonmoveable.
+
 ### Header
 ```c++
 #include <jsoncons/json_reader.hpp>

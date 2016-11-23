@@ -237,7 +237,7 @@ int main()
     try
     {
         json_is_as_examples();
-/*
+
         basics_examples();
         ojson_examples();
 
@@ -256,8 +256,6 @@ int main()
         more_examples();
         mulitple_json_objects();
 
-        introspection_example();
-
         wjson_examples();
 
         unicode_examples();
@@ -273,7 +271,7 @@ int main()
         jsonpath_examples();
 
         jsonx_examples();
-*/
+
     }
     catch (const std::exception& e)
     {

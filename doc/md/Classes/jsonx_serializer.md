@@ -5,6 +5,8 @@ typedef basic_jsonx_serializer<char> jsonx_serializer
 ```
 The `jsonx_serializer` class is an instantiation of the `basic_jsonx_serializer` class template that uses `char` as the character type. It implements [json_output_handler](json_output_handler) and supports formatting a JSON value as [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML).
 
+`jsonx_serializer` is noncopyable and nonmoveable.
+
 ### Header
 
     #include <jsoncons/jsonx/jsonx_serializer.hpp>

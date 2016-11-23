@@ -30,27 +30,33 @@ class buffered_output
 {
     static const size_t default_buffer_length = 16384;
 
-    std::basic_ostream<CharT>* os_;
+    std::basic_ostream<CharT>& os_;
     std::vector<CharT> buffer_;
     CharT * const begin_buffer_;
     const CharT* const end_buffer_;
     CharT* p_;
+
+
+    // Noncopyable and nonmoveable
+    buffered_output(const buffered_output&) = delete;
+    buffered_output& operator=(const buffered_output&) = delete;
+
 public:
     buffered_output(std::basic_ostream<CharT>& os)
-        : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
+        : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
     {
     }
     ~buffered_output()
     {
-        os_->write(begin_buffer_, (p_ - begin_buffer_));
-        os_->flush();
+        os_.write(begin_buffer_, (p_ - begin_buffer_));
+        os_.flush();
     }
 
     void flush()
     {
-        os_->write(begin_buffer_, (p_ - begin_buffer_));
+        os_.write(begin_buffer_, (p_ - begin_buffer_));
         p_ = begin_buffer_;
-        os_->flush();
+        os_.flush();
     }
 
     void write(const CharT* s, size_t length)
@@ -63,8 +69,8 @@ public:
         }
         else
         {
-            os_->write(begin_buffer_, (p_ - begin_buffer_));
-            os_->write(s, length);
+            os_.write(begin_buffer_, (p_ - begin_buffer_));
+            os_.write(s, length);
             p_ = begin_buffer_;
         }
     }
@@ -82,7 +88,7 @@ public:
         }
         else
         {
-            os_->write(begin_buffer_, (p_-begin_buffer_));
+            os_.write(begin_buffer_, (p_-begin_buffer_));
             p_ = begin_buffer_;
             *p_++ = c;
         }

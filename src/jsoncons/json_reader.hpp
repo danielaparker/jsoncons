@@ -28,17 +28,23 @@ class basic_json_reader
     static const size_t default_max_buffer_length = 16384;
 
     basic_json_parser<CharT> parser_;
-    std::basic_istream<CharT> *is_;
+    std::basic_istream<CharT>& is_;
     bool eof_;
     std::vector<CharT> buffer_;
     size_t buffer_length_;
     size_t buffer_capacity_;
     size_t index_;
+
+    // Noncopyable and nonmoveable
+    basic_json_reader(const basic_json_reader&) = delete;
+    basic_json_reader& operator=(const basic_json_reader&) = delete;
+
 public:
+
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_input_handler<CharT>& handler)
         : parser_(handler),
-          is_(std::addressof(is)),
+          is_(is),
           eof_(false),
           buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
@@ -51,7 +57,7 @@ public:
                       basic_json_input_handler<CharT>& handler,
                       basic_parse_error_handler<CharT>& err_handler)
        : parser_(handler,err_handler),
-         is_(std::addressof(is)),
+         is_(is),
          eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
@@ -88,10 +94,10 @@ public:
         {
             if (!(index_ < buffer_length_))
             {
-                if (!is_->eof())
+                if (!is_.eof())
                 {
-                    is_->read(buffer_.data(), buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    is_.read(buffer_.data(), buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_.gcount());
                     if (buffer_length_ == 0)
                     {
                         eof_ = true;
@@ -124,10 +130,10 @@ public:
             {
                 if (!(index_ < buffer_length_))
                 {
-                    if (!is_->eof())
+                    if (!is_.eof())
                     {
-                        is_->read(buffer_.data(), buffer_capacity_);
-                        buffer_length_ = static_cast<size_t>(is_->gcount());
+                        is_.read(buffer_.data(), buffer_capacity_);
+                        buffer_length_ = static_cast<size_t>(is_.gcount());
                         if (buffer_length_ == 0)
                         {
                             eof_ = true;

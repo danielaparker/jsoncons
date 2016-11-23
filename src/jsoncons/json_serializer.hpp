@@ -79,6 +79,10 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     bool indenting_;
     float_printer<CharT> fp_;
     buffered_output<CharT> bos_;
+
+    // Noncopyable and nonmoveable
+    basic_json_serializer(const basic_json_serializer&) = delete;
+    basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
     basic_json_serializer(std::basic_ostream<CharT>& os)
        : indent_(0), 

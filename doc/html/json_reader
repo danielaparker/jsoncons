@@ -474,6 +474,8 @@ vertical-align:1px;
 
 <p>A <code>json_reader</code> can read a sequence of JSON texts from a stream.</p>
 
+<p><code>json_reader</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>

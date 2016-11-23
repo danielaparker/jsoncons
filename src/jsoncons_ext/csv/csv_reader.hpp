@@ -47,7 +47,7 @@ public:
                      basic_json_input_handler<CharT>& handler)
 
        : parser_(handler),
-         is_(std::addressof(is)),
+         is_(is),
          buffer_(default_max_buffer_length),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -62,7 +62,7 @@ public:
                      basic_csv_parameters<CharT> params)
 
        : parser_(handler,params),
-         is_(std::addressof(is)),
+         is_(is),
          buffer_(default_max_buffer_length),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -77,7 +77,7 @@ public:
                      basic_parse_error_handler<CharT>& err_handler)
        :
          parser_(handler,err_handler),
-         is_(std::addressof(is)),
+         is_(is),
          buffer_(),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -95,7 +95,7 @@ public:
                      basic_csv_parameters<CharT> params)
        :
          parser_(handler,err_handler,params),
-         is_(std::addressof(is)),
+         is_(is),
          buffer_(),
          buffer_capacity_(default_max_buffer_length),
          buffer_position_(0),
@@ -116,10 +116,10 @@ public:
         {
             if (!(index_ < buffer_length_))
             {
-                if (!is_->eof())
+                if (!is_.eof())
                 {
-                    is_->read(buffer_.data(), buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_->gcount());
+                    is_.read(buffer_.data(), buffer_capacity_);
+                    buffer_length_ = static_cast<size_t>(is_.gcount());
                     if (buffer_length_ == 0)
                     {
                         eof_ = true;
@@ -156,11 +156,12 @@ public:
     }
 
 private:
+    // noncopyable and nonmoveable
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
     basic_csv_parser<CharT> parser_;
-    std::basic_istream<CharT>* is_;
+    std::basic_istream<CharT>& is_;
     std::vector<CharT> buffer_;
     size_t buffer_capacity_;
     size_t buffer_position_;
