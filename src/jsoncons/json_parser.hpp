@@ -132,6 +132,7 @@ class basic_json_parser : private basic_parsing_context<CharT>
 {
     static const int default_initial_stack_capacity_ = 100;
 
+    basic_default_parse_error_handler<CharT> default_err_handler_;
     std::vector<states> stack_;
     basic_json_input_handler<CharT> *handler_;
     basic_parse_error_handler<CharT> *err_handler_;
@@ -159,7 +160,7 @@ class basic_json_parser : private basic_parsing_context<CharT>
 public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
        : handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
+         err_handler_(&default_err_handler_),
          column_(0),
          line_(0),
          cp_(0),

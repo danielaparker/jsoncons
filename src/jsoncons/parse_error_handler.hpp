@@ -142,12 +142,6 @@ private:
 template <class CharT>
 class basic_default_parse_error_handler : public basic_parse_error_handler<CharT>
 {
-public:
-    static basic_parse_error_handler<CharT>& instance()
-    {
-        static basic_default_parse_error_handler<CharT> instance;
-        return instance;
-    }
 private:
     virtual bool do_error(std::error_code code,
                           const basic_parsing_context<CharT>&) 
@@ -168,12 +162,6 @@ private:
 template <class CharT>
 class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
 {
-public:
-    static basic_parse_error_handler<CharT>& instance()
-    {
-        static basic_strict_parse_error_handler<CharT> instance;
-        return instance;
-    }
 private:
     virtual bool do_error(std::error_code,
                           const basic_parsing_context<CharT>&) 

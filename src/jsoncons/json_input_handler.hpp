@@ -157,12 +157,6 @@ private:
 template <class CharT>
 class basic_null_json_input_handler : public basic_json_input_handler<CharT>
 {
-public:
-    static basic_json_input_handler<CharT>& instance()
-    {
-        static basic_null_json_input_handler<CharT> instance;
-        return instance;
-    }
 private:
     void do_begin_json() override
     {

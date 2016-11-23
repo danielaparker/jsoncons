@@ -91,6 +91,7 @@ class basic_csv_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 3;
 
+    basic_default_parse_error_handler<CharT> default_err_handler_;
     csv_states state_;
     int top_;
     std::vector<csv_modes> stack_;
@@ -119,7 +120,7 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
+         err_handler_(&default_err_handler_),
          is_negative_(false),
          cp_(0),
          index_(0),
@@ -139,7 +140,7 @@ public:
        : top_(-1),
          stack_(default_depth),
          handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
+         err_handler_(&default_err_handler_),
          is_negative_(false),
          cp_(0),
          index_(0),

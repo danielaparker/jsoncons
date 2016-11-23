@@ -369,6 +369,7 @@ private:
         }
     };
 
+    basic_default_parse_error_handler<char_type> default_err_handler_;
     basic_parse_error_handler<char_type> *err_handler_;
     states state_;
     string_type buffer_;
@@ -392,7 +393,7 @@ private:
 
 public:
     jsonpath_evaluator()
-        : err_handler_(std::addressof(basic_default_parse_error_handler<char_type>::instance())),
+        : err_handler_(&default_err_handler_),
           state_(states::start),
           start_(0), positive_start_(true), 
           end_(0), positive_end_(true), undefined_end_(false),
