@@ -126,7 +126,7 @@ void second_example_a()
 {
     try
     {
-        json books = json::make_array();
+        json books = json::array();
 
         {
             json book;

@@ -584,11 +584,7 @@ static json parse_file(const std::string&amp; filename,
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
-<pre><code>static json make_array()
-
-static json make_array(size_t n, const array_allocator&amp; allocator = array_allocator())
-
-template &lt;class T&gt;
+<pre><code>template &lt;class T&gt;
 static json make_array(size_ n, const T&amp; val)
 
 template &lt;class T&gt;
@@ -1228,7 +1224,7 @@ std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 
 <h3>Array</h3>
 
-<div class="highlight highlight-source-c++"><pre>json arr = json::make_array();
+<div class="highlight highlight-source-c++"><pre>json arr = json::array();
 arr.add(<span class="pl-c1">10</span>);
 arr.add(<span class="pl-c1">20</span>);
 arr.add(<span class="pl-c1">30</span>);
@@ -1291,7 +1287,7 @@ Montreal</pre></div>
 
 <div class="highlight highlight-source-c++"><pre>json root;
 
-root[<span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>] = json::make_array();
+root[<span class="pl-s"><span class="pl-pds">"</span>persons<span class="pl-pds">"</span></span>] = json::array();
 
 json person;
 person[<span class="pl-s"><span class="pl-pds">"</span>first_name<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>John<span class="pl-pds">"</span></span>;

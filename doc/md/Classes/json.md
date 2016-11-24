@@ -53,10 +53,6 @@ Throws [parse_exception](parse_exception) if parsing fails.
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 Throws [parse_exception](parse_exception) if parsing fails.
 
-    static json make_array()
-
-    static json make_array(size_t n, const array_allocator& allocator = array_allocator())
-
     template <class T>
     static json make_array(size_ n, const T& val)
 
@@ -549,7 +545,7 @@ Output:
 ```
 ### Array
 ```c++
-json arr = json::make_array();
+json arr = json::array();
 arr.add(10);
 arr.add(20);
 arr.add(30);
@@ -612,7 +608,7 @@ Montreal
 ```c++
 json root;
 
-root["persons"] = json::make_array();
+root["persons"] = json::array();
 
 json person;
 person["first_name"] = "John";

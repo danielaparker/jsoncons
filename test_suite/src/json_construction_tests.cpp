@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add(null_val);
     arr.add(flag);
     arr.add(number);
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");
