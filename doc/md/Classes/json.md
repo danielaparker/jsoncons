@@ -24,7 +24,7 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
-`member_type`|[member_type](json_member_type) is a class that stores a name and a json value
+`member_type`|[member_type](member_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
 `array`|json array type
@@ -276,11 +276,13 @@ Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <class T>
-    T get_with_default(const string_type& name, const T& default_val) const
+    T get_with_default(const string_type& name, 
+                       const T& default_val) const
 If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.
 
-    const char_type* get_with_default(const string_type& name, const char_type* default_val) const
+    const char_type* get_with_default(const string_type& name, 
+                                      const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals.
 
 ### Modifiers

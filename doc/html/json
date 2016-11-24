@@ -520,7 +520,7 @@ vertical-align:1px;
 <tr>
 <td><code>member_type</code></td>
 <td>
-<a href="json_member_type">member_type</a> is a class that stores a name and a json value</td>
+<a href="member_type">member_type</a> is a class that stores a name and a json value</td>
 </tr>
 <tr>
 <td><code>null_type</code></td>
@@ -901,13 +901,15 @@ Throws <code>std::runtime_error</code> if not an array.<br>
 Throws <code>std::out_of_range</code> if the index is outside the bounds of the array.  </p>
 
 <pre><code>template &lt;class T&gt;
-T get_with_default(const string_type&amp; name, const T&amp; default_val) const
+T get_with_default(const string_type&amp; name, 
+                   const T&amp; default_val) const
 </code></pre>
 
 <p>If <code>name</code> matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns <code>default_val</code>.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 
-<pre><code>const char_type* get_with_default(const string_type&amp; name, const char_type* default_val) const
+<pre><code>const char_type* get_with_default(const string_type&amp; name, 
+                                  const char_type* default_val) const
 </code></pre>
 
 <p>Make <code>get_with_default</code> do the right thing for string literals.</p>

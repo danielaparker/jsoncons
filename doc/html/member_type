@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_member_type</title>
+<title>member_type</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,14 +468,13 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json::member_type
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::member_type</pre></div>
 
-<p><code>member_type</code> stores a name and a json value</p>
+<p><code>member_type</code> stores a name (key) and a json value</p>
 
 <h3>Accessors</h3>
 
-<pre><code>const std::string&amp; name() const
+<pre><code>const string_type&amp; key() const
 
 const json&amp; value() const
 
