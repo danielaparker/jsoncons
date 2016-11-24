@@ -364,23 +364,28 @@ public:
 #define float_printer ostringstream_float_printer
 #endif
 
-// string_to_float only requires narrow char
+template <class CharT>
+class string_to_double
+{
+};
+
 #if defined(_MSC_VER)
-class float_reader
+template <>
+class string_to_double<char>
 {
 private:
     _locale_t locale_;
 public:
-    float_reader()
+    string_to_double()
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
-    ~float_reader()
+    ~string_to_double()
     {
         _free_locale(locale_);
     }
 
-    double read(const char* s, size_t)
+    double operator()(const char* s, size_t)
     {
         const char *begin = s;
         char *end = nullptr;
@@ -391,26 +396,60 @@ public:
         }
         return val;
     }
-
-    float_reader(const float_reader& fr) = delete;
-    float_reader& operator=(const float_reader& fr) = delete;
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double&) = delete;
+    string_to_double& operator=(const string_to_double&) = delete;
 };
-#elif defined(ANDROID) || defined(__ANDROID__)
-class float_reader
+
+template <>
+class string_to_double<wchar_t>
+{
+private:
+    _locale_t locale_;
+public:
+    string_to_double()
+    {
+        locale_ = _create_locale(LC_NUMERIC, "C");
+    }
+    ~string_to_double()
+    {
+        _free_locale(locale_);
+    }
+
+    double operator()(const wchar_t* s, size_t)
+    {
+        const wchar_t *begin = s;
+        wchar_t *end = nullptr;
+        double val = _wcstod_l(begin, &end, locale_);
+        if (begin == end)
+        {
+            throw std::invalid_argument("Invalid float value");
+        }
+        return val;
+    }
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double&) = delete;
+    string_to_double& operator=(const string_to_double&) = delete;
+};
+#elif defined(JSONCONS_HAS_STRTOD_L)
+template<>
+class string_to_double<char>
 {
 private:
     locale_t locale_;
 public:
-    float_reader()
+    string_to_double()
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
-    ~float_reader()
+    ~string_to_double()
     {
-        free(locale_);
+        freelocale(locale_);
     }
 
-    double read(const char* s, size_t length)
+    double operator()(const char* s, size_t length)
     {
         const char *begin = s;
         char *end = nullptr;
@@ -422,18 +461,54 @@ public:
         return val;
     }
 
-    float_reader(const float_reader& fr) = delete;
-    float_reader& operator=(const float_reader& fr) = delete;
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double& fr) = delete;
+    string_to_double& operator=(const string_to_double& fr) = delete;
+};
+
+template<>
+class string_to_double<wchar_t>
+{
+private:
+    locale_t locale_;
+public:
+    string_to_double()
+    {
+        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+    }
+    ~string_to_double()
+    {
+        freelocale(locale_);
+    }
+
+    double operator()(const wchar_t* s, size_t length)
+    {
+        const wchar_t *begin = s;
+        wchar_t *end = nullptr;
+        double val = wcstod_l(begin, &end, locale_);
+        if (begin == end)
+        {
+            throw std::invalid_argument("Invalid float value");
+        }
+        return val;
+    }
+
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double& fr) = delete;
+    string_to_double& operator=(const string_to_double& fr) = delete;
 };
 #else
-class float_reader
+template<>
+class string_to_double<char>
 {
 private:
     std::vector<char> buffer_;
     std::string decimal_point_;
     bool is_dot_;
 public:
-    float_reader()
+    string_to_double()
         : buffer_()
     {
         struct lconv * lc = localeconv();
@@ -449,7 +524,7 @@ public:
         is_dot_ = decimal_point_ == ".";
     }
 
-    double read(const char* s, size_t length)
+    double operator()(const char* s, size_t length)
     {
         double val;
         if (is_dot_)
@@ -491,8 +566,81 @@ public:
         return val;
     }
 
-    float_reader(const float_reader& fr) = delete;
-    float_reader& operator=(const float_reader& fr) = delete;
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double& fr) = delete;
+    string_to_double& operator=(const string_to_double& fr) = delete;
+};
+template<>
+class string_to_double<wchar_t>
+{
+private:
+    std::vector<wchar_t> buffer_;
+    std::string decimal_point_;
+    bool is_dot_;
+public:
+    string_to_double()
+        : buffer_()
+    {
+        struct lconv * lc = localeconv();
+        if (lc != nullptr)
+        {
+            decimal_point_ = std::string(lc->decimal_point);    
+        }
+        else
+        {
+            decimal_point_ = std::string("."); 
+        }
+        buffer_.reserve(100);
+        is_dot_ = decimal_point_ == ".";
+    }
+
+    double operator()(const wchar_t* s, size_t length)
+    {
+        double val;
+        if (is_dot_)
+        {
+            const wchar_t *begin = s;
+            wchar_t *end = nullptr;
+            val = wcstod(begin, &end);
+            if (begin == end)
+            {
+                throw std::invalid_argument("Invalid float value");
+            }
+        }
+        else
+        {
+            buffer_.clear();
+            size_t j = 0;
+            const wchar_t* pe = s + length;
+            for (const wchar_t* p = s; p < pe; ++p)
+            {
+                if (*p == '.')
+                {
+                    buffer_.insert(buffer_.begin() + j, decimal_point_.begin(), decimal_point_.end());
+                    j += decimal_point_.length();
+                }
+                else
+                {
+                    buffer_.push_back(*p);
+                    ++j;
+                }
+            }
+            const wchar_t *begin = buffer_.data();
+            wchar_t *end = nullptr;
+            val = wcstod(begin, &end);
+            if (begin == end)
+            {
+                throw std::invalid_argument("Invalid float value");
+            }
+        }
+        return val;
+    }
+
+private:
+    // noncopyable and nonmoveable
+    string_to_double(const string_to_double& fr) = delete;
+    string_to_double& operator=(const string_to_double& fr) = delete;
 };
 #endif
 

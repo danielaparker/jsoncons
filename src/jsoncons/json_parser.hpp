@@ -141,12 +141,11 @@ class basic_json_parser : private basic_parsing_context<CharT>
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
-    std::basic_string<char> number_buffer_;
     bool is_negative_;
     size_t index_;
     int initial_stack_capacity_;
     int max_depth_;
-    float_reader float_reader_;
+    string_to_double<CharT> str_to_double_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
@@ -839,12 +838,12 @@ public:
                         break;
                     case '0': 
                         handler_.begin_json();
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         handler_.begin_json();
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::integer;
                         break;
                     case 'f':
@@ -1047,11 +1046,11 @@ public:
                         stack_.back() = states::minus;
                         break;
                     case '0': 
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::integer;
                         break;
                     case 'f':
@@ -1125,11 +1124,11 @@ public:
                         stack_.back() = states::minus;
                         break;
                     case '0': 
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::integer;
                         break;
                     case 'f':
@@ -1278,11 +1277,11 @@ public:
                     switch (*p_)
                     {
                     case '0': 
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::integer;
                         break;
                     default:
@@ -1322,13 +1321,13 @@ public:
                         do_end_array();
                         break;
                     case '.':
-                        precision_ = static_cast<uint8_t>(number_buffer_.length());
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        precision_ = static_cast<uint8_t>(string_buffer_.length());
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::fraction1;
                         break;
                     case 'e':case 'E':
-                        precision_ = static_cast<uint8_t>(number_buffer_.length());
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        precision_ = static_cast<uint8_t>(string_buffer_.length());
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp1;
                         break;
                     case ',':
@@ -1376,12 +1375,12 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::integer;
                         break;
                     case '.':
-                        precision_ = static_cast<uint8_t>(number_buffer_.length());
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        precision_ = static_cast<uint8_t>(string_buffer_.length());
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::fraction1;
                         break;
                     case ',':
@@ -1389,8 +1388,8 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        precision_ = static_cast<uint8_t>(number_buffer_.length());
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        precision_ = static_cast<uint8_t>(string_buffer_.length());
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp1;
                         break;
                     default:
@@ -1408,7 +1407,7 @@ public:
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         ++precision_;
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::fraction2;
                         break;
                     default:
@@ -1450,7 +1449,7 @@ public:
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         ++precision_;
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::fraction2;
                         break;
                     case ',':
@@ -1458,7 +1457,7 @@ public:
                         begin_member_or_element();
                         break;
                     case 'e':case 'E':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp1;
                         break;
                     default:
@@ -1477,12 +1476,12 @@ public:
                         stack_.back() = states::exp2;
                         break;
                     case '-':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp2;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp3;
                         break;
                     default:
@@ -1499,7 +1498,7 @@ public:
                     {
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp3;
                         break;
                     default:
@@ -1544,7 +1543,7 @@ public:
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        number_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = states::exp3;
                         break;
                     default:
@@ -1755,7 +1754,7 @@ private:
     {
         try
         {
-            double d = float_reader_.read(number_buffer_.data(), precision_);
+            double d = str_to_double_(string_buffer_.data(), precision_);
             if (is_negative_)
                 d = -d;
             handler_.value(d, static_cast<uint8_t>(precision_), *this);
@@ -1765,7 +1764,7 @@ private:
             err_handler_.error(json_parser_errc::invalid_number, *this);
             handler_.value(null_type(), *this); // recovery
         }
-        number_buffer_.clear();
+        string_buffer_.clear();
         is_negative_ = false;
 
         JSONCONS_ASSERT(stack_.size() >= 2);
@@ -1790,7 +1789,7 @@ private:
         if (is_negative_)
         {
             int64_t d;
-            if (try_string_to_integer(is_negative_, number_buffer_.data(), number_buffer_.length(),d))
+            if (try_string_to_integer(is_negative_, string_buffer_.data(), string_buffer_.length(),d))
             {
                 handler_.value(d, *this);
             }
@@ -1798,8 +1797,8 @@ private:
             {
                 try
                 {
-                    double d2 = float_reader_.read(number_buffer_.data(), number_buffer_.length());
-                    handler_.value(-d2, static_cast<uint8_t>(number_buffer_.length()), *this);
+                    double d2 = str_to_double_(string_buffer_.data(), string_buffer_.length());
+                    handler_.value(-d2, static_cast<uint8_t>(string_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1811,7 +1810,7 @@ private:
         else
         {
             uint64_t d;
-            if (try_string_to_uinteger(number_buffer_.data(), number_buffer_.length(),d))
+            if (try_string_to_uinteger(string_buffer_.data(), string_buffer_.length(),d))
             {
                 handler_.value(d, *this);
             }
@@ -1819,8 +1818,8 @@ private:
             {
                 try
                 {
-                    double d2 = float_reader_.read(number_buffer_.data(),number_buffer_.length());
-                    handler_.value(d2, static_cast<uint8_t>(number_buffer_.length()), *this);
+                    double d2 = str_to_double_(string_buffer_.data(),string_buffer_.length());
+                    handler_.value(d2, static_cast<uint8_t>(string_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1845,7 +1844,7 @@ private:
             err_handler_.error(json_parser_errc::invalid_json_text, *this);
             break;
         }
-        number_buffer_.clear();
+        string_buffer_.clear();
         is_negative_ = false;
     }
 

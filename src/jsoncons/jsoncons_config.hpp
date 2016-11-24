@@ -27,7 +27,9 @@
 namespace jsoncons
 {
 
-// Follow boost
+#if defined(ANDROID) || defined(__ANDROID__)
+#define JSONCONS_HAS_STRTOD_L
+#endif
 
 #if defined (__clang__)
 #if defined(_GLIBCXX_USE_NOEXCEPT)
