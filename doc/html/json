@@ -814,13 +814,13 @@ T as() const
 
 <p>Attempts to convert the json value to the template value type using <a href="json_type_traits">json_type_traits</a>.</p>
 
-<pre><code>X as&lt;X&gt; const
+<pre><code>X as&lt;X&gt;() const
 </code></pre>
 
 <p>Type X is integeral: returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.<br>
 Type X is floating point: returns value cast to X if value is integral, returns <code>NaN</code> if value is <code>null</code>, attempts conversion if value is string, otherwise throws.</p>
 
-<pre><code>as&lt;bool&gt;
+<pre><code>as&lt;bool&gt;()
 </code></pre>
 
 <p>Returns <code>true</code> if value is <code>bool</code> and <code>true</code>, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as <code>true</code>. <br>
