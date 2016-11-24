@@ -584,21 +584,22 @@ static json parse_file(const std::string&amp; filename,
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
-<pre><code>template &lt;class T&gt;
-static json make_array(size_ n, const T&amp; val)
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-k">static</span> json <span class="pl-en">make_array</span>(size_ n, <span class="pl-k">const</span> T&amp; val)
 
 template &lt;class T&gt;
-static json make_array(size_ n, const T&amp; val, const array_allocator&amp; allocator = array_allocator())
+static json make_array(size_ n, <span class="pl-k">const</span> T&amp; val, 
+                       <span class="pl-k">const</span> allocator_type&amp; alloc = allocator_type())
 
 template &lt;size_t N&gt;
-static json make_array(size_t size1 ... size_t sizeN)
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN)
 
 template &lt;size_t N,typename T&gt;
-static json make_array(size_t size1 ... size_t sizeN, const T&amp; val)
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val)
 
 template &lt;size_t N,typename T&gt;
-static json make_array(size_t size1 ... size_t sizeN, const T&amp; val, const array_allocator&amp; allocator)
-</code></pre>
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val, 
+                       <span class="pl-k">const</span> allocator_type&amp; alloc)</pre></div>
 
 <p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
 
@@ -756,8 +757,8 @@ bool is() const noexcept
 <pre><code>bool is&lt;X&gt; const noexcept 
 </code></pre>
 
-<p>If the type <code>X</code> is integral, <code>is&lt;X&gt;()</code> returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br><br>
-If the type <code>X</code> is floating point, <code>is&lt;X&gt;()</code> returns <code>true</code> if the json value is floating point and within the range of the type <code>X</code>, <code>false</code> otherwise.  </p>
+<p>Type <code>X</code> is integral: returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br><br>
+Type <code>X</code> is floating point: returns <code>true</code> if the json value is floating point and within the range of the type <code>X</code>, <code>false</code> otherwise.  </p>
 
 <pre><code>bool is&lt;string_type&gt; const noexcept 
 </code></pre>
@@ -813,33 +814,18 @@ T as() const
 
 <p>Attempts to convert the json value to the template value type using <a href="json_type_traits">json_type_traits</a>.</p>
 
+<pre><code>X as&lt;X&gt; const
+</code></pre>
+
+<p>Type X is integeral: returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.<br>
+Type X is floating point: returns value cast to X if value is integral, returns <code>NaN</code> if value is <code>null</code>, attempts conversion if value is string, otherwise throws.</p>
+
 <pre><code>as&lt;bool&gt;
 </code></pre>
 
 <p>Returns <code>true</code> if value is <code>bool</code> and <code>true</code>, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as <code>true</code>. <br>
 Returns <code>false</code> if value is <code>bool</code> and <code>false</code>, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as <code>false</code>. <br>
 Otherwise throws <code>std::runtime_exception</code></p>
-
-<pre><code>as&lt;double&gt;
-</code></pre>
-
-<p>If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is <code>null</code>, returns <code>NaN</code>, otherwise throws.</p>
-
-<pre><code>char as&lt;char&gt; const
-signed char as&lt;signed char&gt; const
-unsigned char as&lt;unsigned char&gt; const
-wchar_t as&lt;wchar_t&gt; const
-short as&lt;short&gt; const
-unsigned short as&lt;unsigned short&gt; const 
-int as&lt;int&gt; const 
-unsigned int as&lt;unsigned int&gt; const 
-long as&lt;long&gt; const 
-unsigned long as&lt;unsigned long&gt; const 
-long long as&lt;long long&gt; const 
-unsigned long long as&lt;unsigned long long&gt; const 
-</code></pre>
-
-<p>Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.</p>
 
 <pre><code>string_type as&lt;string_type&gt;() const noexcept
 string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noexcept

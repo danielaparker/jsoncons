@@ -52,21 +52,24 @@ Throws [parse_exception](parse_exception) if parsing fails.
                            parse_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 Throws [parse_exception](parse_exception) if parsing fails.
+```c++
+template <class T>
+static json make_array(size_ n, const T& val)
 
-    template <class T>
-    static json make_array(size_ n, const T& val)
+template <class T>
+static json make_array(size_ n, const T& val, 
+                       const allocator_type& alloc = allocator_type())
 
-    template <class T>
-    static json make_array(size_ n, const T& val, const array_allocator& allocator = array_allocator())
+template <size_t N>
+static json make_array(size_t size1 ... size_t sizeN)
 
-    template <size_t N>
-    static json make_array(size_t size1 ... size_t sizeN)
+template <size_t N,typename T>
+static json make_array(size_t size1 ... size_t sizeN, const T& val)
 
-    template <size_t N,typename T>
-    static json make_array(size_t size1 ... size_t sizeN, const T& val)
-
-    template <size_t N,typename T>
-    static json make_array(size_t size1 ... size_t sizeN, const T& val, const array_allocator& allocator)
+template <size_t N,typename T>
+static json make_array(size_t size1 ... size_t sizeN, const T& val, 
+                       const allocator_type& alloc)
+```
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
     static const json& null()
@@ -171,8 +174,8 @@ Returns the number of object members that match `name`.
 Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
 
     bool is<X> const noexcept 
-If the type `X` is integral, `is<X>()` returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
-If the type `X` is floating point, `is<X>()` returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
+Type `X` is integral: returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
+Type `X` is floating point: returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
 
     bool is<string_type> const noexcept 
 Returns `true` if the json value is of string type, `false` otherwise.  
@@ -210,27 +213,14 @@ Non-generic versions of `is_` methods
     T as() const
 Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
 
+    X as<X> const
+Type X is integeral: returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
+Type X is floating point: returns value cast to X if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
+
     as<bool>
 Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
 Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
 Otherwise throws `std::runtime_exception`
-
-    as<double>
-If value is double, returns value, if value is signed or unsigned integer, casts to double, if value is `null`, returns `NaN`, otherwise throws.
-
-    char as<char> const
-    signed char as<signed char> const
-    unsigned char as<unsigned char> const
-    wchar_t as<wchar_t> const
-    short as<short> const
-    unsigned short as<unsigned short> const 
-    int as<int> const 
-    unsigned int as<unsigned int> const 
-    long as<long> const 
-    unsigned long as<unsigned long> const 
-    long long as<long long> const 
-    unsigned long long as<unsigned long long> const 
-Return integer value if value has integral type, performs cast if value has double type, returns 1 or 0 if value has bool type, otherwise throws.
 
     string_type as<string_type>() const noexcept
     string_type as<string_type>(const char_allocator& allocator) const noexcept
