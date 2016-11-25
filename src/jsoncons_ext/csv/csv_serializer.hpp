@@ -98,7 +98,7 @@ class basic_csv_serializer : public basic_json_output_handler<CharT>
     std::basic_ostringstream<CharT> header_oss_;
     buffered_output<CharT> header_os_;
     std::map<std::basic_string<CharT>,size_t> column_name_pos_map_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
 
     // Noncopyable and nonmoveable
     basic_csv_serializer(const basic_csv_serializer&) = delete;
@@ -374,7 +374,7 @@ private:
         }
         else
         {
-            fp_.print(val,format_.precision(),os);
+            fp_(val,format_.precision(),os);
         }
 
         end_value();

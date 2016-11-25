@@ -25,8 +25,8 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     ss.imbue(std::locale::classic());
     {
         buffered_output<CharT> os(ss);
-        float_printer<CharT> printer(precision);
-        printer.print(val, precision, os);
+        print_double<CharT> print(precision);
+        print(val, precision, os);
     }
     return ss.str();
 }

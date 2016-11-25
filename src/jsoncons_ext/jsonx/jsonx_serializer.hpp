@@ -254,7 +254,7 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
     bool indenting_;
     int indent_;
 
@@ -536,7 +536,7 @@ private:
         }
         else
         {
-            fp_.print(value,precision,bos_);
+            fp_(value,precision,bos_);
         }
         bos_.write(jsonx_char_traits<CharT>::end_number_element_literal().data(),
                    jsonx_char_traits<CharT>::end_number_element_literal().length());

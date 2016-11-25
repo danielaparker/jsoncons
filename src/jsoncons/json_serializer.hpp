@@ -77,7 +77,7 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     std::vector<stack_item> stack_;
     int indent_;
     bool indenting_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
     buffered_output<CharT> bos_;
 
     // Noncopyable and nonmoveable
@@ -337,7 +337,7 @@ private:
         }
         else
         {
-            fp_.print(value,precision,bos_);
+            fp_(value,precision,bos_);
         }
 
         end_value();
