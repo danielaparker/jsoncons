@@ -45,7 +45,7 @@ public:
         quote_escape_char_('\"'),
         comment_starter_('\0'),
         quote_style_(quote_styles::minimal),
-        max_lines_(std::numeric_limits<unsigned long>::max JSONCONS_NO_MACRO_EXP()),
+        max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0)
     {
         line_delimiter_.push_back('\n');

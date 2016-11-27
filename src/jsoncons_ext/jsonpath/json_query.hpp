@@ -22,7 +22,7 @@ namespace jsoncons { namespace jsonpath {
     template<class CharT>
     bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
     {
-        static const size_t max_value = std::numeric_limits<size_t>::max JSONCONS_NO_MACRO_EXP();
+        static const size_t max_value = (std::numeric_limits<size_t>::max)();
         static const size_t max_value_div_10 = max_value / 10;
 
         size_t start = 0;

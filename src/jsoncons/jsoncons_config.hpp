@@ -22,8 +22,6 @@
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
 
-#define JSONCONS_NO_MACRO_EXP
-
 namespace jsoncons
 {
 

@@ -25,7 +25,7 @@ namespace jsoncons {
 template<class CharT> inline
 bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
 {
-    static const uint64_t max_value = std::numeric_limits<uint64_t>::max JSONCONS_NO_MACRO_EXP();
+    static const uint64_t max_value = (std::numeric_limits<uint64_t>::max)();
     static const uint64_t max_value_div_10 = max_value / 10;
     uint64_t n = 0;
     for (size_t i = 0; i < length; ++i)
@@ -50,7 +50,7 @@ bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
 template<class CharT> inline
 bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t& result)
 {
-    static const int64_t max_value = std::numeric_limits<int64_t>::max JSONCONS_NO_MACRO_EXP();
+    static const int64_t max_value = (std::numeric_limits<int64_t>::max)();
     static const int64_t max_value_div_10 = max_value / 10;
 
     int64_t n = 0;
@@ -178,7 +178,7 @@ public:
          continuation_count_(0),
          string_state_(string_states::u1 )
     {
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        max_depth_ = (std::numeric_limits<int>::max)();
     }
 
     basic_json_parser(basic_json_input_handler<CharT>& handler,
@@ -198,7 +198,7 @@ public:
          continuation_count_(0),
          string_state_(string_states::u1 )
     {
-        max_depth_ = std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP();
+        max_depth_ = (std::numeric_limits<int>::max)();
     }
 
     const basic_parsing_context<CharT>& parsing_context() const
@@ -217,7 +217,7 @@ public:
 
     void max_nesting_depth(size_t max_nesting_depth)
     {
-        max_depth_ = static_cast<int>(std::min(max_nesting_depth,static_cast<size_t>(std::numeric_limits<int>::max JSONCONS_NO_MACRO_EXP())));
+        max_depth_ = static_cast<int>((std::min)(max_nesting_depth,static_cast<size_t>((std::numeric_limits<int>::max)())));
     }
 
     states parent() const

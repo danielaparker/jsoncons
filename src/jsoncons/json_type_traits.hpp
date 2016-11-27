@@ -303,11 +303,11 @@ struct json_type_traits<Json, T,
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= std::numeric_limits<T>::min JSONCONS_NO_MACRO_EXP() && rhs.as_integer() <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= (std::numeric_limits<T>::min)() && rhs.as_integer() <= (std::numeric_limits<T>::max)();
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= static_cast<uint64_t>(std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP());
+            return rhs.as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
         }
         else
         {
@@ -335,11 +335,11 @@ struct json_type_traits<Json, T,
     {
         if (rhs.is_integer())
         {
-            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_integer() >= 0 && static_cast<uint64_t>(rhs.as_integer()) <= (std::numeric_limits<T>::max)();
         }
         else if (rhs.is_uinteger())
         {
-            return rhs.as_uinteger() <= std::numeric_limits<T>::max JSONCONS_NO_MACRO_EXP();
+            return rhs.as_uinteger() <= (std::numeric_limits<T>::max)();
         }
         else
         {

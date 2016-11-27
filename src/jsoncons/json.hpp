@@ -2074,7 +2074,7 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_types::integer_t || (var_.type_id() == value_types::uinteger_t && (as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP())));
+        return var_.type_id() == value_types::integer_t || (var_.type_id() == value_types::uinteger_t && (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT

@@ -383,7 +383,7 @@ private:
     void do_name(const CharT* p, size_t length,
                  const basic_parsing_context<CharT>& context) override
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(name_.length(),length);
+        size_t len = (std::min)(name_.length(),length);
         if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
         {
             this->downstream_handler().name(new_name_.data(),new_name_.length(),context);

@@ -112,7 +112,7 @@ public:
 
     bool operator()(const ValueT& a, const CharT* b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),length_);
+        size_t len = (std::min)(a.key().length(),length_);
         int result = std::char_traits<CharT>::compare(a.key().data(),b,len);
         if (result != 0)
         {
@@ -135,7 +135,7 @@ public:
 
     bool operator()(const CharT* a, const ValueT& b) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(b.key().length(),length_);
+        size_t len = (std::min)(b.key().length(),length_);
         int result = std::char_traits<CharT>::compare(a, b.key().data(),len);
         if (result != 0)
         {
@@ -149,7 +149,7 @@ public:
 template <class StringT,class CharT>
 bool name_le_string(const StringT& a, const CharT* b, size_t length)
 {
-    size_t min_len = std::min JSONCONS_NO_MACRO_EXP(a.length(),length);
+    size_t min_len = (std::min)(a.length(),length);
     int result = std::char_traits<CharT>::compare(a.data(),b, min_len);
     if (result != 0)
     {
@@ -177,7 +177,7 @@ public:
             return std::char_traits<char_type>::compare(a.key().data(),b.key().data(),a.key().length()) < 0;
         }
 
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),b.key().length());
+        size_t len = (std::min)(a.key().length(),b.key().length());
         int result = std::char_traits<char_type>::compare(a.key().data(),b.key().data(),len);
         if (result != 0)
         {
@@ -201,7 +201,7 @@ public:
 
     bool operator()(const ValueT& a) const
     {
-        size_t len = std::min JSONCONS_NO_MACRO_EXP(a.key().length(),length_);
+        size_t len = (std::min)(a.key().length(),length_);
         int result = std::char_traits<CharT>::compare(a.key().data(),b_,len);
 
         return result == 0 && a.key().length() == length_;
@@ -253,9 +253,9 @@ public:
     {
     }
 
-    const string_type& key() const
+    basic_string_proxy<char_type> key() const
     {
-        return key_;
+        return basic_string_proxy<char_type>(key_.data(),key_.length());
     }
 
     ValueT& value()

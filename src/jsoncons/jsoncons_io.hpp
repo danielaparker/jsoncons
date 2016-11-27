@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSONCONS_IO_HPP
 #define JSONCONS_JSONCONS_IO_HPP
 
+#include <Windows.h>
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -18,12 +19,187 @@
 #include <cmath>
 #include <cstdarg>
 #include <locale>
-#include <limits> // std::numeric_limits
+#include <limits> 
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/osequencestream.hpp>
+#include <algorithm>
 
 namespace jsoncons
 {
+
+template <class CharT, class Traits = std::char_traits<CharT>>
+class basic_string_proxy
+{
+private:
+    const CharT* data_;
+    size_t length_;
+public:
+    basic_string_proxy()
+        : data_(nullptr), length_(0)
+    {
+    }
+    basic_string_proxy(const CharT* data, size_t length)
+        : data_(data), length_(length)
+    {
+    }
+    basic_string_proxy(const CharT* data)
+        : data_(data), length_(Traits::length(data))
+    {
+    }
+    basic_string_proxy(const basic_string_proxy& other) = default;
+
+    template <class Allocator>
+    basic_string_proxy(const std::basic_string<CharT,Traits,Allocator>& s)
+        : data_(s.data()), length_(s.length())
+    {
+    }
+
+    template <class Allocator>
+    operator std::basic_string<CharT,Traits,Allocator>() const
+    { 
+        return std::basic_string<CharT,Traits>(data_,length_); 
+    }
+
+    const CharT* data() const
+    {
+        return data_;
+    }
+
+    size_t length() const
+    {
+        return length_;
+    }
+
+    int compare(const basic_string_proxy& x) const 
+    {
+        const int cmp = Traits::compare(data_, x.data_, (std::min)(length_, x.length_));
+        return cmp != 0 ? cmp : (length_ == x.length_ ? 0 : length_ < x.length_ ? -1 : 1);
+    }
+
+    int compare(const CharT* data) const 
+    {
+        const size_t length = Traits::length(data);
+        const int cmp = Traits::compare(data_, data, (std::min)(length_, length));
+        return cmp != 0 ? cmp : (length_ == length? 0 : length_ < length? -1 : 1);
+    }
+
+    template <class Allocator>
+    int compare(const std::basic_string<CharT,Traits,Allocator>& s) const 
+    {
+        const int cmp = Traits::compare(data_, s.data(), (std::min)(length_, s.length()));
+        return cmp != 0 ? cmp : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
+    }
+
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_string_proxy& sv)
+    {
+        os.write(sv.data_,sv.length_);
+        return os;
+    }
+};
+
+// ==
+template<class CharT,class Traits>
+bool operator==(const basic_string_proxy<CharT,Traits>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return lhs.compare(rhs) == 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator==(const basic_string_proxy<CharT,Traits>& lhs, 
+                const std::basic_string<CharT,Traits,Allocator>& rhs)
+{
+    return lhs.compare(rhs) == 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator==(const std::basic_string<CharT,Traits,Allocator>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) == 0;
+}
+template<class CharT,class Traits>
+bool operator==(const basic_string_proxy<CharT,Traits>& lhs, 
+                const CharT* rhs)
+{
+    return lhs.compare(rhs) == 0;
+}
+template<class CharT,class Traits>
+bool operator==(const CharT* lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) == 0;
+}
+
+// !=
+template<class CharT,class Traits>
+bool operator!=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return lhs.compare(rhs) != 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator!=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const std::basic_string<CharT,Traits,Allocator>& rhs)
+{
+    return lhs.compare(rhs) != 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator!=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) != 0;
+}
+template<class CharT,class Traits>
+bool operator!=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const CharT* rhs)
+{
+    return lhs.compare(rhs) != 0;
+}
+template<class CharT,class Traits>
+bool operator!=(const CharT* lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) != 0;
+}
+
+// <=
+template<class CharT,class Traits>
+bool operator<=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return lhs.compare(rhs) <= 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator<=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const std::basic_string<CharT,Traits,Allocator>& rhs)
+{
+    return lhs.compare(rhs) <= 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator<=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) >= 0;
+}
+
+// >=
+template<class CharT,class Traits>
+bool operator>=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return lhs.compare(rhs) >= 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator>=(const basic_string_proxy<CharT,Traits>& lhs, 
+                const std::basic_string<CharT,Traits,Allocator>& rhs)
+{
+    return lhs.compare(rhs) >= 0;
+}
+template<class CharT,class Traits,class Allocator>
+bool operator>=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
+                const basic_string_proxy<CharT,Traits>& rhs)
+{
+    return rhs.compare(lhs) <= 0;
+}
 
 template <class CharT>
 struct cstring_traits
