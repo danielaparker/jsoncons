@@ -209,53 +209,53 @@ public:
 };
 
 template <class StringT, class ValueT>
-class name_value_pair
+class key_value_pair
 {
 public:
     typedef StringT string_type;
     typedef typename StringT::value_type char_type;
 
-    name_value_pair()
+    key_value_pair()
     {
     }
-    name_value_pair(const string_type& name)
+    key_value_pair(const string_type& name)
         : key_(name)
     {
     }
-    name_value_pair(string_type&& name)
+    key_value_pair(string_type&& name)
         : key_(std::forward<string_type&&>(name))
     {
     }
 
-    name_value_pair(const string_type& name, const ValueT& val)
+    key_value_pair(const string_type& name, const ValueT& val)
         : key_(name), value_(val)
     {
     }
-    name_value_pair(string_type&& name, const ValueT& val)
+    key_value_pair(string_type&& name, const ValueT& val)
         : key_(std::forward<string_type>(name)), value_(val)
     {
     }
-    name_value_pair(const string_type& name, ValueT&& val)
+    key_value_pair(const string_type& name, ValueT&& val)
         : key_(name), value_(std::forward<ValueT&&>(val))
     {
     }
-    name_value_pair(string_type&& name, ValueT&& val)
+    key_value_pair(string_type&& name, ValueT&& val)
         : key_(std::forward<string_type&&>(name)), 
           value_(std::forward<ValueT&&>(val))
     {
     }
-    name_value_pair(const name_value_pair& member)
+    key_value_pair(const key_value_pair& member)
         : key_(member.key_), value_(member.value_)
     {
     }
-    name_value_pair(name_value_pair&& member)
+    key_value_pair(key_value_pair&& member)
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
 
-    basic_string_view_<char_type> key() const
+    const string_type& key() const
     {
-        return basic_string_view_<char_type>(key_.data(),key_.length());
+        return key_;
     }
 
     ValueT& value()
@@ -278,13 +278,13 @@ public:
         value_ = std::forward<ValueT&&>(value);
     }
 
-    void swap(name_value_pair& member)
+    void swap(key_value_pair& member)
     {
         key_.swap(member.key_);
         value_.swap(member.value_);
     }
 
-    name_value_pair& operator=(const name_value_pair& member)
+    key_value_pair& operator=(const key_value_pair& member)
     {
         if (this != & member)
         {
@@ -294,7 +294,7 @@ public:
         return *this;
     }
 
-    name_value_pair& operator=(name_value_pair&& member)
+    key_value_pair& operator=(key_value_pair&& member)
     {
         if (this != &member)
         {
@@ -423,7 +423,7 @@ public:
     typedef Allocator allocator_type;
     typedef typename Json::char_type char_type;
     typedef StringT string_type;
-    typedef name_value_pair<StringT,Json> value_type;
+    typedef key_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
@@ -710,7 +710,7 @@ public:
     typedef Allocator allocator_type;
     typedef typename Json::char_type char_type;
     typedef StringT string_type;
-    typedef name_value_pair<StringT,Json> value_type;
+    typedef key_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_iterator;
 

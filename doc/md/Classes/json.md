@@ -24,6 +24,7 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
+`string_view_type`|Wraps a pointer to string data and length
 `member_type`|[member_type](member_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
@@ -163,10 +164,10 @@ Resizes a json array so that it contains `n` elements that are initialized to `v
 
 ### Accessors
 
-    bool has_key(const string_type& name) const
+    bool has_key(string_view_type name) const
 Returns `true` if an object has a member with the given `name`, otherwise `false`.    
 
-    size_t count(const string_type& name) const
+    size_t count(string_view_type name) const
 Returns the number of object members that match `name`.    
 
     template <class T>
@@ -256,15 +257,13 @@ If `name` matches the name of a member in the json object, returns a reference t
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    object_iterator find(const string_type& name)
-    object_iterator find(const char* name)
-    const_object_iterator find(const string_type& name) const
-    const_object_iterator find(const char* name) const
+    object_iterator find(string_view_type name)
+    const_object_iterator find(string_view_type name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
 Throws `std::runtime_error` if not an object.
 
-    json& at(const string_type& name)
-    const json& at(const string_type& name) const
+    json& at(string_view_type name)
+    const json& at(string_view_type name) const
 Returns a reference to the value with the specifed name in a json object.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
@@ -276,12 +275,12 @@ Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <class T>
-    T get_with_default(const string_type& name, 
+    T get_with_default(string_view_type name, 
                        const T& default_val) const
 If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.
 
-    const char_type* get_with_default(const string_type& name, 
+    const char_type* get_with_default(string_view_type name, 
                                       const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals.
 

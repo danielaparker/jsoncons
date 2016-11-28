@@ -118,7 +118,7 @@ public:
 
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef name_value_pair<string_type,json_type> member_type;
+    typedef key_value_pair<string_type,json_type> member_type;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_type> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
@@ -986,7 +986,7 @@ public:
         json_type& evaluate_with_default()
         {
             json_type& val = parent_.evaluate_with_default();
-            auto it = val.find(name_.data(),name_.length());
+            auto it = val.find(name_);
             if (it == val.object_range().end())
             {
                 it = val.set(val.object_range().begin(),name_,object(val.object_value().get_allocator()));            
@@ -1047,12 +1047,12 @@ public:
             return evaluate().type_id();
         }
 
-        size_t count(const string_type& name) const
+        size_t count(string_view_type name) const
         {
             return evaluate().count(name);
         }
 
-        bool has_key(const string_type& name) const
+        bool has_key(string_view_type name) const
         {
             return evaluate().has_key(name);
         }
@@ -1130,6 +1130,11 @@ public:
         bool is_double() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_double();
+        }
+
+        string_view_type as_string_view() const 
+        {
+            return evaluate().as_string_view();
         }
 
         string_type as_string() const JSONCONS_NOEXCEPT
@@ -1246,34 +1251,14 @@ public:
             return evaluate().at(index);
         }
 
-        object_iterator find(const string_type& name)
+        object_iterator find(string_view_type name)
         {
             return evaluate().find(name);
         }
 
-        const_object_iterator find(const string_type& name) const
+        const_object_iterator find(string_view_type name) const
         {
             return evaluate().find(name);
-        }
-
-        object_iterator find(const char_type* name)
-        {
-            return evaluate().find(name);
-        }
-
-        const_object_iterator find(const char_type* name) const
-        {
-            return evaluate().find(name);
-        }
-
-        object_iterator find(const char_type* name, size_t length)
-        {
-            return evaluate().find(name,length);
-        }
-
-        const_object_iterator find(const char_type* name, size_t length) const
-        {
-            return evaluate().find(name,length);
         }
 
         template <class T>
@@ -1283,12 +1268,12 @@ public:
         }
 
         template <class T>
-        T get_with_default(const string_type& name, const T& default_val) const
+        T get_with_default(string_view_type name, const T& default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
 
-        const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+        const CharT* get_with_default(string_view_type name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -2007,7 +1992,7 @@ public:
         return var_.type_id() == value_types::null_t;
     }
 
-    bool has_key(const string_type& name) const
+    bool has_key(string_view_type name) const
     {
         switch (var_.type_id())
         {
@@ -2022,7 +2007,7 @@ public:
         }
     }
 
-    size_t count(const string_type& name) const
+    size_t count(string_view_type name) const
     {
         switch (var_.type_id())
         {
@@ -2361,6 +2346,19 @@ public:
         }
     }
 
+    string_view_type as_string_view() const
+    {
+        switch (var_.type_id())
+        {
+        case value_types::small_string_t:
+            return string_view_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
+        case value_types::string_t:
+            return string_view_type(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
+        }
+    }
+
     string_type as_string() const JSONCONS_NOEXCEPT
     {
         switch (var_.type_id())
@@ -2541,7 +2539,7 @@ public:
         }
     }
 
-    object_iterator find(const string_type& name)
+    object_iterator find(string_view_type name)
     {
         switch (var_.type_id())
         {
@@ -2556,7 +2554,7 @@ public:
         }
     }
 
-    const_object_iterator find(const string_type& name) const
+    const_object_iterator find(string_view_type name) const
     {
         switch (var_.type_id())
         {
@@ -2564,66 +2562,6 @@ public:
             return object_range().end();
         case value_types::object_t:
             return var_.object_data_cast()->value().find(name.data(),name.length());
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    object_iterator find(const char_type* name)
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    const_object_iterator find(const char_type* name) const
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    object_iterator find(const char_type* name, size_t length)
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, length);
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    const_object_iterator find(const char_type* name, size_t length) const
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, length);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2660,7 +2598,7 @@ public:
     }
 
     template<class T>
-    T get_with_default(const string_type& name, const T& default_val) const
+    T get_with_default(string_view_type name, const T& default_val) const
     {
         switch (var_.type_id())
         {
@@ -2687,7 +2625,7 @@ public:
         }
     }
 
-    const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+    const CharT* get_with_default(string_view_type name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
