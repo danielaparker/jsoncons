@@ -377,7 +377,7 @@ public:
     {
     }
 
-    void operator()(double val, uint8_t precision, buffered_output<CharT>& os) const
+    void operator()(double val, uint8_t precision, buffered_output<CharT>& os) 
     {
         char buf[_CVTBUFSIZE];
         int decimal_point = 0;
@@ -487,7 +487,7 @@ public:
         oss_.imbue(std::locale::classic());
         oss_.precision(precision);
     }
-    void operator()(double val, uint8_t precision, buffered_output<CharT>& os) const
+    void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
     {
         oss_.clear_sequence();
         oss_.precision((precision == 0) ? precision_ : precision);
