@@ -114,6 +114,8 @@ public:
     typedef typename json_traits_type::char_traits_type char_traits_type;
     typedef typename json_traits_type::char_allocator char_allocator;
 
+    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef name_value_pair<string_type,json_type> member_type;
@@ -1224,12 +1226,12 @@ public:
             return json_proxy<proxy_type>(*this,name);
         }
 
-        json_type& at(const string_type& name)
+        json_type& at(string_view_type name)
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(const string_type& name) const
+        const json_type& at(string_view_type name) const
         {
             return evaluate().at(name);
         }
@@ -1865,7 +1867,7 @@ public:
         }
     }
 
-    const json_type& operator[](const string_type& name) const
+    const json_type& operator[](string_view_type name) const
     {
         return at(name);
     }
@@ -2424,7 +2426,7 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
         }
     }
-    json_type& at(const string_type& name)
+    json_type& at(string_view_type name)
     {
         switch (var_.type_id())
         {
@@ -2482,7 +2484,7 @@ public:
         return at(name);
     }
 
-    const json_type& at(const string_type& name) const
+    const json_type& at(string_view_type name) const
     {
         switch (var_.type_id())
         {

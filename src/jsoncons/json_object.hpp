@@ -253,9 +253,9 @@ public:
     {
     }
 
-    basic_string_proxy<char_type> key() const
+    basic_string_view_<char_type> key() const
     {
-        return basic_string_proxy<char_type>(key_.data(),key_.length());
+        return basic_string_view_<char_type>(key_.data(),key_.length());
     }
 
     ValueT& value()
