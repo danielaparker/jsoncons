@@ -7,7 +7,6 @@
 #ifndef JSONCONS_JSONCONS_IO_HPP
 #define JSONCONS_JSONCONS_IO_HPP
 
-#include <Windows.h>
 #include <stdexcept>
 #include <string>
 #include <sstream>
