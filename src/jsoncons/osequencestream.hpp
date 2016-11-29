@@ -73,7 +73,7 @@ public:
         return this->pptr() - this->pbase();
     }
 
-    virtual int sync()
+    virtual int sync() override
     {
         return EOF;
     }
