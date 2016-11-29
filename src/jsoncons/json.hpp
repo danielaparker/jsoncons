@@ -58,31 +58,6 @@ public:
     }
 };
 
-template <class T, class Allocator, typename... Args>
-T* create_impl(const Allocator& allocator, Args&& ... args)
-{
-    typename std::allocator_traits<Allocator>:: template rebind_alloc<T> alloc(allocator);
-    T* storage = alloc.allocate(1);
-    try
-    {
-        std::allocator_traits<Allocator>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Args>(args)...);
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
-template <class T, class Allocator>
-void destroy_impl(const Allocator& allocator, T* p)
-{
-    typename std::allocator_traits<Allocator>:: template rebind_alloc<T> alloc(allocator);
-    std::allocator_traits<Allocator>:: template rebind_traits<T>::destroy(alloc, p);
-    alloc.deallocate(p,1);
-}
-
 enum class value_types : uint8_t 
 {
     empty_object_t,
@@ -404,19 +379,19 @@ public:
             }
         };
 
-
         struct object_data : public base_data
         {
-            typename std::allocator_traits<object_allocator>::pointer data_;
+            typedef typename std::allocator_traits<object_allocator>::pointer pointer;
+            pointer data_;
 
             template <typename... Args>
-            void create(object_allocator allocator, Args&& ... args)
+            void create(Allocator allocator, Args&& ... args)
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(allocator);
+                typename std::allocator_traits<object_allocator>:: template rebind_alloc<object> alloc(allocator);
                 data_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, data_, std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, to_plain_pointer(data_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -457,7 +432,9 @@ public:
 
             ~object_data()
             {
-                destroy_impl(data_->get_self_allocator(), data_);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(data_->get_self_allocator());
+                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(data_));
+                alloc.deallocate(data_,1);
             }
 
             object& value()
@@ -473,41 +450,60 @@ public:
 
         struct array_data : public base_data
         {
-            array* data_;
+            typedef typename std::allocator_traits<array_allocator>::pointer pointer;
+            pointer data_;
+
+            template <typename... Args>
+            void create(array_allocator allocator, Args&& ... args)
+            {
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
+                data_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(data_), std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(data_,1);
+                    throw;
+                }
+            }
 
             array_data(const array & val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(val.get_self_allocator(), val);
+                create(val.get_self_allocator(), val);
             }
 
             array_data(const array & val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(array_allocator(a), val, a);
+                create(array_allocator(a), val, a);
             }
 
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(val.data_->get_self_allocator(), *(val.data_));
+                create(val.data_->get_self_allocator(), *(val.data_));
             }
 
             array_data(const array_data & val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(array_allocator(a), *(val.data_), a);
+                create(array_allocator(a), *(val.data_), a);
             }
 
             template<class InputIterator>
             array_data(InputIterator first, InputIterator last, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(array_allocator(a), first, last, a);
+                create(array_allocator(a), first, last, a);
             }
             ~array_data()
             {
-                destroy_impl(data_->get_self_allocator(), data_);
+                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(data_->get_self_allocator());
+                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(data_));
+                alloc.deallocate(data_,1);
             }
 
             array& value()

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONS_IO_HPP
-#define JSONCONS_JSONCONS_IO_HPP
+#ifndef JSONCONS_JSONCONS_UTIL_HPP
+#define JSONCONS_JSONCONS_UTIL_HPP
 
 #include <stdexcept>
 #include <string>
@@ -22,9 +22,22 @@
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/osequencestream.hpp>
 #include <algorithm>
+#include <memory>
 
 namespace jsoncons
 {
+
+template<class Pointer> inline
+auto to_plain_pointer(Pointer ptr)
+{       
+    return (std::addressof(*ptr));
+}
+
+template<class T> inline
+T * to_plain_pointer(T * ptr)
+{       
+    return (ptr);
+}
 
 template <class CharT, class Traits = std::char_traits<CharT>>
 class basic_string_view_

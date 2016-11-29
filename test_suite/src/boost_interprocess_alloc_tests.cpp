@@ -16,7 +16,6 @@
 #include <ctime>
 #include <cstddef>
 #include <memory>
-#include <scoped_allocator>
 
 using namespace jsoncons;
 using namespace boost::interprocess;
@@ -44,19 +43,9 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     const shmem_allocator allocator(segment.get_segment_manager());
 
     shm_json* j = segment.construct<shm_json>("shm_json")(allocator);
+    j->reserve(10);
 
-    ShmVector* v = segment.construct<ShmVector>("ShmVector")(allocator);
-
-    /*typedef basic_json<char,json_traits<char>,allocator_type> my_json;
-
-    managed_shared_memory segment(create_only, "MySharedMemory", 65536);
-    allocator_type alloc(segment.get_segment_manager());
-
-    my_json::array an_array = my_json::array(alloc);
-    my_json::object an_object = my_json::object(alloc);
-
-    my_json root = an_object;
-    root.reserve(1);*/
+    segment.destroy_ptr(j);
 
     /*root.set("field1", 10.0);
     root.set("field2", 20.0);
