@@ -469,13 +469,13 @@ public:
                 }
             }
 
-            array_data(const array & val)
+            array_data(const array& val)
                 : base_data(value_types::array_t)
             {
                 create(val.get_self_allocator(), val);
             }
 
-            array_data(const array & val, const Allocator& a)
+            array_data(const array& val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
                 create(array_allocator(a), val, a);
@@ -679,7 +679,7 @@ public:
         }
         variant(const object& val)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val,val.get_self_allocator());
+            new(reinterpret_cast<void*>(&data_))object_data(val);
         }
         variant(const object& val, const Allocator& alloc)
         {
@@ -689,14 +689,14 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))array_data(val);
         }
+        variant(const array& val, const Allocator& alloc)
+        {
+            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
+        }
         template<class InputIterator>
         variant(InputIterator first, InputIterator last, const Allocator& a)
         {
             new(reinterpret_cast<void*>(&data_))array_data(first, last, a);
-        }
-        variant(const array& val, const Allocator& alloc)
-        {
-            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
 
         ~variant()

@@ -387,6 +387,29 @@ struct json_type_traits<Json, typename Json::object>
     {
         return Json::make_object(rhs);
     }
+    static Json to_json(const typename Json::object& rhs, 
+                        typename Json::allocator_type allocator)
+    {
+        return Json::make_object(rhs, allocator);
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, typename Json::array>
+{
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_array();
+    }
+    static Json to_json(const typename Json::array& rhs)
+    {
+        return Json::make_array<1>(rhs);
+    }
+    static Json to_json(const typename Json::array& rhs, 
+                        typename Json::allocator_type allocator)
+    {
+        return Json::make_array(rhs, allocator);
+    }
 };
 
 template<class Json>
@@ -403,19 +426,6 @@ struct json_type_traits<Json, Json>
     static Json to_json(const Json& rhs)
     {
         return rhs;
-    }
-};
-
-template<class Json>
-struct json_type_traits<Json, typename Json::array>
-{
-    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
-    {
-        return rhs.is_array();
-    }
-    static Json to_json(const typename Json::array& rhs)
-    {
-        return Json::make_array(rhs);
     }
 };
 
