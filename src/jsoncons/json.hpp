@@ -407,36 +407,52 @@ public:
 
         struct object_data : public base_data
         {
-            object* data_;
+            typename std::allocator_traits<object_allocator>::pointer data_;
+
+            template <typename... Args>
+            void create(object_allocator allocator, Args&& ... args)
+            {
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(allocator);
+                data_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, data_, std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(data_,1);
+                    throw;
+                }
+            }
 
             explicit object_data(const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(object_allocator(a),a);
+                create(a,a);
             }
 
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.get_self_allocator(), val);
+                create(val.get_self_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(object_allocator(a), val, a);
+                create(object_allocator(a), val, a);
             }
 
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.data_->get_self_allocator(), *(val.data_));
+                create(val.data_->get_self_allocator(), *(val.data_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(object_allocator(a), *(val.data_), a);
+                create(object_allocator(a), *(val.data_), a);
             }
 
             ~object_data()

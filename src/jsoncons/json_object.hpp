@@ -485,7 +485,7 @@ public:
 
     self_allocator_type get_self_allocator() const
     {
-        return *this;
+        return static_cast<self_allocator_type>(*this);
     }
 
     iterator begin()
@@ -773,7 +773,7 @@ public:
 
     self_allocator_type get_self_allocator() const
     {
-        return *this;
+        return static_cast<self_allocator_type>(*this);
     }
 
     iterator begin()
