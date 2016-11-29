@@ -403,7 +403,7 @@ struct json_type_traits<Json, typename Json::array>
     }
     static Json to_json(const typename Json::array& rhs)
     {
-        return Json::make_array<1>(rhs);
+        return Json::make_array(rhs);
     }
     static Json to_json(const typename Json::array& rhs, 
                         typename Json::allocator_type allocator)

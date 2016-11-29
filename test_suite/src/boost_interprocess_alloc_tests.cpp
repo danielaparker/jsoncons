@@ -46,9 +46,9 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     //j->reserve(10);
 
     shm_json j{ shm_json::array(allocator) };
+    j.add(0);
     j.add(1);
-    j.add(true);
-    j.add(null_type());
+    j.add(2);
     j.add(3);
     j.resize(5);
     j[4] = 4;

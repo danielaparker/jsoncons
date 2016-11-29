@@ -1320,16 +1320,9 @@ public:
        // Remove a member from an object 
 
         template <class T>
-        void set(const string_type& name, T&& value)
+        void set(string_view_type name, T&& value)
         {
             evaluate().set(name,std::forward<T&&>(value));
-        }
-
-        template <class T>
-        void set(string_type&& name, T&& value)
-
-        {
-            evaluate().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
@@ -2742,7 +2735,7 @@ public:
     }
 
     template <class T>
-    void set(const string_type& name, T&& value)
+    void set(string_view_type name, T&& value)
     {
         switch (var_.type_id())
         {
@@ -2754,21 +2747,6 @@ public:
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
-            }
-        }
-    }
-
-    template <class T>
-    void set(string_type&& name, T&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }

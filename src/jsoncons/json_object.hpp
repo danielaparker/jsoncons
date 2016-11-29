@@ -424,6 +424,7 @@ public:
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
     typedef StringT string_type;
+    typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
@@ -590,7 +591,7 @@ public:
     }
 
     template <class T>
-    void set(const string_type& name, T&& value)
+    void set(string_view_type name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -604,24 +605,6 @@ public:
         else
         {
             members_.emplace(it,name,std::forward<T&&>(value));
-        }
-    }
-
-    template <class T>
-    void set(string_type&& name, T&& value)
-    {
-        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
-        if (it == members_.end())
-        {
-            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
-        }
-        else if (it->key() == name)
-        {
-            it->value(std::forward<T&&>(value));
-        }
-        else
-        {
-            members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
         }
     }
 
