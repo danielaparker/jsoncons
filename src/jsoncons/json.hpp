@@ -92,7 +92,10 @@ public:
     typedef basic_string_view_<char_type,char_traits_type> string_view_type;
 
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
-    typedef std::basic_string<CharT,char_traits_type,Allocator> key_type;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> key_allocator;
+    typedef std::basic_string<CharT,char_traits_type,key_allocator> key_type;
+
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> member_type;
 

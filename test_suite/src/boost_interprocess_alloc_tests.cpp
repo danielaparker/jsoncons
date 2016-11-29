@@ -61,6 +61,11 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     j.add(a);
 
     shm_json o{ shm_json::object(allocator) };
+    o.set("field too long for small string optimization", 10.0);
+
+    std::cout << o << std::endl;
+
+    j.add(o);
 
     std::cout << j << std::endl;
 

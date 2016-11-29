@@ -596,7 +596,8 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.emplace_back(name, std::forward<T&&>(value));
+            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+                                  std::forward<T&&>(value));
         }
         else if (it->key() == name)
         {
@@ -604,7 +605,9 @@ public:
         }
         else
         {
-            members_.emplace(it,name,std::forward<T&&>(value));
+            members_.emplace(it,
+                             key_type(name.data(),name.length(),get_self_allocator()),
+                             std::forward<T&&>(value));
         }
     }
 
@@ -623,7 +626,8 @@ public:
 
         if (it == members_.end())
         {
-            members_.emplace_back(name, std::forward<T&&>(value));
+            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+                                  std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -632,7 +636,9 @@ public:
         }
         else
         {
-            it = members_.emplace(it,name,std::forward<T&&>(value));
+            it = members_.emplace(it,
+                                  key_type(name.data(),name.length(),get_self_allocator()),
+                                  std::forward<T&&>(value));
         }
         return iterator(it);
     }
