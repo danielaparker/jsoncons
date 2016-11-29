@@ -480,7 +480,7 @@ public:
         }
         for (auto& element : init)
         {
-            set(element[0].as_string(), std::move(element[1]));
+            set(element[0].as_string_view(), std::move(element[1]));
         }
     }
 
@@ -675,6 +675,7 @@ public:
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
     typedef KeyT key_type;
+    typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_iterator;
@@ -727,7 +728,7 @@ public:
         }
         for (auto& element : init)
         {
-            set(element[0].as_string(), std::move(element[1]));
+            set(element[0].as_string_view(), std::move(element[1]));
         }
     }
 
@@ -843,14 +844,15 @@ public:
     }
 
     template <class T>
-    void set(const key_type& name, T&& value)
+    void set(string_view_type name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
 
         if (it == members_.end())
         {
-            members_.emplace_back(name, std::forward<T&&>(value));
+            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+                                  std::forward<T&&>(value));
         }
         else
         {
@@ -859,29 +861,14 @@ public:
     }
 
     template <class T>
-    void set(key_type&& name, T&& value)
-    {
-        equals_pred<value_type,char_type> comp(name.data(), name.length());
-        auto it = std::find_if(members_.begin(),members_.end(), comp);
-
-        if (it == members_.end())
-        {
-            members_.emplace_back(std::forward<key_type&&>(name), std::forward<T&&>(value));
-        }
-        else
-        {
-            it->value(std::forward<T&&>(value));
-        }
-    }
-
-    template <class T>
-    iterator set(iterator hint, const key_type& name, T&& value)
+    iterator set(iterator hint, string_view_type name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
 
         if (it == members_.end())
         {
-            members_.emplace_back(name, std::forward<T&&>(value));
+            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+                                  std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -890,28 +877,9 @@ public:
         }
         else
         {
-            it = members_.emplace(it,name,std::forward<T&&>(value));
-        }
-        return it;
-    }
-
-    template <class T>
-    iterator set(iterator hint, key_type&& name, T&& value)
-    {
-        typename std::vector<value_type,allocator_type>::iterator it = hint;
-
-        if (it == members_.end())
-        {
-            members_.emplace_back(std::forward<key_type&&>(name), std::forward<T&&>(value));
-            it = members_.begin() + (members_.size() - 1);
-        }
-        else if (it->key() == name)
-        {
-            it->value(std::forward<T&&>(value));
-        }
-        else
-        {
-            it = members_.emplace(it,std::forward<key_type&&>(name),std::forward<T&&>(value));
+            it = members_.emplace(it,
+                                  key_type(name.data(),name.length(),get_self_allocator()),
+                                  std::forward<T&&>(value));
         }
         return it;
     }
