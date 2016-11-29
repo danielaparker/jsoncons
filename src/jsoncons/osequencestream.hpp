@@ -212,12 +212,12 @@ private:
 
 public:
     basic_osequencestream() JSONCONS_NOEXCEPT
-        : buf_(),
-          std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_))
+        : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
+          buf_()
     {}
     basic_osequencestream(std::size_t length) JSONCONS_NOEXCEPT
-        : buf_(length),
-          std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_))
+        : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
+          buf_(length)
     {}
 
     virtual ~basic_osequencestream() JSONCONS_NOEXCEPT 
