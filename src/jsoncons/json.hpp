@@ -297,7 +297,7 @@ public:
                 const char_type* c_str() const { return p_; }
                 const char_type* data() const { return p_; }
                 size_t length() const { return length_; }
-                char_allocator get_allocator() const
+                char_allocator get_self_allocator() const
                 {
                     return *this;
                 }
@@ -368,7 +368,7 @@ public:
             {
                 holder_ = create_string_holder(val.holder_->p_, 
                                              val.holder_->length_, 
-                                             val.holder_->get_allocator());
+                                             val.holder_->get_self_allocator());
             }
 
             string_data(const string_data& val, char_allocator allocator)
@@ -380,7 +380,7 @@ public:
             }
             ~string_data()
             {
-                destroy_string_holder(holder_->get_allocator(), holder_);
+                destroy_string_holder(holder_->get_self_allocator(), holder_);
             }
 
             size_t length() const
@@ -398,9 +398,9 @@ public:
                 return holder_->p_;
             }
 
-            char_allocator get_allocator() const
+            char_allocator get_self_allocator() const
             {
-                return holder_->get_allocator();
+                return holder_->get_self_allocator();
             }
         };
 
@@ -418,7 +418,7 @@ public:
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.get_allocator(), val);
+                data_ = create_impl<object>(val.get_self_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
@@ -430,7 +430,7 @@ public:
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.data_->get_allocator(), *(val.data_));
+                data_ = create_impl<object>(val.data_->get_self_allocator(), *(val.data_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
@@ -441,7 +441,7 @@ public:
 
             ~object_data()
             {
-                destroy_impl(data_->get_allocator(), data_);
+                destroy_impl(data_->get_self_allocator(), data_);
             }
 
             object& value()
@@ -462,7 +462,7 @@ public:
             array_data(const array & val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(val.get_allocator(), val);
+                data_ = create_impl<array>(val.get_self_allocator(), val);
             }
 
             array_data(const array & val, const Allocator& a)
@@ -474,7 +474,7 @@ public:
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(val.data_->get_allocator(), *(val.data_));
+                data_ = create_impl<array>(val.data_->get_self_allocator(), *(val.data_));
             }
 
             array_data(const array_data & val, const Allocator& a)
@@ -491,7 +491,7 @@ public:
             }
             ~array_data()
             {
-                destroy_impl(data_->get_allocator(), data_);
+                destroy_impl(data_->get_self_allocator(), data_);
             }
 
             array& value()
@@ -989,7 +989,7 @@ public:
             auto it = val.find(name_);
             if (it == val.object_range().end())
             {
-                it = val.set(val.object_range().begin(),name_,object(val.object_value().get_allocator()));            
+                it = val.set(val.object_range().begin(),name_,object(val.object_value().get_self_allocator()));            
             }
             return it->value();
         }
@@ -2366,7 +2366,7 @@ public:
         case value_types::small_string_t:
             return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_allocator());
+            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_self_allocator());
         default:
             return to_string();
         }
@@ -2392,7 +2392,7 @@ public:
         case value_types::small_string_t:
             return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_allocator());
+            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_self_allocator());
         default:
             return to_string(format);
         }

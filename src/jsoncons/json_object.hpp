@@ -417,10 +417,11 @@ class json_object
 
 // Do not preserve order
 template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,false,Allocator>
+class json_object<StringT,Json,false,Allocator> : private Allocator
 {
 public:
     typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
     typedef StringT string_type;
     typedef key_value_pair<StringT,Json> value_type;
@@ -429,42 +430,45 @@ public:
 
     typedef json_object_iterator<base_iterator,base_iterator> iterator;
     typedef json_object_iterator<const_base_iterator,base_iterator> const_iterator;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
 private:
-    std::vector<value_type,allocator_type> members_;
+    std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : members_()
+        : Allocator(), members_(vector_allocator_type())
     {
     }
     json_object(const allocator_type& allocator)
-        : members_(allocator)
+        : Allocator(allocator), members_(vector_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : members_(val.members_)
+        : Allocator(), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : members_(std::move(val.members_))
+        : Allocator(), members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) :
-        members_(val.members_,allocator)
+        Allocator(allocator), members_(val.members_,vector_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        members_(std::move(val.members_),allocator)
+        Allocator(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
     {
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
-               const Allocator& allocator = Allocator())
+                const Allocator& allocator = Allocator())
+        : Allocator(allocator),
+          members_(vector_allocator_type(allocator))
     {
-        (void)allocator;
         for (const auto& element : init)
         {
             if (element.size() != 2 || !element[0].is_string())
@@ -479,9 +483,9 @@ public:
         }
     }
 
-    Allocator get_allocator() const
+    self_allocator_type get_self_allocator() const
     {
-        return members_.get_allocator();
+        return *this;
     }
 
     iterator begin()
@@ -704,47 +708,72 @@ private:
 // Preserve order
 
 template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,true,Allocator>
+class json_object<StringT,Json,true,Allocator> : private Allocator
 {
 public:
     typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
     typedef StringT string_type;
     typedef key_value_pair<StringT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_iterator;
 
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
 private:
-    std::vector<value_type,allocator_type> members_;
+    std::vector<value_type,vector_allocator_type> members_;
 public:
-    json_object(const allocator_type& allocator = allocator_type())
-        : members_(allocator)
+    json_object()
+        : Allocator(), members_(vector_allocator_type())
+    {
+    }
+    json_object(const allocator_type& allocator)
+        : Allocator(allocator), members_(vector_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : members_(val.members_)
+        : Allocator(), members_(val.members_)
     {
     }
 
-    json_object(json_object&& val) JSONCONS_NOEXCEPT
-        : members_(std::move(val.members_))
+    json_object(json_object&& val)
+        : Allocator(), members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) :
-        members_(val.members_,allocator)
+        Allocator(allocator), members_(val.members_,vector_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        members_(std::move(val.members_),allocator)
+        Allocator(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
     {
     }
 
-    Allocator get_allocator() const
+    json_object(std::initializer_list<typename Json::array> init, 
+                const Allocator& allocator = Allocator())
+        : Allocator(allocator),
+          members_(vector_allocator_type(allocator))
     {
-        return members_.get_allocator();
+        for (const auto& element : init)
+        {
+            if (element.size() != 2 || !element[0].is_string())
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error, "Cannot create object from initializer list");
+                break;
+            }
+        }
+        for (auto& element : init)
+        {
+            set(element[0].as_string(), std::move(element[1]));
+        }
+    }
+
+    self_allocator_type get_self_allocator() const
+    {
+        return *this;
     }
 
     iterator begin()
