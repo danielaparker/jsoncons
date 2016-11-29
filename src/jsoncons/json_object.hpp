@@ -423,6 +423,7 @@ public:
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
+    typedef typename Json::key_allocator_type key_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
@@ -451,12 +452,14 @@ public:
     }
 
     json_object(json_object&& val)
-        : Allocator(), members_(std::move(val.members_))
+        : Allocator(val.get_self_allocator()), 
+          members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) :
-        Allocator(allocator), members_(val.members_,vector_allocator_type(allocator))
+        Allocator(allocator), 
+        members_(val.members_,vector_allocator_type(allocator))
     {
     }
 
@@ -596,7 +599,7 @@ public:
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
         {
-            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+            members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
                                   std::forward<T&&>(value));
         }
         else if (it->key() == name)
@@ -606,7 +609,7 @@ public:
         else
         {
             members_.emplace(it,
-                             key_type(name.data(),name.length(),get_self_allocator()),
+                             key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
                              std::forward<T&&>(value));
         }
     }
@@ -626,7 +629,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+            members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
                                   std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
@@ -637,7 +640,7 @@ public:
         else
         {
             it = members_.emplace(it,
-                                  key_type(name.data(),name.length(),get_self_allocator()),
+                                  key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
                                   std::forward<T&&>(value));
         }
         return iterator(it);
@@ -674,6 +677,7 @@ public:
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
+    typedef typename Json::key_allocator_type key_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
@@ -851,7 +855,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+            members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
                                   std::forward<T&&>(value));
         }
         else
@@ -867,7 +871,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+            members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
                                   std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
@@ -878,7 +882,7 @@ public:
         else
         {
             it = members_.emplace(it,
-                                  key_type(name.data(),name.length(),get_self_allocator()),
+                                  key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
                                   std::forward<T&&>(value));
         }
         return it;

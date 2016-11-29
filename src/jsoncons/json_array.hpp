@@ -47,13 +47,16 @@ public:
     {
     }
 
-    explicit json_array(size_t n, const Allocator& allocator = Allocator())
+    explicit json_array(size_t n, 
+                        const Allocator& allocator = Allocator())
         : Allocator(allocator), 
           elements_(n,Json(),vector_allocator_type(allocator))
     {
     }
 
-    explicit json_array(size_t n, const Json& value, const Allocator& allocator = Allocator())
+    explicit json_array(size_t n, 
+                        const Json& value, 
+                        const Allocator& allocator = Allocator())
         : Allocator(allocator), 
           elements_(n,value,vector_allocator_type(allocator))
     {
@@ -76,7 +79,7 @@ public:
     {
     }
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : Allocator(), 
+        : Allocator(val.get_self_allocator()), 
           elements_(std::move(val.elements_))
     {
     }
