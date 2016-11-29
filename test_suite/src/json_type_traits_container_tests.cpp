@@ -17,6 +17,7 @@
 #include <deque>
 #include <forward_list>
 #include <list>
+#include <array>
 
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
