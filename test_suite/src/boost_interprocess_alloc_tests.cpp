@@ -53,13 +53,14 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     j.resize(5);
     j[4] = 4;
 
-    shm_json j2{ shm_json::array(allocator) };
-    j2.add(true);
-    j2.add(false);
-    j2.add(null_type());
+    shm_json a{ shm_json::array(allocator) };
+    a.add(true);
+    a.add(false);
+    a.add(null_type());
 
-    j.add(j2);
+    j.add(a);
 
+    shm_json o{ shm_json::object(allocator) };
 
     std::cout << j << std::endl;
 

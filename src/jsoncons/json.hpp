@@ -1327,16 +1327,9 @@ public:
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, const key_type& name, T&& value)
+        object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
-        }
-
-        template <class T>
-        object_iterator set(object_iterator hint, key_type&& name, T&& value)
-
-        {
-            return evaluate().set(hint, std::forward<key_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
@@ -2753,7 +2746,7 @@ public:
     }
 
     template <class T>
-    object_iterator set(object_iterator hint, const key_type& name, T&& value)
+    object_iterator set(object_iterator hint, string_view_type name, T&& value)
     {
         switch (var_.type_id())
         {
@@ -2765,21 +2758,6 @@ public:
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
-            }
-        }
-    }
-
-    template <class T>
-    object_iterator set(object_iterator hint, key_type&& name, T&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::forward<key_type&&>(name),std::forward<T&&>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
             }
         }
     }
