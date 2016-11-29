@@ -445,7 +445,7 @@ public:
     }
 
     json_object(const json_object& val)
-        : Allocator(), members_(val.members_)
+        : Allocator(val.get_self_allocator()), members_(val.members_)
     {
     }
 

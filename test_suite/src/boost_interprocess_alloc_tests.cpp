@@ -42,10 +42,14 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     //Initialize shared memory STL-compatible allocator
     const shmem_allocator allocator(segment.get_segment_manager());
 
-    shm_json* j = segment.construct<shm_json>("shm_json")(allocator);
-    j->reserve(10);
+    //shm_json* j = segment.construct<shm_json>("shm_json")(allocator);
+    //j->reserve(10);
 
-    segment.destroy_ptr(j);
+    shm_json j{ shm_json::array(allocator) };
+
+    //shm_json j2{ shm_json::array(allocator),allocator };
+
+    //segment.destroy_ptr(j);
 
     /*root.set("field1", 10.0);
     root.set("field2", 20.0);

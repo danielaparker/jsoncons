@@ -679,7 +679,7 @@ public:
         }
         variant(const object& val)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val);
+            new(reinterpret_cast<void*>(&data_))object_data(val,val.get_self_allocator());
         }
         variant(const object& val, const Allocator& alloc)
         {

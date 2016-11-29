@@ -66,7 +66,7 @@ public:
     {
     }
     json_array(const json_array& val)
-        : Allocator(), 
+        : Allocator(val.get_self_allocator()),
           elements_(val.elements_)
     {
     }
