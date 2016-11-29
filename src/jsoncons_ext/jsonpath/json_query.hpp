@@ -908,7 +908,7 @@ public:
         start_ = 0;
     }
 
-    void apply_unquoted_string(const string_type& name)
+    void apply_unquoted_string(const key_type& name)
     {
         if (name.length() > 0)
         {
@@ -920,7 +920,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(json_reference context, const string_type& name)
+    void apply_unquoted_string(json_reference context, const key_type& name)
     {
         if (context.is_object())
         {

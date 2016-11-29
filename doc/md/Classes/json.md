@@ -247,12 +247,12 @@ Non-generic versions of `as` methods
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object.
 
-    json& operator[](const string_type& name)
+    json& operator[](const key_type& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    const json& operator[](const string_type& name) const
+    const json& operator[](const key_type& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
@@ -297,7 +297,7 @@ Throws `std::runtime_error` if not an object.
 Remove the members from an object in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 
-    void erase(const string_type& name)
+    void erase(const key_type& name)
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
 
@@ -305,16 +305,16 @@ Throws `std::runtime_error` if not an object.
 Requests the removal of unused capacity.
 
     template <class T>
-    void set(const string_type& name, T&& val)
+    void set(const key_type& name, T&& val)
     template <class T>
-    void set(string_type&& name, T&& val)
+    void set(key_type&& name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
 
     template <class T>
-    object_iterator set(object_iterator hint, const string_type& name, T&& val)
+    object_iterator set(object_iterator hint, const key_type& name, T&& val)
     template <class T>
-    object_iterator set(object_iterator hint, string_type&& name, T&& val)
+    object_iterator set(object_iterator hint, key_type&& name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_iterator` pointing at the member that was inserted or updated

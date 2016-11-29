@@ -208,39 +208,39 @@ public:
     }
 };
 
-template <class StringT, class ValueT>
+template <class KeyT, class ValueT>
 class key_value_pair
 {
 public:
-    typedef StringT string_type;
-    typedef typename StringT::value_type char_type;
+    typedef KeyT key_type;
+    typedef typename KeyT::value_type char_type;
 
     key_value_pair()
     {
     }
-    key_value_pair(const string_type& name)
+    key_value_pair(const key_type& name)
         : key_(name)
     {
     }
-    key_value_pair(string_type&& name)
-        : key_(std::forward<string_type&&>(name))
+    key_value_pair(key_type&& name)
+        : key_(std::forward<key_type&&>(name))
     {
     }
 
-    key_value_pair(const string_type& name, const ValueT& val)
+    key_value_pair(const key_type& name, const ValueT& val)
         : key_(name), value_(val)
     {
     }
-    key_value_pair(string_type&& name, const ValueT& val)
-        : key_(std::forward<string_type>(name)), value_(val)
+    key_value_pair(key_type&& name, const ValueT& val)
+        : key_(std::forward<key_type>(name)), value_(val)
     {
     }
-    key_value_pair(const string_type& name, ValueT&& val)
+    key_value_pair(const key_type& name, ValueT&& val)
         : key_(name), value_(std::forward<ValueT&&>(val))
     {
     }
-    key_value_pair(string_type&& name, ValueT&& val)
-        : key_(std::forward<string_type&&>(name)), 
+    key_value_pair(key_type&& name, ValueT&& val)
+        : key_(std::forward<key_type&&>(name)), 
           value_(std::forward<ValueT&&>(val))
     {
     }
@@ -253,7 +253,7 @@ public:
     {
     }
 
-    const string_type& key() const
+    const key_type& key() const
     {
         return key_;
     }
@@ -310,13 +310,13 @@ public:
         value_.shrink_to_fit();
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    const string_type& name() const
+    const key_type& name() const
     {
         return key_;
     }
 #endif
 private:
-    string_type key_;
+    key_type key_;
     ValueT value_;
 };
 
@@ -410,22 +410,22 @@ public:
     IteratorT it_;
 };
 
-template <class StringT,class Json,bool PreserveOrder,class Allocator>
+template <class KeyT,class Json,bool PreserveOrder,class Allocator>
 class json_object
 {
 };
 
 // Do not preserve order
-template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,false,Allocator> : private Allocator
+template <class KeyT,class Json,class Allocator>
+class json_object<KeyT,Json,false,Allocator> : private Allocator
 {
 public:
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
-    typedef StringT string_type;
+    typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef key_value_pair<StringT,Json> value_type;
+    typedef key_value_pair<KeyT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
 
@@ -609,7 +609,7 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, const string_type& name, T&& value)
+    iterator set(iterator hint, const key_type& name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->key() <= name)
@@ -638,7 +638,7 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, string_type&& name, T&& value)
+    iterator set(iterator hint, key_type&& name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->key() <= name)
@@ -652,7 +652,7 @@ public:
 
         if (it == members_.end())
         {
-            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
+            members_.emplace_back(std::forward<key_type&&>(name), std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -661,7 +661,7 @@ public:
         }
         else
         {
-            it = members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
+            it = members_.emplace(it,std::forward<key_type&&>(name),std::forward<T&&>(value));
         }
         return iterator(it);
     }
@@ -690,15 +690,15 @@ private:
 
 // Preserve order
 
-template <class StringT,class Json,class Allocator>
-class json_object<StringT,Json,true,Allocator> : private Allocator
+template <class KeyT,class Json,class Allocator>
+class json_object<KeyT,Json,true,Allocator> : private Allocator
 {
 public:
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
-    typedef StringT string_type;
-    typedef key_value_pair<StringT,Json> value_type;
+    typedef KeyT key_type;
+    typedef key_value_pair<KeyT,Json> value_type;
     typedef typename std::vector<value_type, allocator_type>::iterator iterator;
     typedef typename std::vector<value_type, allocator_type>::const_iterator const_iterator;
 
@@ -866,7 +866,7 @@ public:
     }
 
     template <class T>
-    void set(const string_type& name, T&& value)
+    void set(const key_type& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -882,14 +882,14 @@ public:
     }
 
     template <class T>
-    void set(string_type&& name, T&& value)
+    void set(key_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
 
         if (it == members_.end())
         {
-            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
+            members_.emplace_back(std::forward<key_type&&>(name), std::forward<T&&>(value));
         }
         else
         {
@@ -898,7 +898,7 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, const string_type& name, T&& value)
+    iterator set(iterator hint, const key_type& name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
 
@@ -919,13 +919,13 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, string_type&& name, T&& value)
+    iterator set(iterator hint, key_type&& name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
 
         if (it == members_.end())
         {
-            members_.emplace_back(std::forward<string_type&&>(name), std::forward<T&&>(value));
+            members_.emplace_back(std::forward<key_type&&>(name), std::forward<T&&>(value));
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -934,7 +934,7 @@ public:
         }
         else
         {
-            it = members_.emplace(it,std::forward<string_type&&>(name),std::forward<T&&>(value));
+            it = members_.emplace(it,std::forward<key_type&&>(name),std::forward<T&&>(value));
         }
         return it;
     }

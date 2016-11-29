@@ -17,7 +17,7 @@ template <class T>
 void add(T&& val)
 
 template <class T>
-void set(const string_type& name, T&& val)
+void set(const key_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 

@@ -92,11 +92,12 @@ public:
     typedef basic_string_view_<char_type,char_traits_type> string_view_type;
 
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
+    typedef std::basic_string<CharT,char_traits_type,Allocator> key_type;
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef key_value_pair<string_type,json_type> member_type;
+    typedef key_value_pair<key_type,json_type> member_type;
 
     typedef json_array<json_type,Allocator> array;
-    typedef json_object<string_type,json_type,json_traits_type::preserve_order,Allocator> object;
+    typedef json_object<key_type,json_type,json_traits_type::preserve_order,Allocator> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -975,12 +976,12 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        const string_type& name_;
+        const key_type& name_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
-        json_proxy(ParentT& parent, const string_type& name)
+        json_proxy(ParentT& parent, const key_type& name)
             : parent_(parent), name_(name)
         {
         }
@@ -1016,12 +1017,12 @@ public:
             return parent_.evaluate(name_).at(index);
         }
 
-        json_type& evaluate(const string_type& index)
+        json_type& evaluate(const key_type& index)
         {
             return parent_.evaluate(name_).at(index);
         }
 
-        const json_type& evaluate(const string_type& index) const
+        const json_type& evaluate(const key_type& index) const
         {
             return parent_.evaluate(name_).at(index);
         }
@@ -1233,12 +1234,12 @@ public:
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const string_type& name)
+        json_proxy<proxy_type> operator[](const key_type& name)
         {
             return json_proxy<proxy_type>(*this,name);
         }
 
-        const json_proxy<proxy_type> operator[](const string_type& name) const
+        const json_proxy<proxy_type> operator[](const key_type& name) const
         {
             return json_proxy<proxy_type>(*this,name);
         }
@@ -1274,7 +1275,7 @@ public:
         }
 
         template <class T>
-        json_type get(const string_type& name, T&& default_val) const
+        json_type get(const key_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1312,7 +1313,7 @@ public:
             evaluate().erase(first, last);
         }
 
-        void erase(const string_type& name)
+        void erase(const key_type& name)
         {
             evaluate().erase(name);
         }
@@ -1326,16 +1327,16 @@ public:
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, const string_type& name, T&& value)
+        object_iterator set(object_iterator hint, const key_type& name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, string_type&& name, T&& value)
+        object_iterator set(object_iterator hint, key_type&& name, T&& value)
 
         {
-            return evaluate().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
+            return evaluate().set(hint, std::forward<key_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
@@ -1483,7 +1484,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const json_type& get(const string_type& name) const
+        const json_type& get(const key_type& name) const
         {
             return evaluate().get(name);
         }
@@ -1533,7 +1534,7 @@ public:
             evaluate_with_default().add(index, std::forward<json_type&&>(value));
         }
 
-        bool has_member(const string_type& name) const
+        bool has_member(const key_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -1544,11 +1545,11 @@ public:
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
-        void remove(const string_type& name)
+        void remove(const key_type& name)
         {
             evaluate().remove(name);
         }
-        void remove_member(const string_type& name)
+        void remove_member(const key_type& name)
         {
             evaluate().remove(name);
         }
@@ -1842,7 +1843,7 @@ public:
         return at(i);
     }
 
-    json_proxy<json_type> operator[](const string_type& name)
+    json_proxy<json_type> operator[](const key_type& name)
     {
         switch (var_.type_id())
         {
@@ -2477,12 +2478,12 @@ public:
         return at(i);
     }
 
-    json_type& evaluate(const string_type& name) 
+    json_type& evaluate(const key_type& name) 
     {
         return at(name);
     }
 
-    const json_type& evaluate(const string_type& name) const
+    const json_type& evaluate(const key_type& name) const
     {
         return at(name);
     }
@@ -2575,7 +2576,7 @@ public:
     }
 
     template<class T>
-    json_type get(const string_type& name, T&& default_val) const
+    json_type get(const key_type& name, T&& default_val) const
     {
         switch (var_.type_id())
         {
@@ -2719,7 +2720,7 @@ public:
 
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void erase(const string_type& name)
+    void erase(const key_type& name)
     {
         switch (var_.type_id())
         {
@@ -2752,7 +2753,7 @@ public:
     }
 
     template <class T>
-    object_iterator set(object_iterator hint, const string_type& name, T&& value)
+    object_iterator set(object_iterator hint, const key_type& name, T&& value)
     {
         switch (var_.type_id())
         {
@@ -2769,12 +2770,12 @@ public:
     }
 
     template <class T>
-    object_iterator set(object_iterator hint, string_type&& name, T&& value){
+    object_iterator set(object_iterator hint, key_type&& name, T&& value){
         switch (var_.type_id()){
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
+            return var_.object_data_cast()->value().set(hint, std::forward<key_type&&>(name),std::forward<T&&>(value));
             break;
         default:
             {
@@ -2955,7 +2956,7 @@ public:
         return array_range().end();
     }
 
-    const json_type& get(const string_type& name) const
+    const json_type& get(const key_type& name) const
     {
         static const json_type a_null = null_type();
 
@@ -3089,7 +3090,7 @@ public:
         }
     }
 
-    bool has_member(const string_type& name) const
+    bool has_member(const key_type& name) const
     {
         switch (var_.type_id())
         {
@@ -3117,11 +3118,11 @@ public:
     }
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove(const string_type& name)
+    void remove(const key_type& name)
     {
         erase(name.data(),name.length());
     }
-    void remove_member(const string_type& name)
+    void remove_member(const key_type& name)
     {
         erase(name.data(),name.length());
     }
