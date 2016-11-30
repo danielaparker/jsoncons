@@ -7,7 +7,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/allocators/allocator.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     //Initialize shared memory STL-compatible allocator
     const shmem_allocator allocator(segment.get_segment_manager());
 
-    shm_json j{ shm_json::array(allocator) };
+    shm_json j = shm_json::array(allocator);
     j.add(0);
     j.add(1);
     j.add(2);
@@ -59,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     v.add(j);
     v.add(a);
 
-    shm_json o{ shm_json::object(allocator) };
+    shm_json o = shm_json::object(allocator);
     o.set("name too long for small string optimization", 10.0);
     shm_json o2{ shm_json::object(allocator) };
     o2.set("name", 10.0);

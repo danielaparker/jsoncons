@@ -469,15 +469,10 @@ vertical-align:1px;
 </head>
 <body>
 <h1>jsoncons: a C++ library for json construction</h1>
-
-<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. </p>
-
+<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world.</p>
 <p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
-
 <p>The <a href="https://github.com/danielaparker/jsoncons">code repository</a> and <a href="https://github.com/danielaparker/jsoncons/releases">releases</a> are on github. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
-
 <p>The library has a number of features, which are listed below:</p>
-
 <ul>
 <li>Uses the standard C++ input/output streams library</li>
 <li>Supports converting to and from the standard library sequence and associative containers</li>
@@ -495,29 +490,19 @@ vertical-align:1px;
 <li>Allows extensions to the types accepted by the json class constructors, accessors and modifiers</li>
 <li>Supports reading (writing) JSON values from (to) CSV files</li>
 <li>Supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</li>
-<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>
-</li>
+<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a></li>
 <li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
-<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>
-</li>
+<li>Supports <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a></li>
 <li>Supports search (by JsonPath) and replace</li>
 </ul>
-
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
-
 <h2>Benchmarks</h2>
-
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.<br>
 Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and <a href="http://www.json.org/JSON_checker/">JSON_checker</a> tests may be found <a href="https://danielaparker.github.io/json_benchmarks/">here</a>.</p>
-
 <h2>Get jsoncons</h2>
-
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
-
-<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
-
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
 <h2>A simple program using jsoncons</h2>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -536,7 +521,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>; <span class="pl-c">// a double</span>
-
+    
     json file_export;
 
     <span class="pl-c">// create "File Format Options" as an object and put "Color Spaces" in it</span>
@@ -552,9 +537,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Dimension 2 = <span class="pl-pds">"</span></span> &lt;&lt; val.<span class="pl-c1">get_with_default</span>(<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)
 {
     <span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>: {
@@ -571,47 +554,39 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 (<span class="pl-c1">2</span>) Dimension <span class="pl-c1">1</span> = <span class="pl-c1">9.84</span>
 
 (<span class="pl-c1">3</span>) Dimension <span class="pl-c1">2</span> = n/a</pre></div>
-
-<p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>. Consult the <a href="https://github.com/danielaparker/jsoncons/wiki">wiki</a> for the latest documentation, tutorials and roadmap. </p>
-
+<p>For a quick guide, see the article <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>. Consult the <a href="https://github.com/danielaparker/jsoncons/wiki">wiki</a> for the latest documentation, tutorials and roadmap.</p>
 <h2>Building the test suite and examples with CMake</h2>
-
 <p><a href="https://cmake.org/">CMake</a> is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a <a href="https://cmake.org/download/">Windows Installer package</a>. On Linux it is usually available as a package, e.g., on Ubuntu,</p>
-
-<pre><code>    sudo apt-get install cmake
+<pre><code>sudo apt-get install cmake
 </code></pre>
-
 <p>Instructions for building the test suite with CMake may be found in</p>
-
 <pre><code>jsoncons/test_suite/build/cmake/README.txt
 </code></pre>
-
 <p>Instructions for building the examples with CMake may be found in</p>
-
 <pre><code>jsoncons/examples/build/cmake/README.txt
 </code></pre>
-
 <h2>About jsoncons::basic_json</h2>
-
 <p>The jsoncons library provides a <code>basic_json</code> class template, which is the generalization of a <code>json</code> value for different character types, different policies for ordering name-value pairs, etc.</p>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
                    JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json;</pre></div>
-
 <p>The library includes four instantiations of <code>basic_json</code>:</p>
-
 <ul>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a narrow character json value that preserves the original name-value insertion order</p></li>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> constructs a wide character json value that preserves the original name-value insertion order</p></li>
+<li>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a narrow character json value that preserves the original name-value insertion order</p>
+</li>
+<li>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> constructs a wide character json value that preserves the original name-value insertion order</p>
+</li>
 </ul>
-
 <h2>Features</h2>
-
 <h3>Meaningful error messages</h3>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">try</span> 
 {
     json val = <span class="pl-c1">json::parse</span>(<span class="pl-s"><span class="pl-pds">"</span>[1,2,3,4,]<span class="pl-pds">"</span></span>);
@@ -620,23 +595,47 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 {
     std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
 }</pre></div>
-
 <p>Output:</p>
-
 <pre><code>Extra comma at line 1 and column 10
 </code></pre>
+<h3>Stateful allocators (including boost::interprocess allocators)</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/managed_shared_memory.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
-<h3>Use range-based for loops with arrays</h3>
+<span class="pl-k">typedef</span> boost::interprocess::allocator&lt;<span class="pl-k">int</span>,
+        boost::interprocess::managed_shared_memory::segment_manager&gt; shmem_allocator;
+<span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
 
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    <span class="pl-k">struct</span> <span class="pl-en">shm_remove</span>
+    {
+        <span class="pl-en">shm_remove</span>() { <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+        <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+    } remover;
+
+    <span class="pl-c">//Create a new segment with given name and size</span>
+    boost::interprocess::managed_shared_memory <span class="pl-smi">segment</span>(boost::interprocess::create_only,
+            <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
+
+    <span class="pl-c">//Initialize shared memory STL-compatible allocator</span>
+    <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
+
+    shm_json o = <span class="pl-c1">shm_json::object</span>(allocator);
+    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>);
+    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>);
+
+    shm_json j = <span class="pl-c1">shm_json::array</span>(allocator);
+    j.<span class="pl-c1">add</span>(o);
+}</pre></div>
+<h3>Range-based for loops with arrays</h3>
 <div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
 
 <span class="pl-k">for</span> (<span class="pl-k">auto</span> element : book.array_range())
 {
     std::cout &lt;&lt; element &lt;&lt; std::endl;
 }</pre></div>
-
-<h3>Use range-based for loops with objects</h3>
-
+<h3>Range-based for loops with objects</h3>
 <div class="highlight highlight-source-c++"><pre>json book = json::object{
     {<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>},
     {<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>},
@@ -648,9 +647,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     std::cout &lt;&lt; member.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }</pre></div>
-
-<h3>Construct multi-dimensional json arrays</h3>
-
+<h3>Multi-dimensional json arrays</h3>
 <div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">3</span>&gt;(<span class="pl-c1">4</span>, <span class="pl-c1">3</span>, <span class="pl-c1">2</span>, <span class="pl-c1">0.0</span>);
 <span class="pl-k">double</span> val = <span class="pl-c1">1.0</span>;
 <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; a.size(); ++i)
@@ -665,9 +662,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     }
 }
 std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>[
     [
         [<span class="pl-c1">1.0</span>,<span class="pl-c1">2.0</span>],
@@ -690,35 +685,24 @@ std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
         [<span class="pl-c1">23.0</span>,<span class="pl-c1">24.0</span>]
     ]
 ]</pre></div>
-
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Arrays">Arrays</a> for details</p>
-
 <h3>Convert from and to standard library sequence containers</h3>
-
 <div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>};
 json <span class="pl-en">j</span>(v);
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>&lt;&lt; j &lt;&lt; std::endl;
 std::deque&lt;<span class="pl-k">int</span>&gt; d = j.as&lt;std::deque&lt;<span class="pl-k">int</span>&gt;&gt;();</pre></div>
-
 <p>Output:</p>
-
 <pre><code>(1) [1,2,3,4]
 </code></pre>
-
 <h3>Convert from and to standard library associative containers</h3>
-
 <div class="highlight highlight-source-c++"><pre>std::map&lt;std::string,<span class="pl-k">int</span>&gt; m{{<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>,<span class="pl-c1">2</span>},{<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>,<span class="pl-c1">3</span>}};
 json <span class="pl-en">j</span>(m);
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j &lt;&lt; std::endl;
 std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt; um = j.as&lt;std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt;&gt;();</pre></div>
-
 <p>Output:</p>
-
 <pre><code>(1) {"one":1,"three":3,"two":2}
 </code></pre>
-
 <h3>Convert from and to user defined types (and standard library containers of user defined types)</h3>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
 {
     std::string author;
@@ -743,13 +727,9 @@ std::vector&lt;book&gt; v{book1, book2};
 json j = v;
 
 std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
-
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a> for details.</p>
-
 <h3>Filter json names and values</h3>
-
 <p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
@@ -780,20 +760,13 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     j.<span class="pl-c1">write</span>(filter1);
     std::cout &lt;&lt; std::endl;
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
-
 <p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
-
 <h2>Extensions</h2>
-
 <h3>jsonpath</h3>
-
 <p>Example file (store.json):</p>
-
 <div class="highlight highlight-source-json"><pre>{ <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
     <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [ 
       { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
@@ -815,7 +788,6 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     ]
   }
 }</pre></div>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -837,9 +809,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(booklist) &lt;&lt; std::endl;
 
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)
 [
     {
@@ -875,21 +845,16 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
         ]
     }
 }</pre></div>
-
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a>, <a href="https://github.com/danielaparker/jsoncons/wiki/json_replace">json_replace</a>, and <a href="https://github.com/danielaparker/jsoncons/wiki/Basics">Basics</a> for details.</p>
-
 <h3>csv</h3>
-
 <p>Example file (tasks.csv)</p>
-
-<pre lang="csv"><code>project_id, task_name, task_start, task_finish
+<pre><code class="language-csv">project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
 4001,task2,02/01/2003,02/28/2003
 4001,task3,03/01/2003,03/31/2003
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 </code></pre>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span>
@@ -918,9 +883,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     csv_serializer <span class="pl-smi">serializer</span>(std::cout);
     tasks.<span class="pl-c1">write</span>(serializer);
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)
 [
     {
@@ -953,19 +916,15 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>05/01/2003<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
-
-<pre lang="csv"><code>(2)
+<pre><code class="language-csv">(2)
 project_id,task_name,task_start,task_finish
 4001,task2,02/01/2003,02/28/2003
 4001,task3,03/01/2003,03/31/2003
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 </code></pre>
-
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/csv_reader">csv_reader</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/csv_serializer">csv_serializer</a> for details.</p>
-
 <h2>Acknowledgements</h2>
-
 <p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p>
 </body>
 </html>

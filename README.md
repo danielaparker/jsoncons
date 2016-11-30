@@ -154,7 +154,39 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-### Use range-based for loops with arrays
+### Stateful allocators (including boost::interprocess allocators)
+```c++
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <jsoncons/json.hpp>
+
+typedef boost::interprocess::allocator<int,
+        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
+typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
+
+int main()
+{
+    struct shm_remove
+    {
+        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+    } remover;
+
+    //Create a new segment with given name and size
+    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
+            "MySharedMemory", 65536);
+
+    //Initialize shared memory STL-compatible allocator
+    const shmem_allocator allocator(segment.get_segment_manager());
+
+    shm_json o = shm_json::object(allocator);
+    o.set("first", 1);
+    o.set("second", 2);
+
+    shm_json j = shm_json::array(allocator);
+    j.add(o);
+}
+```
+### Range-based for loops with arrays
 
 ```c++
 json j = json::array{1,2,3,4};
@@ -165,7 +197,7 @@ for (auto element : book.array_range())
 }
 ```
 
-### Use range-based for loops with objects
+### Range-based for loops with objects
 
 ```c++
 json book = json::object{
@@ -181,7 +213,7 @@ for (const auto& member : book.object_range())
 }
 ```
 
-### Construct multi-dimensional json arrays
+### Multi-dimensional json arrays
 ```c++
 json a = json::make_array<3>(4, 3, 2, 0.0);
 double val = 1.0;
