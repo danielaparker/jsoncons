@@ -739,6 +739,7 @@ string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noe
 int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
+string_view_type as_string_view() const
 string_type as_string() const noexcept
 string_type as_string(const char_allocator&amp; allocator) const noexcept
 unsigned int as&lt;unsigned int&gt; const 
@@ -749,12 +750,12 @@ const json&amp; operator[](size_t i) const
 </code></pre>
 <p>Returns a reference to the value at position i in a json object or array.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>json&amp; operator[](const string_type&amp; name)
+<pre><code>json&amp; operator[](const key_type&amp; name)
 </code></pre>
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
 If read, throws <code>std::out_of_range</code> if the object does not have a member with the specified name.</p>
-<pre><code>const json&amp; operator[](const string_type&amp; name) const
+<pre><code>const json&amp; operator[](const key_type&amp; name) const
 </code></pre>
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
@@ -798,7 +799,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 <p>Remove the members from an object in the range '[first,last)'.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>void erase(const string_type&amp; name)
+<pre><code>void erase(string_view_type name)
 </code></pre>
 <p>Remove a member with the specified name from an object<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
@@ -806,16 +807,12 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 <p>Requests the removal of unused capacity.</p>
 <pre><code>template &lt;class T&gt;
-void set(const string_type&amp; name, T&amp;&amp; val)
-template &lt;class T&gt;
-void set(string_type&amp;&amp; name, T&amp;&amp; val)
+void set(string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 <pre><code>template &lt;class T&gt;
-object_iterator set(object_iterator hint, const string_type&amp; name, T&amp;&amp; val)
-template &lt;class T&gt;
-object_iterator set(object_iterator hint, string_type&amp;&amp; name, T&amp;&amp; val)
+object_iterator set(object_iterator hint, string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>

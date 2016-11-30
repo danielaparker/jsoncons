@@ -178,6 +178,7 @@ int main()
     //Initialize shared memory STL-compatible allocator
     const shmem_allocator allocator(segment.get_segment_manager());
 
+    // Create json value with all dynamic allocations in shared memory
     shm_json o = shm_json::object(allocator);
     o.set("first", 1);
     o.set("second", 2);

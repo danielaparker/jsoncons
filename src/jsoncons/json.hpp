@@ -1610,7 +1610,7 @@ public:
             evaluate().erase(first, last);
         }
 
-        void erase(const key_type& name)
+        void erase(string_view_type name)
         {
             evaluate().erase(name);
         }
@@ -1835,11 +1835,11 @@ public:
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
-        void remove(const key_type& name)
+        void remove(string_view_type name)
         {
             evaluate().remove(name);
         }
-        void remove_member(const key_type& name)
+        void remove_member(string_view_type name)
         {
             evaluate().remove(name);
         }
@@ -2964,7 +2964,7 @@ public:
 
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void erase(const key_type& name)
+    void erase(string_view_type name)
     {
         switch (var_.type_id())
         {
@@ -3347,11 +3347,11 @@ public:
     }
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove(const key_type& name)
+    void remove(string_view_type name)
     {
         erase(name.data(),name.length());
     }
-    void remove_member(const key_type& name)
+    void remove_member(string_view_type name)
     {
         erase(name.data(),name.length());
     }

@@ -237,6 +237,7 @@ If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cp
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
+    string_view_type as_string_view() const
     string_type as_string() const noexcept
     string_type as_string(const char_allocator& allocator) const noexcept
     unsigned int as<unsigned int> const 
@@ -297,7 +298,7 @@ Throws `std::runtime_error` if not an object.
 Remove the members from an object in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 
-    void erase(const key_type& name)
+    void erase(string_view_type name)
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
 
@@ -305,16 +306,12 @@ Throws `std::runtime_error` if not an object.
 Requests the removal of unused capacity.
 
     template <class T>
-    void set(const key_type& name, T&& val)
-    template <class T>
-    void set(key_type&& name, T&& val)
+    void set(string_view_type name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
 
     template <class T>
-    object_iterator set(object_iterator hint, const key_type& name, T&& val)
-    template <class T>
-    object_iterator set(object_iterator hint, key_type&& name, T&& val)
+    object_iterator set(object_iterator hint, string_view_type name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_iterator` pointing at the member that was inserted or updated

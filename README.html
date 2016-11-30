@@ -621,6 +621,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     <span class="pl-c">//Initialize shared memory STL-compatible allocator</span>
     <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
 
+    <span class="pl-c">// Create json value with all dynamic allocations in shared memory</span>
     shm_json o = <span class="pl-c1">shm_json::object</span>(allocator);
     o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>);
     o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>);
