@@ -25,6 +25,8 @@
 namespace jsoncons
 {
 
+//#define JSONCONS_HAS_STRING_VIEW
+
 #if defined(ANDROID) || defined(__ANDROID__)
 #define JSONCONS_HAS_STRTOD_L
 #endif

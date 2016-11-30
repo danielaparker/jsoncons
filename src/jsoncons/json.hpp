@@ -29,6 +29,10 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
 
+#if defined(JSONCONS_HAS_STRING_VIEW)
+#include <string_view>
+#endif
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
@@ -89,8 +93,11 @@ public:
     typedef typename json_traits_type::char_traits_type char_traits_type;
     typedef typename json_traits_type::char_allocator char_allocator;
 
+#if !defined(JSONCONS_HAS_STRING_VIEW)
     typedef basic_string_view_<char_type,char_traits_type> string_view_type;
-
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
     typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> key_allocator_type;

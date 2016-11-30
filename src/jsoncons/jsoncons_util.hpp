@@ -39,6 +39,7 @@ T * to_plain_pointer(T * ptr)
     return (ptr);
 }*/
 
+#if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>
 class basic_string_view_
 {
@@ -252,6 +253,7 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 {
     return rhs.compare(lhs) < 0;
 }
+#endif
 
 template <class CharT>
 struct cstring_traits
