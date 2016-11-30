@@ -417,7 +417,7 @@ class json_object
 
 // Do not preserve order
 template <class KeyT,class Json,class Allocator>
-class json_object<KeyT,Json,false,Allocator> : private Allocator
+class json_object<KeyT,Json,false,Allocator>
 {
 public:
     typedef Allocator allocator_type;
@@ -435,42 +435,43 @@ public:
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
 private:
+    self_allocator_type self_allocator_;
     std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : Allocator(), members_(vector_allocator_type())
+        : self_allocator_(), members_(vector_allocator_type())
     {
     }
     json_object(const allocator_type& allocator)
-        : Allocator(allocator), members_(vector_allocator_type(allocator))
+        : self_allocator_(allocator), members_(vector_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : Allocator(val.get_self_allocator()), members_(val.members_)
+        : self_allocator_(val.get_self_allocator()), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : Allocator(val.get_self_allocator()), 
+        : self_allocator_(val.get_self_allocator()), 
           members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) :
-        Allocator(allocator), 
+        self_allocator_(allocator), 
         members_(val.members_,vector_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        Allocator(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
+        self_allocator_(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
     {
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const Allocator& allocator = Allocator())
-        : Allocator(allocator),
+        : self_allocator_(allocator),
           members_(vector_allocator_type(allocator))
     {
         for (const auto& element : init)
@@ -489,7 +490,7 @@ public:
 
     self_allocator_type get_self_allocator() const
     {
-        return static_cast<self_allocator_type>(*this);
+        return self_allocator_;
     }
 
     iterator begin()
@@ -671,7 +672,7 @@ private:
 // Preserve order
 
 template <class KeyT,class Json,class Allocator>
-class json_object<KeyT,Json,true,Allocator> : private Allocator
+class json_object<KeyT,Json,true,Allocator>
 {
 public:
     typedef Allocator allocator_type;
@@ -686,40 +687,41 @@ public:
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
 private:
+    self_allocator_type self_allocator_;
     std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : Allocator(), members_(vector_allocator_type())
+        : self_allocator_(), members_(vector_allocator_type())
     {
     }
     json_object(const allocator_type& allocator)
-        : Allocator(allocator), members_(vector_allocator_type(allocator))
+        : self_allocator_(allocator), members_(vector_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : Allocator(), members_(val.members_)
+        : self_allocator_(), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : Allocator(), members_(std::move(val.members_))
+        : self_allocator_(), members_(std::move(val.members_))
     {
     }
 
     json_object(const json_object& val, const allocator_type& allocator) :
-        Allocator(allocator), members_(val.members_,vector_allocator_type(allocator))
+        self_allocator_(allocator), members_(val.members_,vector_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        Allocator(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
+        self_allocator_(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
     {
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const Allocator& allocator = Allocator())
-        : Allocator(allocator),
+        : self_allocator_(allocator),
           members_(vector_allocator_type(allocator))
     {
         for (const auto& element : init)
@@ -735,10 +737,13 @@ public:
             set(element[0].as_string_view(), std::move(element[1]));
         }
     }
+    ~json_object()
+    {
+    }
 
     self_allocator_type get_self_allocator() const
     {
-        return static_cast<self_allocator_type>(*this);
+        return self_allocator_;
     }
 
     iterator begin()

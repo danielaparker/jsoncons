@@ -410,6 +410,12 @@ public:
                 create(a,a);
             }
 
+            explicit object_data(pointer ptr)
+                : base_data(value_types::object_t)
+            {
+                data_ = ptr;
+            }
+
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
@@ -451,7 +457,7 @@ public:
                 return *data_;
             }
         };
-
+    public:
         struct array_data : public base_data
         {
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
@@ -476,24 +482,34 @@ public:
             array_data(const array& val)
                 : base_data(value_types::array_t)
             {
+                std::cout << "array_data(const array& val)" << std::endl;
                 create(val.get_self_allocator(), val);
+            }
+
+            array_data(pointer ptr)
+                : base_data(value_types::array_t)
+            {
+                data_ = ptr;
             }
 
             array_data(const array& val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
+                std::cout << "array_data(const array& val, const Allocator&)" << std::endl;
                 create(array_allocator(a), val, a);
             }
 
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
+                std::cout << "array_data(const array_data & val)" << std::endl;
                 create(val.data_->get_self_allocator(), *(val.data_));
             }
 
             array_data(const array_data & val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
+                std::cout << "array_data(const array_data & val, const Allocator&)" << std::endl;
                 create(array_allocator(a), *(val.data_), a);
             }
 
@@ -541,6 +557,7 @@ public:
 
         variant(const variant& val)
         {
+            std::cout << "variant(const variant& val) " << (int)val.type_id() << std::endl;
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -580,6 +597,7 @@ public:
 
         variant(const variant& val, const Allocator& allocator)
         {
+            std::cout << "variant(const variant& val, const Allocator& allocator) " << (int)val.type_id() << std::endl;
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -619,10 +637,59 @@ public:
 
         variant(variant&& val)
         {
+            std::cout << "variant(variant&& val) " << (int)val.type_id() << std::endl;
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+                new(reinterpret_cast<void*>(&data_))null_data();
+                break;
+            case value_types::empty_object_t:
+                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                break;
+            case value_types::double_t:
+                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                break;
+            case value_types::integer_t:
+                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                break;
+            case value_types::uinteger_t:
+                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_types::bool_t:
+                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                break;
+            case value_types::small_string_t:
+                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                break;
+            case value_types::string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
+                break;
+            case value_types::object_t:
+                {
+                    auto ptr = val.object_data_cast()->data_;
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                }
+                break;
+            case value_types::array_t:
+                {
+                    auto ptr = val.array_data_cast()->data_;
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+#if 0
+        variant(variant&& val)
+        {
+            std::cout << "variant(variant&& val)" << std::endl;
             new(reinterpret_cast<void*>(&data_))null_data();
             swap(val);
         }
-
+#endif
         explicit variant(null_type)
         {
             new(reinterpret_cast<void*>(&data_))null_data();
@@ -691,10 +758,12 @@ public:
         }
         variant(const array& val)
         {
+            std::cout << "variant(const array& val)" << std::endl;
             new(reinterpret_cast<void*>(&data_))array_data(val);
         }
         variant(const array& val, const Allocator& alloc)
         {
+            std::cout << "const array& val, const Allocator& alloc" << std::endl;
             new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
         template<class InputIterator>
@@ -966,8 +1035,9 @@ public:
         }
 
 
-        void swap(variant& rhs)
+        void swap(variant& rhs) JSONCONS_NOEXCEPT
         {
+            std::cout << "swap(variant& rhs)" << std::endl;
             std::swap(data_,rhs.data_);
         }
     };
@@ -1687,21 +1757,25 @@ public:
     basic_json(const json_type& val)
         : var_(val.var_)
     {
+        std::cout << "basic_json(const json_type& valr)" << std::endl;
     }
 
     basic_json(const json_type& val, const Allocator& allocator)
         : var_(val.var_,allocator)
     {
+        std::cout << "const json_type& val, const Allocator& allocator" << std::endl;
     }
 
     basic_json(json_type&& other) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_))
     {
+        std::cout << "basic_json(json_type&& other)" << std::endl;
     }
 
     basic_json(json_type&& other, const Allocator& allocator)
         : var_(std::move(other.var_),allocator)
     {
+        std::cout << "basic_json(json_type&& other, const Allocator& allocator)" << std::endl;
     }
 
     basic_json(const array& val)
