@@ -278,12 +278,15 @@ public:
 
         struct string_data : public base_data
         {
-            struct string_data_impl : public char_allocator
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> byte_allocator_type;
+            typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
+
+            struct string_data_impl : public byte_allocator_type
             {
                 const char_type* c_str() const { return p_; }
                 const char_type* data() const { return p_; }
                 size_t length() const { return length_; }
-                char_allocator get_self_allocator() const
+                byte_allocator_type get_self_allocator() const
                 {
                     return *this;
                 }
@@ -293,8 +296,8 @@ public:
                     return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
                 }
 
-                string_data_impl(const char_allocator& allocator)
-                    : char_allocator(allocator), length_(0), p_(nullptr)
+                string_data_impl(const byte_allocator_type& allocator)
+                    : byte_allocator_type(allocator), length_(0), p_(nullptr)
                 {
                 }
 
@@ -305,28 +308,30 @@ public:
                 string_data_impl& operator=(const string_data_impl&);
             };
 
-            struct string_holderA
+            struct string_implA
             {
                 string_data_impl data;
                 char_type c[1];
             };
 
-            typedef typename std::aligned_storage<sizeof(string_holderA), JSONCONS_ALIGNOF(string_holderA)>::type storage_type;
+            typedef typename std::aligned_storage<sizeof(string_implA), JSONCONS_ALIGNOF(string_implA)>::type storage_type;
 
             static size_t aligned_size(size_t n)
             {
                 return sizeof(storage_type) + n;
             }
 
-            string_data_impl* create_string_holder(const char_type* s, size_t length, const char_allocator& allocator)
+            pointer ptr_;
+
+            string_data_impl* create_impl(const char_type* s, size_t length, const byte_allocator_type& allocator)
             {
                 size_t mem_size = aligned_size(length*sizeof(char_type));
 
-                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
+                typename std::allocator_traits<byte_allocator_type>:: template rebind_alloc<char> alloc(allocator);
 
-                char* storage = alloc.allocate(mem_size);
-                string_data_impl* ps = new(storage)string_data_impl(allocator);
-                auto psa = reinterpret_cast<string_holderA*>(storage); 
+                ptr_ = alloc.allocate(mem_size);
+                string_data_impl* ps = new(ptr_)string_data_impl(allocator);
+                auto psa = reinterpret_cast<string_implA*>(ptr_); 
 
                 ps->p_ = new(&psa->c)char_type[length + 1];
                 memcpy(ps->p_, s, length*sizeof(char_type));
@@ -335,64 +340,65 @@ public:
                 return ps;
             }
 
-            void destroy_string_holder(const char_allocator& allocator, string_data_impl* p)
+            void destroy_impl(const byte_allocator_type& allocator, string_data_impl* p)
             {
                 size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
-                alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
+                typename std::allocator_traits<byte_allocator_type>:: template rebind_alloc<char> alloc(allocator);
+                alloc.deallocate(ptr_,mem_size);
             }
 
-            string_data_impl* ptr_;
+            string_data_impl* ptry_;
 
-            string_data(string_data_impl* ptr)
+            string_data(pointer ptr)
                 : base_data(value_types::string_t), ptr_(ptr)
             {
+                ptry_ = reinterpret_cast<string_data_impl*>(to_plain_pointer(ptr_));
             }
 
-            string_data(const char_type* s, size_t length, const char_allocator& alloc)
+            string_data(const char_type* s, size_t length, const byte_allocator_type& alloc)
                 : base_data(value_types::string_t)
             {
-                ptr_ = create_string_holder(s, length, alloc);
+                ptry_ = create_impl(s, length, alloc);
             }
 
             string_data(const string_data& val)
                 : base_data(value_types::string_t)
             {
-                ptr_ = create_string_holder(val.ptr_->p_, 
-                                             val.ptr_->length_, 
-                                             val.ptr_->get_self_allocator());
+                ptry_ = create_impl(val.ptry_->p_, 
+                                             val.ptry_->length_, 
+                                             val.ptry_->get_self_allocator());
             }
 
-            string_data(const string_data& val, char_allocator allocator)
+            string_data(const string_data& val, byte_allocator_type allocator)
                 : base_data(value_types::string_t)
             {
-                ptr_ = create_string_holder(val.ptr_->p_, 
-                                               val.ptr_->length_, 
+                ptry_ = create_impl(val.ptry_->p_, 
+                                               val.ptry_->length_, 
                                                allocator);
             }
             ~string_data()
             {
-                destroy_string_holder(ptr_->get_self_allocator(), ptr_);
+                destroy_impl(ptry_->get_self_allocator(), ptry_);
             }
 
             size_t length() const
             {
-                return ptr_->length_;
+                return ptry_->length_;
             }
 
             const char_type* data() const
             {
-                return ptr_->p_;
+                return ptry_->p_;
             }
 
             const char_type* c_str() const
             {
-                return ptr_->p_;
+                return ptry_->p_;
             }
 
-            char_allocator get_self_allocator() const
+            byte_allocator_type get_self_allocator() const
             {
-                return ptr_->get_self_allocator();
+                return ptry_->get_self_allocator();
             }
         };
 
@@ -1071,7 +1077,7 @@ public:
                         default:
                             break;
                         }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr,string_data_cast()->get_self_allocator());
                     }
                     break;
                 case value_types::object_t:
