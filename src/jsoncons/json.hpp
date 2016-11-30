@@ -278,7 +278,7 @@ public:
 
         struct string_data : public base_data
         {
-            struct string_holder : public char_allocator
+            struct string_data_impl : public char_allocator
             {
                 const char_type* c_str() const { return p_; }
                 const char_type* data() const { return p_; }
@@ -288,12 +288,12 @@ public:
                     return *this;
                 }
 
-                bool operator==(const string_holder& rhs) const
+                bool operator==(const string_data_impl& rhs) const
                 {
                     return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
                 }
 
-                string_holder(const char_allocator& allocator)
+                string_data_impl(const char_allocator& allocator)
                     : char_allocator(allocator), length_(0), p_(nullptr)
                 {
                 }
@@ -301,13 +301,13 @@ public:
                 size_t length_;
                 char_type* p_;
             private:
-                string_holder(const string_holder&);
-                string_holder& operator=(const string_holder&);
+                string_data_impl(const string_data_impl&);
+                string_data_impl& operator=(const string_data_impl&);
             };
 
             struct string_holderA
             {
-                string_holder data;
+                string_data_impl data;
                 char_type c[1];
             };
 
@@ -318,14 +318,14 @@ public:
                 return sizeof(storage_type) + n;
             }
 
-            string_holder* create_string_holder(const char_type* s, size_t length, const char_allocator& allocator)
+            string_data_impl* create_string_holder(const char_type* s, size_t length, const char_allocator& allocator)
             {
                 size_t mem_size = aligned_size(length*sizeof(char_type));
 
                 typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
 
                 char* storage = alloc.allocate(mem_size);
-                string_holder* ps = new(storage)string_holder(allocator);
+                string_data_impl* ps = new(storage)string_data_impl(allocator);
                 auto psa = reinterpret_cast<string_holderA*>(storage); 
 
                 ps->p_ = new(&psa->c)char_type[length + 1];
@@ -335,16 +335,16 @@ public:
                 return ps;
             }
 
-            void destroy_string_holder(const char_allocator& allocator, string_holder* p)
+            void destroy_string_holder(const char_allocator& allocator, string_data_impl* p)
             {
                 size_t mem_size = aligned_size(p->length_*sizeof(char_type));
                 typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
                 alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
             }
 
-            string_holder* ptr_;
+            string_data_impl* ptr_;
 
-            string_data(string_holder* ptr)
+            string_data(string_data_impl* ptr)
                 : base_data(value_types::string_t), ptr_(ptr)
             {
             }
@@ -408,7 +408,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, std::addressof(*ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -456,7 +456,7 @@ public:
             ~object_data()
             {
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_self_allocator());
-                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, std::addressof(*ptr_));
+                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
 
@@ -483,7 +483,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, std::addressof(*ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -531,7 +531,7 @@ public:
             ~array_data()
             {
                 typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_self_allocator());
-                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, std::addressof(*ptr_));
+                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
 

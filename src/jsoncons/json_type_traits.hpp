@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSON_TYPE_TRAITS_HPP
 #define JSONCONS_JSON_TYPE_TRAITS_HPP
 
+#include <array>
 #include <string>
 #include <vector>
 #include <exception>
