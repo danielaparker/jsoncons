@@ -121,7 +121,7 @@ private:
 
         char do_current_char() const override { return '\0'; }
     };
-    const null_parsing_context default_context_;
+    const null_parsing_context default_context_ = null_parsing_context();
 
     basic_null_json_input_handler<CharT> null_input_handler_;
     basic_json_input_output_adapter<CharT> default_input_output_adapter_;
