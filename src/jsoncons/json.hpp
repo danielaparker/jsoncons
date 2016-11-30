@@ -334,6 +334,7 @@ public:
                 typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
                 alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
             }
+
             string_holder* ptr_;
 
             string_data(string_holder* ptr)
@@ -908,6 +909,19 @@ public:
             return reinterpret_cast<const array_data*>(&data_);
         }
 
+        string_view_type as_string_view() const
+        {
+            switch (type_id())
+            {
+            case value_types::small_string_t:
+                return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
+            case value_types::string_t:
+                return string_view_type(string_data_cast()->data(),string_data_cast()->length());
+            default:
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
+            }
+        }
+
         bool operator==(const variant& rhs) const
         {
             if (this == &rhs)
@@ -935,11 +949,8 @@ public:
                 case value_types::bool_t:
                     return bool_data_cast()->val_ == rhs.bool_data_cast()->val_;
                 case value_types::small_string_t:
-                    return small_string_data_cast()->length() == rhs.small_string_data_cast()->length() &&
-                           std::char_traits<char_type>::compare(small_string_data_cast()->data(),rhs.small_string_data_cast()->data(),small_string_data_cast()->length()) == 0;
                 case value_types::string_t:
-                    return string_data_cast()->length() == rhs.string_data_cast()->length() &&
-                           std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.string_data_cast()->data(),string_data_cast()->length()) == 0;
+                    return as_string_view() == rhs.as_string_view();
                 case value_types::object_t:
                     return object_data_cast()->value() == rhs.object_data_cast()->value();
                 case value_types::array_t:
@@ -994,20 +1005,8 @@ public:
                 }
                 break;
             case value_types::small_string_t:
-                if ((rhs_id == value_types::string_t) && 
-                    (small_string_data_cast()->length() == rhs.string_data_cast()->length()) &&
-                     std::char_traits<char_type>::compare(small_string_data_cast()->data(),rhs.string_data_cast()->data(),small_string_data_cast()->length()) == 0)
-                {
-                    return true;
-                }
-                break;
             case value_types::string_t:
-                if ((rhs_id == value_types::small_string_t) && 
-                    (string_data_cast()->length() == rhs.small_string_data_cast()->length()) &&
-                     std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.small_string_data_cast()->data(),string_data_cast()->length()) == 0)
-                {
-                    return true;
-                }
+                return as_string_view() == rhs.as_string_view();
                 break;
             default:
                 break;
@@ -2175,10 +2174,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            handler.value(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-            break;
         case value_types::string_t:
-            handler.value(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+            handler.value(as_string_view().data(),as_string_view().length());
             break;
         case value_types::double_t:
             handler.value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
@@ -2482,25 +2479,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as_bool();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as_bool();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
             }
+            break;
         case value_types::bool_t:
             return var_.bool_data_cast()->value();
         case value_types::double_t:
@@ -2519,25 +2508,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<int64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<int64_t>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
             }
+            break;
         case value_types::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2556,25 +2537,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<uint64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<uint64_t>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
             }
+            break;
         case value_types::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2604,25 +2577,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<double>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<double>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
             }
+            break;
         case value_types::double_t:
             return var_.double_data_cast()->value();
         case value_types::integer_t:
@@ -2638,15 +2603,7 @@ public:
 
     string_view_type as_string_view() const
     {
-        switch (var_.type_id())
-        {
-        case value_types::small_string_t:
-            return string_view_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-        case value_types::string_t:
-            return string_view_type(var_.string_data_cast()->data(),var_.string_data_cast()->length());
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
-        }
+        return var_.as_string_view();
     }
 
     string_type as_string() const JSONCONS_NOEXCEPT
@@ -2654,9 +2611,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_self_allocator());
+            return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string();
         }
@@ -2667,9 +2623,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length(),allocator);
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),allocator);
+            return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(allocator);
         }
@@ -2680,9 +2635,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_self_allocator());
+            return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string(format);
         }
@@ -2694,9 +2648,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length(),allocator);
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),allocator);
+            return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(format,allocator);
         }
