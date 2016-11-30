@@ -639,7 +639,7 @@ struct json_type_traits<Json, std::array<E, N>>
 
     static Json to_json(const std::array<E, N>& value)
     {
-        return J(value.begin(), value.end());
+        return Json(value.begin(), value.end());
     }
 };
 
