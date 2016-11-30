@@ -334,52 +334,57 @@ public:
                 typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
                 alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
             }
-            string_holder* holder_;
+            string_holder* ptr_;
+
+            string_data(string_holder* ptr)
+                : base_data(value_types::string_t), ptr_(ptr)
+            {
+            }
 
             string_data(const char_type* s, size_t length, const char_allocator& alloc)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(s, length, alloc);
+                ptr_ = create_string_holder(s, length, alloc);
             }
 
             string_data(const string_data& val)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(val.holder_->p_, 
-                                             val.holder_->length_, 
-                                             val.holder_->get_self_allocator());
+                ptr_ = create_string_holder(val.ptr_->p_, 
+                                             val.ptr_->length_, 
+                                             val.ptr_->get_self_allocator());
             }
 
             string_data(const string_data& val, char_allocator allocator)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(val.holder_->p_, 
-                                               val.holder_->length_, 
+                ptr_ = create_string_holder(val.ptr_->p_, 
+                                               val.ptr_->length_, 
                                                allocator);
             }
             ~string_data()
             {
-                destroy_string_holder(holder_->get_self_allocator(), holder_);
+                destroy_string_holder(ptr_->get_self_allocator(), ptr_);
             }
 
             size_t length() const
             {
-                return holder_->length_;
+                return ptr_->length_;
             }
 
             const char_type* data() const
             {
-                return holder_->p_;
+                return ptr_->p_;
             }
 
             const char_type* c_str() const
             {
-                return holder_->p_;
+                return ptr_->p_;
             }
 
             char_allocator get_self_allocator() const
             {
-                return holder_->get_self_allocator();
+                return ptr_->get_self_allocator();
             }
         };
 
@@ -659,16 +664,14 @@ public:
                 break;
             case value_types::object_t:
                 {
-                    auto ptr = val.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
-                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
                 }
                 break;
             case value_types::array_t:
                 {
-                    auto ptr = val.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
-                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
                 }
                 break;
             default:
@@ -1035,6 +1038,9 @@ public:
                         case value_types::array_t:
                             new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
                             break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
                         case value_types::null_t:
                             new(reinterpret_cast<void*>(&data_))null_data();
                             break;
@@ -1055,9 +1061,6 @@ public:
                             break;
                         case value_types::small_string_t:
                             new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        case value_types::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(*(rhs.string_data_cast()));
                             break;
                         default:
                             break;
@@ -1076,6 +1079,9 @@ public:
                         case value_types::array_t:
                             new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
                             break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
                         case value_types::null_t:
                             new(reinterpret_cast<void*>(&data_))null_data();
                             break;
@@ -1097,9 +1103,6 @@ public:
                         case value_types::small_string_t:
                             new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
                             break;
-                        case value_types::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(*(rhs.string_data_cast()));
-                            break;
                         default:
                             break;
                         }
@@ -1114,6 +1117,9 @@ public:
                             auto ptr = rhs.object_data_cast()->ptr_;
                             switch (type_id())
                             {
+                            case value_types::string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))string_data(string_data_cast()->ptr_);
+                                break;
                             case value_types::null_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))null_data();
                                 break;
@@ -1134,9 +1140,6 @@ public:
                                 break;
                             case value_types::small_string_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            case value_types::string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))string_data(*(string_data_cast()));
                                 break;
                             default:
                                 break;
@@ -1149,6 +1152,9 @@ public:
                             auto ptr = rhs.array_data_cast()->ptr_;
                             switch (type_id())
                             {
+                            case value_types::string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))string_data(string_data_cast()->ptr_);
+                                break;
                             case value_types::null_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))null_data();
                                 break;
@@ -1169,9 +1175,6 @@ public:
                                 break;
                             case value_types::small_string_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            case value_types::string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))string_data(*(string_data_cast()));
                                 break;
                             default:
                                 break;
