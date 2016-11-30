@@ -91,6 +91,13 @@ struct is_compatible_object_type<Json,T,
     !is_incompatible<Json,typename T::mapped_type>::value
 >::type> : std::true_type {};
 
+// is_std_array
+template<class T>
+struct is_std_array : std::false_type {};
+
+template<class E, size_t N>
+struct is_std_array<std::array<E, N>> : std::true_type {};
+
 template <class Json, class T>
 class json_array_input_iterator
 {
@@ -503,7 +510,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<is_compatible_array_type<Json,T>::value>::type>
+                        typename std::enable_if<is_compatible_array_type<Json,T>::value && !is_std_array<T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
 
@@ -604,6 +611,45 @@ struct json_type_traits<Json, T,
             val.set(p.first, p.second);
         }
         return val;
+    }
+};
+
+template<class Json, class E, size_t N>
+struct json_type_traits<Json, std::array<E, N>>
+{
+    typedef E element_type;
+
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        bool result = rhs.is_array() && rhs.size() == N;
+        if (result)
+        {
+            for (auto e : rhs.array_range())
+            {
+                if (!e.template is<element_type>())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    static std::array<E, N> as(const Json& json)
+    {
+        std::array<E, N> buff;
+        JSONCONS_ASSERT(json.size() == N);
+        for (size_t i = 0; i < N; i++)
+        {
+            buff[i] = json[i].template as<E>();
+        }
+        return buff;
+    }
+
+    static Json to_json(const std::array<E, N>& value)
+    {
+        return J(value.begin(), value.end());
     }
 };
 
