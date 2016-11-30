@@ -27,7 +27,7 @@
 namespace jsoncons
 {
 
-template<class Pointer> inline
+/*template<class Pointer> inline
 auto to_plain_pointer(Pointer ptr)
 {       
     return (std::addressof(*ptr));
@@ -37,7 +37,7 @@ template<class T> inline
 T * to_plain_pointer(T * ptr)
 {       
     return (ptr);
-}
+}*/
 
 template <class CharT, class Traits = std::char_traits<CharT>>
 class basic_string_view_

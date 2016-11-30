@@ -39,14 +39,12 @@ public:
         : self_allocator_(), 
           elements_(vector_allocator_type())
     {
-        std::cout << "json_array()" << std::endl;
     }
 
     explicit json_array(const Allocator& allocator)
         : self_allocator_(allocator), 
           elements_(vector_allocator_type(allocator))
     {
-        std::cout << "json_array(allocator)" << std::endl;
     }
 
     explicit json_array(size_t n, 
@@ -69,19 +67,16 @@ public:
         : self_allocator_(allocator), 
           elements_(begin,end,vector_allocator_type(allocator))
     {
-        std::cout << "json_array(begin,end,allocator)" << std::endl;
     }
     json_array(const json_array& val)
         : self_allocator_(val.get_self_allocator()),
           elements_(val.elements_)
     {
-        std::cout << "json_array(const json_array&)" << std::endl;
     }
     json_array(const json_array& val, const Allocator& allocator)
         : self_allocator_(allocator), 
           elements_(val.elements_,vector_allocator_type(allocator))
     {
-        std::cout << "json_array(const json_array&, const Allocator&)" << std::endl;
     }
 
     json_array(json_array&& val) JSONCONS_NOEXCEPT

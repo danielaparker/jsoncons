@@ -21,7 +21,7 @@ using namespace jsoncons;
 using namespace boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE(json_checker_test_suite)
-
+#if 0
 BOOST_AUTO_TEST_CASE(test_fail1)
 {
     std::string in_file = "input/JSON_checker/fail1.json";
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE(test_fail33)
     }
     BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_bracket);
 }
-
+#endif
 BOOST_AUTO_TEST_CASE(test_pass1)
 {
     std::string in_file = "input/JSON_checker/pass1.json";
@@ -622,7 +622,7 @@ BOOST_AUTO_TEST_CASE(test_pass1)
         throw;
     }
 }
-
+#if 0
 BOOST_AUTO_TEST_CASE(test_pass2)
 {
     std::string in_file = "input/JSON_checker/pass2.json";
@@ -656,7 +656,7 @@ BOOST_AUTO_TEST_CASE(test_pass3)
         throw;
     }
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 
 

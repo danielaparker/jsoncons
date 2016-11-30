@@ -386,20 +386,20 @@ public:
         struct object_data : public base_data
         {
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
-            pointer data_;
+            pointer ptr_;
 
             template <typename... Args>
             void create(Allocator allocator, Args&& ... args)
             {
                 typename std::allocator_traits<object_allocator>:: template rebind_alloc<object> alloc(allocator);
-                data_ = alloc.allocate(1);
+                ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, to_plain_pointer(data_), std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, std::addressof(*ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
-                    alloc.deallocate(data_,1);
+                    alloc.deallocate(ptr_,1);
                     throw;
                 }
             }
@@ -413,7 +413,7 @@ public:
             explicit object_data(pointer ptr)
                 : base_data(value_types::object_t)
             {
-                data_ = ptr;
+                ptr_ = ptr;
             }
 
             explicit object_data(const object & val)
@@ -431,50 +431,50 @@ public:
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                create(val.data_->get_self_allocator(), *(val.data_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                create(object_allocator(a), *(val.data_), a);
+                create(object_allocator(a), *(val.ptr_), a);
             }
 
             ~object_data()
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(data_->get_self_allocator());
-                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(data_));
-                alloc.deallocate(data_,1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, std::addressof(*ptr_));
+                alloc.deallocate(ptr_,1);
             }
 
             object& value()
             {
-                return *data_;
+                return *ptr_;
             }
 
             const object& value() const
             {
-                return *data_;
+                return *ptr_;
             }
         };
     public:
         struct array_data : public base_data
         {
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
-            pointer data_;
+            pointer ptr_;
 
             template <typename... Args>
             void create(array_allocator allocator, Args&& ... args)
             {
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
-                data_ = alloc.allocate(1);
+                ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(data_), std::forward<Args>(args)...);
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, std::addressof(*ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
-                    alloc.deallocate(data_,1);
+                    alloc.deallocate(ptr_,1);
                     throw;
                 }
             }
@@ -482,35 +482,31 @@ public:
             array_data(const array& val)
                 : base_data(value_types::array_t)
             {
-                std::cout << "array_data(const array& val)" << std::endl;
                 create(val.get_self_allocator(), val);
             }
 
             array_data(pointer ptr)
                 : base_data(value_types::array_t)
             {
-                data_ = ptr;
+                ptr_ = ptr;
             }
 
             array_data(const array& val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                std::cout << "array_data(const array& val, const Allocator&)" << std::endl;
                 create(array_allocator(a), val, a);
             }
 
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                std::cout << "array_data(const array_data & val)" << std::endl;
-                create(val.data_->get_self_allocator(), *(val.data_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             array_data(const array_data & val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                std::cout << "array_data(const array_data & val, const Allocator&)" << std::endl;
-                create(array_allocator(a), *(val.data_), a);
+                create(array_allocator(a), *(val.ptr_), a);
             }
 
             template<class InputIterator>
@@ -521,19 +517,19 @@ public:
             }
             ~array_data()
             {
-                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(data_->get_self_allocator());
-                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(data_));
-                alloc.deallocate(data_,1);
+                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, std::addressof(*ptr_));
+                alloc.deallocate(ptr_,1);
             }
 
             array& value()
             {
-                return *data_;
+                return *ptr_;
             }
 
             const array& value() const
             {
-                return *data_;
+                return *ptr_;
             }
         };
 
@@ -557,7 +553,6 @@ public:
 
         variant(const variant& val)
         {
-            std::cout << "variant(const variant& val) " << (int)val.type_id() << std::endl;
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -597,7 +592,6 @@ public:
 
         variant(const variant& val, const Allocator& allocator)
         {
-            std::cout << "variant(const variant& val, const Allocator& allocator) " << (int)val.type_id() << std::endl;
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -635,9 +629,8 @@ public:
             }
         }
 
-        variant(variant&& val)
+        variant(variant&& val) JSONCONS_NOEXCEPT
         {
-            std::cout << "variant(variant&& val) " << (int)val.type_id() << std::endl;
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -666,14 +659,14 @@ public:
                 break;
             case value_types::object_t:
                 {
-                    auto ptr = val.object_data_cast()->data_;
+                    auto ptr = val.object_data_cast()->ptr_;
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
                     new(reinterpret_cast<void*>(&data_))object_data(ptr);
                 }
                 break;
             case value_types::array_t:
                 {
-                    auto ptr = val.array_data_cast()->data_;
+                    auto ptr = val.array_data_cast()->ptr_;
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
                     new(reinterpret_cast<void*>(&data_))array_data(ptr);
                 }
@@ -682,14 +675,7 @@ public:
                 break;
             }
         }
-#if 0
-        variant(variant&& val)
-        {
-            std::cout << "variant(variant&& val)" << std::endl;
-            new(reinterpret_cast<void*>(&data_))null_data();
-            swap(val);
-        }
-#endif
+
         explicit variant(null_type)
         {
             new(reinterpret_cast<void*>(&data_))null_data();
@@ -758,12 +744,10 @@ public:
         }
         variant(const array& val)
         {
-            std::cout << "variant(const array& val)" << std::endl;
             new(reinterpret_cast<void*>(&data_))array_data(val);
         }
         variant(const array& val, const Allocator& alloc)
         {
-            std::cout << "const array& val, const Allocator& alloc" << std::endl;
             new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
         template<class InputIterator>
@@ -995,13 +979,13 @@ public:
                 }
                 break;
             case value_types::empty_object_t:
-                if (rhs_id == value_types::object_t && rhs.object_data_cast()->data_->size() == 0)
+                if (rhs_id == value_types::object_t && rhs.object_data_cast()->ptr_->size() == 0)
                 {
                     return true;
                 }
                 break;
             case value_types::object_t:
-                if (rhs_id == value_types::empty_object_t && object_data_cast()->data_->size() == 0)
+                if (rhs_id == value_types::empty_object_t && object_data_cast()->ptr_->size() == 0)
                 {
                     return true;
                 }
@@ -1034,11 +1018,175 @@ public:
             return !(*this == rhs);
         }
 
-
         void swap(variant& rhs) JSONCONS_NOEXCEPT
         {
-            std::cout << "swap(variant& rhs)" << std::endl;
-            std::swap(data_,rhs.data_);
+            if (this != &rhs)
+            {
+                switch (type_id())
+                {
+                case value_types::object_t:
+                    {
+                        auto ptr = object_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(*(rhs.string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    }
+                    break;
+                case value_types::array_t:
+                    {
+                        auto ptr = array_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(*(rhs.string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    }
+                    break;
+                default:
+                    switch (rhs.type_id())
+                    {
+                    case value_types::object_t:
+                        {
+                            auto ptr = rhs.object_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            case value_types::string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))string_data(*(string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                        }
+                        break;
+                    case value_types::array_t:
+                        {
+                            auto ptr = rhs.array_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            case value_types::string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))string_data(*(string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                        }
+                        break;
+                    default:
+                        {
+                            std::swap(data_,rhs.data_);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     };
 
@@ -1699,13 +1847,13 @@ public:
         return array(std::move(init),allocator);
     }
 
-    static basic_json make_array(size_t n, const array_allocator& allocator = array_allocator())
+    static basic_json make_array(size_t n, const Allocator& allocator = Allocator())
     {
         return array(n,allocator);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val, const array_allocator& allocator = array_allocator())
+    static basic_json make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
         return basic_json::array(n, val,allocator);
     }
@@ -1757,25 +1905,21 @@ public:
     basic_json(const json_type& val)
         : var_(val.var_)
     {
-        std::cout << "basic_json(const json_type& valr)" << std::endl;
     }
 
     basic_json(const json_type& val, const Allocator& allocator)
         : var_(val.var_,allocator)
     {
-        std::cout << "const json_type& val, const Allocator& allocator" << std::endl;
     }
 
     basic_json(json_type&& other) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_))
     {
-        std::cout << "basic_json(json_type&& other)" << std::endl;
     }
 
     basic_json(json_type&& other, const Allocator& allocator)
         : var_(std::move(other.var_),allocator)
     {
-        std::cout << "basic_json(json_type&& other, const Allocator& allocator)" << std::endl;
     }
 
     basic_json(const array& val)

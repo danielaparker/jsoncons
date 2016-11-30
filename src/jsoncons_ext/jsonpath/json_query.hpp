@@ -104,15 +104,9 @@ Json json_query(const Json& root, const typename Json::char_type* path, size_t l
 }
 
 template<class Json>
-Json json_query(const Json& root, const typename Json::string_type& path)
+Json json_query(const Json& root, typename Json::string_view_type path)
 {
     return json_query(root,path.data(),path.length());
-}
-
-template<class Json>
-Json json_query(const Json& root, const typename Json::char_type* path)
-{
-    return json_query(root,path,std::char_traits<typename Json::char_type>::length(path));
 }
 
 template<class Json, class T>
@@ -124,15 +118,9 @@ void json_replace(Json& root, const typename Json::char_type* path, size_t lengt
 }
 
 template<class Json, class T>
-void json_replace(Json& root, const typename Json::string_type& path, T&& new_value)
+void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
 {
     json_replace(root, path.data(), path.length(), std::forward<T&&>(new_value));
-}
-
-template<class Json, class T>
-void json_replace(Json& root, const typename Json::char_type* path, T&& new_value)
-{
-    json_replace(root,path,std::char_traits<typename Json::char_type>::length(path),std::forward<T&&>(new_value));
 }
 
 enum class states 
@@ -163,6 +151,8 @@ class jsonpath_evaluator : private basic_parsing_context<typename Json::char_typ
 private:
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
+    typedef typename Json::key_type key_type;
+    typedef typename Json::string_view_type string_view_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
     typedef std::vector<json_pointer> node_set;
@@ -233,10 +223,10 @@ private:
     class name_selector : public selector
     {
     private:
-        string_type name_;
+        key_type name_;
         bool positive_start_;
     public:
-        name_selector(string_type name, bool positive_start)
+        name_selector(const key_type& name, bool positive_start)
             : name_(name), positive_start_(positive_start)
         {
         }
@@ -432,7 +422,7 @@ public:
         }
     }
 
-    void evaluate(json_reference root, const string_type& path)
+    void evaluate(json_reference root, string_view_type path)
     {
         evaluate(root,path.data(),path.length());
     }
