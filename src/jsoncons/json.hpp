@@ -1027,6 +1027,47 @@ public:
             {
                 switch (type_id())
                 {
+                case value_types::string_t:
+                    {
+                        auto ptr = string_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    }
+                    break;
                 case value_types::object_t:
                     {
                         auto ptr = object_data_cast()->ptr_;
@@ -1112,14 +1153,43 @@ public:
                 default:
                     switch (rhs.type_id())
                     {
+                    case value_types::string_t:
+                        {
+                            auto ptr = rhs.string_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                        }
+                        break;
                     case value_types::object_t:
                         {
                             auto ptr = rhs.object_data_cast()->ptr_;
                             switch (type_id())
                             {
-                            case value_types::string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))string_data(string_data_cast()->ptr_);
-                                break;
                             case value_types::null_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))null_data();
                                 break;
@@ -1152,9 +1222,6 @@ public:
                             auto ptr = rhs.array_data_cast()->ptr_;
                             switch (type_id())
                             {
-                            case value_types::string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))string_data(string_data_cast()->ptr_);
-                                break;
                             case value_types::null_t:
                                 new(reinterpret_cast<void*>(&rhs.data_))null_data();
                                 break;
