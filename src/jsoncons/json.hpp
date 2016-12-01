@@ -1295,7 +1295,7 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        const key_type name_;
+        key_type name_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
@@ -2051,7 +2051,13 @@ public:
     }
 
     template <class ParentT>
-    basic_json(const json_proxy<ParentT>& proxy, const Allocator& allocator = Allocator())
+    basic_json(const json_proxy<ParentT>& proxy)
+        : var_(proxy.evaluate().var_)
+    {
+    }
+
+    template <class ParentT>
+    basic_json(const json_proxy<ParentT>& proxy, const Allocator& allocator)
         : var_(proxy.evaluate().var_,allocator)
     {
     }
@@ -2137,9 +2143,9 @@ public:
         case value_types::empty_object_t:
             return 0;
         case value_types::object_t:
-            return var_.object_data_cast()->value().size();
+            return object_value().size();
         case value_types::array_t:
-            return var_.array_data_cast()->value().size();
+            return array_value().size();
         default:
             return 0;
         }
@@ -2162,7 +2168,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(var_.object_data_cast()->value().get_owning_allocator())));
+            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(object_value().get_owning_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2228,7 +2234,7 @@ public:
         case value_types::object_t:
             {
                 handler.begin_object();
-                const object& o = var_.object_data_cast()->value();
+                const object& o = object_value();
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     handler.name((it->key()).data(),it->key().length());
@@ -2240,7 +2246,7 @@ public:
         case value_types::array_t:
             {
                 handler.begin_array();
-                const array& o = var_.array_data_cast()->value();
+                const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     it->write_body(handler);
@@ -2314,7 +2320,7 @@ public:
         {
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end();
             }
             break;
@@ -2329,7 +2335,7 @@ public:
         {
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     return 0;
@@ -2404,11 +2410,11 @@ public:
         case value_types::string_t:
             return var_.string_data_cast()->length() == 0;
         case value_types::array_t:
-            return var_.array_data_cast()->value().size() == 0;
+            return array_value().size() == 0;
         case value_types::empty_object_t:
             return true;
         case value_types::object_t:
-            return var_.object_data_cast()->value().size() == 0;
+            return object_value().size() == 0;
         default:
             return false;
         }
@@ -2419,9 +2425,9 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return var_.array_data_cast()->value().capacity();
+            return array_value().capacity();
         case value_types::object_t:
-            return var_.object_data_cast()->value().capacity();
+            return object_value().capacity();
         default:
             return 0;
         }
@@ -2448,17 +2454,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().reserve(n);
+            array_value().reserve(n);
             break;
         case value_types::empty_object_t:
         {
             create_object_implicitly();
-            var_.object_data_cast()->value().reserve(n);
+            object_value().reserve(n);
         }
         break;
         case value_types::object_t:
         {
-            var_.object_data_cast()->value().reserve(n);
+            object_value().reserve(n);
         }
             break;
         default:
@@ -2471,7 +2477,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().resize(n);
+            array_value().resize(n);
             break;
         default:
             break;
@@ -2484,7 +2490,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().resize(n, val);
+            array_value().resize(n, val);
             break;
         default:
             break;
@@ -2704,7 +2710,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2762,7 +2768,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2782,13 +2788,13 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            if (i >= var_.array_data_cast()->value().size())
+            if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.array_data_cast()->value().operator[](i);
+            return array_value().operator[](i);
         case value_types::object_t:
-            return var_.object_data_cast()->value().at(i);
+            return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
@@ -2799,13 +2805,13 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            if (i >= var_.array_data_cast()->value().size())
+            if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.array_data_cast()->value().operator[](i);
+            return array_value().operator[](i);
         case value_types::object_t:
-            return var_.object_data_cast()->value().at(i);
+            return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
@@ -2818,7 +2824,7 @@ public:
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return var_.object_data_cast()->value().find(name.data(),name.length());
+            return object_value().find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2833,7 +2839,7 @@ public:
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return var_.object_data_cast()->value().find(name.data(),name.length());
+            return object_value().find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2852,7 +2858,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value();
@@ -2880,7 +2886,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value().template as<T>();
@@ -2907,7 +2913,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value().template as<const CharT*>();
@@ -2931,10 +2937,10 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().shrink_to_fit();
+            array_value().shrink_to_fit();
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().shrink_to_fit();
+            object_value().shrink_to_fit();
             break;
         default:
             break;
@@ -2946,10 +2952,10 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().clear();
+            array_value().clear();
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().clear();
+            object_value().clear();
             break;
         default:
             break;
@@ -2963,7 +2969,7 @@ public:
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().erase(first, last);
+            object_value().erase(first, last);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2976,7 +2982,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().erase(first, last);
+            array_value().erase(first, last);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
@@ -2993,7 +2999,7 @@ public:
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().erase(name.data(),name.length());
+            object_value().erase(name.data(),name.length());
             break;
         default:
             JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", name);
@@ -3009,7 +3015,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(name, std::forward<T&&>(value));
+            object_value().set(name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -3026,7 +3032,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, name, std::forward<T&&>(value));
+            return object_value().set(hint, name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -3041,7 +3047,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().add(std::forward<T&&>(value));
+            array_value().add(std::forward<T&&>(value));
             break;
         default:
             {
@@ -3056,7 +3062,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return var_.array_data_cast()->value().add(pos, std::forward<T&&>(value));
+            return array_value().add(pos, std::forward<T&&>(value));
             break;
         default:
             {
@@ -3222,7 +3228,7 @@ public:
             return a_null;
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end() ? it->value() : a_null;
             }
         default:
@@ -3325,7 +3331,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().add(index, value);
+            array_value().add(index, value);
             break;
         default:
             {
@@ -3337,7 +3343,7 @@ public:
     void add(size_t index, json_type&& value){
         switch (var_.type_id()){
         case value_types::array_t:
-            var_.array_data_cast()->value().add(index, std::forward<json_type&&>(value));
+            array_value().add(index, std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -3352,7 +3358,7 @@ public:
         {
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end();
             }
             break;
@@ -3366,7 +3372,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().remove_range(from_index, to_index);
+            array_value().remove_range(from_index, to_index);
             break;
         default:
             break;

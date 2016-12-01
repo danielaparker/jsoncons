@@ -180,7 +180,7 @@ for (const auto& member : book.object_range())
 }
 ```
 
-### Stateful allocators (including boost::interprocess allocators)
+### Compatible with stateful allocators
 ```c++
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <jsoncons/json.hpp>
