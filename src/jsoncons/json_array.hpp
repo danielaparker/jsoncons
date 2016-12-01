@@ -69,7 +69,7 @@ public:
     {
     }
     json_array(const json_array& val)
-        : self_allocator_(val.get_self_allocator()),
+        : self_allocator_(val.get_owning_allocator()),
           elements_(val.elements_)
     {
     }
@@ -80,7 +80,7 @@ public:
     }
 
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : self_allocator_(val.get_self_allocator()), 
+        : self_allocator_(val.get_owning_allocator()), 
           elements_(std::move(val.elements_))
     {
     }
@@ -100,7 +100,7 @@ public:
     {
     }
 
-    self_allocator_type get_self_allocator() const
+    self_allocator_type get_owning_allocator() const
     {
         return self_allocator_;
     }
@@ -150,7 +150,7 @@ public:
     template <class T>
     void add(T&& value)
     {
-        elements_.emplace_back(Json(std::forward<T&&>(value),get_self_allocator()));
+        elements_.emplace_back(Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 
     void add(size_t index, const Json& value)
@@ -171,13 +171,13 @@ public:
     iterator add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, Json(std::forward<T&&>(value),get_self_allocator()));
+        return elements_.emplace(it, Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 #else
     template <class T>
     iterator add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, Json(std::forward<T&&>(value),get_self_allocator()));
+        return elements_.emplace(pos, Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 #endif
 
