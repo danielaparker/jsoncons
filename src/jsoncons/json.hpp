@@ -1879,7 +1879,7 @@ public:
     static basic_json parse_stream(std::basic_istream<char_type>& is);
     static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
 
-    static basic_json parse(const string_type& s)
+    static basic_json parse(string_view_type s)
     {
         parse_error_handler_type err_handler;
         return parse(s,err_handler);
@@ -1891,7 +1891,7 @@ public:
         return parse(s,length,err_handler);
     }
 
-    static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse(string_view_type s, basic_parse_error_handler<char_type>& err_handler)
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
@@ -3080,12 +3080,12 @@ public:
         a.swap(b);
     }
 
-    static json_type make_string(const string_type& s)
+    static json_type make_string(string_view_type s)
     {
         return json_type(variant(s.data(),s.length()));
     }
 
-    static json_type make_string(const string_type& s, allocator_type allocator)
+    static json_type make_string(string_view_type s, allocator_type allocator)
     {
         return json_type(variant(s.data(),s.length(),allocator));
     }
@@ -3553,13 +3553,13 @@ public:
 
 private:
 
-    friend std::basic_ostream<typename string_type::value_type>& operator<<(std::basic_ostream<typename string_type::value_type>& os, const json_type& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_type& o)
     {
         o.write(os);
         return os;
     }
 
-    friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
+    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, json_type& o)
     {
         json_decoder<json_type> handler;
         basic_json_reader<char_type> reader(is, handler);

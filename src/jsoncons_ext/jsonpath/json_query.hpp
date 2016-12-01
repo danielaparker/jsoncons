@@ -150,7 +150,8 @@ class jsonpath_evaluator : private basic_parsing_context<typename Json::char_typ
 {
 private:
     typedef typename Json::char_type char_type;
-    typedef typename Json::string_type string_type;
+    typedef typename Json::char_traits_type char_traits_type;
+    typedef std::basic_string<char_type,char_traits_type> string_type;
     typedef typename Json::key_type key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference json_reference;
@@ -428,7 +429,7 @@ public:
     }
     void evaluate(json_reference root, const char_type* path)
     {
-        evaluate(root,path,std::char_traits<char_type>::length(path));
+        evaluate(root,path,char_traits_type::length(path));
     }
 
     void evaluate(json_reference root, const char_type* path, size_t length)
