@@ -8,29 +8,17 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_filter.hpp>
-#include <sstream>
-#include <vector>
-#include <utility>
-#include <ctime>
-#include <new>
-#include <boost/optional.hpp>
 
 using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(test_suite_main)
 
-BOOST_AUTO_TEST_CASE(test_object_key_proxy)
+BOOST_AUTO_TEST_CASE(test)
 {
-    json a;
-    a["key1"] = "value1";
-
-    json b;
-    b["key2"] = json();
-    b["key2"]["key3"] = std::move(a);
-
-    BOOST_CHECK(a.is_null());
+    std::allocator<char> allocator;
+    json o = json::object(allocator);
+    o.set("name too long for small string optimization", "value too long for small string optimization");
+    std::cout << o << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

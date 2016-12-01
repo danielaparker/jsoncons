@@ -36,8 +36,8 @@ Member type                         |Definition
 
 ### Static member functions
 
-    static json parse(const string_type& s)
-    static json parse(const string_type& s, 
+    static json parse(string_view_type s)
+    static json parse(string_view_type s, 
                       parse_error_handler& err_handler)
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.

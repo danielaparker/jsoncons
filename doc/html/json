@@ -547,8 +547,8 @@ vertical-align:1px;
 <td>A random access iterator to <code>const json</code></td>
 </tr></tbody></table>
 <h3>Static member functions</h3>
-<pre><code>static json parse(const string_type&amp; s)
-static json parse(const string_type&amp; s, 
+<pre><code>static json parse(string_view_type s)
+static json parse(string_view_type s, 
                   parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Parses a string of JSON text and returns a json object or array value.<br>

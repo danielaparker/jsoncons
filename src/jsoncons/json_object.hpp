@@ -214,6 +214,7 @@ class key_value_pair
 public:
     typedef KeyT key_type;
     typedef typename KeyT::value_type char_type;
+    typedef typename ValueT::allocator_type allocator_type;
 
     key_value_pair()
     {
@@ -252,6 +253,12 @@ public:
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
+    template <class T>
+    key_value_pair(const key_type& name, T&& val, 
+                   const allocator_type& allocator)
+        : key_(name), value_(std::forward<T&&>(val), allocator)
+    {
+    }
 
     const key_type& key() const
     {
@@ -276,6 +283,12 @@ public:
     void value(ValueT&& value)
     {
         value_ = std::forward<ValueT&&>(value);
+    }
+
+    template <class T>
+    void value(T&& value, const allocator_type& allocator)
+    {
+        value_ = ValueT(std::forward<T&&>(value), allocator);
     }
 
     void swap(key_value_pair& member)
@@ -601,17 +614,17 @@ public:
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value));
+            it->value(std::forward<T&&>(value), get_self_allocator());
         }
         else
         {
             members_.emplace(it,
                              key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
-                             std::forward<T&&>(value));
+                             std::forward<T&&>(value),get_self_allocator());
         }
     }
 
@@ -631,7 +644,7 @@ public:
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -642,7 +655,7 @@ public:
         {
             it = members_.emplace(it,
                                   key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
         }
         return iterator(it);
     }
@@ -861,7 +874,7 @@ public:
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
         }
         else
         {
@@ -877,7 +890,7 @@ public:
         if (it == members_.end())
         {
             members_.emplace_back(key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())), 
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
             it = members_.begin() + (members_.size() - 1);
         }
         else if (it->key() == name)
@@ -888,7 +901,7 @@ public:
         {
             it = members_.emplace(it,
                                   key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
-                                  std::forward<T&&>(value));
+                                  std::forward<T&&>(value),get_self_allocator());
         }
         return it;
     }

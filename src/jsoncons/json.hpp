@@ -330,8 +330,8 @@ public:
                 typename std::allocator_traits<byte_allocator_type>:: template rebind_alloc<char> alloc(allocator);
 
                 ptr_ = alloc.allocate(mem_size);
-                string_data_impl* ps = new(ptr_)string_data_impl(allocator);
-                auto psa = reinterpret_cast<string_implA*>(ptr_); 
+                string_data_impl* ps = new(to_plain_pointer(ptr_))string_data_impl(allocator);
+                auto psa = reinterpret_cast<string_implA*>(to_plain_pointer(ptr_)); 
 
                 ps->p_ = new(&psa->c)char_type[length + 1];
                 memcpy(ps->p_, s, length*sizeof(char_type));
@@ -728,7 +728,8 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
             }
         }
-        variant(const char_type* s)
+
+        variant(const char_type* s, const Allocator& alloc)
         {
             size_t length = std::char_traits<char_type>::length(s);
             if (length <= small_string_data::max_length)
@@ -737,9 +738,10 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
             }
         }
+
         variant(const char_type* s, size_t length, const Allocator& alloc)
         {
             if (length <= small_string_data::max_length)
@@ -2040,11 +2042,11 @@ public:
     {
     }
 
-    template <class T>
+    /*template <class T>
     basic_json(const T& val)
         : var_(json_type_traits<json_type,T>::to_json(val).var_)
     {
-    }
+    }*/
 
     template <class T>
     basic_json(const T& val, const Allocator& allocator)
@@ -2052,10 +2054,10 @@ public:
     {
     }
 
-    basic_json(const char_type* s)
+    /*basic_json(const char_type* s)
         : var_(s)
     {
-    }
+    }*/
 
     basic_json(const char_type* s, const Allocator& allocator)
         : var_(s,allocator)

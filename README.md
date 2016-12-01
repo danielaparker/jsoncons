@@ -153,6 +153,32 @@ Output:
 ```
 Extra comma at line 1 and column 10
 ```
+### Range-based for loops with arrays
+
+```c++
+json j = json::array{1,2,3,4};
+
+for (auto element : book.array_range())
+{
+    std::cout << element << std::endl;
+}
+```
+
+### Range-based for loops with objects
+
+```c++
+json book = json::object{
+    {"author", "Haruki Murakami"},
+    {"title", "Kafka on the Shore"},
+    {"price", 25.17}
+};
+
+for (const auto& member : book.object_range())
+{
+    std::cout << member.key() << "=" 
+              << member.value() << std::endl;
+}
+```
 
 ### Stateful allocators (including boost::interprocess allocators)
 ```c++
@@ -185,32 +211,6 @@ int main()
 
     shm_json j = shm_json::array(allocator);
     j.add(o);
-}
-```
-### Range-based for loops with arrays
-
-```c++
-json j = json::array{1,2,3,4};
-
-for (auto element : book.array_range())
-{
-    std::cout << element << std::endl;
-}
-```
-
-### Range-based for loops with objects
-
-```c++
-json book = json::object{
-    {"author", "Haruki Murakami"},
-    {"title", "Kafka on the Shore"},
-    {"price", 25.17}
-};
-
-for (const auto& member : book.object_range())
-{
-    std::cout << member.key() << "=" 
-              << member.value() << std::endl;
 }
 ```
 

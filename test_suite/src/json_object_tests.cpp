@@ -419,5 +419,17 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
     //*it = member; // Don't want this to compile
 }
 
+BOOST_AUTO_TEST_CASE(test_object_key_proxy)
+{
+    json a;
+    a["key1"] = "value1";
+
+    json b;
+    b["key2"] = json();
+    b["key2"]["key3"] = std::move(a);
+
+    BOOST_CHECK(a.is_null());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
