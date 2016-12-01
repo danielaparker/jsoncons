@@ -750,12 +750,12 @@ const json&amp; operator[](size_t i) const
 </code></pre>
 <p>Returns a reference to the value at position i in a json object or array.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>json&amp; operator[](const key_type&amp; name)
+<pre><code>json&amp; operator[](string_view_type name)
 </code></pre>
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
 If read, throws <code>std::out_of_range</code> if the object does not have a member with the specified name.</p>
-<pre><code>const json&amp; operator[](const key_type&amp; name) const
+<pre><code>const json&amp; operator[](string_view_type name) const
 </code></pre>
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>

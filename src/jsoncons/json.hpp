@@ -1321,7 +1321,7 @@ public:
             auto it = val.find(name_);
             if (it == val.object_range().end())
             {
-                it = val.set(val.object_range().begin(),name_,object(val.object_value().get_self_allocator()));            
+                it = val.object_value().set(val.object_range().begin(),std::move(name_),object(val.object_value().get_self_allocator()));            
             }
             return it->value();
         }
@@ -1529,7 +1529,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().set(name_, std::forward<T&&>(val));
+            parent_.evaluate_with_default().object_value().set(std::move(name_), std::forward<T&&>(val));
             return *this;
         }
 

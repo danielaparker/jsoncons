@@ -248,12 +248,12 @@ Non-generic versions of `as` methods
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object.
 
-    json& operator[](const key_type& name)
+    json& operator[](string_view_type name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    const json& operator[](const key_type& name) const
+    const json& operator[](string_view_type name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  

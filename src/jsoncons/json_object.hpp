@@ -611,6 +611,27 @@ public:
     }
 
     template <class T>
+    void set(key_type&& name, T&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value),get_self_allocator());
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value), get_self_allocator()));
+        }
+        else
+        {
+            members_.emplace(it,
+                             std::forward<key_type&&>(name),
+                             std::forward<T&&>(value),get_self_allocator());
+        }
+    }
+
+    template <class T>
     iterator set(iterator hint, string_view_type name, T&& value)
     {
         base_iterator it;
@@ -637,6 +658,38 @@ public:
         {
             it = members_.emplace(it,
                                   key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
+                                  std::forward<T&&>(value),get_self_allocator());
+        }
+        return iterator(it);
+    }
+
+    template <class T>
+    iterator set(iterator hint, key_type&& name, T&& value)
+    {
+        base_iterator it;
+        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        {
+            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value),get_self_allocator());
+            it = members_.begin() + (members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
+        }
+        else
+        {
+            it = members_.emplace(it,
+                                  std::forward<key_type&&>(name),
                                   std::forward<T&&>(value),get_self_allocator());
         }
         return iterator(it);
@@ -865,6 +918,23 @@ public:
     }
 
     template <class T>
+    void set(key_type&& name, T&& value)
+    {
+        equals_pred<value_type,char_type> comp(name.data(), name.length());
+        auto it = std::find_if(members_.begin(),members_.end(), comp);
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value),get_self_allocator());
+        }
+        else
+        {
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
+        }
+    }
+
+    template <class T>
     iterator set(iterator hint, string_view_type name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
@@ -883,6 +953,30 @@ public:
         {
             it = members_.emplace(it,
                                   key_type(name.data(),name.length(),key_allocator_type(get_self_allocator())),
+                                  std::forward<T&&>(value),get_self_allocator());
+        }
+        return it;
+    }
+
+    template <class T>
+    iterator set(iterator hint, key_type&& name, T&& value)
+    {
+        typename std::vector<value_type,allocator_type>::iterator it = hint;
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value),get_self_allocator());
+            it = members_.begin() + (members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
+        }
+        else
+        {
+            it = members_.emplace(it,
+                                  std::forward<key_type&&>(name),
                                   std::forward<T&&>(value),get_self_allocator());
         }
         return it;
