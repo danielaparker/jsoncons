@@ -91,14 +91,16 @@ public:
 
     typedef CharT char_type;
     typedef typename json_traits_type::char_traits_type char_traits_type;
-    typedef typename json_traits_type::char_allocator char_allocator;
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
     typedef basic_string_view_<char_type,char_traits_type> string_view_type;
 #else
     typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
 #endif
-    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
+
+    // char_allocator and string_type are for interface only, not storage 
+    typedef std::allocator<CharT> char_allocator;
+    typedef std::basic_string<CharT,char_traits_type> string_type;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> key_allocator_type;
     typedef std::basic_string<CharT,char_traits_type,key_allocator_type> key_type;

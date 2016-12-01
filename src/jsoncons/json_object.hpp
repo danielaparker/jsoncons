@@ -219,40 +219,28 @@ public:
     key_value_pair()
     {
     }
-    key_value_pair(const key_type& name)
-        : key_(name)
-    {
-    }
-    key_value_pair(key_type&& name)
-        : key_(std::forward<key_type&&>(name))
-    {
-    }
 
     key_value_pair(const key_type& name, const ValueT& val)
         : key_(name), value_(val)
     {
     }
-    key_value_pair(key_type&& name, const ValueT& val)
-        : key_(std::forward<key_type>(name)), value_(val)
-    {
-    }
-    key_value_pair(const key_type& name, ValueT&& val)
-        : key_(name), value_(std::forward<ValueT&&>(val))
-    {
-    }
+
     key_value_pair(key_type&& name, ValueT&& val)
         : key_(std::forward<key_type&&>(name)), 
           value_(std::forward<ValueT&&>(val))
     {
     }
+
     key_value_pair(const key_value_pair& member)
         : key_(member.key_), value_(member.value_)
     {
     }
+
     key_value_pair(key_value_pair&& member)
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
+
     template <class T>
     key_value_pair(const key_type& name, T&& val, 
                    const allocator_type& allocator)

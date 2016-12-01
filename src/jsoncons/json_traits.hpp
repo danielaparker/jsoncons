@@ -22,8 +22,6 @@ template <class CharT>
 struct json_traits
 {
     typedef typename std::char_traits<CharT> char_traits_type;
-    typedef std::allocator<CharT> char_allocator;
-    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
 
     static const bool preserve_order = false;
 
