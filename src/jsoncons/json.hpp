@@ -728,6 +728,18 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
             }
         }
+        variant(const char_type* s)
+        {
+            size_t length = std::char_traits<char_type>::length(s);
+            if (length <= small_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
+            }
+        }
 
         variant(const char_type* s, const Allocator& alloc)
         {
@@ -2042,11 +2054,11 @@ public:
     {
     }
 
-    /*template <class T>
+    template <class T>
     basic_json(const T& val)
         : var_(json_type_traits<json_type,T>::to_json(val).var_)
     {
-    }*/
+    }
 
     template <class T>
     basic_json(const T& val, const Allocator& allocator)
@@ -2054,10 +2066,10 @@ public:
     {
     }
 
-    /*basic_json(const char_type* s)
+    basic_json(const char_type* s)
         : var_(s)
     {
-    }*/
+    }
 
     basic_json(const char_type* s, const Allocator& allocator)
         : var_(s,allocator)
