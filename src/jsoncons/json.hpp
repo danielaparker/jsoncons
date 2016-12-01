@@ -1558,9 +1558,9 @@ public:
             return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_allocator_type(name_.get_allocator())));
         }
 
-        const json_proxy<proxy_type> operator[](string_view_type name) const
+        const json_type& operator[](string_view_type name) const
         {
-            return json_proxy<proxy_type>(*this,key_allocator_type(name_.get_allocator()));
+            return at(name);
         }
 
         json_type& at(string_view_type name)
