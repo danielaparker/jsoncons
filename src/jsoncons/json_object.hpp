@@ -285,12 +285,6 @@ public:
         value_ = std::forward<ValueT&&>(value);
     }
 
-    template <class T>
-    void value(T&& value, const allocator_type& allocator)
-    {
-        value_ = ValueT(std::forward<T&&>(value), allocator);
-    }
-
     void swap(key_value_pair& member)
     {
         key_.swap(member.key_);
@@ -618,7 +612,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value), get_self_allocator());
+            it->value(Json(std::forward<T&&>(value), get_self_allocator()));
         }
         else
         {
@@ -649,7 +643,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(value);
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
         }
         else
         {
@@ -878,7 +872,7 @@ public:
         }
         else
         {
-            it->value(std::forward<T&&>(value));
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
         }
     }
 
@@ -895,7 +889,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value));
+            it->value(Json(std::forward<T&&>(value),get_self_allocator()));
         }
         else
         {

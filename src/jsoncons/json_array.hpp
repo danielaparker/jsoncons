@@ -150,7 +150,7 @@ public:
     template <class T>
     void add(T&& value)
     {
-        elements_.emplace_back(std::forward<T&&>(value));
+        elements_.emplace_back(Json(std::forward<T&&>(value),get_self_allocator()));
     }
 
     void add(size_t index, const Json& value)
@@ -171,13 +171,13 @@ public:
     iterator add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, std::forward<T&&>(value));
+        return elements_.emplace(it, Json(std::forward<T&&>(value),get_self_allocator()));
     }
 #else
     template <class T>
     iterator add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, std::forward<T&&>(value));
+        return elements_.emplace(pos, Json(std::forward<T&&>(value),get_self_allocator()));
     }
 #endif
 

@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     //Initialize shared memory STL-compatible allocator
     const shmem_allocator allocator(segment.get_segment_manager());
 
-    /*shm_json j = shm_json::array(allocator);
+    shm_json j = shm_json::array(allocator);
     j.add(0);
     j.add(1);
     j.add(2);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     j.add(a);
     shm_json v{ shm_json::array(allocator) };
     v.add(j);
-    v.add(a);*/
+    v.add(a);
 
     shm_json o = shm_json::object(allocator);
     o.set("name too long for small string optimization", "value too long for small string optimization");
