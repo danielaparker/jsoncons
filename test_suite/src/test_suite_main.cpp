@@ -15,10 +15,6 @@ BOOST_AUTO_TEST_SUITE(test_suite_main)
 
 BOOST_AUTO_TEST_CASE(test)
 {
-    std::allocator<char> allocator;
-    json o = json::object(allocator);
-    o.set("name too long for small string optimization", "value too long for small string optimization");
-    std::cout << o << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
