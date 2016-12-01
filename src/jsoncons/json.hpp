@@ -1295,7 +1295,7 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        const key_type& name_;
+        const key_type name_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
@@ -1553,14 +1553,14 @@ public:
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const key_type& name)
+        json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,name);
+            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_allocator_type(name_.get_allocator())));
         }
 
-        const json_proxy<proxy_type> operator[](const key_type& name) const
+        const json_proxy<proxy_type> operator[](string_view_type name) const
         {
-            return json_proxy<proxy_type>(*this,name);
+            return json_proxy<proxy_type>(*this,key_allocator_type(name_.get_allocator()));
         }
 
         json_type& at(string_view_type name)
@@ -2155,14 +2155,14 @@ public:
         return at(i);
     }
 
-    json_proxy<json_type> operator[](const key_type& name)
+    json_proxy<json_type> operator[](string_view_type name)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, name);
+            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(var_.object_data_cast()->value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
