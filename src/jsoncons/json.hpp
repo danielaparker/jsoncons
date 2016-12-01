@@ -3093,6 +3093,11 @@ public:
         return json_type(variant(rhs,length));
     }
 
+    static json_type make_string(const char_type* rhs, size_t length, const Allocator& allocator)
+    {
+        return json_type(variant(rhs,length,allocator));
+    }
+
     static json_type make_integer(int64_t val)
     {
         return json_type(variant(val));
