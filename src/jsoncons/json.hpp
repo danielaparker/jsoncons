@@ -1300,8 +1300,8 @@ public:
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
-        json_proxy(ParentT& parent, const key_type& name)
-            : parent_(parent), name_(name)
+        json_proxy(ParentT& parent, key_type&& name)
+            : parent_(parent), name_(std::forward<key_type&&>(name))
         {
         }
 
@@ -1321,7 +1321,7 @@ public:
             auto it = val.find(name_);
             if (it == val.object_range().end())
             {
-                it = val.object_value().set(val.object_range().begin(),std::move(name_),object(val.object_value().get_owning_allocator()));            
+                it = val.set_(val.object_range().begin(),std::move(name_),object(val.object_value().get_owning_allocator()));            
             }
             return it->value();
         }
@@ -1529,7 +1529,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().object_value().set(std::move(name_), std::forward<T&&>(val));
+            parent_.evaluate_with_default().set_(std::move(name_), std::forward<T&&>(val));
             return *this;
         }
 
@@ -1555,7 +1555,7 @@ public:
 
         json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_allocator_type(name_.get_allocator())));
+            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),name_.get_allocator()));
         }
 
         const json_type& operator[](string_view_type name) const
@@ -1646,9 +1646,21 @@ public:
         }
 
         template <class T>
+        void set_(key_type&& name, T&& value)
+        {
+            evaluate().set_(std::forward<key_type&&>(name),std::forward<T&&>(value));
+        }
+
+        template <class T>
         object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
+        }
+
+        template <class T>
+        object_iterator set_(object_iterator hint, key_type&& name, T&& value)
+        {
+            return evaluate().set_(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
         }
 
         template <class T>
@@ -3025,6 +3037,23 @@ public:
     }
 
     template <class T>
+    void set_(key_type&& name, T&& value)
+    {
+        switch (var_.type_id())
+        {
+        case value_types::empty_object_t:
+            create_object_implicitly();
+        case value_types::object_t:
+            object_value().set(std::forward<key_type&&>(name), std::forward<T&&>(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name.c_str());
+            }
+        }
+    }
+
+    template <class T>
     object_iterator set(object_iterator hint, string_view_type name, T&& value)
     {
         switch (var_.type_id())
@@ -3033,6 +3062,23 @@ public:
             create_object_implicitly();
         case value_types::object_t:
             return object_value().set(hint, name, std::forward<T&&>(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
+    template <class T>
+    object_iterator set_(object_iterator hint, key_type&& name, T&& value)
+    {
+        switch (var_.type_id())
+        {
+        case value_types::empty_object_t:
+            create_object_implicitly();
+        case value_types::object_t:
+            return object_value().set(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {

@@ -214,7 +214,7 @@ class key_value_pair
 public:
     typedef KeyT key_type;
     typedef typename KeyT::value_type char_type;
-    typedef typename ValueT::allocator_type allocator_type;
+    typedef typename KeyT::allocator_type allocator_type;
 
     key_value_pair()
     {
@@ -240,11 +240,20 @@ public:
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
-
+/*
     template <class T>
-    key_value_pair(const key_type& name, T&& val, 
+    key_value_pair(const key_type& name, 
+                   T&& val, 
                    const allocator_type& allocator)
         : key_(name), value_(std::forward<T&&>(val), allocator)
+    {
+    }
+*/
+    template <class T>
+    key_value_pair(key_type&& name, 
+                   T&& val, 
+                   const allocator_type& allocator)
+        : key_(std::forward<key_type&&>(name)), value_(std::forward<T&&>(val), allocator)
     {
     }
 
@@ -627,7 +636,8 @@ public:
         {
             members_.emplace(it,
                              std::forward<key_type&&>(name),
-                             std::forward<T&&>(value),get_owning_allocator());
+                             std::forward<T&&>(value),
+                             get_owning_allocator());
         }
     }
 
