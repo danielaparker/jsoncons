@@ -11,16 +11,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-42023908-1', 'auto');
-  ga('send', 'pageview');
-
-</script></head>
+  </head>
   <body>
     <div class="wrapper">
       <header>
@@ -814,6 +805,8 @@ standard library collections of book objects to and from <code>json</code> value
     <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
     <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, book&gt;
     {
+        <span class="pl-k">typedef</span> <span class="pl-k">typename</span> Json::allocator_type allocator_type;
+
         <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
         {
             <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
@@ -829,9 +822,10 @@ standard library collections of book objects to and from <code>json</code> value
             val.<span class="pl-smi">price</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>]. <span class="pl-k">template </span>as&lt;<span class="pl-k">double</span>&gt;();
             <span class="pl-k">return</span> val;
         }
-        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> book&amp; val)
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> book&amp; val, 
+                            <span class="pl-k">const</span> allocator_type&amp; allocator)
         {
-            Json j;
+            Json <span class="pl-smi">j</span>(allocator);
             j[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">author</span>;
             j[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">title</span>;
             j[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">price</span>;
