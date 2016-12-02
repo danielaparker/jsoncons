@@ -445,11 +445,12 @@ private:
     std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : self_allocator_(), members_(vector_allocator_type())
+        : self_allocator_(), members_()
     {
     }
     json_object(const allocator_type& allocator)
-        : self_allocator_(allocator), members_(vector_allocator_type(allocator))
+        : self_allocator_(allocator), 
+          members_(vector_allocator_type(allocator))
     {
     }
 
@@ -753,11 +754,12 @@ private:
     std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : self_allocator_(), members_(vector_allocator_type())
+        : self_allocator_(), members_()
     {
     }
     json_object(const allocator_type& allocator)
-        : self_allocator_(allocator), members_(vector_allocator_type(allocator))
+        : self_allocator_(allocator), 
+          members_(vector_allocator_type(allocator))
     {
     }
 
@@ -810,22 +812,22 @@ public:
 
     iterator begin()
     {
-        return iterator(members_.begin());
+        return members_.begin();
     }
 
     iterator end()
     {
-        return iterator(members_.end());
+        return members_.end();
     }
 
     const_iterator begin() const
     {
-        return const_iterator(members_.begin());
+        return members_.begin();
     }
 
     const_iterator end() const
     {
-        return const_iterator(members_.end());
+        return members_.end();
     }
 
     void swap(json_object& val)
