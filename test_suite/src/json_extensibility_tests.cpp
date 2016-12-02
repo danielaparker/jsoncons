@@ -16,6 +16,8 @@ namespace jsoncons
     template <class Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_string())
@@ -40,20 +42,19 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static Json to_json(boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val, 
+                            const allocator_type& allocator)
         {
-            return Json::make_string(to_iso_extended_string(val));
-        }
-
-        static Json to_json(boost::gregorian::date val, typename Json::allocator_type allocator)
-        {
-            return Json::make_string(to_iso_extended_string(val),allocator);
+            return Json::make_string(to_iso_extended_string(val),
+                                     allocator);
         }
     };
 
     template <class Json,class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_array())
@@ -113,9 +114,10 @@ namespace jsoncons
             }
         }
 
-        static Json to_json(const boost::numeric::ublas::matrix<T>& val)
+        static Json to_json(const boost::numeric::ublas::matrix<T>& val, 
+                            const allocator_type& allocator)
         {
-            Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
+            Json a = Json::template make_array<2>(val.size1(), val.size2(), T(), allocator);
             for (size_t i = 0; i < val.size1(); ++i)
             {
                 for (size_t j = 0; j < val.size1(); ++j)

@@ -17,7 +17,7 @@ template <class T>
 void add(T&& val)
 
 template <class T>
-void set(const string_type& name, T&& val)
+void set(const key_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
@@ -46,6 +46,8 @@ namespace jsoncons
     template<class Json>
     struct json_type_traits<Json, book>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& rhs) noexcept
         {
             return rhs.is_object() &&
@@ -61,9 +63,10 @@ namespace jsoncons
             val.price = rhs["price"]. template as<double>();
             return val;
         }
-        static Json to_json(const book& val)
+        static Json to_json(const book& val,
+                            const allocator_type& allocator)
         {
-            Json j;
+            Json j(allocator);
             j["author"] = val.author;
             j["title"] = val.title;
             j["price"] = val.price;

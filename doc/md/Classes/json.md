@@ -24,7 +24,7 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
-`string_view_type`|Wraps a pointer to string data and length
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
 `member_type`|[member_type](member_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
@@ -36,8 +36,8 @@ Member type                         |Definition
 
 ### Static member functions
 
-    static json parse(const string_type& s)
-    static json parse(const string_type& s, 
+    static json parse(string_view_type s)
+    static json parse(string_view_type s, 
                       parse_error_handler& err_handler)
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
@@ -48,8 +48,8 @@ Throws [parse_exception](parse_exception) if parsing fails.
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
 
-    static json parse_file(const std::string& filename)
-    static json parse_file(const std::string& filename, 
+    static json parse_file(const string_type& filename)
+    static json parse_file(const string_type& filename, 
                            parse_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 Throws [parse_exception](parse_exception) if parsing fails.
@@ -237,6 +237,7 @@ If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cp
     int64_t as_integer() const
     uint64_t as_uinteger() const
     double as_double() const
+    string_view_type as_string_view() const
     string_type as_string() const noexcept
     string_type as_string(const char_allocator& allocator) const noexcept
     unsigned int as<unsigned int> const 
@@ -247,12 +248,12 @@ Non-generic versions of `as` methods
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object.
 
-    json& operator[](const string_type& name)
+    json& operator[](string_view_type name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    const json& operator[](const string_type& name) const
+    const json& operator[](string_view_type name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
@@ -297,7 +298,7 @@ Throws `std::runtime_error` if not an object.
 Remove the members from an object in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 
-    void erase(const string_type& name)
+    void erase(string_view_type name)
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
 
@@ -305,16 +306,12 @@ Throws `std::runtime_error` if not an object.
 Requests the removal of unused capacity.
 
     template <class T>
-    void set(const string_type& name, T&& val)
-    template <class T>
-    void set(string_type&& name, T&& val)
+    void set(string_view_type name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
 
     template <class T>
-    object_iterator set(object_iterator hint, const string_type& name, T&& val)
-    template <class T>
-    object_iterator set(object_iterator hint, string_type&& name, T&& val)
+    object_iterator set(object_iterator hint, string_view_type name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Insertion time is optimized if `hint` points to the member that will precede the inserted member.
 Returns a `member_iterator` pointing at the member that was inserted or updated

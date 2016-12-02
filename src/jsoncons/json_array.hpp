@@ -28,68 +28,85 @@ class json_array
 public:
     typedef Allocator allocator_type;
     typedef Json value_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Json> vector_allocator_type;
-    typedef typename std::vector<Json,Allocator>::reference reference;
-    typedef typename std::vector<Json,Allocator>::const_reference const_reference;
-    typedef typename std::vector<Json,Allocator>::iterator iterator;
-    typedef typename std::vector<Json,Allocator>::const_iterator const_iterator;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_array> self_allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
+
+    typedef typename std::vector<Json, vector_allocator_type>::reference reference;
+    typedef typename std::vector<Json, vector_allocator_type>::const_reference const_reference;
+    typedef typename std::vector<Json, vector_allocator_type>::iterator iterator;
+    typedef typename std::vector<Json, vector_allocator_type>::const_iterator const_iterator;
 
     json_array()
-        : elements_()
+        : self_allocator_(), 
+          elements_()
     {
     }
 
     explicit json_array(const Allocator& allocator)
-        : elements_(allocator)
+        : self_allocator_(allocator), 
+          elements_(vector_allocator_type(allocator))
     {
     }
 
-    explicit json_array(size_t n, const Allocator& allocator = Allocator())
-        : elements_(n,Json(),allocator)
+    explicit json_array(size_t n, 
+                        const Allocator& allocator = Allocator())
+        : self_allocator_(allocator), 
+          elements_(n,Json(),vector_allocator_type(allocator))
     {
     }
 
-    explicit json_array(size_t n, const Json& value, const Allocator& allocator = Allocator())
-        : elements_(n,value,allocator)
+    explicit json_array(size_t n, 
+                        const Json& value, 
+                        const Allocator& allocator = Allocator())
+        : self_allocator_(allocator), 
+          elements_(n,value,vector_allocator_type(allocator))
     {
     }
 
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end, const Allocator& allocator = Allocator())
-        : elements_(begin,end,allocator)
+        : self_allocator_(allocator), 
+          elements_(begin,end,vector_allocator_type(allocator))
     {
     }
-
     json_array(const json_array& val)
-        : elements_(val.elements_)
+        : self_allocator_(val.get_owning_allocator()),
+          elements_(val.elements_)
+    {
+    }
+    json_array(const json_array& val, const Allocator& allocator)
+        : self_allocator_(allocator), 
+          elements_(val.elements_,vector_allocator_type(allocator))
     {
     }
 
-    json_array(const json_array& val, const Allocator& allocator)
-        : elements_(val.elements_,allocator)
-    {
-    }
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : elements_(std::move(val.elements_))
+        : self_allocator_(val.get_owning_allocator()), 
+          elements_(std::move(val.elements_))
     {
     }
     json_array(json_array&& val, const Allocator& allocator)
-        : elements_(std::move(val.elements_),allocator)
+        : self_allocator_(allocator), 
+          elements_(std::move(val.elements_),vector_allocator_type(allocator))
     {
     }
 
     json_array(std::initializer_list<Json> init, 
                const Allocator& allocator = Allocator())
-        : elements_(std::move(init),allocator)
+        : self_allocator_(allocator), 
+          elements_(std::move(init),vector_allocator_type(allocator))
+    {
+    }
+    ~json_array()
     {
     }
 
-    Allocator get_allocator() const
+    self_allocator_type get_owning_allocator() const
     {
-        return elements_.get_allocator();
+        return self_allocator_;
     }
 
-    void swap(json_array<Json,Allocator>& val)
+    void swap(json_array<Json, Allocator>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -134,7 +151,7 @@ public:
     template <class T>
     void add(T&& value)
     {
-        elements_.emplace_back(std::forward<T&&>(value));
+        elements_.emplace_back(Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 
     void add(size_t index, const Json& value)
@@ -155,13 +172,13 @@ public:
     iterator add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, std::forward<T&&>(value));
+        return elements_.emplace(it, Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 #else
     template <class T>
     iterator add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, std::forward<T&&>(value));
+        return elements_.emplace(pos, Json(std::forward<T&&>(value),get_owning_allocator()));
     }
 #endif
 
@@ -173,7 +190,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<Json,Allocator>& rhs) const
+    bool operator==(const json_array<Json, Allocator>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -189,8 +206,10 @@ public:
         return true;
     }
 private:
-    json_array& operator=(const json_array<Json,Allocator>&);
-    std::vector<Json,Allocator> elements_;
+    self_allocator_type self_allocator_;
+    std::vector<Json,vector_allocator_type> elements_;
+
+    json_array& operator=(const json_array<Json,Allocator>&) = delete;
 };
 
 }

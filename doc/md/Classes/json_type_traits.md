@@ -7,6 +7,7 @@ struct json_type_traits
     typedef typename Json::char_type char_type;
     typedef typename Json::object object;
     typedef typename Json::array array;
+    typedef typename Json::allocator_type allocator_type;
 
     static const bool is_assignable = false;
 
@@ -17,9 +18,8 @@ struct json_type_traits
 
     static T as(const Json& rhs);
 
-    static Json to_json(T rhs);
-
-    static Json to_json(T rhs, typename Json::allocator_type allocator);
+    static Json to_json(const T& rhs, 
+                        const allocator_type& allocator);
 };
 ```
 

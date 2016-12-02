@@ -512,7 +512,7 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>string_view_type</code></td>
-<td>Wraps a pointer to string data and length</td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise to a substitute.</td>
 </tr>
 <tr>
 <td><code>member_type</code></td>
@@ -547,8 +547,8 @@ vertical-align:1px;
 <td>A random access iterator to <code>const json</code></td>
 </tr></tbody></table>
 <h3>Static member functions</h3>
-<pre><code>static json parse(const string_type&amp; s)
-static json parse(const string_type&amp; s, 
+<pre><code>static json parse(string_view_type s)
+static json parse(string_view_type s, 
                   parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Parses a string of JSON text and returns a json object or array value.<br>
@@ -559,8 +559,8 @@ static json parse_stream(std::istream&amp; is,
 </code></pre>
 <p>Parses an input stream of JSON text and returns a json object or array value.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-<pre><code>static json parse_file(const std::string&amp; filename)
-static json parse_file(const std::string&amp; filename, 
+<pre><code>static json parse_file(string_view_type filename)
+static json parse_file(string_view_type filename, 
                        parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
@@ -739,6 +739,7 @@ string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noe
 int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
+string_view_type as_string_view() const
 string_type as_string() const noexcept
 string_type as_string(const char_allocator&amp; allocator) const noexcept
 unsigned int as&lt;unsigned int&gt; const 
@@ -749,12 +750,12 @@ const json&amp; operator[](size_t i) const
 </code></pre>
 <p>Returns a reference to the value at position i in a json object or array.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>json&amp; operator[](const string_type&amp; name)
+<pre><code>json&amp; operator[](string_view_type name)
 </code></pre>
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
 If read, throws <code>std::out_of_range</code> if the object does not have a member with the specified name.</p>
-<pre><code>const json&amp; operator[](const string_type&amp; name) const
+<pre><code>const json&amp; operator[](string_view_type name) const
 </code></pre>
 <p>If <code>name</code> matches the name of a member in the json object, returns a reference to the json object, otherwise throws.<br>
 Throws <code>std::runtime_error</code> if not an object.<br>
@@ -798,7 +799,7 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 <p>Remove the members from an object in the range '[first,last)'.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>void erase(const string_type&amp; name)
+<pre><code>void erase(string_view_type name)
 </code></pre>
 <p>Remove a member with the specified name from an object<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
@@ -806,16 +807,12 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 <p>Requests the removal of unused capacity.</p>
 <pre><code>template &lt;class T&gt;
-void set(const string_type&amp; name, T&amp;&amp; val)
-template &lt;class T&gt;
-void set(string_type&amp;&amp; name, T&amp;&amp; val)
+void set(string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 <pre><code>template &lt;class T&gt;
-object_iterator set(object_iterator hint, const string_type&amp; name, T&amp;&amp; val)
-template &lt;class T&gt;
-object_iterator set(object_iterator hint, string_type&amp;&amp; name, T&amp;&amp; val)
+object_iterator set(object_iterator hint, string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
 Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
