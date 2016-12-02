@@ -201,54 +201,6 @@ for (const auto& member : book.object_range())
 }
 ```
 
-### Compatible with stateful allocators
-```c++
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <jsoncons/json.hpp>
-
-using namespace jsoncons;
-
-typedef boost::interprocess::allocator<int,
-        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
-typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
-
-int main()
-{
-    struct shm_remove
-    {
-        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-    } remover;
-
-    //Create a new segment with given name and size
-    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
-            "MySharedMemory", 65536);
-
-    //Initialize shared memory STL-compatible allocator
-    const shmem_allocator allocator(segment.get_segment_manager());
-
-    // Create json value with all dynamic allocations in shared memory
-
-    shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
-
-    o->set("category", "reference");
-    o->set("author", "Nigel Rees");
-    o->set("title", "Sayings of the Century");
-    o->set("price", 8.95);
-
-    std::cout << pretty_print(*o) << std::endl;
-}
-```
-Output:
-```json
-{
-    "author": "Nigel Rees",
-    "category": "reference",
-    "price": 8.95,
-    "title": "Sayings of the Century"
-}
-```
-
 ### Multi-dimensional json arrays
 ```c++
 json a = json::make_array<3>(4, 3, 2, 0.0);
@@ -392,6 +344,54 @@ Output:
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
 Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
+
+### Works with stateful allocators
+```c++
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+typedef boost::interprocess::allocator<int,
+        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
+typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
+
+int main()
+{
+    struct shm_remove
+    {
+        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+    } remover;
+
+    //Create a new segment with given name and size
+    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
+            "MySharedMemory", 65536);
+
+    //Initialize shared memory STL-compatible allocator
+    const shmem_allocator allocator(segment.get_segment_manager());
+
+    // Create json value with all dynamic allocations in shared memory
+
+    shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
+
+    o->set("category", "reference");
+    o->set("author", "Nigel Rees");
+    o->set("title", "Sayings of the Century");
+    o->set("price", 8.95);
+
+    std::cout << pretty_print(*o) << std::endl;
+}
+```
+Output:
+```json
+{
+    "author": "Nigel Rees",
+    "category": "reference",
+    "price": 8.95,
+    "title": "Sayings of the Century"
+}
+```
 
 ## Extensions
 
