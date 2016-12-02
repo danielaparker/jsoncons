@@ -38,7 +38,7 @@ public:
 
     json_array()
         : self_allocator_(), 
-          elements_(vector_allocator_type())
+          elements_()
     {
     }
 
