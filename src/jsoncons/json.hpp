@@ -676,7 +676,10 @@ public:
                 new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
                 break;
             case value_types::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
+                {
+                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
                 break;
             case value_types::object_t:
                 {
@@ -686,6 +689,57 @@ public:
                 break;
             case value_types::array_t:
                 {
+                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        variant(variant&& val, const Allocator&) JSONCONS_NOEXCEPT
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+                new(reinterpret_cast<void*>(&data_))null_data();
+                break;
+            case value_types::empty_object_t:
+                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                break;
+            case value_types::double_t:
+                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                break;
+            case value_types::integer_t:
+                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                break;
+            case value_types::uinteger_t:
+                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_types::bool_t:
+                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                break;
+            case value_types::small_string_t:
+                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                break;
+            case value_types::string_t:
+                {
+                    //if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value
+                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            case value_types::object_t:
+                {
+                    // Check if allocators are compatible
+                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            case value_types::array_t:
+                {
+                    // Check if allocators are compatible
                     new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
                 }
@@ -2027,7 +2081,7 @@ public:
     {
     }
 
-    basic_json(json_type&& other, const Allocator& allocator)
+    basic_json(json_type&& other, const Allocator& allocator) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_),allocator)
     {
     }
@@ -2074,9 +2128,9 @@ public:
     {
     }
 
-    template <class T>
-    basic_json(const T& val)
-        : var_(json_type_traits<json_type,T>::to_json(val).var_)
+    template <class T,class U=Allocator>
+    basic_json(const T& val, typename std::enable_if<std::is_default_constructible<U>::value>::type* = 0)
+        : var_(json_type_traits<json_type,T>::to_json(val,Allocator()).var_)
     {
     }
 
@@ -2130,10 +2184,11 @@ public:
         return *this;
     }
 
-    template <class T>
-    json_type& operator=(const T& val)
+    template <class T,class U=Allocator>
+    typename std::enable_if<std::is_default_constructible<U>::value,json_type&>::type
+    operator=(const T& val)
     {
-        var_ = json_type_traits<json_type,T>::to_json(val).var_;
+        var_ = json_type_traits<json_type,T>::to_json(val,Allocator()).var_;
         return *this;
     }
 
@@ -2144,9 +2199,15 @@ public:
         return *this;
     }
 
-    bool operator!=(const json_type& rhs) const;
+    bool operator!=(const json_type& rhs) const
+    {
+        return !(*this == rhs);
+    }
 
-    bool operator==(const json_type& rhs) const;
+    bool operator==(const json_type& rhs) const
+    {
+        return var_ == rhs.var_;
+    }
 
     size_t size() const JSONCONS_NOEXCEPT
     {
@@ -3044,7 +3105,7 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            object_value().set(std::forward<key_type&&>(name), std::forward<T&&>(value));
+            object_value().set_(std::forward<key_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {
@@ -3630,18 +3691,6 @@ template <class Json>
 void swap(typename Json::member_type& a, typename Json::member_type& b)
 {
     a.swap(b);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-bool basic_json<CharT,JsonTraits,Allocator>::operator!=(const basic_json<CharT,JsonTraits,Allocator>& rhs) const
-{
-    return !(*this == rhs);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-bool basic_json<CharT,JsonTraits,Allocator>::operator==(const basic_json<CharT,JsonTraits,Allocator>& rhs) const
-{
-    return var_ == rhs.var_;
 }
 
 template<class CharT,class JsonTraits,class Allocator>

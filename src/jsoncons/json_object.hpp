@@ -620,7 +620,7 @@ public:
     }
 
     template <class T>
-    void set(key_type&& name, T&& value)
+    void set_(key_type&& name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == members_.end())
@@ -674,7 +674,7 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, key_type&& name, T&& value)
+    iterator set_(iterator hint, key_type&& name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->key() <= name)
@@ -928,7 +928,7 @@ public:
     }
 
     template <class T>
-    void set(key_type&& name, T&& value)
+    void set_(key_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(members_.begin(),members_.end(), comp);
@@ -969,7 +969,7 @@ public:
     }
 
     template <class T>
-    iterator set(iterator hint, key_type&& name, T&& value)
+    iterator set_(iterator hint, key_type&& name, T&& value)
     {
         typename std::vector<value_type,allocator_type>::iterator it = hint;
 

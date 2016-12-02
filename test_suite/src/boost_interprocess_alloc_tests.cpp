@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     j.add(2);
     j.add(3);
     j.resize(5);
-    j[4] = 4;
+    j[4] = shm_json(4,allocator);
 
     shm_json a{ shm_json::array(allocator) };
     a.add(true);
@@ -60,8 +60,12 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
 
     shm_json o = shm_json::object(allocator);
     o.set("name too long for small string optimization", "value too long for small string optimization");
-    o["another name too long for small string optimization"] = 10;
+    o["another name too long for small string optimization"] = shm_json(10,allocator);
     std::cout << o << std::endl;
+
+    std::cout << "Is default " << std::boolalpha << std::is_default_constructible<std::allocator<char>>::value << std::endl;
+    std::cout << "Is default " << std::boolalpha << std::is_default_constructible<shmem_allocator>::value << std::endl;
+
 
     //shm_json o2{ shm_json::object(allocator) };
     //o2.set("name", 10.0);

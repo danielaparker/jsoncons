@@ -266,13 +266,8 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     {
         return rhs.as_cstring();
     }
-    static Json to_json(const char_type* rhs)
-    {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length);
-    }
     static Json to_json(const char_type* rhs, 
-                        allocator_type allocator)
+                        const allocator_type& allocator)
     {
         size_t length = std::char_traits<char_type>::length(rhs);
         return Json::make_string(rhs,length,allocator);
@@ -289,13 +284,8 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     {
         return rhs.is_string();
     }
-    static Json to_json(const char_type *rhs)
-    {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length);
-    }
     static Json to_json(const char_type *rhs, 
-                        allocator_type allocator)
+                        const allocator_type& allocator)
     {
         size_t length = std::char_traits<char_type>::length(rhs);
         return Json::make_string(rhs,length,allocator);
@@ -332,10 +322,6 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(rhs.as_integer());
     }
-    static Json to_json(T rhs)
-    {
-        return Json::make_integer(rhs);
-    }
     static Json to_json(T rhs, allocator_type)
     {
         return Json::make_integer(rhs);
@@ -371,11 +357,6 @@ struct json_type_traits<Json, T,
         return static_cast<T>(rhs.as_uinteger());
     }
 
-    static Json to_json(T val)
-    {
-        return Json::make_uinteger(val);
-    }
-
     static Json to_json(T val, allocator_type)
     {
         return Json::make_uinteger(val);
@@ -397,10 +378,6 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(rhs.as_double());
     }
-    static Json to_json(T val)
-    {
-        return Json::make_double(val);
-    }
     static Json to_json(T val, allocator_type)
     {
         return Json::make_double(val);
@@ -416,12 +393,8 @@ struct json_type_traits<Json, typename Json::object>
     {
         return rhs.is_object();
     }
-    static Json to_json(const typename Json::object& rhs)
-    {
-        return Json::make_object(rhs);
-    }
     static Json to_json(const typename Json::object& rhs, 
-                        allocator_type allocator)
+                        const allocator_type& allocator)
     {
         return Json::make_object(rhs, allocator);
     }
@@ -436,12 +409,8 @@ struct json_type_traits<Json, typename Json::array>
     {
         return rhs.is_array();
     }
-    static Json to_json(const typename Json::array& rhs)
-    {
-        return Json::make_array(rhs);
-    }
     static Json to_json(const typename Json::array& rhs, 
-                        allocator_type allocator)
+                        const allocator_type& allocator)
     {
         return Json::make_array(rhs, allocator);
     }
@@ -457,10 +426,6 @@ struct json_type_traits<Json, Json>
         return true;
     }
     static Json as(Json rhs)
-    {
-        return rhs;
-    }
-    static Json to_json(const Json& rhs)
     {
         return rhs;
     }
@@ -484,10 +449,6 @@ struct json_type_traits<Json, jsoncons::null_type>
         JSONCONS_ASSERT(rhs.is_null());
         return jsoncons::null_type();
     }
-    static Json to_json(jsoncons::null_type)
-    {
-        return Json::null();
-    }
     static Json to_json(jsoncons::null_type, allocator_type)
     {
         return Json::null();
@@ -506,10 +467,6 @@ struct json_type_traits<Json, bool>
     static bool as(const Json& rhs)
     {
         return rhs.as_bool();
-    }
-    static Json to_json(bool rhs)
-    {
-        return Json::make_bool(rhs);
     }
     static Json to_json(bool rhs, allocator_type)
     {
@@ -533,10 +490,6 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return rhs.as_bool();
     }
-    static Json to_json(bool rhs)
-    {
-        return Json::make_bool(rhs);
-    }
     static Json to_json(bool rhs, allocator_type)
     {
         return Json::make_bool(rhs);
@@ -555,10 +508,6 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     static bool as(const Json& rhs)
     {
         return rhs.as_bool();
-    }
-    static Json to_json(std::vector<bool>::reference rhs)
-    {
-        return Json::make_bool(rhs);
     }
     static Json to_json(std::vector<bool>::reference rhs, 
                         allocator_type)
@@ -605,11 +554,7 @@ struct json_type_traits<Json, T,
         }
     }
 
-    static Json to_json(const T& rhs)
-    {
-        return Json(std::begin(rhs), std::end(rhs));
-    }
-    static Json to_json(const T& rhs, allocator_type allocator)
+    static Json to_json(const T& rhs, const allocator_type& allocator)
     {
         return Json(std::begin(rhs), std::end(rhs), allocator);
     }
@@ -632,11 +577,7 @@ struct json_type_traits<Json, T,
         return rhs.as_string();
     }
 
-    static Json to_json(const T& rhs)
-    {
-        return Json::make_string(rhs);
-    }
-    static Json to_json(const T& rhs, allocator_type allocator)
+    static Json to_json(const T& rhs, const allocator_type& allocator)
     {
         return Json::make_string(rhs,allocator);
     }
@@ -672,18 +613,7 @@ struct json_type_traits<Json, T,
         return v;
     }
 
-    static Json to_json(const T& rhs)
-    {
-        Json val;
-        val.reserve(rhs.size());
-        for (auto p: rhs)
-        {
-            val.set(p.first, p.second);
-        }
-        return val;
-    }
-
-    static Json to_json(const T& rhs, allocator_type allocator)
+    static Json to_json(const T& rhs, const allocator_type& allocator)
     {
         Json val(allocator);
         val.reserve(rhs.size());
@@ -729,13 +659,8 @@ struct json_type_traits<Json, std::array<E, N>>
         return buff;
     }
 
-    static Json to_json(const std::array<E, N>& value)
-    {
-        return Json(value.begin(), value.end());
-    }
-
     static Json to_json(const std::array<E, N>& value, 
-                        allocator_type allocator)
+                        const allocator_type& allocator)
     {
         return Json(value.begin(), value.end(), allocator);
     }

@@ -13,7 +13,36 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(test_suite_main)
 
-BOOST_AUTO_TEST_CASE(test)
+/*BOOST_AUTO_TEST_CASE(test)
+{
+    json a;
+    a["key1"] = "value1";
+
+    std::cout << "a: " << a << std::endl;
+
+    json b = std::move(a);
+
+    std::cout << "b: " << b << std::endl;
+    std::cout << "a: " << a << std::endl;
+}*/
+BOOST_AUTO_TEST_CASE(test2)
+{
+    json a = "String too long for small string";
+
+    std::cout << "a: " << a << std::endl;
+
+    json b = json::object();
+    b["key2"] = std::move(a);
+
+    std::cout << "b: " << b << std::endl;
+    std::cout << "a: " << a << std::endl;
+}
+BOOST_AUTO_TEST_CASE(test4)
+{
+    std::cout << "Is default " << std::boolalpha << std::is_default_constructible<std::allocator<char>>::value << std::endl;
+}
+/*
+BOOST_AUTO_TEST_CASE(test2)
 {
     json a;
     a["key1"] = "value1";
@@ -31,6 +60,6 @@ BOOST_AUTO_TEST_CASE(test)
 
     BOOST_CHECK(!(a.is_object() || a.is_array() || a.is_string()));
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
 

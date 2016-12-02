@@ -16,6 +16,8 @@ namespace jsoncons
     template <class Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
+        typedef typename Json::allocator_type allocator_type;
+
         static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_string())
@@ -40,14 +42,11 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static Json to_json(boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val, 
+                            const allocator_type& allocator)
         {
-            return Json::make_string(to_iso_extended_string(val));
-        }
-
-        static Json to_json(boost::gregorian::date val, typename Json::allocator_type allocator)
-        {
-            return Json::make_string(to_iso_extended_string(val),allocator);
+            return Json::make_string(to_iso_extended_string(val),
+                                     allocator);
         }
     };
 
