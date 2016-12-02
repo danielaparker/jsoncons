@@ -283,14 +283,20 @@ public:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> byte_allocator_type;
             typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
 
-            struct string_data_impl : public byte_allocator_type
+            struct base_string_data_impl
+            {
+                byte_allocator_type allocator_;
+            };
+
+            struct string_data_impl : protected base_string_data_impl
             {
                 const char_type* c_str() const { return p_; }
                 const char_type* data() const { return p_; }
                 size_t length() const { return length_; }
+
                 byte_allocator_type get_owning_allocator() const
                 {
-                    return *this;
+                    return this->allocator_;
                 }
 
                 bool operator==(const string_data_impl& rhs) const
@@ -299,7 +305,7 @@ public:
                 }
 
                 string_data_impl(const byte_allocator_type& allocator)
-                    : byte_allocator_type(allocator), length_(0), p_(nullptr)
+                    : base_string_data_impl{ allocator }, length_(0), p_(nullptr)
                 {
                 }
 
@@ -1987,9 +1993,70 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse_file(const std::string& s);
+    static basic_json parse_file(string_view_type filename)
+    {
+        parse_error_handler_type err_handler;
+        return parse_file(filename,err_handler);
+    }
 
-    static basic_json parse_file(const std::string& s, basic_parse_error_handler<char_type>& err_handler);
+    static basic_json parse_file(string_view_type filename, 
+                                 basic_parse_error_handler<char_type>& err_handler)
+    {
+        FILE* fp;
+
+    #if !defined(JSONCONS_HAS_FOPEN_S)
+        fp = std::fopen(filename.c_str(), "rb");
+        if (fp == nullptr)
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
+        }
+    #else
+        errno_t err = fopen_s(&fp, filename.c_str(), "rb");
+        if (err != 0) 
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
+        }
+    #endif
+
+        json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
+        try
+        {
+            // obtain file size:
+            std::fseek (fp , 0 , SEEK_END);
+            long size = std::ftell (fp);
+            std::rewind(fp);
+
+            if (size > 0)
+            {
+                std::vector<char_type> buffer(size);
+
+                // copy the file into the buffer:
+                size_t result = std::fread (buffer.data(),1,size,fp);
+                if (result != static_cast<unsigned long long>(size))
+                {
+                    JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
+                }
+
+                basic_json_parser<char_type> parser(handler,err_handler);
+                parser.begin_parse();
+                parser.parse(buffer.data(),0,buffer.size());
+                parser.end_parse();
+                parser.check_done(buffer.data(),parser.index(),buffer.size());
+            }
+
+            std::fclose (fp);
+        }
+        catch (...)
+        {
+            std::fclose (fp);
+            throw;
+        }
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
+        }
+        return handler.get_result();
+    }
 
     static basic_json make_array()
     {
@@ -3763,73 +3830,6 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
     if (!handler.is_valid())
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json stream");
-    }
-    return handler.get_result();
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename)
-{
-    parse_error_handler_type err_handler;
-    return parse_file(filename,err_handler);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename, 
-                                                                                          basic_parse_error_handler<char_type>& err_handler)
-{
-    FILE* fp;
-
-#if !defined(JSONCONS_HAS_FOPEN_S)
-    fp = std::fopen(filename.c_str(), "rb");
-    if (fp == nullptr)
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#else
-    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
-    if (err != 0) 
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#endif
-
-    json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
-    try
-    {
-        // obtain file size:
-        std::fseek (fp , 0 , SEEK_END);
-        long size = std::ftell (fp);
-        std::rewind(fp);
-
-        if (size > 0)
-        {
-            std::vector<char_type> buffer(size);
-
-            // copy the file into the buffer:
-            size_t result = std::fread (buffer.data(),1,size,fp);
-            if (result != static_cast<unsigned long long>(size))
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
-            }
-
-            basic_json_parser<char_type> parser(handler,err_handler);
-            parser.begin_parse();
-            parser.parse(buffer.data(),0,buffer.size());
-            parser.end_parse();
-            parser.check_done(buffer.data(),parser.index(),buffer.size());
-        }
-
-        std::fclose (fp);
-    }
-    catch (...)
-    {
-        std::fclose (fp);
-        throw;
-    }
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
     }
     return handler.get_result();
 }

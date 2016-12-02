@@ -24,7 +24,7 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator type
 `string_type`|Default `string_type` is `std::string`
-`string_view_type`|Wraps a pointer to string data and length
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
 `member_type`|[member_type](member_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
@@ -48,8 +48,8 @@ Throws [parse_exception](parse_exception) if parsing fails.
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
 
-    static json parse_file(const std::string& filename)
-    static json parse_file(const std::string& filename, 
+    static json parse_file(string_view_type filename)
+    static json parse_file(string_view_type filename, 
                            parse_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 Throws [parse_exception](parse_exception) if parsing fails.
