@@ -1,25 +1,6 @@
 master
 ------
 
-The `json_type_traits` function `to_json` takes an additional parameter, an allocator. If you have implemented your own specializations of `json_type_traits`, you will need to add this parameter to your `to_json` function, e.g.
-
-```c++
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, my_type>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        ...   
-        static Json to_json(const my_type& val,
-                            const allocator_type& allocator)
-        ...
-    };
-};
-```
-The rational for this change is to support stateful allocators.
-
 0.99.5
 ------
 

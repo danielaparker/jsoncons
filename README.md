@@ -33,24 +33,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ## What's new on master
 
-The `json_type_traits` function `to_json` takes an additional parameter, an allocator. If you have implemented your own specializations of `json_type_traits`, you will need to add this parameter to your `to_json` function, e.g.
-
-```c++
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, my_type>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        ...   
-        static Json to_json(const my_type& val,
-                            const allocator_type& allocator)
-        ...
-    };
-};
-```
-The rational for this change is to support stateful allocators.
+The change to support stateful allocators has been backed out, `json_type_traits` `to_json` remains as before.
 
 ## Benchmarks
 
@@ -344,54 +327,6 @@ Output:
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
 Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
-
-### Works with stateful allocators
-```c++
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <jsoncons/json.hpp>
-
-using namespace jsoncons;
-
-typedef boost::interprocess::allocator<int,
-        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
-typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
-
-int main()
-{
-    struct shm_remove
-    {
-        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-    } remover;
-
-    //Create a new segment with given name and size
-    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
-            "MySharedMemory", 65536);
-
-    //Initialize shared memory STL-compatible allocator
-    const shmem_allocator allocator(segment.get_segment_manager());
-
-    // Create json value with all dynamic allocations in shared memory
-
-    shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
-
-    o->set("category", "reference");
-    o->set("author", "Nigel Rees");
-    o->set("title", "Sayings of the Century");
-    o->set("price", 8.95);
-
-    std::cout << pretty_print(*o) << std::endl;
-}
-```
-Output:
-```json
-{
-    "author": "Nigel Rees",
-    "category": "reference",
-    "price": 8.95,
-    "title": "Sayings of the Century"
-}
-```
 
 ## Extensions
 

@@ -7,7 +7,6 @@ struct json_type_traits
     typedef typename Json::char_type char_type;
     typedef typename Json::object object;
     typedef typename Json::array array;
-    typedef typename Json::allocator_type allocator_type;
 
     static const bool is_assignable = false;
 
@@ -18,8 +17,7 @@ struct json_type_traits
 
     static T as(const Json& rhs);
 
-    static Json to_json(const T& rhs, 
-                        const allocator_type& allocator);
+    static Json to_json(const T& rhs);
 };
 ```
 
@@ -97,10 +95,9 @@ namespace jsoncons
             return Json::make_string(to_iso_extended_string(val));
         }
 
-        static Json to_json(boost::gregorian::date val, 
-                            typename Json::allocator_type allocator)
+        static Json to_json(boost::gregorian::date val)
         {
-            return Json::make_string(to_iso_extended_string(val),allocator);
+            return Json::make_string(to_iso_extended_string(val));
         }
     };
 }
