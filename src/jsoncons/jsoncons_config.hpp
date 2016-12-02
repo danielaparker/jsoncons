@@ -50,7 +50,7 @@ namespace jsoncons
 #endif
 
 #if defined(_MSC_VER)
-#define JSONCONS_HAS__ECVT_S
+//#define JSONCONS_HAS__ECVT_S
 #define JSONCONS_HAS_FOPEN_S
 #define JSONCONS_HAS_WCSTOMBS_S
 #if _MSC_VER >= 1900

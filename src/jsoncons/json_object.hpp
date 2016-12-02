@@ -431,13 +431,15 @@ public:
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
-    typedef typename std::vector<value_type, allocator_type>::iterator base_iterator;
-    typedef typename std::vector<value_type, allocator_type>::const_iterator const_base_iterator;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
+
+    typedef typename std::vector<value_type, vector_allocator_type>::iterator base_iterator;
+    typedef typename std::vector<value_type, vector_allocator_type>::const_iterator const_base_iterator;
 
     typedef json_object_iterator<base_iterator,base_iterator> iterator;
     typedef json_object_iterator<const_base_iterator,base_iterator> const_iterator;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
 private:
     self_allocator_type self_allocator_;
     std::vector<value_type,vector_allocator_type> members_;
@@ -740,10 +742,12 @@ public:
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
-    typedef typename std::vector<value_type, allocator_type>::iterator iterator;
-    typedef typename std::vector<value_type, allocator_type>::const_iterator const_iterator;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> vector_allocator_type;
+
+    typedef typename std::vector<value_type, vector_allocator_type>::iterator iterator;
+    typedef typename std::vector<value_type, vector_allocator_type>::const_iterator const_iterator;
+
 private:
     self_allocator_type self_allocator_;
     std::vector<value_type,vector_allocator_type> members_;

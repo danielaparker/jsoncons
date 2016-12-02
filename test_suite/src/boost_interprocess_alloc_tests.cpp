@@ -17,7 +17,6 @@
 #include <memory>
 
 using namespace jsoncons;
-using namespace boost::interprocess;
 
 BOOST_AUTO_TEST_SUITE(boost_interprocess_alloc_test_suite)
 
@@ -95,6 +94,36 @@ BOOST_AUTO_TEST_CASE(test_boost_interprocess_allocator)
     //BOOST_CHECK_EQUAL(10.0,root["field1"]);
     //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
     //std::cout << root << std::endl; 
+}
+
+BOOST_AUTO_TEST_CASE(example)
+{
+    struct shm_remove
+    {
+        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+    } remover;
+
+    //Create a new segment with given name and size
+    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
+            "MySharedMemory", 65536);
+
+    //Initialize shared memory STL-compatible allocator
+    const shmem_allocator allocator(segment.get_segment_manager());
+
+    // Create json value with all dynamic allocations in shared memory
+
+    shm_json j = shm_json::array(allocator);
+
+    shm_json o = shm_json::object(allocator);
+    o.set("category", "reference");
+    o.set("author", "Nigel Rees");
+    o.set("title", "Sayings of the Century");
+    o.set("price", 8.95);
+
+    j.add(o);
+
+    std::cout << pretty_print(j) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -31,6 +31,27 @@ The library has a number of features, which are listed below:
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
+## What's new on master
+
+The `json_type_traits` function `to_json` takes an additional parameter, an allocator. If you have implemented your own specializations of `json_type_traits`, you will need to add this parameter to your `to_json` function, e.g.
+
+```c++
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, my_type>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
+        ...   
+        static Json to_json(const my_type& val,
+                            const allocator_type& allocator)
+        ...
+    };
+};
+```
+The rational for this change is to support stateful allocators.
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
@@ -185,6 +206,8 @@ for (const auto& member : book.object_range())
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <jsoncons/json.hpp>
 
+using namespace jsoncons;
+
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
@@ -205,13 +228,30 @@ int main()
     const shmem_allocator allocator(segment.get_segment_manager());
 
     // Create json value with all dynamic allocations in shared memory
-    shm_json o = shm_json::object(allocator);
-    o.set("first", 1);
-    o.set("second", 2);
 
     shm_json j = shm_json::array(allocator);
+
+    shm_json o = shm_json::object(allocator);
+    o.set("category", "reference");
+    o.set("author", "Nigel Rees");
+    o.set("title", "Sayings of the Century");
+    o.set("price", 8.95);
+
     j.add(o);
+
+    std::cout << pretty_print(j) << std::endl;
 }
+```
+Output:
+```json
+[
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
 ```
 
 ### Multi-dimensional json arrays
