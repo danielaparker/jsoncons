@@ -229,29 +229,24 @@ int main()
 
     // Create json value with all dynamic allocations in shared memory
 
-    shm_json j = shm_json::array(allocator);
+    shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
 
-    shm_json o = shm_json::object(allocator);
-    o.set("category", "reference");
-    o.set("author", "Nigel Rees");
-    o.set("title", "Sayings of the Century");
-    o.set("price", 8.95);
+    o->set("category", "reference");
+    o->set("author", "Nigel Rees");
+    o->set("title", "Sayings of the Century");
+    o->set("price", 8.95);
 
-    j.add(o);
-
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << pretty_print(*o) << std::endl;
 }
 ```
 Output:
 ```json
-[
-    {
-        "author": "Nigel Rees",
-        "category": "reference",
-        "price": 8.95,
-        "title": "Sayings of the Century"
-    }
-]
+{
+    "author": "Nigel Rees",
+    "category": "reference",
+    "price": 8.95,
+    "title": "Sayings of the Century"
+}
 ```
 
 ### Multi-dimensional json arrays
