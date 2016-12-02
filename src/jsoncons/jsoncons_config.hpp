@@ -20,12 +20,12 @@
 #include <limits> // std::numeric_limits
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)
-#define JSONCONS_NO_DEPRECATED
+//#define JSONCONS_NO_DEPRECATED
 
 namespace jsoncons
 {
 
-//#define JSONCONS_HAS_STRING_VIEW
+#define JSONCONS_HAS_STRING_VIEW
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #define JSONCONS_HAS_STRTOD_L

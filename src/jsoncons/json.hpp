@@ -1993,13 +1993,13 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse_file(string_view_type filename)
+    static basic_json parse_file(const string_type& filename)
     {
         parse_error_handler_type err_handler;
         return parse_file(filename,err_handler);
     }
 
-    static basic_json parse_file(string_view_type filename, 
+    static basic_json parse_file(const string_type filename, 
                                  basic_parse_error_handler<char_type>& err_handler)
     {
         FILE* fp;
