@@ -33,7 +33,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ## What's new on master
 
-The change to support stateful allocators has been backed out, `json_type_traits` `to_json` remains as before.
+An experimental change to support stateful allocators has been reverted, `json_type_traits` `to_json` remains as before.
 
 ## Benchmarks
 

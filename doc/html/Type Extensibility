@@ -469,7 +469,6 @@ vertical-align:1px;
 </head>
 <body>
 <p>In the <code>json</code> class, constructors, accessors and modifiers are templated, for example,</p>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
 <span class="pl-en">json</span>(<span class="pl-k">const</span> T&amp; val)
 
@@ -486,20 +485,14 @@ template &lt;class T&gt;
 void add(T&amp;&amp; val)
 
 template &lt;class T&gt;
-void set(<span class="pl-k">const</span> string_type&amp; name, T&amp;&amp; val)</pre></div>
-
+void set(<span class="pl-k">const</span> key_type&amp; name, T&amp;&amp; val)</pre></div>
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Enable</span>=<span class="pl-k">void</span>&gt;
 <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>;</pre></div>
-
 <p>If you want to use the json constructor, <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, <code>operator=</code>, <code>add</code>, and <code>set</code> to access or modify with a new type, you need to show <code>json</code> how to interact with that type, by extending <code>json_type_traits</code> in the <code>jsoncons</code> namespace.</p>
-
 <h3>Example 1. Convert to/from user defined type</h3>
-
 <p>You can provide a specialization of <code>json_type_traits</code> for a <code>book</code> class, and then transfer book objects or<br>
 standard library collections of book objects to and from <code>json</code> values.</p>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
 {
     std::string author;
@@ -574,9 +567,7 @@ standard library collections of book objects to and from <code>json</code> value
                   &lt;&lt; b.<span class="pl-smi">price</span> &lt;&lt; std::endl;
     }
 }</pre></div>
-
 <p>Output:</p>
-
 <pre><code>(1) true
 
 (2) {
@@ -607,10 +598,7 @@ standard library collections of book objects to and from <code>json</code> value
 Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 </code></pre>
-
-<h3>Example 2. Convert to/from <code>boost::gregorian::date</code>
-</h3>
-
+<h3>Example 2. Convert to/from <code>boost::gregorian::date</code></h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
 
@@ -645,13 +633,12 @@ Charles Bukowski, Women: A Novel, 12
             <span class="pl-k">return</span> <span class="pl-c1">boost::gregorian::from_simple_string</span>(s);
         }
 
-        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">assign</span>(Json&amp; lhs, boost::gregorian::date val)
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val)
         {
-            lhs.<span class="pl-c1">assign_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
         }
     };
 }</pre></div>
-
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> jsoncons::json;
     <span class="pl-k">using</span> boost::gregorian::date;
 
@@ -677,9 +664,7 @@ Charles Bukowski, Women: A Novel, 12
     }
     std::cout &lt;&lt; std::endl;
 }</pre></div>
-
 <p>Output:</p>
-
 <pre><code>Maturity: 2014-Oct-14
 
 Observation dates:
@@ -688,10 +673,7 @@ Observation dates:
 2014-Feb-21
 2014-Feb-28
 </code></pre>
-
-<h3>Example 3. Convert to/from <code>boost::numeric::ublas::matrix&lt;T&gt;</code>
-</h3>
-
+<h3>Example 3. Convert to/from <code>boost::numeric::ublas::matrix&lt;T&gt;</code></h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -770,7 +752,6 @@ Observation dates:
         }
     };
 }</pre></div>
-
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> jsoncons::json;
     <span class="pl-k">using</span> boost::gregorian::date;
 
@@ -807,9 +788,7 @@ Observation dates:
     }
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
 }</pre></div>
-
 <p>Output:</p>
-
 <pre><code>(1) true
 
 (2) false

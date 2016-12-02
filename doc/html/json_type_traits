@@ -486,21 +486,16 @@ vertical-align:1px;
 
     <span class="pl-k">static</span> T <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs);
 
-    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs);
-
-    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(T rhs, <span class="pl-k">typename</span> Json::allocator_type allocator);
+    <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> T&amp; rhs);
 };</pre></div>
-
 <h2>Specializations</h2>
-
 <table>
 <thead>
 <tr>
 <th><code>T</code></th>
 <th><code>is&lt;T&gt;</code></th>
 <th><code>as&lt;T&gt;</code></th>
-<th>Assignable from <code>T</code>
-</th>
+<th>Assignable from <code>T</code></th>
 </tr>
 </thead>
 <tbody>
@@ -512,213 +507,145 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>object</code></td>
-<td>
-<code>true</code> if object, otherwise <code>false</code>
-</td>
+<td><code>true</code> if object, otherwise <code>false</code></td>
 <td>Compile-time error</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>array</code></td>
-<td>
-<code>true</code> if array, otherwise <code>false</code>
-</td>
+<td><code>true</code> if array, otherwise <code>false</code></td>
 <td>Compile-time error</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>bool</code></td>
-<td>
-<code>true</code> if boolean, otherwise <code>false</code>
-</td>
-<td>as <code>bool</code>
-</td>
+<td><code>true</code> if boolean, otherwise <code>false</code></td>
+<td>as <code>bool</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>null_type</code></td>
-<td>
-<code>true</code> if null, otherwise <code>false</code>
-</td>
+<td><code>true</code> if null, otherwise <code>false</code></td>
 <td>null value if null, otherwise throws</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>const char_type*</code></td>
-<td>
-<code>true</code> if string, otherwise <code>false</code>
-</td>
-<td>as <code>const char_type*</code>
-</td>
+<td><code>true</code> if string, otherwise <code>false</code></td>
+<td>as <code>const char_type*</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>char_type*</code></td>
-<td>
-<code>true</code> if string, otherwise <code>false</code>
-</td>
+<td><code>true</code> if string, otherwise <code>false</code></td>
 <td>Compile-time error</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>char</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>char</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>char</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>unsigned char</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>unsigned char</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>unsigned char</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>signed char</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>signed char</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>signed char</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>wchar_t</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>wchar_t</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>wchar_t</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>short</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>short</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>short</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>unsigned short</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>unsigned short</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>unsigned short</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>int</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>int</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>int</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>unsigned int</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>unsigned int</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>unsigned int</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>long</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>long</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>long</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>unsigned long</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>unsigned long</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>unsigned long</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
-<td><code>long  long</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>long  long</code>
-</td>
+<td><code>long long</code></td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>long long</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
-<td><code>unsigned long  long</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>unsigned long  long</code>
-</td>
+<td><code>unsigned long long</code></td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>unsigned long long</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>float</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>float</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>float</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>double</code></td>
-<td>
-<code>true</code> if integer and value in range, otherwise <code>false</code>
-</td>
-<td>integer cast to <code>double</code>
-</td>
+<td><code>true</code> if integer and value in range, otherwise <code>false</code></td>
+<td>integer cast to <code>double</code></td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td><code>string</code></td>
-<td>
-<code>true</code> if string, otherwise <code>false</code>
-</td>
+<td><code>true</code> if string, otherwise <code>false</code></td>
 <td>as string</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td>STL sequence container (other than string) e.g. std::vector</td>
-<td>
-<code>true</code> if array and each value is assignable to a <code>Json</code> value, otherwise <code>false</code>
-</td>
+<td><code>true</code> if array and each value is assignable to a <code>Json</code> value, otherwise <code>false</code></td>
 <td>if array and each value is convertible to <code>value_type</code>, as container, otherwise throws</td>
 <td><em>✓</em></td>
 </tr>
 <tr>
 <td>STL associative container e.g. std::map</td>
-<td>
-<code>true</code> if object and each <code>mapped_type</code> is assignable to <code>Json</code>, otherwise <code>false</code>
-</td>
+<td><code>true</code> if object and each <code>mapped_type</code> is assignable to <code>Json</code>, otherwise <code>false</code></td>
 <td>if object and each member value is convertible to <code>mapped_type</code>, as container</td>
 <td><em>✓</em></td>
-</tr>
-</tbody>
-</table>
-
+</tr></tbody></table>
 <h2>Extensibility</h2>
-
 <p>You can interact with a new type using <code>is&lt;T&gt;</code>, <code>as&lt;T&gt;</code>, construction and assignment by extending <code>json_type_traits</code> in the <code>jsoncons</code> namespace.</p>
-
 <p>For example, you can access and modify <code>json</code> values with <code>boost::gregorian</code> dates.</p>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>boost/date_time/gregorian/gregorian.hpp<span class="pl-pds">"</span></span>
 
@@ -758,14 +685,12 @@ vertical-align:1px;
             <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
         }
 
-        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val, 
-                            <span class="pl-k">typename</span> Json::allocator_type allocator)
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(boost::gregorian::date val)
         {
-            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val),allocator);
+            <span class="pl-k">return</span> <span class="pl-c1">Json::make_string</span>(<span class="pl-c1">to_iso_extended_string</span>(val));
         }
     };
 }</pre></div>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">namespace</span> <span class="pl-en">my_ns</span>
 {
     <span class="pl-k">using</span> jsoncons::json;
@@ -791,9 +716,7 @@ vertical-align:1px;
     }
     std::cout &lt;&lt; std::endl;
 }</pre></div>
-
 <p>Output:</p>
-
 <pre><code>Maturity: 2014-Oct-14
 
 Observation dates:

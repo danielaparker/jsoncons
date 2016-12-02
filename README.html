@@ -497,21 +497,7 @@ vertical-align:1px;
 </ul>
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
 <h2>What's new on master</h2>
-<p>The <code>json_type_traits</code> function <code>to_json</code> takes an additional parameter, an allocator. If you have implemented your own specializations of <code>json_type_traits</code>, you will need to add this parameter to your <code>to_json</code> function, e.g.</p>
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
-{
-    <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, my_type&gt;
-    {
-        <span class="pl-k">typedef</span> <span class="pl-k">typename</span> Json::allocator_type allocator_type;
-
-        ...   
-        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> my_type&amp; val,
-                            <span class="pl-k">const</span> allocator_type&amp; allocator)
-        ...
-    };
-};</pre></div>
-<p>The rational for this change is to support stateful allocators.</p>
+<p>An experimental change to support stateful allocators has been reverted, <code>json_type_traits</code> <code>to_json</code> remains as before.</p>
 <h2>Benchmarks</h2>
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.<br>
 Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and <a href="http://www.json.org/JSON_checker/">JSON_checker</a> tests may be found <a href="https://danielaparker.github.io/json_benchmarks/">here</a>.</p>
@@ -750,49 +736,6 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
 <p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
-<h3>Works with stateful allocators</h3>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/managed_shared_memory.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-
-<span class="pl-k">typedef</span> boost::interprocess::allocator&lt;<span class="pl-k">int</span>,
-        boost::interprocess::managed_shared_memory::segment_manager&gt; shmem_allocator;
-<span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
-
-<span class="pl-k">int</span> <span class="pl-en">main</span>()
-{
-    <span class="pl-k">struct</span> <span class="pl-en">shm_remove</span>
-    {
-        <span class="pl-en">shm_remove</span>() { <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
-        <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
-    } remover;
-
-    <span class="pl-c">//Create a new segment with given name and size</span>
-    boost::interprocess::managed_shared_memory <span class="pl-smi">segment</span>(boost::interprocess::create_only,
-            <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
-
-    <span class="pl-c">//Initialize shared memory STL-compatible allocator</span>
-    <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
-
-    <span class="pl-c">// Create json value with all dynamic allocations in shared memory</span>
-
-    shm_json* o = segment.<span class="pl-smi">construct</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>shm_json<span class="pl-pds">"</span></span>)(allocator);
-
-    o-&gt;<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>);
-    o-&gt;<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>);
-    o-&gt;<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>);
-    o-&gt;<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">8.95</span>);
-
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*o) &lt;&lt; std::endl;
-}</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
-    <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
-    <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
-}</pre></div>
 <h2>Extensions</h2>
 <h3>jsonpath</h3>
 <p>Example file (store.json):</p>

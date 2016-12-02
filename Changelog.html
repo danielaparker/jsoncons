@@ -469,19 +469,6 @@ vertical-align:1px;
 </head>
 <body>
 <h2>master</h2>
-<p>The <code>json_type_traits</code> function <code>to_json</code> takes an additional parameter, an allocator. If you have implemented your own specializations of <code>json_type_traits</code>, you will need to add this parameter to your <code>to_json</code> function, e.g.</p>
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
-{
-    <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, my_type&gt;
-    {
-        ...   
-        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> my_type&amp; val,
-                            <span class="pl-k">const</span> allocator_type&amp; allocator)
-        ...
-    };
-};</pre></div>
-<p>The rational for this change is to support stateful allocators.</p>
 <h2>0.99.5</h2>
 <ul>
 <li>Validations added to utf8 and utf16 string parsing to pass all <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> tests</li>

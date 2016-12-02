@@ -179,9 +179,9 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static void assign(Json& lhs, boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val)
         {
-            lhs.assign_string(to_iso_extended_string(val));
+            return Json::make_string(to_iso_extended_string(val));
         }
     };
 }
