@@ -953,7 +953,7 @@ public:
     template <class T>
     iterator set(iterator hint, string_view_type name, T&& value)
     {
-        typename std::vector<value_type,allocator_type>::iterator it = hint;
+        iterator it = hint;
 
         if (it == members_.end())
         {
@@ -977,7 +977,7 @@ public:
     template <class T>
     iterator set_(iterator hint, key_type&& name, T&& value)
     {
-        typename std::vector<value_type,allocator_type>::iterator it = hint;
+        iterator it = hint;
 
         if (it == members_.end())
         {
