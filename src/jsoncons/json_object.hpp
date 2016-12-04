@@ -442,25 +442,26 @@ public:
 
 private:
     self_allocator_type self_allocator_;
+    bool alloc_state_flag_;
     std::vector<value_type,vector_allocator_type> members_;
 public:
     json_object()
-        : self_allocator_(), members_()
+        : self_allocator_(), alloc_state_flag_(false), members_()
     {
     }
     json_object(const allocator_type& allocator)
-        : self_allocator_(allocator), 
+        : self_allocator_(allocator), alloc_state_flag_(true), 
           members_(vector_allocator_type(allocator))
     {
     }
 
     json_object(const json_object& val)
-        : self_allocator_(val.get_owning_allocator()), members_(val.members_)
+        : self_allocator_(val.get_owning_allocator()), alloc_state_flag_(val.alloc_state_flag_), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : self_allocator_(val.get_owning_allocator()), 
+        : self_allocator_(val.get_owning_allocator()), alloc_state_flag_(val.alloc_state_flag_), 
           members_(std::move(val.members_))
     {
     }
@@ -472,13 +473,13 @@ public:
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        self_allocator_(allocator), members_(std::move(val.members_),vector_allocator_type(allocator))
+        self_allocator_(allocator), alloc_state_flag_(true), members_(std::move(val.members_),vector_allocator_type(allocator))
     {
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const Allocator& allocator = Allocator())
-        : self_allocator_(allocator),
+        : self_allocator_(allocator), alloc_state_flag_(false),
           members_(vector_allocator_type(allocator))
     {
         for (const auto& element : init)
