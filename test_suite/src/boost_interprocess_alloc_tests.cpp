@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE(example)
 
      shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
 
-    //o->set("category", "reference");
-    //o->set("author", "Nigel Rees");
-    //o->set("title", "Sayings of the Century");
+    o->set("category", "reference");
+    o->set("author", "Nigel Rees");
+    o->set("title", "Sayings of the Century");
     o->set("price", 8.95);
 
     std::cout << pretty_print(*o) << std::endl;

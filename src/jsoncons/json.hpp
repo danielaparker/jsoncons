@@ -617,6 +617,45 @@ public:
             }
         }
 
+        variant(const variant& val, const Allocator& allocator)
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+                new(reinterpret_cast<void*>(&data_))null_data();
+                break;
+            case value_types::empty_object_t:
+                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                break;
+            case value_types::double_t:
+                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                break;
+            case value_types::integer_t:
+                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                break;
+            case value_types::uinteger_t:
+                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_types::bool_t:
+                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                break;
+            case value_types::small_string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(val.small_string_data_cast()->data(), val.small_string_data_cast()->length(),allocator);
+                break;
+            case value_types::string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),allocator);
+                break;
+            case value_types::object_t:
+                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),allocator);
+                break;
+            case value_types::array_t:
+                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),allocator);
+                break;
+            default:
+                break;
+            }
+        }
+
         variant(variant&& val) JSONCONS_NOEXCEPT
         {
             switch (val.type_id())
@@ -734,7 +773,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator(alloc));
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
             }
         }
         variant(const object& val)
@@ -2050,7 +2089,7 @@ public:
     }
 
     basic_json(const json_type& val, const Allocator& allocator)
-        : var_(val.var_ /*,allocator*/ )
+        : var_(val.var_,allocator)
     {
     }
 
@@ -2125,7 +2164,7 @@ public:
     }
 
     basic_json(const char_type* s, const Allocator& allocator)
-        : var_(s /*,allocator*/)
+        : var_(s,allocator)
     {
     }
 
@@ -3181,6 +3220,11 @@ public:
         return json_type(variant(rhs,length));
     }
 
+    static json_type make_string(string_view_type s, allocator_type allocator)
+    {
+        return json_type(variant(s.data(),s.length(),allocator));
+    }
+
     static json_type make_integer(int64_t val)
     {
         return json_type(variant(val));
@@ -3204,6 +3248,11 @@ public:
     static json_type make_object(const object& o)
     {
         return json_type(variant(o));
+    }
+
+    static json_type make_object(const object& o, allocator_type allocator)
+    {
+        return json_type(variant(o,allocator));
     }
 
     static basic_json make_2d_array(size_t m, size_t n);

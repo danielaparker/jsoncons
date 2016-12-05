@@ -256,6 +256,7 @@ template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::const_pointer_type>
 {
     typedef typename Json::char_type char_type;
+    typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -270,12 +271,19 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
         size_t length = std::char_traits<char_type>::length(rhs);
         return Json::make_string(rhs,length);
     }
+    static Json to_json(const char_type* rhs, 
+                        const allocator_type& allocator)
+    {
+        size_t length = std::char_traits<char_type>::length(rhs);
+        return Json::make_string(rhs,length,allocator);
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::pointer_type>
 {
     typedef typename Json::char_type char_type;
+    typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -285,6 +293,12 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     {
         size_t length = std::char_traits<char_type>::length(rhs);
         return Json::make_string(rhs,length);
+    }
+    static Json to_json(const char_type *rhs, 
+                        const allocator_type& allocator)
+    {
+        size_t length = std::char_traits<char_type>::length(rhs);
+        return Json::make_string(rhs,length,allocator);
     }
 };
 
@@ -297,6 +311,8 @@ struct json_type_traits<Json, T,
                         !std::is_same<T,bool>::value
 >::type>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -320,6 +336,10 @@ struct json_type_traits<Json, T,
     {
         return Json::make_integer(rhs);
     }
+    static Json to_json(T rhs, allocator_type)
+    {
+        return Json::make_integer(rhs);
+    }
 };
 
 template<class Json, class T>
@@ -329,6 +349,8 @@ struct json_type_traits<Json, T,
                         !std::is_same<T,bool>::value
 >::type >
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         if (rhs.is_integer())
@@ -353,6 +375,11 @@ struct json_type_traits<Json, T,
     {
         return Json::make_uinteger(val);
     }
+
+    static Json to_json(T val, allocator_type)
+    {
+        return Json::make_uinteger(val);
+    }
 };
 
 template<class Json,class T>
@@ -360,6 +387,8 @@ struct json_type_traits<Json, T,
                         typename std::enable_if<std::is_floating_point<T>::value
 >::type>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_double();
@@ -372,11 +401,18 @@ struct json_type_traits<Json, T,
     {
         return Json::make_double(val);
     }
+    static Json to_json(T val, 
+                        const allocator_type& allocator)
+    {
+        return Json::make_double(val);
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, typename Json::object>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_object();
@@ -385,11 +421,18 @@ struct json_type_traits<Json, typename Json::object>
     {
         return Json::make_object(rhs);
     }
+    static Json to_json(const typename Json::object& rhs, 
+                        const allocator_type& allocator)
+    {
+        return Json::make_object(rhs, allocator);
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, typename Json::array>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_array();
@@ -398,11 +441,18 @@ struct json_type_traits<Json, typename Json::array>
     {
         return Json::make_array(rhs);
     }
+    static Json to_json(const typename Json::array& rhs, 
+                        const allocator_type& allocator)
+    {
+        return Json::make_array(rhs, allocator);
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, Json>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json&) JSONCONS_NOEXCEPT
     {
         return true;
@@ -415,11 +465,17 @@ struct json_type_traits<Json, Json>
     {
         return rhs;
     }
+    static Json to_json(const Json& rhs, allocator_type)
+    {
+        return rhs;
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, jsoncons::null_type>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_null();
@@ -433,11 +489,17 @@ struct json_type_traits<Json, jsoncons::null_type>
     {
         return Json::null();
     }
+    static Json to_json(jsoncons::null_type, allocator_type)
+    {
+        return Json::null();
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, bool>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -447,6 +509,10 @@ struct json_type_traits<Json, bool>
         return rhs.as_bool();
     }
     static Json to_json(bool rhs)
+    {
+        return Json::make_bool(rhs);
+    }
+    static Json to_json(bool rhs, allocator_type)
     {
         return Json::make_bool(rhs);
     }
@@ -458,6 +524,8 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
                      std::vector<bool>::const_reference,
                      void>::type>::value>::type>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -470,11 +538,17 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return Json::make_bool(rhs);
     }
+    static Json to_json(bool rhs, allocator_type)
+    {
+        return Json::make_bool(rhs);
+    }
 };
 
 template<class Json>
 struct json_type_traits<Json, std::vector<bool>::reference>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
         return rhs.is_bool();
@@ -487,6 +561,11 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     {
         return Json::make_bool(rhs);
     }
+    static Json to_json(std::vector<bool>::reference rhs, 
+                        allocator_type)
+    {
+        return Json::make_bool(rhs);
+    }
 };
 
 template<class Json, typename T>
@@ -494,6 +573,7 @@ struct json_type_traits<Json, T,
                         typename std::enable_if<is_compatible_array_type<Json,T>::value && !is_std_array<T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
+    typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -530,6 +610,11 @@ struct json_type_traits<Json, T,
     {
         return Json(std::begin(rhs), std::end(rhs));
     }
+
+    static Json to_json(const T& rhs, const allocator_type& allocator)
+    {
+        return Json(std::begin(rhs), std::end(rhs), allocator);
+    }
 };
 
 template<class Json, typename T>
@@ -537,6 +622,7 @@ struct json_type_traits<Json, T,
                         typename std::enable_if<is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
+    typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -552,6 +638,11 @@ struct json_type_traits<Json, T,
     {
         return Json::make_string(rhs);
     }
+
+    static Json to_json(const T& rhs, const allocator_type& allocator)
+    {
+        return Json::make_string(rhs,allocator);
+    }
 };
 
 template<class Json, typename T>
@@ -562,6 +653,7 @@ struct json_type_traits<Json, T,
     typedef typename T::key_type key_type;
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
+    typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
     {
@@ -593,11 +685,24 @@ struct json_type_traits<Json, T,
         }
         return val;
     }
+
+    static Json to_json(const T& rhs, const allocator_type& allocator)
+    {
+        Json val(allocator);
+        val.reserve(rhs.size());
+        for (auto p: rhs)
+        {
+            val.set(p.first, p.second);
+        }
+        return val;
+    }
 };
 
 template<class Json, class E, size_t N>
 struct json_type_traits<Json, std::array<E, N>>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     typedef E element_type;
 
     static bool is(const Json& rhs) JSONCONS_NOEXCEPT
@@ -631,6 +736,12 @@ struct json_type_traits<Json, std::array<E, N>>
     static Json to_json(const std::array<E, N>& value)
     {
         return Json(value.begin(), value.end());
+    }
+
+    static Json to_json(const std::array<E, N>& value, 
+                        const allocator_type& allocator)
+    {
+        return Json(value.begin(), value.end(), allocator);
     }
 };
 
