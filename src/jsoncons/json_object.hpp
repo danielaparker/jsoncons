@@ -520,7 +520,6 @@ public:
 
     iterator begin()
     {
-        //return members_.begin();
         return iterator(members_.begin());
     }
 
