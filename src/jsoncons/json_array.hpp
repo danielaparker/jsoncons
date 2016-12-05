@@ -164,6 +164,14 @@ public:
         elements_.emplace_back(Json(std::forward<T&&>(value)));
     }
 
+    template <class T, class U=Allocator,
+             typename std::enable_if<!is_stateless<U>::value
+                >::type* = nullptr>
+    void add(T&& value)
+    {
+        elements_.emplace_back(std::forward<T&&>(value),get_owning_allocator());
+    }
+
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
     template <class T, class U=Allocator>

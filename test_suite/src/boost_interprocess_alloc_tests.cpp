@@ -41,14 +41,18 @@ BOOST_AUTO_TEST_CASE(example)
 
     // Create json value with all dynamic allocations in shared memory
 
-     shm_json* o = segment.construct<shm_json>("shm_json")(allocator);
+    shm_json::array a(allocator);
+    shm_json* j = segment.construct<shm_json>("shm_json")(a,allocator);
 
-    o->set("category", "reference");
-    o->set("author", "Nigel Rees");
-    o->set("title", "Sayings of the Century");
-    o->set("price", 8.95);
+    shm_json o(allocator);
+    o.set("category", "reference");
+    o.set("author", "Nigel Rees");
+    o.set("title", "Sayings of the Century");
+    o.set("price", 8.95);
 
-    std::cout << pretty_print(*o) << std::endl;
+    j->add(o);
+
+    std::cout << pretty_print(*j) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

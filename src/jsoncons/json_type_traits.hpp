@@ -401,8 +401,7 @@ struct json_type_traits<Json, T,
     {
         return Json::make_double(val);
     }
-    static Json to_json(T val, 
-                        const allocator_type& allocator)
+    static Json to_json(T val, const allocator_type&)
     {
         return Json::make_double(val);
     }

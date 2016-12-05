@@ -456,12 +456,12 @@ public:
     }
 
     json_object(const json_object& val)
-        : owning_allocator_(), members_(val.members_)
+        : owning_allocator_(val.get_owning_allocator()), members_(val.members_)
     {
     }
 
     json_object(json_object&& val)
-        : owning_allocator_(), 
+        : owning_allocator_(val.get_owning_allocator()), 
           members_(std::move(val.members_))
     {
     }
