@@ -806,7 +806,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init)
-        : owning_allocator_(allocator)
+        : owning_allocator_()
     {
         for (const auto& element : init)
         {
@@ -823,7 +823,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
-                const Allocator& allocator = Allocator())
+                const Allocator& allocator)
         : owning_allocator_(allocator),
           members_(member_allocator_type(allocator))
     {
