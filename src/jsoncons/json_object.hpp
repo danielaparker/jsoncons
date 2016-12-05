@@ -642,6 +642,29 @@ public:
     }
 
     template <class T, class U=Allocator,
+        typename std::enable_if<!is_stateless<U>::value
+           >::type* = nullptr>
+    void set(string_view_type name, T&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
+        if (it == members_.end())
+        {
+            members_.emplace_back(key_type(name.data(),name.length(), get_owning_allocator()),
+                                  std::forward<T&&>(value,get_owning_allocator()));
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value,get_owning_allocator())));
+        }
+        else
+        {
+            members_.emplace(it,
+                             key_type(name.data(),name.length(), get_owning_allocator()),
+                             std::forward<T&&>(value,get_owning_allocator()));
+        }
+    }
+
+    template <class T, class U=Allocator,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
     void set_(key_type&& name, T&& value)
@@ -661,6 +684,29 @@ public:
             members_.emplace(it,
                              std::forward<key_type&&>(name),
                              std::forward<T&&>(value));
+        }
+    }
+
+    template <class T, class U=Allocator,
+        typename std::enable_if<!is_stateless<U>::value
+           >::type* = nullptr>
+    void set_(key_type&& name, T&& value)
+    {
+        auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value, get_owning_allocator()));
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value, get_owning_allocator())));
+        }
+        else
+        {
+            members_.emplace(it,
+                             std::forward<key_type&&>(name),
+                             std::forward<T&&>(value, get_owning_allocator()));
         }
     }
 
@@ -698,6 +744,39 @@ public:
     }
 
     template <class T, class U=Allocator>
+        typename std::enable_if<!is_stateless<U>::value,iterator>::type 
+    set(iterator hint, string_view_type name, T&& value)
+    {
+        base_iterator it;
+        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        {
+            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(key_type(name.data(),name.length(), get_owning_allocator()), 
+                                  std::forward<T&&>(value, get_owning_allocator()));
+            it = members_.begin() + (members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value, get_owning_allocator())));
+        }
+        else
+        {
+            it = members_.emplace(it,
+                                  key_type(name.data(),name.length(), get_owning_allocator()),
+                                  std::forward<T&&>(value, get_owning_allocator()));
+        }
+        return iterator(it);
+    }
+
+    template <class T, class U=Allocator>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set_(iterator hint, key_type&& name, T&& value)
     {
@@ -726,6 +805,39 @@ public:
             it = members_.emplace(it,
                                   std::forward<key_type&&>(name),
                                   std::forward<T&&>(value));
+        }
+        return iterator(it);
+    }
+
+    template <class T, class U=Allocator>
+        typename std::enable_if<!is_stateless<U>::value,iterator>::type 
+    set_(iterator hint, key_type&& name, T&& value)
+    {
+        base_iterator it;
+        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        {
+            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+        else
+        {
+            it = std::lower_bound(members_.begin(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+        }
+
+        if (it == members_.end())
+        {
+            members_.emplace_back(std::forward<key_type&&>(name), 
+                                  std::forward<T&&>(value, get_owning_allocator()));
+            it = members_.begin() + (members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<T&&>(value, get_owning_allocator())));
+        }
+        else
+        {
+            it = members_.emplace(it,
+                                  std::forward<key_type&&>(name),
+                                  std::forward<T&&>(value, get_owning_allocator()));
         }
         return iterator(it);
     }

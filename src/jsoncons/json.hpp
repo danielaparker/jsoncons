@@ -2103,6 +2103,12 @@ public:
     {
     }
 
+    template <class T>
+    basic_json(const T& val, const Allocator& allocator)
+        : var_(json_type_traits<json_type,T>::to_json(val,allocator).var_)
+    {
+    }
+
     basic_json(const char_type* s)
         : var_(s)
     {
