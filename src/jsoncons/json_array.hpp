@@ -19,6 +19,7 @@
 #include <utility>
 #include <initializer_list>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
@@ -149,35 +150,27 @@ public:
 
     const Json& operator[](size_t i) const {return elements_[i];}
 
-    template <class T>
+    template <class T, class U=Allocator,
+             typename std::enable_if<is_stateless<U>::value
+                >::type* = nullptr>
     void add(T&& value)
     {
         elements_.emplace_back(Json(std::forward<T&&>(value)));
     }
 
-    void add(size_t index, const Json& value)
-    {
-        auto position = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(position, value);
-    }
-
-    void add(size_t index, Json&& value)
-    {
-        auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(it, std::forward<Json&&>(value));
-    }
-
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
-    template <class T>
-    iterator add(const_iterator pos, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, Json(std::forward<T&&>(value)));
     }
 #else
-    template <class T>
-    iterator add(const_iterator pos, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
     {
         return elements_.emplace(pos, Json(std::forward<T&&>(value)));
     }

@@ -19,6 +19,7 @@
 #include <cstdarg>
 #include <locale>
 #include <limits> 
+#include <type_traits>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/osequencestream.hpp>
 #include <algorithm>
@@ -28,12 +29,12 @@ namespace jsoncons
 {
 template <typename T>
 struct is_stateless
- : public integral_constant<bool,  
-      (std::has_trivial_constructor<T>::value
-      && std::has_trivial_copy<T>::value
-      && std::has_trivial_destructor<T>::value
-      && std::is_class<T>::value
-      && std::is_empty<T>::value)>
+ : public std::integral_constant<bool,  
+      (//std::is_trivially_constructible<T>::value
+      //&& std::is_trivially_copy_constructible<T>::value
+      //&& std::is_trivially_destructible<T>::value && 
+      std::is_default_constructible<T>::value &&
+      std::is_empty<T>::value)>
 {};
 
 template<class Pointer> inline

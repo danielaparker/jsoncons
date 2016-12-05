@@ -1467,7 +1467,8 @@ public:
         }
 
         template<class T>
-        typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator& allocator) const
+        typename std::enable_if<std::is_same<string_type,T>::value>::type 
+            as(const char_allocator& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }

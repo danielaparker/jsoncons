@@ -19,6 +19,7 @@
 #include <utility>
 #include <initializer_list>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
@@ -618,7 +619,9 @@ public:
         members_.erase(members_.begin(),it.base());
     }
 
-    template <class T>
+    template <class T, class U=Allocator,
+        typename std::enable_if<is_stateless<U>::value
+           >::type* = nullptr>
     void set(string_view_type name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
@@ -639,7 +642,9 @@ public:
         }
     }
 
-    template <class T>
+    template <class T, class U=Allocator,
+        typename std::enable_if<is_stateless<U>::value
+           >::type* = nullptr>
     void set_(key_type&& name, T&& value)
     {
         auto it = std::lower_bound(members_.begin(),members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
@@ -660,8 +665,9 @@ public:
         }
     }
 
-    template <class T>
-    iterator set(iterator hint, string_view_type name, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    set(iterator hint, string_view_type name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->key() <= name)
@@ -692,8 +698,9 @@ public:
         return iterator(it);
     }
 
-    template <class T>
-    iterator set_(iterator hint, key_type&& name, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    set_(iterator hint, key_type&& name, T&& value)
     {
         base_iterator it;
         if (hint.get() != members_.end() && hint.get()->key() <= name)
@@ -949,7 +956,9 @@ public:
         members_.erase(it,members_.end());
     }
 
-    template <class T>
+    template <class T, class U=Allocator,
+        typename std::enable_if<is_stateless<U>::value
+           >::type* = nullptr>
     void set(string_view_type name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
@@ -966,7 +975,9 @@ public:
         }
     }
 
-    template <class T>
+    template <class T, class U=Allocator,
+        typename std::enable_if<is_stateless<U>::value
+           >::type* = nullptr>
     void set_(key_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
@@ -983,8 +994,9 @@ public:
         }
     }
 
-    template <class T>
-    iterator set(iterator hint, string_view_type name, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    set(iterator hint, string_view_type name, T&& value)
     {
         iterator it = hint;
 
@@ -1007,8 +1019,9 @@ public:
         return it;
     }
 
-    template <class T>
-    iterator set_(iterator hint, key_type&& name, T&& value)
+    template <class T, class U=Allocator>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    set_(iterator hint, key_type&& name, T&& value)
     {
         iterator it = hint;
 
