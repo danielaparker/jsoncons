@@ -26,6 +26,15 @@
 
 namespace jsoncons
 {
+template <typename T>
+struct is_stateless
+ : public integral_constant<bool,  
+      (std::has_trivial_constructor<T>::value
+      && std::has_trivial_copy<T>::value
+      && std::has_trivial_destructor<T>::value
+      && std::is_class<T>::value
+      && std::is_empty<T>::value)>
+{};
 
 template<class Pointer> inline
 typename std::pointer_traits<Pointer>::element_type* to_plain_pointer(Pointer ptr)
