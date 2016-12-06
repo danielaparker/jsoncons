@@ -241,15 +241,7 @@ public:
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
-/*
-    template <class T>
-    key_value_pair(const key_type& name, 
-                   T&& val, 
-                   const allocator_type& allocator)
-        : key_(name), value_(std::forward<T&&>(val), allocator)
-    {
-    }
-*/
+
     template <class T>
     key_value_pair(key_type&& name, 
                    T&& val, 
@@ -325,126 +317,33 @@ private:
     ValueT value_;
 };
 
-template <class IteratorT,class NonConstIteratorT>
-class json_object_iterator
-{
-public:
-    typedef IteratorT iterator;
-    typedef typename std::iterator_traits<IteratorT>::value_type value_type;
-    typedef typename std::iterator_traits<IteratorT>::difference_type difference_type;
-    typedef typename std::iterator_traits<IteratorT>::pointer pointer;
-    typedef typename std::iterator_traits<IteratorT>::reference reference;
-    typedef std::bidirectional_iterator_tag iterator_category;
-
-    json_object_iterator()
-    {
-    }
-
-    json_object_iterator(iterator it)
-        : it_(it)
-    {
-    }
-
-    json_object_iterator(const json_object_iterator<NonConstIteratorT,NonConstIteratorT>& it)
-        : it_(it.it_)
-    {
-    }
-
-    json_object_iterator& operator=(json_object_iterator rhs)
-    {
-        swap(*this,rhs);
-        return *this;
-    }
-
-    json_object_iterator& operator++()
-    {
-        ++it_;
-        return *this;
-    }
-
-    json_object_iterator operator++(int) // postfix increment
-    {
-        json_object_iterator temp(*this);
-        ++it_;
-        return temp;
-    }
-
-    json_object_iterator& operator--()
-    {
-        --it_;
-        return *this;
-    }
-
-    json_object_iterator operator--(int)
-    {
-        json_object_iterator temp(*this);
-        --it_;
-        return temp;
-    }
-
-    reference operator*() const
-    {
-        return *it_;
-    }
-
-    pointer operator->() const
-    {
-        return &(*it_);
-    }
-
-    friend bool operator==(const json_object_iterator& it1, const json_object_iterator& it2)
-    {
-        return it1.it_ == it2.it_;
-    }
-    friend bool operator!=(const json_object_iterator& it1, const json_object_iterator& it2)
-    {
-        return !(it1.it_ == it2.it_);
-    }
-    friend void swap(json_object_iterator& lhs, json_object_iterator& rhs)
-    {
-        using std::swap;
-        swap(lhs.it_,rhs.it_);
-    }
-
-    iterator get()
-    {
-        return it_;
-    }
-
-//private:
-    IteratorT it_;
-};
-
-template <class KeyT,class Json,bool PreserveOrder,class Allocator>
+template <class KeyT,class Json,bool PreserveOrder>
 class json_object
 {
 };
 
 // Do not preserve order
-template <class KeyT,class Json,class Allocator>
-class json_object<KeyT,Json,false,Allocator>
+template <class KeyT,class Json>
+class json_object<KeyT,Json,false>
 {
 public:
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> owning_allocator_type;
+    typedef typename Json::allocator_type allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_object> owning_allocator_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::key_allocator_type key_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> member_allocator_type;
-    typedef std::vector<value_type, member_allocator_type> container_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> member_allocator_type;
+    typedef std::vector<value_type, member_allocator_type> object_impl;
 
-    typedef typename container_type::iterator base_iterator;
-    typedef typename container_type::const_iterator const_base_iterator;
-
-    typedef json_object_iterator<base_iterator,base_iterator> iterator;
-    typedef json_object_iterator<const_base_iterator,base_iterator> const_iterator;
+    typedef typename object_impl::iterator iterator;
+    typedef typename object_impl::const_iterator const_iterator;
 
 private:
     owning_allocator_type owning_allocator_;
-    container_type members_;
+    object_impl members_;
 public:
     json_object()
         : owning_allocator_(), members_()
@@ -496,7 +395,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
-                const Allocator& allocator)
+                const allocator_type& allocator)
         : owning_allocator_(allocator),
           members_(member_allocator_type(allocator))
     {
@@ -521,22 +420,22 @@ public:
 
     iterator begin()
     {
-        return iterator(members_.begin());
+        return members_.begin();
     }
 
     iterator end()
     {
-        return iterator(members_.end());
+        return members_.end();
     }
 
     const_iterator begin() const
     {
-        return const_iterator(members_.begin());
+        return members_.begin();
     }
 
     const_iterator end() const
     {
-        return const_iterator(members_.end());
+        return members_.end();
     }
 
     void swap(json_object& val)
@@ -576,7 +475,7 @@ public:
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         auto result = (it != members_.end() && name_eq_string(it->key(),name,length)) ? it : members_.end();
-        return iterator(result);
+        return result;
     }
 
     const_iterator find(const char_type* name, size_t length) const
@@ -584,12 +483,12 @@ public:
         member_lt_string<value_type,char_type> comp(length);
         auto it = std::lower_bound(members_.begin(),members_.end(), name, comp);
         auto result = (it != members_.end() && name_eq_string(it->key(),name,length)) ? it : members_.end();
-        return const_iterator(result);
+        return result;
     }
 
     void erase(iterator first, iterator last) 
     {
-        members_.erase(first.get(),last.get());
+        members_.erase(first,last);
     }
 
     void erase(const char_type* name, size_t length) 
@@ -619,7 +518,7 @@ public:
         members_.erase(members_.begin(),it.base());
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
@@ -642,7 +541,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
@@ -665,7 +564,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
     void set_(key_type&& name, T&& value)
@@ -688,7 +587,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
     void set_(key_type&& name, T&& value)
@@ -711,14 +610,14 @@ public:
         }
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set(iterator hint, string_view_type name, T&& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        iterator it;
+        if (hint != members_.end() && hint->key() <= name)
         {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint,members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -741,17 +640,17 @@ public:
                                   key_type(name.data(),name.length()),
                                   std::forward<T&&>(value));
         }
-        return iterator(it);
+        return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
     set(iterator hint, string_view_type name, T&& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        iterator it;
+        if (hint != members_.end() && hint->key() <= name)
         {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint,members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -774,17 +673,17 @@ public:
                                   key_type(name.data(),name.length(), get_owning_allocator()),
                                   std::forward<T&&>(value),get_owning_allocator() );
         }
-        return iterator(it);
+        return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set_(iterator hint, key_type&& name, T&& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        iterator it;
+        if (hint != members_.end() && hint->key() <= name)
         {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint,members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -807,17 +706,17 @@ public:
                                   std::forward<key_type&&>(name),
                                   std::forward<T&&>(value));
         }
-        return iterator(it);
+        return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
     set_(iterator hint, key_type&& name, T&& value)
     {
-        base_iterator it;
-        if (hint.get() != members_.end() && hint.get()->key() <= name)
+        iterator it;
+        if (hint != members_.end() && hint->key() <= name)
         {
-            it = std::lower_bound(hint.get(),members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
+            it = std::lower_bound(hint,members_.end(),name.data() ,member_lt_string<value_type,char_type>(name.length()));
         }
         else
         {
@@ -840,7 +739,7 @@ public:
                                   std::forward<key_type&&>(name),
                                   std::forward<T&&>(value),get_owning_allocator() );
         }
-        return iterator(it);
+        return it;
     }
 
     bool operator==(const json_object& rhs) const
@@ -867,27 +766,27 @@ private:
 
 // Preserve order
 
-template <class KeyT,class Json,class Allocator>
-class json_object<KeyT,Json,true,Allocator>
+template <class KeyT,class Json>
+class json_object<KeyT,Json,true>
 {
 public:
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_object> owning_allocator_type;
+    typedef typename Json::allocator_type allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_object> owning_allocator_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::key_allocator_type key_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> member_allocator_type;
-    typedef std::vector<value_type, member_allocator_type> container_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> member_allocator_type;
+    typedef std::vector<value_type, member_allocator_type> object_impl;
 
-    typedef typename container_type::iterator iterator;
-    typedef typename container_type::const_iterator const_iterator;
+    typedef typename object_impl::iterator iterator;
+    typedef typename object_impl::const_iterator const_iterator;
 
 private:
     owning_allocator_type owning_allocator_;
-    container_type members_;
+    object_impl members_;
 public:
     json_object()
         : owning_allocator_(), members_()
@@ -940,7 +839,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init, 
-                const Allocator& allocator)
+                const allocator_type& allocator)
         : owning_allocator_(allocator),
           members_(member_allocator_type(allocator))
     {
@@ -1042,7 +941,7 @@ public:
 
     void erase(iterator first, iterator last) 
     {
-        members_.erase(first.get(),last.get());
+        members_.erase(first,last);
     }
 
     void erase(const char_type* name, size_t length) 
@@ -1072,7 +971,7 @@ public:
         members_.erase(it,members_.end());
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
@@ -1091,7 +990,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
@@ -1110,7 +1009,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
     void set_(key_type&& name, T&& value)
@@ -1129,7 +1028,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator,
+    template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
     void set_(key_type&& name, T&& value)
@@ -1148,7 +1047,7 @@ public:
         }
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set(iterator hint, string_view_type name, T&& value)
     {
@@ -1173,7 +1072,7 @@ public:
         return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
     set(iterator hint, string_view_type name, T&& value)
     {
@@ -1198,7 +1097,7 @@ public:
         return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set_(iterator hint, key_type&& name, T&& value)
     {
@@ -1223,7 +1122,7 @@ public:
         return it;
     }
 
-    template <class T, class U=Allocator>
+    template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
     set_(iterator hint, key_type&& name, T&& value)
     {

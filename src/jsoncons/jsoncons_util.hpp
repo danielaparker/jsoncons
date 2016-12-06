@@ -30,10 +30,7 @@ namespace jsoncons
 template <typename T>
 struct is_stateless
  : public std::integral_constant<bool,  
-      (//std::is_trivially_constructible<T>::value
-      //&& std::is_trivially_copy_constructible<T>::value
-      //&& std::is_trivially_destructible<T>::value && 
-      std::is_default_constructible<T>::value &&
+      (std::is_default_constructible<T>::value &&
       std::is_empty<T>::value)>
 {};
 

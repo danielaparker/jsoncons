@@ -108,8 +108,8 @@ public:
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> member_type;
 
-    typedef json_array<json_type,Allocator> array;
-    typedef json_object<key_type,json_type,json_traits_type::preserve_order,Allocator> object;
+    typedef json_array<json_type> array;
+    typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
