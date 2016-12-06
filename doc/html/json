@@ -504,7 +504,7 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>object_allocator</code></td>
-<td>Object allocator type</td>
+<td>Object allocator</td>
 </tr>
 <tr>
 <td><code>string_type</code></td>
@@ -532,19 +532,19 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>object_iterator</code></td>
-<td>A bidirectional iterator to <code>json::member_type</code></td>
+<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <a href="member_type">member_type</a></td>
 </tr>
 <tr>
 <td><code>const_object_iterator</code></td>
-<td>A bidirectional iterator to <code>const json::member_type</code></td>
+<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to const <a href="member_type">member_type</a></td>
 </tr>
 <tr>
 <td><code>array_iterator</code></td>
-<td>A random access iterator to <code>json</code></td>
+<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <code>json</code></td>
 </tr>
 <tr>
 <td><code>const_array_iterator</code></td>
-<td>A random access iterator to <code>const json</code></td>
+<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <code>const json</code></td>
 </tr></tbody></table>
 <h3>Static member functions</h3>
 <pre><code>static json parse(string_view_type s)
@@ -749,7 +749,7 @@ unsigned int as&lt;unsigned int&gt; const
 const json&amp; operator[](size_t i) const
 </code></pre>
 <p>Returns a reference to the value at position i in a json object or array.<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
+Throws <code>std::runtime_error</code> if not an object or array.</p>
 <pre><code>json&amp; operator[](string_view_type name)
 </code></pre>
 <p>Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws.<br>

@@ -1,6 +1,10 @@
 master
 ------
 
+- Support for stateful allocators
+- json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)
+- json operator [size_t i] applied to a json object now returns the ith object (previously threw) 
+
 0.99.5
 ------
 

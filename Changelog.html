@@ -469,6 +469,11 @@ vertical-align:1px;
 </head>
 <body>
 <h2>master</h2>
+<ul>
+<li>Support for stateful allocators</li>
+<li>json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)</li>
+<li>json operator [size_t i] applied to a json object now returns the ith object (previously threw)</li>
+</ul>
 <h2>0.99.5</h2>
 <ul>
 <li>Validations added to utf8 and utf16 string parsing to pass all <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> tests</li>

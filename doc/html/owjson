@@ -473,45 +473,31 @@ vertical-align:1px;
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
                    JsonTraits = o_json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; owjson</pre></div>
-
-<p>The <code>owjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The original insertion order of an object's name/value pairs is preserved. </p>
-
+<p>The <code>owjson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>wchar_t</code> as the character type. The original insertion order of an object's name/value pairs is preserved.</p>
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
-
 <h3>Header</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span></pre></div>
-
 <h3>Interface</h3>
-
 <p>The interface is the same as <a href="wjson">wjson</a>, substituting wide character instantiations of classes - <code>std::wstring</code>, <code>std::wistream</code>, etc. - for narrow character ones.</p>
-
 <ul>
-<li>In <code>owjson</code>, <code>object_allocator</code> is a random access iterator, so object members can be accessed by position, e.g.</li>
+<li>
+<p><code>owjson</code>, like <code>wjson</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>wjson</code> that parameter is just a hint that allows optimization, with <code>owjson</code> it is the actual location where to insert the member.</p>
+</li>
+<li>
+<p>In <code>owjson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p>
+</li>
 </ul>
-
-<pre><code>owjson o = owjson::parse(R"(
-{
-    "street_number" : "100",
-    "street_name" : "Queen St W"
-}
-)");
-
-owjson::member_type member = o.object_range().begin()[1];
-std::cout &lt;&lt; member.key() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
-</code></pre>
-
-<ul>
-<li><p><code>owjson</code>, like <code>wjson</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>wjson</code> that parameter is just a hint that allows optimization, with <code>owjson</code> it is the actual location where to insert the member.</p></li>
-<li><p>In <code>owjson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p></li>
-</ul>
-
 <h3>See also</h3>
-
 <ul>
-<li><p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="ojson">ojson</a> constructs a narrow character json value that preserves the original insertion order of an object's name/value pairs</p></li>
+<li>
+<p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="ojson">ojson</a> constructs a narrow character json value that preserves the original insertion order of an object's name/value pairs</p>
+</li>
 </ul>
 </body>
 </html>
