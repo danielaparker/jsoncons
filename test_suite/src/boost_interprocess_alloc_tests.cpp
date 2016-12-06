@@ -23,8 +23,9 @@ BOOST_AUTO_TEST_SUITE(boost_interprocess_alloc_test_suite)
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
+typedef basic_json<char,o_json_traits<char>,shmem_allocator> shm_ojson;
 
-BOOST_AUTO_TEST_CASE(example)
+BOOST_AUTO_TEST_CASE(json_shared_memory_test)
 {
     struct shm_remove
     {
@@ -45,6 +46,37 @@ BOOST_AUTO_TEST_CASE(example)
     shm_json* j = segment.construct<shm_json>("shm_json")(a,allocator);
 
     shm_json o(allocator);
+    o.set("category", "reference");
+    o.set("author", "Nigel Rees");
+    o.set("title", "Sayings of the Century");
+    o.set("price", 8.95);
+
+    j->add(o);
+
+    std::cout << pretty_print(*j) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(ojson_shared_memory_test)
+{
+    struct shm_remove
+    {
+        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+    } remover;
+
+    //Create a new segment with given name and size
+    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
+            "MySharedMemory", 65536);
+
+    //Initialize shared memory STL-compatible allocator
+    const shmem_allocator allocator(segment.get_segment_manager());
+
+    // Create json value with all dynamic allocations in shared memory
+
+    shm_ojson::array a(allocator);
+    shm_ojson* j = segment.construct<shm_ojson>("shm_ojson")(a,allocator);
+
+    shm_ojson o(allocator);
     o.set("category", "reference");
     o.set("author", "Nigel Rees");
     o.set("title", "Sayings of the Century");

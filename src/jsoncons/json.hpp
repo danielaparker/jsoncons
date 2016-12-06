@@ -1304,55 +1304,55 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        key_type name_;
+        key_type key_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
         json_proxy(ParentT& parent, key_type&& name)
-            : parent_(parent), name_(std::forward<key_type&&>(name))
+            : parent_(parent), key_(std::forward<key_type&&>(name))
         {
         }
 
         json_type& evaluate() 
         {
-            return parent_.evaluate(name_);
+            return parent_.evaluate(key_);
         }
 
         const json_type& evaluate() const
         {
-            return parent_.evaluate(name_);
+            return parent_.evaluate(key_);
         }
 
         json_type& evaluate_with_default()
         {
             json_type& val = parent_.evaluate_with_default();
-            auto it = val.find(name_);
+            auto it = val.find(key_);
             if (it == val.object_range().end())
             {
-                it = val.set_(val.object_range().begin(),std::move(name_),object(val.object_value().get_owning_allocator()));            
+                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_owning_allocator()));            
             }
             return it->value();
         }
 
         json_type& evaluate(size_t index)
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
         const json_type& evaluate(size_t index) const
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
         json_type& evaluate(const key_type& index)
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
         const json_type& evaluate(const key_type& index) const
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
     public:
 
@@ -1539,7 +1539,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().set_(std::move(name_), std::forward<T&&>(val));
+            parent_.evaluate_with_default().set_(std::move(key_), std::forward<T&&>(val));
             return *this;
         }
 
@@ -1565,7 +1565,7 @@ public:
 
         json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),name_.get_allocator()));
+            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_.get_allocator()));
         }
 
         const json_type& operator[](string_view_type name) const
@@ -2524,7 +2524,7 @@ public:
     }
 
     template<class U=Allocator,
-         typename std::enable_if<std::is_default_constructible<U>::value
+         typename std::enable_if<is_stateless<U>::value
             >::type* = nullptr>
     void create_object_implicitly()
     {
@@ -2532,7 +2532,7 @@ public:
     }
 
     template<class U=Allocator,
-         typename std::enable_if<!std::is_default_constructible<U>::value
+         typename std::enable_if<!is_stateless<U>::value
             >::type* = nullptr>
     void create_object_implicitly() const
     {
