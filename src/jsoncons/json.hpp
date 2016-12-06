@@ -285,6 +285,11 @@ public:
 
             struct base_string_data_impl
             {
+                base_string_data_impl(const byte_allocator_type& allocator)
+                    : allocator_(allocator)
+                {
+                }
+
                 byte_allocator_type allocator_;
             };
 
@@ -305,7 +310,7 @@ public:
                 }
 
                 string_data_impl(const byte_allocator_type& allocator)
-                    : base_string_data_impl{ allocator }, length_(0), p_(nullptr)
+                    : base_string_data_impl(allocator), length_(0), p_(nullptr)
                 {
                 }
 
