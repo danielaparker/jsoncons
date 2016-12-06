@@ -299,7 +299,7 @@ public:
                 const char_type* data() const { return p_; }
                 size_t length() const { return length_; }
 
-                byte_allocator_type get_owning_allocator() const
+                byte_allocator_type get_self_allocator() const
                 {
                     return this->allocator_;
                 }
@@ -379,7 +379,7 @@ public:
             {
                 ptry_ = create_impl(val.ptry_->p_, 
                                              val.ptry_->length_, 
-                                             val.ptry_->get_owning_allocator());
+                                             val.ptry_->get_self_allocator());
             }
 
             string_data(const string_data& val, byte_allocator_type allocator)
@@ -391,7 +391,7 @@ public:
             }
             ~string_data()
             {
-                destroy_impl(ptry_->get_owning_allocator(), ptry_);
+                destroy_impl(ptry_->get_self_allocator(), ptry_);
             }
 
             size_t length() const
@@ -409,9 +409,9 @@ public:
                 return ptry_->p_;
             }
 
-            byte_allocator_type get_owning_allocator() const
+            byte_allocator_type get_self_allocator() const
             {
-                return ptry_->get_owning_allocator();
+                return ptry_->get_self_allocator();
             }
         };
 
@@ -451,7 +451,7 @@ public:
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
-                create(val.get_owning_allocator(), val);
+                create(val.get_self_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
@@ -463,7 +463,7 @@ public:
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                create(val.ptr_->get_owning_allocator(), *(val.ptr_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
@@ -474,7 +474,7 @@ public:
 
             ~object_data()
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_owning_allocator());
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_self_allocator());
                 std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
@@ -514,7 +514,7 @@ public:
             array_data(const array& val)
                 : base_data(value_types::array_t)
             {
-                create(val.get_owning_allocator(), val);
+                create(val.get_self_allocator(), val);
             }
 
             array_data(pointer ptr)
@@ -532,7 +532,7 @@ public:
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                create(val.ptr_->get_owning_allocator(), *(val.ptr_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             array_data(const array_data & val, const Allocator& a)
@@ -549,7 +549,7 @@ public:
             }
             ~array_data()
             {
-                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_owning_allocator());
+                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_self_allocator());
                 std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
@@ -1107,7 +1107,7 @@ public:
                         default:
                             break;
                         }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr,string_data_cast()->get_owning_allocator());
+                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr,string_data_cast()->get_self_allocator());
                     }
                     break;
                 case value_types::object_t:
@@ -1335,7 +1335,7 @@ public:
             auto it = val.find(key_);
             if (it == val.object_range().end())
             {
-                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_owning_allocator()));            
+                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_self_allocator()));            
             }
             return it->value();
         }
@@ -2263,7 +2263,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(object_value().get_owning_allocator())));
+            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(object_value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
