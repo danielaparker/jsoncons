@@ -22,17 +22,17 @@ Member type                         |Definition
 `allocator_type`|Allocator type
 `char_allocator`|String allocator type
 `array_allocator`|Array allocator type
-`object_allocator`|Object allocator type
+`object_allocator`|Object allocator 
 `string_type`|Default `string_type` is `std::string`
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
 `member_type`|[member_type](member_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
 `array`|json array type
-`object_iterator`|A bidirectional iterator to `json::member_type`
-`const_object_iterator`|A bidirectional iterator to `const json::member_type`
-`array_iterator`|A random access iterator to `json`
-`const_array_iterator`|A random access iterator to `const json`
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [member_type](member_type)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [member_type](member_type)
+`array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
+`const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
 
 ### Static member functions
 
@@ -246,7 +246,7 @@ Non-generic versions of `as` methods
     json& operator[](size_t i)
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.
-Throws `std::runtime_error` if not an object.
+Throws `std::runtime_error` if not an object or array.
 
     json& operator[](string_view_type name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 

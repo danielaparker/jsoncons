@@ -17,19 +17,6 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 The interface is the same as [wjson](wjson), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
 
-- In `owjson`, `object_allocator` is a random access iterator, so object members can be accessed by position, e.g.
-
-```
-owjson o = owjson::parse(R"(
-{
-    "street_number" : "100",
-    "street_name" : "Queen St W"
-}
-)");
-
-owjson::member_type member = o.object_range().begin()[1];
-std::cout << member.key() << "=" << member.value() << std::endl;
-```
 - `owjson`, like `wjson`, supports object member `set` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `owjson` it is the actual location where to insert the member.
 
 - In `owjson`, the `set` members that just take a name and a value always insert the member at the end.
