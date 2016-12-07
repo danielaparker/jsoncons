@@ -280,138 +280,127 @@ public:
 
         struct string_data : public base_data
         {
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> byte_allocator_type;
-            typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> char_allocator_type;
+            typedef typename std::allocator_traits<char_allocator_type>::pointer pointer;
 
-            struct base_string_data_impl
+            struct Base_string_holder_
             {
-                base_string_data_impl(const byte_allocator_type& allocator)
+                Base_string_holder_(const char_allocator_type& allocator)
                     : allocator_(allocator)
                 {
                 }
 
-                byte_allocator_type allocator_;
+                char_allocator_type get_allocator()
+                {
+                    return allocator_;
+                }
+
+                char_allocator_type allocator_;
             };
-
-            struct string_data_impl : protected base_string_data_impl
+            struct String_holder_ : public Base_string_holder_
             {
-                const char_type* c_str() const { return p_; }
-                const char_type* data() const { return p_; }
-                size_t length() const { return length_; }
-
-                byte_allocator_type get_self_allocator() const
-                {
-                    return this->allocator_;
-                }
-
-                bool operator==(const string_data_impl& rhs) const
-                {
-                    return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
-                }
-
-                string_data_impl(const byte_allocator_type& allocator)
-                    : base_string_data_impl(allocator), length_(0), p_(nullptr)
+                String_holder_(const char_allocator_type& allocator)
+                    : Base_string_holder_(allocator)
                 {
                 }
-
-                size_t length_;
-                char_type* p_;
-            private:
-                string_data_impl(const string_data_impl&);
-                string_data_impl& operator=(const string_data_impl&);
+                size_t length;
+                char_type* data;
             };
-
-            struct string_implA
+            struct Wrap_string_holder_
             {
-                string_data_impl data;
+                String_holder_ holder;
                 char_type c[1];
             };
+            typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
 
-            typedef typename std::aligned_storage<sizeof(string_implA), JSONCONS_ALIGNOF(string_implA)>::type storage_type;
-
-            static size_t aligned_size(size_t n)
+            static pointer create_string_holder(const char_type* data,
+                size_t length,
+                const char_allocator_type& allocator)
             {
-                return sizeof(storage_type) + n;
+                typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(allocator);
+
+                size_t needed = calculate_needed(length);
+                pointer storage = alloc.allocate(needed);
+                String_holder_* pv = new(to_plain_pointer(storage))String_holder_(allocator);
+                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
+                pv->data = new(&pwh->c)char_type[length + 1];
+                memcpy(pv->data, data, length * sizeof(char_type));
+                pv->data[length] = 0;
+                pv->length = length;
+                return storage;
             }
 
+            static String_holder_* string_holder_cast(pointer p)
+            {
+                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(p));
+                return &(pwh->holder);
+            }
+
+            static size_t calculate_needed(size_t length)
+            {
+                return sizeof(storage_type) + length * sizeof(char_type);
+            }
+
+            static void destroy_string_holder(pointer p)
+            {
+                String_holder_* holder = string_holder_cast(p);
+                size_t needed = calculate_needed(holder->length);
+                typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(holder->get_allocator());
+                alloc.deallocate(p, needed);
+            }
             pointer ptr_;
-
-            string_data_impl* create_impl(const char_type* s, size_t length, const byte_allocator_type& allocator)
-            {
-                size_t mem_size = aligned_size(length*sizeof(char_type));
-
-                typename std::allocator_traits<byte_allocator_type>:: template rebind_alloc<char> alloc(allocator);
-
-                ptr_ = alloc.allocate(mem_size);
-                string_data_impl* ps = new(to_plain_pointer(ptr_))string_data_impl(allocator);
-                auto psa = reinterpret_cast<string_implA*>(to_plain_pointer(ptr_)); 
-
-                ps->p_ = new(&psa->c)char_type[length + 1];
-                memcpy(ps->p_, s, length*sizeof(char_type));
-                ps->p_[length] = 0;
-                ps->length_ = length;
-                return ps;
-            }
-
-            void destroy_impl(const byte_allocator_type& allocator, string_data_impl* p)
-            {
-                size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-                typename std::allocator_traits<byte_allocator_type>:: template rebind_alloc<char> alloc(allocator);
-                alloc.deallocate(ptr_,mem_size);
-            }
-
-            string_data_impl* ptry_;
 
             string_data(pointer ptr)
                 : base_data(value_types::string_t), ptr_(ptr)
             {
-                ptry_ = reinterpret_cast<string_data_impl*>(to_plain_pointer(ptr_));
             }
 
-            string_data(const char_type* s, size_t length, const byte_allocator_type& alloc)
+            string_data(const char_type* s,
+                size_t length,
+                const char_allocator_type& alloc)
                 : base_data(value_types::string_t)
             {
-                ptry_ = create_impl(s, length, alloc);
+                ptr_ = create_string_holder(s, length, alloc);
             }
 
             string_data(const string_data& val)
                 : base_data(value_types::string_t)
             {
-                ptry_ = create_impl(val.ptry_->p_, 
-                                             val.ptry_->length_, 
-                                             val.ptry_->get_self_allocator());
+                ptr_ = create_string_holder(val.data(),
+                    val.length(),
+                    val.get_self_allocator());
             }
 
-            string_data(const string_data& val, byte_allocator_type allocator)
+            string_data(const string_data& val, char_allocator_type allocator)
                 : base_data(value_types::string_t)
             {
-                ptry_ = create_impl(val.ptry_->p_, 
-                                               val.ptry_->length_, 
-                                               allocator);
+                ptr_ = create_string_holder(val.data(),
+                    val.length(),
+                    allocator);
             }
             ~string_data()
             {
-                destroy_impl(ptry_->get_self_allocator(), ptry_);
+                destroy_string_holder(ptr_);
             }
 
             size_t length() const
             {
-                return ptry_->length_;
+                return string_holder_cast(ptr_)->length;
             }
 
             const char_type* data() const
             {
-                return ptry_->p_;
+                return string_holder_cast(ptr_)->data;
             }
 
             const char_type* c_str() const
             {
-                return ptry_->p_;
+                return string_holder_cast(ptr_)->data;
             }
 
-            byte_allocator_type get_self_allocator() const
+            char_allocator_type get_self_allocator() const
             {
-                return ptry_->get_self_allocator();
+                return string_holder_cast(ptr_)->get_allocator();
             }
         };
 
