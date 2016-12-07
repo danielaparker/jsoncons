@@ -319,7 +319,7 @@ public:
             {
                 typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(allocator);
 
-                size_t needed = calculate_needed(length);
+                size_t needed = calculate_needed(length+1);
                 pointer storage = alloc.allocate(needed);
                 String_holder_* pv = new(to_plain_pointer(storage))String_holder_(allocator);
                 auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
@@ -338,13 +338,13 @@ public:
 
             static size_t calculate_needed(size_t length)
             {
-                return sizeof(storage_type) + length * sizeof(char_type);
+                return sizeof(storage_type) + (length-1) * sizeof(char_type);
             }
 
             static void destroy_string_holder(pointer p)
             {
                 String_holder_* holder = string_holder_cast(p);
-                size_t needed = calculate_needed(holder->length);
+                size_t needed = calculate_needed(holder->length + 1);
                 typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(holder->get_allocator());
                 alloc.deallocate(p, needed);
             }
