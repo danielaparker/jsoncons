@@ -24,6 +24,8 @@
 
 [Convert json to/from user defined type](#A12)
 
+[Stateful allocators](#A13)
+
 <div id="A1"/>
 ### Preliminaries
 
@@ -852,3 +854,63 @@ Output:
 Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 ```
+
+<div id="A13"/>
+### Stateful allocators
+
+This example shows how to create `json` values in a shared memory segment with a name identifier, so other processes can find and use them.
+```c++
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <jsoncons/json.hpp>
+
+typedef boost::interprocess::allocator<int,
+        boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
+typedef basic_json<char,json_traits<char>,shmem_allocator> shm_json;
+
+using namespace jsoncons;
+
+int main()
+{
+    struct shm_remove
+    {
+        shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+        ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+    } remover;
+
+    //Create a new segment with given name and size
+    boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only,
+            "MySharedMemory", 65536);
+
+    //Initialize shared memory STL-compatible allocator
+    const shmem_allocator allocator(segment.get_segment_manager());
+
+    // Create json value with all dynamic allocations in shared memory
+
+    shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
+
+    shm_json o(allocator);
+    o.set("category", "reference");
+    o.set("author", "Nigel Rees");
+    o.set("title", "Sayings of the Century");
+    o.set("price", 8.95);
+
+    j->add(o);
+
+    std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
+    res = segment.find<shm_json>("my json");
+
+    std::cout << pretty_print(*(res.first)) << std::endl;
+}
+```
+Output:
+```json
+[
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
+```
+

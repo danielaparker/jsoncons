@@ -42,8 +42,7 @@ BOOST_AUTO_TEST_CASE(json_shared_memory_test)
 
     // Create json value with all dynamic allocations in shared memory
 
-    shm_json::array a(allocator);
-    shm_json* j = segment.construct<shm_json>("shm_json")(a,allocator);
+    shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
 
     shm_json o(allocator);
     o.set("category", "reference");
@@ -53,7 +52,10 @@ BOOST_AUTO_TEST_CASE(json_shared_memory_test)
 
     j->add(o);
 
-    std::cout << pretty_print(*j) << std::endl;
+    std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
+    res = segment.find<shm_json>("my json");
+
+    std::cout << pretty_print(*(res.first)) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(ojson_shared_memory_test)

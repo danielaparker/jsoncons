@@ -1,3 +1,15 @@
+*.suo
+*.sdf
+*.VC.opendb
+*.VC.db
+*.vcxproj.user
+*.vcxproj.filters
+**/x64/Debug/
+**/x64/Release/
+**/.vcxproj
+**/vs2015
+**/vs2013
+
 test_suite/build/cmake/build_vc140x64
 test_suite/build/vs2015
 test_suite/build/vs2013
@@ -25,7 +37,6 @@ test_suite/build/vs2013/targetver.h
 test_suite/build/vs2013/vs2013.cpp
 test_suite/build/vs2013/vs2013.sdf
 test_suite/build/vs2013/vs2013.sln
-test_suite/build/vs2013/vs2013.suo
 test_suite/build/vs2013/vs2013.vcxproj
 test_suite/build/vs2013/vs2013.vcxproj.filters
 test_suite/build/vs2013/vs2013.vcxproj.user
