@@ -113,13 +113,13 @@ public:
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
-    using base_val_container_type = typename json_traits_type::template base_container_type<json_type, val_allocator_type>;
+    using base_array_container_type = typename json_traits_type::template base_container_type<json_type, val_allocator_type>;
 
     typedef json_array<json_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
 
-    using base_kvp_container_type = typename json_traits_type::template base_container_type<kvp_type , kvp_allocator_type>;
+    using base_object_container_type = typename json_traits_type::template base_container_type<kvp_type , kvp_allocator_type>;
     typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;

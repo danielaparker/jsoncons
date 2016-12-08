@@ -337,14 +337,14 @@ public:
     typedef key_value_pair<KeyT,Json> value_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
-    typedef typename Json::base_kvp_container_type base_kvp_container_type;
+    typedef typename Json::base_object_container_type base_object_container_type;
 
-    typedef typename base_kvp_container_type::iterator iterator;
-    typedef typename base_kvp_container_type::const_iterator const_iterator;
+    typedef typename base_object_container_type::iterator iterator;
+    typedef typename base_object_container_type::const_iterator const_iterator;
 
 private:
     self_allocator_type self_allocator_;
-    base_kvp_container_type members_;
+    base_object_container_type members_;
 public:
     json_object()
         : self_allocator_(), members_()
@@ -788,14 +788,14 @@ public:
     typedef key_value_pair<KeyT,Json> value_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
-    typedef std::vector<value_type, kvp_allocator_type> base_kvp_container_type;
+    typedef std::vector<value_type, kvp_allocator_type> base_object_container_type;
 
-    typedef typename base_kvp_container_type::iterator iterator;
-    typedef typename base_kvp_container_type::const_iterator const_iterator;
+    typedef typename base_object_container_type::iterator iterator;
+    typedef typename base_object_container_type::const_iterator const_iterator;
 
 private:
     self_allocator_type self_allocator_;
-    base_kvp_container_type members_;
+    base_object_container_type members_;
 public:
     json_object()
         : self_allocator_(), members_()
