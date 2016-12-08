@@ -106,9 +106,20 @@ public:
     typedef std::basic_string<CharT,char_traits_type,key_allocator_type> key_type;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef key_value_pair<key_type,json_type> member_type;
+    typedef key_value_pair<key_type,json_type> kvp_type;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    typedef kvp_type member_type;
+#endif
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
+    using base_val_container_type = typename json_traits_type::template base_container_type<json_type, val_allocator_type>;
 
     typedef json_array<json_type> array;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
+
+    using base_kvp_container_type = typename json_traits_type::template base_container_type<kvp_type , kvp_allocator_type>;
     typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
@@ -3694,7 +3705,7 @@ private:
 };
 
 template <class Json>
-void swap(typename Json::member_type& a, typename Json::member_type& b)
+void swap(typename Json::kvp_type & a, typename Json::kvp_type & b)
 {
     a.swap(b);
 }

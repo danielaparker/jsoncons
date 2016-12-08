@@ -1,7 +1,7 @@
 ```c++
-jsoncons::json::member_type
+jsoncons::json::kvp_type 
 ```
-`member_type` stores a name (key) and a json value
+`kvp_type ` stores a name (key) and a json value
 
 ### Accessors
     

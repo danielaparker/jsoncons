@@ -15,12 +15,16 @@
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <string>
+#include <vector>
 
 namespace jsoncons {
 
 template <class CharT>
 struct json_traits
 {
+    template <class T,class Allocator>
+    using base_container_type = std::vector<T,Allocator>;
+
     typedef typename std::char_traits<CharT> char_traits_type;
 
     static const bool preserve_order = false;
@@ -31,6 +35,9 @@ struct json_traits
 template <class CharT>
 struct o_json_traits 
 {
+    template <class T,class Allocator>
+    using base_container_type = std::vector<T,Allocator>;
+
     typedef typename std::char_traits<CharT> char_traits_type;
 
     static const bool preserve_order = true;

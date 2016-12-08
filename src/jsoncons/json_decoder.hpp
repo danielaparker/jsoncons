@@ -25,7 +25,7 @@ class json_decoder : public basic_json_input_handler<typename Json::char_type>
 
     typedef Json json_type;
     typedef typename Json::char_type char_type;
-    typedef typename Json::member_type member_type;
+    typedef typename Json::kvp_type  kvp_type ;
     typedef typename Json::string_type string_type;
     typedef typename string_type::allocator_type char_allocator;
     typedef typename Json::allocator_type allocator_type;
@@ -167,9 +167,9 @@ private:
         pop_array();
     }
 
-    static member_type move_pair(stack_item&& val)
+    static kvp_type  move_pair(stack_item&& val)
     {
-        return member_type(std::move(val.name_),std::move(val.value_));
+        return kvp_type (std::move(val.name_),std::move(val.value_));
     }
 
     void end_structure() 

@@ -19,6 +19,7 @@
 #include <utility>
 #include <initializer_list>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/json_traits.hpp>
 #include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
@@ -335,15 +336,15 @@ public:
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> member_allocator_type;
-    typedef std::vector<value_type, member_allocator_type> object_impl;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
+    typedef typename Json::base_kvp_container_type base_kvp_container_type;
 
-    typedef typename object_impl::iterator iterator;
-    typedef typename object_impl::const_iterator const_iterator;
+    typedef typename base_kvp_container_type::iterator iterator;
+    typedef typename base_kvp_container_type::const_iterator const_iterator;
 
 private:
     self_allocator_type self_allocator_;
-    object_impl members_;
+    base_kvp_container_type members_;
 public:
     json_object()
         : self_allocator_(), members_()
@@ -351,7 +352,7 @@ public:
     }
     json_object(const allocator_type& allocator)
         : self_allocator_(allocator), 
-          members_(member_allocator_type(allocator))
+          members_(kvp_allocator_type(allocator))
     {
     }
 
@@ -368,12 +369,12 @@ public:
 
     json_object(const json_object& val, const allocator_type& allocator) :
         self_allocator_(allocator), 
-        members_(val.members_,member_allocator_type(allocator))
+        members_(val.members_,kvp_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        self_allocator_(allocator), members_(std::move(val.members_),member_allocator_type(allocator))
+        self_allocator_(allocator), members_(std::move(val.members_),kvp_allocator_type(allocator))
     {
     }
 
@@ -397,7 +398,7 @@ public:
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
         : self_allocator_(allocator),
-          members_(member_allocator_type(allocator))
+          members_(kvp_allocator_type(allocator))
     {
         for (const auto& element : init)
         {
@@ -786,15 +787,15 @@ public:
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> member_allocator_type;
-    typedef std::vector<value_type, member_allocator_type> object_impl;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
+    typedef std::vector<value_type, kvp_allocator_type> base_kvp_container_type;
 
-    typedef typename object_impl::iterator iterator;
-    typedef typename object_impl::const_iterator const_iterator;
+    typedef typename base_kvp_container_type::iterator iterator;
+    typedef typename base_kvp_container_type::const_iterator const_iterator;
 
 private:
     self_allocator_type self_allocator_;
-    object_impl members_;
+    base_kvp_container_type members_;
 public:
     json_object()
         : self_allocator_(), members_()
@@ -802,7 +803,7 @@ public:
     }
     json_object(const allocator_type& allocator)
         : self_allocator_(allocator), 
-          members_(member_allocator_type(allocator))
+          members_(kvp_allocator_type(allocator))
     {
     }
 
@@ -820,12 +821,12 @@ public:
 
     json_object(const json_object& val, const allocator_type& allocator) 
         : self_allocator_(allocator), 
-          members_(val.members_,member_allocator_type(allocator))
+          members_(val.members_,kvp_allocator_type(allocator))
     {
     }
 
     json_object(json_object&& val,const allocator_type& allocator) :
-        self_allocator_(allocator), members_(std::move(val.members_),member_allocator_type(allocator))
+        self_allocator_(allocator), members_(std::move(val.members_),kvp_allocator_type(allocator))
     {
     }
 
@@ -849,7 +850,7 @@ public:
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
         : self_allocator_(allocator),
-          members_(member_allocator_type(allocator))
+          members_(kvp_allocator_type(allocator))
     {
         for (const auto& element : init)
         {

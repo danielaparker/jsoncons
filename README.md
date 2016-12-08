@@ -158,9 +158,9 @@ Extra comma at line 1 and column 10
 ```c++
 json j = json::array{1,2,3,4};
 
-for (auto element : book.array_range())
+for (auto val : book.array_range())
 {
-    std::cout << element << std::endl;
+    std::cout << val << std::endl;
 }
 ```
 
@@ -173,10 +173,10 @@ json book = json::object{
     {"price", 25.17}
 };
 
-for (const auto& member : book.object_range())
+for (const auto& kvp : book.object_range())
 {
-    std::cout << member.key() << "=" 
-              << member.value() << std::endl;
+    std::cout << kvp.key() << "=" 
+              << kvp.value() << std::endl;
 }
 ```
 

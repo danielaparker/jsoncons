@@ -515,8 +515,8 @@ vertical-align:1px;
 <td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise to a substitute.</td>
 </tr>
 <tr>
-<td><code>member_type</code></td>
-<td><a href="member_type">member_type</a> is a class that stores a name and a json value</td>
+<td><code>kvp_type</code></td>
+<td><a href="kvp_type">kvp_type </a> is a class that stores a name and a json value</td>
 </tr>
 <tr>
 <td><code>null_type</code></td>
@@ -532,11 +532,11 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>object_iterator</code></td>
-<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <a href="member_type">member_type</a></td>
+<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <a href="kvp_type">kvp_type </a></td>
 </tr>
 <tr>
 <td><code>const_object_iterator</code></td>
-<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to const <a href="member_type">member_type</a></td>
+<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to const <a href="kvp_type">kvp_type </a></td>
 </tr>
 <tr>
 <td><code>array_iterator</code></td>
@@ -960,9 +960,9 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 <span class="pl-s">}</span>
 <span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member: book.object_range())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kvp: book.object_range())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; member.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; kvp.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; kvp.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
 } </pre></div>
 <h3>Range-based for loop over elements of an array</h3>
 <div class="highlight highlight-source-c++"><pre>json book1;    
