@@ -40,6 +40,97 @@
 
 namespace jsoncons {
 
+template <class CharT,class Allocator>
+class Base_string_holder_
+{
+public:
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+
+    Base_string_holder_(const allocator_type& allocator)
+        : allocator_(allocator)
+    {
+    }
+
+    allocator_type get_self_allocator()
+    {
+        return allocator_;
+    }
+
+    allocator_type allocator_;
+};
+
+template <class CharT,class Allocator>
+class String_holder_ : public Base_string_holder_<CharT,Allocator>
+{
+public:
+    String_holder_(const Allocator& allocator)
+        : Base_string_holder_(allocator)
+    {
+    }
+
+    size_t length;
+    char_type* data;
+};
+
+template <class CharT, class Allocator>
+struct Wrap_string_holder_
+{
+    String_holder_<CharT,Allocator> holder;
+    CharT c[1];
+};
+
+template <class CharT, class Allocator>
+struct String_holder_factory_
+{
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char>
+        storage_alloc;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
+        storage_traits;
+
+    typedef typename storage_traits::pointer pointer;
+
+    typedef typename std::aligned_storage<sizeof(Wrap_string_holder_<CharT,Allocator>), JSONCONS_ALIGNOF(Wrap_string_holder_<CharT,Allocator>)>::type storage_type;
+
+    static size_t calculate_needed(size_t length)
+    {
+        return sizeof(storage_type) + (length-1) * sizeof(char_type);
+    }
+
+    static pointer create(const char_type* data, size_t length, allocator_type allocator)
+    {
+        size_t needed = calculate_needed(length+1);
+        typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
+        storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
+
+        String_holder_<char_type,Allocator>* pv = new(to_plain_pointer(storage))String_holder_<char_type,Allocator>(allocator);
+        auto pwh = reinterpret_cast<Wrap_string_holder_<CharT,Allocator>*>(to_plain_pointer(storage));
+        pv->data = new(&pwh->c)char_type[length + 1];
+        memcpy(pv->data, data, length * sizeof(char_type));
+        pv->data[length] = 0;
+        pv->length = length;
+        return storage;
+    }
+
+    static String_holder_<char_type,Allocator>* string_holder_cast(pointer p)
+    {
+        auto pwh = reinterpret_cast<Wrap_string_holder_<CharT,Allocator>*>(to_plain_pointer(p));
+        return &(pwh->holder);
+    }
+
+    static void destroy(pointer p)
+    {
+        String_holder_<char_type,Allocator>* holder = string_holder_cast(p);
+        size_t needed = calculate_needed(holder->length + 1);
+        typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(holder->get_self_allocator());
+        alloc.deallocate(p, needed);
+    }
+};
+
+
 template <typename IteratorT>
 class range 
 {
@@ -291,9 +382,10 @@ public:
 
         struct string_data : public base_data
         {
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> char_allocator_type;
-            typedef typename std::allocator_traits<char_allocator_type>::pointer pointer;
+            //typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char> char_allocator_type;
+            typedef typename String_holder_factory_<CharT,Allocator>::pointer pointer;
 
+            /*
             struct Base_string_holder_
             {
                 Base_string_holder_(const char_allocator_type& allocator)
@@ -317,47 +409,58 @@ public:
                 size_t length;
                 char_type* data;
             };
-            struct Wrap_string_holder_
+            */
+
+            /*struct Wrap_string_holder_
             {
-                String_holder_ holder;
+                String_holder_<char_type,Allocator> holder;
                 char_type c[1];
-            };
-            typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
+            };*/
+            //typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
 
             static pointer create_string_holder(const char_type* data,
                 size_t length,
-                const char_allocator_type& allocator)
+                const Allocator& allocator)
             {
+                return String_holder_factory_<CharT,Allocator>::create(data,length,allocator);
+/*
                 typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(allocator);
 
                 size_t needed = calculate_needed(length+1);
                 pointer storage = alloc.allocate(needed);
-                String_holder_* pv = new(to_plain_pointer(storage))String_holder_(allocator);
+
+                String_holder_<char_type,Allocator>* pv = new(to_plain_pointer(storage))String_holder_<char_type,Allocator>(allocator);
                 auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
                 pv->data = new(&pwh->c)char_type[length + 1];
                 memcpy(pv->data, data, length * sizeof(char_type));
                 pv->data[length] = 0;
                 pv->length = length;
                 return storage;
+*/
             }
 
-            static String_holder_* string_holder_cast(pointer p)
+            static String_holder_<char_type,Allocator>* string_holder_cast(pointer p)
             {
-                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(p));
-                return &(pwh->holder);
+                //auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(p));
+                //return &(pwh->holder);
+
+                return String_holder_factory_<CharT,Allocator>::string_holder_cast(p);
             }
 
-            static size_t calculate_needed(size_t length)
-            {
-                return sizeof(storage_type) + (length-1) * sizeof(char_type);
-            }
+            //static size_t calculate_needed(size_t length)
+            //{
+            //    return sizeof(storage_type) + (length-1) * sizeof(char_type);
+            //}
 
             static void destroy_string_holder(pointer p)
             {
-                String_holder_* holder = string_holder_cast(p);
+                String_holder_factory_<CharT,Allocator>::destroy(p);
+/*
+                String_holder_<char_type,Allocator>* holder = string_holder_cast(p);
                 size_t needed = calculate_needed(holder->length + 1);
-                typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(holder->get_allocator());
+                typename std::allocator_traits<char_allocator_type>:: template rebind_alloc<char> alloc(holder->get_self_allocator());
                 alloc.deallocate(p, needed);
+*/
             }
             pointer ptr_;
 
@@ -368,7 +471,7 @@ public:
 
             string_data(const char_type* s,
                 size_t length,
-                const char_allocator_type& alloc)
+                const Allocator& alloc)
                 : base_data(value_types::string_t)
             {
                 ptr_ = create_string_holder(s, length, alloc);
@@ -382,7 +485,7 @@ public:
                     val.get_self_allocator());
             }
 
-            string_data(const string_data& val, char_allocator_type allocator)
+            string_data(const string_data& val, const Allocator& allocator)
                 : base_data(value_types::string_t)
             {
                 ptr_ = create_string_holder(val.data(),
@@ -409,9 +512,9 @@ public:
                 return string_holder_cast(ptr_)->data;
             }
 
-            char_allocator_type get_self_allocator() const
+            Allocator get_self_allocator() const
             {
-                return string_holder_cast(ptr_)->get_allocator();
+                return string_holder_cast(ptr_)->get_self_allocator();
             }
         };
 
