@@ -17,17 +17,17 @@ public:
     }
 
 private:
-    void do_name(const char* p, size_t length, 
+    void do_name(string_view_type name, 
                  const parsing_context& context) override
     {
-        member_name_ = std::string(p, length);
+        member_name_ = name;
         if (member_name_ != "name")
         {
-            this->downstream_handler().name(p, length, context);
+            this->downstream_handler(name, context);
         }
     }
 
-    void do_string_value(const char* p, size_t length, 
+    void do_string_value(string_view_type val, 
                          const parsing_context& context) override
     {
         if (member_name_ == "name")

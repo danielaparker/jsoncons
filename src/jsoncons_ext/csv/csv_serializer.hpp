@@ -272,17 +272,17 @@ private:
         }
     }
 
-    void do_string_value(const CharT* val, size_t length) override
+    void do_string_value(string_view_type val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                value(val,length,header_os_);
+                value(val,header_os_);
             }
             else
             {
-                value(val,length,os_);
+                value(val,os_);
             }
         }
     }
@@ -349,10 +349,10 @@ private:
         }
     }
 
-    void value(const CharT* val, size_t length, buffered_output<CharT>& os)
+    void value(string_view_type value, buffered_output<CharT>& os)
     {
         begin_value(os);
-        write_string(val,length,os);
+        write_string(value.data(),value.length(),os);
         end_value();
     }
 

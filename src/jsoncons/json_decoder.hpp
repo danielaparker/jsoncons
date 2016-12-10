@@ -27,6 +27,7 @@ class json_decoder : public basic_json_input_handler<typename Json::char_type>
     typedef typename Json::char_type char_type;
     typedef typename Json::kvp_type  kvp_type ;
     typedef typename Json::string_type string_type;
+    typedef typename Json::key_type key_type;
     typedef typename string_type::allocator_type char_allocator;
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::array array;
@@ -208,14 +209,14 @@ private:
         }
     }
 
-    void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
+    void do_name(string_view_type name, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name_ = string_type(p,length,sa_);
+        stack_[top_].name_ = key_type(name.data(),name.length(),sa_);
     }
 
-    void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
+    void do_string_value(string_view_type val, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value_ = Json(p,length,sa_);
+        stack_[top_].value_ = Json(val.data(),val.length(),sa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

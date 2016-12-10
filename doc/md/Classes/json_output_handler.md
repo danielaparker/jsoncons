@@ -72,10 +72,10 @@ Receive begin JSON array event
     virtual void do_end_array()
 Receive end JSON array event
 
-    virtual void do_name(const char* p, size_t length)
+    virtual void do_name(string_view_type name)
 Receive name event for name-value pair
 
-    virtual void do_string_value(const char* p, size_t length)
+    virtual void do_string_value(string_view_type value)
 Receive character data event
 
     virtual void do_integer_value(int64_t value)

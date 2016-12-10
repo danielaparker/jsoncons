@@ -471,7 +471,7 @@ private:
                    jsonx_char_traits<CharT>::end_null_element_literal().length());
     }
 
-    void do_string_value(const CharT* val, size_t length) override
+    void do_string_value(string_view_type value) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -494,7 +494,7 @@ private:
             bos_.write(jsonx_char_traits<CharT>::string_element_literal().data(),
                        jsonx_char_traits<CharT>::string_element_literal().length());
         }
-        escape_value(val,length,options_,bos_);
+        escape_value(value.data(),value.length(),options_,bos_);
         bos_.write(jsonx_char_traits<CharT>::end_string_element_literal().data(),
                    jsonx_char_traits<CharT>::end_string_element_literal().length());
     }

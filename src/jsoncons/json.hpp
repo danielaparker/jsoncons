@@ -2330,7 +2330,7 @@ public:
         {
         case value_types::small_string_t:
         case value_types::string_t:
-            handler.value(as_string_view().data(),as_string_view().length());
+            handler.value(as_string_view());
             break;
         case value_types::double_t:
             handler.value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());

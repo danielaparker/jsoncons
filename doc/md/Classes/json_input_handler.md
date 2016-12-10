@@ -96,12 +96,12 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 
 
-    virtual void do_name(const char* p, size_t length, 
+    virtual void do_name(string_view_type name, 
                          const parsing_context& context)
 Receive name event for name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  
 
-    virtual void do_string_value(const char* p, size_t length, 
+    virtual void do_string_value(string_view_type val, 
                                  const parsing_context& context)
 Receive character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. 

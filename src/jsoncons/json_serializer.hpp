@@ -303,7 +303,7 @@ private:
         end_value();
     }
 
-    void do_string_value(const CharT* value, size_t length) override
+    void do_string_value(string_view_type value) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -311,7 +311,7 @@ private:
         }
 
         bos_. put('\"');
-        escape_string<CharT>(value, length, format_, bos_);
+        escape_string<CharT>(value.data(), value.length(), format_, bos_);
         bos_. put('\"');
 
         end_value();

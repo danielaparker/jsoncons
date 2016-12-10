@@ -70,16 +70,16 @@ private:
         output_handler_.end_array();
     }
 
-    void do_name(const CharT* name, size_t length, 
+    void do_name(string_view_type name, 
                  const basic_parsing_context<CharT>&) override
     {
-        output_handler_.name(name, length);
+        output_handler_.name(name);
     }
 
-    void do_string_value(const CharT* value, size_t length, 
+    void do_string_value(string_view_type value, 
                          const basic_parsing_context<CharT>&) override
     {
-        output_handler_.value(value, length);
+        output_handler_.value(value);
     }
 
     void do_integer_value(int64_t value, const basic_parsing_context<CharT>&) override
@@ -184,12 +184,12 @@ private:
 
     void do_name(string_view_type name) override
     {
-        input_handler_.name(name.data(), name.length(), default_context_);
+        input_handler_.name(name, default_context_);
     }
 
-    void do_string_value(const CharT* value, size_t length) override
+    void do_string_value(string_view_type value) override
     {
-        input_handler_.value(value, length, default_context_);
+        input_handler_.value(value.data(), value.length(), default_context_);
     }
 
     void do_integer_value(int64_t value) override
@@ -294,16 +294,16 @@ private:
         downstream_handler_.end_array(context);
     }
 
-    void do_name(const CharT* name, size_t length,
+    void do_name(string_view_type name,
                  const basic_parsing_context<CharT>& context) override
     {
-        downstream_handler_.name(name, length,context);
+        downstream_handler_.name(name,context);
     }
 
-    void do_string_value(const CharT* value, size_t length,
+    void do_string_value(string_view_type value,
                          const basic_parsing_context<CharT>& context) override
     {
-        downstream_handler_.value(value,length,context);
+        downstream_handler_.value(value,context);
     }
 
     void do_double_value(double value, uint8_t precision,
@@ -380,17 +380,16 @@ public:
     }
 
 private:
-    void do_name(const CharT* p, size_t length,
+    void do_name(string_view_type name,
                  const basic_parsing_context<CharT>& context) override
     {
-        size_t len = (std::min)(name_.length(),length);
-        if (len == length && std::char_traits<CharT>::compare(name_.data(),p,len) == 0)
+        if (name == name_)
         {
-            this->downstream_handler().name(new_name_.data(),new_name_.length(),context);
+            this->downstream_handler().name(new_name_,context);
         }
         else
         {
-            this->downstream_handler().name(p,length,context);
+            this->downstream_handler().name(name,context);
         }
     }
 };
