@@ -355,7 +355,7 @@ public:
             {
                 size_t needed = calculate_needed(length+1);
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
-                storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
+                typename storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
                 String_holder_* pv = reinterpret_cast<String_holder_*>(to_plain_pointer(storage));
 
                 string_holder_alloc a(allocator);
