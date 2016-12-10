@@ -334,62 +334,48 @@ public:
                 CharT c[1];
             };
 
-            struct String_holder_factory_
+            typedef CharT char_type;
+            typedef Allocator allocator_type;
+
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char>
+                storage_alloc;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
+                storage_traits;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_>
+                string_holder_alloc;
+
+            typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
+
+            static size_t calculate_needed(size_t length)
             {
-                typedef CharT char_type;
-                typedef Allocator allocator_type;
-
-                typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char>
-                    storage_alloc;
-                typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
-                    storage_traits;
-                typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_>
-                    string_holder_alloc;
-
-                typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
-
-                static size_t calculate_needed(size_t length)
-                {
-                    return sizeof(storage_type) + (length-1) * sizeof(char_type);
-                }
-
-                static String_holder_* create(const char_type* data, size_t length, allocator_type allocator)
-                {
-                    size_t needed = calculate_needed(length+1);
-                    typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
-                    storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
-                    String_holder_* pv = reinterpret_cast<String_holder_*>(to_plain_pointer(storage));
-
-                    string_holder_alloc a(allocator);
-                    std::allocator_traits<string_holder_alloc>::construct(a,pv,allocator);
-
-                    auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
-                    pv->data = new(&pwh->c)char_type[length + 1];
-                    memcpy(pv->data, data, length * sizeof(char_type));
-                    pv->data[length] = 0;
-                    pv->length = length;
-                    return pv;
-                }
-
-                static void destroy(String_holder_* p) JSONCONS_NOEXCEPT
-                {
-                    size_t needed = calculate_needed(p->length + 1);
-                    typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(p->get_self_allocator());
-                    storage_traits::deallocate(alloc, (char*)p, needed);
-                }
-            };
-
-            static String_holder_* create_string_holder(const char_type* data,
-                size_t length,
-                const Allocator& allocator)
-            {
-                return String_holder_factory_::create(data,length,allocator);
+                return sizeof(storage_type) + (length-1) * sizeof(char_type);
             }
 
-            static void destroy_string_holder(String_holder_* p)
+            static String_holder_* create_string_holder(const char_type* data, size_t length, allocator_type allocator)
             {
-                String_holder_factory_::destroy(p);
+                size_t needed = calculate_needed(length+1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
+                storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
+                String_holder_* pv = reinterpret_cast<String_holder_*>(to_plain_pointer(storage));
+
+                string_holder_alloc a(allocator);
+                std::allocator_traits<string_holder_alloc>::construct(a,pv,allocator);
+
+                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
+                pv->data = new(&pwh->c)char_type[length + 1];
+                memcpy(pv->data, data, length * sizeof(char_type));
+                pv->data[length] = 0;
+                pv->length = length;
+                return pv;
             }
+
+            static void destroy_string_holder(String_holder_* p) JSONCONS_NOEXCEPT
+            {
+                size_t needed = calculate_needed(p->length + 1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(p->get_self_allocator());
+                storage_traits::deallocate(alloc, (char*)p, needed);
+            }
+            
             String_holder_* ptr_;
 
             string_data(String_holder_* ptr)
