@@ -341,6 +341,7 @@ public:
                 storage_alloc;
             typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
                 storage_traits;
+            typedef typename storage_traits::pointer pointer;
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_>
                 string_holder_alloc;
 
@@ -351,7 +352,7 @@ public:
                 return sizeof(storage_type) + (length-1) * sizeof(char_type);
             }
 
-            static String_holder_* create_string_holder(const char_type* data, size_t length, allocator_type allocator)
+            static pointer create_string_holder(const char_type* data, size_t length, allocator_type allocator)
             {
                 size_t needed = calculate_needed(length+1);
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
@@ -366,21 +367,21 @@ public:
                 memcpy(pv->data, data, length * sizeof(char_type));
                 pv->data[length] = 0;
                 pv->length = length;
-                return pv;
+                return storage;
             }
 
-            static void destroy_string_holder(String_holder_* p) JSONCONS_NOEXCEPT
+            static void destroy_string_holder(pointer p) JSONCONS_NOEXCEPT
             {
-                string_holder_alloc a(p->get_self_allocator());
-                std::allocator_traits<string_holder_alloc>::destroy(a,p);
-                size_t needed = calculate_needed(p->length + 1);
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(p->get_self_allocator());
-                storage_traits::deallocate(alloc, (char*)p, needed);
+                string_holder_alloc a(string_holder_cast(p)->get_self_allocator());
+                size_t needed = calculate_needed(string_holder_cast(p)->length + 1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(string_holder_cast(p)->get_self_allocator());
+                std::allocator_traits<string_holder_alloc>::destroy(a,string_holder_cast(p));
+                storage_traits::deallocate(alloc, to_plain_pointer(p), needed);
             }
             
-            String_holder_* ptr_;
+            pointer ptr_;
 
-            string_data(String_holder_* ptr)
+            string_data(pointer ptr)
                 : base_data(value_types::string_t), ptr_(ptr)
             {
             }
@@ -413,24 +414,29 @@ public:
                 destroy_string_holder(ptr_);
             }
 
+            static String_holder_* string_holder_cast(pointer ptr) 
+            {
+                return reinterpret_cast<String_holder_*>(to_plain_pointer(ptr));
+            }
+
             size_t length() const
             {
-                return ptr_->length;
+                return string_holder_cast(ptr_)->length;
             }
 
             const char_type* data() const
             {
-                return ptr_->data;
+                return string_holder_cast(ptr_)->data;
             }
 
             const char_type* c_str() const
             {
-                return ptr_->data;
+                return string_holder_cast(ptr_)->data;
             }
 
             Allocator get_self_allocator() const
             {
-                return ptr_->get_self_allocator();
+                return string_holder_cast(ptr_)->get_self_allocator();
             }
         };
 
