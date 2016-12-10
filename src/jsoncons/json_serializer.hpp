@@ -263,7 +263,7 @@ private:
         end_value();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         if (!stack_.empty())
         {
@@ -281,7 +281,7 @@ private:
         }
 
         bos_.put('\"');
-        escape_string<CharT>(name, length, format_, bos_);
+        escape_string<CharT>(name.data(), name.length(), format_, bos_);
         bos_.put('\"');
         bos_.put(':');
         if (indenting_)

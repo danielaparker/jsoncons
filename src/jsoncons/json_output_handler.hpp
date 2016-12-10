@@ -9,6 +9,7 @@
 
 #include <string>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
@@ -52,6 +53,16 @@ template <class CharT>
 class basic_json_output_handler
 {
 public:
+
+    typedef CharT char_type;
+    typedef std::char_traits<char_type> char_traits_type;
+
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
+
     virtual ~basic_json_output_handler() {}
 
     // Overloaded methods
@@ -86,14 +97,14 @@ public:
         do_end_array();
     }
 
-    void name(const std::basic_string<CharT>& name)
+    void name(string_view_type name)
     {
-        do_name(name.data(), name.length());
+        do_name(name);
     }
 
     void name(const CharT* p, size_t length) 
     {
-        do_name(p, length);
+        do_name(string_view_type(p, length));
     }
 
     void value(const std::basic_string<CharT>& value) 
@@ -162,7 +173,7 @@ private:
 
     virtual void do_end_json() = 0;
 
-    virtual void do_name(const CharT* name, size_t length) = 0;
+    virtual void do_name(string_view_type name) = 0;
 
     virtual void do_begin_object() = 0;
 
@@ -198,10 +209,8 @@ private:
     {
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type) override
     {
-        (void)name;
-        (void)length;
     }
 
     void do_begin_object() override

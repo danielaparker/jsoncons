@@ -436,10 +436,10 @@ private:
         stack_.pop_back();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        stack_.back().name_ = std::basic_string<CharT>(name,length);
+        stack_.back().name_ = name;
     }
 
     void do_null_value() override

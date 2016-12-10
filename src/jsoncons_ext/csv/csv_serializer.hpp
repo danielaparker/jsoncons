@@ -206,7 +206,7 @@ private:
         end_value();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         if (stack_.size() == 2)
         {
@@ -216,12 +216,12 @@ private:
                 {
                     os_.put(parameters_.field_delimiter());
                 }
-                write_string(name, length, os_);
+                write_string(name.data(), name.length(), os_);
                 column_name_pos_map_[name] = stack_.back().count_;
             }
             else
             {
-                auto it = column_name_pos_map_.find(std::basic_string<CharT>(name,length));
+                auto it = column_name_pos_map_.find(std::basic_string<CharT>(name));
                 if (it == column_name_pos_map_.end())
                 {
                     stack_.back().skip_ = true;

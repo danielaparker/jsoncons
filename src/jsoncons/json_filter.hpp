@@ -182,9 +182,9 @@ private:
         input_handler_.end_array(default_context_);
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
-        input_handler_.name(name, length, default_context_);
+        input_handler_.name(name.data(), name.length(), default_context_);
     }
 
     void do_string_value(const CharT* value, size_t length) override
