@@ -304,7 +304,7 @@ public:
                 {
                 }
 
-                allocator_type get_self_allocator()
+                allocator_type get_self_allocator() const
                 {
                     return allocator_;
                 }
@@ -371,6 +371,8 @@ public:
 
             static void destroy_string_holder(String_holder_* p) JSONCONS_NOEXCEPT
             {
+                string_holder_alloc a(p->get_self_allocator());
+                std::allocator_traits<string_holder_alloc>::destroy(a,p);
                 size_t needed = calculate_needed(p->length + 1);
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(p->get_self_allocator());
                 storage_traits::deallocate(alloc, (char*)p, needed);
