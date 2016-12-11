@@ -21,10 +21,13 @@ namespace jsoncons {
 template <class Json>
 class json_decoder : public basic_json_input_handler<typename Json::char_type>
 {
+public:
+    typedef typename Json::char_type char_type;
+    using typename basic_json_input_handler<char_type>::string_view_type                                 ;
+
     static const int default_stack_size = 1000;
 
     typedef Json json_type;
-    typedef typename Json::char_type char_type;
     typedef typename Json::kvp_type  kvp_type ;
     typedef typename Json::string_type string_type;
     typedef typename Json::key_type key_type;
