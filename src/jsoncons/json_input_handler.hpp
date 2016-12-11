@@ -85,6 +85,11 @@ public:
         do_string_value(string_view_type(p, length), context);
     }
 
+    void value(const CharT* p, const basic_parsing_context<CharT>& context)
+    {
+        do_string_value(string_view_type(p), context);
+    }
+
     void value(int value, const basic_parsing_context<CharT>& context) 
     {
         do_integer_value(value,context);

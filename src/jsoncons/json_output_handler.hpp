@@ -120,6 +120,11 @@ public:
         do_string_value(string_view_type(p, length));
     }
 
+    void value(const CharT* p) 
+    {
+        do_string_value(string_view_type(p));
+    }
+
     void value(int value) 
     {
         do_integer_value(value);
