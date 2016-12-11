@@ -198,7 +198,7 @@ template <class CharT>
 class basic_null_json_output_handler : public basic_json_output_handler<CharT>
 {
 public:
-    typedef typename basic_json_output_handler::string_view_type string_view_type;
+    using typename basic_json_output_handler::string_view_type                                 ;
 private:
 
     void do_begin_json() override

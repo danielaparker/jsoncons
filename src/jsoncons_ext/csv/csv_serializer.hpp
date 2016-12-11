@@ -77,7 +77,7 @@ template<class CharT>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
 public:
-    typedef typename basic_json_output_handler::string_view_type string_view_type;
+    using typename basic_json_output_handler::string_view_type                                 ;
 private:
     struct stack_item
     {

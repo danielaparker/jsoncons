@@ -26,7 +26,7 @@ template<class CharT>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
 public:
-    typedef typename basic_json_output_handler::string_view_type string_view_type;
+    using typename basic_json_output_handler::string_view_type                                 ;
 
 private:
     static const size_t default_buffer_length = 16384;
