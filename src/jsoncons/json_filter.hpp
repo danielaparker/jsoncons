@@ -226,7 +226,7 @@ template <class CharT>
 class basic_json_filter : public basic_json_input_handler<CharT>
 {
 public:
-    using typename basic_json_input_handler::string_view_type                                 ;
+    using typename basic_json_input_handler<CharT>::string_view_type                                 ;
 private:
     basic_json_input_output_adapter<CharT> input_output_adapter_;
     basic_json_output_input_adapter<CharT> output_input_adapter_;
