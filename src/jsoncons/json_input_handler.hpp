@@ -166,6 +166,8 @@ private:
 template <class CharT>
 class basic_null_json_input_handler : public basic_json_input_handler<CharT>
 {
+public:
+    typedef typename basic_json_input_handler::string_view_type string_view_type;
 private:
     void do_begin_json() override
     {

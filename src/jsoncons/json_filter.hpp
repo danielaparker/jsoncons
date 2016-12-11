@@ -18,6 +18,8 @@ namespace jsoncons {
 template <class CharT>
 class basic_json_input_output_adapter : public basic_json_input_handler<CharT>
 {
+public:
+    typedef typename basic_json_input_handler::string_view_type string_view_type;
 private:
 
     basic_null_json_output_handler<CharT> null_output_handler_;
@@ -112,6 +114,8 @@ private:
 template <class CharT>
 class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
 {
+public:
+    typedef typename basic_json_output_handler::string_view_type string_view_type;
 private:
     class null_parsing_context : public parsing_context
     {
@@ -221,6 +225,8 @@ private:
 template <class CharT>
 class basic_json_filter : public basic_json_input_handler<CharT>
 {
+public:
+    typedef typename basic_json_input_handler::string_view_type string_view_type;
 private:
     basic_json_input_output_adapter<CharT> input_output_adapter_;
     basic_json_output_input_adapter<CharT> output_input_adapter_;
@@ -342,6 +348,8 @@ template <class CharT>
 class basic_json_body_filter : public basic_json_filter<CharT>
 {
 public:
+    typedef typename basic_json_filter::string_view_type string_view_type;
+
     basic_json_body_filter(basic_json_input_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler)
     {
@@ -359,6 +367,9 @@ private:
 template <class CharT>
 class basic_rename_name_filter : public basic_json_filter<CharT>
 {
+public:
+    typedef typename basic_json_filter::string_view_type string_view_type;
+
 private:
     std::basic_string<CharT> name_;
     std::basic_string<CharT> new_name_;

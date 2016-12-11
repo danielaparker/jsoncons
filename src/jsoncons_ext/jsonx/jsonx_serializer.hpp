@@ -235,6 +235,9 @@ void escape_value(const CharT* s,
 template<class CharT>
 class basic_jsonx_serializer : public basic_json_output_handler<CharT>
 {
+public:
+    typedef typename basic_json_output_handler::string_view_type string_view_type;
+private:
     struct stack_item
     {
         stack_item(bool is_object)
