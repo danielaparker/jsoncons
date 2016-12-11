@@ -469,6 +469,28 @@ vertical-align:1px;
 </head>
 <body>
 <h2>master</h2>
+<p>Breaking change (if you've implemented your own input and output handlers)</p>
+<p>In basic_json_input_handler, the virtual functions</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">virtual</span> <span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> CharT* value, <span class="pl-c1">size_t</span> length, 
+                     <span class="pl-k">const</span> basic_parsing_context&lt;CharT&gt;&amp; context)
+
+virtual void do_string_value(<span class="pl-k">const</span> CharT* value, <span class="pl-c1">size_t</span> length, 
+                             <span class="pl-k">const</span> basic_parsing_context&lt;CharT&gt;&amp; context)</pre></div>
+<p>have been changed to</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">virtual</span> <span class="pl-k">void</span> <span class="pl-en">do_name</span>(string_view_type val, 
+                     <span class="pl-k">const</span> basic_parsing_context&lt;CharT&gt;&amp; context) 
+
+virtual void do_string_value(string_view_type val, 
+                             <span class="pl-k">const</span> basic_parsing_context&lt;CharT&gt;&amp; context) </pre></div>
+<p>In basic_json_output_handler, the virtual functions</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">virtual</span> <span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> CharT* value, <span class="pl-c1">size_t</span> length) 
+
+virtual void do_string_value(<span class="pl-k">const</span> CharT* value, <span class="pl-c1">size_t</span> length) </pre></div>
+<p>have been changed to</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">virtual</span> <span class="pl-k">void</span> <span class="pl-en">do_name</span>(string_view_type val)
+
+virtual void do_string_value(string_view_type val)</pre></div>
+<p>Non-breaking changes</p>
 <ul>
 <li>Support for stateful allocators</li>
 <li>json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)</li>

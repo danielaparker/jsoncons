@@ -23,7 +23,7 @@ private:
         member_name_ = name;
         if (member_name_ != "name")
         {
-            this->downstream_handler(name, context);
+            this->downstream_handler().name(name, context);
         }
     }
 
@@ -32,7 +32,7 @@ private:
     {
         if (member_name_ == "name")
         {
-            std::string value(p, length);
+            std::string value = val;
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
@@ -53,7 +53,7 @@ private:
         }
         else
         {
-            this->downstream_handler().value(p, length, context);
+            this->downstream_handler().value(val, context);
         }
     }
 

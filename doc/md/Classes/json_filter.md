@@ -16,6 +16,12 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 [json_input_handler](json_input_handler)
 
+### Member types
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
+
 ### Constructors
 
     json_filter(json_input_handler& handler)
@@ -130,7 +136,7 @@ private:
     {
         if (member_name_ == "name")
         {
-            std::string value(p, length);
+            std::string value = val;
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
@@ -151,7 +157,7 @@ private:
         }
         else
         {
-            this->downstream_handler().value(p, length, context);
+            this->downstream_handler().value(val, context);
         }
     }
 

@@ -471,51 +471,44 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::json_filter
 
 <span class="pl-k">typedef</span> basic_json_filter&lt;<span class="pl-k">char</span>&gt; json_filter</pre></div>
-
 <p>The <code>json_filter</code> class is an instantiation of the <code>basic_json_filter</code> class template that uses <code>char</code> as the character type.</p>
-
 <p><code>json_filter</code> is noncopyable and nonmoveable.</p>
-
 <h3>Header</h3>
-
 <pre><code>#include &lt;jsoncons/json_filter.hpp&gt;
 </code></pre>
-
 <h3>Base classes</h3>
-
 <p><a href="json_input_handler">json_input_handler</a></p>
-
+<h3>Member types</h3>
+<table>
+<thead>
+<tr>
+<th>Member type                         </th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string_view_type</code></td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise to a substitute.</td>
+</tr></tbody></table>
 <h3>Constructors</h3>
-
 <pre><code>json_filter(json_input_handler&amp; handler)
 </code></pre>
-
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_input_handler</code> (i.e. another filter.)<br>
 You must ensure that the <code>handler</code> exists as long as does <code>json_filter</code>, as <code>json_filter</code> holds a pointer to but does not own this object.</p>
-
 <pre><code>json_filter(json_output_handler&amp; handler)
 </code></pre>
-
 <p>All JSON events that pass through the <code>json_filter</code> go to the specified <code>json_output_handler</code>.<br>
 You must ensure that the <code>handler</code> exists as long as does <code>json_filter</code>, as <code>json_filter</code> holds a pointer to but does not own this object.</p>
-
 <h3>Accessors</h3>
-
 <pre><code>operator json_output_handler&amp;() 
 </code></pre>
-
 <p>Adapts a <code>json_filter</code> to a <code>json_output_handler</code></p>
-
 <pre><code>json_input_handler&amp; downstream_handler()
 </code></pre>
-
-<p>Returns a reference to the JSON handler that sends json events to downstream handlers. </p>
-
+<p>Returns a reference to the JSON handler that sends json events to downstream handlers.</p>
 <h2>Examples</h2>
-
-<h3>Rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a>
-</h3>
-
+<h3>Rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
@@ -546,16 +539,11 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
     j.<span class="pl-c1">write</span>(filter1);
     std::cout &lt;&lt; std::endl;
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
-
 <h3>Fix up names in an address book JSON file</h3>
-
 <p>Example address book file (<code>address-book.json</code>):</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>address-book<span class="pl-pds">"</span></span> : 
     [
@@ -569,11 +557,8 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
          }
     ]
 }</pre></div>
-
-<p>Suppose you want to break the name into a first name and last name, and report a warning when <code>name</code> does not contain a space or tab separated part. </p>
-
-<p>You can achieve the desired result by subclassing the <a href="json_filter">json_filter</a> class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent <a href="json_input_handler">json_input_handler</a> (which in this example will forward them to a <a href="json_serializer">json_serializer</a>.) </p>
-
+<p>Suppose you want to break the name into a first name and last name, and report a warning when <code>name</code> does not contain a space or tab separated part.</p>
+<p>You can achieve the desired result by subclassing the <a href="json_filter">json_filter</a> class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent <a href="json_input_handler">json_input_handler</a> (which in this example will forward them to a <a href="json_serializer">json_serializer</a>.)</p>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_serializer.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_reader.hpp<span class="pl-pds">&gt;</span></span>
@@ -590,22 +575,22 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
     }
 
 <span class="pl-k">private:</span>
-    <span class="pl-k">void</span> <span class="pl-en">do_name</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
+    <span class="pl-k">void</span> <span class="pl-en">do_name</span>(string_view_type name, 
                  <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
     {
-        member_name_ = <span class="pl-c1">std::string</span>(p, length);
+        member_name_ = name;
         <span class="pl-k">if</span> (member_name_ != <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>)
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(p, length, context);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(name, context);
         }
     }
 
-    <span class="pl-k">void</span> <span class="pl-en">do_string_value</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* p, <span class="pl-c1">size_t</span> length, 
+    <span class="pl-k">void</span> <span class="pl-en">do_string_value</span>(string_view_type val, 
                          <span class="pl-k">const</span> parsing_context&amp; context) <span class="pl-k">override</span>
     {
         <span class="pl-k">if</span> (member_name_ == <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>)
         {
-            std::string <span class="pl-smi">value</span>(p, length);
+            std::string value = val;
             <span class="pl-c1">size_t</span> end_first = value.<span class="pl-c1">find_first_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>);
             <span class="pl-c1">size_t</span> start_last = value.<span class="pl-c1">find_first_not_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>, end_first);
             <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>first-name<span class="pl-pds">"</span></span>, context);
@@ -626,43 +611,33 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
         }
         <span class="pl-k">else</span>
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(p, length, context);
+            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(val, context);
         }
     }
 
     std::string member_name_;
 };</pre></div>
-
-<p>Configure a <a href="name_fix_up_filter">name_fix_up_filter</a> to emit json events to a <a href="json_serializer">json_serializer</a>. </p>
-
+<p>Configure a <a href="name_fix_up_filter">name_fix_up_filter</a> to emit json events to a <a href="json_serializer">json_serializer</a>.</p>
 <div class="highlight highlight-source-c++"><pre>std::ofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/new-address-book.json<span class="pl-pds">"</span></span>);
 json_serializer <span class="pl-en">serializer</span>(os, <span class="pl-c1">true</span>);
 name_fix_up_filter <span class="pl-en">filter</span>(serializer);</pre></div>
-
 <p>Parse the input and send the json events into the filter ...</p>
-
 <div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/address-book.json<span class="pl-pds">"</span></span>);
 json_reader <span class="pl-en">reader</span>(is, filter);
 reader.read();
 std:: &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
-
 <p>or read into a json value and write to the filter</p>
-
 <div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
 json j;
 is &gt;&gt; j;
 j.write(filter);
 std:: &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
-
 <p>Output:</p>
-
 <pre><code>(1) Incomplete name "John" at line 9 and column 26 
 (2) Incomplete name "John" at line 0 and column 0
 </code></pre>
-
-<p>Note that when filtering <code>json</code> events written from a <code>json</code> value to an output handler, contexual line and column information in the original file has been lost. </p>
-
+<p>Note that when filtering <code>json</code> events written from a <code>json</code> value to an output handler, contexual line and column information in the original file has been lost.</p>
 <pre><code>
 The new address book (`address-book-new.json`) with name fixes is
 ```json
