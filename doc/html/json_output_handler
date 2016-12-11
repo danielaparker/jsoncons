@@ -468,14 +468,12 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json_output_handler
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_output_handler
 
-typedef basic_json_output_handler&lt;char&gt; json_output_handler
-</code></pre>
+<span class="pl-k">typedef</span> basic_json_output_handler&lt;<span class="pl-k">char</span>&gt; json_output_handler</pre></div>
 <p>The <code>json_output_handler</code> class is an instantiation of the <code>basic_json_output_handler</code> class template that uses <code>char</code> as the character type. It is a pure virtual class that defines an interface for a JSON writer.</p>
 <h3>Header</h3>
-<pre><code>#include &lt;jsoncons/json_output_handler.hpp&gt;
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_output_handler.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 <h3>Member types</h3>
 <table>
 <thead>
