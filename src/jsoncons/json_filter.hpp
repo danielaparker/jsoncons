@@ -115,7 +115,7 @@ template <class CharT>
 class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
 {
 public:
-    using typename basic_json_output_handler::string_view_type                                 ;
+    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
 private:
     class null_parsing_context : public parsing_context
     {
